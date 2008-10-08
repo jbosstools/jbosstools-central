@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.2"?>
+<plugin>
+
+  <extension point="org.eclipse.ui.newWizards">
+    <category
+            name="JBoss Tools"
+            id="org.jboss.ide.eclipse.ui.wizards">
+      </category>
+    <wizard
+		id="org.jboss.tools.project.examples.wizard.NewProjectExamplesWizard"
+		name="Project Examples"
+		class="org.jboss.tools.project.examples.wizard.NewProjectExamplesWizard"
+		category="org.jboss.ide.eclipse.ui.wizards"
+		icon="icons/examples_wiz.gif">	
+	</wizard>
+  </extension>
+</plugin>

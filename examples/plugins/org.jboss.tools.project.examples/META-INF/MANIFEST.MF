@@ -1,0 +1,21 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Project Examples
+Bundle-SymbolicName: org.jboss.tools.project.examples;singleton:=true
+Bundle-Version: 1.0.0
+Bundle-Activator: org.jboss.tools.project.examples.ProjectExamplesActivator
+Bundle-Vendor: Red Hat, inc
+Require-Bundle: org.eclipse.ui,
+ org.eclipse.core.runtime,
+ org.eclipse.core.resources,
+ org.eclipse.jface,
+ org.eclipse.osgi,
+ org.eclipse.ecf,
+ org.eclipse.ecf.filetransfer,
+ org.eclipse.equinox.common,
+ org.eclipse.ecf.provider.filetransfer,
+ org.eclipse.equinox.security,
+ org.eclipse.equinox.p2.engine,
+ org.eclipse.equinox.p2.core,
+ org.eclipse.ui.ide
+Bundle-ActivationPolicy: lazy
