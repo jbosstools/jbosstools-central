@@ -223,8 +223,10 @@ public class ProjectUtil {
 				file.deleteOnExit();
 				BufferedOutputStream destination = new BufferedOutputStream(new FileOutputStream(file));
 				IStatus result = getTransport().download(prefix,url.toExternalForm(), destination, monitor);
-				if (!result.isOK())
+				if (!result.isOK()) {
+					ProjectExamplesActivator.getDefault().getLog().log(result);
 					return null;
+				}
 			} catch (FileNotFoundException e) {
 				ProjectExamplesActivator.log(e);
 				return null;

@@ -11,6 +11,7 @@
 package org.jboss.tools.project.examples.wizard;
 
 
+import java.util.Iterator;
 import java.util.List;
 
 import org.eclipse.jface.viewers.ISelectionChangedListener;
@@ -40,7 +41,7 @@ import org.jboss.tools.project.examples.model.ProjectUtil;
  */
 public class NewProjectExamplesWizardPage extends WizardPage {
 
-	private Project selectedProject;
+	private IStructuredSelection selection;
 	
 	public NewProjectExamplesWizardPage() {
 		super("org.jboss.tools.project.examples");
@@ -58,7 +59,7 @@ public class NewProjectExamplesWizardPage extends WizardPage {
 		gd.widthHint= 225;
 		composite.setLayoutData(gd);
 		
-		TreeViewer viewer = new TreeViewer(composite,SWT.SINGLE);
+		TreeViewer viewer = new TreeViewer(composite,SWT.MULTI);
 		Tree tree = viewer.getTree();
 		tree.setLayoutData(new GridData(GridData.FILL_BOTH));
 		tree.setFont(parent.getFont());
@@ -97,23 +98,33 @@ public class NewProjectExamplesWizardPage extends WizardPage {
 		viewer.addSelectionChangedListener(new ISelectionChangedListener() {
 
 			public void selectionChanged(SelectionChangedEvent event) {
-				IStructuredSelection selection = (IStructuredSelection) event.getSelection();
+				selection = (IStructuredSelection) event.getSelection();
 				Object selected = selection.getFirstElement();
-				if (selected instanceof Project) {
-					selectedProject = (Project) selected;
+				if (selected instanceof Project && selection.size() == 1) {
+					Project selectedProject = (Project) selected;
 					text.setText(selectedProject.getDescription());
-					setPageComplete(true);
 					projectName.setText(selectedProject.getName());
 					projectURL.setText(selectedProject.getUrl());
 					projectSize.setText(selectedProject.getSizeAsText());
 				} else {
-					selectedProject=null;
+					Project selectedProject=null;
 					text.setText("");
 					projectName.setText("");
 					projectURL.setText("");
 					projectSize.setText("");
-					setPageComplete(false);
 				}
+				boolean canFinish = false;
+				Iterator iterator = selection.iterator();
+				while (iterator.hasNext()) {
+					Object object = iterator.next();
+					if (object instanceof Project) {
+						canFinish=true;
+					} else {
+						canFinish=false;
+						break;
+					}
+				}
+				setPageComplete(canFinish);
 			}
 			
 		});
@@ -180,7 +191,7 @@ public class NewProjectExamplesWizardPage extends WizardPage {
 		
 	}
 
-	public Project getSelectedProject() {
-		return selectedProject;
+	public IStructuredSelection getSelection() {
+		return selection;
 	}
 }

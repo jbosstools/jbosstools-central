@@ -15,6 +15,9 @@ package org.jboss.tools.project.examples.wizard;
  * 
  */
 import java.io.File;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 import java.util.zip.ZipFile;
 
 import org.eclipse.core.resources.IProject;
@@ -74,8 +77,8 @@ public class NewProjectExamplesWizard extends Wizard implements INewWizard {
 
 	@Override
 	public boolean performFinish() {
-		final Project project = page.getSelectedProject();
-		if (project == null) {
+		
+		if (page.getSelection() == null || page.getSelection().size() <= 0) {
 			return false;
 		}
 		WorkspaceJob job = new WorkspaceJob("Downloading...") {
@@ -83,15 +86,30 @@ public class NewProjectExamplesWizard extends Wizard implements INewWizard {
 			@Override
 			public IStatus runInWorkspace(IProgressMonitor monitor)
 					throws CoreException {
-				String url = project.getUrl();
-				String name = project.getName();
-				final File file = ProjectUtil.getProjectExamplesFile(url, name,
-						".zip",monitor);
-				if (file == null) {
-					return Status.CANCEL_STATUS;
+				IStructuredSelection selection= page.getSelection();
+				Iterator iterator = selection.iterator();
+				List<Project> projects = new ArrayList<Project>();
+				List<File> files = new ArrayList<File>();
+				while (iterator.hasNext()) {
+					Object object = iterator.next();
+					if (object instanceof Project) {
+						Project project = (Project) object;
+						String url = project.getUrl();
+						String name = project.getName();
+						final File file = ProjectUtil.getProjectExamplesFile(
+								url, name, ".zip", monitor);
+						if (file == null) {
+							return Status.CANCEL_STATUS;
+						}
+						projects.add(project);
+						files.add(file);
+					}
 				}
 				try {
-					importProject(project, file, monitor);
+					int i = 0;
+					for (Project project:projects) {
+						importProject(project, files.get(i++), monitor);
+					}
 				} catch (final Exception e) {
 					Display.getDefault().syncExec(new Runnable() {
 
