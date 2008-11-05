@@ -4,7 +4,7 @@ Bundle-Name: Project Examples
 Bundle-SymbolicName: org.jboss.tools.project.examples;singleton:=true
 Bundle-Version: 1.0.0
 Bundle-Activator: org.jboss.tools.project.examples.ProjectExamplesActivator
-Bundle-Vendor: Red Hat, inc
+Bundle-Vendor: JBoss, a division of Red Hat
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
  org.eclipse.core.resources,
