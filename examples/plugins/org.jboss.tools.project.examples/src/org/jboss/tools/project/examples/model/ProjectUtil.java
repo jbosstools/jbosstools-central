@@ -112,7 +112,7 @@ public class ProjectUtil {
 		Category other = Category.OTHER;
 		try {
 			// TODO add a progress monitor
-			File file = getProjectExamplesFile(PROJECT_EXAMPLES_XML,"projectExamples", ".xml",null);
+			File file = getProjectExamplesFile(getProjectExamplesXml(),"projectExamples", ".xml",null);
 			if (file.exists() && file.isFile()) {
 				DocumentBuilderFactory dbf = DocumentBuilderFactory
 						.newInstance();
@@ -180,6 +180,14 @@ public class ProjectUtil {
 		}
 		list.add(other);
 		return list;
+	}
+
+	private static String getProjectExamplesXml() {
+		String projectXML = System.getProperty("org.jboss.tools.project.examples.xml");
+		if (projectXML != null && projectXML.length() > 0) {
+			return projectXML;
+		}
+		return PROJECT_EXAMPLES_XML;
 	}
 
 	private static String getContent(Element child) {

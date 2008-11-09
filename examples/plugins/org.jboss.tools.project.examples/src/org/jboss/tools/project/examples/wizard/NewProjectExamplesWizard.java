@@ -20,6 +20,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.zip.ZipFile;
 
+import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.ResourcesPlugin;
@@ -27,19 +28,28 @@ import org.eclipse.core.resources.WorkspaceJob;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.jobs.IJobChangeEvent;
+import org.eclipse.core.runtime.jobs.IJobChangeListener;
+import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.dialogs.MessageDialogWithToggle;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.INewWizard;
 import org.eclipse.ui.IWorkbench;
+import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.dialogs.IOverwriteQuery;
 import org.eclipse.ui.wizards.datatransfer.ImportOperation;
 import org.eclipse.ui.wizards.datatransfer.ZipFileStructureProvider;
+import org.eclipse.wst.validation.internal.operations.ValidationBuilder;
 import org.jboss.tools.project.examples.ProjectExamplesActivator;
+import org.jboss.tools.project.examples.dialog.MarkerDialog;
 import org.jboss.tools.project.examples.model.Project;
 import org.jboss.tools.project.examples.model.ProjectUtil;
 
@@ -51,6 +61,7 @@ public class NewProjectExamplesWizard extends Wizard implements INewWizard {
 		}
 	};
 
+	private List<Project> projects = new ArrayList<Project>();
 	/**
 	 * The workbench.
 	 */
@@ -65,6 +76,8 @@ public class NewProjectExamplesWizard extends Wizard implements INewWizard {
 
 	protected boolean overwrite;
 
+	private WorkspaceJob workspaceJob;
+
 	public NewProjectExamplesWizard() {
 		super();
 		setWindowTitle("New Project Example");
@@ -77,18 +90,18 @@ public class NewProjectExamplesWizard extends Wizard implements INewWizard {
 
 	@Override
 	public boolean performFinish() {
-		
+
 		if (page.getSelection() == null || page.getSelection().size() <= 0) {
 			return false;
 		}
-		WorkspaceJob job = new WorkspaceJob("Downloading...") {
+		workspaceJob = new WorkspaceJob("Downloading...") {
 
 			@Override
 			public IStatus runInWorkspace(IProgressMonitor monitor)
 					throws CoreException {
-				IStructuredSelection selection= page.getSelection();
+				IStructuredSelection selection = page.getSelection();
 				Iterator iterator = selection.iterator();
-				List<Project> projects = new ArrayList<Project>();
+				projects.clear();
 				List<File> files = new ArrayList<File>();
 				while (iterator.hasNext()) {
 					Object object = iterator.next();
@@ -107,37 +120,94 @@ public class NewProjectExamplesWizard extends Wizard implements INewWizard {
 				}
 				try {
 					int i = 0;
-					for (Project project:projects) {
+					setName("Importing...");
+					for (Project project : projects) {
 						importProject(project, files.get(i++), monitor);
 					}
 				} catch (final Exception e) {
 					Display.getDefault().syncExec(new Runnable() {
 
 						public void run() {
-							MessageDialogWithToggle.openError(getShell(), "Error", e
-									.getMessage(), "Detail", false,
+							MessageDialogWithToggle.openError(getShell(),
+									"Error", e.getMessage(), "Detail", false,
 									ProjectExamplesActivator.getDefault()
-											.getPreferenceStore(), "errorDialog");							
+											.getPreferenceStore(),
+									"errorDialog");
 						}
-						
+
 					});
 					ProjectExamplesActivator.log(e);
-				} 
+				}
 				return Status.OK_STATUS;
 			}
 
 		};
-		job.setUser(true);
-		job.schedule();
-		//try {
-		//	job.join();
-		//} catch (InterruptedException e) {
-		//	return false;
-		//}
+		workspaceJob.setUser(true);
+		final boolean showQuickFix = page.showQuickFix();
+		workspaceJob.schedule();
+
+		if (showQuickFix) {
+			workspaceJob.addJobChangeListener(new IJobChangeListener() {
+
+				public void aboutToRun(IJobChangeEvent event) {
+
+				}
+
+				public void awake(IJobChangeEvent event) {
+
+				}
+
+				public void done(IJobChangeEvent event) {
+					try {
+						ProjectExamplesActivator.waitForBuildAndValidation.schedule();
+						ProjectExamplesActivator.waitForBuildAndValidation.join();
+
+					} catch (InterruptedException e) {
+						return;
+					}
+					if (showQuickFix) {
+						List<IMarker> markers = ProjectExamplesActivator
+								.getMarkers(projects);
+						if (markers != null && markers.size() > 0) {
+							showQuickFix();
+						}
+					}
+				}
+
+				public void running(IJobChangeEvent event) {
+
+				}
+
+				public void scheduled(IJobChangeEvent event) {
+
+				}
+
+				public void sleeping(IJobChangeEvent event) {
+
+				}
+
+			});
+		}
 		return true;
 	}
 
-	private void importProject(Project projectDescription, File file, IProgressMonitor monitor) throws Exception {
+	private void showQuickFix() {
+
+		Display.getDefault().asyncExec(new Runnable() {
+
+			public void run() {
+
+				Shell shell = PlatformUI.getWorkbench()
+						.getActiveWorkbenchWindow().getShell();
+				Dialog dialog = new MarkerDialog(shell, projects);
+				dialog.open();
+			}
+
+		});
+	}
+
+	private void importProject(Project projectDescription, File file,
+			IProgressMonitor monitor) throws Exception {
 		final String projectName = projectDescription.getName();
 		IWorkspace workspace = ResourcesPlugin.getWorkspace();
 		IProject project = workspace.getRoot().getProject(projectName);
@@ -145,9 +215,11 @@ public class NewProjectExamplesWizard extends Wizard implements INewWizard {
 			Display.getDefault().syncExec(new Runnable() {
 
 				public void run() {
-					overwrite = MessageDialog.openQuestion(getShell(), "Question", "Overwrite project '" + projectName + "'");
+					overwrite = MessageDialog.openQuestion(getShell(),
+							"Question", "Overwrite project '" + projectName
+									+ "'");
 				}
-				
+
 			});
 			if (!overwrite) {
 				return;
@@ -160,8 +232,8 @@ public class NewProjectExamplesWizard extends Wizard implements INewWizard {
 		ZipFileStructureProvider structureProvider = new ZipFileStructureProvider(
 				sourceFile);
 
-		ImportOperation operation = new ImportOperation(workspace.getRoot().getFullPath(),
-				structureProvider.getRoot(), structureProvider,
+		ImportOperation operation = new ImportOperation(workspace.getRoot()
+				.getFullPath(), structureProvider.getRoot(), structureProvider,
 				OVERWRITE_ALL_QUERY);
 		operation.setContext(getShell());
 		operation.run(monitor);

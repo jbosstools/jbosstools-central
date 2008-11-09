@@ -26,6 +26,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
@@ -42,6 +43,7 @@ import org.jboss.tools.project.examples.model.ProjectUtil;
 public class NewProjectExamplesWizardPage extends WizardPage {
 
 	private IStructuredSelection selection;
+	private Button showQuickFixButton;
 	
 	public NewProjectExamplesWizardPage() {
 		super("org.jboss.tools.project.examples");
@@ -59,6 +61,7 @@ public class NewProjectExamplesWizardPage extends WizardPage {
 		gd.widthHint= 225;
 		composite.setLayoutData(gd);
 		
+		new Label(composite,SWT.NONE).setText("Projects:");
 		TreeViewer viewer = new TreeViewer(composite,SWT.MULTI);
 		Tree tree = viewer.getTree();
 		tree.setLayoutData(new GridData(GridData.FILL_BOTH));
@@ -107,7 +110,7 @@ public class NewProjectExamplesWizardPage extends WizardPage {
 					projectURL.setText(selectedProject.getUrl());
 					projectSize.setText(selectedProject.getSizeAsText());
 				} else {
-					Project selectedProject=null;
+					//Project selectedProject=null;
 					text.setText("");
 					projectName.setText("");
 					projectURL.setText("");
@@ -128,6 +131,16 @@ public class NewProjectExamplesWizardPage extends WizardPage {
 			}
 			
 		});
+		
+		showQuickFixButton = new Button(internal,SWT.CHECK);
+		showQuickFixButton.setText("Show the Quick Fix dialog");
+		showQuickFixButton.setSelection(true);
+		gd=new GridData(GridData.FILL_HORIZONTAL);
+		gd.horizontalSpan=2;
+		showQuickFixButton.setLayoutData(gd);
+		//Label showQuickFixLabel = new Label(internal,SWT.NULL);
+		//showQuickFixLabel.setText("Show the Quick Fix dialog:");
+		
 		setPageComplete(false);
 		
 		setControl(composite);
@@ -193,5 +206,12 @@ public class NewProjectExamplesWizardPage extends WizardPage {
 
 	public IStructuredSelection getSelection() {
 		return selection;
+	}
+	
+	public boolean showQuickFix() {
+		if (showQuickFixButton != null) {
+			return showQuickFixButton.getSelection();
+		}
+		return false;
 	}
 }

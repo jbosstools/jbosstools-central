@@ -1,8 +1,31 @@
+/*************************************************************************************
+ * Copyright (c) 2008 JBoss, a division of Red Hat and others.
+ * All rights reserved. This program and the accompanying materials 
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ * 
+ * Contributors:
+ *     JBoss, a division of Red Hat - Initial implementation.
+ ************************************************************************************/
 package org.jboss.tools.project.examples;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.eclipse.core.resources.IMarker;
+import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
+import org.eclipse.wst.validation.internal.operations.ValidationBuilder;
+import org.jboss.tools.project.examples.model.Project;
 import org.osgi.framework.BundleContext;
 
 /**
@@ -17,6 +40,25 @@ public class ProjectExamplesActivator extends AbstractUIPlugin {
 	private static ProjectExamplesActivator plugin;
 
 	private static BundleContext context;
+	
+	public static Job waitForBuildAndValidation = new Job("Waiting...") {
+
+		@Override
+		protected IStatus run(IProgressMonitor monitor) {
+			try {
+				Job.getJobManager().join(ResourcesPlugin.FAMILY_AUTO_BUILD,
+						monitor);
+				Job.getJobManager().join(
+						ValidationBuilder.FAMILY_VALIDATION_JOB, monitor);
+			} catch (OperationCanceledException e) {
+				return Status.CANCEL_STATUS;
+			} catch (InterruptedException e) {
+				return Status.CANCEL_STATUS;
+			}
+			return Status.OK_STATUS;
+		}
+
+	};
 
 	/**
 	 * The constructor
@@ -69,4 +111,22 @@ public class ProjectExamplesActivator extends AbstractUIPlugin {
 		return context;
 	}
 
+	public static List<IMarker> getMarkers(List<Project> projects) {
+		List<IMarker> markers = new ArrayList<IMarker>();
+		for(Project project:projects) {
+			try {
+				String projectName = project.getName();
+				IProject eclipseProject = ResourcesPlugin.getWorkspace().getRoot().getProject(projectName);
+				IMarker[] projectMarkers = eclipseProject.findMarkers(IMarker.PROBLEM, true, IResource.DEPTH_INFINITE);
+				for (int i = 0; i < projectMarkers.length; i++) {
+					if (projectMarkers[i].getAttribute(IMarker.SEVERITY, IMarker.SEVERITY_ERROR) == IMarker.SEVERITY_ERROR) {
+						markers.add(projectMarkers[i]);
+					}
+				}
+			} catch (CoreException e) {
+				ProjectExamplesActivator.log(e);
+			}
+		}
+		return markers;
+	}
 }
