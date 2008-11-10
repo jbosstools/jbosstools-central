@@ -170,7 +170,7 @@ public class ProjectUtil {
 									}
 									project.setSize(size);
 								}
-								if (nodeName.equals("includedProjects")) {
+								if (nodeName.equals("included-projects")) {
 									String includedProjects = getContent(child);
 									if (includedProjects != null) {
 										includedProjects = includedProjects.trim();
