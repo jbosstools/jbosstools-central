@@ -40,7 +40,7 @@ public class ProjectExamplesActivator extends AbstractUIPlugin {
 	private static ProjectExamplesActivator plugin;
 
 	private static BundleContext context;
-	
+
 	public static Job waitForBuildAndValidation = new Job("Waiting...") {
 
 		@Override
@@ -113,18 +113,34 @@ public class ProjectExamplesActivator extends AbstractUIPlugin {
 
 	public static List<IMarker> getMarkers(List<Project> projects) {
 		List<IMarker> markers = new ArrayList<IMarker>();
-		for(Project project:projects) {
+		for (Project project : projects) {
 			try {
-				String projectName = project.getName();
-				IProject eclipseProject = ResourcesPlugin.getWorkspace().getRoot().getProject(projectName);
-				IMarker[] projectMarkers = eclipseProject.findMarkers(IMarker.PROBLEM, true, IResource.DEPTH_INFINITE);
-				for (int i = 0; i < projectMarkers.length; i++) {
-					if (projectMarkers[i].getAttribute(IMarker.SEVERITY, IMarker.SEVERITY_ERROR) == IMarker.SEVERITY_ERROR) {
-						markers.add(projectMarkers[i]);
+				if (project.getIncludedProjects() == null) {
+					String projectName = project.getName();
+					getMarkers(markers, projectName);
+				} else {
+					List<String> includedProjects = project.getIncludedProjects();
+					for (String projectName:includedProjects) {
+						getMarkers(markers, projectName);
 					}
 				}
 			} catch (CoreException e) {
 				ProjectExamplesActivator.log(e);
+			}
+		}
+		return markers;
+	}
+
+	private static List<IMarker> getMarkers(List<IMarker> markers,
+			String projectName) throws CoreException {
+		IProject eclipseProject = ResourcesPlugin.getWorkspace()
+				.getRoot().getProject(projectName);
+		IMarker[] projectMarkers = eclipseProject.findMarkers(
+				IMarker.PROBLEM, true, IResource.DEPTH_INFINITE);
+		for (int i = 0; i < projectMarkers.length; i++) {
+			if (projectMarkers[i].getAttribute(IMarker.SEVERITY,
+					IMarker.SEVERITY_ERROR) == IMarker.SEVERITY_ERROR) {
+				markers.add(projectMarkers[i]);
 			}
 		}
 		return markers;

@@ -24,6 +24,7 @@ import org.eclipse.core.resources.IResourceChangeEvent;
 import org.eclipse.core.resources.IResourceChangeListener;
 import org.eclipse.core.resources.IncrementalProjectBuilder;
 import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
@@ -70,9 +71,9 @@ import org.jboss.tools.project.examples.dialog.xpl.QuickFixWizard;
 import org.jboss.tools.project.examples.model.Project;
 
 /**
-* @author snjeza
-* 
-*/
+ * @author snjeza
+ * 
+ */
 public class MarkerDialog extends TitleAreaDialog {
 
 	private static final String QUICK_FIX = "Quick Fix";
@@ -83,7 +84,7 @@ public class MarkerDialog extends TitleAreaDialog {
 	private Button finishButton;
 	private TableViewer tableViewer;
 	private IResourceChangeListener resourceChangeListener;
-	
+
 	private class QuickFixWizardDialog extends WizardDialog {
 
 		/**
@@ -93,11 +94,10 @@ public class MarkerDialog extends TitleAreaDialog {
 		public QuickFixWizardDialog(Shell parentShell, IWizard newWizard) {
 			super(parentShell, newWizard);
 			setShellStyle(SWT.CLOSE | SWT.MAX | SWT.TITLE | SWT.BORDER
-					| SWT.MODELESS | SWT.RESIZE | getDefaultOrientation());	
+					| SWT.MODELESS | SWT.RESIZE | getDefaultOrientation());
 		}
 
 	}
-
 
 	public MarkerDialog(Shell parentShell, List<Project> projects) {
 		super(parentShell);
@@ -126,8 +126,8 @@ public class MarkerDialog extends TitleAreaDialog {
 
 		Label markersLabel = new Label(contents, SWT.NULL);
 		markersLabel.setText("Markers:");
-		tableViewer = new TableViewer(contents, SWT.H_SCROLL
-				| SWT.V_SCROLL | SWT.BORDER | SWT.SINGLE);
+		tableViewer = new TableViewer(contents, SWT.H_SCROLL | SWT.V_SCROLL
+				| SWT.BORDER | SWT.SINGLE);
 		Table table = tableViewer.getTable();
 		gd = new GridData(GridData.FILL_BOTH);
 		table.setLayoutData(gd);
@@ -165,15 +165,16 @@ public class MarkerDialog extends TitleAreaDialog {
 				Display.getDefault().asyncExec(new Runnable() {
 
 					public void run() {
-						if (tableViewer != null && !tableViewer.getTable().isDisposed()) {
+						if (tableViewer != null
+								&& !tableViewer.getTable().isDisposed()) {
 							refreshTableViewer();
 						}
 					}
-					
+
 				});
 
 			}
-			
+
 		};
 		ResourcesPlugin.getWorkspace().addResourceChangeListener(
 				resourceChangeListener);
@@ -186,7 +187,8 @@ public class MarkerDialog extends TitleAreaDialog {
 			_dlgTitleImage.dispose();
 		}
 		if (resourceChangeListener != null) {
-			ResourcesPlugin.getWorkspace().removeResourceChangeListener(resourceChangeListener);
+			ResourcesPlugin.getWorkspace().removeResourceChangeListener(
+					resourceChangeListener);
 			resourceChangeListener = null;
 		}
 		return super.close();
@@ -219,13 +221,18 @@ public class MarkerDialog extends TitleAreaDialog {
 				try {
 					quickFixButton.setSelection(false);
 					openQuickFixWizard(selected);
-					for (Project project:projects) {
-						IProject eclipseProject = ResourcesPlugin.getWorkspace().getRoot().getProject(project.getName());
-						if (eclipseProject != null && eclipseProject.isOpen()) {
-							eclipseProject.build(IncrementalProjectBuilder.CLEAN_BUILD, null);
+					for (Project project : projects) {
+						if (project.getIncludedProjects() == null) {
+							buildProject(project.getName());
+						} else {
+							List<String> includedProjects = project.getIncludedProjects();
+							for (String projectName:includedProjects) {
+								buildProject(projectName);
+							}
 						}
 					}
-					ProjectExamplesActivator.waitForBuildAndValidation.schedule();
+					ProjectExamplesActivator.waitForBuildAndValidation
+							.schedule();
 					ProjectExamplesActivator.waitForBuildAndValidation.join();
 				} catch (Exception e) {
 					ProjectExamplesActivator.log(e);
@@ -236,6 +243,16 @@ public class MarkerDialog extends TitleAreaDialog {
 		}
 	}
 
+	private void buildProject(String projectName) throws CoreException {
+		IProject eclipseProject = ResourcesPlugin
+				.getWorkspace().getRoot().getProject(projectName);
+		if (eclipseProject != null
+				&& eclipseProject.isOpen()) {
+			eclipseProject.build(
+					IncrementalProjectBuilder.CLEAN_BUILD,
+					null);
+		}
+	}
 
 	private void refreshTableViewer() {
 		tableViewer.setInput(projects);
@@ -248,9 +265,10 @@ public class MarkerDialog extends TitleAreaDialog {
 		}
 	}
 
-	private void openQuickFixWizard(final IMarker selected) throws ExecutionException {
+	private void openQuickFixWizard(final IMarker selected)
+			throws ExecutionException {
 		final Map resolutions = new LinkedHashMap();
-		
+
 		IRunnableWithProgress resolutionsRunnable = new IRunnableWithProgress() {
 			public void run(IProgressMonitor monitor) {
 				monitor
@@ -258,7 +276,8 @@ public class MarkerDialog extends TitleAreaDialog {
 								MarkerMessages.resolveMarkerAction_computationManyAction,
 								100);
 
-				IMarker[] allMarkers = (IMarker[]) ProjectExamplesActivator.getMarkers(projects).toArray(new IMarker[0]);
+				IMarker[] allMarkers = (IMarker[]) ProjectExamplesActivator
+						.getMarkers(projects).toArray(new IMarker[0]);
 				monitor.worked(20);
 				IMarkerResolution[] found = IDE.getMarkerHelpRegistry()
 						.getResolutions(selected);
@@ -289,8 +308,8 @@ public class MarkerDialog extends TitleAreaDialog {
 
 		Object service = null;
 
-		IRunnableContext context = new ProgressMonitorDialog(PlatformUI.getWorkbench().getActiveWorkbenchWindow()
-				.getShell());
+		IRunnableContext context = new ProgressMonitorDialog(PlatformUI
+				.getWorkbench().getActiveWorkbenchWindow().getShell());
 
 		try {
 			if (service == null) {
@@ -330,22 +349,23 @@ public class MarkerDialog extends TitleAreaDialog {
 					markerDescription);
 
 			Wizard wizard = new QuickFixWizard(description, resolutions);
-			wizard.setWindowTitle(MarkerMessages.resolveMarkerAction_dialogTitle);
-			WizardDialog dialog = new QuickFixWizardDialog(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(), wizard);
+			wizard
+					.setWindowTitle(MarkerMessages.resolveMarkerAction_dialogTitle);
+			WizardDialog dialog = new QuickFixWizardDialog(PlatformUI
+					.getWorkbench().getActiveWorkbenchWindow().getShell(),
+					wizard);
 			dialog.open();
 		}
 	}
 
 	private IMarkerResolution[] getMarkerResolutions(ISelection source) {
 		IStructuredSelection selection = (IStructuredSelection) source;
-		IMarker marker = (IMarker) selection
-				.getFirstElement();
+		IMarker marker = (IMarker) selection.getFirstElement();
 		if (marker == null) {
 			return EMPTY_ARRAY;
 		}
-		IMarkerResolution[] resolutions = IDE
-				.getMarkerHelpRegistry().getResolutions(
-						marker);
+		IMarkerResolution[] resolutions = IDE.getMarkerHelpRegistry()
+				.getResolutions(marker);
 		return resolutions;
 	}
 }

@@ -11,6 +11,7 @@
 package org.jboss.tools.project.examples.model;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 /**
  * @author snjeza
@@ -24,6 +25,7 @@ public class Project {
 	private String url;
 	private long size;
 	private Category category;
+	private List<String> includedProjects;
 
 	public Project() {
 		name="";
@@ -94,5 +96,13 @@ public class Project {
 			sizeString = String.format("%d", size);
 		}
 		return sizeString;
+	}
+
+	public List<String> getIncludedProjects() {
+		return includedProjects;
+	}
+
+	public void setIncludedProjects(List<String> includedProjects) {
+		this.includedProjects = includedProjects;
 	}
 }

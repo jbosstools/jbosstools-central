@@ -20,6 +20,7 @@ import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.StringTokenizer;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -168,6 +169,18 @@ public class ProjectUtil {
 									} catch (Exception ignored) {
 									}
 									project.setSize(size);
+								}
+								if (nodeName.equals("includedProjects")) {
+									String includedProjects = getContent(child);
+									if (includedProjects != null) {
+										includedProjects = includedProjects.trim();
+										StringTokenizer tokenizer = new StringTokenizer(includedProjects,",");
+										List<String> projectList = new ArrayList<String>();
+										while (tokenizer.hasMoreTokens()) {
+											projectList.add(tokenizer.nextToken());
+										}
+										project.setIncludedProjects(projectList);
+									}
 								}
 							}
 						}
