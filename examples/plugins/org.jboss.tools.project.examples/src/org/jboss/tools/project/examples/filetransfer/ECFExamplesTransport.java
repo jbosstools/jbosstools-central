@@ -47,6 +47,7 @@ import org.eclipse.equinox.internal.provisional.p2.core.repository.IRepository;
 import org.eclipse.equinox.security.storage.ISecurePreferences;
 import org.eclipse.equinox.security.storage.SecurePreferencesFactory;
 import org.eclipse.equinox.security.storage.StorageException;
+import org.jboss.tools.project.examples.Messages;
 import org.jboss.tools.project.examples.ProjectExamplesActivator;
 import org.osgi.util.tracker.ServiceTracker;
 
@@ -62,7 +63,7 @@ public class ECFExamplesTransport {
 	 */
 	private static final int LOGIN_RETRIES = 3;
 	private static final ProtocolException ERROR_401 = new ProtocolException();
-	private static final String SERVER_REDIRECT = "Server redirected too many times";
+	private static final String SERVER_REDIRECT = Messages.ECFExamplesTransport_Server_redirected_too_many_times;
 	
 	private static ECFExamplesTransport INSTANCE;
 	private ServiceTracker retrievalFactoryTracker;
@@ -79,7 +80,7 @@ public class ECFExamplesTransport {
 		 * @param barrier The job will wait until the first entry in the barrier is non-null
 		 */
 		WaitJob(String location, Object[] barrier) {
-			super("Loading");
+			super(Messages.ECFExamplesTransport_Loading);
 			this.barrier = barrier;
 			setSystem(true);
 		}
@@ -143,7 +144,7 @@ public class ECFExamplesTransport {
 			throw new OperationCanceledException();
 		}
 		//too many retries, so report as failure
-		throw new CoreException(new Status(IStatus.ERROR, ProjectExamplesActivator.PLUGIN_ID, "IO error", null));
+		throw new CoreException(new Status(IStatus.ERROR, ProjectExamplesActivator.PLUGIN_ID, Messages.ECFExamplesTransport_IO_error, null));
 	}
 	
 	/**
@@ -196,13 +197,13 @@ public class ECFExamplesTransport {
 			}
 		}
 		//reached maximum number of retries without success
-		return new Status(IStatus.ERROR, ProjectExamplesActivator.PLUGIN_ID,  "IO error", null);
+		return new Status(IStatus.ERROR, ProjectExamplesActivator.PLUGIN_ID,  Messages.ECFExamplesTransport_IO_error, null);
 	}
 
 	public IStatus performDownload(String name,String toDownload, OutputStream target, IConnectContext context, IProgressMonitor monitor) throws ProtocolException {
 		IRetrieveFileTransferFactory factory = (IRetrieveFileTransferFactory) retrievalFactoryTracker.getService();
 		if (factory == null)
-			return new Status(IStatus.ERROR, ProjectExamplesActivator.PLUGIN_ID, "IO error");
+			return new Status(IStatus.ERROR, ProjectExamplesActivator.PLUGIN_ID, Messages.ECFExamplesTransport_IO_error);
 
 		return transfer(name,factory.newInstance(), toDownload, target, context, monitor);
 	}
@@ -225,7 +226,7 @@ public class ECFExamplesTransport {
 							long fileLength = rse.getSource().getFileLength();
 							final long totalWork = ((fileLength == -1) ? 100 : fileLength);
 							int work = (totalWork > Integer.MAX_VALUE) ? Integer.MAX_VALUE : (int) totalWork;
-							monitor.beginTask("Downloading " + name,work);
+							monitor.beginTask(Messages.ECFExamplesTransport_Downloading + name,work);
 							oldWorked=0;
 						}
 					} catch (IOException e) {
@@ -250,10 +251,10 @@ public class ECFExamplesTransport {
 						int worked = (int) Math.round(factor * received);
 						double downloadRateBytesPerSecond = (received / ((System.currentTimeMillis() + 1 - transferStartTime) / 1000.0));
 						
-						String rates = String.format(" (at %s/s)", AbstractRetrieveFileTransfer.toHumanReadableBytes(downloadRateBytesPerSecond));
+						String rates = String.format(" (at %s/s)", AbstractRetrieveFileTransfer.toHumanReadableBytes(downloadRateBytesPerSecond)); //$NON-NLS-1$
 						String receivedString = AbstractRetrieveFileTransfer.toHumanReadableBytes(received);
 						String fileLengthString = AbstractRetrieveFileTransfer.toHumanReadableBytes(fileLength);
-						monitor.subTask(receivedString + " of " + fileLengthString + rates);
+						monitor.subTask(receivedString + Messages.ECFExamplesTransport_of + fileLengthString + rates);
 						monitor.worked(worked-oldWorked);
 						oldWorked=worked;
 					}
@@ -375,7 +376,7 @@ public class ECFExamplesTransport {
 					return null;
 				return ConnectContextFactory.createUsernamePasswordConnectContext(username, password);
 			} catch (StorageException e) {
-				String msg = "Internal Error";
+				String msg = Messages.ECFExamplesTransport_Internal_Error;
 				throw new CoreException(new Status(IStatus.ERROR, ProjectExamplesActivator.PLUGIN_ID, msg, e));
 			}
 		}
@@ -398,10 +399,10 @@ public class ECFExamplesTransport {
 				prefNode.put(IRepository.PROP_PASSWORD, loginDetails.getPassword(), true);
 				prefNode.flush();
 			} catch (StorageException e1) {
-				String msg = "Internal error";
+				String msg = Messages.ECFExamplesTransport_Internal_error;
 				throw new CoreException(new Status(IStatus.ERROR, ProjectExamplesActivator.PLUGIN_ID,  msg, e1));
 			} catch (IOException e) {
-				String msg = "Internal error";
+				String msg = Messages.ECFExamplesTransport_Internal_error;
 				throw new CoreException(new Status(IStatus.ERROR, ProjectExamplesActivator.PLUGIN_ID, msg, e));
 			}
 		}
@@ -428,7 +429,7 @@ public class ECFExamplesTransport {
 				wait.join();
 			} catch (InterruptedException e) {
 				if (!logged)
-					LogHelper.log(new Status(IStatus.WARNING, ProjectExamplesActivator.PLUGIN_ID, "Unexpected interrupt while waiting on ECF transfer", e));
+					LogHelper.log(new Status(IStatus.WARNING, ProjectExamplesActivator.PLUGIN_ID, Messages.ECFExamplesTransport_Unexpected_interrupt_while_waiting_on_ECF_transfer, e));
 			}
 		}
 	}

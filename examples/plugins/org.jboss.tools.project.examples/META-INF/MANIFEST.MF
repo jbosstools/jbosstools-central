@@ -1,10 +1,10 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: Project Examples
+Bundle-Name: %BundleName
 Bundle-SymbolicName: org.jboss.tools.project.examples;singleton:=true
 Bundle-Version: 1.0.0
 Bundle-Activator: org.jboss.tools.project.examples.ProjectExamplesActivator
-Bundle-Vendor: JBoss, a division of Red Hat
+Bundle-Vendor: %BunldeVendor
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
  org.eclipse.core.resources,
@@ -21,3 +21,4 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.wst.validation,
  org.eclipse.ui.views
 Bundle-ActivationPolicy: lazy
+Bundle-Localization: plugin

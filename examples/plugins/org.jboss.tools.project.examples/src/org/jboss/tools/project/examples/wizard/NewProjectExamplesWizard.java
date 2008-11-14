@@ -42,6 +42,7 @@ import org.eclipse.jface.dialogs.MessageDialogWithToggle;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.wizard.Wizard;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.INewWizard;
@@ -52,6 +53,7 @@ import org.eclipse.ui.internal.services.SourceProviderService;
 import org.eclipse.ui.wizards.datatransfer.IImportStructureProvider;
 import org.eclipse.ui.wizards.datatransfer.ImportOperation;
 import org.eclipse.ui.wizards.datatransfer.ZipFileStructureProvider;
+import org.jboss.tools.project.examples.Messages;
 import org.jboss.tools.project.examples.ProjectExamplesActivator;
 import org.jboss.tools.project.examples.dialog.MarkerDialog;
 import org.jboss.tools.project.examples.model.Project;
@@ -84,7 +86,7 @@ public class NewProjectExamplesWizard extends Wizard implements INewWizard {
 
 	public NewProjectExamplesWizard() {
 		super();
-		setWindowTitle("New Project Example");
+		setWindowTitle(Messages.NewProjectExamplesWizard_New_Project_Example);
 
 	}
 
@@ -98,7 +100,7 @@ public class NewProjectExamplesWizard extends Wizard implements INewWizard {
 		if (page.getSelection() == null || page.getSelection().size() <= 0) {
 			return false;
 		}
-		workspaceJob = new WorkspaceJob("Downloading...") {
+		workspaceJob = new WorkspaceJob(Messages.NewProjectExamplesWizard_Downloading) {
 
 			@Override
 			public IStatus runInWorkspace(IProgressMonitor monitor)
@@ -114,7 +116,7 @@ public class NewProjectExamplesWizard extends Wizard implements INewWizard {
 						String url = project.getUrl();
 						String name = project.getName();
 						final File file = ProjectUtil.getProjectExamplesFile(
-								url, name, ".zip", monitor);
+								url, name, ".zip", monitor); //$NON-NLS-1$
 						if (file == null) {
 							return Status.CANCEL_STATUS;
 						}
@@ -124,7 +126,7 @@ public class NewProjectExamplesWizard extends Wizard implements INewWizard {
 				}
 				try {
 					int i = 0;
-					setName("Importing...");
+					setName(Messages.NewProjectExamplesWizard_Importing);
 					for (Project project : projects) {
 						importProject(project, files.get(i++), monitor);
 					}
@@ -133,10 +135,10 @@ public class NewProjectExamplesWizard extends Wizard implements INewWizard {
 
 						public void run() {
 							MessageDialogWithToggle.openError(getShell(),
-									"Error", e.getMessage(), "Detail", false,
+									Messages.NewProjectExamplesWizard_Error, e.getMessage(), Messages.NewProjectExamplesWizard_Detail, false,
 									ProjectExamplesActivator.getDefault()
 											.getPreferenceStore(),
-									"errorDialog");
+									"errorDialog"); //$NON-NLS-1$
 						}
 
 					});
@@ -226,8 +228,8 @@ public class NewProjectExamplesWizard extends Wizard implements INewWizard {
 
 						public void run() {
 							overwrite = MessageDialog.openQuestion(getShell(),
-									"Question", "Overwrite project '"
-											+ projectName + "'");
+									Messages.NewProjectExamplesWizard_Question, NLS.bind(Messages.NewProjectExamplesWizard_OverwriteProject,
+										projectName));
 						}
 
 					});
@@ -245,7 +247,7 @@ public class NewProjectExamplesWizard extends Wizard implements INewWizard {
 				Enumeration<? extends ZipEntry> entries = sourceFile.entries();
 				ZipEntry entry = null;
 				List<ZipEntry> filesToImport = new ArrayList<ZipEntry>();
-				String prefix = projectName + "/";
+				String prefix = projectName + "/"; //$NON-NLS-1$
 				while (entries.hasMoreElements()) {
 					entry = entries.nextElement();
 					if (entry.getName().startsWith(prefix)) {
@@ -276,8 +278,8 @@ public class NewProjectExamplesWizard extends Wizard implements INewWizard {
 
 				public void run() {
 					overwrite = MessageDialog.openQuestion(getShell(),
-							"Question", "Overwrite project '" + projectName
-									+ "'");
+							Messages.NewProjectExamplesWizard_Question, NLS.bind(Messages.NewProjectExamplesWizard_OverwriteProject,
+									projectName));
 				}
 
 			});
@@ -308,7 +310,7 @@ public class NewProjectExamplesWizard extends Wizard implements INewWizard {
 	protected void initializeDefaultPageImageDescriptor() {
 		ImageDescriptor desc = ProjectExamplesActivator
 				.imageDescriptorFromPlugin(ProjectExamplesActivator.PLUGIN_ID,
-						"icons/new_wiz.gif");
+						"icons/new_wiz.gif"); //$NON-NLS-1$
 		setDefaultPageImageDescriptor(desc);
 	}
 

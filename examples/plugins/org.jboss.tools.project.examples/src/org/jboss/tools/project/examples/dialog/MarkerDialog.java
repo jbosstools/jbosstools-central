@@ -66,6 +66,7 @@ import org.eclipse.ui.statushandlers.StatusAdapter;
 import org.eclipse.ui.statushandlers.StatusManager;
 import org.eclipse.ui.views.markers.WorkbenchMarkerResolution;
 import org.eclipse.ui.views.markers.internal.MarkerMessages;
+import org.jboss.tools.project.examples.Messages;
 import org.jboss.tools.project.examples.ProjectExamplesActivator;
 import org.jboss.tools.project.examples.dialog.xpl.QuickFixWizard;
 import org.jboss.tools.project.examples.model.Project;
@@ -76,7 +77,7 @@ import org.jboss.tools.project.examples.model.Project;
  */
 public class MarkerDialog extends TitleAreaDialog {
 
-	private static final String QUICK_FIX = "Quick Fix";
+	private static final String QUICK_FIX = Messages.MarkerDialog_Quick_Fix;
 	private static final IMarkerResolution[] EMPTY_ARRAY = new IMarkerResolution[0];
 	private List<Project> projects;
 	private Image _dlgTitleImage;
@@ -119,13 +120,13 @@ public class MarkerDialog extends TitleAreaDialog {
 		contents.setLayoutData(gd);
 		contents.setLayout(new GridLayout());
 		setTitle(QUICK_FIX);
-		setMessage("Select a marker and click the Quick Fix button.");
+		setMessage(Messages.MarkerDialog_Select_a_marker_and_click_the_Quick_Fix_button);
 		getShell().setText(QUICK_FIX);
 		applyDialogFont(contents);
 		initializeDialogUnits(area);
 
 		Label markersLabel = new Label(contents, SWT.NULL);
-		markersLabel.setText("Markers:");
+		markersLabel.setText(Messages.MarkerDialog_Markers);
 		tableViewer = new TableViewer(contents, SWT.H_SCROLL | SWT.V_SCROLL
 				| SWT.BORDER | SWT.SINGLE);
 		Table table = tableViewer.getTable();
@@ -134,7 +135,7 @@ public class MarkerDialog extends TitleAreaDialog {
 		table.setHeaderVisible(true);
 		table.setLinesVisible(true);
 
-		String[] columnNames = new String[] { "Description", "Resource", "Type" };
+		String[] columnNames = new String[] { Messages.MarkerDialog_Description, Messages.MarkerDialog_Resource, Messages.MarkerDialog_Type };
 		int[] columnWidths = new int[] { 200, 150, 150 };
 
 		for (int i = 0; i < columnNames.length; i++) {
@@ -198,9 +199,9 @@ public class MarkerDialog extends TitleAreaDialog {
 	protected void createButtonsForButtonBar(Composite parent) {
 		super.createButtonsForButtonBar(parent);
 		quickFixButton = getButton(IDialogConstants.OK_ID);
-		quickFixButton.setText("Quick Fix");
+		quickFixButton.setText(Messages.MarkerDialog_Quick_Fix);
 		finishButton = getButton(IDialogConstants.CANCEL_ID);
-		finishButton.setText("Finish");
+		finishButton.setText(Messages.MarkerDialog_Finish);
 		quickFixButton.setEnabled(false);
 	}
 

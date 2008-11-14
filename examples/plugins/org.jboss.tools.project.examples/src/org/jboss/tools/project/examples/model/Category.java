@@ -13,6 +13,8 @@ package org.jboss.tools.project.examples.model;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.jboss.tools.project.examples.Messages;
+
 /**
  * @author snjeza
  * 
@@ -21,7 +23,7 @@ public class Category {
 
 	private String name;
 	private List<Project> projects = new ArrayList<Project>();
-	public static Category OTHER = new Category("Other");
+	public static Category OTHER = new Category(Messages.Category_Other);
 
 	public Category(String name) {
 		super();

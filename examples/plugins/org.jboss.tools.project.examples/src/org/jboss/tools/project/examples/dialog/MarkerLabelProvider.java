@@ -37,14 +37,14 @@ public class MarkerLabelProvider extends LabelProvider implements
 		IMarker marker = (IMarker) element;
 		switch (columnIndex) {
 		case 0:
-			return marker.getAttribute(IMarker.MESSAGE, "");
+			return marker.getAttribute(IMarker.MESSAGE, ""); //$NON-NLS-1$
 		case 1:
 			return marker.getResource().getName();
 		case 2:
 			try {
 				IExtensionPoint extensionPoint = Platform
 						.getExtensionRegistry().getExtensionPoint(
-								"org.eclipse.core.resources.markers");
+								"org.eclipse.core.resources.markers"); //$NON-NLS-1$
 				IExtension[] extensions = extensionPoint.getExtensions();
 				for (int i = 0; i < extensions.length; i++) {
 					IExtension extension = extensions[i];
@@ -58,7 +58,7 @@ public class MarkerLabelProvider extends LabelProvider implements
 				}
 				return marker.getType();
 			} catch (CoreException e) {
-				return "";
+				return ""; //$NON-NLS-1$
 			}
 		}
 		return null;

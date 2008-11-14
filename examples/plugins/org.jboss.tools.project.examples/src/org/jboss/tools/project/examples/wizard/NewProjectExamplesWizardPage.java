@@ -31,6 +31,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.Tree;
+import org.jboss.tools.project.examples.Messages;
 import org.jboss.tools.project.examples.ProjectExamplesActivator;
 import org.jboss.tools.project.examples.model.Category;
 import org.jboss.tools.project.examples.model.Project;
@@ -46,10 +47,10 @@ public class NewProjectExamplesWizardPage extends WizardPage {
 	private Button showQuickFixButton;
 	
 	public NewProjectExamplesWizardPage() {
-		super("org.jboss.tools.project.examples");
-        setTitle( "Project Example" );
-        setDescription( "Import Project Example" );
-        setImageDescriptor( ProjectExamplesActivator.imageDescriptorFromPlugin(ProjectExamplesActivator.PLUGIN_ID, "icons/new_wiz.gif"));
+		super("org.jboss.tools.project.examples"); //$NON-NLS-1$
+        setTitle( Messages.NewProjectExamplesWizardPage_Project_Example );
+        setDescription( Messages.NewProjectExamplesWizardPage_Import_Project_Example );
+        setImageDescriptor( ProjectExamplesActivator.imageDescriptorFromPlugin(ProjectExamplesActivator.PLUGIN_ID, "icons/new_wiz.gif")); //$NON-NLS-1$
 		
 	}
 
@@ -61,7 +62,7 @@ public class NewProjectExamplesWizardPage extends WizardPage {
 		gd.widthHint= 225;
 		composite.setLayoutData(gd);
 		
-		new Label(composite,SWT.NONE).setText("Projects:");
+		new Label(composite,SWT.NONE).setText(Messages.NewProjectExamplesWizardPage_Projects);
 		TreeViewer viewer = new TreeViewer(composite,SWT.MULTI);
 		Tree tree = viewer.getTree();
 		tree.setLayoutData(new GridData(GridData.FILL_BOTH));
@@ -72,7 +73,7 @@ public class NewProjectExamplesWizardPage extends WizardPage {
 		viewer.setInput(ProjectUtil.getProjects());
 		
 		Label descriptionLabel = new Label(composite,SWT.NULL);
-		descriptionLabel.setText("Description:");
+		descriptionLabel.setText(Messages.NewProjectExamplesWizardPage_Description);
 		final Text text = new Text(composite,SWT.BORDER | SWT.MULTI | SWT.WRAP | SWT.READ_ONLY);
 		gd = new GridData(GridData.FILL_BOTH | GridData.GRAB_HORIZONTAL | GridData.GRAB_VERTICAL);
 		gd.heightHint=75;
@@ -84,17 +85,17 @@ public class NewProjectExamplesWizardPage extends WizardPage {
 		internal.setLayoutData(gd);
 		
 		Label projectNameLabel = new Label(internal,SWT.NULL);
-		projectNameLabel.setText("Project name:");
+		projectNameLabel.setText(Messages.NewProjectExamplesWizardPage_Project_name);
 		final Text projectName = new Text(internal,SWT.BORDER | SWT.READ_ONLY);
 		projectName.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		
 		Label projectSizeLabel = new Label(internal,SWT.NULL);
-		projectSizeLabel.setText("Project size:");
+		projectSizeLabel.setText(Messages.NewProjectExamplesWizardPage_Project_size);
 		final Text projectSize = new Text(internal,SWT.BORDER | SWT.READ_ONLY);
 		projectSize.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		
 		Label projectURLLabel = new Label(internal,SWT.NULL);
-		projectURLLabel.setText("URL:");
+		projectURLLabel.setText(Messages.NewProjectExamplesWizardPage_URL);
 		final Text projectURL = new Text(internal,SWT.BORDER | SWT.READ_ONLY);
 		projectURL.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		
@@ -111,10 +112,10 @@ public class NewProjectExamplesWizardPage extends WizardPage {
 					projectSize.setText(selectedProject.getSizeAsText());
 				} else {
 					//Project selectedProject=null;
-					text.setText("");
-					projectName.setText("");
-					projectURL.setText("");
-					projectSize.setText("");
+					text.setText(""); //$NON-NLS-1$
+					projectName.setText(""); //$NON-NLS-1$
+					projectURL.setText(""); //$NON-NLS-1$
+					projectSize.setText(""); //$NON-NLS-1$
 				}
 				boolean canFinish = false;
 				Iterator iterator = selection.iterator();
@@ -133,7 +134,7 @@ public class NewProjectExamplesWizardPage extends WizardPage {
 		});
 		
 		showQuickFixButton = new Button(internal,SWT.CHECK);
-		showQuickFixButton.setText("Show the Quick Fix dialog");
+		showQuickFixButton.setText(Messages.NewProjectExamplesWizardPage_Show_the_Quick_Fix_dialog);
 		showQuickFixButton.setSelection(true);
 		gd=new GridData(GridData.FILL_HORIZONTAL);
 		gd.horizontalSpan=2;

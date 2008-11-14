@@ -34,14 +34,14 @@ import org.osgi.framework.BundleContext;
 public class ProjectExamplesActivator extends AbstractUIPlugin {
 
 	// The plug-in ID
-	public static final String PLUGIN_ID = "org.jboss.tools.project.examples";
+	public static final String PLUGIN_ID = "org.jboss.tools.project.examples"; //$NON-NLS-1$
 
 	// The shared instance
 	private static ProjectExamplesActivator plugin;
 
 	private static BundleContext context;
 
-	public static Job waitForBuildAndValidation = new Job("Waiting...") {
+	public static Job waitForBuildAndValidation = new Job(Messages.ProjectExamplesActivator_Waiting) {
 
 		@Override
 		protected IStatus run(IProgressMonitor monitor) {

@@ -4,12 +4,12 @@
 
   <extension point="org.eclipse.ui.newWizards">
     <category
-            name="JBoss Tools"
+            name="%JBoss_Tools_category"
             id="org.jboss.ide.eclipse.ui.wizards">
       </category>
     <wizard
 		id="org.jboss.tools.project.examples.wizard.NewProjectExamplesWizard"
-		name="Project Examples"
+		name="%Project_Examples_wizard"
 		class="org.jboss.tools.project.examples.wizard.NewProjectExamplesWizard"
 		category="org.jboss.ide.eclipse.ui.wizards"
 		icon="icons/examples_wiz.gif">	
@@ -18,7 +18,7 @@
   <extension
          point="org.eclipse.ui.commands">
       <command
-            name="Project Examples"
+            name="%Project_Examples_command"
             id="org.jboss.tools.project.examples">
       </command>
    </extension>
