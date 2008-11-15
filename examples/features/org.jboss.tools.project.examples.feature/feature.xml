@@ -6,7 +6,7 @@
       provider-name="%providerName"
       plugin="org.jboss.tools.project.examples">
 
-   <description url="http://www.example.com/description">
+   <description>
       %description
    </description>
 
