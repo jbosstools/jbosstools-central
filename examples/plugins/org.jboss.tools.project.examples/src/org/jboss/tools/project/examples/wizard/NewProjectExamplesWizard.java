@@ -17,6 +17,8 @@ package org.jboss.tools.project.examples.wizard;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.Iterator;
@@ -113,8 +115,15 @@ public class NewProjectExamplesWizard extends Wizard implements INewWizard {
 					Object object = iterator.next();
 					if (object instanceof Project) {
 						Project project = (Project) object;
-						String url = project.getUrl();
+						String urlString = project.getUrl();
 						String name = project.getName();
+						URL url = null;
+						try {
+							url = new URL(urlString);
+						} catch (MalformedURLException e) {
+							ProjectExamplesActivator.log(e);
+							continue;
+						}
 						final File file = ProjectUtil.getProjectExamplesFile(
 								url, name, ".zip", monitor); //$NON-NLS-1$
 						if (file == null) {

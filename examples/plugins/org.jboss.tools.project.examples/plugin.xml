@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?eclipse version="3.2"?>
 <plugin>
+   <extension-point id="projectExamplesXml" name="%ProjectExamples" schema="schema/projectExamplesXml.exsd"/>
 
   <extension point="org.eclipse.ui.newWizards">
     <category
@@ -40,4 +41,9 @@
                         
       </menuContribution>
    </extension>
+   <extension
+        point="org.jboss.tools.project.examples.projectExamplesXml">
+        <url>http://anonsvn.jboss.org/repos/jbosstools/workspace/examples/projectExamples.xml</url>
+   </extension>
+  
 </plugin>

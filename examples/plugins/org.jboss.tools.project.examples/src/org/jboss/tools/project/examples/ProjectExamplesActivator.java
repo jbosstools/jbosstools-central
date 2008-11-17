@@ -106,6 +106,11 @@ public class ProjectExamplesActivator extends AbstractUIPlugin {
 				.getLocalizedMessage(), e);
 		ProjectExamplesActivator.getDefault().getLog().log(status);
 	}
+	
+	public static void log(String message) {
+		IStatus status = new Status(IStatus.WARNING, PLUGIN_ID,message);
+		ProjectExamplesActivator.getDefault().getLog().log(status);
+	}
 
 	public static BundleContext getBundleContext() {
 		return context;

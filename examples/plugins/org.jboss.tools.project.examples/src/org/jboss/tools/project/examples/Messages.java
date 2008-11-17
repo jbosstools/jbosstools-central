@@ -46,6 +46,7 @@ public class Messages extends NLS {
 	public static String NewProjectExamplesWizardPage_Show_the_Quick_Fix_dialog;
 	public static String NewProjectExamplesWizardPage_URL;
 	public static String ProjectExamplesActivator_Waiting;
+	public static String ProjectUtil_Invalid_URL;
 	static {
 		// initialize resource bundle
 		NLS.initializeMessages(BUNDLE_NAME, Messages.class);
