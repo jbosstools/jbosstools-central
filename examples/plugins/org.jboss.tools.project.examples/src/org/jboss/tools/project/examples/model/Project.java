@@ -13,13 +13,11 @@ package org.jboss.tools.project.examples.model;
 import java.math.BigDecimal;
 import java.util.List;
 
-import org.jboss.tools.project.examples.Messages;
-
 /**
  * @author snjeza
  * 
  */
-public class Project {
+public class Project implements ProjectModelElement {
 
 	private String name;
 	private String shortDescription;

@@ -19,7 +19,7 @@ import org.jboss.tools.project.examples.Messages;
  * @author snjeza
  * 
  */
-public class Category {
+public class Category implements ProjectModelElement {
 
 	private String name;
 	private List<Project> projects = new ArrayList<Project>();
@@ -69,6 +69,10 @@ public class Category {
 		} else if (!name.equals(other.name))
 			return false;
 		return true;
+	}
+
+	public String getDescription() {
+		return getName();
 	}
 
 }

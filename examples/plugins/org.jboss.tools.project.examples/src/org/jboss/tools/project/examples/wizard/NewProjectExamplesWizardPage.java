@@ -31,6 +31,9 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.Tree;
+import org.eclipse.ui.dialogs.FilteredTree;
+import org.eclipse.ui.internal.dialogs.WizardPatternFilter;
+import org.eclipse.ui.model.AdaptableList;
 import org.jboss.tools.project.examples.Messages;
 import org.jboss.tools.project.examples.ProjectExamplesActivator;
 import org.jboss.tools.project.examples.model.Category;
@@ -60,17 +63,27 @@ public class NewProjectExamplesWizardPage extends WizardPage {
 		
 		GridData gd = new GridData(GridData.FILL_BOTH);
 		gd.widthHint= 225;
+		
 		composite.setLayoutData(gd);
 		
 		new Label(composite,SWT.NONE).setText(Messages.NewProjectExamplesWizardPage_Projects);
-		TreeViewer viewer = new TreeViewer(composite,SWT.MULTI);
+		
+		ProjectExamplesPatternFilter filter = new ProjectExamplesPatternFilter();
+		int styleBits = SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL | SWT.BORDER;
+		FilteredTree filteredTree = new FilteredTree(composite, styleBits, filter);
+		filteredTree.setBackground(parent.getDisplay().getSystemColor(
+				SWT.COLOR_WIDGET_BACKGROUND));
+		TreeViewer viewer = filteredTree.getViewer();
 		Tree tree = viewer.getTree();
 		tree.setLayoutData(new GridData(GridData.FILL_BOTH));
 		tree.setFont(parent.getFont());
 		
 		viewer.setLabelProvider(new ProjectLabelProvider());
 		viewer.setContentProvider(new ProjectContentProvider());
-		viewer.setInput(ProjectUtil.getProjects());
+		
+		AdaptableList input = new AdaptableList(ProjectUtil.getProjects());
+
+		viewer.setInput(input);
 		
 		Label descriptionLabel = new Label(composite,SWT.NULL);
 		descriptionLabel.setText(Messages.NewProjectExamplesWizardPage_Description);
@@ -171,9 +184,11 @@ public class NewProjectExamplesWizardPage extends WizardPage {
 	private class ProjectContentProvider implements ITreeContentProvider {
 
 		public Object[] getChildren(Object parentElement) {
-			if (parentElement instanceof List) {
-				List children = (List) parentElement;
-				return children.toArray();
+			if (parentElement instanceof AdaptableList) {
+				Object[] childCollections = ((AdaptableList)parentElement).getChildren();
+				//List children = (List) parentElement;
+				//return children.toArray();
+				return childCollections;
 			}
 			if (parentElement instanceof Category) {
 				Category category = (Category) parentElement;
