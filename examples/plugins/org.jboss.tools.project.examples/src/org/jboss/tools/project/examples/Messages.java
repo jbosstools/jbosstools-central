@@ -16,7 +16,6 @@ public class Messages extends NLS {
 	private static final String BUNDLE_NAME = "org.jboss.tools.project.examples.messages"; //$NON-NLS-1$
 	public static String Category_Other;
 	public static String ECFExamplesTransport_Downloading;
-	public static String ECFExamplesTransport_Internal_error;
 	public static String ECFExamplesTransport_Internal_Error;
 	public static String ECFExamplesTransport_IO_error;
 	public static String ECFExamplesTransport_Loading;
@@ -33,6 +32,7 @@ public class Messages extends NLS {
 	public static String NewProjectExamplesWizard_Detail;
 	public static String NewProjectExamplesWizard_Downloading;
 	public static String NewProjectExamplesWizard_Error;
+	public static String NewProjectExamplesWizard_File_does_not_exist;
 	public static String NewProjectExamplesWizard_Importing;
 	public static String NewProjectExamplesWizard_New_Project_Example;
 	public static String NewProjectExamplesWizard_OverwriteProject;
@@ -47,6 +47,7 @@ public class Messages extends NLS {
 	public static String NewProjectExamplesWizardPage_URL;
 	public static String ProjectExamplesActivator_Waiting;
 	public static String ProjectUtil_Invalid_URL;
+	public static String ProjectUtil_Invalid_welcome_element;
 	static {
 		// initialize resource bundle
 		NLS.initializeMessages(BUNDLE_NAME, Messages.class);

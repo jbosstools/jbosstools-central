@@ -399,10 +399,10 @@ public class ECFExamplesTransport {
 				prefNode.put(IRepository.PROP_PASSWORD, loginDetails.getPassword(), true);
 				prefNode.flush();
 			} catch (StorageException e1) {
-				String msg = Messages.ECFExamplesTransport_Internal_error;
+				String msg = Messages.ECFExamplesTransport_Internal_Error;
 				throw new CoreException(new Status(IStatus.ERROR, ProjectExamplesActivator.PLUGIN_ID,  msg, e1));
 			} catch (IOException e) {
-				String msg = Messages.ECFExamplesTransport_Internal_error;
+				String msg = Messages.ECFExamplesTransport_Internal_Error;
 				throw new CoreException(new Status(IStatus.ERROR, ProjectExamplesActivator.PLUGIN_ID, msg, e));
 			}
 		}

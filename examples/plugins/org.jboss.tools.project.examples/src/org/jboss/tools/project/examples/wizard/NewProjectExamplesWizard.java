@@ -27,14 +27,19 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipException;
 import java.util.zip.ZipFile;
 
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.resources.WorkspaceJob;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.FileLocator;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.IJobChangeEvent;
 import org.eclipse.core.runtime.jobs.IJobChangeListener;
@@ -49,9 +54,14 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.INewWizard;
 import org.eclipse.ui.IWorkbench;
+import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.browser.IWebBrowser;
+import org.eclipse.ui.browser.IWorkbenchBrowserSupport;
 import org.eclipse.ui.dialogs.IOverwriteQuery;
-import org.eclipse.ui.internal.services.SourceProviderService;
+import org.eclipse.ui.internal.cheatsheets.state.DefaultStateManager;
+import org.eclipse.ui.internal.cheatsheets.views.CheatSheetView;
+import org.eclipse.ui.internal.cheatsheets.views.ViewUtilities;
 import org.eclipse.ui.wizards.datatransfer.IImportStructureProvider;
 import org.eclipse.ui.wizards.datatransfer.ImportOperation;
 import org.eclipse.ui.wizards.datatransfer.ZipFileStructureProvider;
@@ -178,7 +188,6 @@ public class NewProjectExamplesWizard extends Wizard implements INewWizard {
 								.schedule();
 						ProjectExamplesActivator.waitForBuildAndValidation
 								.join();
-
 					} catch (InterruptedException e) {
 						return;
 					}
@@ -189,6 +198,7 @@ public class NewProjectExamplesWizard extends Wizard implements INewWizard {
 							showQuickFix();
 						}
 					}
+					openWelcome();
 				}
 
 				public void running(IJobChangeEvent event) {
@@ -204,8 +214,68 @@ public class NewProjectExamplesWizard extends Wizard implements INewWizard {
 				}
 
 			});
+		} else {
+			openWelcome();
 		}
 		return true;
+	}
+
+	private void openWelcome() {
+		for(final Project project:projects) {
+			if (project.isWelcome()) {
+				String urlString = project.getWelcomeURL();
+				URL url = null;
+				if (urlString.startsWith("/")) { //$NON-NLS-1$
+					IPath path = new Path(urlString);
+					IResource resource = ResourcesPlugin.getWorkspace().getRoot().findMember(path);
+					if (resource instanceof IFile && resource.isAccessible()) {
+						try {
+							url = resource.getRawLocationURI().toURL();
+						} catch (MalformedURLException e) {
+							ProjectExamplesActivator.log(e);
+						} 
+					} else {
+						ProjectExamplesActivator.log(NLS.bind(Messages.NewProjectExamplesWizard_File_does_not_exist,urlString));
+					}
+				} else {
+					try {
+						url = new URL(urlString);
+					} catch (MalformedURLException e) {
+						ProjectExamplesActivator.log(e);
+					}
+				}
+				if (url!=null) {
+					final URL finalURL = url;
+					Display.getDefault().asyncExec(new Runnable() {
+
+						public void run() {
+							if (ProjectUtil.CHEATSHEETS.equals(project.getType())) {
+								CheatSheetView view = ViewUtilities.showCheatSheetView();
+								if (view == null) {
+									return;
+								}
+								IPath filePath = new Path(finalURL.getPath());
+								String id = filePath.lastSegment();
+								if (id == null) {
+									id = ""; //$NON-NLS-1$
+								}
+								view.getCheatSheetViewer().setInput(id, id, finalURL, new DefaultStateManager(), true);
+							} else {
+								try {
+									IWorkbenchBrowserSupport browserSupport = ProjectExamplesActivator.getDefault().getWorkbench().getBrowserSupport();
+									IWebBrowser browser = browserSupport.createBrowser(IWorkbenchBrowserSupport.LOCATION_BAR | IWorkbenchBrowserSupport.NAVIGATION_BAR, null, null, null);
+									browser.openURL(finalURL);
+								} catch (PartInitException e) {
+									ProjectExamplesActivator.log(e);
+								}
+							}
+						}
+						
+					});
+					
+				}
+			}
+		}
 	}
 
 	private void showQuickFix() {

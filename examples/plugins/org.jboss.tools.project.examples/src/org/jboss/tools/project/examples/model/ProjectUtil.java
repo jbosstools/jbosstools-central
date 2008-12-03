@@ -47,6 +47,10 @@ import org.w3c.dom.NodeList;
  */
 public class ProjectUtil {
 
+	private static final String EDITOR = "editor"; //$NON-NLS-1$
+
+	public static final String CHEATSHEETS = "cheatsheets"; //$NON-NLS-1$
+
 	private static final String PROTOCOL_FILE = "file"; //$NON-NLS-1$
 
 	private static final String PROJECT_EXAMPLES_XML_EXTENSION_ID = "org.jboss.tools.project.examples.projectExamplesXml"; //$NON-NLS-1$
@@ -178,6 +182,22 @@ public class ProjectUtil {
 										}
 										project
 												.setIncludedProjects(projectList);
+									}
+								}
+								if (nodeName.equals("welcome")) { //$NON-NLS-1$
+									project.setWelcome(true);
+									String attribute = child.getAttribute("type"); //$NON-NLS-1$
+									if (attribute != null && CHEATSHEETS.equals(attribute.trim())) {
+										project.setType(attribute.trim());
+									} else {
+										project.setType(EDITOR);
+									}
+									attribute = child.getAttribute("url"); //$NON-NLS-1$
+									if (attribute == null || attribute.trim().length() <= 0) {
+										project.setWelcome(false);
+										ProjectExamplesActivator.log(Messages.ProjectUtil_Invalid_welcome_element);
+									} else {
+										project.setWelcomeURL(attribute.trim());
 									}
 								}
 							}

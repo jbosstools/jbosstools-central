@@ -19,6 +19,7 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.equinox.p2.core,
  org.eclipse.ui.ide,
  org.eclipse.wst.validation,
- org.eclipse.ui.views
+ org.eclipse.ui.views,
+ org.eclipse.ui.cheatsheets
 Bundle-ActivationPolicy: lazy
 Bundle-Localization: plugin

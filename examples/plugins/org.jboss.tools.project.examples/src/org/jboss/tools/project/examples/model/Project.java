@@ -26,12 +26,16 @@ public class Project implements ProjectModelElement {
 	private long size;
 	private Category category;
 	private List<String> includedProjects;
-
+	private boolean welcome;
+	private String type;
+	private String welcomeURL;
+	
 	public Project() {
 		name=""; //$NON-NLS-1$
 		shortDescription=""; //$NON-NLS-1$
 		description=""; //$NON-NLS-1$
 		url=""; //$NON-NLS-1$
+		welcome=false;
 		setCategory(Category.OTHER);
 	}
 
@@ -104,5 +108,29 @@ public class Project implements ProjectModelElement {
 
 	public void setIncludedProjects(List<String> includedProjects) {
 		this.includedProjects = includedProjects;
+	}
+
+	public boolean isWelcome() {
+		return welcome;
+	}
+
+	public void setWelcome(boolean welcome) {
+		this.welcome = welcome;
+	}
+
+	public String getType() {
+		return type;
+	}
+
+	public void setType(String type) {
+		this.type = type;
+	}
+
+	public String getWelcomeURL() {
+		return welcomeURL;
+	}
+
+	public void setWelcomeURL(String welcomeURL) {
+		this.welcomeURL = welcomeURL;
 	}
 }
