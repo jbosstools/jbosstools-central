@@ -35,7 +35,6 @@ import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.resources.WorkspaceJob;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -43,6 +42,12 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.IJobChangeEvent;
 import org.eclipse.core.runtime.jobs.IJobChangeListener;
+import org.eclipse.jdt.core.IClasspathEntry;
+import org.eclipse.jdt.core.IJavaProject;
+import org.eclipse.jdt.core.IPackageFragmentRoot;
+import org.eclipse.jdt.core.JavaCore;
+import org.eclipse.jdt.internal.core.JavaElementInfo;
+import org.eclipse.jdt.internal.core.JavaProject;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.dialogs.MessageDialogWithToggle;
@@ -192,6 +197,11 @@ public class NewProjectExamplesWizard extends Wizard implements INewWizard {
 						return;
 					}
 					if (showQuickFix) {
+						try {
+							Thread.sleep(100);
+						} catch (InterruptedException e) {
+							
+						}
 						List<IMarker> markers = ProjectExamplesActivator
 								.getMarkers(projects);
 						if (markers != null && markers.size() > 0) {
@@ -342,6 +352,7 @@ public class NewProjectExamplesWizard extends Wizard implements INewWizard {
 						structureProvider, OVERWRITE_ALL_QUERY, filesToImport);
 				operation.setContext(getShell());
 				operation.run(monitor);
+				reconfigure(project, monitor);
 			}
 		}
 	}
@@ -378,6 +389,7 @@ public class NewProjectExamplesWizard extends Wizard implements INewWizard {
 				OVERWRITE_ALL_QUERY);
 		operation.setContext(getShell());
 		operation.run(monitor);
+		reconfigure(project, monitor);
 	}
 
 	public void init(IWorkbench workbench, IStructuredSelection selection) {
@@ -420,5 +432,24 @@ public class NewProjectExamplesWizard extends Wizard implements INewWizard {
 			}
 		}
 		return list;
+	}
+	
+	private static void reconfigure(IProject project, IProgressMonitor monitor) throws CoreException {
+		if (project == null || !project.exists() || !project.isOpen() || !project.hasNature(JavaCore.NATURE_ID)) {
+			return;
+		}
+		project.refreshLocal(IResource.DEPTH_INFINITE, monitor);
+		IJavaProject javaProject = JavaCore.create(project);
+		if (javaProject != null && javaProject.exists() && javaProject.isOpen() && javaProject instanceof JavaProject) {
+			Object object = ((JavaProject) javaProject).getElementInfo();
+			if (object instanceof JavaElementInfo) {
+				// copied from JavaProject.buildStructure(...)
+				JavaElementInfo info = (JavaElementInfo) object;
+				IClasspathEntry[] resolvedClasspath = ((JavaProject) javaProject).getResolvedClasspath();
+				IPackageFragmentRoot[] children = ((JavaProject) javaProject).computePackageFragmentRoots(resolvedClasspath,false, null /* no reverse map */);
+				info.setChildren(children);
+				((JavaProject) javaProject).getPerProjectInfo().rememberExternalLibTimestamps();
+			}
+		}
 	}
 }
