@@ -75,4 +75,8 @@ public class Category implements ProjectModelElement {
 		return getName();
 	}
 
+	public String getShortDescription() {
+		return getName();
+	}
+
 }

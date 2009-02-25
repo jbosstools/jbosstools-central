@@ -38,7 +38,7 @@ public class ProjectExamplesPatternFilter extends PatternFilter {
 		}
 		ProjectModelElement model = (ProjectModelElement) element;
 		
-		if (wordMatches(model.getName()) || wordMatches(model.getDescription())) {
+		if (wordMatches(model.getName()) || wordMatches(model.getDescription()) || wordMatches(model.getShortDescription())) {
 			return true;
 		}
 		return false;
