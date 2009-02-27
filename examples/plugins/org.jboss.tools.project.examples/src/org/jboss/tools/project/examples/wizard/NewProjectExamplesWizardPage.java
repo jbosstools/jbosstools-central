@@ -11,8 +11,11 @@
 package org.jboss.tools.project.examples.wizard;
 
 
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
@@ -23,10 +26,13 @@ import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
+import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
@@ -58,22 +64,46 @@ public class NewProjectExamplesWizardPage extends WizardPage {
 	}
 
 	public void createControl(Composite parent) {
-		Composite composite = new Composite(parent,SWT.NULL);
+		Composite composite = new Composite(parent,SWT.NONE);
 		composite.setLayout(new GridLayout(1,false));
 		
 		GridData gd = new GridData(GridData.FILL_BOTH);
-		gd.widthHint= 225;
 		
 		composite.setLayoutData(gd);
 		
+		Composite siteComposite = new Composite(composite,SWT.NONE);
+		GridLayout gridLayout = new GridLayout(2,false);
+		gridLayout.marginHeight = 0;
+		gridLayout.marginWidth = 0;
+		siteComposite.setLayout(gridLayout);
+		gd = new GridData(SWT.FILL, SWT.BEGINNING, true, false);
+		siteComposite.setLayoutData(gd);
+		
+		new Label(siteComposite,SWT.NONE).setText(Messages.NewProjectExamplesWizardPage_Site);
+		final Combo siteCombo = new Combo(siteComposite,SWT.READ_ONLY);
+		siteCombo.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
+		List<Category> categories = ProjectUtil.getProjects();
+		Set<String> sites = new TreeSet<String>();
+		sites.add(ProjectExamplesActivator.ALL_SITES);
+		for (Category category:categories) {
+			List<Project> projects = category.getProjects();
+			for (Project project:projects) {
+				sites.add(project.getSite());
+			}
+		}
+		String[] items = sites.toArray(new String[0]);
+		siteCombo.setItems(items);
+		siteCombo.setText(ProjectExamplesActivator.ALL_SITES);
+		
 		new Label(composite,SWT.NONE).setText(Messages.NewProjectExamplesWizardPage_Projects);
 		
-		ProjectExamplesPatternFilter filter = new ProjectExamplesPatternFilter();
+		final ProjectExamplesPatternFilter filter = new ProjectExamplesPatternFilter();
+		
 		int styleBits = SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL | SWT.BORDER;
-		FilteredTree filteredTree = new FilteredTree(composite, styleBits, filter);
+		final FilteredTree filteredTree = new FilteredTree(composite, styleBits, filter);
 		filteredTree.setBackground(parent.getDisplay().getSystemColor(
 				SWT.COLOR_WIDGET_BACKGROUND));
-		TreeViewer viewer = filteredTree.getViewer();
+		final TreeViewer viewer = filteredTree.getViewer();
 		Tree tree = viewer.getTree();
 		tree.setLayoutData(new GridData(GridData.FILL_BOTH));
 		tree.setFont(parent.getFont());
@@ -81,8 +111,10 @@ public class NewProjectExamplesWizardPage extends WizardPage {
 		viewer.setLabelProvider(new ProjectLabelProvider());
 		viewer.setContentProvider(new ProjectContentProvider());
 		
-		AdaptableList input = new AdaptableList(ProjectUtil.getProjects());
+		final AdaptableList input = new AdaptableList(categories);
 
+		final SiteFilter siteFilter = new SiteFilter();
+		viewer.addFilter(siteFilter);
 		viewer.setInput(input);
 		
 		Label descriptionLabel = new Label(composite,SWT.NULL);
@@ -152,8 +184,16 @@ public class NewProjectExamplesWizardPage extends WizardPage {
 		gd=new GridData(GridData.FILL_HORIZONTAL);
 		gd.horizontalSpan=2;
 		showQuickFixButton.setLayoutData(gd);
-		//Label showQuickFixLabel = new Label(internal,SWT.NULL);
-		//showQuickFixLabel.setText("Show the Quick Fix dialog:");
+		
+		siteCombo.addSelectionListener(new SelectionAdapter() {
+
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				siteFilter.setSite(siteCombo.getText());
+				viewer.refresh();
+			}
+			
+		});
 		
 		setPageComplete(false);
 		

@@ -14,6 +14,7 @@ import org.eclipse.osgi.util.NLS;
 
 public class Messages extends NLS {
 	private static final String BUNDLE_NAME = "org.jboss.tools.project.examples.messages"; //$NON-NLS-1$
+	public static String NewProjectExamplesWizardPage_Site;
 	public static String Category_Other;
 	public static String ECFExamplesTransport_Downloading;
 	public static String ECFExamplesTransport_Internal_Error;
@@ -45,6 +46,10 @@ public class Messages extends NLS {
 	public static String NewProjectExamplesWizardPage_Projects;
 	public static String NewProjectExamplesWizardPage_Show_the_Quick_Fix_dialog;
 	public static String NewProjectExamplesWizardPage_URL;
+	public static String Project_JBoss_Tools_Team_from_jboss_org;
+	public static String Project_Local;
+	public static String Project_Unknown;
+	public static String ProjectExamplesActivator_All;
 	public static String ProjectExamplesActivator_Waiting;
 	public static String ProjectUtil_Invalid_URL;
 	public static String ProjectUtil_Invalid_welcome_element;

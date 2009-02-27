@@ -13,6 +13,9 @@ package org.jboss.tools.project.examples.model;
 import java.math.BigDecimal;
 import java.util.List;
 
+import org.jboss.tools.project.examples.Messages;
+import org.jboss.tools.project.examples.ProjectExamplesActivator;
+
 /**
  * @author snjeza
  * 
@@ -29,6 +32,7 @@ public class Project implements ProjectModelElement {
 	private boolean welcome;
 	private String type;
 	private String welcomeURL;
+	private String site;
 	
 	public Project() {
 		name=""; //$NON-NLS-1$
@@ -132,5 +136,22 @@ public class Project implements ProjectModelElement {
 
 	public void setWelcomeURL(String welcomeURL) {
 		this.welcomeURL = welcomeURL;
+	}
+
+	public String getSite() {
+		if (site == null) {
+			if (getUrl().startsWith("http://anonsvn.jboss.org")) { //$NON-NLS-1$
+				site = Messages.Project_JBoss_Tools_Team_from_jboss_org;
+			} else if (getUrl().startsWith("file:")) { //$NON-NLS-1$
+				site = Messages.Project_Local;
+			} else {
+				site = Messages.Project_Unknown;
+			}
+		}
+		return site;
+	}
+
+	public void setSite(String site) {
+		this.site = site;
 	}
 }

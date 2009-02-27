@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.jboss.tools.project.examples.Messages;
+import org.jboss.tools.project.examples.ProjectExamplesActivator;
 
 /**
  * @author snjeza
@@ -77,6 +78,10 @@ public class Category implements ProjectModelElement {
 
 	public String getShortDescription() {
 		return getName();
+	}
+
+	public String getSite() {
+		return ProjectExamplesActivator.ALL_SITES;
 	}
 
 }

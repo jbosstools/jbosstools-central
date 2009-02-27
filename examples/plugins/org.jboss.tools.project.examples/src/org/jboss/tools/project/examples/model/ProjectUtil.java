@@ -150,6 +150,9 @@ public class ProjectUtil {
 								if (nodeName.equals("name")) { //$NON-NLS-1$
 									project.setName(getContent(child));
 								}
+								if (nodeName.equals("site")) { //$NON-NLS-1$
+									project.setSite(getContent(child));
+								}
 								if (nodeName.equals("shortDescription")) { //$NON-NLS-1$
 									project
 											.setShortDescription(getContent(child));

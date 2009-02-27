@@ -35,7 +35,8 @@ public class ProjectExamplesActivator extends AbstractUIPlugin {
 
 	// The plug-in ID
 	public static final String PLUGIN_ID = "org.jboss.tools.project.examples"; //$NON-NLS-1$
-
+	public static final String ALL_SITES = Messages.ProjectExamplesActivator_All;
+	
 	// The shared instance
 	private static ProjectExamplesActivator plugin;
 
