@@ -43,7 +43,7 @@
    </extension>
    <extension
         point="org.jboss.tools.project.examples.projectExamplesXml">
-        <url>http://anonsvn.jboss.org/repos/jbosstools/workspace/examples/projectExamples.xml</url>
+        <url>http://download.jboss.org/jbosstools/examples/project-examples-3.0.xml</url>
    </extension>
   
 </plugin>
