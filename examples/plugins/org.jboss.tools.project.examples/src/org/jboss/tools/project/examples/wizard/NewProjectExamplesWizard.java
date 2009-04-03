@@ -46,8 +46,8 @@ import org.eclipse.jdt.core.IClasspathEntry;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IPackageFragmentRoot;
 import org.eclipse.jdt.core.JavaCore;
-import org.eclipse.jdt.internal.core.JavaElementInfo;
 import org.eclipse.jdt.internal.core.JavaProject;
+import org.eclipse.jdt.internal.core.OpenableElementInfo;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.dialogs.MessageDialogWithToggle;
@@ -442,9 +442,9 @@ public class NewProjectExamplesWizard extends Wizard implements INewWizard {
 		IJavaProject javaProject = JavaCore.create(project);
 		if (javaProject != null && javaProject.exists() && javaProject.isOpen() && javaProject instanceof JavaProject) {
 			Object object = ((JavaProject) javaProject).getElementInfo();
-			if (object instanceof JavaElementInfo) {
+			if (object instanceof OpenableElementInfo) {
 				// copied from JavaProject.buildStructure(...)
-				JavaElementInfo info = (JavaElementInfo) object;
+				OpenableElementInfo info = (OpenableElementInfo) object;
 				IClasspathEntry[] resolvedClasspath = ((JavaProject) javaProject).getResolvedClasspath();
 				IPackageFragmentRoot[] children = ((JavaProject) javaProject).computePackageFragmentRoots(resolvedClasspath,false, null /* no reverse map */);
 				info.setChildren(children);
