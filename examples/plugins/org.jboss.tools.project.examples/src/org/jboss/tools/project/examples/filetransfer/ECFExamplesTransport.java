@@ -41,12 +41,12 @@ import org.eclipse.ecf.filetransfer.service.IRetrieveFileTransferFactory;
 import org.eclipse.ecf.provider.filetransfer.retrieve.AbstractRetrieveFileTransfer;
 import org.eclipse.equinox.internal.p2.core.helpers.LogHelper;
 import org.eclipse.equinox.internal.provisional.p2.core.IServiceUI;
-import org.eclipse.equinox.internal.provisional.p2.core.ProvisionException;
 import org.eclipse.equinox.internal.provisional.p2.core.IServiceUI.AuthenticationInfo;
 import org.eclipse.equinox.internal.provisional.p2.core.repository.IRepository;
 import org.eclipse.equinox.security.storage.ISecurePreferences;
 import org.eclipse.equinox.security.storage.SecurePreferencesFactory;
 import org.eclipse.equinox.security.storage.StorageException;
+import org.eclipse.osgi.util.NLS;
 import org.jboss.tools.project.examples.Messages;
 import org.jboss.tools.project.examples.ProjectExamplesActivator;
 import org.osgi.util.tracker.ServiceTracker;
@@ -226,7 +226,7 @@ public class ECFExamplesTransport {
 							long fileLength = rse.getSource().getFileLength();
 							final long totalWork = ((fileLength == -1) ? 100 : fileLength);
 							int work = (totalWork > Integer.MAX_VALUE) ? Integer.MAX_VALUE : (int) totalWork;
-							monitor.beginTask(Messages.ECFExamplesTransport_Downloading + name,work);
+							monitor.beginTask(NLS.bind(Messages.ECFExamplesTransport_Downloading, name), work);
 							oldWorked=0;
 						}
 					} catch (IOException e) {
@@ -251,10 +251,12 @@ public class ECFExamplesTransport {
 						int worked = (int) Math.round(factor * received);
 						double downloadRateBytesPerSecond = (received / ((System.currentTimeMillis() + 1 - transferStartTime) / 1000.0));
 						
-						String rates = String.format(" (at %s/s)", AbstractRetrieveFileTransfer.toHumanReadableBytes(downloadRateBytesPerSecond)); //$NON-NLS-1$
+						String downloadRateString = AbstractRetrieveFileTransfer.toHumanReadableBytes(downloadRateBytesPerSecond);
 						String receivedString = AbstractRetrieveFileTransfer.toHumanReadableBytes(received);
 						String fileLengthString = AbstractRetrieveFileTransfer.toHumanReadableBytes(fileLength);
-						monitor.subTask(receivedString + Messages.ECFExamplesTransport_of + fileLengthString + rates);
+						monitor.subTask(NLS.bind(
+								Messages.ECFExamplesTransport_ReceivedSize_Of_FileSize_At_RatePerSecond, 
+									new String[]{receivedString, fileLengthString, downloadRateString}));
 						monitor.worked(worked-oldWorked);
 						oldWorked=worked;
 					}
