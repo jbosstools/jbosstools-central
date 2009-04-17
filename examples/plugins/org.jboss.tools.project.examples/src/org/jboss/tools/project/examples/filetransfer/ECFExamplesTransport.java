@@ -13,6 +13,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.ecf.core.ContainerCreateException;
@@ -39,16 +40,16 @@ import org.eclipse.ecf.filetransfer.identity.FileCreateException;
 import org.eclipse.ecf.filetransfer.identity.FileIDFactory;
 import org.eclipse.ecf.filetransfer.service.IRetrieveFileTransferFactory;
 import org.eclipse.ecf.provider.filetransfer.retrieve.AbstractRetrieveFileTransfer;
-import org.eclipse.equinox.internal.p2.core.helpers.LogHelper;
 import org.eclipse.equinox.internal.provisional.p2.core.IServiceUI;
 import org.eclipse.equinox.internal.provisional.p2.core.IServiceUI.AuthenticationInfo;
-import org.eclipse.equinox.internal.provisional.p2.core.repository.IRepository;
 import org.eclipse.equinox.security.storage.ISecurePreferences;
 import org.eclipse.equinox.security.storage.SecurePreferencesFactory;
 import org.eclipse.equinox.security.storage.StorageException;
 import org.eclipse.osgi.util.NLS;
 import org.jboss.tools.project.examples.Messages;
 import org.jboss.tools.project.examples.ProjectExamplesActivator;
+import org.osgi.framework.Bundle;
+import org.osgi.framework.BundleException;
 import org.osgi.util.tracker.ServiceTracker;
 
 /**
@@ -65,6 +66,25 @@ public class ECFExamplesTransport {
 	private static final ProtocolException ERROR_401 = new ProtocolException();
 	private static final String SERVER_REDIRECT = Messages.ECFExamplesTransport_Server_redirected_too_many_times;
 	
+	/**
+	 * The node identifier for repository secure preference store.
+	 */
+	public static final String PREFERENCE_NODE = "org.jboss.tools.project.examples"; //$NON-NLS-1$
+
+	/**
+	 * The key for a string property providing the user name to an authenticated
+	 * URL.  This key is used in the secure preference store for repository data.
+	 * @see #PREFERENCE_NODE
+	 */
+	public static final String PROP_USERNAME = "username"; //$NON-NLS-1$
+
+	/**
+	 * The key for a string property providing the password to an authenticated
+	 * URL.  This key is used in the secure preference store for repository data.
+	 * @see #PREFERENCE_NODE
+	 */
+	public static final String PROP_PASSWORD = "password"; //$NON-NLS-1$
+
 	private static ECFExamplesTransport INSTANCE;
 	private ServiceTracker retrievalFactoryTracker;
 	
@@ -179,7 +199,18 @@ public class ECFExamplesTransport {
 			IConnectContext context = getConnectionContext(url, false);
 			for (int i = 0; i < LOGIN_RETRIES; i++) {
 				try {
-					return performDownload(name,url, destination, context, monitor);
+					IStatus status = performDownload(name,url, destination, context, monitor);
+					if (status.isOK()) {
+						return status;
+					} else {
+						Throwable exception = status.getException();
+						if (exception instanceof IncomingFileTransferException) {
+							int code = ((IncomingFileTransferException)exception).getErrorCode();
+							if (code == 401) {
+								context = getConnectionContext(url, true);
+							}
+						}
+					}
 				} catch (ProtocolException e) {
 					if (e == ERROR_401)
 						context = getConnectionContext(url, true);
@@ -363,7 +394,7 @@ public class ECFExamplesTransport {
 			//fall back to default platform encoding
 			nodeKey = URLEncoder.encode(hostLocation.toString());
 		}
-		String nodeName = IRepository.PREFERENCE_NODE + '/' + nodeKey;
+		String nodeName = PREFERENCE_NODE + '/' + nodeKey;
 		ISecurePreferences prefNode = null;
 		if (securePreferences.nodeExists(nodeName))
 			prefNode = securePreferences.node(nodeName);
@@ -371,8 +402,8 @@ public class ECFExamplesTransport {
 			if (prefNode == null)
 				return null;
 			try {
-				String username = prefNode.get(IRepository.PROP_USERNAME, null);
-				String password = prefNode.get(IRepository.PROP_PASSWORD, null);
+				String username = prefNode.get(PROP_USERNAME, null);
+				String password = prefNode.get(PROP_PASSWORD, null);
 				//if we don't have stored connection data just return a null connection context
 				if (username == null || password == null)
 					return null;
@@ -383,6 +414,15 @@ public class ECFExamplesTransport {
 			}
 		}
 		//need to prompt user for user name and password
+		// check if adminUIService has been started
+		Bundle bundle = Platform.getBundle("org.eclipse.equinox.p2.ui.sdk");
+		if (bundle != null && bundle.getState() != Bundle.ACTIVE) {
+			try {
+				bundle.start();
+			} catch (BundleException e) {
+				// ignore
+			}
+		}
 		ServiceTracker adminUITracker = new ServiceTracker(ProjectExamplesActivator.getBundleContext(), IServiceUI.class.getName(), null);
 		adminUITracker.open();
 		IServiceUI adminUIService = (IServiceUI) adminUITracker.getService();
@@ -397,8 +437,8 @@ public class ECFExamplesTransport {
 			if (prefNode == null)
 				prefNode = securePreferences.node(nodeName);
 			try {
-				prefNode.put(IRepository.PROP_USERNAME, loginDetails.getUserName(), true);
-				prefNode.put(IRepository.PROP_PASSWORD, loginDetails.getPassword(), true);
+				prefNode.put(PROP_USERNAME, loginDetails.getUserName(), true);
+				prefNode.put(PROP_PASSWORD, loginDetails.getPassword(), true);
 				prefNode.flush();
 			} catch (StorageException e1) {
 				String msg = Messages.ECFExamplesTransport_Internal_Error;
@@ -431,7 +471,7 @@ public class ECFExamplesTransport {
 				wait.join();
 			} catch (InterruptedException e) {
 				if (!logged)
-					LogHelper.log(new Status(IStatus.WARNING, ProjectExamplesActivator.PLUGIN_ID, Messages.ECFExamplesTransport_Unexpected_interrupt_while_waiting_on_ECF_transfer, e));
+					ProjectExamplesActivator.log(e);
 			}
 		}
 	}
