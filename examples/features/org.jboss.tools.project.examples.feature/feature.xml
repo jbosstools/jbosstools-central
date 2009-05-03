@@ -2,7 +2,7 @@
 <feature
       id="org.jboss.tools.project.examples.feature"
       label="%featureName"
-      version="1.0.0"
+      version="1.0.1"
       provider-name="%providerName"
       plugin="org.jboss.tools.project.examples">
 
@@ -24,6 +24,13 @@
 
    <plugin
          id="org.jboss.tools.project.examples"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.jboss.tools.seam.tutorial"
          download-size="0"
          install-size="0"
          version="0.0.0"

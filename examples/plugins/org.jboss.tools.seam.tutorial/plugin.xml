@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="org.eclipse.ui.cheatsheets.cheatSheetContent">
+      <category
+            id="org.jboss.tools.seam.tutorial"
+            name="JBoss Seam Tutorials">
+      </category>
+      <cheatsheet
+            category="org.jboss.tools.seam.tutorial"
+            contentFile="$nl$/cheatsheets/registration.xml"
+            id="org.jboss.tools.seam.tutorial.registration"
+            name="Your first Seam application: the registration example">
+         <description>
+            The registration example is a simple application that lets a new user store his username, real name and password in the database.
+         </description>
+      </cheatsheet>
+   </extension>
+
+</plugin>

@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: %BundleName
 Bundle-SymbolicName: org.jboss.tools.project.examples;singleton:=true
-Bundle-Version: 1.0.0
+Bundle-Version: 1.0.1
 Bundle-Activator: org.jboss.tools.project.examples.ProjectExamplesActivator
 Bundle-Vendor: %BunldeVendor
 Require-Bundle: org.eclipse.ui,
@@ -24,3 +24,10 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.jdt.core
 Bundle-ActivationPolicy: lazy
 Bundle-Localization: plugin
+Export-Package: org.jboss.tools.project.examples,
+ org.jboss.tools.project.examples.actions,
+ org.jboss.tools.project.examples.dialog,
+ org.jboss.tools.project.examples.dialog.xpl,
+ org.jboss.tools.project.examples.filetransfer,
+ org.jboss.tools.project.examples.model,
+ org.jboss.tools.project.examples.wizard

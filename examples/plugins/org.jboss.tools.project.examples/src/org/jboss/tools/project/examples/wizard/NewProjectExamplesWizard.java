@@ -96,8 +96,10 @@ public class NewProjectExamplesWizard extends Wizard implements INewWizard {
 	private IStructuredSelection selection;
 
 	private NewProjectExamplesWizardPage page;
+	
+	private static Shell shell;
 
-	protected boolean overwrite;
+	protected static boolean overwrite;
 
 	private WorkspaceJob workspaceJob;
 
@@ -174,7 +176,6 @@ public class NewProjectExamplesWizard extends Wizard implements INewWizard {
 		};
 		workspaceJob.setUser(true);
 		final boolean showQuickFix = page.showQuickFix();
-		workspaceJob.schedule();
 
 		if (showQuickFix) {
 			workspaceJob.addJobChangeListener(new IJobChangeListener() {
@@ -205,7 +206,7 @@ public class NewProjectExamplesWizard extends Wizard implements INewWizard {
 						List<IMarker> markers = ProjectExamplesActivator
 								.getMarkers(projects);
 						if (markers != null && markers.size() > 0) {
-							showQuickFix();
+							showQuickFix(projects);
 						}
 					}
 					openWelcome();
@@ -227,6 +228,7 @@ public class NewProjectExamplesWizard extends Wizard implements INewWizard {
 		} else {
 			openWelcome();
 		}
+		workspaceJob.schedule();
 		return true;
 	}
 
@@ -288,7 +290,7 @@ public class NewProjectExamplesWizard extends Wizard implements INewWizard {
 		}
 	}
 
-	private void showQuickFix() {
+	public static void showQuickFix(final List<Project> projects) {
 
 		Display.getDefault().asyncExec(new Runnable() {
 
@@ -303,7 +305,7 @@ public class NewProjectExamplesWizard extends Wizard implements INewWizard {
 		});
 	}
 
-	private void importProject(Project projectDescription, File file,
+	public static void importProject(Project projectDescription, File file,
 			IProgressMonitor monitor) throws Exception {
 		if (projectDescription.getIncludedProjects() == null) {
 			importSingleProject(projectDescription, file, monitor);
@@ -316,7 +318,7 @@ public class NewProjectExamplesWizard extends Wizard implements INewWizard {
 					Display.getDefault().syncExec(new Runnable() {
 
 						public void run() {
-							overwrite = MessageDialog.openQuestion(getShell(),
+							overwrite = MessageDialog.openQuestion(getActiveShell(),
 									Messages.NewProjectExamplesWizard_Question, NLS.bind(Messages.NewProjectExamplesWizard_OverwriteProject,
 										projectName));
 						}
@@ -350,14 +352,26 @@ public class NewProjectExamplesWizard extends Wizard implements INewWizard {
 				ImportOperation operation = new ImportOperation(workspace
 						.getRoot().getFullPath(), structureProvider.getRoot(),
 						structureProvider, OVERWRITE_ALL_QUERY, filesToImport);
-				operation.setContext(getShell());
+				operation.setContext(getActiveShell());
 				operation.run(monitor);
 				reconfigure(project, monitor);
 			}
 		}
 	}
 
-	private void importSingleProject(Project projectDescription, File file,
+	private static Shell getActiveShell() {
+		Display display = Display.getDefault();
+		shell = null;
+		display.syncExec(new Runnable() {
+
+			public void run() {
+				shell = Display.getCurrent().getActiveShell();
+			}
+			
+		});
+		return shell;
+	}
+	private static void importSingleProject(Project projectDescription, File file,
 			IProgressMonitor monitor) throws CoreException, ZipException,
 			IOException, InvocationTargetException, InterruptedException {
 		final String projectName = projectDescription.getName();
@@ -367,7 +381,7 @@ public class NewProjectExamplesWizard extends Wizard implements INewWizard {
 			Display.getDefault().syncExec(new Runnable() {
 
 				public void run() {
-					overwrite = MessageDialog.openQuestion(getShell(),
+					overwrite = MessageDialog.openQuestion(getActiveShell(),
 							Messages.NewProjectExamplesWizard_Question, NLS.bind(Messages.NewProjectExamplesWizard_OverwriteProject,
 									projectName));
 				}
@@ -387,7 +401,7 @@ public class NewProjectExamplesWizard extends Wizard implements INewWizard {
 		ImportOperation operation = new ImportOperation(workspace.getRoot()
 				.getFullPath(), structureProvider.getRoot(), structureProvider,
 				OVERWRITE_ALL_QUERY);
-		operation.setContext(getShell());
+		operation.setContext(getActiveShell());
 		operation.run(monitor);
 		reconfigure(project, monitor);
 	}
