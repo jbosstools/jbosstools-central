@@ -9,6 +9,7 @@ import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IStatusLineManager;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IRegion;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.ui.IActionBars;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IEditorSite;
@@ -24,6 +25,7 @@ import org.eclipse.ui.ide.IDE;
 import org.eclipse.ui.part.MultiPageEditorPart;
 import org.eclipse.ui.texteditor.ITextEditor;
 import org.jboss.tools.common.model.ui.editor.EditorPartWrapper;
+import org.jboss.tools.seam.tutorial.Messages;
 
 public class OpenFileInEditor extends Action implements ICheatSheetAction {
 
@@ -49,7 +51,7 @@ public class OpenFileInEditor extends Action implements ICheatSheetAction {
 				editor = IDE.openEditor(page, file, true);
 			}
 		} catch (PartInitException e) {
-			setStatusMessage(page,"Cannot open the " + params[0] + " file");
+			setStatusMessage(page,NLS.bind(Messages.OpenFileInEditor_Cannot_open, params[0]));
 			return;
 		}
 		ITextEditor textEditor = getTextEditor(editor);

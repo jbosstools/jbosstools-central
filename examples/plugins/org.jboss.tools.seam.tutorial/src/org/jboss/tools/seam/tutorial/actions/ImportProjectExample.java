@@ -34,7 +34,7 @@ public class ImportProjectExample extends Action implements ICheatSheetAction {
 		
 		Project project = new Project();
 		project.setName(params[0]);
-		StringTokenizer tokenizer = new StringTokenizer(params[1],",");
+		StringTokenizer tokenizer = new StringTokenizer(params[1],","); //$NON-NLS-1$
 		List<String> includedProjects = new ArrayList<String>();
 		while (tokenizer.hasMoreTokens()) {
 			includedProjects.add(tokenizer.nextToken().trim());

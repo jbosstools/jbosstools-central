@@ -415,7 +415,7 @@ public class ECFExamplesTransport {
 		}
 		//need to prompt user for user name and password
 		// check if adminUIService has been started
-		Bundle bundle = Platform.getBundle("org.eclipse.equinox.p2.ui.sdk");
+		Bundle bundle = Platform.getBundle("org.eclipse.equinox.p2.ui.sdk"); //$NON-NLS-1$
 		if (bundle != null && bundle.getState() != Bundle.ACTIVE) {
 			try {
 				bundle.start();
