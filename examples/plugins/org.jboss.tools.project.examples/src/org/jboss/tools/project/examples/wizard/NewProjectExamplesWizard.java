@@ -271,7 +271,7 @@ public class NewProjectExamplesWizard extends Wizard implements INewWizard {
 								if (id == null) {
 									id = ""; //$NON-NLS-1$
 								}
-								view.getCheatSheetViewer().setInput(id, id, finalURL, new DefaultStateManager(), true);
+								view.getCheatSheetViewer().setInput(id, id, finalURL, new DefaultStateManager(), false);
 							} else {
 								try {
 									IWorkbenchBrowserSupport browserSupport = ProjectExamplesActivator.getDefault().getWorkbench().getBrowserSupport();
