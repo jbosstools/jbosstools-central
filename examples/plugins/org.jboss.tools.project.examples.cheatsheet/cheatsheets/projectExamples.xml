@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8" ?> 
+<cheatsheet title="Project Examples Tutorial">
+
+  <intro>
+    <description>
+      Learn how to use Project Examples Wizard.
+    </description>
+  </intro>
+
+  <item title="Open the Seam perspective" dialog="false" skip="false" href="/org.eclipse.platform.doc.user/concepts/concepts-4.htm">
+      <description>
+         If you&apos;re not already in the Seam perspective, in the main menu select <b>Window</b> &gt; <b>Open Perspective</b> &gt; <b>Other</b> &gt; <b>Seam</b> or click on the &quot;Click to Perform&quot; link below.
+      </description>
+      <command serialization="org.eclipse.ui.perspectives.showPerspective(org.eclipse.ui.perspectives.showPerspective.perspectiveId=org.jboss.tools.seam.ui.SeamPerspective)" required="false" translate="">
+      </command>
+   </item>
+   
+  <item
+      title="Setup the Environment"
+      skip="true">
+    <description>
+    You must set up your environment before performing the steps in this tutorial.
+    <br/><br/>
+    <b>
+    If you have JBoss Developer Studio with EAP installed, your environment is already set correctly.
+    </b> 
+    </description>
+    <subitem
+            label="Create JBoss AS Runtime and Server using &quot;File &gt; New &gt; Other &gt; Server &gt; Server&quot; and select &quot;JBoss Comunity&quot; or &quot;JBoss Enterprise Middleware&quot; server type or click the &quot;Click to Perform&quot; link."
+            skip="true">
+    	<command 
+    		serialization="org.eclipse.ui.newWizard(newWizardId=org.eclipse.wst.server.ui.new.server)" 
+    		required="false" translate="">
+     	</command>
+	</subitem>
+	<subitem
+            label="Create a Seam Runtime using &quot;Window &gt; Preferences &gt; JBoss Tools &gt; Web &gt; Seam.&quot; or click the &quot;Click to Perform&quot; link."
+            skip="true">
+		<action
+			required="false"
+			pluginId="org.jboss.tools.project.examples.cheatsheet"
+			class="org.jboss.tools.project.examples.cheatsheet.actions.OpenPreferencePage"
+			param1="org.jboss.tools.common.model.ui.seam"/>
+	</subitem>
+	<subitem
+            label="Create a Database Connection Profile by selecting &quot;File &gt; New &gt; Other &gt; Connection Profiles &gt; Connection Profile.&quot; or click the &quot;Click to Perform&quot; link."
+            skip="true">
+		<command 
+    		serialization="org.eclipse.ui.newWizard(newWizardId=org.eclipse.datatools.connectivity.internal.ui.wizards.newconnectionprofile)" 
+    		required="false" translate="">
+     	</command>
+	</subitem>
+  </item>
+
+  <item
+      title="Call the Project Examples wizard">
+    <description>
+    	Click <b>Help > Project Examples</b> or the "Click to Perform" link below.
+    	<br/><br/>
+    	If you don't have JBoss Developer Studio with EAP, you will have to set your Server Runtime, Seam Runtime and Database Connection Profile. 
+After importing the project example, you will be able to use the Quick Fix dialog to set them. 
+    </description>
+    <command 
+    	serialization="org.eclipse.ui.newWizard(newWizardId=org.jboss.tools.project.examples.wizard.NewProjectExamplesWizard)" 
+    	required="false" translate="">
+     </command>   
+  </item>
+  
+</cheatsheet>

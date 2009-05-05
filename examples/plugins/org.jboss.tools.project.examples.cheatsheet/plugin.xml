@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="org.eclipse.ui.cheatsheets.cheatSheetContent">
+      <category
+            id="org.jboss.tools.project.examples.cheatsheet"
+            name="Project Examples Tutorial">
+      </category>
+      <cheatsheet
+            category="org.jboss.tools.project.examples.cheatsheet"
+            contentFile="$nl$/cheatsheets/projectExamples.xml"
+            id="org.jboss.tools.project.examples.cheatsheet.projectExamples"
+            name="Project Examples Tutorial">
+         <description>
+            Learn how to use Project Examples Wizard
+         </description>
+      </cheatsheet>
+   </extension>
+
+</plugin>
