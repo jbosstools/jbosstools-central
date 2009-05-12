@@ -100,7 +100,7 @@ public class NewProjectExamplesWizardPage extends WizardPage {
 		final ProjectExamplesPatternFilter filter = new ProjectExamplesPatternFilter();
 		
 		int styleBits = SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL | SWT.BORDER;
-		final FilteredTree filteredTree = new FilteredTree(composite, styleBits, filter);
+		final FilteredTree filteredTree = new FilteredTree(composite, styleBits, filter,true);
 		filteredTree.setBackground(parent.getDisplay().getSystemColor(
 				SWT.COLOR_WIDGET_BACKGROUND));
 		final TreeViewer viewer = filteredTree.getViewer();

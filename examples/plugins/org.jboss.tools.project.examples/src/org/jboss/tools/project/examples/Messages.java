@@ -22,7 +22,6 @@ public class Messages extends NLS {
 	public static String ECFExamplesTransport_Loading;
 	public static String ECFExamplesTransport_ReceivedSize_Of_FileSize_At_RatePerSecond;
 	public static String ECFExamplesTransport_Server_redirected_too_many_times;
-	public static String ECFExamplesTransport_Unexpected_interrupt_while_waiting_on_ECF_transfer;
 	public static String MarkerDialog_Description;
 	public static String MarkerDialog_Finish;
 	public static String MarkerDialog_Markers;
@@ -46,13 +45,29 @@ public class Messages extends NLS {
 	public static String NewProjectExamplesWizardPage_Projects;
 	public static String NewProjectExamplesWizardPage_Show_the_Quick_Fix_dialog;
 	public static String NewProjectExamplesWizardPage_URL;
-	public static String Project_JBoss_Tools_Team_from_jboss_org;
-	public static String Project_Local;
 	public static String Project_Unknown;
 	public static String ProjectExamplesActivator_All;
 	public static String ProjectExamplesActivator_Waiting;
+	public static String ProjectExamplesPreferencePage_Add;
+	public static String ProjectExamplesPreferencePage_Edit;
+	public static String ProjectExamplesPreferencePage_Remove;
+	public static String ProjectExamplesPreferencePage_Show_experimental_sites;
+	public static String ProjectExamplesPreferencePage_Sites;
+	public static String ProjectUtil_Invalid_preferences;
 	public static String ProjectUtil_Invalid_URL;
 	public static String ProjectUtil_Invalid_welcome_element;
+	public static String ProjectUtil_Test;
+	public static String SiteDialog_Add_Project_Example_Site;
+	public static String SiteDialog_Browse;
+	public static String SiteDialog_Edit_Project_Example_Site;
+	public static String SiteDialog_Invalid_URL;
+	public static String SiteDialog_Name;
+	public static String SiteDialog_The_name_field_is_required;
+	public static String SiteDialog_The_site_already_exists;
+	public static String SiteDialog_The_url_field_is_required;
+	public static String SiteDialog_URL;
+	public static String Sites_Plugin_provided_sites;
+	public static String Sites_User_sites;
 	static {
 		// initialize resource bundle
 		NLS.initializeMessages(BUNDLE_NAME, Messages.class);

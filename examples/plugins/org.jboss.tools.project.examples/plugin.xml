@@ -42,8 +42,30 @@
       </menuContribution>
    </extension>
    <extension
-        point="org.jboss.tools.project.examples.projectExamplesXml">
+        point="org.jboss.tools.project.examples.projectExamplesXml"
+        name="%JBoss_Developer_Studio_Examples">
         <url>http://download.jboss.org/jbosstools/examples/project-examples-3.0.xml</url>
+        <experimental>false</experimental>
+   </extension>
+   
+   <extension
+        point="org.jboss.tools.project.examples.projectExamplesXml"
+        name="%JBoss_Tools_Community_Examples">
+        <url>http://anonsvn.jboss.org/repos/jbosstools/workspace/examples/project-examples-3.1.xml </url>
+        <experimental>true</experimental>
    </extension>
   
+   <extension
+        point="org.eclipse.ui.preferencePages">
+     <page
+           category="org.jboss.tools.common.model.ui.MainPreferencePage"
+           class="org.jboss.tools.project.examples.preferences.ProjectExamplesPreferencePage"
+           id="org.jboss.tools.project.examples.preferences.projectExamplesPreferencePage"
+           name="%Project_Examples"/>
+    </extension>
+    
+    <extension
+         point="org.eclipse.core.runtime.preferences">
+      <initializer class="org.jboss.tools.project.examples.preferences.ProjectExamplesPreferencesInitializer"/>
+   </extension>
 </plugin>
