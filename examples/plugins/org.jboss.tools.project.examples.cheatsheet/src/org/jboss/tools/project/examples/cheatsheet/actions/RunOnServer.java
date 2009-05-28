@@ -34,7 +34,7 @@ public class RunOnServer extends Action implements ICheatSheetAction {
 		}
 		if (params[1] != null) {
 			IFile file = wRoot.getFile(new Path(params[1]));
-			if (file != null || file.exists()) {
+			if (file != null && file.exists()) {
 				try {
 					SingleDeployableFactory.makeDeployable(file.getFullPath());
 					IServer[] deployableServersAsIServers = ServerConverter
