@@ -40,6 +40,7 @@ import org.eclipse.ecf.filetransfer.identity.FileCreateException;
 import org.eclipse.ecf.filetransfer.identity.FileIDFactory;
 import org.eclipse.ecf.filetransfer.service.IRetrieveFileTransferFactory;
 import org.eclipse.ecf.provider.filetransfer.retrieve.AbstractRetrieveFileTransfer;
+import org.eclipse.equinox.internal.p2.core.helpers.ServiceHelper;
 import org.eclipse.equinox.internal.provisional.p2.core.IServiceUI;
 import org.eclipse.equinox.internal.provisional.p2.core.IServiceUI.AuthenticationInfo;
 import org.eclipse.equinox.security.storage.ISecurePreferences;
@@ -49,7 +50,10 @@ import org.eclipse.osgi.util.NLS;
 import org.jboss.tools.project.examples.Messages;
 import org.jboss.tools.project.examples.ProjectExamplesActivator;
 import org.osgi.framework.Bundle;
+import org.osgi.framework.BundleContext;
 import org.osgi.framework.BundleException;
+import org.osgi.framework.ServiceReference;
+import org.osgi.service.packageadmin.PackageAdmin;
 import org.osgi.util.tracker.ServiceTracker;
 
 /**
@@ -126,8 +130,6 @@ public class ECFExamplesTransport {
 	 * Private to avoid client instantiation.
 	 */
 	private ECFExamplesTransport() {
-		retrievalFactoryTracker = new ServiceTracker(ProjectExamplesActivator.getBundleContext(), IRetrieveFileTransferFactory.class.getName(), null);
-		retrievalFactoryTracker.open();
 	}
 	
 	/**
@@ -232,7 +234,7 @@ public class ECFExamplesTransport {
 	}
 
 	public IStatus performDownload(String name,String toDownload, OutputStream target, IConnectContext context, IProgressMonitor monitor) throws ProtocolException {
-		IRetrieveFileTransferFactory factory = (IRetrieveFileTransferFactory) retrievalFactoryTracker.getService();
+		IRetrieveFileTransferFactory factory = (IRetrieveFileTransferFactory) getFileTransferServiceTracker().getService();
 		if (factory == null)
 			return new Status(IStatus.ERROR, ProjectExamplesActivator.PLUGIN_ID, Messages.ECFExamplesTransport_IO_error);
 
@@ -474,5 +476,47 @@ public class ECFExamplesTransport {
 					ProjectExamplesActivator.log(e);
 			}
 		}
+	}
+	
+	private synchronized ServiceTracker getFileTransferServiceTracker() {
+		if (retrievalFactoryTracker == null) {
+			retrievalFactoryTracker = new ServiceTracker(ProjectExamplesActivator.getBundleContext(), IRetrieveFileTransferFactory.class.getName(), null);
+			retrievalFactoryTracker.open();
+			startBundle("org.eclipse.ecf"); //$NON-NLS-1$
+			startBundle("org.eclipse.ecf.provider.filetransfer"); //$NON-NLS-1$
+		}
+		return retrievalFactoryTracker;
+	}
+	
+	private boolean startBundle(String bundleId) {
+		PackageAdmin packageAdmin = (PackageAdmin) ServiceHelper.getService(ProjectExamplesActivator.getBundleContext(), PackageAdmin.class.getName());
+		if (packageAdmin == null)
+			return false;
+
+		Bundle[] bundles = packageAdmin.getBundles(bundleId, null);
+		if (bundles != null && bundles.length > 0) {
+			for (int i = 0; i < bundles.length; i++) {
+				try {
+					if ((bundles[0].getState() & Bundle.INSTALLED) == 0) {
+						bundles[0].start();
+						return true;
+					}
+				} catch (BundleException e) {
+					// failed, try next bundle
+				}
+			}
+		}
+		return false;
+	}
+
+	public static Object getService(BundleContext context, String name) {
+		if (context == null)
+			return null;
+		ServiceReference reference = context.getServiceReference(name);
+		if (reference == null)
+			return null;
+		Object result = context.getService(reference);
+		context.ungetService(reference);
+		return result;
 	}
 }
