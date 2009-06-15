@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<feature
+      id="org.jboss.tools.maven.seam.feature"
+      label="%featureName"
+      version="1.0.0"
+      provider-name="%providerName"
+      plugin="org.jboss.tools.maven.seam">
+
+   <description>
+      %description
+   </description>
+
+   <copyright>
+      %copyright
+   </copyright>
+
+   <license url="%licenseURL">
+      %license
+   </license>
+
+   <url>
+      <update label="%updateSiteName" url="http://download.jboss.org/jbosstools/updates/stable"/>
+   </url>
+
+   <plugin
+         id="org.jboss.tools.maven.seam"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+</feature>
