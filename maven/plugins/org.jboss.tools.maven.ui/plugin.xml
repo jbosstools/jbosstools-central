@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+
+  <extension 
+        point="org.eclipse.wst.common.project.facet.ui.wizardPages">
+    <wizard-pages action="jboss.m2.install">
+        <page class="org.jboss.tools.maven.ui.internal.project.facet.MavenFacetInstallPage"/>
+    </wizard-pages>
+  </extension> 
+  
+</plugin>

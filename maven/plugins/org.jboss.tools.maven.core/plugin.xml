@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+	
+    <extension point="org.eclipse.wst.common.project.facet.core.facets">
+   
+	 <project-facet id="jboss.m2">   
+    	<label>JBoss Maven Integration</label>
+    	<description>
+      		Adds support for Maven.
+    	</description>
+    	<default-version version="1.0"/>
+  	  </project-facet>
+  	  
+  	  <project-facet-version facet="jboss.m2" version="1.0">
+      	<constraint>
+        	<and>
+          		<requires facet="jst.java" version="[5.0"/>
+          		<requires facet="jst.web" version="[2.3"/>
+        	</and>
+      	</constraint>
+      </project-facet-version>
+      
+     <action id="jboss.m2.install" facet="jboss.m2" type="INSTALL" version="1.0">
+      	<delegate class="org.jboss.tools.maven.core.internal.project.facet.MavenFacetInstallDelegate"/>
+      	<config-factory class="org.jboss.tools.maven.core.internal.project.facet.MavenFacetInstallDataModelProvider"/>
+     </action>  
+      
+    </extension>
+     
+    <extension point="org.eclipse.wst.common.project.facet.core.runtimes">
+    	<supported>
+			<runtime-component any="true"/>
+        		<facet id="jboss.m2" version="1.0"/>
+    	</supported>
+    </extension>
+   
+</plugin>

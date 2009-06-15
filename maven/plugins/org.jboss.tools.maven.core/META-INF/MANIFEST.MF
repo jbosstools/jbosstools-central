@@ -1,0 +1,26 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: JBoss Maven Core
+Bundle-SymbolicName: org.jboss.tools.maven.core; singleton:=true
+Bundle-Version: 1.0.0
+Bundle-Activator: org.jboss.tools.maven.core.MavenCoreActivator
+Require-Bundle: org.eclipse.core.runtime,
+ org.eclipse.wst.common.project.facet.core;visibility:=reexport,
+ org.eclipse.jst.common.project.facet.core;visibility:=reexport,
+ org.eclipse.core.resources;visibility:=reexport,
+ org.eclipse.wst.common.frameworks;visibility:=reexport,
+ org.eclipse.jst.common.frameworks;visibility:=reexport,
+ org.eclipse.wst.common.modulecore;visibility:=reexport,
+ org.maven.ide.eclipse;visibility:=reexport,
+ org.maven.ide.components.maven_embedder;visibility:=reexport,
+ org.eclipse.jdt.core;visibility:=reexport,
+ org.maven.ide.eclipse.jdt;visibility:=reexport,
+ org.eclipse.jst.j2ee;visibility:=reexport,
+ org.eclipse.jst.j2ee.web;visibility:=reexport,
+ org.jboss.tools.common;visibility:=reexport,
+ org.eclipse.jdt.launching;visibility:=reexport
+Bundle-ActivationPolicy: lazy
+Bundle-RequiredExecutionEnvironment: J2SE-1.5
+Bundle-Vendor: JBoss, a division of Red Hat
+Export-Package: org.jboss.tools.maven.core,
+ org.jboss.tools.maven.core.internal.project.facet
