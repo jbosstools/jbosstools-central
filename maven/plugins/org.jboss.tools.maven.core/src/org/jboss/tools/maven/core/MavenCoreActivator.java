@@ -123,8 +123,10 @@ public class MavenCoreActivator extends Plugin {
 			}
 		}
 		if (!hasJavaNature) {
-			createFolder("target",monitor, project);
-			IFolder binFolder = createFolder("target/classes",monitor, project); 
+			// EAR project
+			createFolder("src",monitor, project);
+			createFolder("src/main",monitor,project);
+			IFolder binFolder = createFolder("src/main/application",monitor, project); 
 			String[] newNatureIds = new String[natureIds.length + 1];
 			for (int i = 0; i < natureIds.length; i++) {
 				newNatureIds[i]=natureIds[i];

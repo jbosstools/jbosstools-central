@@ -137,17 +137,15 @@ public class MavenSeamActivator extends AbstractUIPlugin {
 		parentArtifactId = artifactId + PARENT_SUFFIX;
 		testProjectName = webProjectName + TEST_SUFFIX;
 		testArtifactId = artifactId + TEST_SUFFIX;
+		earProjectName = webProjectName + EAR_SUFFIX;
+		earArtifactId = artifactId + EAR_SUFFIX;
+		ejbProjectName = webProjectName + EJB_SUFFIX;
+		ejbArtifactId = artifactId + EJB_SUFFIX;
 		configureParentProject(m2FacetModel, seamFacetModel);
 		configureWarProject(m2FacetModel, seamFacetModel);
 		configureTestProject(m2FacetModel, seamFacetModel);
 		if (!SeamFacetAbstractInstallDelegate
 				.isWarConfiguration(seamFacetModel)) {
-			
-			earProjectName = webProjectName + EAR_SUFFIX;
-			earArtifactId = artifactId + EAR_SUFFIX;
-			ejbProjectName = webProjectName + EJB_SUFFIX;
-			ejbArtifactId = artifactId + EJB_SUFFIX;
-
 			configureEjbProject(m2FacetModel, seamFacetModel);
 			configureEarProject(m2FacetModel, seamFacetModel);
 			
@@ -360,7 +358,7 @@ public class MavenSeamActivator extends AbstractUIPlugin {
 				if (sourceDirectory != null) {
 					build.setSourceDirectory(sourceDirectory);
 				}
-				build.setOutputDirectory("target/classes");
+				build.setOutputDirectory("src/main/application");
 				MavenCoreActivator.addMavenEarPlugin(build, project, m2FacetModel, true);
 				model.setBuild(build);
 				MavenCoreActivator.createMavenProject(earProjectName, null, model, true);
