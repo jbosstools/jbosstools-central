@@ -124,9 +124,8 @@ public class MavenCoreActivator extends Plugin {
 		}
 		if (!hasJavaNature) {
 			// EAR project
-			createFolder("src",monitor, project);
-			createFolder("src/main",monitor,project);
-			IFolder binFolder = createFolder("src/main/application",monitor, project); 
+			createFolder("target",monitor, project);
+			IFolder binFolder = createFolder("target/classes",monitor, project); 
 			String[] newNatureIds = new String[natureIds.length + 1];
 			for (int i = 0; i < natureIds.length; i++) {
 				newNatureIds[i]=natureIds[i];
@@ -338,6 +337,9 @@ public class MavenCoreActivator extends Plugin {
 		Xpp3Dom defaultLibBundleDir = new Xpp3Dom("defaultLibBundleDir");
 		defaultLibBundleDir.setValue("lib");
 		configuration.addChild(defaultLibBundleDir);
+		Xpp3Dom earSourceDirectory = new Xpp3Dom("earSourceDirectory");
+		earSourceDirectory.setValue(sourceDirectory);
+		configuration.addChild(earSourceDirectory);
 		
 		if (addModule) {
 			Xpp3Dom modules = new Xpp3Dom("modules");

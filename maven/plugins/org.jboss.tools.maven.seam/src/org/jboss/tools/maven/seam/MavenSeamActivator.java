@@ -352,13 +352,13 @@ public class MavenSeamActivator extends AbstractUIPlugin {
 			
 			Build build = new Build();
 			try {
-				//build.setFinalName(earProjectName);
+				build.setFinalName(earProjectName);
 				
 				String sourceDirectory = MavenCoreActivator.getEarRoot(project);
 				if (sourceDirectory != null) {
 					build.setSourceDirectory(sourceDirectory);
 				}
-				build.setOutputDirectory("src/main/application");
+				build.setOutputDirectory("target/classes");
 				MavenCoreActivator.addMavenEarPlugin(build, project, m2FacetModel, true);
 				model.setBuild(build);
 				MavenCoreActivator.createMavenProject(earProjectName, null, model, true);
