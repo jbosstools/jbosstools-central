@@ -52,6 +52,8 @@ import org.jboss.tools.seam.internal.core.project.facet.SeamFacetAbstractInstall
 import org.maven.ide.eclipse.MavenPlugin;
 import org.maven.ide.eclipse.core.IMavenConstants;
 import org.maven.ide.eclipse.embedder.MavenModelManager;
+import org.maven.ide.eclipse.project.MavenProjectManager;
+import org.maven.ide.eclipse.project.ResolverConfiguration;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 
@@ -770,6 +772,12 @@ public class MavenSeamActivator extends AbstractUIPlugin {
 			}
 			
 			MavenCoreActivator.createMavenProject(parentProjectName, null, model, false);
+			// disable workspace resolution
+			MavenProjectManager projectManager = MavenPlugin.getDefault().getMavenProjectManager();
+		    IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject(parentProjectName);
+		    ResolverConfiguration configuration = projectManager.getResolverConfiguration(project);
+		    configuration.setResolveWorkspaceProjects(false);
+		    projectManager.setResolverConfiguration(project, configuration);
 		} catch (Exception e) {
 			log(e);
 		}
