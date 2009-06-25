@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Integration Seam projects with Maven
 Bundle-SymbolicName: org.jboss.tools.maven.seam;singleton:=true
-Bundle-Version: 1.0.0
+Bundle-Version: 1.0.0.qualifier
 Bundle-Activator: org.jboss.tools.maven.seam.MavenSeamActivator
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
@@ -12,4 +12,4 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.jst.j2ee.core
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
-Bundle-Vendor: JBoss, a division of Red Hat
+Bundle-Vendor: JBoss by Red Hat

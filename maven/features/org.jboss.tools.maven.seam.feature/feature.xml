@@ -2,7 +2,7 @@
 <feature
       id="org.jboss.tools.maven.seam.feature"
       label="%featureName"
-      version="1.0.0"
+      version="1.0.0.qualifier"
       provider-name="%providerName"
       plugin="org.jboss.tools.maven.seam">
 
