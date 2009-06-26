@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<feature
+      id="org.jboss.tools.maven.sdk.feature"
+      label="%featureName"
+      version="1.0.0.qualifier"
+      provider-name="%providerName">
+
+   <description>
+      %description
+   </description>
+
+   <copyright>
+      %copyright
+   </copyright>
+
+   <license url="%licenseURL">
+      %license
+   </license>
+
+   <url>
+      <update label="%updateSiteName" url="http://download.jboss.org/jbosstools/updates/stable"/>
+   </url>
+
+   <includes
+         id="org.jboss.tools.maven.feature" version="0.0.0"/>
+
+   <includes
+         id="org.jboss.tools.maven.source.feature" version="0.0.0"/>
+
+   <includes
+         id="org.jboss.tools.maven.seam.feature" version="0.0.0"/>
+
+   <includes
+         id="org.jboss.tools.maven.seam.source.feature" version="0.0.0"/>
+
+</feature>
