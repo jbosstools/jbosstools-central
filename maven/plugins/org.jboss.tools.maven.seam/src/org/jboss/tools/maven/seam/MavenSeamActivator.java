@@ -1,6 +1,9 @@
 package org.jboss.tools.maven.seam;
 
-import java.io.File;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.Reader;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -12,7 +15,6 @@ import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Exclusion;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Parent;
-import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.ResourcesPlugin;
@@ -22,7 +24,6 @@ import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.jdt.core.IClasspathEntry;
@@ -30,20 +31,14 @@ import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jst.j2ee.application.Application;
-import org.eclipse.jst.j2ee.application.ApplicationFactory;
 import org.eclipse.jst.j2ee.application.EjbModule;
 import org.eclipse.jst.j2ee.application.WebModule;
 import org.eclipse.jst.j2ee.componentcore.util.EARArtifactEdit;
-import org.eclipse.jst.j2ee.project.facet.EarFacetRuntimeHandler;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
-import org.eclipse.wst.common.componentcore.ComponentCore;
 import org.eclipse.wst.common.componentcore.datamodel.properties.IFacetDataModelProperties;
-import org.eclipse.wst.common.componentcore.resources.IVirtualComponent;
-import org.eclipse.wst.common.componentcore.resources.IVirtualFolder;
 import org.eclipse.wst.common.frameworks.datamodel.IDataModel;
 import org.eclipse.wst.common.project.facet.core.FacetedProjectFramework;
 import org.eclipse.wst.common.project.facet.core.IFacetedProject;
-import org.eclipse.wst.common.project.facet.core.IFacetedProjectWorkingCopy;
 import org.eclipse.wst.common.project.facet.core.ProjectFacetsManager;
 import org.jboss.tools.maven.core.IJBossMavenConstants;
 import org.jboss.tools.maven.core.MavenCoreActivator;
@@ -738,11 +733,12 @@ public class MavenSeamActivator extends AbstractUIPlugin {
 	private void configureParentProject(IDataModel m2FacetModel, IDataModel seamFacetModel) {
 		Bundle bundle = getDefault().getBundle();
 		URL parentPomEntryURL = bundle.getEntry("/poms/parent-pom.xml");
+		Reader reader = null;
 		try {
 			URL resolvedURL = FileLocator.resolve(parentPomEntryURL);
-			File pomFile = new File(FileLocator.toFileURL(resolvedURL).getFile());
 			MavenModelManager modelManager = MavenPlugin.getDefault().getMavenModelManager();
-			Model model = modelManager.readMavenModel(pomFile);
+			reader = new BufferedReader(new InputStreamReader(resolvedURL.openStream()));
+			Model model = modelManager.readMavenModel(reader);
 			model.setArtifactId(parentArtifactId);
 			model.setGroupId(m2FacetModel.getStringProperty(IJBossMavenConstants.GROUP_ID));
 			String projectVersion = m2FacetModel.getStringProperty(IJBossMavenConstants.VERSION);
@@ -780,6 +776,12 @@ public class MavenSeamActivator extends AbstractUIPlugin {
 		    projectManager.setResolverConfiguration(project, configuration);
 		} catch (Exception e) {
 			log(e);
+		} finally {
+			if (reader != null) {
+				try {
+					reader.close();
+				} catch (IOException ignore) {}
+			}
 		}
 	}
 
