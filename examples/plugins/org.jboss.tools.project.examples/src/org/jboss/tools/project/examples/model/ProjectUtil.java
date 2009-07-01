@@ -258,7 +258,7 @@ public class ProjectUtil {
 									}
 									project.setCategory(category);
 								}
-								if (nodeName.equals(NAME)) { //$NON-NLS-1$
+								if (nodeName.equals(NAME)) { 
 									project.setName(getContent(child));
 								}
 								if (nodeName.equals("site")) { //$NON-NLS-1$
@@ -271,7 +271,7 @@ public class ProjectUtil {
 								if (nodeName.equals("description")) { //$NON-NLS-1$
 									project.setDescription(getContent(child));
 								}
-								if (nodeName.equals(URL)) { //$NON-NLS-1$
+								if (nodeName.equals(URL)) { 
 									project.setUrl(getContent(child));
 								}
 								if (nodeName.equals("size")) { //$NON-NLS-1$
@@ -306,7 +306,7 @@ public class ProjectUtil {
 									} else {
 										project.setType(EDITOR);
 									}
-									attribute = child.getAttribute(URL); //$NON-NLS-1$
+									attribute = child.getAttribute(URL); 
 									if (attribute == null || attribute.trim().length() <= 0) {
 										project.setWelcome(false);
 										ProjectExamplesActivator.log(Messages.ProjectUtil_Invalid_welcome_element);
@@ -406,7 +406,7 @@ public class ProjectUtil {
 			return ""; //$NON-NLS-1$
 		}
 		Document doc = getDocument();
-		Element sitesElement = doc.createElement(SITES); //$NON-NLS-1$
+		Element sitesElement = doc.createElement(SITES); 
 		doc.appendChild(sitesElement);
 		for (ProjectExampleSite site : sites) {
 			Element siteElement = doc.createElement(SITE);
