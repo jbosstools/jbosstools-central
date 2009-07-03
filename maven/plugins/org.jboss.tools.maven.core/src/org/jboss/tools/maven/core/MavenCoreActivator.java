@@ -48,14 +48,14 @@ import org.osgi.framework.BundleContext;
  */
 public class MavenCoreActivator extends Plugin {
 
-	private static final String SEPARATOR = "/";
+	private static final String SEPARATOR = "/"; //$NON-NLS-1$
 
 	// The plug-in ID
-	public static final String PLUGIN_ID = "org.jboss.tools.maven.core";
+	public static final String PLUGIN_ID = "org.jboss.tools.maven.core"; //$NON-NLS-1$
 
 	public static final String OWNER_PROJECT_FACETS_ATTR = "owner.project.facets"; //$NON-NLS-1$
     
-	public static final String BASEDIR = "${basedir}";
+	public static final String BASEDIR = "${basedir}"; //$NON-NLS-1$
 	
 	// The shared instance
 	private static MavenCoreActivator plugin;
@@ -124,8 +124,8 @@ public class MavenCoreActivator extends Plugin {
 		}
 		if (!hasJavaNature) {
 			// EAR project
-			createFolder("target",monitor, project);
-			IFolder binFolder = createFolder("target/classes",monitor, project); 
+			createFolder("target",monitor, project); //$NON-NLS-1$
+			IFolder binFolder = createFolder("target/classes",monitor, project);  //$NON-NLS-1$
 			String[] newNatureIds = new String[natureIds.length + 1];
 			for (int i = 0; i < natureIds.length; i++) {
 				newNatureIds[i]=natureIds[i];
@@ -265,7 +265,7 @@ public class MavenCoreActivator extends Plugin {
 		resolverConfiguration.setIncludeModules(false);
 		// FIXME
 		resolverConfiguration.setResolveWorkspaceProjects(true);
-		resolverConfiguration.setActiveProfiles("");
+		resolverConfiguration.setActiveProfiles(""); //$NON-NLS-1$
 		IProjectConfigurationManager configurationManager = MavenPlugin
 				.getDefault().getProjectConfigurationManager();
 		configurationManager.updateProjectConfiguration(project,
@@ -276,17 +276,17 @@ public class MavenCoreActivator extends Plugin {
 	
 	public static void addMavenWarPlugin(Build build, IProject project) throws JavaModelException {
 		org.apache.maven.model.Plugin plugin = new org.apache.maven.model.Plugin();
-		plugin.setGroupId("org.apache.maven.plugins");
-		plugin.setArtifactId("maven-war-plugin");
+		plugin.setGroupId("org.apache.maven.plugins"); //$NON-NLS-1$
+		plugin.setArtifactId("maven-war-plugin"); //$NON-NLS-1$
 		
-		Xpp3Dom configuration = new Xpp3Dom( "configuration" );
-		Xpp3Dom webappDirectory = new Xpp3Dom("webappDirectory");
+		Xpp3Dom configuration = new Xpp3Dom( "configuration" ); //$NON-NLS-1$
+		Xpp3Dom webappDirectory = new Xpp3Dom("webappDirectory"); //$NON-NLS-1$
 		IVirtualComponent component = ComponentCore.createComponent(project);
 		IVirtualFolder rootFolder = component.getRootFolder();
 		IContainer root = rootFolder.getUnderlyingFolder();
 		String webContentRoot = root.getProjectRelativePath().toString();
 		configuration.addChild(webappDirectory); 
-		Xpp3Dom warSourceDirectory = new Xpp3Dom("warSourceDirectory");
+		Xpp3Dom warSourceDirectory = new Xpp3Dom("warSourceDirectory"); //$NON-NLS-1$
 		if (webContentRoot.startsWith(SEPARATOR)) {
 			webappDirectory.setValue(MavenCoreActivator.BASEDIR + webContentRoot);
 			warSourceDirectory.setValue(MavenCoreActivator.BASEDIR + webContentRoot);
@@ -314,7 +314,7 @@ public class MavenCoreActivator extends Plugin {
 		if (sourceDirectory != null) {
 			resource.setDirectory(sourceDirectory);
 			List<String> excludes = new ArrayList<String>();
-			excludes.add("**/*.java");
+			excludes.add("**/*.java"); //$NON-NLS-1$
 			resource.setExcludes(excludes);
 		}
 		build.getResources().add(resource);
@@ -324,55 +324,55 @@ public class MavenCoreActivator extends Plugin {
 		String sourceDirectory = getEarRoot(project);
 		build.setSourceDirectory(sourceDirectory);
 		org.apache.maven.model.Plugin plugin = new org.apache.maven.model.Plugin();
-		plugin.setGroupId("org.apache.maven.plugins");
-		plugin.setArtifactId("maven-ear-plugin");
+		plugin.setGroupId("org.apache.maven.plugins"); //$NON-NLS-1$
+		plugin.setArtifactId("maven-ear-plugin"); //$NON-NLS-1$
 		
-		Xpp3Dom configuration = new Xpp3Dom( "configuration" );
-		Xpp3Dom version = new Xpp3Dom("version");
-		version.setValue("5");
+		Xpp3Dom configuration = new Xpp3Dom( "configuration" ); //$NON-NLS-1$
+		Xpp3Dom version = new Xpp3Dom("version"); //$NON-NLS-1$
+		version.setValue("5"); //$NON-NLS-1$
 		configuration.addChild(version);
-		Xpp3Dom generateApplicationXml = new Xpp3Dom("generateApplicationXml");
-		generateApplicationXml.setValue("false");
+		Xpp3Dom generateApplicationXml = new Xpp3Dom("generateApplicationXml"); //$NON-NLS-1$
+		generateApplicationXml.setValue("false"); //$NON-NLS-1$
 		configuration.addChild(generateApplicationXml);
-		Xpp3Dom defaultLibBundleDir = new Xpp3Dom("defaultLibBundleDir");
-		defaultLibBundleDir.setValue("lib");
+		Xpp3Dom defaultLibBundleDir = new Xpp3Dom("defaultLibBundleDir"); //$NON-NLS-1$
+		defaultLibBundleDir.setValue("lib"); //$NON-NLS-1$
 		configuration.addChild(defaultLibBundleDir);
-		Xpp3Dom earSourceDirectory = new Xpp3Dom("earSourceDirectory");
+		Xpp3Dom earSourceDirectory = new Xpp3Dom("earSourceDirectory"); //$NON-NLS-1$
 		earSourceDirectory.setValue(sourceDirectory);
 		configuration.addChild(earSourceDirectory);
 		
 		if (addModule) {
-			Xpp3Dom modules = new Xpp3Dom("modules");
+			Xpp3Dom modules = new Xpp3Dom("modules"); //$NON-NLS-1$
 			configuration.addChild(modules);
 
 			Xpp3Dom ejbProject = getEarModule(
-					"ejbModule",
+					"ejbModule", //$NON-NLS-1$
 					m2FacetModel.getStringProperty(IJBossMavenConstants.GROUP_ID),
 					m2FacetModel.getStringProperty(IJBossMavenConstants.ARTIFACT_ID)
-							+ "-ejb", "/");
+							+ "-ejb", "/"); //$NON-NLS-1$ //$NON-NLS-2$
 			modules.addChild(ejbProject);
 
-			Xpp3Dom seamModule = getEarModule("ejbModule", "org.jboss.seam",
-					"jboss-seam", "/");
+			Xpp3Dom seamModule = getEarModule("ejbModule", "org.jboss.seam", //$NON-NLS-1$ //$NON-NLS-2$
+					"jboss-seam", "/"); //$NON-NLS-1$ //$NON-NLS-2$
 			modules.addChild(seamModule);
 
 			Xpp3Dom webProject = getEarModule(
-					"webModule",
+					"webModule", //$NON-NLS-1$
 					m2FacetModel.getStringProperty(IJBossMavenConstants.GROUP_ID),
 					m2FacetModel.getStringProperty(IJBossMavenConstants.ARTIFACT_ID),
-					"/");
-			Xpp3Dom contextRoot = new Xpp3Dom("contextRoot");
+					"/"); //$NON-NLS-1$
+			Xpp3Dom contextRoot = new Xpp3Dom("contextRoot"); //$NON-NLS-1$
 			contextRoot.setValue(m2FacetModel
 					.getStringProperty(IJBossMavenConstants.ARTIFACT_ID));
 			webProject.addChild(contextRoot);
 			modules.addChild(webProject);
 
-			Xpp3Dom richFacesApi = getEarModule("jarModule",
-					"org.richfaces.framework", "richfaces-api", "/lib");
+			Xpp3Dom richFacesApi = getEarModule("jarModule", //$NON-NLS-1$
+					"org.richfaces.framework", "richfaces-api", "/lib"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 			modules.addChild(richFacesApi);
 
-			Xpp3Dom commonDigester = getEarModule("jarModule",
-					"commons-digester", "commons-digester", "/lib");
+			Xpp3Dom commonDigester = getEarModule("jarModule", //$NON-NLS-1$
+					"commons-digester", "commons-digester", "/lib"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 			modules.addChild(commonDigester);
 		}
 		plugin.setConfiguration(configuration);
@@ -386,13 +386,13 @@ public class MavenCoreActivator extends Plugin {
 			String groupIdString,String artifactIdString, String bundleDirString) {
 		Xpp3Dom earModule = new Xpp3Dom(module);
 		//modules.addChild(earModule);
-		Xpp3Dom groupId = new Xpp3Dom("groupId");
+		Xpp3Dom groupId = new Xpp3Dom("groupId"); //$NON-NLS-1$
 		groupId.setValue(groupIdString);
 		earModule.addChild(groupId);
-		Xpp3Dom artifactId = new Xpp3Dom("artifactId");
+		Xpp3Dom artifactId = new Xpp3Dom("artifactId"); //$NON-NLS-1$
 		artifactId.setValue(artifactIdString);
 		earModule.addChild(artifactId);
-		Xpp3Dom bundleDir = new Xpp3Dom("bundleDir");
+		Xpp3Dom bundleDir = new Xpp3Dom("bundleDir"); //$NON-NLS-1$
 		bundleDir.setValue(bundleDirString);
 		earModule.addChild(bundleDir);
 		return earModule;
@@ -400,13 +400,13 @@ public class MavenCoreActivator extends Plugin {
 	
 	public static void addMavenEjbPlugin(Build build, IProject project) throws JavaModelException {
 		org.apache.maven.model.Plugin plugin = new org.apache.maven.model.Plugin();
-		plugin.setGroupId("org.apache.maven.plugins");
-		plugin.setArtifactId("maven-ejb-plugin");
-		plugin.setInherited("true");
+		plugin.setGroupId("org.apache.maven.plugins"); //$NON-NLS-1$
+		plugin.setArtifactId("maven-ejb-plugin"); //$NON-NLS-1$
+		plugin.setInherited("true"); //$NON-NLS-1$
 		
-		Xpp3Dom configuration = new Xpp3Dom( "configuration" );
-		Xpp3Dom ejbVersion = new Xpp3Dom("ejbVersion");
-		ejbVersion.setValue("3.0");
+		Xpp3Dom configuration = new Xpp3Dom( "configuration" ); //$NON-NLS-1$
+		Xpp3Dom ejbVersion = new Xpp3Dom("ejbVersion"); //$NON-NLS-1$
+		ejbVersion.setValue("3.0"); //$NON-NLS-1$
 		configuration.addChild(ejbVersion); 
 		plugin.setConfiguration(configuration);
 		build.getPlugins().add(plugin);

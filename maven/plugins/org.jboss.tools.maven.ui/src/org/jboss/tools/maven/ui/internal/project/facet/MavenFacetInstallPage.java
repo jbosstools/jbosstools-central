@@ -32,7 +32,7 @@ import org.jboss.tools.maven.core.IJBossMavenConstants;
 public class MavenFacetInstallPage extends DataModelWizardPage implements
 IFacetWizardPage {
 
-	private static final String SEAM_FACET_ID = "jst.seam";
+	private static final String SEAM_FACET_ID = "jst.seam"; //$NON-NLS-1$
 	private Text groupId;
 	private Text artifactId;
 	private Text version;
@@ -69,7 +69,7 @@ IFacetWizardPage {
 		packaging.setLayoutData(gd);
 		synchHelper.synchCombo(packaging, IJBossMavenConstants.PACKAGING, null);
 		// FIXME
-		String[] items = { "war","ear", "ejb", "jar" };
+		String[] items = { "war","ear", "ejb", "jar" }; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 		packaging.setItems(items);
 		IFacetedProjectWorkingCopy fpwc = (IFacetedProjectWorkingCopy) getDataModel().getProperty(IFacetDataModelProperties.FACETED_PROJECT_WORKING_COPY);
 		if (fpwc.hasProjectFacet(WebFacetUtils.WEB_FACET)) {
@@ -89,10 +89,10 @@ IFacetWizardPage {
 		if (fpwc.hasProjectFacet(SEAM_FACET)) {
 			Text seamVersion = createField(composite, "Seam Maven version:", IJBossMavenConstants.SEAM_MAVEN_VERSION);
 			IProjectFacetVersion seamFacetVersion = fpwc.getProjectFacetVersion(SEAM_FACET);
-			if ("2.0".equals(seamFacetVersion.getVersionString())) {
-				seamVersion.setText("2.0.2.SP1");
+			if ("2.0".equals(seamFacetVersion.getVersionString())) { //$NON-NLS-1$
+				seamVersion.setText("2.0.2.SP1"); //$NON-NLS-1$
 			} else {
-				seamVersion.setText("2.1.1.GA");
+				seamVersion.setText("2.1.1.GA"); //$NON-NLS-1$
 			}
 			Button removeWTPContainers = new Button(composite,SWT.CHECK);
 			removeWTPContainers.setText("Remove WTP Classpath containers");
