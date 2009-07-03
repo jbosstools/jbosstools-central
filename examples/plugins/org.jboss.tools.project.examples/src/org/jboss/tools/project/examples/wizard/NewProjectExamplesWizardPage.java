@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
+import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.ITreeContentProvider;
@@ -54,6 +55,7 @@ public class NewProjectExamplesWizardPage extends WizardPage {
 
 	private IStructuredSelection selection;
 	private Button showQuickFixButton;
+	private Combo siteCombo;
 	
 	public NewProjectExamplesWizardPage() {
 		super("org.jboss.tools.project.examples"); //$NON-NLS-1$
@@ -79,19 +81,34 @@ public class NewProjectExamplesWizardPage extends WizardPage {
 		gd = new GridData(SWT.FILL, SWT.BEGINNING, true, false);
 		siteComposite.setLayoutData(gd);
 		
-		new Label(siteComposite,SWT.NONE).setText(Messages.NewProjectExamplesWizardPage_Site);
-		final Combo siteCombo = new Combo(siteComposite,SWT.READ_ONLY);
-		siteCombo.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
-		List<Category> categories = ProjectUtil.getProjects();
-		Set<String> sites = new TreeSet<String>();
-		sites.add(ProjectExamplesActivator.ALL_SITES);
-		for (Category category:categories) {
-			List<Project> projects = category.getProjects();
-			for (Project project:projects) {
-				sites.add(project.getSite());
+		final Button button = new Button(siteComposite,SWT.CHECK);
+		gd = new GridData(SWT.FILL, SWT.BEGINNING, true, false);
+		gd.horizontalSpan = 2;
+		button.setLayoutData(gd);
+		button.setText(Messages.ProjectExamplesPreferencePage_Show_experimental_sites);
+		IPreferenceStore store = ProjectExamplesActivator.getDefault().getPreferenceStore();
+		button.setSelection(store.getBoolean(ProjectExamplesActivator.SHOW_EXPERIMENTAL_SITES));
+		button.addSelectionListener(new SelectionAdapter() {
+
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				IPreferenceStore store = ProjectExamplesActivator.getDefault().getPreferenceStore();
+				store.setValue(ProjectExamplesActivator.SHOW_EXPERIMENTAL_SITES, button.getSelection());
+				if (siteCombo != null) {
+					String[] items = getItems();
+					siteCombo.setItems(items);
+					if (items.length > 0) {
+						siteCombo.select(0);
+					}
+				}
 			}
-		}
-		String[] items = sites.toArray(new String[0]);
+			
+		});
+		
+		new Label(siteComposite,SWT.NONE).setText(Messages.NewProjectExamplesWizardPage_Site);
+		siteCombo = new Combo(siteComposite,SWT.READ_ONLY);
+		siteCombo.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
+		String[] items = getItems();
 		siteCombo.setItems(items);
 		siteCombo.setText(ProjectExamplesActivator.ALL_SITES);
 		
@@ -111,7 +128,7 @@ public class NewProjectExamplesWizardPage extends WizardPage {
 		viewer.setLabelProvider(new ProjectLabelProvider());
 		viewer.setContentProvider(new ProjectContentProvider());
 		
-		final AdaptableList input = new AdaptableList(categories);
+		final AdaptableList input = new AdaptableList(getCategories());
 
 		final SiteFilter siteFilter = new SiteFilter();
 		viewer.addFilter(siteFilter);
@@ -200,6 +217,24 @@ public class NewProjectExamplesWizardPage extends WizardPage {
 		setControl(composite);
 	}
 
+	private List<Category> getCategories() {
+		return ProjectUtil.getProjects();
+	}
+	
+	private String[] getItems() {
+		List<Category> categories = getCategories();
+		Set<String> sites = new TreeSet<String>();
+		sites.add(ProjectExamplesActivator.ALL_SITES);
+		for (Category category:categories) {
+			List<Project> projects = category.getProjects();
+			for (Project project:projects) {
+				sites.add(project.getSite());
+			}
+		}
+		String[] items = sites.toArray(new String[0]);
+		return items;
+	}
+	
 	private class ProjectLabelProvider extends LabelProvider {
 
 		@Override
