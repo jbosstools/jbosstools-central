@@ -29,6 +29,7 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.jdt.core.IClasspathAttribute;
+import org.eclipse.jdt.core.IClasspathContainer;
 import org.eclipse.jdt.core.IClasspathEntry;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.JavaCore;
@@ -219,8 +220,11 @@ public class MavenCoreActivator extends Plugin {
 			project.setDescription(description, monitor);
 		}
 		IJavaProject javaProject = JavaCore.create(project);
-		IPath path = new Path(BuildPathManager.CONTAINER_ID);
-		setContainerPath(monitor, javaProject, path);
+		IClasspathContainer mavenContainer = BuildPathManager.getMaven2ClasspathContainer(javaProject);
+		if (mavenContainer == null) {
+			IPath path = new Path(BuildPathManager.CONTAINER_ID);
+			setContainerPath(monitor, javaProject, path);
+		}
 		return hasMavenNature;
 	}
 

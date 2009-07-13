@@ -15,6 +15,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.IClasspathAttribute;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.JavaCore;
+import org.eclipse.jst.common.project.facet.core.JavaFacet;
 import org.eclipse.jst.common.project.facet.core.libprov.LibraryProviderOperationConfig;
 import org.eclipse.jst.j2ee.classpathdep.ClasspathDependencyUtil;
 import org.eclipse.jst.j2ee.classpathdep.IClasspathDependencyConstants;
@@ -65,14 +66,19 @@ public class MavenFacetInstallDelegate implements IDelegate {
 					.getStringProperty(IJBossMavenConstants.PACKAGING));
 			model.setDescription(config
 					.getStringProperty(IJBossMavenConstants.DESCRIPTION));
-			
 			Build build = new Build();
-			//build.setFinalName(artifactId);
-			String outputDirectory = MavenCoreActivator.getOutputDirectory(javaProject);	
-			build.setOutputDirectory(outputDirectory);
-			String sourceDirectory = MavenCoreActivator.getSourceDirectory(javaProject);
-			if (sourceDirectory != null) {
-				build.setSourceDirectory(sourceDirectory);
+			model.setBuild(build);
+			
+			// build.setFinalName(artifactId);			
+			if (fpwc.hasProjectFacet(JavaFacet.FACET)) {
+				String outputDirectory = MavenCoreActivator
+						.getOutputDirectory(javaProject);
+				build.setOutputDirectory(outputDirectory);
+				String sourceDirectory = MavenCoreActivator
+						.getSourceDirectory(javaProject);
+				if (sourceDirectory != null) {
+					build.setSourceDirectory(sourceDirectory);
+				}
 			}
 			
 			if (fpwc.hasProjectFacet(WebFacetUtils.WEB_FACET)) {
@@ -84,13 +90,14 @@ public class MavenFacetInstallDelegate implements IDelegate {
 				MavenCoreActivator.addMavenEjbPlugin(build, project);
 			}
 			if (fpwc.hasProjectFacet(IJ2EEFacetConstants.ENTERPRISE_APPLICATION_FACET)) {
-				
 				MavenCoreActivator.addMavenEarPlugin(build, project, config, false);
+				MavenCoreActivator.createMavenProject(project.getName(), monitor, model, true);
 			}
-			model.setBuild(build);
 			
-			MavenModelManager modelManager = MavenPlugin.getDefault().getMavenModelManager();
-			modelManager.createMavenModel(pom, model);
+			if (!pom.exists()) {
+				MavenModelManager modelManager = MavenPlugin.getDefault().getMavenModelManager();
+				modelManager.createMavenModel(pom, model);
+			}
 		}
 		
 		boolean hasMavenNature = MavenCoreActivator.addMavenNature(project, monitor);
@@ -116,8 +123,9 @@ public class MavenFacetInstallDelegate implements IDelegate {
 			for (LibraryProviderOperationConfig libraryProviderOperationConfig:configs) {
 				operation.execute(libraryProviderOperationConfig, monitor);
 			}
+			configs.clear();
 		}
-		configs.clear();
+		
 	}
 	
 }

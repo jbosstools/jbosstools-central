@@ -14,11 +14,15 @@
   	  
   	  <project-facet-version facet="jboss.m2" version="1.0">
       	<constraint>
-        	<and>
-          		<requires facet="jst.java" version="[5.0"/>
-          		<requires facet="jst.web" version="[2.3"/>
-        	</and>
-      	</constraint>
+         	<or>
+                <requires facet="jst.ear" version="[5.0"/>
+                <requires facet="jst.ejb" version="[3.0"/>
+	            <requires facet="jst.web" version="[2.5"/>
+    	        <requires facet="jst.utility" version="[1.0"/>
+				<requires facet="jst.appclient" version="[1.2"/>
+				<requires facet="jst.connector" version="[1.0"/>
+         	</or>
+         </constraint>
       </project-facet-version>
       
      <action id="jboss.m2.install" facet="jboss.m2" type="INSTALL" version="1.0">
