@@ -35,4 +35,64 @@
     	</supported>
     </extension>
    
+    <extension point="org.eclipse.jst.common.project.facet.core.libraryProviders">
+    	<provider id="maven-library-provider" abstract="true">
+      		<label>Maven library provider</label>
+      		<priority>500</priority>
+      		<action type="INSTALL">
+        		<config class="org.jboss.tools.maven.core.libprov.MavenLibraryProviderInstallOperationConfig"/>
+        		<operation class="org.jboss.tools.maven.core.libprov.MavenLibraryProviderInstallOperation"/>
+      		</action>
+      		
+      		<action type="UNINSTALL">
+        		<operation class="org.jboss.tools.maven.core.libprov.MavenLibraryProviderUninstallOperation"/>
+      		</action>
+      		
+    	</provider>
+  	</extension>
+  	
+  	 <extension point="org.eclipse.core.expressions.propertyTesters">
+      <propertyTester
+      		namespace="org.jboss.tools.maven.core"
+            properties="projectFacets"
+            type="java.util.Collection"
+            class="org.jboss.tools.maven.core.ProjectFacetsFactoryTester"
+            id="org.jboss.tools.maven.core.ProjectFacetsFactoryTester">
+      </propertyTester>
+   </extension>
+   
+  	<extension point="org.eclipse.jst.common.project.facet.core.libraryProviders">
+    	<provider id="jsf12-maven-library-provider" extends="maven-library-provider">
+    		<label>Maven JSF 1.2 Libraries</label>
+      		<param name="template" value="platform:/plugin/org.jboss.tools.maven.core/poms/jsf-template12.xml"/>
+      		<enablement>
+      		  <and>
+        		<with variable="projectFacets">
+          			<test property="org.jboss.tools.maven.core.projectFacets" value="jst.jsf,jboss.m2" forcePluginActivation="true"/>
+        		</with>
+        		<with variable="requestingProjectFacet">
+                    <test property="org.eclipse.wst.common.project.facet.core.projectFacet" value="jst.jsf:1.2" forcePluginActivation="true"/>
+                </with>
+        	  </and>
+      		</enablement>
+    	</provider>
+  	</extension>
+  	
+  	<extension point="org.eclipse.jst.common.project.facet.core.libraryProviders">
+    	<provider id="jsf11-maven-library-provider" extends="maven-library-provider">
+      		<label>Maven JSF 1.1 Libraries</label>
+      		<param name="template" value="platform:/plugin/org.jboss.tools.maven.core/poms/jsf-template11.xml"/>
+      		<enablement>
+      		  <and>
+        		<with variable="projectFacets">
+          			<test property="org.jboss.tools.maven.core.projectFacets" value="jst.jsf,jboss.m2" forcePluginActivation="true"/>
+        		</with>
+        		<with variable="requestingProjectFacet">
+                    <test property="org.eclipse.wst.common.project.facet.core.projectFacet" value="jst.jsf:1.1" forcePluginActivation="true"/>
+                </with>
+        	  </and>
+      		</enablement>
+    	</provider>
+  	</extension>
+  	
 </plugin>

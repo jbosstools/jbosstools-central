@@ -18,9 +18,13 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.jst.j2ee;visibility:=reexport,
  org.eclipse.jst.j2ee.web;visibility:=reexport,
  org.jboss.tools.common;visibility:=reexport,
- org.eclipse.jdt.launching;visibility:=reexport
+ org.eclipse.jdt.launching;visibility:=reexport,
+ org.eclipse.ui.workbench;visibility:=reexport,
+ org.maven.ide.components.maven_model_edit;visibility:=reexport,
+ org.eclipse.core.expressions
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Bundle-Vendor: JBoss by Red Hat
 Export-Package: org.jboss.tools.maven.core,
- org.jboss.tools.maven.core.internal.project.facet
+ org.jboss.tools.maven.core.internal.project.facet,
+ org.jboss.tools.maven.core.libprov

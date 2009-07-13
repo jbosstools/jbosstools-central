@@ -1,6 +1,9 @@
 package org.jboss.tools.maven.core;
 
+import java.io.File;
+import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 
@@ -23,20 +26,31 @@ import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Plugin;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.emf.common.util.URI;
+import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.jdt.core.IClasspathAttribute;
 import org.eclipse.jdt.core.IClasspathEntry;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.launching.JavaRuntime;
+import org.eclipse.jst.common.project.facet.core.libprov.ILibraryProvider;
+import org.eclipse.jst.common.project.facet.core.libprov.LibraryProviderOperationConfig;
 import org.eclipse.jst.j2ee.project.facet.IJ2EEFacetConstants;
 import org.eclipse.wst.common.componentcore.ComponentCore;
 import org.eclipse.wst.common.componentcore.resources.IVirtualComponent;
 import org.eclipse.wst.common.componentcore.resources.IVirtualFolder;
 import org.eclipse.wst.common.frameworks.datamodel.IDataModel;
 import org.eclipse.wst.common.project.facet.core.FacetedProjectFramework;
+import org.maven.ide.components.pom.Dependency;
+import org.maven.ide.components.pom.PomFactory;
+import org.maven.ide.components.pom.PropertyElement;
+import org.maven.ide.components.pom.Repository;
+import org.maven.ide.components.pom.util.PomResourceFactoryImpl;
+import org.maven.ide.components.pom.util.PomResourceImpl;
 import org.maven.ide.eclipse.MavenPlugin;
 import org.maven.ide.eclipse.core.IMavenConstants;
+import org.maven.ide.eclipse.embedder.IMavenConfiguration;
 import org.maven.ide.eclipse.embedder.MavenModelManager;
 import org.maven.ide.eclipse.jdt.BuildPathManager;
 import org.maven.ide.eclipse.project.IProjectConfigurationManager;
@@ -57,8 +71,14 @@ public class MavenCoreActivator extends Plugin {
     
 	public static final String BASEDIR = "${basedir}"; //$NON-NLS-1$
 	
+	public static final String ENCODING = "UTF-8"; //$NON-NLS-1$
+	
+	public static final List<LibraryProviderOperationConfig> libraryProviderOperationConfigs = new ArrayList<LibraryProviderOperationConfig>();
+	
 	// The shared instance
 	private static MavenCoreActivator plugin;
+
+	private static PomResourceImpl resource;
 	
 	/**
 	 * The constructor
@@ -268,9 +288,10 @@ public class MavenCoreActivator extends Plugin {
 		resolverConfiguration.setActiveProfiles(""); //$NON-NLS-1$
 		IProjectConfigurationManager configurationManager = MavenPlugin
 				.getDefault().getProjectConfigurationManager();
+		IMavenConfiguration mavenConfiguration = MavenPlugin.lookup(IMavenConfiguration.class);
 		configurationManager.updateProjectConfiguration(project,
 				resolverConfiguration, //
-				MavenPlugin.getDefault().getMavenRuntimeManager()
+				mavenConfiguration
 						.getGoalOnUpdate(), new NullProgressMonitor());
 	}
 	
@@ -434,5 +455,190 @@ public class MavenCoreActivator extends Plugin {
 		IContainer root = rootFolder.getUnderlyingFolder();
 		String sourceDirectory = root.getProjectRelativePath().toString();
 		return sourceDirectory;
+	}
+	
+	public static void mergeModel(org.maven.ide.components.pom.Model projectModel, org.maven.ide.components.pom.Model libraryModel) {
+		addProperties(projectModel,libraryModel);
+		addRepositories(projectModel,libraryModel);
+		addPlugins(projectModel,libraryModel);
+		addDependencies(projectModel,libraryModel);
+	}
+
+	private static void addDependencies(org.maven.ide.components.pom.Model projectModel, org.maven.ide.components.pom.Model libraryModel) {
+		List<org.maven.ide.components.pom.Dependency> projectDependencies = projectModel.getDependencies();
+		List<org.maven.ide.components.pom.Dependency> libraryDependencies = libraryModel.getDependencies();
+		for (Dependency dependency:libraryDependencies) {
+			if (!dependencyExists(dependency,projectDependencies)) {
+				Dependency newDependency = (Dependency) EcoreUtil.copy(dependency);
+				projectDependencies.add(newDependency);
+			}
+		}
+		
+	}
+
+	private static boolean dependencyExists(Dependency dependency,
+			List<Dependency> projectDependencies) {
+		String groupId = dependency.getGroupId();
+		String artifactId = dependency.getArtifactId();
+		if (artifactId == null) {
+			return false;
+		}
+		for (Dependency projectDependency:projectDependencies) {
+			String projectGroupId = projectDependency.getGroupId();
+			String projectArtifactId = projectDependency.getArtifactId();
+			if (!artifactId.equals(projectArtifactId)) {
+				return false;
+			}
+			if (groupId == null && projectGroupId == null) {
+				return true;
+			}
+			if (groupId != null && groupId.equals(projectGroupId)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	private static void addPlugins(org.maven.ide.components.pom.Model projectModel, org.maven.ide.components.pom.Model libraryModel) {
+		org.maven.ide.components.pom.Build libraryBuild = libraryModel.getBuild();
+		if (libraryBuild == null) {
+			return;
+		}
+		List<org.maven.ide.components.pom.Plugin> libraryPlugins = projectModel.getBuild().getPlugins();
+		for (org.maven.ide.components.pom.Plugin plugin:libraryPlugins) {
+			org.maven.ide.components.pom.Build projectBuild = projectModel.getBuild();
+			if (projectBuild == null) {
+				projectBuild = PomFactory.eINSTANCE.createBuild();
+		        projectModel.setBuild(projectBuild);
+			}
+			List<org.maven.ide.components.pom.Plugin> projectPlugins = projectBuild.getPlugins();
+			if (!pluginExists(plugin,projectPlugins)) {
+				org.maven.ide.components.pom.Plugin newPlugin = (org.maven.ide.components.pom.Plugin) EcoreUtil.copy(plugin);
+				projectPlugins.add(newPlugin);
+			}
+		}
+	}
+
+	private static boolean pluginExists(org.maven.ide.components.pom.Plugin plugin, List<org.maven.ide.components.pom.Plugin> projectPlugins) {
+		String groupId = plugin.getGroupId();
+		String artifactId = plugin.getArtifactId();
+		if (artifactId == null) {
+			return false;
+		}
+		for (org.maven.ide.components.pom.Plugin projectPlugin:projectPlugins) {
+			String projectGroupId = projectPlugin.getGroupId();
+			String projectArtifactId = projectPlugin.getArtifactId();
+			if (!artifactId.equals(projectArtifactId)) {
+				return false;
+			}
+			if (groupId == null && projectGroupId == null) {
+				return true;
+			}
+			if (groupId != null && groupId.equals(projectGroupId)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	private static void addRepositories(org.maven.ide.components.pom.Model projectModel, org.maven.ide.components.pom.Model libraryModel) {
+		List<Repository> projectRepositories = projectModel.getRepositories();
+		List<Repository> libraryRepositories = libraryModel.getRepositories();
+		for (Repository repository:libraryRepositories) {
+			if (!repositoryExists(repository,projectRepositories)) {
+				Repository newRepository = (Repository) EcoreUtil.copy(repository);
+				projectRepositories.add(newRepository);
+			}
+		}
+	}
+
+	private static boolean repositoryExists(Repository repository,
+			List<Repository> projectRepositories) {
+		String url = repository.getUrl();
+		if (url == null) {
+			return false;
+		}
+		for(Repository projectRepository:projectRepositories) {
+			if (url.equals(projectRepository.getUrl())) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	private static void addProperties(org.maven.ide.components.pom.Model projectModel, org.maven.ide.components.pom.Model libraryModel) {
+		List<PropertyElement> projectProperties = projectModel.getProperties();
+		List<PropertyElement> libraryProperties = libraryModel.getProperties();
+		for (PropertyElement libraryProperty:libraryProperties) {
+			String propertyName = libraryProperty.getName();
+			if (!propertyExists(propertyName,projectProperties)) {
+				PropertyElement newProperty = (PropertyElement) EcoreUtil.copy(libraryProperty);
+				projectProperties.add(newProperty);
+			}
+		}
+	}
+
+	private static boolean propertyExists(String propertyName,
+			List<PropertyElement> projectProperties) {
+		if (propertyName == null) {
+			return false;
+		}
+		for (PropertyElement propertyElement:projectProperties) {
+			if (propertyName.equals(propertyElement.getName())) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	public static void log(Throwable e) {
+		IStatus status = new Status(IStatus.ERROR, PLUGIN_ID, e.getLocalizedMessage(), e);
+		getDefault().getLog().log(status);
+	}
+
+	public static void log(String message) {
+		IStatus status = new Status(IStatus.ERROR, PLUGIN_ID, message);
+		getDefault().getLog().log(status);
+	}
+	
+	public static File getProviderFile(ILibraryProvider provider) {
+		String id = provider.getId();
+		IPath providerDir = MavenCoreActivator.getDefault().getStateLocation().append(id);
+		File providerDirFile = providerDir.toFile();
+		providerDirFile.mkdir();
+		File providerFile = new File(providerDirFile, "template.xml"); //$NON-NLS-1$
+		return providerFile;
+	}
+	
+	public static PomResourceImpl loadResource(URL url) throws CoreException {
+		try {
+			URI uri = URI.createURI(url.toString());
+			org.eclipse.emf.ecore.resource.Resource resource = new PomResourceFactoryImpl()
+					.createResource(uri);
+			resource.load(Collections.EMPTY_MAP);
+			return (PomResourceImpl) resource;
+
+		} catch (Exception ex) {
+			log(ex);
+			throw new CoreException(new Status(IStatus.ERROR,
+					PLUGIN_ID, -1, ex.getMessage(), ex));
+		}
+	}
+
+	public static void addLibraryProviderOperationConfig(
+			LibraryProviderOperationConfig config) {
+		libraryProviderOperationConfigs.add(config);
+	}
+
+	public static List<LibraryProviderOperationConfig> getLibraryProviderOperationConfigs() {
+		return libraryProviderOperationConfigs;
+	}
+
+	public static PomResourceImpl getResource() {
+		return resource;
+	}
+
+	public static void setResource(PomResourceImpl resource2) {
+		resource = resource2;
 	}
 }

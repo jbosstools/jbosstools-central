@@ -15,6 +15,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.IClasspathAttribute;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.JavaCore;
+import org.eclipse.jst.common.project.facet.core.libprov.LibraryProviderOperationConfig;
 import org.eclipse.jst.j2ee.classpathdep.ClasspathDependencyUtil;
 import org.eclipse.jst.j2ee.classpathdep.IClasspathDependencyConstants;
 import org.eclipse.jst.j2ee.project.facet.IJ2EEFacetConstants;
@@ -26,6 +27,8 @@ import org.eclipse.wst.common.project.facet.core.IFacetedProjectWorkingCopy;
 import org.eclipse.wst.common.project.facet.core.IProjectFacetVersion;
 import org.jboss.tools.maven.core.MavenCoreActivator;
 import org.jboss.tools.maven.core.IJBossMavenConstants;
+import org.jboss.tools.maven.core.libprov.MavenLibraryProviderInstallOperation;
+import org.jboss.tools.maven.core.libprov.MavenLibraryProviderInstallOperationConfig;
 import org.maven.ide.eclipse.MavenPlugin;
 import org.maven.ide.eclipse.core.IMavenConstants;
 import org.maven.ide.eclipse.embedder.MavenModelManager;
@@ -106,6 +109,15 @@ public class MavenFacetInstallDelegate implements IDelegate {
 		if (!hasMavenNature) {
 			MavenCoreActivator.updateMavenProjectConfiguration(project);
 		}
+		
+		List<LibraryProviderOperationConfig> configs = MavenCoreActivator.getLibraryProviderOperationConfigs();
+		if (configs.size() > 0) {
+			MavenLibraryProviderInstallOperation operation = new MavenLibraryProviderInstallOperation();
+			for (LibraryProviderOperationConfig libraryProviderOperationConfig:configs) {
+				operation.execute(libraryProviderOperationConfig, monitor);
+			}
+		}
+		configs.clear();
 	}
 	
 }

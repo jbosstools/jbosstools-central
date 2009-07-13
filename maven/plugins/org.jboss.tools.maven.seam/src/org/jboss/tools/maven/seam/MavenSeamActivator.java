@@ -2,6 +2,7 @@ package org.jboss.tools.maven.seam;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.net.URL;
@@ -733,12 +734,12 @@ public class MavenSeamActivator extends AbstractUIPlugin {
 	private void configureParentProject(IDataModel m2FacetModel, IDataModel seamFacetModel) {
 		Bundle bundle = getDefault().getBundle();
 		URL parentPomEntryURL = bundle.getEntry("/poms/parent-pom.xml");
-		Reader reader = null;
+		InputStream inputStream = null;
 		try {
 			URL resolvedURL = FileLocator.resolve(parentPomEntryURL);
 			MavenModelManager modelManager = MavenPlugin.getDefault().getMavenModelManager();
-			reader = new BufferedReader(new InputStreamReader(resolvedURL.openStream()));
-			Model model = modelManager.readMavenModel(reader);
+			inputStream = resolvedURL.openStream();
+			Model model = modelManager.readMavenModel(inputStream);
 			model.setArtifactId(parentArtifactId);
 			model.setGroupId(m2FacetModel.getStringProperty(IJBossMavenConstants.GROUP_ID));
 			String projectVersion = m2FacetModel.getStringProperty(IJBossMavenConstants.VERSION);
@@ -777,9 +778,9 @@ public class MavenSeamActivator extends AbstractUIPlugin {
 		} catch (Exception e) {
 			log(e);
 		} finally {
-			if (reader != null) {
+			if (inputStream != null) {
 				try {
-					reader.close();
+					inputStream.close();
 				} catch (IOException ignore) {}
 			}
 		}

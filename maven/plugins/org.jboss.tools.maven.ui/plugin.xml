@@ -9,4 +9,9 @@
     </wizard-pages>
   </extension> 
   
+  <extension point="org.eclipse.jst.common.project.facet.ui.libraryProviderActionPanels">
+    <panel 
+      provider="maven-library-provider"
+      class="org.jboss.tools.maven.ui.internal.libprov.MavenUserLibraryProviderInstallPanel"/>
+  </extension>
 </plugin>

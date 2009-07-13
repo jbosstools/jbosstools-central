@@ -1,6 +1,16 @@
 package org.jboss.tools.maven.ui;
 
+import java.net.URL;
+import java.util.Collections;
+
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.emf.common.util.URI;
+import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
+import org.maven.ide.components.pom.util.PomResourceFactoryImpl;
+import org.maven.ide.components.pom.util.PomResourceImpl;
 import org.osgi.framework.BundleContext;
 
 /**
@@ -45,6 +55,16 @@ public class Activator extends AbstractUIPlugin {
 	 */
 	public static Activator getDefault() {
 		return plugin;
+	}
+	
+	public static void log(Throwable e) {
+		IStatus status = new Status(IStatus.ERROR, PLUGIN_ID, e.getLocalizedMessage(), e);
+		getDefault().getLog().log(status);
+	}
+
+	public static void log(String message) {
+		IStatus status = new Status(IStatus.ERROR, PLUGIN_ID, message);
+		getDefault().getLog().log(status);
 	}
 
 }
