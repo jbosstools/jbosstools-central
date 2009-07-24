@@ -767,8 +767,12 @@ public class MavenSeamActivator extends AbstractUIPlugin {
 				modules.add("../" + ejbArtifactId);
 				modules.add("../" + earArtifactId);
 			}
+			webProjectName = seamFacetModel.getStringProperty(IFacetDataModelProperties.FACET_PROJECT_NAME);
 			
-			MavenCoreActivator.createMavenProject(parentProjectName, null, model, false);
+			IProject seamWebProject = ResourcesPlugin.getWorkspace().getRoot().getProject(webProjectName);
+			IPath location = seamWebProject.getLocation().removeLastSegments(1);
+			location = location.append(parentProjectName);
+			MavenCoreActivator.createMavenProject(parentProjectName, null, model, false, location);
 			// disable workspace resolution
 			MavenProjectManager projectManager = MavenPlugin.getDefault().getMavenProjectManager();
 		    IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject(parentProjectName);

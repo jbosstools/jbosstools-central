@@ -124,13 +124,23 @@ public class MavenCoreActivator extends Plugin {
 	}
 	
 	public static IProject createMavenProject(String projectName, IProgressMonitor monitor, Model model, boolean force) throws CoreException {
+		return createMavenProject(projectName, monitor, model, force, null);
+	}
+	
+	public static IProject createMavenProject(String projectName, IProgressMonitor monitor, Model model, boolean force, IPath location) throws CoreException {
 		IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
 		IProject project = root.getProject(projectName);
 		if (project.exists() && !force ) {
 			return project;
 		}
 		if (!project.exists()) {
-			project.create(monitor);
+			if (location != null) {
+				IProjectDescription desc = project.getWorkspace().newProjectDescription(project.getName());
+				desc.setLocation(location);
+				project.create(desc, monitor);
+			} else {
+				project.create(monitor);
+			}
 			project.open(monitor);
 		}
 		IJavaProject javaProject = JavaCore.create(project);
