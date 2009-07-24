@@ -35,6 +35,7 @@ import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.launching.JavaRuntime;
+import org.eclipse.jst.common.project.facet.JavaFacetUtils;
 import org.eclipse.jst.common.project.facet.core.libprov.ILibraryProvider;
 import org.eclipse.jst.common.project.facet.core.libprov.LibraryProviderOperationConfig;
 import org.eclipse.jst.j2ee.project.facet.IJ2EEFacetConstants;
@@ -654,5 +655,24 @@ public class MavenCoreActivator extends Plugin {
 
 	public static void setResource(PomResourceImpl resource2) {
 		resource = resource2;
+	}
+
+	public static void addCompilerPlugin(Build build, IProject project) {
+		String compilerLevel = JavaFacetUtils.getCompilerLevel(project);
+		if (compilerLevel == null) {
+			return;
+		}
+		org.apache.maven.model.Plugin plugin = new org.apache.maven.model.Plugin();
+		plugin.setGroupId("org.apache.maven.plugins"); //$NON-NLS-1$
+		plugin.setArtifactId("maven-compiler-plugin"); //$NON-NLS-1$
+		Xpp3Dom configuration = new Xpp3Dom( "configuration" ); //$NON-NLS-1$
+		Xpp3Dom source = new Xpp3Dom("source"); //$NON-NLS-1$
+		source.setValue(compilerLevel); //$NON-NLS-1$
+		configuration.addChild(source);
+		Xpp3Dom target = new Xpp3Dom("target"); //$NON-NLS-1$
+		target.setValue(compilerLevel); //$NON-NLS-1$
+		configuration.addChild(target);
+		plugin.setConfiguration(configuration);
+		build.getPlugins().add(plugin);
 	}
 }

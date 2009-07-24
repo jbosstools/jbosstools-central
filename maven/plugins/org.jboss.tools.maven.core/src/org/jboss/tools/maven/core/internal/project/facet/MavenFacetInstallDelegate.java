@@ -25,7 +25,9 @@ import org.eclipse.wst.common.componentcore.datamodel.properties.IFacetDataModel
 import org.eclipse.wst.common.frameworks.datamodel.IDataModel;
 import org.eclipse.wst.common.project.facet.core.IDelegate;
 import org.eclipse.wst.common.project.facet.core.IFacetedProjectWorkingCopy;
+import org.eclipse.wst.common.project.facet.core.IProjectFacet;
 import org.eclipse.wst.common.project.facet.core.IProjectFacetVersion;
+import org.eclipse.wst.common.project.facet.core.ProjectFacetsManager;
 import org.jboss.tools.maven.core.MavenCoreActivator;
 import org.jboss.tools.maven.core.IJBossMavenConstants;
 import org.jboss.tools.maven.core.libprov.MavenLibraryProviderInstallOperation;
@@ -35,7 +37,9 @@ import org.maven.ide.eclipse.core.IMavenConstants;
 import org.maven.ide.eclipse.embedder.MavenModelManager;
 
 public class MavenFacetInstallDelegate implements IDelegate {
-	
+
+	private static final String SEAM_FACET_ID = "jst.seam"; //$NON-NLS-1$
+
 	public void execute(IProject project, IProjectFacetVersion fv, Object cfg,
 			IProgressMonitor monitor) throws CoreException {
 		IDataModel config = null;
@@ -50,82 +54,106 @@ public class MavenFacetInstallDelegate implements IDelegate {
 
 		IFile pom = project.getFile(IMavenConstants.POM_FILE_NAME);
 		IJavaProject javaProject = JavaCore.create(project);
-		IFacetedProjectWorkingCopy fpwc = (IFacetedProjectWorkingCopy) config
-		.getProperty(IFacetDataModelProperties.FACETED_PROJECT_WORKING_COPY);
-		if (!pom.exists()) {
-			Model model = new Model();
-			model.setModelVersion(IJBossMavenConstants.MAVEN_MODEL_VERSION);
-			model.setGroupId(config
-					.getStringProperty(IJBossMavenConstants.GROUP_ID));
-			String artifactId = config.getStringProperty(IJBossMavenConstants.ARTIFACT_ID);
-			model.setArtifactId(artifactId);
-			model.setVersion(config
-					.getStringProperty(IJBossMavenConstants.VERSION));
-			model.setName(config.getStringProperty(IJBossMavenConstants.NAME));
-			model.setPackaging(config
-					.getStringProperty(IJBossMavenConstants.PACKAGING));
-			model.setDescription(config
-					.getStringProperty(IJBossMavenConstants.DESCRIPTION));
-			Build build = new Build();
-			model.setBuild(build);
-			
-			// build.setFinalName(artifactId);			
-			if (fpwc.hasProjectFacet(JavaFacet.FACET)) {
-				String outputDirectory = MavenCoreActivator
-						.getOutputDirectory(javaProject);
-				build.setOutputDirectory(outputDirectory);
-				String sourceDirectory = MavenCoreActivator
-						.getSourceDirectory(javaProject);
-				if (sourceDirectory != null) {
-					build.setSourceDirectory(sourceDirectory);
+		IFacetedProjectWorkingCopy fpwc = null;
+		try {
+			fpwc = (IFacetedProjectWorkingCopy) config
+
+					.getProperty(IFacetDataModelProperties.FACETED_PROJECT_WORKING_COPY);
+			if (!pom.exists()) {
+				Model model = new Model();
+				model.setModelVersion(IJBossMavenConstants.MAVEN_MODEL_VERSION);
+				model.setGroupId(config
+						.getStringProperty(IJBossMavenConstants.GROUP_ID));
+				String artifactId = config
+						.getStringProperty(IJBossMavenConstants.ARTIFACT_ID);
+				model.setArtifactId(artifactId);
+				model.setVersion(config
+						.getStringProperty(IJBossMavenConstants.VERSION));
+				model.setName(config
+						.getStringProperty(IJBossMavenConstants.NAME));
+				model.setPackaging(config
+						.getStringProperty(IJBossMavenConstants.PACKAGING));
+				model.setDescription(config
+						.getStringProperty(IJBossMavenConstants.DESCRIPTION));
+				Build build = new Build();
+				model.setBuild(build);
+
+				// build.setFinalName(artifactId);
+				if (fpwc.hasProjectFacet(JavaFacet.FACET)) {
+					String outputDirectory = MavenCoreActivator
+							.getOutputDirectory(javaProject);
+					build.setOutputDirectory(outputDirectory);
+					String sourceDirectory = MavenCoreActivator
+							.getSourceDirectory(javaProject);
+					if (sourceDirectory != null) {
+						build.setSourceDirectory(sourceDirectory);
+					}
+				}
+
+				if (fpwc.hasProjectFacet(WebFacetUtils.WEB_FACET)) {
+
+					MavenCoreActivator.addMavenWarPlugin(build, project);
+				}
+				if (fpwc.hasProjectFacet(IJ2EEFacetConstants.EJB_FACET)) {
+
+					MavenCoreActivator.addMavenEjbPlugin(build, project);
+				}
+				if (fpwc
+						.hasProjectFacet(IJ2EEFacetConstants.ENTERPRISE_APPLICATION_FACET)) {
+					MavenCoreActivator.addMavenEarPlugin(build, project,
+							config, false);
+					MavenCoreActivator.createMavenProject(project.getName(),
+							monitor, model, true);
+				}
+				IProjectFacet seamFacet = ProjectFacetsManager
+						.getProjectFacet(SEAM_FACET_ID);
+				if (!fpwc.hasProjectFacet(seamFacet)) {
+					MavenCoreActivator.addCompilerPlugin(build, project);
+				}
+
+				if (!pom.exists()) {
+					MavenModelManager modelManager = MavenPlugin.getDefault()
+							.getMavenModelManager();
+					modelManager.createMavenModel(pom, model);
 				}
 			}
-			
+
+			boolean hasMavenNature = MavenCoreActivator.addMavenNature(project,
+					monitor);
+
 			if (fpwc.hasProjectFacet(WebFacetUtils.WEB_FACET)) {
-				
-				MavenCoreActivator.addMavenWarPlugin(build, project);
+				IClasspathAttribute attribute = JavaCore
+						.newClasspathAttribute(
+								IClasspathDependencyConstants.CLASSPATH_COMPONENT_DEPENDENCY,
+								ClasspathDependencyUtil.getDefaultRuntimePath(
+										true).toString());
+				MavenCoreActivator.addClasspathAttribute(javaProject,
+						attribute, monitor);
 			}
-			if (fpwc.hasProjectFacet(IJ2EEFacetConstants.EJB_FACET)) {
-				
-				MavenCoreActivator.addMavenEjbPlugin(build, project);
-			}
-			if (fpwc.hasProjectFacet(IJ2EEFacetConstants.ENTERPRISE_APPLICATION_FACET)) {
-				MavenCoreActivator.addMavenEarPlugin(build, project, config, false);
-				MavenCoreActivator.createMavenProject(project.getName(), monitor, model, true);
-			}
-			
-			if (!pom.exists()) {
-				MavenModelManager modelManager = MavenPlugin.getDefault().getMavenModelManager();
-				modelManager.createMavenModel(pom, model);
-			}
-		}
-		
-		boolean hasMavenNature = MavenCoreActivator.addMavenNature(project, monitor);
-		
-		if (fpwc.hasProjectFacet(WebFacetUtils.WEB_FACET)) {
+			// FIXME
 			IClasspathAttribute attribute = JavaCore.newClasspathAttribute(
-							IClasspathDependencyConstants.CLASSPATH_COMPONENT_DEPENDENCY,
-							ClasspathDependencyUtil.getDefaultRuntimePath(true).toString());
-			MavenCoreActivator.addClasspathAttribute(javaProject, attribute, monitor);
-		}
-		// FIXME
-		IClasspathAttribute attribute = JavaCore.newClasspathAttribute(
-				MavenCoreActivator.OWNER_PROJECT_FACETS_ATTR,
-				IJBossMavenConstants.M2_FACET_ID);
-		MavenCoreActivator.addClasspathAttribute(javaProject, attribute, monitor);
-		if (!hasMavenNature) {
-			MavenCoreActivator.updateMavenProjectConfiguration(project);
-		}
-		
-		List<LibraryProviderOperationConfig> configs = MavenCoreActivator.getLibraryProviderOperationConfigs();
-		if (configs.size() > 0) {
-			MavenLibraryProviderInstallOperation operation = new MavenLibraryProviderInstallOperation();
-			for (LibraryProviderOperationConfig libraryProviderOperationConfig:configs) {
-				operation.execute(libraryProviderOperationConfig, monitor);
+					MavenCoreActivator.OWNER_PROJECT_FACETS_ATTR,
+					IJBossMavenConstants.M2_FACET_ID);
+			MavenCoreActivator.addClasspathAttribute(javaProject, attribute,
+					monitor);
+			if (!hasMavenNature) {
+				MavenCoreActivator.updateMavenProjectConfiguration(project);
 			}
-			configs.clear();
+
+			List<LibraryProviderOperationConfig> configs = MavenCoreActivator
+					.getLibraryProviderOperationConfigs();
+			if (configs.size() > 0) {
+				MavenLibraryProviderInstallOperation operation = new MavenLibraryProviderInstallOperation();
+				for (LibraryProviderOperationConfig libraryProviderOperationConfig : configs) {
+					operation.execute(libraryProviderOperationConfig, monitor);
+				}
+				configs.clear();
+			}
+		} finally {
+			if (fpwc != null) {
+				fpwc.dispose();
+			}
 		}
-		
 	}
-	
+
 }
