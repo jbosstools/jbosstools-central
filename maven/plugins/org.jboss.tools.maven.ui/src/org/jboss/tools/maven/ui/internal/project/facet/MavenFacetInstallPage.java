@@ -5,6 +5,11 @@ import java.util.SortedSet;
 
 import javax.swing.JButton;
 
+import org.apache.maven.model.Model;
+import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jst.j2ee.project.facet.IJ2EEFacetConstants;
 import org.eclipse.jst.j2ee.web.project.facet.WebFacetUtils;
 import org.eclipse.swt.SWT;
@@ -28,6 +33,10 @@ import org.eclipse.wst.common.project.facet.core.ProjectFacetsManager;
 import org.eclipse.wst.common.project.facet.ui.IFacetWizardPage;
 import org.eclipse.wst.common.project.facet.ui.IWizardContext;
 import org.jboss.tools.maven.core.IJBossMavenConstants;
+import org.jboss.tools.maven.ui.Activator;
+import org.maven.ide.eclipse.MavenPlugin;
+import org.maven.ide.eclipse.core.IMavenConstants;
+import org.maven.ide.eclipse.embedder.MavenModelManager;
 
 public class MavenFacetInstallPage extends DataModelWizardPage implements
 IFacetWizardPage {
@@ -37,6 +46,8 @@ IFacetWizardPage {
 	private Text artifactId;
 	private Text version;
 	private Combo packaging;
+	private Text description;
+	private Text name;
 	public static final IProjectFacet SEAM_FACET = ProjectFacetsManager.getProjectFacet(SEAM_FACET_ID);
 	
 	public MavenFacetInstallPage() {
@@ -55,10 +66,42 @@ IFacetWizardPage {
 		GridData gd = new GridData(GridData.FILL_BOTH);
 		composite.setLayoutData(gd);
 		
+		String projectName = getDataModel().getStringProperty(IFacetProjectCreationDataModelProperties.FACET_PROJECT_NAME);
+		IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject(projectName);
+		boolean mavenProjectExists = false;
+		if (project != null && project.isOpen()) {
+			try {
+				boolean hasMavenNature = project.hasNature(IMavenConstants.NATURE_ID);
+				IFile pom = project.getFile(IMavenConstants.POM_FILE_NAME);
+				if (hasMavenNature && pom.exists()) {
+					getDataModel().setBooleanProperty(IJBossMavenConstants.MAVEN_PROJECT_EXISTS, true);
+					mavenProjectExists = true;
+					MavenModelManager modelManager = MavenPlugin.getDefault().getMavenModelManager();
+					Model mavenModel = modelManager.readMavenModel(pom);
+					String groupId = mavenModel.getGroupId();
+					model.setStringProperty(IJBossMavenConstants.GROUP_ID, groupId);
+					String artifactId = mavenModel.getArtifactId();
+					model.setStringProperty(IJBossMavenConstants.ARTIFACT_ID, artifactId);
+					String version = mavenModel.getVersion();
+					model.setStringProperty(IJBossMavenConstants.VERSION, version);
+					String packaging = mavenModel.getPackaging();
+					model.setStringProperty(IJBossMavenConstants.PACKAGING, packaging);
+					String name = mavenModel.getName();
+					model.setStringProperty(IJBossMavenConstants.NAME, name);
+					String description = mavenModel.getDescription();
+					model.setStringProperty(IJBossMavenConstants.DESCRIPTION, description);
+				}
+			} catch (CoreException e) {
+				Activator.log(e);
+			}
+			
+		}
+		
 		groupId = createField(composite,"Group Id:",IJBossMavenConstants.GROUP_ID);
 		artifactId = createField(composite, "Artifact Id:", IJBossMavenConstants.ARTIFACT_ID);
-		String projectName = getDataModel().getStringProperty(IFacetProjectCreationDataModelProperties.FACET_PROJECT_NAME);
-		artifactId.setText(projectName);
+		if (!mavenProjectExists) {
+			artifactId.setText(projectName);
+		}
 		
 		version = createField(composite, "Version:", IJBossMavenConstants.VERSION);
 		
@@ -67,39 +110,64 @@ IFacetWizardPage {
 		packaging = new Combo(composite, SWT.READ_ONLY);
 		gd = new GridData(GridData.FILL_HORIZONTAL);
 		packaging.setLayoutData(gd);
-		synchHelper.synchCombo(packaging, IJBossMavenConstants.PACKAGING, null);
-		// FIXME
 		String[] items = { "war","ear", "ejb", "jar" }; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 		packaging.setItems(items);
-		IFacetedProjectWorkingCopy fpwc = (IFacetedProjectWorkingCopy) getDataModel().getProperty(IFacetDataModelProperties.FACETED_PROJECT_WORKING_COPY);
-		if (fpwc.hasProjectFacet(WebFacetUtils.WEB_FACET)) {
-			packaging.select(0);
-		} else if (fpwc.hasProjectFacet(IJ2EEFacetConstants.ENTERPRISE_APPLICATION_FACET)) {
-			packaging.select(1);
-		} else if (fpwc.hasProjectFacet(IJ2EEFacetConstants.EJB_FACET)) {
-			packaging.select(2);
-		} else {
-			packaging.select(3);
-		}
 		
-		Text name = createField(composite, "Name:", IJBossMavenConstants.NAME);
-		name.setText(projectName);
-		createField(composite, "Description", IJBossMavenConstants.DESCRIPTION);
-	
-		if (fpwc.hasProjectFacet(SEAM_FACET)) {
-			Text seamVersion = createField(composite, "Seam Maven version:", IJBossMavenConstants.SEAM_MAVEN_VERSION);
-			IProjectFacetVersion seamFacetVersion = fpwc.getProjectFacetVersion(SEAM_FACET);
-			if ("2.0".equals(seamFacetVersion.getVersionString())) { //$NON-NLS-1$
-				seamVersion.setText("2.0.2.SP1"); //$NON-NLS-1$
+		IFacetedProjectWorkingCopy fpwc = null;
+		try {
+			fpwc = (IFacetedProjectWorkingCopy) getDataModel().getProperty(IFacetDataModelProperties.FACETED_PROJECT_WORKING_COPY);
+			if (!mavenProjectExists) {
+				if (fpwc.hasProjectFacet(WebFacetUtils.WEB_FACET)) {
+					packaging.select(0);
+				} else if (fpwc
+						.hasProjectFacet(IJ2EEFacetConstants.ENTERPRISE_APPLICATION_FACET)) {
+					packaging.select(1);
+				} else if (fpwc.hasProjectFacet(IJ2EEFacetConstants.EJB_FACET)) {
+					packaging.select(2);
+				} else {
+					packaging.select(3);
+				}
 			} else {
-				seamVersion.setText("2.1.1.GA"); //$NON-NLS-1$
+				String mavenPackaging = getDataModel().getStringProperty(IJBossMavenConstants.PACKAGING);
+				packaging.setText(mavenPackaging);
 			}
-			Button removeWTPContainers = new Button(composite,SWT.CHECK);
-			removeWTPContainers.setText("Remove WTP Classpath containers");
-			synchHelper.synchCheckbox(removeWTPContainers, IJBossMavenConstants.REMOVE_WTP_CLASSPATH_CONTAINERS, null);
-			// FIXME add the Validate button
+			synchHelper.synchCombo(packaging, IJBossMavenConstants.PACKAGING, null);
+			
+			name = createField(composite, "Name:", IJBossMavenConstants.NAME);
+			name.setText(projectName);
+			description = createField(composite, "Description", IJBossMavenConstants.DESCRIPTION);
+
+			if (!mavenProjectExists && fpwc.hasProjectFacet(SEAM_FACET)) {
+				Text seamVersion = createField(composite, "Seam Maven version:", IJBossMavenConstants.SEAM_MAVEN_VERSION);
+				IProjectFacetVersion seamFacetVersion = fpwc.getProjectFacetVersion(SEAM_FACET);
+				if ("2.0".equals(seamFacetVersion.getVersionString())) { //$NON-NLS-1$
+					seamVersion.setText("2.0.2.SP1"); //$NON-NLS-1$
+				} else if ("2.1".equals(seamFacetVersion.getVersionString())) { //$NON-NLS-1$ 
+					seamVersion.setText("2.1.1.GA"); //$NON-NLS-1$
+				} else if ("2.2".equals(seamFacetVersion.getVersionString())) { //$NON-NLS-1$
+					seamVersion.setText("2.2.0.GA"); //$NON-NLS-1$
+				}
+				Button removeWTPContainers = new Button(composite,SWT.CHECK);
+				removeWTPContainers.setText("Remove WTP Classpath containers");
+				synchHelper.synchCheckbox(removeWTPContainers, IJBossMavenConstants.REMOVE_WTP_CLASSPATH_CONTAINERS, null);
+				// FIXME add the Validate button
+			}
+		} catch (Exception e) {
+			Activator.log(e);
+		} finally {
+			if (fpwc != null) {
+				fpwc.dispose();
+			}
 		}
 		
+		if (mavenProjectExists) {
+			artifactId.setEditable(false);
+			groupId.setEditable(false);
+			version.setEditable(false);
+			name.setEditable(false);
+			description.setEditable(false);
+			packaging.setEnabled(false);
+		}
         validatePage();
 		return composite;
 	}

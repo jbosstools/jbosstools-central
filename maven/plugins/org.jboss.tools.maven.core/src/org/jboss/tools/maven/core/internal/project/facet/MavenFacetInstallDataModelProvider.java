@@ -51,6 +51,9 @@ public class MavenFacetInstallDataModelProvider extends
 		if (propertyName.equals(IJBossMavenConstants.REMOVE_WTP_CLASSPATH_CONTAINERS)) {
 			return Boolean.TRUE;
 		}
+		if (propertyName.equals(IJBossMavenConstants.MAVEN_PROJECT_EXISTS)) {
+			return Boolean.FALSE;
+		}
 		return super.getDefaultProperty(propertyName);
 	}
 	
@@ -65,6 +68,7 @@ public class MavenFacetInstallDataModelProvider extends
 		propertyNames.add(IJBossMavenConstants.PACKAGING);
 		propertyNames.add(IJBossMavenConstants.SEAM_MAVEN_VERSION);
 		propertyNames.add(IJBossMavenConstants.REMOVE_WTP_CLASSPATH_CONTAINERS);
+		propertyNames.add(IJBossMavenConstants.MAVEN_PROJECT_EXISTS);
 		return propertyNames;
 	}
 

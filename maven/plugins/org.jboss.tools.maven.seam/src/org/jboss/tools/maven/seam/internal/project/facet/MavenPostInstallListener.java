@@ -20,8 +20,8 @@ public class MavenPostInstallListener implements IFacetedProjectListener {
 	private IDataModel m2FacetModel, seamFacetModel;
 	private boolean configured = false;
 	
-	private static final String M2_FACET_MODEL_PROVIDER = "org.jboss.tools.maven.core.internal.project.facet.MavenFacetInstallDataModelProvider";
-	private static final String SEAM_FACET_MODEL_PROVIDER = "org.jboss.tools.seam.internal.core.project.facet.SeamFacetInstallDataModelProvider";
+	private static final String M2_FACET_MODEL_PROVIDER = "org.jboss.tools.maven.core.internal.project.facet.MavenFacetInstallDataModelProvider"; //$NON-NLS-1$
+	private static final String SEAM_FACET_MODEL_PROVIDER = "org.jboss.tools.seam.internal.core.project.facet.SeamFacetInstallDataModelProvider"; //$NON-NLS-1$
 	public void handleEvent(IFacetedProjectEvent event) {
 		IFacetedProject facetedProject = event.getProject();
 		Set<IProjectFacetVersion> projectFacets = facetedProject
@@ -57,7 +57,10 @@ public class MavenPostInstallListener implements IFacetedProjectListener {
 		}
 		
 		if (isSeamProject && isM2Project && !configured) {
-			MavenSeamActivator.getDefault().configureSeamProject(seamFacetModel,m2FacetModel);
+			boolean mavenProjectExists = m2FacetModel.getBooleanProperty(IJBossMavenConstants.MAVEN_PROJECT_EXISTS);
+			if (!mavenProjectExists) {
+				MavenSeamActivator.getDefault().configureSeamProject(seamFacetModel,m2FacetModel);
+			}
 			configured=true;
 		}
 	}

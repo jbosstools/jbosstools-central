@@ -72,6 +72,10 @@ public class MavenSeamActivator extends AbstractUIPlugin {
 
 	// The plug-in ID
 	public static final String PLUGIN_ID = "org.jboss.tools.maven.seam";
+
+	public static final String CONFIGURE_SEAM = "configureSeam"; //$NON-NLS-1$
+
+	public static final boolean CONFIGURE_SEAM_VALUE = true;
   
 	// The shared instance
 	private static MavenSeamActivator plugin;

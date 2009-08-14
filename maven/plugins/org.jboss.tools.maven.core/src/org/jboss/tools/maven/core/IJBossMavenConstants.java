@@ -31,4 +31,5 @@ public interface IJBossMavenConstants {
 	static final String SEAM_MAVEN_VERSION = "seamMavenVersion"; //$NON-NLS-1$
 	static final String SEAM_VERSION = "seam.version"; //$NON-NLS-1$
 	static final String REMOVE_WTP_CLASSPATH_CONTAINERS = "removeWTPClasspathContainers"; //$NON-NLS-1$
+	static final String MAVEN_PROJECT_EXISTS = "mavenProjectExists"; //$NON-NLS-1$
 }

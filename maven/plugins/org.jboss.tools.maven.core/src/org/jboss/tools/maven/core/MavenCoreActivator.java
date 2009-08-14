@@ -473,6 +473,9 @@ public class MavenCoreActivator extends Plugin {
 	}
 	
 	public static void mergeModel(org.maven.ide.components.pom.Model projectModel, org.maven.ide.components.pom.Model libraryModel) {
+		if (projectModel == null || libraryModel == null) {
+			return;
+		}
 		addProperties(projectModel,libraryModel);
 		addRepositories(projectModel,libraryModel);
 		addPlugins(projectModel,libraryModel);
