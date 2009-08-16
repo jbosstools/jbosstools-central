@@ -3,6 +3,8 @@ package org.jboss.tools.maven.seam.preferences;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.PreferencePage;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
@@ -15,7 +17,8 @@ public class SeamConfiguratorPreferencePage extends PreferencePage implements
 		IWorkbenchPreferencePage {
 
 	
-	private Button button;
+	private Button configureSeamButton;
+	private Button configureSeamRuntimeButton;
 
 	@Override
 	protected Control createContents(Composite parent) {
@@ -25,11 +28,27 @@ public class SeamConfiguratorPreferencePage extends PreferencePage implements
 		layout.marginHeight = 0;
 		composite.setLayout(layout);
 		
-		button = new Button(composite,SWT.CHECK);
-		button.setText("Configure Seam when importing Maven projects");
+		configureSeamButton = new Button(composite,SWT.CHECK);
+		configureSeamButton.setText("Configure Seam when importing Maven projects");
 		IPreferenceStore store = MavenSeamActivator.getDefault().getPreferenceStore();
 		boolean configureSeam = store.getBoolean(MavenSeamActivator.CONFIGURE_SEAM);
-		button.setSelection(configureSeam);
+		configureSeamButton.setSelection(configureSeam);
+		
+		configureSeamRuntimeButton = new Button(composite,SWT.CHECK);
+		configureSeamRuntimeButton.setText("Configure Seam Runtime");
+		boolean configureSeamRuntime = store.getBoolean(MavenSeamActivator.CONFIGURE_SEAM_RUNTIME);
+		configureSeamRuntimeButton.setSelection(configureSeamRuntime);
+		configureSeamRuntimeButton.setEnabled(configureSeam);
+		
+		configureSeamButton.addSelectionListener(new SelectionAdapter() {
+
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				configureSeamRuntimeButton.setEnabled(configureSeamButton.getSelection());
+			}
+		
+		});
+		
 		return composite;
 	}
 
@@ -38,7 +57,7 @@ public class SeamConfiguratorPreferencePage extends PreferencePage implements
 
 	@Override
 	protected void performDefaults() {
-		button.setSelection(MavenSeamActivator.CONFIGURE_SEAM_VALUE);
+		configureSeamButton.setSelection(MavenSeamActivator.CONFIGURE_SEAM_VALUE);
 		IPreferenceStore store = MavenSeamActivator.getDefault().getPreferenceStore();
 		store.setValue(MavenSeamActivator.CONFIGURE_SEAM, MavenSeamActivator.CONFIGURE_SEAM_VALUE);
 		super.performDefaults();
@@ -47,7 +66,7 @@ public class SeamConfiguratorPreferencePage extends PreferencePage implements
 	@Override
 	public boolean performOk() {
 		IPreferenceStore store = MavenSeamActivator.getDefault().getPreferenceStore();
-		store.setValue(MavenSeamActivator.CONFIGURE_SEAM, button.getSelection());
+		store.setValue(MavenSeamActivator.CONFIGURE_SEAM, configureSeamButton.getSelection());
 		return super.performOk();
 	}
 

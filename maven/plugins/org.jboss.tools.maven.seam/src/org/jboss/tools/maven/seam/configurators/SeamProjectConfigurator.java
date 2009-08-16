@@ -1,5 +1,6 @@
 package org.jboss.tools.maven.seam.configurators;
 
+import java.io.File;
 import java.util.List;
 
 import org.apache.maven.model.Dependency;
@@ -30,6 +31,10 @@ import org.jboss.tools.maven.core.internal.project.facet.MavenFacetInstallDataMo
 import org.jboss.tools.maven.seam.MavenSeamActivator;
 import org.jboss.tools.seam.core.ISeamProject;
 import org.jboss.tools.seam.core.SeamCorePlugin;
+import org.jboss.tools.seam.core.SeamUtil;
+import org.jboss.tools.seam.core.project.facet.SeamRuntime;
+import org.jboss.tools.seam.core.project.facet.SeamRuntimeManager;
+import org.jboss.tools.seam.core.project.facet.SeamVersion;
 import org.jboss.tools.seam.internal.core.project.facet.ISeamFacetDataModelProperties;
 import org.jboss.tools.seam.internal.core.project.facet.SeamFacetInstallDataModelProvider;
 import org.maven.ide.eclipse.MavenPlugin;
@@ -102,13 +107,22 @@ public class SeamProjectConfigurator extends AbstractProjectConfigurator {
 	    	if (earProjects.length > 0) {
 	    		deploying = "ear"; //$NON-NLS-1$
 	    	}
-	    	IDataModel model = createSeamDataModel(deploying);
+	    	IDataModel model = createSeamDataModel(deploying, seamVersion);
     		final IFacetedProject fproj = ProjectFacetsManager.create(project);
 	    	if ("war".equals(packaging)) { //$NON-NLS-1$
 	    		installWarFacets(fproj,model,seamVersion, monitor);
 	    	} else if ("ear".equals(packaging)) { //$NON-NLS-1$
 	    		installEarFacets(fproj, monitor);
 	    		installM2Facet(fproj, monitor);
+	    		IProject webProject = getReferencingSeamWebProject(project);
+	    		if (webProject != null) {
+	    			IEclipsePreferences prefs = SeamCorePlugin.getSeamPreferences(webProject);
+	    			String deployingType = prefs.get(ISeamFacetDataModelProperties.JBOSS_AS_DEPLOY_AS,null);
+	    			if (deployingType == null || deployingType.equals(ISeamFacetDataModelProperties.DEPLOY_AS_WAR)) {
+	    				prefs.put(ISeamFacetDataModelProperties.JBOSS_AS_DEPLOY_AS,ISeamFacetDataModelProperties.DEPLOY_AS_EAR);
+	    				storeSettings(webProject);
+	    			}
+	    		}
 	    	} else if ("ejb".equals(packaging)) { //$NON-NLS-1$
 	    		installM2Facet(fproj,monitor);
 	    		installEjbFacets(fproj, monitor);
@@ -287,9 +301,12 @@ public class SeamProjectConfigurator extends AbstractProjectConfigurator {
 	    return null;
 	}
 
-	private IDataModel createSeamDataModel(String deployType) {
+	private IDataModel createSeamDataModel(String deployType, String seamVersion) {
 		IDataModel config = (IDataModel) new SeamFacetInstallDataModelProvider().create();
-		//config.setStringProperty(ISeamFacetDataModelProperties.SEAM_RUNTIME_NAME, SEAM_1_2_0);
+		String seamRuntimeName = getSeamRuntimeName(seamVersion);
+		if (seamRuntimeName != null) {
+			config.setStringProperty(ISeamFacetDataModelProperties.SEAM_RUNTIME_NAME, seamRuntimeName);
+		}
 		config.setBooleanProperty(ISeamFacetDataModelProperties.DB_ALREADY_EXISTS, true);
 		config.setBooleanProperty(ISeamFacetDataModelProperties.RECREATE_TABLES_AND_DATA_ON_DEPLOY, false);
 		config.setStringProperty(ISeamFacetDataModelProperties.JBOSS_AS_DEPLOY_AS, deployType);
@@ -301,5 +318,59 @@ public class SeamProjectConfigurator extends AbstractProjectConfigurator {
 		//config.setStringProperty(ISeamFacetDataModelProperties.SEAM_CONNECTION_PROFILE, "noop-connection");
 		//config.setProperty(ISeamFacetDataModelProperties.JDBC_DRIVER_JAR_PATH, new String[] { "noop-driver.jar" });
 		return config;
+	}
+
+	private String getSeamRuntimeName(String seamVersionStr) {
+		if (seamVersionStr == null) {
+			return null;
+		}
+		IPreferenceStore store = MavenSeamActivator.getDefault().getPreferenceStore();
+		boolean configureSeamRuntime = store.getBoolean(MavenSeamActivator.CONFIGURE_SEAM_RUNTIME);
+		if (!configureSeamRuntime) {
+			return null;
+		}
+		String seamRuntime5 = null;
+		String seamRuntime3 = null;
+		SeamRuntime[] seamRuntimes = SeamRuntimeManager.getInstance().getRuntimes();
+		for (int i = 0; i < seamRuntimes.length; i++) {
+			SeamRuntime seamRuntime = seamRuntimes[i];
+			String seamHomeDir = seamRuntime.getHomeDir();
+			if (seamHomeDir == null) {
+				continue;
+			}
+			if ( ! (new File(seamHomeDir).exists() )) {
+				continue;
+			}
+			String fullVersion = SeamUtil.getSeamVersionFromManifest(seamRuntime.getHomeDir());
+			if (fullVersion == null)  {
+				continue;
+			}
+			if (fullVersion == seamVersionStr) {
+				return seamRuntime.getName();
+			}
+			if (seamRuntime5 == null) {
+				String fullVersion5 = fullVersion.substring(0,5);
+				String seamVersion5 = seamVersionStr.substring(0,5);
+				if (seamVersion5.equals(fullVersion5)) {
+					seamRuntime5 = seamRuntime.getName();
+				}
+			}
+			if (seamRuntime5 == null && seamRuntime3 == null) {
+				String fullVersion3 = fullVersion.substring(0,3);
+				String seamVersion3 = seamVersionStr.substring(0,3);
+				if (seamVersion3.equals(fullVersion3)) {
+					seamRuntime3 = seamRuntime.getName();
+				}
+			}
+		}
+		if (seamRuntime5 != null) {
+			return seamRuntime5;
+		}
+		SeamVersion seamVersion = SeamVersion.parseFromString(seamVersionStr.substring(0,3));
+		SeamRuntime defaultRuntime = SeamRuntimeManager.getInstance().getDefaultRuntime(seamVersion);
+		if (defaultRuntime != null) {
+			return defaultRuntime.getName();
+		}
+		return seamRuntime3;
 	}
 }
