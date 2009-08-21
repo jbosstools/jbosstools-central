@@ -1,6 +1,7 @@
 package org.jboss.tools.maven.seam.configurators;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.maven.model.Dependency;
@@ -9,15 +10,24 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.ProjectScope;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.core.runtime.preferences.IScopeContext;
+import org.eclipse.jdt.core.IClasspathEntry;
+import org.eclipse.jdt.core.IJavaProject;
+import org.eclipse.jdt.core.IPackageFragment;
+import org.eclipse.jdt.core.IPackageFragmentRoot;
+import org.eclipse.jdt.core.JavaCore;
+import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jst.j2ee.internal.project.J2EEProjectUtilities;
 import org.eclipse.jst.j2ee.project.JavaEEProjectUtilities;
 import org.eclipse.wst.common.componentcore.ComponentCore;
 import org.eclipse.wst.common.componentcore.ModuleCoreNature;
 import org.eclipse.wst.common.componentcore.resources.IVirtualComponent;
+import org.eclipse.wst.common.componentcore.resources.IVirtualFolder;
 import org.eclipse.wst.common.componentcore.resources.IVirtualReference;
 import org.eclipse.wst.common.frameworks.datamodel.IDataModel;
 import org.eclipse.wst.common.project.facet.core.IFacetedProject;
@@ -37,6 +47,7 @@ import org.jboss.tools.seam.core.project.facet.SeamRuntimeManager;
 import org.jboss.tools.seam.core.project.facet.SeamVersion;
 import org.jboss.tools.seam.internal.core.project.facet.ISeamFacetDataModelProperties;
 import org.jboss.tools.seam.internal.core.project.facet.SeamFacetInstallDataModelProvider;
+import org.jboss.tools.seam.ui.wizard.SeamWizardUtils;
 import org.maven.ide.eclipse.MavenPlugin;
 import org.maven.ide.eclipse.core.IMavenConstants;
 import org.maven.ide.eclipse.project.IMavenProjectFacade;
@@ -92,11 +103,24 @@ public class SeamProjectConfigurator extends AbstractProjectConfigurator {
 
 	}
 
+	private boolean isSeamSettingChangedByUser(IProject project) {
+		IEclipsePreferences projectPreferences = SeamCorePlugin.getSeamPreferences(project);
+		boolean seamSettingsChangedByUser = projectPreferences.getBoolean(ISeamFacetDataModelProperties.SEAM_SETTINGS_CHANGED_BY_USER, false);
+		return seamSettingsChangedByUser;
+	}
+	
 	private void configureInternal(MavenProject mavenProject,IProject project,
 			IProgressMonitor monitor) throws CoreException {
 		IPreferenceStore store = MavenSeamActivator.getDefault().getPreferenceStore();
 		boolean configureSeam = store.getBoolean(MavenSeamActivator.CONFIGURE_SEAM);
 		if (!configureSeam) {
+			return;
+		}
+		if (isSeamSettingChangedByUser(project)) {
+			return;
+		}
+		IProject rootSeamProject = SeamWizardUtils.getRootSeamProject(project);
+		if (rootSeamProject != null && isSeamSettingChangedByUser(rootSeamProject)) {
 			return;
 		}
 		String packaging = mavenProject.getPackaging();
@@ -107,10 +131,10 @@ public class SeamProjectConfigurator extends AbstractProjectConfigurator {
 	    	if (earProjects.length > 0) {
 	    		deploying = "ear"; //$NON-NLS-1$
 	    	}
-	    	IDataModel model = createSeamDataModel(deploying, seamVersion);
-    		final IFacetedProject fproj = ProjectFacetsManager.create(project);
+	    	final IFacetedProject fproj = ProjectFacetsManager.create(project);
 	    	if ("war".equals(packaging)) { //$NON-NLS-1$
-	    		installWarFacets(fproj,model,seamVersion, monitor);
+	    		IDataModel model = createSeamDataModel(deploying, seamVersion, project);
+	    		installWarFacets(fproj, model, seamVersion, monitor);
 	    	} else if ("ear".equals(packaging)) { //$NON-NLS-1$
 	    		installEarFacets(fproj, monitor);
 	    		installM2Facet(fproj, monitor);
@@ -122,7 +146,45 @@ public class SeamProjectConfigurator extends AbstractProjectConfigurator {
 	    				prefs.put(ISeamFacetDataModelProperties.JBOSS_AS_DEPLOY_AS,ISeamFacetDataModelProperties.DEPLOY_AS_EAR);
 	    				storeSettings(webProject);
 	    			}
+	    			IProject ejbProject = getReferencingSeamEJBProject(project);
+		    		if (ejbProject != null) {
+		    			prefs.put(ISeamFacetDataModelProperties.SEAM_EJB_PROJECT, ejbProject.getName());
+		    			IJavaProject javaProject = JavaCore.create(ejbProject);
+		    			boolean configureSeamArtifacts = store.getBoolean(MavenSeamActivator.CONFIGURE_SEAM_ARTIFACTS);
+						if (configureSeamArtifacts) {
+							if (javaProject != null && javaProject.isOpen()) {
+								try {
+									IClasspathEntry[] entries = javaProject.getRawClasspath();
+									for (int i = 0; i < entries.length; i++) {
+										IClasspathEntry entry = entries[i];
+										if (entry.getEntryKind() == IClasspathEntry.CPE_SOURCE) {
+											String sourceFolder = entry.getPath().toString();
+											prefs.put(ISeamFacetDataModelProperties.SESSION_BEAN_SOURCE_FOLDER, sourceFolder);
+											prefs.put(ISeamFacetDataModelProperties.ENTITY_BEAN_SOURCE_FOLDER, sourceFolder);
+											break;
+										}
+									}
+								} catch (JavaModelException e) {
+									MavenSeamActivator.log(e);
+								}
+							}
+							IPackageFragment[] packageFragments = javaProject.getPackageFragments();
+							for (int i = 0; i < packageFragments.length; i++) {
+								IPackageFragment pf = packageFragments[i];
+								if (pf != null && pf.getKind() == IPackageFragmentRoot.K_SOURCE && !pf.isDefaultPackage()) {
+									if (pf.hasSubpackages() && !pf.hasChildren()) {
+										continue;
+									}
+									String packageName = pf.getElementName();
+									prefs.put(ISeamFacetDataModelProperties.SESSION_BEAN_PACKAGE_NAME, packageName);
+									prefs.put(ISeamFacetDataModelProperties.ENTITY_BEAN_PACKAGE_NAME, packageName);
+								}
+							}
+						}
+		    		}
+		    		storeSettings(webProject);
 	    		}
+	    		
 	    	} else if ("ejb".equals(packaging)) { //$NON-NLS-1$
 	    		installM2Facet(fproj,monitor);
 	    		installEjbFacets(fproj, monitor);
@@ -134,6 +196,18 @@ public class SeamProjectConfigurator extends AbstractProjectConfigurator {
 //	    	
 //	    	storeSettings(project);
 	    }
+	}
+
+	private String getViewFolder(IProject project) {
+		IVirtualComponent com = ComponentCore.createComponent(project);
+		String viewFolder = null;
+		if(com!=null) {
+			IVirtualFolder webRootFolder = com.getRootFolder().getFolder(new Path("/")); //$NON-NLS-1$
+			if(webRootFolder!=null) {
+				viewFolder = webRootFolder.getUnderlyingFolder().getFullPath().toString();
+			}
+		}
+		return viewFolder;
 	}
 
 	@Override
@@ -195,6 +269,28 @@ public class SeamProjectConfigurator extends AbstractProjectConfigurator {
 		if (!fproj.hasProjectFacet(seamFacet)) {
 			IProjectFacetVersion seamFacetVersion = getSeamFacetVersion(seamVersion);
 			fproj.installProjectFacet(seamFacetVersion, model, monitor);
+		} else {
+			String deploying = model.getStringProperty(ISeamFacetDataModelProperties.JBOSS_AS_DEPLOY_AS);
+			if (deploying != null && deploying.equals(ISeamFacetDataModelProperties.DEPLOY_AS_WAR)) {
+				IPreferenceStore store = MavenSeamActivator.getDefault().getPreferenceStore();
+				boolean configureSeamArtifacts = store.getBoolean(MavenSeamActivator.CONFIGURE_SEAM_ARTIFACTS);
+				if (!configureSeamArtifacts) {
+					return;
+				}
+				IEclipsePreferences prefs = SeamCorePlugin.getSeamPreferences(fproj.getProject());
+				setModelProperty(model, prefs,ISeamFacetDataModelProperties.SESSION_BEAN_SOURCE_FOLDER);
+				setModelProperty(model, prefs,ISeamFacetDataModelProperties.ENTITY_BEAN_SOURCE_FOLDER);
+				setModelProperty(model, prefs,ISeamFacetDataModelProperties.SESSION_BEAN_PACKAGE_NAME);
+				setModelProperty(model, prefs,ISeamFacetDataModelProperties.ENTITY_BEAN_PACKAGE_NAME);
+				setModelProperty(model, prefs,ISeamFacetDataModelProperties.WEB_CONTENTS_FOLDER);
+			}
+		}
+	}
+
+	private void setModelProperty(IDataModel model, IEclipsePreferences prefs, String property) {
+		String value = model.getStringProperty(property);
+		if (value != null && value.trim().length() > 0) {
+			prefs.put(property, value);
 		}
 	}
 
@@ -208,9 +304,11 @@ public class SeamProjectConfigurator extends AbstractProjectConfigurator {
 	private void storeSettings(IProject project) {
 		IScopeContext projectScope = new ProjectScope(project);
 		IEclipsePreferences prefs = projectScope.getNode(SeamCorePlugin.PLUGIN_ID);
-		prefs.put(ISeamFacetDataModelProperties.SEAM_SETTINGS_VERSION, 
+		String version = prefs.get(ISeamFacetDataModelProperties.SEAM_SETTINGS_VERSION, null);
+		if (version == null) {
+			prefs.put(ISeamFacetDataModelProperties.SEAM_SETTINGS_VERSION, 
 				ISeamFacetDataModelProperties.SEAM_SETTINGS_VERSION_1_1);
-		
+		}
 		try {
 			prefs.flush();
 		} catch (BackingStoreException e) {
@@ -281,6 +379,43 @@ public class SeamProjectConfigurator extends AbstractProjectConfigurator {
 		return null;
 	}
 	
+	private IProject getReferencingSeamEJBProject(IProject earProject)
+			throws CoreException {
+		IVirtualComponent component = ComponentCore.createComponent(earProject);
+		if (component != null) {
+			IVirtualReference[] references = component.getReferences();
+			for (int i = 0; i < references.length; i++) {
+				IVirtualComponent refComponent = references[i]
+						.getReferencedComponent();
+				IProject refProject = refComponent.getProject();
+				if (JavaEEProjectUtilities.isEJBProject(refProject)) {
+					if (refProject.hasNature(IMavenConstants.NATURE_ID)) {
+						IFile pom = refProject
+								.getFile(IMavenConstants.POM_FILE_NAME);
+						if (pom.exists()) {
+							MavenProjectManager projectManager = MavenPlugin
+									.getDefault().getMavenProjectManager();
+							IMavenProjectFacade facade = projectManager.create(
+									pom, true, null);
+							if (facade != null) {
+								MavenProject mavenProject = facade
+										.getMavenProject(null);
+								if (mavenProject != null) {
+									String version = getSeamVersion(mavenProject);
+									if (version != null) {
+										return refProject;
+									}
+								}
+							}
+						}
+
+					}
+				}
+			}
+		}
+		return null;
+	}
+
 	private String getSeamVersion(MavenProject mavenProject) {
 		List<Dependency> dependencies = mavenProject.getDependencies();
 		Dependency seamDependency = null;
@@ -301,7 +436,7 @@ public class SeamProjectConfigurator extends AbstractProjectConfigurator {
 	    return null;
 	}
 
-	private IDataModel createSeamDataModel(String deployType, String seamVersion) {
+	private IDataModel createSeamDataModel(String deployType, String seamVersion, IProject project) {
 		IDataModel config = (IDataModel) new SeamFacetInstallDataModelProvider().create();
 		String seamRuntimeName = getSeamRuntimeName(seamVersion);
 		if (seamRuntimeName != null) {
@@ -310,11 +445,67 @@ public class SeamProjectConfigurator extends AbstractProjectConfigurator {
 		config.setBooleanProperty(ISeamFacetDataModelProperties.DB_ALREADY_EXISTS, true);
 		config.setBooleanProperty(ISeamFacetDataModelProperties.RECREATE_TABLES_AND_DATA_ON_DEPLOY, false);
 		config.setStringProperty(ISeamFacetDataModelProperties.JBOSS_AS_DEPLOY_AS, deployType);
-		//config.setStringProperty(ISeamFacetDataModelProperties.SESSION_BEAN_PACKAGE_NAME, "org.session.beans");
-		//config.setStringProperty(ISeamFacetDataModelProperties.ENTITY_BEAN_PACKAGE_NAME, "org.entity.beans");
-		//config.setStringProperty(ISeamFacetDataModelProperties.TEST_CASES_PACKAGE_NAME, "org.test.beans");
 		config.setBooleanProperty(ISeamFacetDataModelProperties.CONFIGURE_DEFAULT_SEAM_RUNTIME, false);
 		config.setBooleanProperty(ISeamFacetDataModelProperties.CONFIGURE_WAR_PROJECT, false);
+		IPreferenceStore store = MavenSeamActivator.getDefault().getPreferenceStore();
+		boolean configureSeamArtifacts = store.getBoolean(MavenSeamActivator.CONFIGURE_SEAM_ARTIFACTS);
+		if (!configureSeamArtifacts) {
+			return config;
+		}
+		String viewFolder = getViewFolder(project);
+		if (viewFolder != null) {
+			config.setStringProperty(ISeamFacetDataModelProperties.WEB_CONTENTS_FOLDER, viewFolder);
+		}
+		IJavaProject javaProject = JavaCore.create(project);
+		List<IPath> sourcePaths = new ArrayList<IPath>();
+		if (javaProject != null && javaProject.isOpen()) {
+			try {
+				IClasspathEntry[] entries = javaProject.getRawClasspath();
+				for (int i = 0; i < entries.length; i++) {
+					IClasspathEntry entry = entries[i];
+					if (entry.getEntryKind() == IClasspathEntry.CPE_SOURCE) {
+						sourcePaths.add(entry.getPath());
+					}
+				}
+			} catch (JavaModelException e) {
+				MavenSeamActivator.log(e);
+			}
+			if (sourcePaths.size() > 0) {
+				IPath actionSourceFolder = null;
+				IPath modelSourceFolder = null;
+				for (IPath sourcePath:sourcePaths) {
+					if (sourcePath.toString().contains("hot")) { //$NON-NLS-1$
+						actionSourceFolder = sourcePath;
+					} else {
+						modelSourceFolder = sourcePath;
+					}
+				}
+				if (actionSourceFolder == null) {
+					actionSourceFolder = modelSourceFolder;
+				}
+				if (modelSourceFolder == null) {
+					modelSourceFolder = actionSourceFolder;
+				}
+				String modelSourceFolderStr = modelSourceFolder.toString();
+				config.setStringProperty(ISeamFacetDataModelProperties.ENTITY_BEAN_SOURCE_FOLDER, modelSourceFolderStr);
+				String actionSourceFolderStr = actionSourceFolder.toString();
+				config.setStringProperty(ISeamFacetDataModelProperties.SESSION_BEAN_SOURCE_FOLDER, actionSourceFolderStr);
+			}
+			try {
+				IPackageFragment[] packageFragments = javaProject.getPackageFragments();
+				for (int i = 0; i < packageFragments.length; i++) {
+					IPackageFragment pf = packageFragments[i];
+					if (pf != null && pf.getKind() == IPackageFragmentRoot.K_SOURCE && !pf.isDefaultPackage()) {
+						String packageName = pf.getElementName();
+						config.setStringProperty(ISeamFacetDataModelProperties.SESSION_BEAN_PACKAGE_NAME, packageName);
+						config.setStringProperty(ISeamFacetDataModelProperties.ENTITY_BEAN_PACKAGE_NAME, packageName);
+					}
+				}
+			} catch (JavaModelException e) {
+				MavenSeamActivator.log(e);
+			}
+		}
+		//config.setStringProperty(ISeamFacetDataModelProperties.TEST_CASES_PACKAGE_NAME, "org.test.beans");
 		//config.setStringProperty(ISeamFacetDataModelProperties.SEAM_CONNECTION_PROFILE, "noop-connection");
 		//config.setProperty(ISeamFacetDataModelProperties.JDBC_DRIVER_JAR_PATH, new String[] { "noop-driver.jar" });
 		return config;

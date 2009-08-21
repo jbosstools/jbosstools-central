@@ -19,6 +19,9 @@ public class SeamConfiguratorPreferencesInitializer extends
 		node.putBoolean(
 				MavenSeamActivator.CONFIGURE_SEAM_RUNTIME,
 				MavenSeamActivator.CONFIGURE_SEAM_RUNTIME_VALUE);
+		node.putBoolean(
+				MavenSeamActivator.CONFIGURE_SEAM_ARTIFACTS,
+				MavenSeamActivator.CONFIGURE_SEAM_ARTIFACTS_VALUE);
 	}
 
 }

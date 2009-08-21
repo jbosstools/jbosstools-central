@@ -80,6 +80,10 @@ public class MavenSeamActivator extends AbstractUIPlugin {
 	public static final String CONFIGURE_SEAM_RUNTIME = "configureSeamRuntime"; //$NON-NLS-1$
   
 	public static final boolean CONFIGURE_SEAM_RUNTIME_VALUE = true;
+
+	public static final String CONFIGURE_SEAM_ARTIFACTS = "configureSeamArtifacts"; //$NON-NLS-1$
+	
+	public static final boolean CONFIGURE_SEAM_ARTIFACTS_VALUE = true;
 	
 	// The shared instance
 	private static MavenSeamActivator plugin;

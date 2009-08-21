@@ -19,6 +19,7 @@ public class SeamConfiguratorPreferencePage extends PreferencePage implements
 	
 	private Button configureSeamButton;
 	private Button configureSeamRuntimeButton;
+	private Button configureSeamArtifactsButton;
 
 	@Override
 	protected Control createContents(Composite parent) {
@@ -40,11 +41,18 @@ public class SeamConfiguratorPreferencePage extends PreferencePage implements
 		configureSeamRuntimeButton.setSelection(configureSeamRuntime);
 		configureSeamRuntimeButton.setEnabled(configureSeam);
 		
+		configureSeamArtifactsButton = new Button(composite,SWT.CHECK);
+		configureSeamArtifactsButton.setText("Configure Seam Artifacts (view folder, model source folder, package ...)");
+		boolean configureSeamArtifacts = store.getBoolean(MavenSeamActivator.CONFIGURE_SEAM_ARTIFACTS);
+		configureSeamArtifactsButton.setSelection(configureSeamArtifacts);
+		configureSeamArtifactsButton.setEnabled(configureSeam);
+		
 		configureSeamButton.addSelectionListener(new SelectionAdapter() {
 
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				configureSeamRuntimeButton.setEnabled(configureSeamButton.getSelection());
+				configureSeamArtifactsButton.setEnabled(configureSeamButton.getSelection());
 			}
 		
 		});
