@@ -286,7 +286,7 @@ public class MavenSeamActivator extends AbstractUIPlugin {
 			dependency.setArtifactId(ejbProjectName);
 			dependency.setVersion(m2FacetModel.getStringProperty(IJBossMavenConstants.VERSION));
 			dependency.setType("ejb");
-			dependency.setScope("compile");
+			dependency.setScope("runtime");
 			dependencies.add(dependency);
 			
 			dependency = new Dependency();
@@ -294,7 +294,7 @@ public class MavenSeamActivator extends AbstractUIPlugin {
 			dependency.setArtifactId(webProjectName);
 			dependency.setVersion(m2FacetModel.getStringProperty(IJBossMavenConstants.VERSION));
 			dependency.setType("war");
-			dependency.setScope("compile");
+			dependency.setScope("runtime");
 			dependencies.add(dependency);
 			
 			dependency = getSeamDependency();
@@ -373,7 +373,7 @@ public class MavenSeamActivator extends AbstractUIPlugin {
 				model.setBuild(build);
 				MavenCoreActivator.createMavenProject(earProjectName, null, model, true);
 				removeWTPContainers(m2FacetModel, project);
-				configureApplicationXml(project, m2FacetModel, null);
+				// configureApplicationXml(project, m2FacetModel, null);
 				//removeRuntime(project);
 				//IProject ejbProject = ResourcesPlugin.getWorkspace().getRoot().getProject(ejbProjectName);
 				//removeRuntime(ejbProject);
@@ -558,6 +558,8 @@ public class MavenSeamActivator extends AbstractUIPlugin {
 			dependency = new Dependency();
 			dependency.setGroupId("org.jboss.seam");
 			dependency.setArtifactId("jboss-seam-debug");
+			// FIXME
+			dependency.setVersion("${seam.version}");
 			
 			modelManager.addDependency(pomFile,dependency);
 			

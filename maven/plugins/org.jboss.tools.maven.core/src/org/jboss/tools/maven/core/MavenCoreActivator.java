@@ -136,9 +136,15 @@ public class MavenCoreActivator extends Plugin {
 		}
 		if (!project.exists()) {
 			if (location != null) {
-				IProjectDescription desc = project.getWorkspace().newProjectDescription(project.getName());
-				desc.setLocation(location);
-				project.create(desc, monitor);
+				IPath workspacePath = project.getWorkspace().getRoot().getLocation();
+				location = location.makeRelativeTo(workspacePath);
+				if (projectName.equals(location.toString())) {
+					project.create(monitor);
+				} else {
+					IProjectDescription desc = project.getWorkspace().newProjectDescription(project.getName());
+					desc.setLocation(location);
+					project.create(desc, monitor);
+				}
 			} else {
 				project.create(monitor);
 			}
@@ -381,22 +387,25 @@ public class MavenCoreActivator extends Plugin {
 			Xpp3Dom modules = new Xpp3Dom("modules"); //$NON-NLS-1$
 			configuration.addChild(modules);
 
+			String ejbModuleName = m2FacetModel.getStringProperty(IJBossMavenConstants.ARTIFACT_ID) + "-ejb.jar"; //$NON-NLS-1$
 			Xpp3Dom ejbProject = getEarModule(
 					"ejbModule", //$NON-NLS-1$
 					m2FacetModel.getStringProperty(IJBossMavenConstants.GROUP_ID),
 					m2FacetModel.getStringProperty(IJBossMavenConstants.ARTIFACT_ID)
-							+ "-ejb", "/"); //$NON-NLS-1$ //$NON-NLS-2$
+							+ "-ejb", "/", ejbModuleName ); //$NON-NLS-1$ //$NON-NLS-2$
 			modules.addChild(ejbProject);
 
 			Xpp3Dom seamModule = getEarModule("ejbModule", "org.jboss.seam", //$NON-NLS-1$ //$NON-NLS-2$
-					"jboss-seam", "/"); //$NON-NLS-1$ //$NON-NLS-2$
+					"jboss-seam", "/", null); //$NON-NLS-1$ //$NON-NLS-2$
 			modules.addChild(seamModule);
 
+			String webModuleName = m2FacetModel.getStringProperty(IJBossMavenConstants.ARTIFACT_ID) + ".war"; //$NON-NLS-1$
+			
 			Xpp3Dom webProject = getEarModule(
 					"webModule", //$NON-NLS-1$
 					m2FacetModel.getStringProperty(IJBossMavenConstants.GROUP_ID),
 					m2FacetModel.getStringProperty(IJBossMavenConstants.ARTIFACT_ID),
-					"/"); //$NON-NLS-1$
+					"/", webModuleName); //$NON-NLS-1$
 			Xpp3Dom contextRoot = new Xpp3Dom("contextRoot"); //$NON-NLS-1$
 			contextRoot.setValue(m2FacetModel
 					.getStringProperty(IJBossMavenConstants.ARTIFACT_ID));
@@ -404,11 +413,11 @@ public class MavenCoreActivator extends Plugin {
 			modules.addChild(webProject);
 
 			Xpp3Dom richFacesApi = getEarModule("jarModule", //$NON-NLS-1$
-					"org.richfaces.framework", "richfaces-api", "/lib"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+					"org.richfaces.framework", "richfaces-api", "/lib", null); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 			modules.addChild(richFacesApi);
 
 			Xpp3Dom commonDigester = getEarModule("jarModule", //$NON-NLS-1$
-					"commons-digester", "commons-digester", "/lib"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+					"commons-digester", "commons-digester", "/lib", null); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 			modules.addChild(commonDigester);
 		}
 		plugin.setConfiguration(configuration);
@@ -419,7 +428,7 @@ public class MavenCoreActivator extends Plugin {
 	}
 	
 	private static Xpp3Dom getEarModule(String module,
-			String groupIdString,String artifactIdString, String bundleDirString) {
+			String groupIdString,String artifactIdString, String bundleDirString, String bundleFileNameString) {
 		Xpp3Dom earModule = new Xpp3Dom(module);
 		//modules.addChild(earModule);
 		Xpp3Dom groupId = new Xpp3Dom("groupId"); //$NON-NLS-1$
@@ -431,6 +440,12 @@ public class MavenCoreActivator extends Plugin {
 		Xpp3Dom bundleDir = new Xpp3Dom("bundleDir"); //$NON-NLS-1$
 		bundleDir.setValue(bundleDirString);
 		earModule.addChild(bundleDir);
+		if (bundleFileNameString != null) {
+			Xpp3Dom bundleFileName = new Xpp3Dom("bundleFileName"); //$NON-NLS-1$
+			bundleFileName.setValue(bundleFileNameString);
+			earModule.addChild(bundleFileName);
+			
+		}
 		return earModule;
 	}
 	
