@@ -28,6 +28,7 @@
         <javax.el.version>1.0</javax.el.version>
         <drools.version>4.0.4</drools.version>
         <jbpm.version>3.2.2</jbpm.version>
+        <jbpm3.version>3.2.5.SP5</jbpm3.version>
         <mvel.version>1.2.21</mvel.version>
         <project.version>0.0.1-SNAPSHOT</project.version>
    </properties>
@@ -99,6 +100,14 @@
 					<artifactId>dom4j</artifactId>
 					<groupId>dom4j</groupId>
 				</exclusion>
+				<exclusion>
+        			<artifactId>xpp3_min</artifactId>
+        			<groupId>xpp3</groupId>
+          		</exclusion>
+          		<exclusion>
+        			<artifactId>xstream</artifactId>
+        			<groupId>xstream</groupId>
+          		</exclusion>
             </exclusions>
          </dependency>
          <dependency>
@@ -396,10 +405,45 @@
 					<groupId>janino</groupId>
 				</exclusion>
 				<exclusion>
-            		<artifactId>mvel14</artifactId>
-            		<groupId>org.mvel</groupId>
-          		</exclusion>
+      				<artifactId>joda-time</artifactId>
+      				<groupId>joda-time</groupId>
+      	  		</exclusion>
 			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>org.jbpm.jbpm3</groupId>
+			<artifactId>jbpm-jpdl</artifactId>
+			<version>${jbpm3.version}</version>
+			<exclusions>
+				<exclusion>
+					<artifactId>commons-logging</artifactId>
+					<groupId>commons-logging</groupId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.apache.ant</groupId>
+					<artifactId>ant</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.apache.ant</groupId>
+					<artifactId>ant-launcher</artifactId>
+				</exclusion>
+				<exclusion>
+          			<groupId>org.hibernate</groupId>
+            		<artifactId>hibernate</artifactId>
+          		</exclusion>
+          		<exclusion>
+          			<groupId>bsh</groupId>
+            		<artifactId>bsh</artifactId>
+          		</exclusion>
+          		<exclusion>
+          			<groupId>dom4j</groupId>
+            		<artifactId>dom4j</artifactId>
+          		</exclusion>
+      	  		<exclusion>
+      				<artifactId>jackrabbit-core</artifactId>
+      				<groupId>org.apache.jackrabbit</groupId>
+      	  		</exclusion>
+			</exclusions>	
 		</dependency>
 		<dependency>
 			<groupId>org.jbpm</groupId>
@@ -412,13 +456,7 @@
 				</exclusion>
 			</exclusions>	
 		</dependency>
-		<dependency>
-    	<groupId>org.mvel</groupId>
-    	<artifactId>mvel14</artifactId>
-    	<version>${mvel.version}</version>
-    	<type>jar</type>
-    	<scope>compile</scope>
-    </dependency>
+		
 	</dependencies>
    </dependencyManagement>
    

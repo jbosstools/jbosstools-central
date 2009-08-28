@@ -56,9 +56,7 @@ public class MavenFacetInstallDelegate implements IDelegate {
 		IJavaProject javaProject = JavaCore.create(project);
 		IFacetedProjectWorkingCopy fpwc = null;
 		try {
-			fpwc = (IFacetedProjectWorkingCopy) config
-
-					.getProperty(IFacetDataModelProperties.FACETED_PROJECT_WORKING_COPY);
+			fpwc = (IFacetedProjectWorkingCopy) config.getProperty(IFacetDataModelProperties.FACETED_PROJECT_WORKING_COPY);
 			if (!pom.exists()) {
 				Model model = new Model();
 				model.setModelVersion(IJBossMavenConstants.MAVEN_MODEL_VERSION);

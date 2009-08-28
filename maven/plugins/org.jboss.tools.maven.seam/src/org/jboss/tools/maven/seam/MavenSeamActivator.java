@@ -1,6 +1,7 @@
 package org.jboss.tools.maven.seam;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -43,6 +44,10 @@ import org.eclipse.wst.common.project.facet.core.IFacetedProject;
 import org.eclipse.wst.common.project.facet.core.ProjectFacetsManager;
 import org.jboss.tools.maven.core.IJBossMavenConstants;
 import org.jboss.tools.maven.core.MavenCoreActivator;
+import org.jboss.tools.seam.core.SeamUtil;
+import org.jboss.tools.seam.core.project.facet.SeamRuntime;
+import org.jboss.tools.seam.core.project.facet.SeamRuntimeManager;
+import org.jboss.tools.seam.core.project.facet.SeamVersion;
 import org.jboss.tools.seam.internal.core.project.facet.ISeamFacetDataModelProperties;
 import org.jboss.tools.seam.internal.core.project.facet.SeamFacetAbstractInstallDelegate;
 import org.maven.ide.eclipse.MavenPlugin;
@@ -317,6 +322,16 @@ public class MavenSeamActivator extends AbstractUIPlugin {
 			exclusion.setArtifactId("dom4j");
 			exclusions.add(exclusion);
 			
+			exclusion = new Exclusion();
+			exclusion.setGroupId("xstream");
+			exclusion.setArtifactId("xstream");
+			exclusions.add(exclusion);
+			
+			exclusion = new Exclusion();
+			exclusion.setGroupId("xpp3");
+			exclusion.setArtifactId("xpp3_min");
+			exclusions.add(exclusion);
+			
 			dependencies.add(dependency);
 			
 			dependency = getRichFacesApi();
@@ -342,18 +357,34 @@ public class MavenSeamActivator extends AbstractUIPlugin {
 			dependencies.add(dependency);
 			
 			dependency = new Dependency();
-			dependency.setGroupId("org.mvel");
-			dependency.setArtifactId("mvel14");
-			dependency.setType("jar");
-			dependency.setScope("compile");
-			dependencies.add(dependency);
-			
-			dependency = new Dependency();
-			dependency.setGroupId("org.jbpm");
+			String jbpmGroupId = "org.jbpm"; //$NON-NLS-1$
+			// JBoss EAP 5.0 requires org.jbpm.jbpm3
+			SeamRuntime seamRuntime = SeamRuntimeManager.getInstance().findRuntimeByName(seamFacetModel.getProperty(ISeamFacetDataModelProperties.SEAM_RUNTIME_NAME).toString());
+			if(seamRuntime!=null) {
+				SeamVersion seamVersion = seamRuntime.getVersion();
+				if (SeamVersion.SEAM_2_2.equals(seamVersion)) {
+					String fullVersion = SeamUtil.getSeamVersionFromManifest(seamRuntime);
+					if (fullVersion != null && fullVersion.contains("EAP")) { //$NON-NLS-1$
+						jbpmGroupId = "org.jbpm.jbpm3"; //$NON-NLS-1$
+					}
+				}
+			}
+			dependency.setGroupId(jbpmGroupId);
 			dependency.setArtifactId("jbpm-jpdl");
 			dependency.setType("jar");
 			dependency.setScope("compile");
 			dependencies.add(dependency);
+			
+//			dependency = new Dependency();
+//			dependency.setGroupId("org.mvel");
+//			if ("org.jbpm.jbpm3".equals(jbpmGroupId)) {
+//				dependency.setArtifactId("mvel2");
+//			} else {
+//				dependency.setArtifactId("mvel14");
+//			}
+//			dependency.setType("jar");
+//			dependency.setScope("compile");
+//			dependencies.add(dependency);
 			
 			dependency = new Dependency();
 			dependency.setGroupId("commons-digester");
@@ -388,43 +419,7 @@ public class MavenSeamActivator extends AbstractUIPlugin {
 		}
 	}
 	
-	protected void configureApplicationXml(IProject project, IDataModel m2FacetModel, IProgressMonitor monitor) {
-		EARArtifactEdit earArtifactEdit = null;
-		try {
-			earArtifactEdit = EARArtifactEdit.getEARArtifactEditForWrite(project);
-			if(earArtifactEdit!=null) {
-				Application application = earArtifactEdit.getApplication();
-				EList modules = application.getModules();
-				for (Iterator iterator = modules.iterator(); iterator.hasNext();) {
-					Object module = (Object) iterator.next();
-					if (module instanceof WebModule) {
-						WebModule webModule = (WebModule) module;
-						String uri = webModule.getUri();
-						String value = webProjectName + WAR_ARCHIVE_SUFFIX;
-						if (value.equals(uri)) {
-							String newUri = artifactId + "-" + m2FacetModel.getStringProperty(IJBossMavenConstants.VERSION) + WAR_ARCHIVE_SUFFIX;
-							webModule.setUri(newUri);
-						}
-					}
-					if (module instanceof EjbModule) {
-						EjbModule ejbModule = (EjbModule) module;
-						String uri = ejbModule.getUri();
-						String value = ejbProjectName + EJB_ARCHIVE_SUFFIX;
-						if (value.equals(uri)) {
-							String newUri = ejbArtifactId + "-" + m2FacetModel.getStringProperty(IJBossMavenConstants.VERSION) + EJB_ARCHIVE_SUFFIX;
-							ejbModule.setUri(newUri);
-						}
-					}
-				}
-				
-				earArtifactEdit.save(monitor);
-			}
-		} finally {
-			if(earArtifactEdit!=null) {
-				earArtifactEdit.dispose();
-			}
-		}
-	}
+	
 	private void removeRuntime(IProject project) throws CoreException {
 		IFacetedProject facetedProject = ProjectFacetsManager.create( project );
 		facetedProject.setRuntime(null, null);
@@ -769,9 +764,75 @@ public class MavenSeamActivator extends AbstractUIPlugin {
 			
 			Properties properties = model.getProperties();
 			properties.put(IJBossMavenConstants.PROJECT_VERSION, projectVersion);
+			SeamRuntime seamRuntime = SeamRuntimeManager.getInstance().findRuntimeByName(seamFacetModel.getProperty(ISeamFacetDataModelProperties.SEAM_RUNTIME_NAME).toString());
+			if(seamRuntime==null) {
+				getDefault().log("Can't get seam runtime " + seamFacetModel.getProperty(ISeamFacetDataModelProperties.SEAM_RUNTIME_NAME).toString());
+			}
 			String seamVersion = m2FacetModel.getStringProperty(IJBossMavenConstants.SEAM_MAVEN_VERSION);
 			if (seamVersion != null && seamVersion.trim().length() > 0) {
 				properties.put(IJBossMavenConstants.SEAM_VERSION, seamVersion);
+			}
+			String seamHomePath = seamRuntime.getHomeDir();
+			File seamHomeDir = new File(seamHomePath);
+			if (seamHomeDir.exists()) {
+				//String seamVersion = SeamUtil.getSeamVersionFromManifest(seamRuntime.getHomeDir());
+				//properties.put(IJBossMavenConstants.SEAM_VERSION, seamVersion);
+				File buildDir = new File(seamHomeDir,"build");
+				File rootPom = new File(buildDir,"root.pom.xml");
+				if (!rootPom.exists()) {
+					getDefault().log("The " + rootPom.getAbsolutePath() + " file doesn't exist.");
+				} else {
+					try {
+						Model rootPomModel = modelManager.readMavenModel(rootPom);
+						List<Dependency> seamDependencies = rootPomModel.getDependencyManagement().getDependencies();
+						setArtifactVersion("jsf.version", properties, "javax.faces", "jsf-api", seamDependencies);
+						String richfacesVersion = setArtifactVersion("richfaces.version", properties, "org.richfaces.framework", "richfaces-impl", seamDependencies);
+						if (richfacesVersion == null) {
+							Properties seamProperties = rootPomModel.getProperties();
+							richfacesVersion = seamProperties.getProperty("version.richfaces");
+							if (richfacesVersion != null) {
+								properties.put("richfaces.version", richfacesVersion);
+							}
+						}
+						setArtifactVersion("hibernate-validator.version", properties, "org.hibernate", "hibernate-validator", seamDependencies);
+						setArtifactVersion("hibernate-annotations.version", properties, "org.hibernate", "hibernate-annotations", seamDependencies);
+						setArtifactVersion("hibernate-entitymanager.version", properties, "org.hibernate", "hibernate-entitymanager", seamDependencies);
+						//setArtifactVersion("testng.version", properties, "org.hibernate", "hibernate-entitymanager", seamDependencies);
+						//if (seamVersion != null && "2.2".equals(seamVersion.subSequence(0, 3))) {
+						//	properties.put("testng.version", "5.9");
+						//}
+						setArtifactVersion("jboss.embedded.version", properties, "org.jboss.seam.embedded", "jboss-embedded-api", seamDependencies);
+						setArtifactVersion("slf4j.version", properties, "org.slf4j", "slf4j-api", seamDependencies);
+						setArtifactVersion("ejb.api.version", properties, "javax.ejb", "ejb-api", seamDependencies);
+						setArtifactVersion("jsr250-api.version", properties, "javax.annotation", "jsr250-api", seamDependencies);
+						setArtifactVersion("persistence-api.version", properties, "javax.persistence", "persistence-api", seamDependencies);
+						setArtifactVersion("servlet.version", properties, "javax.servlet", "servlet-api", seamDependencies);
+						setArtifactVersion("javax.el.version", properties, "javax.el", "el-api", seamDependencies);
+						String droolsVersion = setArtifactVersion("drools.version", properties, "org.drools", "drools-core", seamDependencies);
+						if (droolsVersion == null) {
+							Properties seamProperties = rootPomModel.getProperties();
+							droolsVersion = seamProperties.getProperty("version.drools");
+							if (droolsVersion != null) {
+								properties.put("drools.version", droolsVersion);
+							}
+						}
+						String jbpmVersion = setArtifactVersion("jbpm.version", properties, "org.jbpm", "jbpm-jpdl", seamDependencies);
+						if (jbpmVersion == null) {
+							setArtifactVersion("jbpm3.version", properties, "org.jbpm.jbpm3", "jbpm-jpdl", seamDependencies);
+						}
+						//setArtifactVersion("mvel.version", properties, "org.mvel", "mvel14", seamDependencies);
+								        
+//				        <javax.activation.version>1.1</javax.activation.version>
+//				        <hibernate-commons-annotations.version>3.3.0.ga</hibernate-commons-annotations.version>
+//				        <commons.digester.version>1.8</commons.digester.version>
+//				        <mvel.version>1.2.21</mvel.version>
+						
+					} catch (Exception e) {
+						getDefault().log(e);
+					}
+				}
+			} else {
+				getDefault().log("The " + seamHomePath + " folder doesn't exist.");
 			}
 			
 			List<String> modules = model.getModules();
@@ -804,9 +865,28 @@ public class MavenSeamActivator extends AbstractUIPlugin {
 		}
 	}
 
+	private String setArtifactVersion(String property, Properties properties, String groupId, String artifactId,
+			List<Dependency> seamDependencies) {
+		for (Dependency dependency:seamDependencies) {
+			if (groupId.equals(dependency.getGroupId()) && artifactId.equals(dependency.getArtifactId())) {
+				String version = dependency.getVersion();
+				if (version != null && !version.startsWith("${")) {
+					properties.put(property, version);
+					return version;
+				}
+			}
+		}
+		return null;
+	}
+
 	public static void log(Throwable e) {
 		IStatus status = new Status(IStatus.ERROR, PLUGIN_ID, e
 				.getLocalizedMessage(), e);
+		getDefault().getLog().log(status);
+	}
+	
+	public static void log(String message) {
+		IStatus status = new Status(IStatus.WARNING, PLUGIN_ID, message, null);
 		getDefault().getLog().log(status);
 	}
 }

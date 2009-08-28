@@ -419,6 +419,10 @@ public class MavenCoreActivator extends Plugin {
 			Xpp3Dom commonDigester = getEarModule("jarModule", //$NON-NLS-1$
 					"commons-digester", "commons-digester", "/lib", null); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 			modules.addChild(commonDigester);
+			
+			//Xpp3Dom mvel14 = getEarModule("jarModule", //$NON-NLS-1$
+			//		"org.mvel", "mvel14", "/", null); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+			//modules.addChild(mvel14);
 		}
 		plugin.setConfiguration(configuration);
 		

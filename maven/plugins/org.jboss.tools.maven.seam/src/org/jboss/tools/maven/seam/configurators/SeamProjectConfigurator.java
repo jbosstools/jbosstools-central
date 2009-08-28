@@ -2,6 +2,7 @@ package org.jboss.tools.maven.seam.configurators;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import org.apache.maven.model.Dependency;
@@ -15,6 +16,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.core.runtime.preferences.IScopeContext;
+import org.eclipse.emf.common.util.EList;
 import org.eclipse.jdt.core.IClasspathEntry;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IPackageFragment;
@@ -22,6 +24,11 @@ import org.eclipse.jdt.core.IPackageFragmentRoot;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.jst.j2ee.application.Application;
+import org.eclipse.jst.j2ee.application.EjbModule;
+import org.eclipse.jst.j2ee.application.Module;
+import org.eclipse.jst.j2ee.application.WebModule;
+import org.eclipse.jst.j2ee.componentcore.util.EARArtifactEdit;
 import org.eclipse.jst.j2ee.internal.project.J2EEProjectUtilities;
 import org.eclipse.jst.j2ee.project.JavaEEProjectUtilities;
 import org.eclipse.wst.common.componentcore.ComponentCore;
@@ -136,6 +143,7 @@ public class SeamProjectConfigurator extends AbstractProjectConfigurator {
 	    		IDataModel model = createSeamDataModel(deploying, seamVersion, project);
 	    		installWarFacets(fproj, model, seamVersion, monitor);
 	    	} else if ("ear".equals(packaging)) { //$NON-NLS-1$
+	    		configureApplicationXml(project, monitor);
 	    		installEarFacets(fproj, monitor);
 	    		installM2Facet(fproj, monitor);
 	    		IProject webProject = getReferencingSeamWebProject(project);
@@ -563,5 +571,31 @@ public class SeamProjectConfigurator extends AbstractProjectConfigurator {
 			return defaultRuntime.getName();
 		}
 		return seamRuntime3;
+	}
+	
+	private void configureApplicationXml(IProject project, IProgressMonitor monitor) {
+		EARArtifactEdit earArtifactEdit = null;
+		try {
+			earArtifactEdit = EARArtifactEdit.getEARArtifactEditForWrite(project);
+			if(earArtifactEdit!=null) {
+				Application application = earArtifactEdit.getApplication();
+				EList modules = application.getModules();
+				for (Iterator iterator = modules.iterator(); iterator.hasNext();) {
+					Object object = iterator.next();
+					if (object instanceof Module) {
+						Module module = (Module) object;
+						String uri = module.getUri();
+						if (uri != null && (uri.startsWith("mvel14") || uri.startsWith("mvel2"))) {
+							iterator.remove();
+						}
+					}
+				}				
+				earArtifactEdit.saveIfNecessary(monitor);
+			}
+		} finally {
+			if(earArtifactEdit!=null) {
+				earArtifactEdit.dispose();
+			}
+		}
 	}
 }
