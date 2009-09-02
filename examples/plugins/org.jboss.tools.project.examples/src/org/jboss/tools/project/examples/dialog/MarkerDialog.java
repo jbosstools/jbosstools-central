@@ -250,7 +250,7 @@ public class MarkerDialog extends TitleAreaDialog {
 		if (eclipseProject != null
 				&& eclipseProject.isOpen()) {
 			eclipseProject.build(
-					IncrementalProjectBuilder.CLEAN_BUILD,
+					IncrementalProjectBuilder.FULL_BUILD,
 					null);
 		}
 	}
