@@ -579,6 +579,9 @@ public class SeamProjectConfigurator extends AbstractProjectConfigurator {
 			earArtifactEdit = EARArtifactEdit.getEARArtifactEditForWrite(project);
 			if(earArtifactEdit!=null) {
 				Application application = earArtifactEdit.getApplication();
+				if (application == null) {
+					return;
+				}
 				EList modules = application.getModules();
 				for (Iterator iterator = modules.iterator(); iterator.hasNext();) {
 					Object object = iterator.next();
