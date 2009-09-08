@@ -15,6 +15,18 @@
 		category="org.jboss.ide.eclipse.ui.wizards"
 		icon="icons/examples_wiz.gif">	
 	</wizard>
+    <wizard
+          category="org.eclipse.ui.Examples/org.jboss.tools.project.examples.category"
+          class="org.jboss.tools.project.examples.wizard.NewProjectExamplesWizard"
+          icon="icons/examples_wiz.gif"
+          id="org.jboss.tools.project.examples.wizard.NewProjectExamplesWizard"
+          name="%Project_Examples_wizard">
+    </wizard>
+    <category
+          id="org.jboss.tools.project.examples.category"
+          name="%JBoss_Tools_category"
+          parentCategory="org.eclipse.ui.Examples">
+    </category>
   </extension>
   <extension
          point="org.eclipse.ui.commands">
