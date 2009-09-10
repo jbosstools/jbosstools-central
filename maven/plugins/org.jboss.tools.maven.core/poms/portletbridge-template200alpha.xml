@@ -1,0 +1,52 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>template</groupId>
+	<artifactId>template</artifactId>
+	<packaging>pom</packaging>
+	<version>0.0.1-SNAPSHOT</version>
+     
+    <dependencies>
+    	 <dependency>
+            <groupId>org.jboss.portletbridge</groupId>
+            <artifactId>portletbridge-api</artifactId>
+            <version>2.0.0.ALPHA</version>
+            <exclusions>
+               <exclusion>
+                  <groupId>javax.faces</groupId>
+                  <artifactId>jsf-api</artifactId>
+               </exclusion>
+               <exclusion>
+                  <groupId>javax.faces</groupId>
+                  <artifactId>jsf-impl</artifactId>
+               </exclusion>
+               <exclusion>
+                   <groupId>commons-collections</groupId>
+                   <artifactId>commons-collections</artifactId>
+               </exclusion>
+            </exclusions>
+         </dependency>
+         <dependency>
+            <groupId>org.jboss.portletbridge</groupId>
+            <artifactId>portletbridge-impl</artifactId>
+            <version>2.0.0.ALPHA</version>
+            <exclusions>
+               <exclusion>
+                  <groupId>javax.faces</groupId>
+                  <artifactId>jsf-api</artifactId>
+               </exclusion>
+               <exclusion>
+                  <groupId>javax.faces</groupId>
+                  <artifactId>jsf-impl</artifactId>
+               </exclusion>
+               
+               <exclusion>
+                  <groupId>commons-collections</groupId>
+                  <artifactId>commons-collections</artifactId>
+                </exclusion>
+            </exclusions>
+         </dependency>
+         
+    </dependencies>
+</project>

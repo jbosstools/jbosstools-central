@@ -119,4 +119,70 @@
     	</provider>
   	</extension>
   	
+  	<extension point="org.eclipse.jst.common.project.facet.core.libraryProviders">
+    	<provider id="portlet10-maven-library-provider" extends="maven-library-provider">
+      		<label>Maven Portlet 1.0 Libraries</label>
+      		<param name="template" value="platform:/plugin/org.jboss.tools.maven.core/poms/portlet-template10.xml"/>
+      		<enablement>
+      		  <and>
+        		<with variable="projectFacets">
+          			<test property="org.jboss.tools.maven.core.projectFacets" value="jboss.portlet,jboss.m2" forcePluginActivation="true"/>
+        		</with>
+        		<with variable="requestingProjectFacet">
+                    <test property="org.eclipse.wst.common.project.facet.core.projectFacet" value="jboss.portlet:1.0" forcePluginActivation="true"/>
+                </with>
+        	  </and>
+      		</enablement>
+    	</provider>
+  	</extension>
+  	
+  	<extension point="org.eclipse.jst.common.project.facet.core.libraryProviders">
+    	<provider id="portlet20-maven-library-provider" extends="maven-library-provider">
+      		<label>Maven Portlet 2.0 Libraries</label>
+      		<param name="template" value="platform:/plugin/org.jboss.tools.maven.core/poms/portlet-template20.xml"/>
+      		<enablement>
+      		  <and>
+        		<with variable="projectFacets">
+          			<test property="org.jboss.tools.maven.core.projectFacets" value="jboss.portlet,jboss.m2" forcePluginActivation="true"/>
+        		</with>
+        		<with variable="requestingProjectFacet">
+                    <test property="org.eclipse.wst.common.project.facet.core.projectFacet" value="jboss.portlet:2.0" forcePluginActivation="true"/>
+                </with>
+        	  </and>
+      		</enablement>
+    	</provider>
+  	</extension>
+  	
+  	<extension point="org.eclipse.jst.common.project.facet.core.libraryProviders">
+    	<provider id="portletbridge200alpha-maven-library-provider" extends="maven-library-provider">
+      		<label>Maven Portletbridge 2.0.0 ALPHA Libraries</label>
+      		<param name="template" value="platform:/plugin/org.jboss.tools.maven.core/poms/portletbridge-template200alpha.xml"/>
+      		<enablement>
+      		  <and>
+        		<with variable="projectFacets">
+          			<test property="org.jboss.tools.maven.core.projectFacets" value="jboss.jsfportlet,jboss.m2" forcePluginActivation="true"/>
+        		</with>
+        		<with variable="requestingProjectFacet">
+                    <test property="org.eclipse.wst.common.project.facet.core.projectFacet" value="jboss.jsfportlet:1.0" forcePluginActivation="true"/>
+                </with>
+        	  </and>
+      		</enablement>
+    	</provider>
+  	</extension>
+  	<extension point="org.eclipse.jst.common.project.facet.core.libraryProviders">
+    	<provider id="portletbridge200alphadep-maven-library-provider" extends="maven-library-provider">
+      		<label>Maven Portletbridge 2.0.0 ALPHA Libraries with Dependencies</label>
+      		<param name="template" value="platform:/plugin/org.jboss.tools.maven.core/poms/portletbridge-template200alphadep.xml"/>
+      		<enablement>
+      		  <and>
+        		<with variable="projectFacets">
+          			<test property="org.jboss.tools.maven.core.projectFacets" value="jboss.jsfportlet,jboss.m2" forcePluginActivation="true"/>
+        		</with>
+        		<with variable="requestingProjectFacet">
+                    <test property="org.eclipse.wst.common.project.facet.core.projectFacet" value="jboss.jsfportlet:1.0" forcePluginActivation="true"/>
+                </with>
+        	  </and>
+      		</enablement>
+    	</provider>
+  	</extension>
 </plugin>
