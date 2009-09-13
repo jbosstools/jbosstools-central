@@ -66,8 +66,14 @@ public class SeamConfiguratorPreferencePage extends PreferencePage implements
 	@Override
 	protected void performDefaults() {
 		configureSeamButton.setSelection(MavenSeamActivator.CONFIGURE_SEAM_VALUE);
+		configureSeamRuntimeButton.setSelection(MavenSeamActivator.CONFIGURE_SEAM_RUNTIME_VALUE);
+		configureSeamArtifactsButton.setSelection(MavenSeamActivator.CONFIGURE_SEAM_ARTIFACTS_VALUE);
 		IPreferenceStore store = MavenSeamActivator.getDefault().getPreferenceStore();
 		store.setValue(MavenSeamActivator.CONFIGURE_SEAM, MavenSeamActivator.CONFIGURE_SEAM_VALUE);
+		store.setValue(MavenSeamActivator.CONFIGURE_SEAM_RUNTIME, MavenSeamActivator.CONFIGURE_SEAM_RUNTIME_VALUE);
+		store.setValue(MavenSeamActivator.CONFIGURE_SEAM_ARTIFACTS, MavenSeamActivator.CONFIGURE_SEAM_ARTIFACTS_VALUE);
+		configureSeamRuntimeButton.setEnabled(configureSeamButton.getSelection());
+		configureSeamArtifactsButton.setEnabled(configureSeamButton.getSelection());
 		super.performDefaults();
 	}
 
@@ -75,6 +81,8 @@ public class SeamConfiguratorPreferencePage extends PreferencePage implements
 	public boolean performOk() {
 		IPreferenceStore store = MavenSeamActivator.getDefault().getPreferenceStore();
 		store.setValue(MavenSeamActivator.CONFIGURE_SEAM, configureSeamButton.getSelection());
+		store.setValue(MavenSeamActivator.CONFIGURE_SEAM_RUNTIME, configureSeamRuntimeButton.getSelection());
+		store.setValue(MavenSeamActivator.CONFIGURE_SEAM_ARTIFACTS, configureSeamArtifactsButton.getSelection());
 		return super.performOk();
 	}
 
