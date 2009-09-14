@@ -67,7 +67,10 @@ IFacetWizardPage {
 		composite.setLayoutData(gd);
 		
 		String projectName = getDataModel().getStringProperty(IFacetProjectCreationDataModelProperties.FACET_PROJECT_NAME);
-		IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject(projectName);
+		IProject project = null;
+		if (projectName != null && projectName.trim().length() > 0) {
+			project = ResourcesPlugin.getWorkspace().getRoot().getProject(projectName);
+		}
 		boolean mavenProjectExists = false;
 		if (project != null && project.isOpen()) {
 			try {

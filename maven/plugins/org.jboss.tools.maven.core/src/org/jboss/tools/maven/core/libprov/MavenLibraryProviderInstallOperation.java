@@ -58,14 +58,11 @@ public class MavenLibraryProviderInstallOperation extends
 			URIConverter.WriteableOutputStream uws = null;
 			FileWriter fw = null;
 			try {
-				if (providerFile.exists()) {
-					url = providerFile.toURL();
-				} else {
-					Map<String, String> params = provider.getParams();
-					String pomURLString = params.get("template"); //$NON-NLS-1$
-					URL platformURL = new URL(pomURLString);
-					url = FileLocator.resolve(platformURL);
-				}
+				Map<String, String> params = provider.getParams();
+				String pomURLString = params.get("template"); //$NON-NLS-1$
+				URL platformURL = new URL(pomURLString);
+				url = FileLocator.resolve(platformURL);
+				
 				libraryResource = MavenCoreActivator.loadResource(url);
 				libraryResource.getContents().clear();
 				libraryResource.getContents().add(libraryModel);
@@ -84,12 +81,16 @@ public class MavenLibraryProviderInstallOperation extends
 					try {
 						uws.flush();
 						uws.close();
-					} catch (IOException ignore) {}
+					} catch (IOException e) {
+						MavenCoreActivator.log(e);
+					}
 				}
 				if (fw != null) {
 					try {
 						fw.close();
-					} catch (IOException ignore) {}
+					} catch (IOException e) {
+						MavenCoreActivator.log(e);
+					}
 				}
 				if (libraryResource != null) {
 					libraryResource.unload();
