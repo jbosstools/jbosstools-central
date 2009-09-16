@@ -14,6 +14,13 @@
           name="Seam Project configurator" priority="200"/>
     </extension>
    
+    <extension point="org.maven.ide.eclipse.projectConfigurators">
+      <configurator 
+          id="org.jboss.tools.maven.jsf.configurator"
+          class="org.jboss.tools.maven.seam.configurators.JSFProjectConfigurator"
+          name="JSF Project configurator" priority="150"/>
+    </extension>
+    
     <extension
         point="org.eclipse.ui.preferencePages">
      <page

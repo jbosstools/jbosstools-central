@@ -20,6 +20,7 @@ public class SeamConfiguratorPreferencePage extends PreferencePage implements
 	private Button configureSeamButton;
 	private Button configureSeamRuntimeButton;
 	private Button configureSeamArtifactsButton;
+	private Button configureJSFButton;
 
 	@Override
 	protected Control createContents(Composite parent) {
@@ -57,6 +58,11 @@ public class SeamConfiguratorPreferencePage extends PreferencePage implements
 		
 		});
 		
+		configureJSFButton = new Button(composite,SWT.CHECK);
+		configureJSFButton.setText("Configure JSF facet when importing Maven projects");
+		boolean configureJSF = store.getBoolean(MavenSeamActivator.CONFIGURE_JSF);
+		configureJSFButton.setSelection(configureJSF);
+		
 		return composite;
 	}
 
@@ -65,11 +71,13 @@ public class SeamConfiguratorPreferencePage extends PreferencePage implements
 
 	@Override
 	protected void performDefaults() {
+		configureJSFButton.setSelection(MavenSeamActivator.CONFIGURE_JSF_VALUE);
 		configureSeamButton.setSelection(MavenSeamActivator.CONFIGURE_SEAM_VALUE);
 		configureSeamRuntimeButton.setSelection(MavenSeamActivator.CONFIGURE_SEAM_RUNTIME_VALUE);
 		configureSeamArtifactsButton.setSelection(MavenSeamActivator.CONFIGURE_SEAM_ARTIFACTS_VALUE);
 		IPreferenceStore store = MavenSeamActivator.getDefault().getPreferenceStore();
 		store.setValue(MavenSeamActivator.CONFIGURE_SEAM, MavenSeamActivator.CONFIGURE_SEAM_VALUE);
+		store.setValue(MavenSeamActivator.CONFIGURE_JSF, MavenSeamActivator.CONFIGURE_JSF_VALUE);
 		store.setValue(MavenSeamActivator.CONFIGURE_SEAM_RUNTIME, MavenSeamActivator.CONFIGURE_SEAM_RUNTIME_VALUE);
 		store.setValue(MavenSeamActivator.CONFIGURE_SEAM_ARTIFACTS, MavenSeamActivator.CONFIGURE_SEAM_ARTIFACTS_VALUE);
 		configureSeamRuntimeButton.setEnabled(configureSeamButton.getSelection());
@@ -81,6 +89,7 @@ public class SeamConfiguratorPreferencePage extends PreferencePage implements
 	public boolean performOk() {
 		IPreferenceStore store = MavenSeamActivator.getDefault().getPreferenceStore();
 		store.setValue(MavenSeamActivator.CONFIGURE_SEAM, configureSeamButton.getSelection());
+		store.setValue(MavenSeamActivator.CONFIGURE_JSF, configureJSFButton.getSelection());
 		store.setValue(MavenSeamActivator.CONFIGURE_SEAM_RUNTIME, configureSeamRuntimeButton.getSelection());
 		store.setValue(MavenSeamActivator.CONFIGURE_SEAM_ARTIFACTS, configureSeamArtifactsButton.getSelection());
 		return super.performOk();

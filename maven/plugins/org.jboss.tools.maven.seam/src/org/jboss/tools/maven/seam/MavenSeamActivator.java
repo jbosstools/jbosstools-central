@@ -89,6 +89,10 @@ public class MavenSeamActivator extends AbstractUIPlugin {
 	public static final String CONFIGURE_SEAM_ARTIFACTS = "configureSeamArtifacts"; //$NON-NLS-1$
 	
 	public static final boolean CONFIGURE_SEAM_ARTIFACTS_VALUE = true;
+
+	public static final String CONFIGURE_JSF = "configureJSF"; //$NON-NLS-1$
+	
+	public static final boolean CONFIGURE_JSF_VALUE = true;
 	
 	// The shared instance
 	private static MavenSeamActivator plugin;

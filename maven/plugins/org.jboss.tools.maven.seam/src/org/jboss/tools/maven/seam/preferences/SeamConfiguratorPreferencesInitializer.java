@@ -22,6 +22,9 @@ public class SeamConfiguratorPreferencesInitializer extends
 		node.putBoolean(
 				MavenSeamActivator.CONFIGURE_SEAM_ARTIFACTS,
 				MavenSeamActivator.CONFIGURE_SEAM_ARTIFACTS_VALUE);
+		node.putBoolean(
+				MavenSeamActivator.CONFIGURE_JSF,
+				MavenSeamActivator.CONFIGURE_JSF_VALUE);
 	}
 
 }
