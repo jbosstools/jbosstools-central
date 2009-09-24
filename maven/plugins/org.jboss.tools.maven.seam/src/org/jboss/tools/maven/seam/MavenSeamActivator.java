@@ -1,14 +1,10 @@
 package org.jboss.tools.maven.seam;
 
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
 
@@ -17,6 +13,7 @@ import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Exclusion;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Parent;
+import org.apache.maven.project.MavenProject;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.ResourcesPlugin;
@@ -24,23 +21,23 @@ import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.IPath;
-import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.emf.common.util.EList;
 import org.eclipse.jdt.core.IClasspathEntry;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.JavaModelException;
-import org.eclipse.jst.j2ee.application.Application;
-import org.eclipse.jst.j2ee.application.EjbModule;
-import org.eclipse.jst.j2ee.application.WebModule;
-import org.eclipse.jst.j2ee.componentcore.util.EARArtifactEdit;
+import org.eclipse.jst.common.project.facet.core.libprov.ILibraryProvider;
+import org.eclipse.jst.common.project.facet.core.libprov.LibraryInstallDelegate;
+import org.eclipse.jst.common.project.facet.core.libprov.LibraryProviderFramework;
+import org.eclipse.jst.jsf.core.internal.project.facet.IJSFFacetInstallDataModelProperties;
+import org.eclipse.jst.jsf.core.internal.project.facet.JSFFacetInstallDataModelProvider;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.eclipse.wst.common.componentcore.datamodel.properties.IFacetDataModelProperties;
 import org.eclipse.wst.common.frameworks.datamodel.IDataModel;
 import org.eclipse.wst.common.project.facet.core.FacetedProjectFramework;
 import org.eclipse.wst.common.project.facet.core.IFacetedProject;
+import org.eclipse.wst.common.project.facet.core.IProjectFacetVersion;
 import org.eclipse.wst.common.project.facet.core.ProjectFacetsManager;
 import org.jboss.tools.maven.core.IJBossMavenConstants;
 import org.jboss.tools.maven.core.MavenCoreActivator;
@@ -80,6 +77,8 @@ public class MavenSeamActivator extends AbstractUIPlugin {
 
 	public static final String CONFIGURE_SEAM = "configureSeam"; //$NON-NLS-1$
 
+	public static final String CONFIGURE_PORTLET = "configurePortlet"; //$NON-NLS-1$
+
 	public static final boolean CONFIGURE_SEAM_VALUE = true;
 
 	public static final String CONFIGURE_SEAM_RUNTIME = "configureSeamRuntime"; //$NON-NLS-1$
@@ -93,6 +92,16 @@ public class MavenSeamActivator extends AbstractUIPlugin {
 	public static final String CONFIGURE_JSF = "configureJSF"; //$NON-NLS-1$
 	
 	public static final boolean CONFIGURE_JSF_VALUE = true;
+
+	public static final boolean CONFIGURE_PORTLET_VALUE = true;
+
+	public static final String CONFIGURE_JSFPORTLET = "configureJSFPortlet"; //$NON-NLS-1$
+	
+	public static final boolean CONFIGURE_JSFPORTLET_VALUE = true;
+
+	public static final String CONFIGURE_SEAMPORTLET = "configureSeamPortlet"; //$NON-NLS-1$
+	
+	public static final boolean CONFIGURE_SEAMPORTLET_VALUE = true;
 	
 	// The shared instance
 	private static MavenSeamActivator plugin;
@@ -892,5 +901,28 @@ public class MavenSeamActivator extends AbstractUIPlugin {
 	public static void log(String message) {
 		IStatus status = new Status(IStatus.WARNING, PLUGIN_ID, message, null);
 		getDefault().getLog().log(status);
+	}
+	
+	public String getDependencyVersion(MavenProject mavenProject, String gid, String aid) {
+		List<Dependency> dependencies = mavenProject.getDependencies();
+		for (Dependency dependency:dependencies) {
+	    	String groupId = dependency.getGroupId();
+    		if (groupId != null && (groupId.equals(gid)) ) {
+    			String artifactId = dependency.getArtifactId();
+    			if (artifactId != null && artifactId.equals(aid)) {
+	    			return dependency.getVersion();
+	    		} 
+	    	}
+	    }
+	    return null;
+	}
+	
+	public IDataModel createJSFDataModel(IFacetedProject fproj, IProjectFacetVersion facetVersion) {
+		IDataModel config = (IDataModel) new JSFFacetInstallDataModelProvider().create();
+		LibraryInstallDelegate libraryDelegate = new LibraryInstallDelegate(fproj, facetVersion);
+		ILibraryProvider provider = LibraryProviderFramework.getProvider("jsf-no-op-library-provider"); //$NON-NLS-1$
+		libraryDelegate.setLibraryProvider(provider);
+		config.setProperty(IJSFFacetInstallDataModelProperties.LIBRARY_PROVIDER_DELEGATE, libraryDelegate);
+		return config;
 	}
 }

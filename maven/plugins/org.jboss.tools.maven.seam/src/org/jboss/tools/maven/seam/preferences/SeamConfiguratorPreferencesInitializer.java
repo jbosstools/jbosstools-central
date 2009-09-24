@@ -25,6 +25,15 @@ public class SeamConfiguratorPreferencesInitializer extends
 		node.putBoolean(
 				MavenSeamActivator.CONFIGURE_JSF,
 				MavenSeamActivator.CONFIGURE_JSF_VALUE);
+		node.putBoolean(
+				MavenSeamActivator.CONFIGURE_PORTLET,
+				MavenSeamActivator.CONFIGURE_PORTLET_VALUE);
+		node.putBoolean(
+				MavenSeamActivator.CONFIGURE_JSFPORTLET,
+				MavenSeamActivator.CONFIGURE_JSFPORTLET_VALUE);
+		node.putBoolean(
+				MavenSeamActivator.CONFIGURE_SEAMPORTLET,
+				MavenSeamActivator.CONFIGURE_SEAMPORTLET_VALUE);
 	}
 
 }

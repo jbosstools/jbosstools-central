@@ -83,6 +83,10 @@ public class SeamProjectConfigurator extends AbstractProjectConfigurator {
 	protected static final IProjectFacet m2Facet;
 	protected static final IProjectFacetVersion m2Version;
 	private static final IProjectFacet seamFacet;
+	private static final IProjectFacet portletFacet;
+	private static final IProjectFacet jsfportletFacet;
+	private static final IProjectFacet seamPortletFacet;
+	private static final IProjectFacetVersion seamPortletVersion;
 	
 	static {
 		seamFacet = ProjectFacetsManager.getProjectFacet("jst.seam"); //$NON-NLS-1$
@@ -98,6 +102,10 @@ public class SeamProjectConfigurator extends AbstractProjectConfigurator {
 		m2Version = m2Facet.getVersion("1.0"); //$NON-NLS-1$
 		ejbFacet = ProjectFacetsManager.getProjectFacet("jst.ejb"); //$NON-NLS-1$
 		ejbVersion = ejbFacet.getVersion("3.0"); //$NON-NLS-1$
+		portletFacet = ProjectFacetsManager.getProjectFacet("jboss.portlet"); //$NON-NLS-1$
+		jsfportletFacet = ProjectFacetsManager.getProjectFacet("jboss.jsfportlet"); //$NON-NLS-1$
+		seamPortletFacet = ProjectFacetsManager.getProjectFacet("jboss.seamportlet"); //$NON-NLS-1$
+		seamPortletVersion = seamPortletFacet.getVersion("1.0"); //$NON-NLS-1$
 	}
 	
 	@Override
@@ -293,6 +301,16 @@ public class SeamProjectConfigurator extends AbstractProjectConfigurator {
 				setModelProperty(model, prefs,ISeamFacetDataModelProperties.WEB_CONTENTS_FOLDER);
 			}
 		}
+		IPreferenceStore store = MavenSeamActivator.getDefault().getPreferenceStore();
+		boolean configureSeamPortlet = store.getBoolean(MavenSeamActivator.CONFIGURE_SEAMPORTLET);
+		if (!configureSeamPortlet) {
+			return;
+		}
+		if (fproj.hasProjectFacet(seamFacet) && fproj.hasProjectFacet(portletFacet) && fproj.hasProjectFacet(jsfportletFacet)) {
+			if (!fproj.hasProjectFacet(seamPortletFacet)) {
+				fproj.installProjectFacet(seamPortletVersion, null, monitor);
+			}
+		}
 	}
 
 	private void setModelProperty(IDataModel model, IEclipsePreferences prefs, String property) {
@@ -305,7 +323,8 @@ public class SeamProjectConfigurator extends AbstractProjectConfigurator {
 	private void installJSFFacet(IFacetedProject fproj, IProgressMonitor monitor)
 			throws CoreException {
 		if (!fproj.hasProjectFacet(jsfFacet)) {
-			fproj.installProjectFacet(jsfVersion, null, monitor);
+			IDataModel model = MavenSeamActivator.getDefault().createJSFDataModel(fproj,jsfVersion);
+			fproj.installProjectFacet(jsfVersion, model, monitor);
 		}
 	}
 

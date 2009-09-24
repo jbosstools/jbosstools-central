@@ -35,6 +35,9 @@ public class MavenLibraryProviderInstallOperation extends
 		IProject project = facetedProject.getProject();
 		IFile pom = project.getFile(IMavenConstants.POM_FILE_NAME);
 		MavenLibraryProviderInstallOperationConfig mavenConfig = (MavenLibraryProviderInstallOperationConfig) config;
+		if (mavenConfig.getModel() == null) {
+			return;
+		}
 		if (pom.exists()) {
 			// JBoss Maven Integration facet has been executed		
 			MavenModelManager modelManager = MavenPlugin.getDefault().getMavenModelManager();

@@ -21,6 +21,13 @@
           name="JSF Project configurator" priority="150"/>
     </extension>
     
+    <extension point="org.maven.ide.eclipse.projectConfigurators">
+      <configurator 
+          id="org.jboss.tools.maven.portlet.configurator"
+          class="org.jboss.tools.maven.seam.configurators.PortletProjectConfigurator"
+          name="Portlet Core Project configurator" priority="155"/>
+    </extension>
+    
     <extension
         point="org.eclipse.ui.preferencePages">
      <page

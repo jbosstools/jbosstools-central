@@ -1,68 +1,29 @@
 package org.jboss.tools.maven.seam.configurators;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-
-import org.apache.maven.model.Dependency;
 import org.apache.maven.project.MavenProject;
-import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
-import org.eclipse.core.resources.ProjectScope;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.Path;
-import org.eclipse.core.runtime.preferences.IEclipsePreferences;
-import org.eclipse.core.runtime.preferences.IScopeContext;
-import org.eclipse.emf.common.util.EList;
-import org.eclipse.jdt.core.IClasspathEntry;
-import org.eclipse.jdt.core.IJavaProject;
-import org.eclipse.jdt.core.IPackageFragment;
-import org.eclipse.jdt.core.IPackageFragmentRoot;
-import org.eclipse.jdt.core.JavaCore;
-import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jface.preference.IPreferenceStore;
-import org.eclipse.jst.j2ee.application.Application;
-import org.eclipse.jst.j2ee.application.EjbModule;
-import org.eclipse.jst.j2ee.application.Module;
-import org.eclipse.jst.j2ee.application.WebModule;
-import org.eclipse.jst.j2ee.componentcore.util.EARArtifactEdit;
-import org.eclipse.jst.j2ee.internal.project.J2EEProjectUtilities;
-import org.eclipse.jst.j2ee.project.JavaEEProjectUtilities;
-import org.eclipse.wst.common.componentcore.ComponentCore;
+import org.eclipse.jst.common.project.facet.core.libprov.ILibraryProvider;
+import org.eclipse.jst.common.project.facet.core.libprov.LibraryInstallDelegate;
+import org.eclipse.jst.common.project.facet.core.libprov.LibraryProviderFramework;
+import org.eclipse.jst.jsf.core.internal.project.facet.IJSFFacetInstallDataModelProperties;
+import org.eclipse.jst.jsf.core.internal.project.facet.JSFFacetInstallDataModelProvider;
 import org.eclipse.wst.common.componentcore.ModuleCoreNature;
-import org.eclipse.wst.common.componentcore.resources.IVirtualComponent;
-import org.eclipse.wst.common.componentcore.resources.IVirtualFolder;
-import org.eclipse.wst.common.componentcore.resources.IVirtualReference;
 import org.eclipse.wst.common.frameworks.datamodel.IDataModel;
 import org.eclipse.wst.common.project.facet.core.IFacetedProject;
 import org.eclipse.wst.common.project.facet.core.IProjectFacet;
 import org.eclipse.wst.common.project.facet.core.IProjectFacetVersion;
 import org.eclipse.wst.common.project.facet.core.ProjectFacetsManager;
-import org.jboss.tools.common.model.util.EclipseResourceUtil;
-import org.jboss.tools.jst.web.kb.IKbProject;
 import org.jboss.tools.maven.core.IJBossMavenConstants;
 import org.jboss.tools.maven.core.internal.project.facet.MavenFacetInstallDataModelProvider;
 import org.jboss.tools.maven.seam.MavenSeamActivator;
-import org.jboss.tools.seam.core.ISeamProject;
-import org.jboss.tools.seam.core.SeamCorePlugin;
-import org.jboss.tools.seam.core.SeamUtil;
-import org.jboss.tools.seam.core.project.facet.SeamRuntime;
-import org.jboss.tools.seam.core.project.facet.SeamRuntimeManager;
-import org.jboss.tools.seam.core.project.facet.SeamVersion;
-import org.jboss.tools.seam.internal.core.project.facet.ISeamFacetDataModelProperties;
 import org.jboss.tools.seam.internal.core.project.facet.SeamFacetInstallDataModelProvider;
-import org.jboss.tools.seam.ui.wizard.SeamWizardUtils;
-import org.maven.ide.eclipse.MavenPlugin;
-import org.maven.ide.eclipse.core.IMavenConstants;
 import org.maven.ide.eclipse.project.IMavenProjectFacade;
 import org.maven.ide.eclipse.project.MavenProjectChangedEvent;
-import org.maven.ide.eclipse.project.MavenProjectManager;
 import org.maven.ide.eclipse.project.configurator.AbstractProjectConfigurator;
 import org.maven.ide.eclipse.project.configurator.ProjectConfigurationRequest;
-import org.osgi.service.prefs.BackingStoreException;
 
 public class JSFProjectConfigurator extends AbstractProjectConfigurator {
 
@@ -92,7 +53,6 @@ public class JSFProjectConfigurator extends AbstractProjectConfigurator {
 	@Override
 	public void configure(ProjectConfigurationRequest request,
 			IProgressMonitor monitor) throws CoreException {
-		// adds Seam capabilities if there are Seam dependencies
 		MavenProject mavenProject = request.getMavenProject();
 		IProject project = request.getProject();
 		configureInternal(mavenProject,project, monitor);
@@ -159,30 +119,28 @@ public class JSFProjectConfigurator extends AbstractProjectConfigurator {
 			throws CoreException {
 		if (!fproj.hasProjectFacet(jsfFacet)) {
 			if (jsfVersionString.startsWith("1.1")) { //$NON-NLS-1$
-				fproj.installProjectFacet(jsfVersion11, null, monitor);	
+				IDataModel model = MavenSeamActivator.getDefault().createJSFDataModel(fproj,jsfVersion11);
+				fproj.installProjectFacet(jsfVersion11, model, monitor);	
 			}
 			if (jsfVersionString.startsWith("1.2")) { //$NON-NLS-1$
-				fproj.installProjectFacet(jsfVersion12, null, monitor);	
+				IDataModel model = MavenSeamActivator.getDefault().createJSFDataModel(fproj,jsfVersion12);
+				fproj.installProjectFacet(jsfVersion12, model, monitor);	
 			}
 			// FIXME
 			if (jsfVersionString.startsWith("2.0")) { //$NON-NLS-1$
-				fproj.installProjectFacet(jsfVersion12, null, monitor);	
+				IDataModel model = MavenSeamActivator.getDefault().createJSFDataModel(fproj,jsfVersion12);
+				fproj.installProjectFacet(jsfVersion12, model, monitor);	
 			}
 		}
 	}
-
+	
 	private String getJSFVersion(MavenProject mavenProject) {
-		List<Dependency> dependencies = mavenProject.getDependencies();
-		for (Dependency dependency:dependencies) {
-	    	String groupId = dependency.getGroupId();
-    		if (groupId != null && (JSF_API_GROUP_ID.equals(groupId) || JSF_API2_GROUP_ID.equals(groupId)) ) {
-    			String artifactId = dependency.getArtifactId();
-    			if (artifactId != null && JSF_API_ARTIFACT_ID.equals(artifactId)) {
-	    			return dependency.getVersion();
-	    		} 
-	    	}
-	    }
-	    return null;
+		String version = null;
+		version = MavenSeamActivator.getDefault().getDependencyVersion(mavenProject, JSF_API_GROUP_ID, JSF_API_ARTIFACT_ID);
+		if (version == null) {
+			version = MavenSeamActivator.getDefault().getDependencyVersion(mavenProject, JSF_API2_GROUP_ID, JSF_API_ARTIFACT_ID);
+		}
+	    return version;
 	}
 
 }

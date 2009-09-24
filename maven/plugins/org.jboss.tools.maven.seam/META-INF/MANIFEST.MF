@@ -8,12 +8,14 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
  org.jboss.tools.maven.core,
  org.jboss.tools.seam.core,
+ org.jboss.tools.portlet.core,
  org.jboss.tools.seam.ui,
  org.jboss.tools.common.model,
  org.maven.ide.components.maven_model_edit,
  org.eclipse.jst.j2ee.core,
  org.eclipse.jst.j2ee,
- org.eclipse.wst.common.emfworkbench.integration
+ org.eclipse.wst.common.emfworkbench.integration,
+ org.eclipse.jst.jsf.core
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Bundle-Vendor: JBoss by Red Hat

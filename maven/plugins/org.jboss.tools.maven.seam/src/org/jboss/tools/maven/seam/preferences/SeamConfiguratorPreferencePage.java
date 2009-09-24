@@ -21,6 +21,9 @@ public class SeamConfiguratorPreferencePage extends PreferencePage implements
 	private Button configureSeamRuntimeButton;
 	private Button configureSeamArtifactsButton;
 	private Button configureJSFButton;
+	private Button configurePortletButton;
+	private Button configureJSFPortletButton;
+	private Button configureSeamPortletButton;
 
 	@Override
 	protected Control createContents(Composite parent) {
@@ -63,6 +66,21 @@ public class SeamConfiguratorPreferencePage extends PreferencePage implements
 		boolean configureJSF = store.getBoolean(MavenSeamActivator.CONFIGURE_JSF);
 		configureJSFButton.setSelection(configureJSF);
 		
+		configurePortletButton = new Button(composite,SWT.CHECK);
+		configurePortletButton.setText("Configure JBoss Portlet Core facet when importing Maven projects");
+		boolean configurePortlet = store.getBoolean(MavenSeamActivator.CONFIGURE_PORTLET);
+		configurePortletButton.setSelection(configurePortlet);
+		
+		configureJSFPortletButton = new Button(composite,SWT.CHECK);
+		configureJSFPortletButton.setText("Configure JBoss JSF Portlet facet when importing Maven projects");
+		boolean configureJSFPortlet = store.getBoolean(MavenSeamActivator.CONFIGURE_JSFPORTLET);
+		configureJSFPortletButton.setSelection(configureJSFPortlet);
+		
+		configureSeamPortletButton = new Button(composite,SWT.CHECK);
+		configureSeamPortletButton.setText("Configure JBoss Seam Portlet facet when importing Maven projects");
+		boolean configureSeamPortlet = store.getBoolean(MavenSeamActivator.CONFIGURE_SEAMPORTLET);
+		configureJSFPortletButton.setSelection(configureSeamPortlet);
+		
 		return composite;
 	}
 
@@ -75,9 +93,15 @@ public class SeamConfiguratorPreferencePage extends PreferencePage implements
 		configureSeamButton.setSelection(MavenSeamActivator.CONFIGURE_SEAM_VALUE);
 		configureSeamRuntimeButton.setSelection(MavenSeamActivator.CONFIGURE_SEAM_RUNTIME_VALUE);
 		configureSeamArtifactsButton.setSelection(MavenSeamActivator.CONFIGURE_SEAM_ARTIFACTS_VALUE);
+		configurePortletButton.setSelection(MavenSeamActivator.CONFIGURE_PORTLET_VALUE);
+		configureJSFPortletButton.setSelection(MavenSeamActivator.CONFIGURE_JSFPORTLET_VALUE);
+		configureSeamPortletButton.setSelection(MavenSeamActivator.CONFIGURE_SEAMPORTLET_VALUE);
 		IPreferenceStore store = MavenSeamActivator.getDefault().getPreferenceStore();
 		store.setValue(MavenSeamActivator.CONFIGURE_SEAM, MavenSeamActivator.CONFIGURE_SEAM_VALUE);
 		store.setValue(MavenSeamActivator.CONFIGURE_JSF, MavenSeamActivator.CONFIGURE_JSF_VALUE);
+		store.setValue(MavenSeamActivator.CONFIGURE_JSFPORTLET, MavenSeamActivator.CONFIGURE_JSFPORTLET_VALUE);
+		store.setValue(MavenSeamActivator.CONFIGURE_SEAMPORTLET, MavenSeamActivator.CONFIGURE_SEAMPORTLET_VALUE);
+		store.setValue(MavenSeamActivator.CONFIGURE_PORTLET, MavenSeamActivator.CONFIGURE_PORTLET_VALUE);
 		store.setValue(MavenSeamActivator.CONFIGURE_SEAM_RUNTIME, MavenSeamActivator.CONFIGURE_SEAM_RUNTIME_VALUE);
 		store.setValue(MavenSeamActivator.CONFIGURE_SEAM_ARTIFACTS, MavenSeamActivator.CONFIGURE_SEAM_ARTIFACTS_VALUE);
 		configureSeamRuntimeButton.setEnabled(configureSeamButton.getSelection());
@@ -89,7 +113,10 @@ public class SeamConfiguratorPreferencePage extends PreferencePage implements
 	public boolean performOk() {
 		IPreferenceStore store = MavenSeamActivator.getDefault().getPreferenceStore();
 		store.setValue(MavenSeamActivator.CONFIGURE_SEAM, configureSeamButton.getSelection());
+		store.setValue(MavenSeamActivator.CONFIGURE_PORTLET, configurePortletButton.getSelection());
 		store.setValue(MavenSeamActivator.CONFIGURE_JSF, configureJSFButton.getSelection());
+		store.setValue(MavenSeamActivator.CONFIGURE_JSFPORTLET, configureJSFPortletButton.getSelection());
+		store.setValue(MavenSeamActivator.CONFIGURE_SEAMPORTLET, configureSeamPortletButton.getSelection());
 		store.setValue(MavenSeamActivator.CONFIGURE_SEAM_RUNTIME, configureSeamRuntimeButton.getSelection());
 		store.setValue(MavenSeamActivator.CONFIGURE_SEAM_ARTIFACTS, configureSeamArtifactsButton.getSelection());
 		return super.performOk();
