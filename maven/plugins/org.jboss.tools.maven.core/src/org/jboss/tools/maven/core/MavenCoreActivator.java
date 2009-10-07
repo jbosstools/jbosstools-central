@@ -1,6 +1,10 @@
 package org.jboss.tools.maven.core;
 
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -650,15 +654,53 @@ public class MavenCoreActivator extends Plugin {
 	public static PomResourceImpl loadResource(URL url) throws CoreException {
 		try {
 			URI uri = URI.createURI(url.toString());
+			if ( !( uri.isFile() || uri.isPlatformResource()) ) {
+				// the m2eclipse pom model can read only a file URL or platform resource URL
+				// see https://jira.jboss.org/jira/browse/JBIDE-4972
+				InputStream is = null;
+		        OutputStream os = null;
+		        try {
+					File temp = File.createTempFile("mavenCoreActivator", ".pom");  //$NON-NLS-1$//$NON-NLS-2$
+					temp.deleteOnExit();
+					os = new FileOutputStream(temp);
+					is = url.openStream();
+					copy(is,os);
+					URL tempURL = temp.toURL();
+					uri = URI.createURI(tempURL.toString());
+				} catch (Exception e) {
+					log(e);
+					throw new CoreException(new Status(IStatus.ERROR,
+							PLUGIN_ID, -1, e.getMessage(), e));
+				} finally {
+					if (is != null) {
+						try {
+							is.close();
+						} catch (Exception ignore) {}
+					}
+					if (os != null) {
+						try {
+							os.close();
+						} catch (Exception ignore) {}
+					}
+				}
+			}
 			org.eclipse.emf.ecore.resource.Resource resource = new PomResourceFactoryImpl()
 					.createResource(uri);
 			resource.load(Collections.EMPTY_MAP);
 			return (PomResourceImpl) resource;
-
 		} catch (Exception ex) {
 			log(ex);
 			throw new CoreException(new Status(IStatus.ERROR,
 					PLUGIN_ID, -1, ex.getMessage(), ex));
+		}
+	}
+
+	private static void copy(InputStream is, OutputStream os)
+			throws IOException {
+		byte[] buffer = new byte[1024];
+		int count;
+		while ( (count = is.read(buffer)) > 0) {
+			os.write(buffer,0,count);
 		}
 	}
 
