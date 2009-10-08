@@ -642,13 +642,6 @@ public class MavenSeamActivator extends AbstractUIPlugin {
 				modelManager.addDependency(pomFile,dependency);
 				
 				dependency = new Dependency();
-				dependency.setGroupId("org.mvel");
-				dependency.setArtifactId("mvel14");
-				dependency.setType("jar");
-				dependency.setScope("compile");
-				modelManager.addDependency(pomFile,dependency);
-				
-				dependency = new Dependency();
 				dependency.setGroupId("org.jbpm");
 				dependency.setArtifactId("jbpm-jpdl");
 				dependency.setType("jar");
