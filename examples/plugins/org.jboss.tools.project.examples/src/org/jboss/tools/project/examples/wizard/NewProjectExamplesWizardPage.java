@@ -88,22 +88,6 @@ public class NewProjectExamplesWizardPage extends WizardPage {
 		button.setText(Messages.ProjectExamplesPreferencePage_Show_experimental_sites);
 		IPreferenceStore store = ProjectExamplesActivator.getDefault().getPreferenceStore();
 		button.setSelection(store.getBoolean(ProjectExamplesActivator.SHOW_EXPERIMENTAL_SITES));
-		button.addSelectionListener(new SelectionAdapter() {
-
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				IPreferenceStore store = ProjectExamplesActivator.getDefault().getPreferenceStore();
-				store.setValue(ProjectExamplesActivator.SHOW_EXPERIMENTAL_SITES, button.getSelection());
-				if (siteCombo != null) {
-					String[] items = getItems();
-					siteCombo.setItems(items);
-					if (items.length > 0) {
-						siteCombo.select(0);
-					}
-				}
-			}
-			
-		});
 		
 		new Label(siteComposite,SWT.NONE).setText(Messages.NewProjectExamplesWizardPage_Site);
 		siteCombo = new Combo(siteComposite,SWT.READ_ONLY);
@@ -128,11 +112,9 @@ public class NewProjectExamplesWizardPage extends WizardPage {
 		viewer.setLabelProvider(new ProjectLabelProvider());
 		viewer.setContentProvider(new ProjectContentProvider());
 		
-		final AdaptableList input = new AdaptableList(getCategories());
-
+		refresh(viewer);
 		final SiteFilter siteFilter = new SiteFilter();
 		viewer.addFilter(siteFilter);
-		viewer.setInput(input);
 		
 		Label descriptionLabel = new Label(composite,SWT.NULL);
 		descriptionLabel.setText(Messages.NewProjectExamplesWizardPage_Description);
@@ -212,9 +194,37 @@ public class NewProjectExamplesWizardPage extends WizardPage {
 			
 		});
 		
+		button.addSelectionListener(new SelectionAdapter() {
+
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				IPreferenceStore store = ProjectExamplesActivator.getDefault().getPreferenceStore();
+				store.setValue(ProjectExamplesActivator.SHOW_EXPERIMENTAL_SITES, button.getSelection());
+				refresh(viewer);
+				if (siteCombo != null) {
+					String[] items = getItems();
+					int index = siteCombo.getSelectionIndex();
+					siteCombo.setItems(items);
+					if (items.length > 0 && (index < 0 || index > items.length) ) {
+						siteCombo.select(0);
+					} else {
+						siteCombo.select(index);
+					}
+				}
+				siteFilter.setSite(siteCombo.getText());
+				viewer.refresh();
+			}
+			
+		});
 		setPageComplete(false);
 		
 		setControl(composite);
+	}
+
+	private void refresh(final TreeViewer viewer) {
+		AdaptableList input = new AdaptableList(getCategories());
+		viewer.setInput(input);
+		viewer.refresh();
 	}
 
 	private List<Category> getCategories() {
