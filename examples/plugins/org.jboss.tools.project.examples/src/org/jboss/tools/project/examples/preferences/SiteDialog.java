@@ -1,5 +1,6 @@
 package org.jboss.tools.project.examples.preferences;
 
+import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Set;
@@ -128,8 +129,6 @@ public class SiteDialog extends TitleAreaDialog {
 		browse.addSelectionListener(new SelectionListener(){
 		
 			public void widgetSelected(SelectionEvent e) {
-			
-				
 				FileDialog dialog = new FileDialog(getShell(), SWT.SINGLE);
 				dialog.setFilterExtensions(new String[] { "*.xml" }); //$NON-NLS-1$;
 			
@@ -137,7 +136,12 @@ public class SiteDialog extends TitleAreaDialog {
 				if (result == null || result.trim().length() == 0) {
 					return;
 				}
-				urlText.setText("file:/" + result); //$NON-NLS-1$
+				try {
+					String urlString = new File(result).toURL().toString();
+					urlText.setText(urlString);
+				} catch (MalformedURLException e1) {
+					urlText.setText("file:///" + result); //$NON-NLS-1$
+				}
 			}
 		
 			public void widgetDefaultSelected(SelectionEvent e) {
