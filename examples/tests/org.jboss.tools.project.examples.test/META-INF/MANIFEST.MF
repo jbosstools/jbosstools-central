@@ -1,0 +1,11 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Project Examples Test Suite
+Bundle-SymbolicName: org.jboss.tools.project.examples.test;singleton:=true
+Bundle-Version: 1.0.0
+Require-Bundle: org.eclipse.core.runtime,
+ org.junit;bundle-version="3.8.2",
+ org.jboss.tools.tests;bundle-version="2.0.0"
+Bundle-ActivationPolicy: lazy
+Bundle-RequiredExecutionEnvironment: J2SE-1.5
+Export-Package: org.jboss.tools.project.examples.test
