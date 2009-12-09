@@ -183,6 +183,9 @@ public class MavenSeamActivator extends AbstractUIPlugin {
 	private void configureTestProject(IDataModel m2FacetModel,
 			IDataModel seamFacetModel) {
 		IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject(testProjectName);
+		if (project == null || !project.exists()) {
+			return;
+		}
 		IFile pom = project.getFile(IMavenConstants.POM_FILE_NAME);
 		IJavaProject javaProject = JavaCore.create(project);
 		if (!pom.exists()) {
