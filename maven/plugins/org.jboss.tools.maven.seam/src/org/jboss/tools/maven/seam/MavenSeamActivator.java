@@ -32,6 +32,7 @@ import org.eclipse.jst.common.project.facet.core.libprov.LibraryInstallDelegate;
 import org.eclipse.jst.common.project.facet.core.libprov.LibraryProviderFramework;
 import org.eclipse.jst.jsf.core.internal.project.facet.IJSFFacetInstallDataModelProperties;
 import org.eclipse.jst.jsf.core.internal.project.facet.JSFFacetInstallDataModelProvider;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.eclipse.wst.common.componentcore.datamodel.properties.IFacetDataModelProperties;
 import org.eclipse.wst.common.frameworks.datamodel.IDataModel;
@@ -60,17 +61,17 @@ import org.osgi.framework.BundleContext;
  */
 public class MavenSeamActivator extends AbstractUIPlugin {
 
-	private static final String WAR_ARCHIVE_SUFFIX = ".war";
+	private static final String WAR_ARCHIVE_SUFFIX = ".war"; //$NON-NLS-1$
 	
-	private static final String EJB_ARCHIVE_SUFFIX = ".jar";
+	private static final String EJB_ARCHIVE_SUFFIX = ".jar"; //$NON-NLS-1$
 
-	private static final String TEST_SUFFIX = "-test";
+	private static final String TEST_SUFFIX = "-test"; //$NON-NLS-1$
 
-	private static final String EJB_SUFFIX = "-ejb";
+	private static final String EJB_SUFFIX = "-ejb"; //$NON-NLS-1$
 
-	private static final String EAR_SUFFIX = "-ear";
+	private static final String EAR_SUFFIX = "-ear"; //$NON-NLS-1$
 
-	private static final String PARENT_SUFFIX = "-parent";
+	private static final String PARENT_SUFFIX = "-parent"; //$NON-NLS-1$
 
 	// The plug-in ID
 	public static final String PLUGIN_ID = "org.jboss.tools.maven.seam"; //$NON-NLS-1$
@@ -196,8 +197,8 @@ public class MavenSeamActivator extends AbstractUIPlugin {
 			model.setArtifactId(testArtifactId);
 			model.setVersion(m2FacetModel
 					.getStringProperty(IJBossMavenConstants.VERSION));
-			model.setName(m2FacetModel.getStringProperty(IJBossMavenConstants.NAME) + " - test");
-			model.setPackaging("jar");
+			model.setName(m2FacetModel.getStringProperty(IJBossMavenConstants.NAME) + " - test"); //$NON-NLS-1$
+			model.setPackaging("jar"); //$NON-NLS-1$
 			model.setDescription(m2FacetModel
 					.getStringProperty(IJBossMavenConstants.DESCRIPTION));
 			
@@ -210,50 +211,50 @@ public class MavenSeamActivator extends AbstractUIPlugin {
 			List dependencies = model.getDependencies();
 			
 			Dependency dependency = new Dependency();
-			dependency.setGroupId("org.jboss.seam.embedded");
-			dependency.setArtifactId("hibernate-all");
+			dependency.setGroupId("org.jboss.seam.embedded"); //$NON-NLS-1$
+			dependency.setArtifactId("hibernate-all"); //$NON-NLS-1$
 			dependencies.add(dependency);
 			
 			dependency = new Dependency();
-			dependency.setGroupId("org.jboss.seam.embedded");
-			dependency.setArtifactId("jboss-embedded-all");
+			dependency.setGroupId("org.jboss.seam.embedded"); //$NON-NLS-1$
+			dependency.setArtifactId("jboss-embedded-all"); //$NON-NLS-1$
 			dependencies.add(dependency);
 			
 			dependency = new Dependency();
-			dependency.setGroupId("org.jboss.seam.embedded");
-			dependency.setArtifactId("thirdparty-all");
+			dependency.setGroupId("org.jboss.seam.embedded"); //$NON-NLS-1$
+			dependency.setArtifactId("thirdparty-all"); //$NON-NLS-1$
 			dependencies.add(dependency);
 			
 			dependency = getSeamDependency();
-			dependency.setScope("test");
+			dependency.setScope("test"); //$NON-NLS-1$
 			dependencies.add(dependency);
 			
 			dependency = getJSFApi();
-			dependency.setScope("test");
+			dependency.setScope("test"); //$NON-NLS-1$
 			dependencies.add(dependency);
 			
 			dependency = new Dependency();
-			dependency.setGroupId("javax.activation");
-			dependency.setArtifactId("activation");
+			dependency.setGroupId("javax.activation"); //$NON-NLS-1$
+			dependency.setArtifactId("activation"); //$NON-NLS-1$
 			dependencies.add(dependency);
 			
 			dependency = new Dependency();
-			dependency.setGroupId("org.testng");
-			dependency.setArtifactId("testng");
+			dependency.setGroupId("org.testng"); //$NON-NLS-1$
+			dependency.setArtifactId("testng"); //$NON-NLS-1$
 			// FIXME
-			dependency.setVersion("${testng.version}");
-			dependency.setClassifier("jdk15");
-			dependency.setScope("test");
+			dependency.setVersion("${testng.version}"); //$NON-NLS-1$
+			dependency.setClassifier("jdk15"); //$NON-NLS-1$
+			dependency.setScope("test"); //$NON-NLS-1$
 			dependencies.add(dependency);
 			
 			dependency = new Dependency();
-			dependency.setGroupId("org.slf4j");
-			dependency.setArtifactId("slf4j-api");
+			dependency.setGroupId("org.slf4j"); //$NON-NLS-1$
+			dependency.setArtifactId("slf4j-api"); //$NON-NLS-1$
 			dependencies.add(dependency);
 			
 			dependency = new Dependency();
-			dependency.setGroupId("org.slf4j");
-			dependency.setArtifactId("slf4j-nop");
+			dependency.setGroupId("org.slf4j"); //$NON-NLS-1$
+			dependency.setArtifactId("slf4j-nop"); //$NON-NLS-1$
 			dependencies.add(dependency);
 			
 			Build build = new Build();
@@ -289,8 +290,8 @@ public class MavenSeamActivator extends AbstractUIPlugin {
 			model.setArtifactId(earArtifactId);
 			model.setVersion(m2FacetModel
 					.getStringProperty(IJBossMavenConstants.VERSION));
-			model.setName(m2FacetModel.getStringProperty(IJBossMavenConstants.NAME) + " - EAR");
-			model.setPackaging("ear");
+			model.setName(m2FacetModel.getStringProperty(IJBossMavenConstants.NAME) + " - EAR"); //$NON-NLS-1$
+			model.setPackaging("ear"); //$NON-NLS-1$
 			model.setDescription(m2FacetModel
 					.getStringProperty(IJBossMavenConstants.DESCRIPTION));
 			
@@ -306,70 +307,70 @@ public class MavenSeamActivator extends AbstractUIPlugin {
 			dependency.setGroupId(m2FacetModel.getStringProperty(IJBossMavenConstants.GROUP_ID));
 			dependency.setArtifactId(ejbProjectName);
 			dependency.setVersion(m2FacetModel.getStringProperty(IJBossMavenConstants.VERSION));
-			dependency.setType("ejb");
-			dependency.setScope("runtime");
+			dependency.setType("ejb"); //$NON-NLS-1$
+			dependency.setScope("runtime"); //$NON-NLS-1$
 			dependencies.add(dependency);
 			
 			dependency = new Dependency();
 			dependency.setGroupId(m2FacetModel.getStringProperty(IJBossMavenConstants.GROUP_ID));
 			dependency.setArtifactId(webProjectName);
 			dependency.setVersion(m2FacetModel.getStringProperty(IJBossMavenConstants.VERSION));
-			dependency.setType("war");
-			dependency.setScope("runtime");
+			dependency.setType("war"); //$NON-NLS-1$
+			dependency.setScope("runtime"); //$NON-NLS-1$
 			dependencies.add(dependency);
 			
 			dependency = getSeamDependency();
-			dependency.setVersion("${seam.version}");
-			dependency.setType("ejb");
-			dependency.setScope("compile");
+			dependency.setVersion("${seam.version}"); //$NON-NLS-1$
+			dependency.setType("ejb"); //$NON-NLS-1$
+			dependency.setScope("compile"); //$NON-NLS-1$
 			List exclusions = dependency.getExclusions();
 			Exclusion exclusion = new Exclusion();
-			exclusion.setGroupId("javassist");
-			exclusion.setArtifactId("javassist");
+			exclusion.setGroupId("javassist"); //$NON-NLS-1$
+			exclusion.setArtifactId("javassist"); //$NON-NLS-1$
 			exclusions.add(exclusion);
 			
 			exclusion = new Exclusion();
-			exclusion.setGroupId("javax.el");
-			exclusion.setArtifactId("el-api");
+			exclusion.setGroupId("javax.el"); //$NON-NLS-1$
+			exclusion.setArtifactId("el-api"); //$NON-NLS-1$
 			exclusions.add(exclusion);
 			
 			exclusion = new Exclusion();
-			exclusion.setGroupId("dom4j");
-			exclusion.setArtifactId("dom4j");
+			exclusion.setGroupId("dom4j"); //$NON-NLS-1$
+			exclusion.setArtifactId("dom4j"); //$NON-NLS-1$
 			exclusions.add(exclusion);
 			
 			exclusion = new Exclusion();
-			exclusion.setGroupId("xstream");
-			exclusion.setArtifactId("xstream");
+			exclusion.setGroupId("xstream"); //$NON-NLS-1$
+			exclusion.setArtifactId("xstream"); //$NON-NLS-1$
 			exclusions.add(exclusion);
 			
 			exclusion = new Exclusion();
-			exclusion.setGroupId("xpp3");
-			exclusion.setArtifactId("xpp3_min");
+			exclusion.setGroupId("xpp3"); //$NON-NLS-1$
+			exclusion.setArtifactId("xpp3_min"); //$NON-NLS-1$
 			exclusions.add(exclusion);
 			
 			dependencies.add(dependency);
 			
 			dependency = getRichFacesApi();
-			dependency.setType("jar");
-			dependency.setScope("compile");
+			dependency.setType("jar"); //$NON-NLS-1$
+			dependency.setScope("compile"); //$NON-NLS-1$
 			exclusions = dependency.getExclusions();
 			exclusion = new Exclusion();
-			exclusion.setGroupId("commons-collections");
-			exclusion.setArtifactId("commons-collections");
+			exclusion.setGroupId("commons-collections"); //$NON-NLS-1$
+			exclusion.setArtifactId("commons-collections"); //$NON-NLS-1$
 			exclusions.add(exclusion);
 			exclusion = new Exclusion();
-			exclusion.setGroupId("commons-logging");
-			exclusion.setArtifactId("commons-logging");
+			exclusion.setGroupId("commons-logging"); //$NON-NLS-1$
+			exclusion.setArtifactId("commons-logging"); //$NON-NLS-1$
 			exclusions.add(exclusion);
 			
 			dependencies.add(dependency);
 			
 			dependency = new Dependency();
-			dependency.setGroupId("org.drools");
-			dependency.setArtifactId("drools-compiler");
-			dependency.setType("jar");
-			dependency.setScope("compile");
+			dependency.setGroupId("org.drools"); //$NON-NLS-1$
+			dependency.setArtifactId("drools-compiler"); //$NON-NLS-1$
+			dependency.setType("jar"); //$NON-NLS-1$
+			dependency.setScope("compile"); //$NON-NLS-1$
 			dependencies.add(dependency);
 			
 			dependency = new Dependency();
@@ -386,9 +387,9 @@ public class MavenSeamActivator extends AbstractUIPlugin {
 				}
 			}
 			dependency.setGroupId(jbpmGroupId);
-			dependency.setArtifactId("jbpm-jpdl");
-			dependency.setType("jar");
-			dependency.setScope("compile");
+			dependency.setArtifactId("jbpm-jpdl"); //$NON-NLS-1$
+			dependency.setType("jar"); //$NON-NLS-1$
+			dependency.setScope("compile"); //$NON-NLS-1$
 			dependencies.add(dependency);
 			
 //			dependency = new Dependency();
@@ -403,8 +404,8 @@ public class MavenSeamActivator extends AbstractUIPlugin {
 //			dependencies.add(dependency);
 			
 			dependency = new Dependency();
-			dependency.setGroupId("commons-digester");
-			dependency.setArtifactId("commons-digester");
+			dependency.setGroupId("commons-digester"); //$NON-NLS-1$
+			dependency.setArtifactId("commons-digester"); //$NON-NLS-1$
 			dependencies.add(dependency);
 			
 			Build build = new Build();
@@ -415,7 +416,7 @@ public class MavenSeamActivator extends AbstractUIPlugin {
 				if (sourceDirectory != null) {
 					build.setSourceDirectory(sourceDirectory);
 				}
-				build.setOutputDirectory("target/classes");
+				build.setOutputDirectory("target/classes"); //$NON-NLS-1$
 				MavenCoreActivator.addMavenEarPlugin(build, project, m2FacetModel, true);
 				model.setBuild(build);
 				MavenCoreActivator.createMavenProject(earProjectName, null, model, true);
@@ -455,8 +456,8 @@ public class MavenSeamActivator extends AbstractUIPlugin {
 			model.setArtifactId(ejbArtifactId);
 			model.setVersion(m2FacetModel
 					.getStringProperty(IJBossMavenConstants.VERSION));
-			model.setName(m2FacetModel.getStringProperty(IJBossMavenConstants.NAME) + " - EJB");
-			model.setPackaging("ejb");
+			model.setName(m2FacetModel.getStringProperty(IJBossMavenConstants.NAME) + " - EJB"); //$NON-NLS-1$
+			model.setPackaging("ejb"); //$NON-NLS-1$
 			model.setDescription(m2FacetModel
 					.getStringProperty(IJBossMavenConstants.DESCRIPTION));
 			
@@ -469,24 +470,24 @@ public class MavenSeamActivator extends AbstractUIPlugin {
 			List dependencies = model.getDependencies();
 			
 			Dependency dependency = getSeamDependency();
-			dependency.setScope("provided");
+			dependency.setScope("provided"); //$NON-NLS-1$
 			dependencies.add(dependency);
 			dependencies.add(getJSFApi());
 			dependencies.add(getRichFacesApi());
 			
 			dependency = new Dependency();
-			dependency.setGroupId("javax.ejb");
-			dependency.setArtifactId("ejb-api");
+			dependency.setGroupId("javax.ejb"); //$NON-NLS-1$
+			dependency.setArtifactId("ejb-api"); //$NON-NLS-1$
 			dependencies.add(dependency);
 			
 			dependency = new Dependency();
-			dependency.setGroupId("javax.annotation");
-			dependency.setArtifactId("jsr250-api");
+			dependency.setGroupId("javax.annotation"); //$NON-NLS-1$
+			dependency.setArtifactId("jsr250-api"); //$NON-NLS-1$
 			dependencies.add(dependency);
 			
 			dependency = new Dependency();
-			dependency.setGroupId("javax.persistence");
-			dependency.setArtifactId("persistence-api");
+			dependency.setGroupId("javax.persistence"); //$NON-NLS-1$
+			dependency.setArtifactId("persistence-api"); //$NON-NLS-1$
 			dependencies.add(dependency);
 			
 			dependencies.add(getHibernateAnnotations());
@@ -535,125 +536,125 @@ public class MavenSeamActivator extends AbstractUIPlugin {
 			modelManager.addDependency(pomFile,dependency);
 			
 			dependency = new Dependency();
-			dependency.setGroupId("org.hibernate");
-			dependency.setArtifactId("hibernate-entitymanager");
+			dependency.setGroupId("org.hibernate"); //$NON-NLS-1$
+			dependency.setArtifactId("hibernate-entitymanager"); //$NON-NLS-1$
 			modelManager.addDependency(pomFile,dependency);
 			
 			dependency = getSeamDependency();
 			if (!SeamFacetAbstractInstallDelegate
 					.isWarConfiguration(seamFacetModel)) {
-				dependency.setScope("provided");
+				dependency.setScope("provided"); //$NON-NLS-1$
 			}
 			modelManager.addDependency(pomFile,dependency);
 			
 			dependency = new Dependency();
-			dependency.setGroupId("org.jboss.seam");
-			dependency.setArtifactId("jboss-seam-ui");
+			dependency.setGroupId("org.jboss.seam"); //$NON-NLS-1$
+			dependency.setArtifactId("jboss-seam-ui"); //$NON-NLS-1$
 			List<Exclusion> exclusions = dependency.getExclusions();
 			Exclusion exclusion = new Exclusion();
-			exclusion.setGroupId("org.jboss.seam");
-			exclusion.setArtifactId("jboss-seam");
+			exclusion.setGroupId("org.jboss.seam"); //$NON-NLS-1$
+			exclusion.setArtifactId("jboss-seam"); //$NON-NLS-1$
 			exclusions.add(exclusion);
 			modelManager.addDependency(pomFile,dependency);
 			
 			dependency = new Dependency();
-			dependency.setGroupId("org.jboss.seam");
-			dependency.setArtifactId("jboss-seam-ioc");
+			dependency.setGroupId("org.jboss.seam"); //$NON-NLS-1$
+			dependency.setArtifactId("jboss-seam-ioc"); //$NON-NLS-1$
 			exclusions = dependency.getExclusions();
 			exclusion = new Exclusion();
-			exclusion.setGroupId("org.jboss.seam");
-			exclusion.setArtifactId("jboss-seam");
+			exclusion.setGroupId("org.jboss.seam"); //$NON-NLS-1$
+			exclusion.setArtifactId("jboss-seam"); //$NON-NLS-1$
 			exclusions.add(exclusion);
 			modelManager.addDependency(pomFile,dependency);
 			
 			dependency = new Dependency();
-			dependency.setGroupId("org.jboss.seam");
-			dependency.setArtifactId("jboss-seam-debug");
+			dependency.setGroupId("org.jboss.seam"); //$NON-NLS-1$
+			dependency.setArtifactId("jboss-seam-debug"); //$NON-NLS-1$
 			// FIXME
-			dependency.setVersion("${seam.version}");
+			dependency.setVersion("${seam.version}"); //$NON-NLS-1$
 			
 			modelManager.addDependency(pomFile,dependency);
 			
 			dependency = new Dependency();
-			dependency.setGroupId("org.jboss.seam");
-			dependency.setArtifactId("jboss-seam-mail");
+			dependency.setGroupId("org.jboss.seam"); //$NON-NLS-1$
+			dependency.setArtifactId("jboss-seam-mail"); //$NON-NLS-1$
 			
 			modelManager.addDependency(pomFile,dependency);
 			
 			dependency = new Dependency();
-			dependency.setGroupId("org.jboss.seam");
-			dependency.setArtifactId("jboss-seam-pdf");
+			dependency.setGroupId("org.jboss.seam"); //$NON-NLS-1$
+			dependency.setArtifactId("jboss-seam-pdf"); //$NON-NLS-1$
 			
 			modelManager.addDependency(pomFile,dependency);
 			
 			dependency = new Dependency();
-			dependency.setGroupId("org.jboss.seam");
-			dependency.setArtifactId("jboss-seam-remoting");
+			dependency.setGroupId("org.jboss.seam"); //$NON-NLS-1$
+			dependency.setArtifactId("jboss-seam-remoting"); //$NON-NLS-1$
 			
 			modelManager.addDependency(pomFile,dependency);
 			
 			if (FacetedProjectFramework.hasProjectFacet(webProject, ISeamFacetDataModelProperties.SEAM_FACET_ID, ISeamFacetDataModelProperties.SEAM_FACET_VERSION_21)) {
 				dependency = new Dependency();
-				dependency.setGroupId("org.jboss.seam");
-				dependency.setArtifactId("jboss-seam-excel");
+				dependency.setGroupId("org.jboss.seam"); //$NON-NLS-1$
+				dependency.setArtifactId("jboss-seam-excel"); //$NON-NLS-1$
 				
 				modelManager.addDependency(pomFile,dependency);
 			}
 			
 			dependency = new Dependency();
-			dependency.setGroupId("javax.servlet");
-			dependency.setArtifactId("servlet-api");
+			dependency.setGroupId("javax.servlet"); //$NON-NLS-1$
+			dependency.setArtifactId("servlet-api"); //$NON-NLS-1$
 			modelManager.addDependency(pomFile,dependency);
 			
 			dependency = new Dependency();
-			dependency.setGroupId("org.richfaces.ui");
-			dependency.setArtifactId("richfaces-ui");
+			dependency.setGroupId("org.richfaces.ui"); //$NON-NLS-1$
+			dependency.setArtifactId("richfaces-ui"); //$NON-NLS-1$
 			modelManager.addDependency(pomFile,dependency);
 			
 			dependency = getRichFacesApi();
 			if (!SeamFacetAbstractInstallDelegate
 					.isWarConfiguration(seamFacetModel)) {
-				dependency.setScope("provided");
+				dependency.setScope("provided"); //$NON-NLS-1$
 			}
 			modelManager.addDependency(pomFile,dependency);
 			
 			dependency = new Dependency();
-			dependency.setGroupId("org.richfaces.framework");
-			dependency.setArtifactId("richfaces-impl");
+			dependency.setGroupId("org.richfaces.framework"); //$NON-NLS-1$
+			dependency.setArtifactId("richfaces-impl"); //$NON-NLS-1$
 			modelManager.addDependency(pomFile,dependency);
 			
 			dependency = getJSFApi();
 			modelManager.addDependency(pomFile,dependency);
 			
 			dependency = new Dependency();
-			dependency.setGroupId("javax.faces");
-			dependency.setArtifactId("jsf-impl");
+			dependency.setGroupId("javax.faces"); //$NON-NLS-1$
+			dependency.setArtifactId("jsf-impl"); //$NON-NLS-1$
 			modelManager.addDependency(pomFile,dependency);
 			
 			dependency = new Dependency();
-			dependency.setGroupId("javax.el");
-			dependency.setArtifactId("el-api");
+			dependency.setGroupId("javax.el"); //$NON-NLS-1$
+			dependency.setArtifactId("el-api"); //$NON-NLS-1$
 			modelManager.addDependency(pomFile,dependency);
 			
 			if (SeamFacetAbstractInstallDelegate
 					.isWarConfiguration(seamFacetModel)) {
 				dependency = new Dependency();
-				dependency.setGroupId("org.drools");
-				dependency.setArtifactId("drools-compiler");
-				dependency.setType("jar");
-				dependency.setScope("compile");
+				dependency.setGroupId("org.drools"); //$NON-NLS-1$
+				dependency.setArtifactId("drools-compiler"); //$NON-NLS-1$
+				dependency.setType("jar"); //$NON-NLS-1$
+				dependency.setScope("compile"); //$NON-NLS-1$
 				modelManager.addDependency(pomFile,dependency);
 				
 				dependency = new Dependency();
-				dependency.setGroupId("org.jbpm");
-				dependency.setArtifactId("jbpm-jpdl");
-				dependency.setType("jar");
-				dependency.setScope("compile");
+				dependency.setGroupId("org.jbpm"); //$NON-NLS-1$
+				dependency.setArtifactId("jbpm-jpdl"); //$NON-NLS-1$
+				dependency.setType("jar"); //$NON-NLS-1$
+				dependency.setScope("compile"); //$NON-NLS-1$
 				modelManager.addDependency(pomFile,dependency);
 				
 				dependency = new Dependency();
-				dependency.setGroupId("commons-digester");
-				dependency.setArtifactId("commons-digester");
+				dependency.setGroupId("commons-digester"); //$NON-NLS-1$
+				dependency.setArtifactId("commons-digester"); //$NON-NLS-1$
 				modelManager.addDependency(pomFile,dependency);
 			}
 			
@@ -665,8 +666,8 @@ public class MavenSeamActivator extends AbstractUIPlugin {
 				dependency.setGroupId(m2FacetModel.getStringProperty(IJBossMavenConstants.GROUP_ID));
 				dependency.setArtifactId(ejbProjectName);
 				dependency.setVersion(m2FacetModel.getStringProperty(IJBossMavenConstants.VERSION));
-				dependency.setType("ejb");
-				dependency.setScope("provided");
+				dependency.setType("ejb"); //$NON-NLS-1$
+				dependency.setScope("provided"); //$NON-NLS-1$
 				modelManager.addDependency(pomFile,dependency);
 			}
 			removeWTPContainers(m2FacetModel, webProject);
@@ -689,7 +690,7 @@ public class MavenSeamActivator extends AbstractUIPlugin {
 					IPath path = entry.getPath();
 					if (path != null) {
 						String value = path.toString();
-						if (value.startsWith("org.eclipse.jst")) {
+						if (value.startsWith("org.eclipse.jst")) { //$NON-NLS-1$
 							add = false;
 						}
 					}
@@ -704,54 +705,54 @@ public class MavenSeamActivator extends AbstractUIPlugin {
 
 	private Dependency getHibernateValidator() {
 		Dependency dependency = new Dependency();
-		dependency.setGroupId("org.hibernate");
-		dependency.setArtifactId("hibernate-validator");
+		dependency.setGroupId("org.hibernate"); //$NON-NLS-1$
+		dependency.setArtifactId("hibernate-validator"); //$NON-NLS-1$
 		return dependency;
 	}
 
 	private Dependency getHibernateAnnotations() {
 		Dependency dependency;
 		dependency = new Dependency();
-		dependency.setGroupId("org.hibernate");
-		dependency.setArtifactId("hibernate-annotations");
+		dependency.setGroupId("org.hibernate"); //$NON-NLS-1$
+		dependency.setArtifactId("hibernate-annotations"); //$NON-NLS-1$
 		return dependency;
 	}
 	
 	private Dependency getHibernateCommonAnnotations() {
 		Dependency dependency;
 		dependency = new Dependency();
-		dependency.setGroupId("org.hibernate");
-		dependency.setArtifactId("hibernate-commons-annotations");
+		dependency.setGroupId("org.hibernate"); //$NON-NLS-1$
+		dependency.setArtifactId("hibernate-commons-annotations"); //$NON-NLS-1$
 		return dependency;
 	}
 
 	private Dependency getRichFacesApi() {
 		Dependency dependency;
 		dependency = new Dependency();
-		dependency.setGroupId("org.richfaces.framework");
-		dependency.setArtifactId("richfaces-api");
+		dependency.setGroupId("org.richfaces.framework"); //$NON-NLS-1$
+		dependency.setArtifactId("richfaces-api"); //$NON-NLS-1$
 		return dependency;
 	}
 
 	private Dependency getJSFApi() {
 		Dependency dependency;
 		dependency = new Dependency();
-		dependency.setGroupId("javax.faces");
-		dependency.setArtifactId("jsf-api");
+		dependency.setGroupId("javax.faces"); //$NON-NLS-1$
+		dependency.setArtifactId("jsf-api"); //$NON-NLS-1$
 		return dependency;
 	}
 
 	private Dependency getSeamDependency() {
 		Dependency dependency;
 		dependency = new Dependency();
-		dependency.setGroupId("org.jboss.seam");
-		dependency.setArtifactId("jboss-seam");
+		dependency.setGroupId("org.jboss.seam"); //$NON-NLS-1$
+		dependency.setArtifactId("jboss-seam"); //$NON-NLS-1$
 		return dependency;
 	}
 
 	private void configureParentProject(IDataModel m2FacetModel, IDataModel seamFacetModel) {
 		Bundle bundle = getDefault().getBundle();
-		URL parentPomEntryURL = bundle.getEntry("/poms/parent-pom.xml");
+		URL parentPomEntryURL = bundle.getEntry("/poms/parent-pom.xml"); //$NON-NLS-1$
 		InputStream inputStream = null;
 		try {
 			URL resolvedURL = FileLocator.resolve(parentPomEntryURL);
@@ -763,11 +764,11 @@ public class MavenSeamActivator extends AbstractUIPlugin {
 			String projectVersion = m2FacetModel.getStringProperty(IJBossMavenConstants.VERSION);
 			String name = m2FacetModel.getStringProperty(IJBossMavenConstants.NAME);
 			if (name != null && name.trim().length() > 0) {
-				model.setName(name + " - parent");
+				model.setName(name + " - parent"); //$NON-NLS-1$
 			}
 			String description= m2FacetModel.getStringProperty(IJBossMavenConstants.DESCRIPTION);
 			if (description != null && description.trim().length() > 0) {
-				model.setDescription(description + " - parent");
+				model.setDescription(description + " - parent"); //$NON-NLS-1$
 			}
 			model.setVersion(projectVersion);
 			
@@ -775,7 +776,7 @@ public class MavenSeamActivator extends AbstractUIPlugin {
 			properties.put(IJBossMavenConstants.PROJECT_VERSION, projectVersion);
 			SeamRuntime seamRuntime = SeamRuntimeManager.getInstance().findRuntimeByName(seamFacetModel.getProperty(ISeamFacetDataModelProperties.SEAM_RUNTIME_NAME).toString());
 			if(seamRuntime==null) {
-				getDefault().log("Can't get seam runtime " + seamFacetModel.getProperty(ISeamFacetDataModelProperties.SEAM_RUNTIME_NAME).toString());
+				getDefault().log(Messages.MavenSeamActivator_Cannot_get_seam_runtime + seamFacetModel.getProperty(ISeamFacetDataModelProperties.SEAM_RUNTIME_NAME).toString());
 			}
 			String seamVersion = m2FacetModel.getStringProperty(IJBossMavenConstants.SEAM_MAVEN_VERSION);
 			if (seamVersion != null && seamVersion.trim().length() > 0) {
@@ -786,48 +787,48 @@ public class MavenSeamActivator extends AbstractUIPlugin {
 			if (seamHomeDir.exists()) {
 				//String seamVersion = SeamUtil.getSeamVersionFromManifest(seamRuntime.getHomeDir());
 				//properties.put(IJBossMavenConstants.SEAM_VERSION, seamVersion);
-				File buildDir = new File(seamHomeDir,"build");
-				File rootPom = new File(buildDir,"root.pom.xml");
+				File buildDir = new File(seamHomeDir,"build"); //$NON-NLS-1$
+				File rootPom = new File(buildDir,"root.pom.xml"); //$NON-NLS-1$
 				if (!rootPom.exists()) {
-					getDefault().log("The " + rootPom.getAbsolutePath() + " file doesn't exist.");
+					MavenSeamActivator.log(NLS.bind(Messages.MavenSeamActivator_The_file_does_not_exist, rootPom.getAbsolutePath()));
 				} else {
 					try {
 						Model rootPomModel = modelManager.readMavenModel(rootPom);
 						List<Dependency> seamDependencies = rootPomModel.getDependencyManagement().getDependencies();
-						setArtifactVersion("jsf.version", properties, "javax.faces", "jsf-api", seamDependencies);
-						String richfacesVersion = setArtifactVersion("richfaces.version", properties, "org.richfaces.framework", "richfaces-impl", seamDependencies);
+						setArtifactVersion("jsf.version", properties, "javax.faces", "jsf-api", seamDependencies); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+						String richfacesVersion = setArtifactVersion("richfaces.version", properties, "org.richfaces.framework", "richfaces-impl", seamDependencies); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 						if (richfacesVersion == null) {
 							Properties seamProperties = rootPomModel.getProperties();
-							richfacesVersion = seamProperties.getProperty("version.richfaces");
+							richfacesVersion = seamProperties.getProperty("version.richfaces"); //$NON-NLS-1$
 							if (richfacesVersion != null) {
-								properties.put("richfaces.version", richfacesVersion);
+								properties.put("richfaces.version", richfacesVersion); //$NON-NLS-1$
 							}
 						}
-						setArtifactVersion("hibernate-validator.version", properties, "org.hibernate", "hibernate-validator", seamDependencies);
-						setArtifactVersion("hibernate-annotations.version", properties, "org.hibernate", "hibernate-annotations", seamDependencies);
-						setArtifactVersion("hibernate-entitymanager.version", properties, "org.hibernate", "hibernate-entitymanager", seamDependencies);
+						setArtifactVersion("hibernate-validator.version", properties, "org.hibernate", "hibernate-validator", seamDependencies); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+						setArtifactVersion("hibernate-annotations.version", properties, "org.hibernate", "hibernate-annotations", seamDependencies); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+						setArtifactVersion("hibernate-entitymanager.version", properties, "org.hibernate", "hibernate-entitymanager", seamDependencies); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 						//setArtifactVersion("testng.version", properties, "org.hibernate", "hibernate-entitymanager", seamDependencies);
 						//if (seamVersion != null && "2.2".equals(seamVersion.subSequence(0, 3))) {
 						//	properties.put("testng.version", "5.9");
 						//}
-						setArtifactVersion("jboss.embedded.version", properties, "org.jboss.seam.embedded", "jboss-embedded-api", seamDependencies);
-						setArtifactVersion("slf4j.version", properties, "org.slf4j", "slf4j-api", seamDependencies);
-						setArtifactVersion("ejb.api.version", properties, "javax.ejb", "ejb-api", seamDependencies);
-						setArtifactVersion("jsr250-api.version", properties, "javax.annotation", "jsr250-api", seamDependencies);
-						setArtifactVersion("persistence-api.version", properties, "javax.persistence", "persistence-api", seamDependencies);
-						setArtifactVersion("servlet.version", properties, "javax.servlet", "servlet-api", seamDependencies);
-						setArtifactVersion("javax.el.version", properties, "javax.el", "el-api", seamDependencies);
-						String droolsVersion = setArtifactVersion("drools.version", properties, "org.drools", "drools-core", seamDependencies);
+						setArtifactVersion("jboss.embedded.version", properties, "org.jboss.seam.embedded", "jboss-embedded-api", seamDependencies); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+						setArtifactVersion("slf4j.version", properties, "org.slf4j", "slf4j-api", seamDependencies); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+						setArtifactVersion("ejb.api.version", properties, "javax.ejb", "ejb-api", seamDependencies); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+						setArtifactVersion("jsr250-api.version", properties, "javax.annotation", "jsr250-api", seamDependencies); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+						setArtifactVersion("persistence-api.version", properties, "javax.persistence", "persistence-api", seamDependencies); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+						setArtifactVersion("servlet.version", properties, "javax.servlet", "servlet-api", seamDependencies); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+						setArtifactVersion("javax.el.version", properties, "javax.el", "el-api", seamDependencies); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+						String droolsVersion = setArtifactVersion("drools.version", properties, "org.drools", "drools-core", seamDependencies); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 						if (droolsVersion == null) {
 							Properties seamProperties = rootPomModel.getProperties();
-							droolsVersion = seamProperties.getProperty("version.drools");
+							droolsVersion = seamProperties.getProperty("version.drools"); //$NON-NLS-1$
 							if (droolsVersion != null) {
-								properties.put("drools.version", droolsVersion);
+								properties.put("drools.version", droolsVersion); //$NON-NLS-1$
 							}
 						}
-						String jbpmVersion = setArtifactVersion("jbpm.version", properties, "org.jbpm", "jbpm-jpdl", seamDependencies);
+						String jbpmVersion = setArtifactVersion("jbpm.version", properties, "org.jbpm", "jbpm-jpdl", seamDependencies); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 						if (jbpmVersion == null) {
-							setArtifactVersion("jbpm3.version", properties, "org.jbpm.jbpm3", "jbpm-jpdl", seamDependencies);
+							setArtifactVersion("jbpm3.version", properties, "org.jbpm.jbpm3", "jbpm-jpdl", seamDependencies); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 						}
 						//setArtifactVersion("mvel.version", properties, "org.mvel", "mvel14", seamDependencies);
 								        
@@ -841,15 +842,15 @@ public class MavenSeamActivator extends AbstractUIPlugin {
 					}
 				}
 			} else {
-				getDefault().log("The " + seamHomePath + " folder doesn't exist.");
+				MavenSeamActivator.log(NLS.bind(Messages.MavenSeamActivator_The_folder_does_not_exist, seamHomePath));
 			}
 			
 			List<String> modules = model.getModules();
-			modules.add("../" + artifactId);
+			modules.add("../" + artifactId); //$NON-NLS-1$
 			if (!SeamFacetAbstractInstallDelegate
 					.isWarConfiguration(seamFacetModel)) {
-				modules.add("../" + ejbArtifactId);
-				modules.add("../" + earArtifactId);
+				modules.add("../" + ejbArtifactId); //$NON-NLS-1$
+				modules.add("../" + earArtifactId); //$NON-NLS-1$
 			}
 			webProjectName = seamFacetModel.getStringProperty(IFacetDataModelProperties.FACET_PROJECT_NAME);
 			
@@ -879,7 +880,7 @@ public class MavenSeamActivator extends AbstractUIPlugin {
 		for (Dependency dependency:seamDependencies) {
 			if (groupId.equals(dependency.getGroupId()) && artifactId.equals(dependency.getArtifactId())) {
 				String version = dependency.getVersion();
-				if (version != null && !version.startsWith("${")) {
+				if (version != null && !version.startsWith("${")) { //$NON-NLS-1$
 					properties.put(property, version);
 					return version;
 				}

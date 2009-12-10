@@ -5,6 +5,7 @@ import org.eclipse.jface.viewers.ColumnViewer;
 import org.eclipse.jface.viewers.EditingSupport;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TextCellEditor;
+import org.jboss.tools.maven.ui.Messages;
 import org.maven.ide.components.pom.Exclusion;
 
 public class ExclusionEditingSupport extends EditingSupport {
@@ -36,13 +37,13 @@ public class ExclusionEditingSupport extends EditingSupport {
 		case 0:
 			value = exclusion.getGroupId();
 			if (value == null) {
-				value = "";
+				value = ""; //$NON-NLS-1$
 			}
 			return value;
 		case 1:
 			value = exclusion.getArtifactId();
 			if (value == null) {
-				value = "";
+				value = ""; //$NON-NLS-1$
 			}
 			return value;
 		}

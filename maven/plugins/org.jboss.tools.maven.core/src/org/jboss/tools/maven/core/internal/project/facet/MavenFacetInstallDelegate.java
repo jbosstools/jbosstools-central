@@ -30,6 +30,7 @@ import org.eclipse.wst.common.project.facet.core.IProjectFacetVersion;
 import org.eclipse.wst.common.project.facet.core.ProjectFacetsManager;
 import org.jboss.tools.maven.core.MavenCoreActivator;
 import org.jboss.tools.maven.core.IJBossMavenConstants;
+import org.jboss.tools.maven.core.Messages;
 import org.jboss.tools.maven.core.libprov.MavenLibraryProviderInstallOperation;
 import org.jboss.tools.maven.core.libprov.MavenLibraryProviderInstallOperationConfig;
 import org.maven.ide.eclipse.MavenPlugin;
@@ -49,7 +50,7 @@ public class MavenFacetInstallDelegate implements IDelegate {
 		} else {
 			throw new CoreException(
 					MavenCoreActivator
-							.getStatus("Internal Error creating JBoss Maven Facet.  Missing configuration"));
+							.getStatus(Messages.MavenFacetInstallDelegate_Internal_Error_creating_JBoss_Maven_Facet));
 		}
 
 		IFile pom = project.getFile(IMavenConstants.POM_FILE_NAME);

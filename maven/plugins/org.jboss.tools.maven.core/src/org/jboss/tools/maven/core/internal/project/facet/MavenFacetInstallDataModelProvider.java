@@ -14,6 +14,7 @@ import java.util.Set;
 
 import org.eclipse.wst.common.componentcore.datamodel.FacetInstallDataModelProvider;
 import org.jboss.tools.maven.core.IJBossMavenConstants;
+import org.jboss.tools.maven.core.Messages;
 
 /**
  * @author snjeza
@@ -31,22 +32,22 @@ public class MavenFacetInstallDataModelProvider extends
 			return getDefaultProperty(FACET_PROJECT_NAME);
 		}
 		if (propertyName.equals(IJBossMavenConstants.GROUP_ID)) {
-			return "org.jboss.tools";
+			return "org.jboss.tools"; //$NON-NLS-1$
 		}
 		if (propertyName.equals(IJBossMavenConstants.VERSION)) {
-			return "0.0.1-SNAPSHOT";
+			return "0.0.1-SNAPSHOT"; //$NON-NLS-1$
 		}
 		if (propertyName.equals(IJBossMavenConstants.NAME)) {
 			return getDefaultProperty(FACET_PROJECT_NAME);
 		}
 		if (propertyName.equals(IJBossMavenConstants.DESCRIPTION)) {
-			return "";
+			return ""; //$NON-NLS-1$
 		}
 		if (propertyName.equals(IJBossMavenConstants.PACKAGING)) {
-			return "war";
+			return "war"; //$NON-NLS-1$
 		}
 		if (propertyName.equals(IJBossMavenConstants.SEAM_MAVEN_VERSION)) {
-			return "";
+			return ""; //$NON-NLS-1$
 		}
 		if (propertyName.equals(IJBossMavenConstants.REMOVE_WTP_CLASSPATH_CONTAINERS)) {
 			return Boolean.TRUE;

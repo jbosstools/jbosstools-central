@@ -19,6 +19,7 @@ import org.eclipse.wst.common.project.facet.core.ProjectFacetsManager;
 import org.jboss.tools.maven.core.IJBossMavenConstants;
 import org.jboss.tools.maven.core.internal.project.facet.MavenFacetInstallDataModelProvider;
 import org.jboss.tools.maven.seam.MavenSeamActivator;
+import org.jboss.tools.maven.seam.Messages;
 import org.jboss.tools.seam.internal.core.project.facet.SeamFacetInstallDataModelProvider;
 import org.maven.ide.eclipse.project.IMavenProjectFacade;
 import org.maven.ide.eclipse.project.MavenProjectChangedEvent;
@@ -107,7 +108,7 @@ public class JSFProjectConfigurator extends AbstractProjectConfigurator {
 	private void installWarFacets(IFacetedProject fproj, String jsfVersion,IProgressMonitor monitor) throws CoreException {
 		
 		if (!fproj.hasProjectFacet(dynamicWebFacet)) {
-			MavenSeamActivator.log("The project doesn't contain the Web Module facet.");
+			MavenSeamActivator.log(Messages.JSFProjectConfigurator_The_project_does_not_contain_the_Web_Module_facet);
 		}
 		installJSFFacet(fproj, jsfVersion, monitor);
 		installM2Facet(fproj, monitor);

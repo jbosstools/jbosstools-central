@@ -12,6 +12,7 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 import org.jboss.tools.maven.seam.MavenSeamActivator;
+import org.jboss.tools.maven.seam.Messages;
 
 public class SeamConfiguratorPreferencePage extends PreferencePage implements
 		IWorkbenchPreferencePage {
@@ -34,19 +35,19 @@ public class SeamConfiguratorPreferencePage extends PreferencePage implements
 		composite.setLayout(layout);
 		
 		configureSeamButton = new Button(composite,SWT.CHECK);
-		configureSeamButton.setText("Configure Seam when importing Maven projects");
+		configureSeamButton.setText(Messages.SeamConfiguratorPreferencePage_Configure_Seam_when_importing_Maven_projects);
 		IPreferenceStore store = MavenSeamActivator.getDefault().getPreferenceStore();
 		boolean configureSeam = store.getBoolean(MavenSeamActivator.CONFIGURE_SEAM);
 		configureSeamButton.setSelection(configureSeam);
 		
 		configureSeamRuntimeButton = new Button(composite,SWT.CHECK);
-		configureSeamRuntimeButton.setText("Configure Seam Runtime");
+		configureSeamRuntimeButton.setText(Messages.SeamConfiguratorPreferencePage_Configure_Seam_Runtime);
 		boolean configureSeamRuntime = store.getBoolean(MavenSeamActivator.CONFIGURE_SEAM_RUNTIME);
 		configureSeamRuntimeButton.setSelection(configureSeamRuntime);
 		configureSeamRuntimeButton.setEnabled(configureSeam);
 		
 		configureSeamArtifactsButton = new Button(composite,SWT.CHECK);
-		configureSeamArtifactsButton.setText("Configure Seam Artifacts (view folder, model source folder, package ...)");
+		configureSeamArtifactsButton.setText(Messages.SeamConfiguratorPreferencePage_Configure_Seam_Artifacts);
 		boolean configureSeamArtifacts = store.getBoolean(MavenSeamActivator.CONFIGURE_SEAM_ARTIFACTS);
 		configureSeamArtifactsButton.setSelection(configureSeamArtifacts);
 		configureSeamArtifactsButton.setEnabled(configureSeam);
@@ -62,22 +63,22 @@ public class SeamConfiguratorPreferencePage extends PreferencePage implements
 		});
 		
 		configureJSFButton = new Button(composite,SWT.CHECK);
-		configureJSFButton.setText("Configure JSF facet when importing Maven projects");
+		configureJSFButton.setText(Messages.SeamConfiguratorPreferencePage_Configure_JSF_facet);
 		boolean configureJSF = store.getBoolean(MavenSeamActivator.CONFIGURE_JSF);
 		configureJSFButton.setSelection(configureJSF);
 		
 		configurePortletButton = new Button(composite,SWT.CHECK);
-		configurePortletButton.setText("Configure JBoss Portlet Core facet when importing Maven projects");
+		configurePortletButton.setText(Messages.SeamConfiguratorPreferencePage_Configure_JBoss_Portlet_Core_facet);
 		boolean configurePortlet = store.getBoolean(MavenSeamActivator.CONFIGURE_PORTLET);
 		configurePortletButton.setSelection(configurePortlet);
 		
 		configureJSFPortletButton = new Button(composite,SWT.CHECK);
-		configureJSFPortletButton.setText("Configure JBoss JSF Portlet facet when importing Maven projects");
+		configureJSFPortletButton.setText(Messages.SeamConfiguratorPreferencePage_Configure_JBoss_JSF_Portlet_facet);
 		boolean configureJSFPortlet = store.getBoolean(MavenSeamActivator.CONFIGURE_JSFPORTLET);
 		configureJSFPortletButton.setSelection(configureJSFPortlet);
 		
 		configureSeamPortletButton = new Button(composite,SWT.CHECK);
-		configureSeamPortletButton.setText("Configure JBoss Seam Portlet facet when importing Maven projects");
+		configureSeamPortletButton.setText(Messages.SeamConfiguratorPreferencePage_Configure_JBoss_Seam_Portlet_facet);
 		boolean configureSeamPortlet = store.getBoolean(MavenSeamActivator.CONFIGURE_SEAMPORTLET);
 		configureJSFPortletButton.setSelection(configureSeamPortlet);
 		

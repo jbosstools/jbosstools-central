@@ -46,6 +46,7 @@ import org.jboss.tools.jst.web.kb.IKbProject;
 import org.jboss.tools.maven.core.IJBossMavenConstants;
 import org.jboss.tools.maven.core.internal.project.facet.MavenFacetInstallDataModelProvider;
 import org.jboss.tools.maven.seam.MavenSeamActivator;
+import org.jboss.tools.maven.seam.Messages;
 import org.jboss.tools.seam.core.ISeamProject;
 import org.jboss.tools.seam.core.SeamCorePlugin;
 import org.jboss.tools.seam.core.SeamUtil;
@@ -607,7 +608,7 @@ public class SeamProjectConfigurator extends AbstractProjectConfigurator {
 					if (object instanceof Module) {
 						Module module = (Module) object;
 						String uri = module.getUri();
-						if (uri != null && (uri.startsWith("mvel14") || uri.startsWith("mvel2"))) {
+						if (uri != null && (uri.startsWith("mvel14") || uri.startsWith("mvel2"))) { //$NON-NLS-1$ //$NON-NLS-2$
 							iterator.remove();
 						}
 					}

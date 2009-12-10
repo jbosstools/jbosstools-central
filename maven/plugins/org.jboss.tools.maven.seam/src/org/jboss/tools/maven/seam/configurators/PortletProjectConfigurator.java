@@ -17,6 +17,7 @@ import org.eclipse.wst.common.project.facet.core.ProjectFacetsManager;
 import org.jboss.tools.maven.core.IJBossMavenConstants;
 import org.jboss.tools.maven.core.internal.project.facet.MavenFacetInstallDataModelProvider;
 import org.jboss.tools.maven.seam.MavenSeamActivator;
+import org.jboss.tools.maven.seam.Messages;
 import org.jboss.tools.portlet.core.IPortletConstants;
 import org.jboss.tools.portlet.core.internal.project.facet.JSFPortletFacetInstallDataModelProvider;
 import org.jboss.tools.portlet.core.internal.project.facet.PortletFacetInstallDataModelProvider;
@@ -114,7 +115,7 @@ public class PortletProjectConfigurator extends AbstractProjectConfigurator {
 	private void installWarFacets(IFacetedProject fproj, String portletVersion, String jsfportletVersion, IProgressMonitor monitor) throws CoreException {
 		
 		if (!fproj.hasProjectFacet(dynamicWebFacet)) {
-			MavenSeamActivator.log("The project doesn't contain the Web Module facet.");
+			MavenSeamActivator.log(Messages.PortletProjectConfigurator_The_project_does_not_contain_the_Web_Module_facet);
 		}
 		installM2Facet(fproj, monitor);
 		installPortletFacet(fproj, portletVersion, jsfportletVersion, monitor);

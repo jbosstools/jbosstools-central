@@ -5,9 +5,9 @@
     <extension point="org.eclipse.wst.common.project.facet.core.facets">
    
 	 <project-facet id="jboss.m2">   
-    	<label>JBoss Maven Integration</label>
+    	<label>%JBoss_Maven_Integration</label>
     	<description>
-      		Adds support for Maven.
+      		%Adds_support_for_Maven
     	</description>
     	<default-version version="1.0"/>
   	  </project-facet>
@@ -41,7 +41,7 @@
    
     <extension point="org.eclipse.jst.common.project.facet.core.libraryProviders">
     	<provider id="maven-library-provider" abstract="true">
-      		<label>Maven library provider</label>
+      		<label>%Maven_library_provider</label>
       		<priority>500</priority>
       		<action type="INSTALL">
         		<config class="org.jboss.tools.maven.core.libprov.MavenLibraryProviderInstallOperationConfig"/>
@@ -67,7 +67,7 @@
    
   	<extension point="org.eclipse.jst.common.project.facet.core.libraryProviders">
     	<provider id="jsf12-maven-library-provider" extends="maven-library-provider">
-    		<label>Maven JSF 1.2 Libraries</label>
+    		<label>%Maven_JSF_1_2_Libraries</label>
       		<param name="template" value="platform:/plugin/org.jboss.tools.maven.core/poms/jsf-template12.xml"/>
       		<enablement>
       		  <and>
@@ -84,7 +84,7 @@
   	
   	<extension point="org.eclipse.jst.common.project.facet.core.libraryProviders">
     	<provider id="jsf11-maven-library-provider" extends="maven-library-provider">
-      		<label>Maven JSF 1.1 Libraries</label>
+      		<label>%Maven_JSF_1_1_Libraries</label>
       		<param name="template" value="platform:/plugin/org.jboss.tools.maven.core/poms/jsf-template11.xml"/>
       		<enablement>
       		  <and>
@@ -101,7 +101,7 @@
   	
   	<extension point="org.eclipse.jst.common.project.facet.core.libraryProviders">
     	<provider id="hibernate332-maven-library-provider" extends="maven-library-provider">
-      		<label>Hibernate 3.3.2 Libraries</label>
+      		<label>%Hibernate_3_3_2_Libraries</label>
       		<param name="template" value="platform:/plugin/org.jboss.tools.maven.core/poms/hibernate332-template.xml"/>
       		<enablement>
       		  <and>
@@ -121,7 +121,7 @@
   	
   	<extension point="org.eclipse.jst.common.project.facet.core.libraryProviders">
     	<provider id="portlet10-maven-library-provider" extends="maven-library-provider">
-      		<label>Maven Portlet 1.0 Libraries</label>
+      		<label>%Maven_Portlet_1_0_Libraries</label>
       		<param name="template" value="platform:/plugin/org.jboss.tools.maven.core/poms/portlet-template10.xml"/>
       		<enablement>
       		  <and>
@@ -138,7 +138,7 @@
   	
   	<extension point="org.eclipse.jst.common.project.facet.core.libraryProviders">
     	<provider id="portlet20-maven-library-provider" extends="maven-library-provider">
-      		<label>Maven Portlet 2.0 Libraries</label>
+      		<label>%Maven_Portlet_2_0_Libraries</label>
       		<param name="template" value="platform:/plugin/org.jboss.tools.maven.core/poms/portlet-template20.xml"/>
       		<enablement>
       		  <and>
@@ -155,7 +155,7 @@
   	
   	<extension point="org.eclipse.jst.common.project.facet.core.libraryProviders">
     	<provider id="portletbridge200alpha-maven-library-provider" extends="maven-library-provider">
-      		<label>Maven Portletbridge 2.0.0 ALPHA Libraries</label>
+      		<label>%Maven_Portletbridge_2_0_0_ALPHA_Libraries</label>
       		<param name="template" value="platform:/plugin/org.jboss.tools.maven.core/poms/portletbridge-template200alpha.xml"/>
       		<enablement>
       		  <and>
@@ -171,7 +171,7 @@
   	</extension>
   	<extension point="org.eclipse.jst.common.project.facet.core.libraryProviders">
     	<provider id="portletbridge200alphadep-maven-library-provider" extends="maven-library-provider">
-      		<label>Maven Portletbridge 2.0.0 ALPHA Libraries with Dependencies</label>
+      		<label>%Maven_Portletbridge_2_0_0_ALPHA_Libraries_with_Dependencies</label>
       		<param name="template" value="platform:/plugin/org.jboss.tools.maven.core/poms/portletbridge-template200alphadep.xml"/>
       		<enablement>
       		  <and>

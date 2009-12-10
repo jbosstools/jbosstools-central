@@ -32,6 +32,7 @@ import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.ControlListener;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
+import org.jboss.tools.maven.ui.Messages;
 
 public class AutoResizeTableLayout extends TableLayout implements
         ControlListener {
@@ -92,7 +93,7 @@ public class AutoResizeTableLayout extends TableLayout implements
                 int weight = cw.weight;
                 totalWeight += weight;
             } else {
-                throw new IllegalStateException("Unknown column layout data");
+                throw new IllegalStateException(Messages.AutoResizeTableLayout_Unknown_column_layout_data);
             }
         }
         

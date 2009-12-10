@@ -34,6 +34,7 @@ import org.eclipse.wst.common.project.facet.ui.IFacetWizardPage;
 import org.eclipse.wst.common.project.facet.ui.IWizardContext;
 import org.jboss.tools.maven.core.IJBossMavenConstants;
 import org.jboss.tools.maven.ui.Activator;
+import org.jboss.tools.maven.ui.Messages;
 import org.maven.ide.eclipse.MavenPlugin;
 import org.maven.ide.eclipse.core.IMavenConstants;
 import org.maven.ide.eclipse.embedder.MavenModelManager;
@@ -53,8 +54,8 @@ IFacetWizardPage {
 	public MavenFacetInstallPage() {
 		super(DataModelFactory.createDataModel(new AbstractDataModelProvider() {
 		}), "jboss.m2.facet.install.page"); //$NON-NLS-1$
-		setTitle("JBoss M2 capabilities");
-		setDescription("Add M2 capabilities to this Web Project");
+		setTitle(Messages.MavenFacetInstallPage_JBoss_M2_capabilities);
+		setDescription(Messages.MavenFacetInstallPage_Add_M2_capabilities_to_this_Web_Project);
 		
 	}
 
@@ -100,16 +101,16 @@ IFacetWizardPage {
 			
 		}
 		
-		groupId = createField(composite,"Group Id:",IJBossMavenConstants.GROUP_ID);
-		artifactId = createField(composite, "Artifact Id:", IJBossMavenConstants.ARTIFACT_ID);
+		groupId = createField(composite,Messages.MavenFacetInstallPage_Group_Id,IJBossMavenConstants.GROUP_ID);
+		artifactId = createField(composite, Messages.MavenFacetInstallPage_Artifact_Id, IJBossMavenConstants.ARTIFACT_ID);
 		if (!mavenProjectExists) {
 			artifactId.setText(projectName);
 		}
 		
-		version = createField(composite, "Version:", IJBossMavenConstants.VERSION);
+		version = createField(composite, Messages.MavenFacetInstallPage_Version, IJBossMavenConstants.VERSION);
 		
 		Label packagingLabel = new Label(composite, SWT.NONE);
-		packagingLabel.setText("Packaging:");
+		packagingLabel.setText(Messages.MavenFacetInstallPage_Packaging);
 		packaging = new Combo(composite, SWT.READ_ONLY);
 		gd = new GridData(GridData.FILL_HORIZONTAL);
 		packaging.setLayoutData(gd);
@@ -136,12 +137,12 @@ IFacetWizardPage {
 			}
 			synchHelper.synchCombo(packaging, IJBossMavenConstants.PACKAGING, null);
 			
-			name = createField(composite, "Name:", IJBossMavenConstants.NAME);
+			name = createField(composite, Messages.MavenFacetInstallPage_Name, IJBossMavenConstants.NAME);
 			name.setText(projectName);
-			description = createField(composite, "Description", IJBossMavenConstants.DESCRIPTION);
+			description = createField(composite, Messages.MavenFacetInstallPage_Description, IJBossMavenConstants.DESCRIPTION);
 
 			if (!mavenProjectExists && fpwc.hasProjectFacet(SEAM_FACET)) {
-				Text seamVersion = createField(composite, "Seam Maven version:", IJBossMavenConstants.SEAM_MAVEN_VERSION);
+				Text seamVersion = createField(composite, Messages.MavenFacetInstallPage_Seam_Maven_version, IJBossMavenConstants.SEAM_MAVEN_VERSION);
 				IProjectFacetVersion seamFacetVersion = fpwc.getProjectFacetVersion(SEAM_FACET);
 				if ("2.0".equals(seamFacetVersion.getVersionString())) { //$NON-NLS-1$
 					seamVersion.setText("2.0.2.SP1"); //$NON-NLS-1$
@@ -151,7 +152,7 @@ IFacetWizardPage {
 					seamVersion.setText("2.2.0.GA"); //$NON-NLS-1$
 				}
 				Button removeWTPContainers = new Button(composite,SWT.CHECK);
-				removeWTPContainers.setText("Remove WTP Classpath containers");
+				removeWTPContainers.setText(Messages.MavenFacetInstallPage_Remove_WTP_Classpath_containers);
 				synchHelper.synchCheckbox(removeWTPContainers, IJBossMavenConstants.REMOVE_WTP_CLASSPATH_CONTAINERS, null);
 				// FIXME add the Validate button
 			}
@@ -179,13 +180,13 @@ IFacetWizardPage {
 	protected void validatePage() {
 		setErrorMessage(null);
 		if (groupId.getText().trim().length() <= 0) {
-			setErrorMessage("The groupId field is required.");
+			setErrorMessage(Messages.MavenFacetInstallPage_The_groupId_field_is_required);
 		} else if (artifactId.getText().trim().length() <= 0) {
-			setErrorMessage("The artifactId field is required.");
+			setErrorMessage(Messages.MavenFacetInstallPage_The_artifactId_field_is_required);
 		} else if (version.getText().trim().length() <= 0) {
-			setErrorMessage("The version field is required.");
+			setErrorMessage(Messages.MavenFacetInstallPage_The_version_field_is_required);
 		} else if (packaging.getText().trim().length() <= 0) {
-			setErrorMessage("The packaging field is required.");
+			setErrorMessage(Messages.MavenFacetInstallPage_The_packaging_field_is_required);
 		}
 		
 	}

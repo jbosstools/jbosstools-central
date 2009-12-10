@@ -1,8 +1,9 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: JBoss Maven Core
+Bundle-Name: %Bundle-Name
 Bundle-SymbolicName: org.jboss.tools.maven.core; singleton:=true
 Bundle-Version: 1.0.0.qualifier
+Bundle-Localization: plugin
 Bundle-Activator: org.jboss.tools.maven.core.MavenCoreActivator
 Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.wst.common.project.facet.core;visibility:=reexport,
@@ -24,7 +25,7 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.core.expressions
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
-Bundle-Vendor: JBoss by Red Hat
+Bundle-Vendor: %Bundle-Vendor
 Export-Package: org.jboss.tools.maven.core,
  org.jboss.tools.maven.core.internal.project.facet,
  org.jboss.tools.maven.core.libprov

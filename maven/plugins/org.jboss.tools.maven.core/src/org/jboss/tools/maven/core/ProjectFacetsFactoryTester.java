@@ -31,7 +31,7 @@ public class ProjectFacetsFactoryTester extends PropertyTester {
 			ProjectFacetVersion projectFacetVersion = (ProjectFacetVersion) object;
 			facets.add(projectFacetVersion.getProjectFacet().getId());
 		}
-		StringTokenizer tokenizer = new StringTokenizer(requiredFacets,",");
+		StringTokenizer tokenizer = new StringTokenizer(requiredFacets,","); //$NON-NLS-1$
 		while (tokenizer.hasMoreTokens()) {
 			String requiredFacet = tokenizer.nextToken().trim();
 			if (!facets.contains(requiredFacet)) {

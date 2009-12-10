@@ -1,5 +1,6 @@
 package org.jboss.tools.maven.ui.internal.libprov;
 
+import org.jboss.tools.maven.ui.Messages;
 import org.maven.ide.components.pom.Dependency;
 import org.eclipse.jface.viewers.CellEditor;
 import org.eclipse.jface.viewers.ColumnViewer;
@@ -10,8 +11,8 @@ import org.eclipse.jface.viewers.TextCellEditor;
 
 public class DependencyEditingSupport extends EditingSupport {
 
-	private static String[] scopes = {"","provided", "compile", "test", "runtime", "system","import"};
-	private static String[] types = {"","jar","war","rar","ear","par","ejb","ejb3","ejb-client","test-jar","java-source","javadoc","maven-plugin","pom"};
+	private static String[] scopes = {"","provided", "compile", "test", "runtime", "system","import"}; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$ //$NON-NLS-7$
+	private static String[] types = {"","jar","war","rar","ear","par","ejb","ejb3","ejb-client","test-jar","java-source","javadoc","maven-plugin","pom"}; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$ //$NON-NLS-7$ //$NON-NLS-8$ //$NON-NLS-9$ //$NON-NLS-10$ //$NON-NLS-11$ //$NON-NLS-12$ //$NON-NLS-13$ //$NON-NLS-14$
 	
 	private CellEditor editor;
 	private int column;
@@ -54,19 +55,19 @@ public class DependencyEditingSupport extends EditingSupport {
 		case 0:
 			value = dependency.getGroupId();
 			if (value == null) {
-				value = "";
+				value = ""; //$NON-NLS-1$
 			}
 			return value;
 		case 1:
 			value = dependency.getArtifactId();
 			if (value == null) {
-				value = "";
+				value = ""; //$NON-NLS-1$
 			}
 			return value;
 		case 2:
 			value = dependency.getVersion();
 			if (value == null) {
-				value = "";
+				value = ""; //$NON-NLS-1$
 			}
 			return value;
 		case 3:

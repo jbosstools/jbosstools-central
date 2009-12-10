@@ -11,21 +11,21 @@
       <configurator 
           id="org.jboss.tools.maven.seam.configurator"
           class="org.jboss.tools.maven.seam.configurators.SeamProjectConfigurator"
-          name="Seam Project configurator" priority="200"/>
+          name="%Seam_Project_configurator" priority="200"/>
     </extension>
    
     <extension point="org.maven.ide.eclipse.projectConfigurators">
       <configurator 
           id="org.jboss.tools.maven.jsf.configurator"
           class="org.jboss.tools.maven.seam.configurators.JSFProjectConfigurator"
-          name="JSF Project configurator" priority="150"/>
+          name="%JSF_Project_configurator" priority="150"/>
     </extension>
     
     <extension point="org.maven.ide.eclipse.projectConfigurators">
       <configurator 
           id="org.jboss.tools.maven.portlet.configurator"
           class="org.jboss.tools.maven.seam.configurators.PortletProjectConfigurator"
-          name="Portlet Core Project configurator" priority="155"/>
+          name="%Portlet_Core_Project_configurator" priority="155"/>
     </extension>
     
     <extension
@@ -34,7 +34,7 @@
            category="org.jboss.tools.common.model.ui.MainPreferencePage"
            class="org.jboss.tools.maven.seam.preferences.SeamConfiguratorPreferencePage"
            id="org.jboss.tools.maven.seam.preferences.seamConfiguratorPreferencePage"
-           name="JBoss Maven Integration"/>
+           name="%JBoss_Maven_Integration"/>
     </extension>
     
     <extension

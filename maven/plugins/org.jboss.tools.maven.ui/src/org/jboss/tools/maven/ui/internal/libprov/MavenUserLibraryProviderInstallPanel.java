@@ -26,6 +26,7 @@ import org.eclipse.jface.viewers.TableViewerColumn;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jst.common.project.facet.core.libprov.ILibraryProvider;
 import org.eclipse.jst.common.project.facet.ui.libprov.LibraryProviderOperationPanel;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
@@ -41,6 +42,7 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Table;
 import org.jboss.tools.maven.core.MavenCoreActivator;
 import org.jboss.tools.maven.core.libprov.MavenLibraryProviderInstallOperationConfig;
+import org.jboss.tools.maven.ui.Messages;
 import org.maven.ide.components.pom.Dependency;
 import org.maven.ide.components.pom.Exclusion;
 import org.maven.ide.components.pom.Model;
@@ -119,7 +121,7 @@ public class MavenUserLibraryProviderInstallPanel extends
 		composite.setLayoutData(new GridData(GridData.FILL_BOTH));
 
 		Label dependencyLabel = new Label(composite, SWT.NONE);
-		dependencyLabel.setText("Dependencies:");
+		dependencyLabel.setText(Messages.MavenUserLibraryProviderInstallPanel_Dependencies);
 		GridData gd = new GridData(GridData.FILL_BOTH);
 		gd.horizontalSpan=2;
 		dependencyLabel.setLayoutData(gd);
@@ -142,7 +144,7 @@ public class MavenUserLibraryProviderInstallPanel extends
 		});
 		
 		Label exclusionLabel = new Label(composite, SWT.NONE);
-		exclusionLabel.setText("Exclusions:");
+		exclusionLabel.setText(Messages.MavenUserLibraryProviderInstallPanel_Exclusions);
 		gd = new GridData(GridData.FILL_BOTH);
 		gd.horizontalSpan=2;
 		exclusionLabel.setLayoutData(gd);
@@ -170,7 +172,7 @@ public class MavenUserLibraryProviderInstallPanel extends
 		table.setLinesVisible(true);
 		table.setFont(parent.getFont());
 		
-		String[] columnHeaders = {"GroupId","ArtifactId"};
+		String[] columnHeaders = {Messages.MavenUserLibraryProviderInstallPanel_GroupId,Messages.MavenUserLibraryProviderInstallPanel_ArtifactId};
 
 		for (int i = 0; i < columnHeaders.length; i++) {
 			TableViewerColumn column = new TableViewerColumn(exclusionViewer, SWT.NONE);
@@ -206,7 +208,7 @@ public class MavenUserLibraryProviderInstallPanel extends
 		table.setLinesVisible(true);
 		table.setFont(parent.getFont());
 		
-		String[] columnHeaders = {"GroupId","ArtifactId","Version","Scope","Type"};
+		String[] columnHeaders = {Messages.MavenUserLibraryProviderInstallPanel_GroupId,Messages.MavenUserLibraryProviderInstallPanel_ArtifactId,Messages.MavenUserLibraryProviderInstallPanel_Version,Messages.MavenUserLibraryProviderInstallPanel_Scope,Messages.MavenUserLibraryProviderInstallPanel_Type};
 		
 		for (int i = 0; i < columnHeaders.length; i++) {
 			TableViewerColumn column = new TableViewerColumn(dependencyViewer, SWT.NONE);
@@ -236,7 +238,7 @@ public class MavenUserLibraryProviderInstallPanel extends
 		
 		Button addButton = new Button(buttonComposite, SWT.PUSH);
 		addButton.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-		addButton.setText("Add");
+		addButton.setText(Messages.MavenUserLibraryProviderInstallPanel_Add);
 		addButton.addSelectionListener(new SelectionListener(){
 
 			public void widgetDefaultSelected(SelectionEvent e) {
@@ -245,8 +247,8 @@ public class MavenUserLibraryProviderInstallPanel extends
 
 			public void widgetSelected(SelectionEvent e) {
 				Dependency dependency = PomFactory.eINSTANCE.createDependency();
-				dependency.setGroupId("?");
-				dependency.setArtifactId("?");
+				dependency.setGroupId("?"); //$NON-NLS-1$
+				dependency.setArtifactId("?"); //$NON-NLS-1$
 				dependencies.add(dependency);
 				dependencyViewer.refresh();
 			}
@@ -255,7 +257,7 @@ public class MavenUserLibraryProviderInstallPanel extends
 		
 		final Button removeButton = new Button(buttonComposite, SWT.PUSH);
 		removeButton.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-		removeButton.setText("Remove");
+		removeButton.setText(Messages.MavenUserLibraryProviderInstallPanel_Remove);
 		removeButton.setEnabled(false);
 		
 		removeButton.addSelectionListener(new SelectionListener(){
@@ -267,7 +269,7 @@ public class MavenUserLibraryProviderInstallPanel extends
 					Object object = selection.getFirstElement();
 					if (object instanceof Dependency) {
 						Dependency dependency = (Dependency) object;
-						boolean ok = MessageDialog.openQuestion(getShell(), "Remove dependency", "Are you sure you want to remove the '" + dependency.getGroupId() + ":" + dependency.getArtifactId() + "' artifact?");
+						boolean ok = MessageDialog.openQuestion(getShell(), Messages.MavenUserLibraryProviderInstallPanel_Remove_dependency, NLS.bind(Messages.MavenUserLibraryProviderInstallPanel_Are_you_sure_you_want_to_remove_the_artifact, dependency.getGroupId(), dependency.getArtifactId()));
 						if (ok) {
 							dependencies.remove(object);
 							dependencyViewer.refresh();
@@ -283,7 +285,7 @@ public class MavenUserLibraryProviderInstallPanel extends
 		
 		final Button restoreDefaults = new Button(buttonComposite, SWT.PUSH);
 		restoreDefaults.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-		restoreDefaults.setText("Restore Defaults");
+		restoreDefaults.setText(Messages.MavenUserLibraryProviderInstallPanel_Restore_Defaults);
 		
 		restoreDefaults.addSelectionListener(new SelectionListener(){
 		
@@ -351,7 +353,7 @@ public class MavenUserLibraryProviderInstallPanel extends
 		
 		Button addButton = new Button(buttonComposite, SWT.PUSH);
 		addButton.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-		addButton.setText("Add");
+		addButton.setText(Messages.MavenUserLibraryProviderInstallPanel_Add);
 		addButton.addSelectionListener(new SelectionListener(){
 
 			public void widgetDefaultSelected(SelectionEvent e) {
@@ -360,8 +362,8 @@ public class MavenUserLibraryProviderInstallPanel extends
 
 			public void widgetSelected(SelectionEvent e) {
 				Exclusion exclusion = PomFactory.eINSTANCE.createExclusion();
-				exclusion.setGroupId("?");
-				exclusion.setArtifactId("?");
+				exclusion.setGroupId("?"); //$NON-NLS-1$
+				exclusion.setArtifactId("?"); //$NON-NLS-1$
 				if (exclusions == null) {
 					ISelection sel = dependencyViewer.getSelection();
 					if (sel instanceof IStructuredSelection) {
@@ -383,7 +385,7 @@ public class MavenUserLibraryProviderInstallPanel extends
 		
 		final Button removeButton = new Button(buttonComposite, SWT.PUSH);
 		removeButton.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-		removeButton.setText("Remove");
+		removeButton.setText(Messages.MavenUserLibraryProviderInstallPanel_Remove);
 		removeButton.setEnabled(false);
 		
 		removeButton.addSelectionListener(new SelectionListener(){
@@ -395,7 +397,7 @@ public class MavenUserLibraryProviderInstallPanel extends
 					Object object = selection.getFirstElement();
 					if (object instanceof Exclusion) {
 						Exclusion exclusion = (Exclusion) object;
-						boolean ok = MessageDialog.openQuestion(getShell(), "Remove exclusion", "Are you sure you want to remove the '" + exclusion.getGroupId() + ":" + exclusion.getArtifactId() + "' artifact?");
+						boolean ok = MessageDialog.openQuestion(getShell(), Messages.MavenUserLibraryProviderInstallPanel_Remove_exclusion, NLS.bind(Messages.MavenUserLibraryProviderInstallPanel_Are_you_sure_you_want_to_remove_the_artifact, exclusion.getGroupId(), exclusion.getArtifactId())); 
 						if (ok && exclusions != null) {
 							exclusions.remove(object);
 						}
