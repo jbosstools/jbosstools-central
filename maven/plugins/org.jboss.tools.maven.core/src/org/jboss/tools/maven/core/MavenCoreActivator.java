@@ -210,8 +210,8 @@ public class MavenCoreActivator extends Plugin {
 		}
 		
 		boolean hasMavenNature = MavenCoreActivator.addMavenNature(project, monitor);
-		
-		if (!hasMavenNature) {
+		boolean hasJavaNature = project.hasNature(JavaCore.NATURE_ID);
+		if (!hasMavenNature && hasJavaNature) {
 			IClasspathAttribute attribute = JavaCore.newClasspathAttribute(
 					MavenCoreActivator.OWNER_PROJECT_FACETS_ATTR,
 					IJBossMavenConstants.M2_FACET_ID);
@@ -240,11 +240,15 @@ public class MavenCoreActivator extends Plugin {
 			description.setNatureIds(newNatures);
 			project.setDescription(description, monitor);
 		}
-		IJavaProject javaProject = JavaCore.create(project);
-		IClasspathContainer mavenContainer = BuildPathManager.getMaven2ClasspathContainer(javaProject);
-		if (mavenContainer == null) {
-			IPath path = new Path(BuildPathManager.CONTAINER_ID);
-			setContainerPath(monitor, javaProject, path);
+		boolean hasJavaNature = project.hasNature(JavaCore.NATURE_ID);
+		if (hasJavaNature) {
+			IJavaProject javaProject = JavaCore.create(project);
+			IClasspathContainer mavenContainer = BuildPathManager
+					.getMaven2ClasspathContainer(javaProject);
+			if (mavenContainer == null) {
+				IPath path = new Path(BuildPathManager.CONTAINER_ID);
+				setContainerPath(monitor, javaProject, path);
+			}
 		}
 		return hasMavenNature;
 	}

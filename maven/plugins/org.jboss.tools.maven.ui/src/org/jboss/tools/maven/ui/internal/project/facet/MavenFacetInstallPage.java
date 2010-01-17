@@ -23,8 +23,10 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.wst.common.componentcore.datamodel.properties.IFacetDataModelProperties;
 import org.eclipse.wst.common.componentcore.datamodel.properties.IFacetProjectCreationDataModelProperties;
 import org.eclipse.wst.common.frameworks.datamodel.AbstractDataModelProvider;
+import org.eclipse.wst.common.frameworks.datamodel.DataModelEvent;
 import org.eclipse.wst.common.frameworks.datamodel.DataModelFactory;
 import org.eclipse.wst.common.frameworks.datamodel.IDataModel;
+import org.eclipse.wst.common.frameworks.datamodel.IDataModelListener;
 import org.eclipse.wst.common.frameworks.internal.datamodel.ui.DataModelWizardPage;
 import org.eclipse.wst.common.project.facet.core.IFacetedProjectWorkingCopy;
 import org.eclipse.wst.common.project.facet.core.IProjectFacet;
@@ -172,23 +174,20 @@ IFacetWizardPage {
 			description.setEditable(false);
 			packaging.setEnabled(false);
 		}
-        validatePage();
-		return composite;
-	}
-
-	@Override
-	protected void validatePage() {
-		setErrorMessage(null);
-		if (groupId.getText().trim().length() <= 0) {
-			setErrorMessage(Messages.MavenFacetInstallPage_The_groupId_field_is_required);
-		} else if (artifactId.getText().trim().length() <= 0) {
-			setErrorMessage(Messages.MavenFacetInstallPage_The_artifactId_field_is_required);
-		} else if (version.getText().trim().length() <= 0) {
-			setErrorMessage(Messages.MavenFacetInstallPage_The_version_field_is_required);
-		} else if (packaging.getText().trim().length() <= 0) {
-			setErrorMessage(Messages.MavenFacetInstallPage_The_packaging_field_is_required);
-		}
+		getDataModel().addListener(new IDataModelListener() {
+			
+			public void propertyChanged(DataModelEvent event) {
+				String propertyName = event.getPropertyName();
+				if (IFacetProjectCreationDataModelProperties.FACET_PROJECT_NAME.equals(propertyName)) {
+					String projectName = getDataModel().getStringProperty(IFacetProjectCreationDataModelProperties.FACET_PROJECT_NAME);
+					if (projectName != null) {
+						artifactId.setText(projectName);
+					}
+				}
+			}
+		});
 		
+		return composite;
 	}
 
 	private Text createField(Composite composite, String labelText,String property) {
@@ -203,7 +202,10 @@ IFacetWizardPage {
 
 	@Override
 	protected String[] getValidationPropertyNames() {
-		return new String[0];
+		return new String[] { IJBossMavenConstants.GROUP_ID,
+			IJBossMavenConstants.ARTIFACT_ID, 
+			IJBossMavenConstants.VERSION,
+			IJBossMavenConstants.PACKAGING };
 	}
 
 	public void setConfig(Object config) {

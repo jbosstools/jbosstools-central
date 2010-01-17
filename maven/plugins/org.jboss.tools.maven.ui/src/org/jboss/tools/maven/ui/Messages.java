@@ -14,10 +14,6 @@ public class Messages extends NLS {
 	public static String MavenFacetInstallPage_Packaging;
 	public static String MavenFacetInstallPage_Remove_WTP_Classpath_containers;
 	public static String MavenFacetInstallPage_Seam_Maven_version;
-	public static String MavenFacetInstallPage_The_artifactId_field_is_required;
-	public static String MavenFacetInstallPage_The_groupId_field_is_required;
-	public static String MavenFacetInstallPage_The_packaging_field_is_required;
-	public static String MavenFacetInstallPage_The_version_field_is_required;
 	public static String MavenFacetInstallPage_Version;
 	public static String MavenUserLibraryProviderInstallPanel_Add;
 	public static String MavenUserLibraryProviderInstallPanel_Are_you_sure_you_want_to_remove_the_artifact;

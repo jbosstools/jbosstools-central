@@ -12,8 +12,11 @@ package org.jboss.tools.maven.core.internal.project.facet;
 
 import java.util.Set;
 
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.wst.common.componentcore.datamodel.FacetInstallDataModelProvider;
 import org.jboss.tools.maven.core.IJBossMavenConstants;
+import org.jboss.tools.maven.core.MavenCoreActivator;
 import org.jboss.tools.maven.core.Messages;
 
 /**
@@ -73,4 +76,35 @@ public class MavenFacetInstallDataModelProvider extends
 		return propertyNames;
 	}
 
+	@Override
+	public IStatus validate(String propertyName) {
+		IStatus status = OK_STATUS;
+        if(propertyName.equals(IJBossMavenConstants.GROUP_ID)){
+        	String groupId = getStringProperty(IJBossMavenConstants.GROUP_ID);
+        	if (groupId == null || groupId.trim().length() <= 0) {
+        		status = new Status(IStatus.ERROR, MavenCoreActivator.PLUGIN_ID	, Messages.MavenFacetInstallPage_The_groupId_field_is_required);
+        	}
+        }
+        if(propertyName.equals(IJBossMavenConstants.ARTIFACT_ID)){
+        	String groupId = getStringProperty(IJBossMavenConstants.ARTIFACT_ID);
+        	if (groupId == null || groupId.trim().length() <= 0) {
+        		status = new Status(IStatus.ERROR, MavenCoreActivator.PLUGIN_ID	, Messages.MavenFacetInstallPage_The_artifactId_field_is_required);
+        	}
+        }
+        if(propertyName.equals(IJBossMavenConstants.VERSION)){
+        	String groupId = getStringProperty(IJBossMavenConstants.VERSION);
+        	if (groupId == null || groupId.trim().length() <= 0) {
+        		status = new Status(IStatus.ERROR, MavenCoreActivator.PLUGIN_ID	, Messages.MavenFacetInstallPage_The_version_field_is_required);
+        	}
+        }
+        if(propertyName.equals(IJBossMavenConstants.PACKAGING)){
+        	String groupId = getStringProperty(IJBossMavenConstants.PACKAGING);
+        	if (groupId == null || groupId.trim().length() <= 0) {
+        		status = new Status(IStatus.ERROR, MavenCoreActivator.PLUGIN_ID	, Messages.MavenFacetInstallPage_The_packaging_field_is_required);
+        	}
+        }
+        return status;
+	}
+
+	
 }
