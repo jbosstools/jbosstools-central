@@ -920,6 +920,9 @@ public class MavenSeamActivator extends AbstractUIPlugin {
 		ILibraryProvider provider = LibraryProviderFramework.getProvider("jsf-no-op-library-provider"); //$NON-NLS-1$
 		libraryDelegate.setLibraryProvider(provider);
 		config.setProperty(IJSFFacetInstallDataModelProperties.LIBRARY_PROVIDER_DELEGATE, libraryDelegate);
+		config.setProperty(IJSFFacetInstallDataModelProperties.SERVLET_NAME, "");
+		config.setProperty(IJSFFacetInstallDataModelProperties.SERVLET_URL_PATTERNS, new String[0]);
+		
 		return config;
 	}
 }
