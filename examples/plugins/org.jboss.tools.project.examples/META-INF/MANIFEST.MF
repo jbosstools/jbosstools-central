@@ -4,7 +4,7 @@ Bundle-Name: %BundleName
 Bundle-SymbolicName: org.jboss.tools.project.examples;singleton:=true
 Bundle-Version: 1.0.1
 Bundle-Activator: org.jboss.tools.project.examples.ProjectExamplesActivator
-Bundle-Vendor: %BunldeVendor
+Bundle-Vendor: %BundleVendor
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
  org.eclipse.core.resources,
