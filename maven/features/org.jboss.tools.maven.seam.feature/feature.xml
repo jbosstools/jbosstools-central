@@ -18,10 +18,6 @@
       %license
    </license>
 
-   <url>
-      <update label="%updateSiteName" url="http://download.jboss.org/jbosstools/updates/stable"/>
-   </url>
-
    <plugin
          id="org.jboss.tools.maven.seam"
          download-size="0"

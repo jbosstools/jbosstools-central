@@ -17,10 +17,6 @@
       %license
    </license>
 
-   <url>
-      <update label="%updateSiteName" url="http://download.jboss.org/jbosstools/updates/stable"/>
-   </url>
-
    <includes
          id="org.jboss.tools.maven.feature" version="0.0.0"/>
 
