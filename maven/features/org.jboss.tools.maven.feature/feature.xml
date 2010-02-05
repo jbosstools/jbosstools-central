@@ -18,9 +18,12 @@
       %license
    </license>
 
-   <url>
-      <update label="%updateSiteName" url="http://download.jboss.org/jbosstools/updates/stable"/>
-   </url>
+   <!-- <url>
+      <update label="%updateSiteName" url="http://download.jboss.org/jbosstools/updates/stable/galileo/"/>
+   </url> -->
+	<!-- this is a DEPENDENCY SITE, not a DISCOVERY SITE, so there's no point having it be discovered AFTER the feature's already installed
+      <discovery label="m2eclipse Updates" url="http://m2eclipse.sonatype.org/update-dev/"/>
+    -->
 
    <plugin
          id="org.jboss.tools.maven.core"
