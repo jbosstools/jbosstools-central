@@ -21,7 +21,11 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.wst.validation,
  org.eclipse.ui.views,
  org.eclipse.ui.cheatsheets,
- org.eclipse.jdt.core
+ org.eclipse.jdt.core,
+ org.eclipse.wst.server.core,
+ org.jboss.tools.seam.core,
+ org.eclipse.wst.common.project.facet.core,
+ org.jboss.tools.common
 Bundle-ActivationPolicy: lazy
 Bundle-Localization: plugin
 Export-Package: org.jboss.tools.project.examples,

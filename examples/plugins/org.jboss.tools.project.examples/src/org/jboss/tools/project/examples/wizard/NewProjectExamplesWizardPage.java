@@ -11,12 +11,15 @@
 package org.jboss.tools.project.examples.wizard;
 
 
-import java.util.HashSet;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+import java.util.StringTokenizer;
 import java.util.TreeSet;
 
+import org.eclipse.core.runtime.Platform;
+import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
@@ -39,13 +42,24 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.ui.dialogs.FilteredTree;
-import org.eclipse.ui.internal.dialogs.WizardPatternFilter;
 import org.eclipse.ui.model.AdaptableList;
+import org.eclipse.ui.part.PageBook;
+import org.eclipse.wst.server.core.IRuntime;
+import org.eclipse.wst.server.core.IRuntimeType;
+import org.eclipse.wst.server.core.ServerCore;
 import org.jboss.tools.project.examples.Messages;
 import org.jboss.tools.project.examples.ProjectExamplesActivator;
+import org.jboss.tools.project.examples.dialog.FixDialog;
+import org.jboss.tools.project.examples.fixes.PluginFix;
+import org.jboss.tools.project.examples.fixes.SeamRuntimeFix;
+import org.jboss.tools.project.examples.fixes.WTPRuntimeFix;
 import org.jboss.tools.project.examples.model.Category;
 import org.jboss.tools.project.examples.model.Project;
+import org.jboss.tools.project.examples.model.ProjectFix;
 import org.jboss.tools.project.examples.model.ProjectUtil;
+import org.jboss.tools.seam.core.project.facet.SeamRuntime;
+import org.jboss.tools.seam.core.project.facet.SeamRuntimeManager;
+import org.osgi.framework.Bundle;
 
 /**
  * @author snjeza
@@ -56,6 +70,11 @@ public class NewProjectExamplesWizardPage extends WizardPage {
 	private IStructuredSelection selection;
 	private Button showQuickFixButton;
 	private Combo siteCombo;
+	private Text noteText;
+	private Button details;
+	private PageBook notesPageBook;
+	private Composite noteEmptyComposite;
+	private Composite noteComposite;
 	
 	public NewProjectExamplesWizardPage() {
 		super("org.jboss.tools.project.examples"); //$NON-NLS-1$
@@ -167,6 +186,27 @@ public class NewProjectExamplesWizardPage extends WizardPage {
 					Object object = iterator.next();
 					if (object instanceof Project) {
 						canFinish=true;
+						Project project = (Project) object;
+						if (project.getUnsatisfiedFixes() == null) {
+							List<ProjectFix> fixes = project.getFixes();
+							List<ProjectFix> unsatisfiedFixes = new ArrayList<ProjectFix>();
+							project.setUnsatisfiedFixes(unsatisfiedFixes);
+							for (ProjectFix fix:fixes) {
+								if (!canFix(project, fix)) {
+									unsatisfiedFixes.add(fix);
+								}
+							}
+						}
+						if (project.getUnsatisfiedFixes().size() > 0) {
+							notesPageBook.showPage(noteComposite);
+							noteComposite.setVisible(true);
+							noteEmptyComposite.setVisible(false);
+						} else {
+							notesPageBook.showPage(noteEmptyComposite);
+							noteComposite.setVisible(false);
+							noteEmptyComposite.setVisible(true);
+						}
+
 					} else {
 						canFinish=false;
 						break;
@@ -175,6 +215,49 @@ public class NewProjectExamplesWizardPage extends WizardPage {
 				setPageComplete(canFinish);
 			}
 			
+		});
+		
+		notesPageBook = new PageBook( internal , SWT.NONE );
+        notesPageBook.setLayout(new GridLayout(1,false));
+        gd=new GridData(GridData.FILL_HORIZONTAL);
+		gd.horizontalSpan=2;
+		notesPageBook.setLayoutData( gd );
+        
+        noteEmptyComposite = new Composite( notesPageBook, SWT.NONE );
+        noteEmptyComposite.setLayout( new GridLayout(1, false));
+        //notesEmptyComposite.setVisible( false );
+        gd=new GridData(GridData.FILL_HORIZONTAL);
+		noteEmptyComposite.setLayoutData(gd);
+		
+		noteComposite = new Composite(notesPageBook, SWT.NONE);
+		noteComposite.setLayout(new GridLayout(2,false));
+		//notesComposite.setText("Note");
+		gd=new GridData(GridData.FILL_HORIZONTAL);
+		noteComposite.setLayoutData(gd);
+		noteComposite.setVisible(false);
+		
+		notesPageBook.showPage(noteEmptyComposite);
+		
+		Label noteLabel = new Label(noteComposite,SWT.NONE);
+		gd=new GridData(GridData.FILL_HORIZONTAL);
+		gd.horizontalSpan = 2;
+		noteLabel.setText("Note:");
+		noteLabel.setLayoutData(gd);
+		noteText = new Text(noteComposite, SWT.BORDER | SWT.MULTI | SWT.WRAP | SWT.READ_ONLY);
+		noteText.setText(""); //$NON-NLS-1$
+		gd = new GridData(GridData.FILL_BOTH | GridData.GRAB_HORIZONTAL | GridData.GRAB_VERTICAL);
+		gd.heightHint=50;
+		noteText.setLayoutData(gd);
+		noteText.setText("You could face a problem when importing this project example. For more details click the Details button.");
+		
+		details = new Button(noteComposite, SWT.PUSH);
+		details.setText("Details...");
+		details.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				Dialog dialog = new FixDialog(getShell(), getSelection());
+				dialog.open();
+			}
 		});
 		
 		showQuickFixButton = new Button(internal,SWT.CHECK);
@@ -221,6 +304,23 @@ public class NewProjectExamplesWizardPage extends WizardPage {
 		setControl(composite);
 	}
 
+	private boolean canFix(Project project,ProjectFix fix) {
+		String type = fix.getType();
+		if (ProjectFix.PLUGIN_TYPE.equals(type)) {
+			return new PluginFix().canFix(project, fix);
+		}
+		
+		if (ProjectFix.WTP_RUNTIME.equals(type)) {
+			return new WTPRuntimeFix().canFix(project, fix);
+		}
+		
+		if (ProjectFix.SEAM_RUNTIME.equals(type)) {
+			return new SeamRuntimeFix().canFix(project, fix);
+		}
+		ProjectExamplesActivator.log("Invalid fix in " + project.getName() + ".");
+		return true;
+	}
+	
 	private void refresh(final TreeViewer viewer) {
 		AdaptableList input = new AdaptableList(getCategories());
 		viewer.setInput(input);

@@ -11,6 +11,7 @@
 package org.jboss.tools.project.examples.model;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -30,6 +31,9 @@ public class Project implements ProjectModelElement {
 	private String type;
 	private String welcomeURL;
 	private String site;
+	private List<ProjectFix> fixes = new ArrayList<ProjectFix>();
+	private List<ProjectFix> unsatisfiedFixes;
+	
 	
 	public Project() {
 		name=""; //$NON-NLS-1$
@@ -150,5 +154,21 @@ public class Project implements ProjectModelElement {
 
 	public void setSite(String site) {
 		this.site = site;
+	}
+
+	public List<ProjectFix> getFixes() {
+		return fixes;
+	}
+
+	public void setFixes(List<ProjectFix> fixes) {
+		this.fixes = fixes;
+	}
+
+	public List<ProjectFix> getUnsatisfiedFixes() {
+		return unsatisfiedFixes;
+	}
+
+	public void setUnsatisfiedFixes(List<ProjectFix> unsatisfiedFixes) {
+		this.unsatisfiedFixes = unsatisfiedFixes;
 	}
 }

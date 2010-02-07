@@ -73,7 +73,10 @@ import org.eclipse.ui.wizards.datatransfer.ZipFileStructureProvider;
 import org.jboss.tools.project.examples.Messages;
 import org.jboss.tools.project.examples.ProjectExamplesActivator;
 import org.jboss.tools.project.examples.dialog.MarkerDialog;
+import org.jboss.tools.project.examples.fixes.SeamRuntimeFix;
+import org.jboss.tools.project.examples.fixes.WTPRuntimeFix;
 import org.jboss.tools.project.examples.model.Project;
+import org.jboss.tools.project.examples.model.ProjectFix;
 import org.jboss.tools.project.examples.model.ProjectUtil;
 
 public class NewProjectExamplesWizard extends Wizard implements INewWizard {
@@ -155,7 +158,9 @@ public class NewProjectExamplesWizard extends Wizard implements INewWizard {
 					setName(Messages.NewProjectExamplesWizard_Importing);
 					for (Project project : projects) {
 						importProject(project, files.get(i++), monitor);
+						fix(project, monitor);
 					}
+					
 				} catch (final Exception e) {
 					Display.getDefault().syncExec(new Runnable() {
 
@@ -305,6 +310,19 @@ public class NewProjectExamplesWizard extends Wizard implements INewWizard {
 		});
 	}
 
+	public static void fix(Project project, IProgressMonitor monitor) {
+		List<ProjectFix> fixes = project.getFixes();
+		for (ProjectFix fix:fixes) {
+			if (ProjectFix.WTP_RUNTIME.equals(fix.getType())) {
+				new WTPRuntimeFix().fix(project, fix, monitor);
+			}
+			if (ProjectFix.SEAM_RUNTIME.equals(fix.getType())) {
+				new SeamRuntimeFix().fix(project, fix, monitor);
+			}
+		}
+	}
+	
+	
 	public static void importProject(Project projectDescription, File file,
 			IProgressMonitor monitor) throws Exception {
 		if (projectDescription.getIncludedProjects() == null) {

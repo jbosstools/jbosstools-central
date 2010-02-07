@@ -11,7 +11,9 @@
 package org.jboss.tools.project.examples;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
+import java.util.StringTokenizer;
 
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IProject;
@@ -26,6 +28,7 @@ import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.eclipse.wst.validation.internal.operations.ValidationBuilder;
 import org.jboss.tools.project.examples.model.Project;
+import org.jboss.tools.project.examples.model.ProjectFix;
 import org.osgi.framework.BundleContext;
 
 /**
@@ -153,5 +156,34 @@ public class ProjectExamplesActivator extends AbstractUIPlugin {
 			}
 		}
 		return markers;
+	}
+	
+	public static IProject[] getEclipseProject(Project project,
+			ProjectFix fix) {
+		String pName = fix.getProperties().get(
+				ProjectFix.ECLIPSE_PROJECTS);
+		if (pName == null) {
+			List<String> projectNames = project.getIncludedProjects();
+			List<IProject> projects = new ArrayList<IProject>();
+			for (String projectName:projectNames) {
+				IProject eclipseProject = ResourcesPlugin.getWorkspace().getRoot().getProject(projectName);
+				if (eclipseProject != null && eclipseProject.isOpen()) {
+					projects.add(eclipseProject);
+				}
+			}
+			return projects.toArray(new IProject[0]);
+		}
+		StringTokenizer tokenizer = new StringTokenizer(pName,","); //$NON-NLS-1$
+		List<IProject> projects = new ArrayList<IProject>();
+		while (tokenizer.hasMoreTokens()) {
+			String projectName = tokenizer.nextToken().trim();
+			if (projectName != null && projectName.length() > 0) {
+				IProject eclipseProject = ResourcesPlugin.getWorkspace().getRoot().getProject(projectName);
+				if (eclipseProject != null && eclipseProject.isOpen()) {
+					projects.add(eclipseProject);
+				}
+			}
+		}
+		return projects.toArray(new IProject[0]);
 	}
 }

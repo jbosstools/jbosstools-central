@@ -242,6 +242,10 @@ public class ProjectUtil {
 							if (cNode.getNodeType() == Node.ELEMENT_NODE) {
 								Element child = (Element) cNode;
 								String nodeName = child.getNodeName();
+								if (nodeName.equals("fixes")) { //$NON-NLS-1$
+									parseFixes(project, child);
+								}
+								
 								if (nodeName.equals("category")) { //$NON-NLS-1$
 									String value = getContent(child);
 									boolean found = false;
@@ -334,9 +338,52 @@ public class ProjectUtil {
 		return list;
 	}
 
+	private static void parseFixes(Project project, Element node) {
+		NodeList children = node.getChildNodes();
+		int cLen = children.getLength();
+		for (int i = 0; i < cLen; i++) {
+			Node cNode = children.item(i);
+			if (cNode.getNodeType() == Node.ELEMENT_NODE) {
+				Element child = (Element) cNode;
+				String nodeName = child.getNodeName();
+				if (nodeName.equals("fix")) { //$NON-NLS-1$
+					parseFix(project,child);
+				}
+			}
+		}
+	}
+
+	private static void parseFix(Project project, Element node) {
+		String type = node.getAttribute("type"); //$NON-NLS-1$
+		if (type == null || type.trim().length() <= 0) {
+			ProjectExamplesActivator.log("Invalid fix.");
+			return;
+		}
+		ProjectFix fix = new ProjectFix();
+		fix.setType(type);
+		NodeList children = node.getChildNodes();
+		int cLen = children.getLength();
+		for (int i = 0; i < cLen; i++) {
+			Node cNode = children.item(i);
+			if (cNode.getNodeType() == Node.ELEMENT_NODE) {
+				Element child = (Element) cNode;
+				String nodeName = child.getNodeName();
+				if (nodeName.equals("property")) { //$NON-NLS-1$
+					String name = child.getAttribute("name"); //$NON-NLS-1$
+					if (name == null || name.trim().length() <= 0) {
+						ProjectExamplesActivator.log("Invalid property.");
+						return;
+					}
+					String value = getContent(child);
+					fix.getProperties().put(name, value);
+				}
+			}
+		}
+		project.getFixes().add(fix);
+	}
+
 	private static String getProjectExamplesXml() {
-		String projectXML = System
-				.getProperty("org.jboss.tools.project.examples.xml"); //$NON-NLS-1$
+		String projectXML = System.getProperty("org.jboss.tools.project.examples.xml"); //$NON-NLS-1$
 		if (projectXML != null && projectXML.length() > 0) {
 			return projectXML;
 		}
