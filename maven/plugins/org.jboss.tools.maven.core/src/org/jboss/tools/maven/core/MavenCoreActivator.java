@@ -330,18 +330,14 @@ public class MavenCoreActivator extends Plugin {
 		plugin.setArtifactId("maven-war-plugin"); //$NON-NLS-1$
 		
 		Xpp3Dom configuration = new Xpp3Dom( "configuration" ); //$NON-NLS-1$
-		Xpp3Dom webappDirectory = new Xpp3Dom("webappDirectory"); //$NON-NLS-1$
 		IVirtualComponent component = ComponentCore.createComponent(project);
 		IVirtualFolder rootFolder = component.getRootFolder();
 		IContainer root = rootFolder.getUnderlyingFolder();
 		String webContentRoot = root.getProjectRelativePath().toString();
-		configuration.addChild(webappDirectory); 
 		Xpp3Dom warSourceDirectory = new Xpp3Dom("warSourceDirectory"); //$NON-NLS-1$
 		if (webContentRoot.startsWith(SEPARATOR)) {
-			webappDirectory.setValue(MavenCoreActivator.BASEDIR + webContentRoot);
 			warSourceDirectory.setValue(MavenCoreActivator.BASEDIR + webContentRoot);
 		} else {
-			webappDirectory.setValue(MavenCoreActivator.BASEDIR + SEPARATOR + webContentRoot);
 			warSourceDirectory.setValue(MavenCoreActivator.BASEDIR + SEPARATOR + webContentRoot);
 		}
 		
