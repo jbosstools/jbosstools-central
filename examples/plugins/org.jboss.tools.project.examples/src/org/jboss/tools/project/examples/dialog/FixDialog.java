@@ -29,6 +29,7 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.Text;
+import org.jboss.tools.project.examples.Messages;
 import org.jboss.tools.project.examples.model.Project;
 import org.jboss.tools.project.examples.model.ProjectFix;
 import org.jboss.tools.project.examples.wizard.NewProjectExamplesWizardPage;
@@ -72,12 +73,12 @@ public class FixDialog extends Dialog {
 		gd.heightHint = 300;
 		contents.setLayoutData(gd);
 		contents.setLayout(new GridLayout());
-		getShell().setText("Fixing Requirements");
+		getShell().setText(Messages.FixDialog_Requirement_details);
 		applyDialogFont(contents);
 		initializeDialogUnits(area);
 
 		Label fixesLabel = new Label(contents, SWT.NULL);
-		fixesLabel.setText("Requirements:");
+		fixesLabel.setText(Messages.FixDialog_Requirements);
 		tableViewer = new TableViewer(contents, SWT.H_SCROLL | SWT.V_SCROLL
 				| SWT.BORDER | SWT.SINGLE);
 		Table table = tableViewer.getTable();
@@ -87,7 +88,7 @@ public class FixDialog extends Dialog {
 		table.setHeaderVisible(true);
 		table.setLinesVisible(true);
 
-		String[] columnNames = new String[] { "Type", "Short description" };
+		String[] columnNames = new String[] { Messages.FixDialog_Type, Messages.FixDialog_Short_description };
 		int[] columnWidths = new int[] { 200, 350 };
 
 		for (int i = 0; i < columnNames.length; i++) {
@@ -101,7 +102,7 @@ public class FixDialog extends Dialog {
 		tableViewer.setInput(fixes);
 
 		Label descriptionLabel = new Label(contents, SWT.NONE);
-		descriptionLabel.setText("Description:");
+		descriptionLabel.setText(Messages.FixDialog_Description);
 		final Text description = new Text(contents, SWT.BORDER | SWT.MULTI | SWT.WRAP | SWT.READ_ONLY);
 		gd = new GridData(GridData.FILL_BOTH | GridData.GRAB_HORIZONTAL | GridData.GRAB_VERTICAL);
 		gd.heightHint=50;
@@ -131,7 +132,7 @@ public class FixDialog extends Dialog {
 	
 	@Override
 	protected void createButtonsForButtonBar(Composite parent) {
-		fixButton = createButton(parent, FIX_BUTTON, "Fix", true);
+		fixButton = createButton(parent, FIX_BUTTON, Messages.FixDialog_Fix, true);
 		if (fix == null) {
 			fixButton.setEnabled(false);
 		} else {
@@ -151,7 +152,7 @@ public class FixDialog extends Dialog {
 			}
 		
 		});
-		createButton(parent, IDialogConstants.OK_ID, "Finish",
+		createButton(parent, IDialogConstants.OK_ID, Messages.FixDialog_Finish,
 				true);
 	}
 	

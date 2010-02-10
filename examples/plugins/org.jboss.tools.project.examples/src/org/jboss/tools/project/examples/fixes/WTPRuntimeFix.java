@@ -3,15 +3,16 @@ package org.jboss.tools.project.examples.fixes;
 import java.util.StringTokenizer;
 
 import org.eclipse.core.resources.IProject;
-import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.wst.common.project.facet.core.IFacetedProject;
 import org.eclipse.wst.common.project.facet.core.ProjectFacetsManager;
 import org.eclipse.wst.common.project.facet.core.runtime.RuntimeManager;
 import org.eclipse.wst.server.core.IRuntime;
 import org.eclipse.wst.server.core.IRuntimeType;
 import org.eclipse.wst.server.core.ServerCore;
+import org.jboss.tools.project.examples.Messages;
 import org.jboss.tools.project.examples.ProjectExamplesActivator;
 import org.jboss.tools.project.examples.model.Project;
 import org.jboss.tools.project.examples.model.ProjectFix;
@@ -64,8 +65,7 @@ public class WTPRuntimeFix implements ProjectExamplesFix {
 		String allowedTypes = fix.getProperties().get(
 				ProjectFix.ALLOWED_TYPES);
 		if (allowedTypes == null) {
-			ProjectExamplesActivator.log("Invalid WTP runtime fix in "
-					+ project.getName() + ".");
+			ProjectExamplesActivator.log(NLS.bind(Messages.WTPRuntimeFix_Invalid_WTP_runtime_fix, project.getName()));
 			return null;
 		}
 		StringTokenizer tokenizer = new StringTokenizer(allowedTypes, ","); //$NON-NLS-1$

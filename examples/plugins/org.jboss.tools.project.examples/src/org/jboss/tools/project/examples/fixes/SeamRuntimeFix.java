@@ -5,6 +5,8 @@ import java.util.StringTokenizer;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
+import org.eclipse.osgi.util.NLS;
+import org.jboss.tools.project.examples.Messages;
 import org.jboss.tools.project.examples.ProjectExamplesActivator;
 import org.jboss.tools.project.examples.model.Project;
 import org.jboss.tools.project.examples.model.ProjectFix;
@@ -26,7 +28,7 @@ public class SeamRuntimeFix implements ProjectExamplesFix {
 	private SeamRuntime getBestRuntime(Project project, ProjectFix fix) {
 		String allowedVersions = fix.getProperties().get(ProjectFix.ALLOWED_VERSIONS);
 		if (allowedVersions == null) {
-			ProjectExamplesActivator.log("Invalid Seam runtime fix in " + project.getName() + ".");
+			ProjectExamplesActivator.log(NLS.bind(Messages.SeamRuntimeFix_Invalid_seam_runtime_fix, project.getName())); 
 			return null;
 		}
 		StringTokenizer tokenizer = new StringTokenizer(allowedVersions,","); //$NON-NLS-1$

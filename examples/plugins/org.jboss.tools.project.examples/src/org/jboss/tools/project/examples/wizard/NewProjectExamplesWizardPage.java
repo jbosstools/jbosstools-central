@@ -30,6 +30,7 @@ import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.wizard.WizardPage;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -227,10 +228,10 @@ public class NewProjectExamplesWizardPage extends WizardPage {
 		gd.heightHint=50;
 		gd.widthHint = 400;
 		noteText.setLayoutData(gd);
-		noteText.setText("This example has some requirements that could not be automatically configured. When importing the example you might see some errors which would need fixing manually or via Quick Fixes. Click \"Details\" to see more.");
+		noteText.setText(Messages.NewProjectExamplesWizardPage_Note);
 		
 		details = new Button(noteComposite, SWT.PUSH);
-		details.setText("Details...");
+		details.setText(Messages.NewProjectExamplesWizardPage_Details);
 		details.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
@@ -296,7 +297,7 @@ public class NewProjectExamplesWizardPage extends WizardPage {
 		if (ProjectFix.SEAM_RUNTIME.equals(type)) {
 			return new SeamRuntimeFix().canFix(project, fix);
 		}
-		ProjectExamplesActivator.log("Invalid fix in " + project.getName() + ".");
+		ProjectExamplesActivator.log(NLS.bind(Messages.NewProjectExamplesWizardPage_Invalid_fix, project.getName()));
 		return true;
 	}
 	

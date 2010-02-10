@@ -356,7 +356,7 @@ public class ProjectUtil {
 	private static void parseFix(Project project, Element node) {
 		String type = node.getAttribute("type"); //$NON-NLS-1$
 		if (type == null || type.trim().length() <= 0) {
-			ProjectExamplesActivator.log("Invalid fix.");
+			ProjectExamplesActivator.log(Messages.ProjectUtil_Invalid_fix);
 			return;
 		}
 		ProjectFix fix = new ProjectFix();
@@ -371,7 +371,7 @@ public class ProjectUtil {
 				if (nodeName.equals("property")) { //$NON-NLS-1$
 					String name = child.getAttribute("name"); //$NON-NLS-1$
 					if (name == null || name.trim().length() <= 0) {
-						ProjectExamplesActivator.log("Invalid property.");
+						ProjectExamplesActivator.log(Messages.ProjectUtil_Invalid_property);
 						return;
 					}
 					String value = getContent(child);

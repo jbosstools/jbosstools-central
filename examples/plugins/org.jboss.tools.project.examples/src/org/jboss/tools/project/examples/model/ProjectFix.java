@@ -15,6 +15,7 @@ import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.dialogs.PreferencesUtil;
+import org.jboss.tools.project.examples.Messages;
 import org.jboss.tools.project.examples.ProjectExamplesActivator;
 
 public class ProjectFix {
@@ -31,18 +32,18 @@ public class ProjectFix {
 	public final static String DESCRIPTION = "description"; //$NON-NLS-1$
 	public final static String ANY = "any"; //$NON-NLS-1$
 	
-	public static final String SEAM_PREFERENCES_ID = "org.jboss.tools.common.model.ui.seam";
-	public static final String WTP_PREFERENCES_ID = "org.eclipse.wst.server.ui.runtime.preferencePage";
+	public static final String SEAM_PREFERENCES_ID = "org.jboss.tools.common.model.ui.seam"; //$NON-NLS-1$
+	public static final String WTP_PREFERENCES_ID = "org.eclipse.wst.server.ui.runtime.preferencePage"; //$NON-NLS-1$
 	private String type;
 	private Map<String,String> properties = new HashMap<String,String>();
 	private static Map<String,String> shortDescriptions = new HashMap<String, String>();
 	private static Map<String,Boolean> fixableMaps = new HashMap<String, Boolean>();
 	
 	static {
-		shortDescriptions.put(WTP_RUNTIME, "Missing WTP Runtime");
-		shortDescriptions.put(SEAM_RUNTIME, "Missing Seam Runtime");
-		shortDescriptions.put(PLUGIN_TYPE, "Missing plugin");
-		shortDescriptions.put(DROOLS_RUNTIME, "Missing Drools Runtime");
+		shortDescriptions.put(WTP_RUNTIME, Messages.ProjectFix_Missing_WTP_Runtime);
+		shortDescriptions.put(SEAM_RUNTIME, Messages.ProjectFix_Missing_Seam_Runtime);
+		shortDescriptions.put(PLUGIN_TYPE, Messages.ProjectFix_Missing_plugin);
+		shortDescriptions.put(DROOLS_RUNTIME, Messages.ProjectFix_Missing_Drools_Runtime);
 		fixableMaps.put(WTP_RUNTIME,true);
 		fixableMaps.put(SEAM_RUNTIME,true);
 		fixableMaps.put(PLUGIN_TYPE,true);
