@@ -21,6 +21,7 @@ import java.util.TreeSet;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.ITreeContentProvider;
@@ -38,6 +39,7 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.Tree;
@@ -180,38 +182,7 @@ public class NewProjectExamplesWizardPage extends WizardPage {
 					projectURL.setText(""); //$NON-NLS-1$
 					projectSize.setText(""); //$NON-NLS-1$
 				}
-				boolean canFinish = false;
-				Iterator iterator = selection.iterator();
-				while (iterator.hasNext()) {
-					Object object = iterator.next();
-					if (object instanceof Project) {
-						canFinish=true;
-						Project project = (Project) object;
-						if (project.getUnsatisfiedFixes() == null) {
-							List<ProjectFix> fixes = project.getFixes();
-							List<ProjectFix> unsatisfiedFixes = new ArrayList<ProjectFix>();
-							project.setUnsatisfiedFixes(unsatisfiedFixes);
-							for (ProjectFix fix:fixes) {
-								if (!canFix(project, fix)) {
-									unsatisfiedFixes.add(fix);
-								}
-							}
-						}
-						if (project.getUnsatisfiedFixes().size() > 0) {
-							notesPageBook.showPage(noteComposite);
-							noteComposite.setVisible(true);
-							noteEmptyComposite.setVisible(false);
-						} else {
-							notesPageBook.showPage(noteEmptyComposite);
-							noteComposite.setVisible(false);
-							noteEmptyComposite.setVisible(true);
-						}
-
-					} else {
-						canFinish=false;
-						break;
-					}
-				}
+				boolean canFinish = refresh(false);
 				setPageComplete(canFinish);
 			}
 			
@@ -226,36 +197,44 @@ public class NewProjectExamplesWizardPage extends WizardPage {
         noteEmptyComposite = new Composite( notesPageBook, SWT.NONE );
         noteEmptyComposite.setLayout( new GridLayout(1, false));
         //notesEmptyComposite.setVisible( false );
-        gd=new GridData(GridData.FILL_HORIZONTAL);
+        gd=new GridData(SWT.BEGINNING, SWT.BEGINNING, false, false);
 		noteEmptyComposite.setLayoutData(gd);
 		
 		noteComposite = new Composite(notesPageBook, SWT.NONE);
 		noteComposite.setLayout(new GridLayout(2,false));
-		//notesComposite.setText("Note");
-		gd=new GridData(GridData.FILL_HORIZONTAL);
+		gd=new GridData(SWT.BEGINNING, SWT.BEGINNING, false, false);
 		noteComposite.setLayoutData(gd);
 		noteComposite.setVisible(false);
 		
 		notesPageBook.showPage(noteEmptyComposite);
 		
-		Label noteLabel = new Label(noteComposite,SWT.NONE);
-		gd=new GridData(GridData.FILL_HORIZONTAL);
-		gd.horizontalSpan = 2;
-		noteLabel.setText("Note:");
+		Composite messageComposite = new Composite(noteComposite, SWT.BORDER);
+		messageComposite.setLayout(new GridLayout(2, false));
+		gd=new GridData(SWT.BEGINNING, SWT.BEGINNING, false, false);
+		
+		messageComposite.setLayoutData(gd);
+		
+		Label noteLabel = new Label(messageComposite,SWT.NONE);
+		gd=new GridData(SWT.BEGINNING, SWT.BEGINNING, false, false);
 		noteLabel.setLayoutData(gd);
-		noteText = new Text(noteComposite, SWT.BORDER | SWT.MULTI | SWT.WRAP | SWT.READ_ONLY);
+		Image image = JFaceResources.getImage(Dialog.DLG_IMG_MESSAGE_WARNING);
+		image.setBackground(noteLabel.getBackground());
+		noteLabel.setImage(image);
+		
+		noteText = new Text(messageComposite, SWT.MULTI | SWT.WRAP | SWT.READ_ONLY);
 		noteText.setText(""); //$NON-NLS-1$
 		gd = new GridData(GridData.FILL_BOTH | GridData.GRAB_HORIZONTAL | GridData.GRAB_VERTICAL);
 		gd.heightHint=50;
+		gd.widthHint = 400;
 		noteText.setLayoutData(gd);
-		noteText.setText("You could face a problem when importing this project example. For more details click the Details button.");
+		noteText.setText("This example has some requirements that could not be automatically configured. When importing the example you might see some errors which would need fixing manually or via Quick Fixes. Click \"Details\" to see more.");
 		
 		details = new Button(noteComposite, SWT.PUSH);
 		details.setText("Details...");
 		details.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				Dialog dialog = new FixDialog(getShell(), getSelection());
+				Dialog dialog = new FixDialog(getShell(), NewProjectExamplesWizardPage.this);
 				dialog.open();
 			}
 		});
@@ -414,5 +393,41 @@ public class NewProjectExamplesWizardPage extends WizardPage {
 			return showQuickFixButton.getSelection();
 		}
 		return false;
+	}
+
+	public boolean refresh(boolean force) {
+		boolean canFinish = false;
+		Iterator iterator = selection.iterator();
+		while (iterator.hasNext()) {
+			Object object = iterator.next();
+			if (object instanceof Project) {
+				canFinish=true;
+				Project project = (Project) object;
+				if (force || project.getUnsatisfiedFixes() == null) {
+					List<ProjectFix> fixes = project.getFixes();
+					List<ProjectFix> unsatisfiedFixes = new ArrayList<ProjectFix>();
+					project.setUnsatisfiedFixes(unsatisfiedFixes);
+					for (ProjectFix fix:fixes) {
+						if (!canFix(project, fix)) {
+							unsatisfiedFixes.add(fix);
+						}
+					}
+				}
+				if (project.getUnsatisfiedFixes().size() > 0) {
+					notesPageBook.showPage(noteComposite);
+					noteComposite.setVisible(true);
+					noteEmptyComposite.setVisible(false);
+				} else {
+					notesPageBook.showPage(noteEmptyComposite);
+					noteComposite.setVisible(false);
+					noteEmptyComposite.setVisible(true);
+				}
+
+			} else {
+				canFinish=false;
+				break;
+			}
+		}
+		return canFinish;
 	}
 }

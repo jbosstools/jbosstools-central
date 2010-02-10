@@ -25,7 +25,10 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.wst.server.core,
  org.jboss.tools.seam.core,
  org.eclipse.wst.common.project.facet.core,
- org.jboss.tools.common
+ org.jboss.tools.common,
+ org.eclipse.equinox.p2.ui,
+ org.eclipse.equinox.p2.ui.sdk,
+ org.eclipse.equinox.p2.metadata
 Bundle-ActivationPolicy: lazy
 Bundle-Localization: plugin
 Export-Package: org.jboss.tools.project.examples,

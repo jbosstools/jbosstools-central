@@ -16,9 +16,12 @@ import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
@@ -28,14 +31,27 @@ import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.Text;
 import org.jboss.tools.project.examples.model.Project;
 import org.jboss.tools.project.examples.model.ProjectFix;
+import org.jboss.tools.project.examples.wizard.NewProjectExamplesWizardPage;
 
 public class FixDialog extends Dialog {
 
+	private static final int FIX_BUTTON = 1;
 	private TableViewer tableViewer;
 	private List<ProjectFix> fixes;
+	private Button fixButton;
+	private ProjectFix fix;
+	private NewProjectExamplesWizardPage page;
 	
-	public FixDialog(Shell parentShell, IStructuredSelection selection) {
+	public FixDialog(Shell parentShell, NewProjectExamplesWizardPage page) {
 		super(parentShell);
+		setShellStyle(SWT.CLOSE | SWT.MAX | SWT.TITLE | SWT.BORDER
+				| SWT.MODELESS | SWT.RESIZE | getDefaultOrientation());
+		this.page = page;
+		refresh();
+	}
+
+	private void refresh() {
+		IStructuredSelection selection = page.getSelection();
 		Iterator iterator = selection.iterator();
 		fixes = new ArrayList<ProjectFix>();
 		while (iterator.hasNext()) {
@@ -56,12 +72,12 @@ public class FixDialog extends Dialog {
 		gd.heightHint = 300;
 		contents.setLayoutData(gd);
 		contents.setLayout(new GridLayout());
-		getShell().setText("Fixes");
+		getShell().setText("Fixing Requirements");
 		applyDialogFont(contents);
 		initializeDialogUnits(area);
 
 		Label fixesLabel = new Label(contents, SWT.NULL);
-		fixesLabel.setText("Fixes:");
+		fixesLabel.setText("Requirements:");
 		tableViewer = new TableViewer(contents, SWT.H_SCROLL | SWT.V_SCROLL
 				| SWT.BORDER | SWT.SINGLE);
 		Table table = tableViewer.getTable();
@@ -96,10 +112,14 @@ public class FixDialog extends Dialog {
 					public void selectionChanged(SelectionChangedEvent event) {
 						description.setText(""); //$NON-NLS-1$
 						ISelection selection = event.getSelection();
+						fix = null;
+						fixButton.setEnabled(false);
 						if (selection instanceof IStructuredSelection) {
-							Object fix = ((IStructuredSelection) selection).getFirstElement();
-							if (fix instanceof ProjectFix) {
-								description.setText(((ProjectFix) fix).getProperties().get(ProjectFix.DESCRIPTION));
+							Object object = ((IStructuredSelection) selection).getFirstElement();
+							if (object instanceof ProjectFix) {
+								fix = (ProjectFix) object;
+								fixButton.setEnabled(fix.isFixable());
+								description.setText(fix.getProperties().get(ProjectFix.DESCRIPTION));
 							}
 						}
 					}
@@ -111,10 +131,36 @@ public class FixDialog extends Dialog {
 	
 	@Override
 	protected void createButtonsForButtonBar(Composite parent) {
-		createButton(parent, IDialogConstants.OK_ID, IDialogConstants.OK_LABEL,
+		fixButton = createButton(parent, FIX_BUTTON, "Fix", true);
+		if (fix == null) {
+			fixButton.setEnabled(false);
+		} else {
+			fixButton.setEnabled(fix.isFixable());
+		}
+		fixButton.addSelectionListener(new SelectionAdapter() {
+
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				if (fix != null) {
+					fix.fix();
+					page.refresh(true);
+					refresh();
+					tableViewer.setInput(fixes);
+					//tableViewer.refresh();
+				}
+			}
+		
+		});
+		createButton(parent, IDialogConstants.OK_ID, "Finish",
 				true);
 	}
 	
+	@Override
+	protected void buttonPressed(int buttonId) {
+		if (FIX_BUTTON != buttonId) {
+			super.buttonPressed(buttonId);
+		}
+	}
 	private class FixLabelProvider extends LabelProvider implements
 			ITableLabelProvider {
 
@@ -129,7 +175,7 @@ public class FixDialog extends Dialog {
 					return fix.getType();
 				}
 				if (columnIndex == 1) {
-					return fix.getProperties().get(ProjectFix.SHORT_DESCRIPTION);
+					return fix.getShortDescription();
 				}
 			}
 			return null;
@@ -153,7 +199,7 @@ public class FixDialog extends Dialog {
 		}
 
 		public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
-			
+			fixes = (List<ProjectFix>) newInput;
 		}
 		
 	}
