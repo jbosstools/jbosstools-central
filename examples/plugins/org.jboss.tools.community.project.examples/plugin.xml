@@ -8,4 +8,14 @@
         <url>http://anonsvn.jboss.org/repos/jbosstools/workspace/examples/project-examples-3.1.xml </url>
         <experimental>false</experimental>
    </extension>
+   <extension
+       name="%JBoss_Tools_Community_BPEL_Examples"
+       point="org.jboss.tools.project.examples.projectExamplesXml">
+    <url>
+       http://download.jboss.org/jbosstools/examples/project-examples-bpel-3.1.xml
+    </url>
+    <experimental>
+       false
+    </experimental>
+ </extension>
 </plugin>
