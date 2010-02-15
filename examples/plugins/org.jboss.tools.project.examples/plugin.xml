@@ -75,4 +75,10 @@
         <experimental>false</experimental>
    </extension>
    
+   <extension
+        point="org.jboss.tools.project.examples.projectExamplesXml"
+        name="%JBoss_Developer_Studio30_Examples">
+        <url>http://download.jboss.org/jbosstools/examples/project-examples-jbds30.xml</url>
+        <experimental>false</experimental>
+   </extension>
 </plugin>
