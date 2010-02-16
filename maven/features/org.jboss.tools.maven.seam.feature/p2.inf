@@ -2,7 +2,9 @@ instructions.configure=addRepository(location:http${#58}//download.eclipse.org/r
    addRepository(location:http${#58}//download.eclipse.org/releases/galileo/,type:1,name:Eclipse Galileo,enabled:true); \
    addRepository(location:http${#58}//download.eclipse.org/eclipse/updates/3.5/,type:0,name:Eclipse 3.5,enabled:true); \
    addRepository(location:http${#58}//download.eclipse.org/eclipse/updates/3.5/,type:1,name:Eclipse 3.5,enabled:true); \
-   addRepository(location:http${#58}//download.jboss.org/jbosstools/updates/m2eclipse/0.10/,type:0,name:m2eclipse 0.10,enabled:true); \
-   addRepository(location:http${#58}//download.jboss.org/jbosstools/updates/m2eclipse/0.10/,type:1,name:m2eclipse 0.10,enabled:true); \
+   addRepository(location:http${#58}//m2eclipse.sonatype.org/sites/m2e/,type:0,name:m2eclipse 0.10,enabled:true); \
+   addRepository(location:http${#58}//m2eclipse.sonatype.org/sites/m2e/,type:1,name:m2eclipse 0.10,enabled:true); \
+   addRepository(location:http${#58}//m2eclipse.sonatype.org/sites/m2e-extras/,type:0,name:m2eclipse 0.10,enabled:true); \
+   addRepository(location:http${#58}//m2eclipse.sonatype.org/sites/m2e-extras/,type:1,name:m2eclipse 0.10,enabled:true); \
    addRepository(location:http${#58}//subclipse.tigris.org/update_1.6.x/,type:0,name:Subclipse 1.6,enabled:true); \
    addRepository(location:http${#58}//subclipse.tigris.org/update_1.6.x/,type:1,name:Subclipse 1.6,enabled:true);
