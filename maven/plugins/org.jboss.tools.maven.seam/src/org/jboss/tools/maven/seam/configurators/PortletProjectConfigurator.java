@@ -78,7 +78,7 @@ public class PortletProjectConfigurator extends AbstractProjectConfigurator {
 	    String jsfportletVersion = MavenSeamActivator.getDefault().getDependencyVersion(mavenProject, PORTLETBRIDGE_API_GROUP_ID, PORTLETBRIDGE_API_ARTIFACT_ID);
 	    if (portletVersion != null) {
 	    	final IFacetedProject fproj = ProjectFacetsManager.create(project);
-	    	if ("war".equals(packaging)) { //$NON-NLS-1$
+	    	if (fproj != null && "war".equals(packaging)) { //$NON-NLS-1$
 	    		installWarFacets(fproj, portletVersion, jsfportletVersion, monitor);
 	    	}
 	    }
