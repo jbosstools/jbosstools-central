@@ -18,6 +18,11 @@
       %license
    </license>
 
+   <requires>
+      <import feature="org.maven.ide.eclipse.feature" version="0.10.0" match="greaterOrEqual"/>
+      <import feature="org.maven.ide.eclipse.wtp.feature" version="0.10.0" match="greaterOrEqual"/>
+   </requires>
+
    <plugin
          id="org.jboss.tools.maven.seam"
          download-size="0"
