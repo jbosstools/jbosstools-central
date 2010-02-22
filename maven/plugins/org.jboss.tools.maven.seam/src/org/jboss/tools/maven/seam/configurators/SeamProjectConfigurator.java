@@ -148,6 +148,9 @@ public class SeamProjectConfigurator extends AbstractProjectConfigurator {
 	    		deploying = "ear"; //$NON-NLS-1$
 	    	}
 	    	final IFacetedProject fproj = ProjectFacetsManager.create(project);
+	    	if (fproj == null) {
+	    		return;
+	    	}
 	    	if ("war".equals(packaging)) { //$NON-NLS-1$
 	    		IDataModel model = createSeamDataModel(deploying, seamVersion, project);
 	    		installWarFacets(fproj, model, seamVersion, monitor);

@@ -71,7 +71,7 @@ public class JSFProjectConfigurator extends AbstractProjectConfigurator {
 	    String jsfVersion = getJSFVersion(mavenProject);
 	    if (jsfVersion != null) {
 	    	final IFacetedProject fproj = ProjectFacetsManager.create(project);
-	    	if ("war".equals(packaging)) { //$NON-NLS-1$
+	    	if (fproj != null && "war".equals(packaging)) { //$NON-NLS-1$
 	    		installWarFacets(fproj, jsfVersion, monitor);
 	    	}
 	    }
