@@ -1,0 +1,378 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.3//EN"
+"http://www.docbook.org/xml/4.3/docbookx.dtd"
+
+[<!ENTITY intro SYSTEM "introduction.xml">
+<!ENTITY creating_mavenized_seam SYSTEM "creating_mavenized_seam.xml">
+
+<!ENTITY seamlink "../../seam/html_single/index.html">
+<!ENTITY aslink "../../as/html_single/index.html">
+<!ENTITY esblink "../../esb_ref_guide/html_single/index.html">
+<!ENTITY gsglink "../../GettingStartedGuide/html_single/index.html">
+<!ENTITY hibernatelink "../../hibernatetools/html_single/index.html">
+<!ENTITY jbpmlink "../../jbpm/html_single/index.html">
+<!ENTITY jsflink "../../jsf/html_single/index.html">
+<!ENTITY jsfreflink "../../jsf_tools_ref_guide/html_single/index.html">
+<!ENTITY jsftutoriallink "../../jsf_tools_tutorial/html_single/index.html">
+<!ENTITY strutsreflink "../../struts_tools_ref_guide/html_single/index.html">
+<!ENTITY strutstutoriallink "../../struts_tools_tutorial/html_single/index.html">                        
+
+ 
+]><book xmlns:diffmk="http://diffmk.sf.net/ns/diff">
+    
+     <bookinfo>
+         
+         <title>JBoss Maven Integration Guide</title>
+             <corpauthor>
+                 <inlinemediaobject>
+                     <imageobject role="fo">
+                         <imagedata fileref="images/jbosstools_logo.png" format="PNG"></imagedata>
+                     </imageobject>	
+                     <imageobject role="html">
+                         <imagedata></imagedata>
+                     </imageobject>	
+                 </inlinemediaobject>           
+             </corpauthor>
+     
+
+         <author><firstname>Svetlana</firstname><surname>Mukhina</surname><email>smukhina@exadel.com</email></author>
+         <author><firstname>Olga</firstname><surname>Chikvina</surname></author>
+         
+         
+         <copyright>
+             <year>2010</year>
+             <holder>JBoss by Red Hat</holder>
+         </copyright>
+         <releaseinfo><diffmk:wrapper diffmk:change="changed">
+             Version: 3.1.0.GA
+         </diffmk:wrapper></releaseinfo>
+         
+<abstract>
+   <title></title>
+       <para>
+           <ulink url="http://download.jboss.org/jbosstools/nightly-docs/en/maven/pdf/JBoss_Maven_Integration_Guide.pdf">PDF version</ulink>
+       </para>
+</abstract>
+
+
+    </bookinfo>
+    <toc/>  
+
+
+<chapter id="intro" xml:base="file:///home/vchukhutsina/repos/ochik_jboss/seam/docs/reference/en/modules/intro.xml" xreflabel="intro">
+    <?dbhtml filename="intro.html"?>
+    <chapterinfo>
+        <keywordset>
+            <keyword>JBoss Tools</keyword>
+            <keyword>Seam</keyword>
+            <keyword>JBDS</keyword>
+        </keywordset>
+    </chapterinfo>
+
+    <title>Introduction</title>
+
+    <section>
+
+        <title>What is Seam?</title>
+        <para>This introduction will help you to understand what is <property moreinfo="none">Seam</property>.</para>
+        <para><property moreinfo="none">Seam</property> is a fully featured application framework on top of Java EE
+            5. It is also one of the most popular enterprise Java frameworks today. Seam deeply
+            integrates many other standard-based or open source frameworks (e.g., JSF, EJB3, JMS,
+            Web Services, jBPM, JBoss Rules, Ajax4jsf, RichFaces, Facelets, Spring, iText, Quartz,
+            TestNG, etc.), and provides a single programming model for developers to
+            "drive" those underlying frameworks via simple annotated POJOs (Plain
+            Old Java Objects). It makes life easier for developers to tackle complex enterprise
+            applications with many component frameworks.</para>
+    </section>
+
+    <section><title>Key Features of JBoss Seam</title> 
+        <para>For a start, we propose you to look through the table of main features of JBoss Seam:</para>
+
+        <table>
+            
+            <title>Key Functionality for JBoss Seam</title>
+            <tgroup cols="3">
+                
+                <colspec align="left" colnum="1" colwidth="2*"></colspec>
+                <colspec colnum="2" colwidth="4*"></colspec>
+                <colspec align="left" colnum="3" colwidth="2*"></colspec>
+                
+                <thead>
+                    <row>
+                        <entry>Feature</entry>
+                        <entry>Benefit</entry>
+                        <entry>Chapter</entry>
+                    </row>
+                </thead>
+                
+                <tbody>
+                    
+                    <row>
+                        <entry><para>Integrated JSF with EJB 3.0</para></entry>
+                        <entry><para>JBoss Seam combines the component models of EJB3 and JSF, eliminating glue code, and thus, letting the developer think about the business problem.</para></entry>
+                                          </row>
+                    
+                    <row>
+                        <entry><para>Integrated AJAX</para></entry>
+                        <entry><para>Developer can add AJAX capability to the user interface of his application  without the need to write any JavaScript code as Seam supports JBoss RichFaces and ICEfaces - the best open source JSF-based AJAX solutions.</para></entry>
+                                      </row>
+                    
+                    <row>
+                        <entry><para>Bijection</para></entry>
+                        <entry><para>Bijection allows auto-assembly of stateful components by the container. It even allows a component to safely and easily manipulate the value of a context variable, just by assigning it to an attribute of the component.</para></entry>
+                                            </row>
+                    
+                    <row>
+                        <entry><para>New Seam Project wizard</para></entry>
+                        <entry><para>An easy step-by-step wizard to create a standalone Seam Web Project with a form to create runtime and server instances in order to get started creating, running, and debugging J2EE (only) applications. You may also add JSF capabilities.</para></entry>
+                        <entry>
+                            <link linkend="create_seam">New Seam Project wizard</link>
+                        </entry>
+                    </row>
+                    
+                    <row>
+                        <entry><para>Seam component generations options </para></entry>
+                        <entry><para>All the Seam component generations options known from Seam-gen are available as wizards (with sensible auto-defaulting) for creating various common Seam components.</para></entry>
+                        <entry>
+                            <link linkend="seam_wizards">Seam Wizards</link>
+                        </entry>
+                    </row>
+                    
+                    <row>
+                        <entry><para>Seam Editors</para></entry>
+                        <entry><para>Visual Page Editor,  Seam Pages Editor and Seam Components Editor provide you with a range of great possibilities and will be helpful when working with JBoss Seam.</para></entry>
+                        <entry>
+                            <link linkend="seam_editors">Seam Editors</link>
+                        </entry>
+                    </row>
+                    
+                    <row>
+                        <entry><para>Seam Validator</para></entry>
+                        <entry><para>A configured Seam Validator provides validation of various possible problematic definitions.</para></entry>
+                        <entry>
+                            <link linkend="SeamValidation">Seam Validation</link>
+                        </entry>
+                    </row>
+                    
+                    <row>
+                        <entry><para>CRUD Database Application Generation</para></entry>
+                        <entry><para>JBoss Seam allows adding CRUD support to a Seam Web application.</para></entry>
+                        <entry>
+                            <link linkend="crud_database_application">CRUD Database Application</link>
+                        </entry>
+                    </row>
+                    
+                    <row>
+                        <entry><para>TestNG Framework</para></entry>
+                        <entry><para>TestNG ("Testing, the Next Generation") is a Java unit testing framework that aims to overcome many limitations of JUnit.</para></entry>
+                        <entry>
+                            <link linkend="testNG">Using TestNG project</link>
+                        </entry>
+                    </row>
+                    
+                </tbody>
+                
+            </tgroup>
+        </table>
+        
+        
+
+
+
+
+
+
+</section>
+
+    <section> 
+        <title>Installation into Eclipse</title>
+
+        <para>Here, we are going to explain how to install Seam plugin into Eclipse.</para>
+
+        <para>Seam is a one module of JBoss Tools project. Since Seam has a dependence on other JBoss Tools modules we recommend you to install
+            a bundle of all <ulink url="http://labs.jboss.com/tools/download.html">JBoss Tools plug-ins</ulink>. Installation instruction you can find on JBoss Wiki in <ulink url="http://labs.jboss.com/wiki/InstallingJBossTools">InstallingJBossTools</ulink> section.</para>
+        
+    </section>
+
+    <section>
+        <title>Other relevant resources on the topic</title>
+
+        <para>The <ulink url="http://seamframework.org/">Seam Framework</ulink> - Next generation enterprise Java development.</para>
+        <para>All JBoss Developer Studio/JBoss Tools release documentation you can find at<ulink url="http://docs.jboss.org/tools/">http://docs.jboss.org/tools</ulink> in the corresponding release directory.</para>
+        <para>There is some extra information on <ulink url="http://www.jboss.org/community/wiki/JBossSeam">JBoss Wiki. </ulink></para>
+        <para>The latest documentation builds are available at <ulink url="http://download.jboss.org/jbosstools/nightly-docs/">http://download.jboss.org/jbosstools/nightly-docs</ulink>.</para>
+    	<para>You can find a set of screencasts on how to search/find references and use Seam refactoring tools in the following Max Andersen's 
+    		<ulink url="http://in.relation.to/12524.lace">blog post</ulink>.</para>
+    </section>
+</chapter>
+<chapter id="mavenized_seam" xml:base="file:///home/vchukhutsina/repos/ochik_jboss/seam/docs/reference/en/modules/creating_mavenized_seam.xml" xreflabel="mavenized_seam">
+	<?dbhtml filename="create_mavenized_seam.html"?>
+	<chapterinfo>
+		<keywordset>
+			<keyword>JBoss Tools</keyword>
+			<keyword>Seam</keyword>
+			<keyword>JBDS</keyword>
+		</keywordset>
+	</chapterinfo>
+	<title>Maven Integration for Seam Projects</title>
+	<para>Starting from 3.1 M2 version <property moreinfo="none">JBoss Tools</property> includes new Jboss Maven
+		Integration plug-in which for now allows to create mavenized Seam projects and enable Seam
+		tools support for imported Maven projects.</para>
+	<para>The Jboss Maven Integration requires <ulink url="http://m2eclipse.sonatype.org/">m2eclipse</ulink> to be installed.</para>
+	<note>
+		<title>Note:</title>
+		<para>For M2 release of <property moreinfo="none">Jboss Tools</property> it is important to use m2eclipse
+				<ulink url="http://m2eclipse.sonatype.org/update/">stable updatesite</ulink> or the
+				<ulink url="http://m2eclipse.sonatype.org/releases/0.9.9.200906081351">latest
+				integration build</ulink> that M2 was developed against. If you want to use the
+			latest development release of m2eclipse you need to use the <ulink url="http://download.jboss.org/jbosstools/updates/nightly/trunk/">nightly
+				builds</ulink> of <property moreinfo="none">JBoss Tools</property>.</para>
+	</note>
+	<section id="create_mavenized_project">
+		<title>Creating Maven ready Seam project</title>
+		<para>Maven Integration makes the Seam Wizard capable of creating Maven ready projects to
+			let Maven get the libraries instead of using the Seam runtime.</para>
+		<para>To create a mavenized Seam project you should perform the following steps:</para>
+		<itemizedlist>
+			<listitem>
+				<para>Navigate to <emphasis>
+						<property moreinfo="none">File &gt; New Seam Project</property>.</emphasis> Give the project
+					a meaningful name, specify a target runtime and server and select the proper
+					configuration for your Seam project:</para>
+				<figure float="0">
+					<title>Starting the Mavenized Seam Project</title>
+					<mediaobject>
+						<imageobject>
+							<imagedata fileref="images/create_mavenized_seam/createMavenizedSeamProject.png"></imagedata>
+						</imageobject>
+					</mediaobject>
+				</figure>
+			</listitem>
+			<listitem>
+				<para>Click the <emphasis>
+						<property moreinfo="none">Modify</property></emphasis> button to enable the <emphasis>
+						<property moreinfo="none">Jboss Maven Integration</property></emphasis> facet:</para>
+				<figure float="0">
+					<title>Enabling the Jboss Maven Integration Facet</title>
+					<mediaobject>
+						<imageobject>
+							<imagedata fileref="images/create_mavenized_seam/jbossMavenIntegrationFacet.png"></imagedata>
+						</imageobject>
+					</mediaobject>
+				</figure>
+			</listitem>
+			<listitem>
+				<para>On the <property moreinfo="none">JBoss M2 capabilities</property> page you'll be prompted
+					to add the following maven properties: groupId, artifactId, version, packaging,
+					name and description. Here it's possible to set a maven version of Seam and
+					also decide whether to remove WTP classpath containers (where the path starts
+					with org.eclipse.jst). </para>
+				<figure float="0">
+					<title>Adjusting JBoss M2 Capabilities</title>
+					<mediaobject>
+						<imageobject>
+							<imagedata fileref="images/create_mavenized_seam/jbossM2capabilities.png"></imagedata>
+						</imageobject>
+					</mediaobject>
+				</figure>
+			</listitem>
+			<listitem>
+				<para> On the <property moreinfo="none">JSF Capabilities</property> page you can choose Maven as
+					libraries provider. This is possible when you use Maven JSF 1.2 Libraries as
+					type of JSF Implementing Library. Also it gives you capability to edit
+					Dependencies and Exclusions for the mavenized Seam project directly from the
+					wizard. </para>
+				<figure float="0">
+					<title>Using JSF Implementation libraries provided by Maven</title>
+					<mediaobject>
+						<imageobject>
+							<imagedata fileref="images/create_mavenized_seam/seamJSFImplementation.png"></imagedata>
+						</imageobject>
+					</mediaobject>
+				</figure>
+			</listitem>
+			<listitem>
+				<para>On the <property moreinfo="none">Seam Facet</property> page configure the Seam Facet settings
+					and click <emphasis>
+						<property moreinfo="none">Finish</property>:</emphasis></para>
+				<figure float="0">
+					<title>Seam Facet Settings</title>
+					<mediaobject>
+						<imageobject>
+							<imagedata fileref="images/create_mavenized_seam/seamFacetPage.png"></imagedata>
+						</imageobject>
+					</mediaobject>
+				</figure>
+			</listitem>
+		</itemizedlist>
+		<para>The organized Seam project contains five projects with the Maven nature, builder,
+			Maven classpath and the <emphasis>
+				<property moreinfo="none">pom.xml</property></emphasis> files added: projectname, projectname-ear,
+			projectname-ejb, projectname-parent and projectname-test.</para>
+		<figure float="0">
+			<title>Mavenized Seam Project</title>
+			<mediaobject>
+				<imageobject>
+					<imagedata fileref="images/create_mavenized_seam/mavenizedProjectStructure.png"></imagedata>
+				</imageobject>
+			</mediaobject>
+		</figure>
+	</section>
+	<section id="import_maven_project">
+		<title>Existing Maven Projects Import</title>
+		<para>Maven Integration includes the Seam Maven configurator which is called when importing
+			a project, changing <emphasis>
+				<property moreinfo="none">pom.xml</property></emphasis> and/or calling <emphasis>
+				<property moreinfo="none">Maven &gt; Update Project Configuration</property>.</emphasis> When
+			importing a Maven Seam project, the Seam Maven configurator picks up the settings set up
+			in <emphasis>
+				<property moreinfo="none">pom.xml</property></emphasis> and adds to the project the
+			following:</para>
+		<itemizedlist>
+			<listitem>
+				<para>Seam nature</para>
+			</listitem>
+			<listitem>
+				<para>Seam facet and dependent facets to the EJB, EAR and WAR projects</para>
+			</listitem>
+			<listitem>
+				<para>JBoss Maven Integration facet if the Maven project contains a dependency with
+					the org.jboss.seam groupId and an artifactId starting with 'jboss-seam'</para>
+			</listitem>
+			<listitem>
+				<para>other required facets (Web Module, Java, JSF, etc.)</para>
+			</listitem>
+		</itemizedlist>
+		<para>If the Seam version from <emphasis>
+				<property moreinfo="none">pom.xml</property></emphasis> matches a version of a Seam runtime
+			configured in the workspace, Seam configurator will set that runtime, otherwise no Seam
+			runtime will be set and you'll have to set it manually under <link linkend="project_pref">Seam Settings in the project preferences</link>.</para>
+		<para>Seam configurator recognizes the Seam artifacts in the following way: the view folder
+			is a web content folder from the WAR project, the source folder is the first Eclipse
+			source folder. If there is a folder containing "hot" in the name, it will be
+			chosen as the action source folder. Package is the first package that has children or
+			doesn't have any subpackage. </para>
+		<para>Configuring the Seam when importing a Maven project as well as a Seam Runtime, Seam
+			artifacts and some facets could be suspended in the JBoss Maven Integration preferences
+				(<emphasis>
+				<property moreinfo="none">Window &gt; Preferences &gt; JBoss Tools &gt; JBoss Maven
+					Integration</property></emphasis>).</para>
+		<figure float="0">
+			<title>JBoss Maven Integration Preferences</title>
+			<mediaobject>
+				<imageobject>
+					<imagedata fileref="images/create_mavenized_seam/configure_maven_integration.png"></imagedata>
+				</imageobject>
+			</mediaobject>
+		</figure>
+	</section>
+	<section>
+		<title>Relevant Resources Links</title>
+		<para>In the <ulink url="http://in.relation.to/Bloggers/UsingMavenWithJBossTools">Using
+				Maven with JBoss Tools</ulink> article written by Max Andersen you'll find
+			references to the screencasts on how to use the examples of mavenized Seam projects
+			provided by <property moreinfo="none">JBoss Tools</property>.</para>
+	</section>
+</chapter>
+
+</book>

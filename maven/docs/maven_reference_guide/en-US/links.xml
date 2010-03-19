@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<chapter>
+    <chapterinfo>
+        <keywordset>
+            <keyword>JBoss Developer Studio</keyword>
+            <keyword>JBDS</keyword>
+            <keyword>JBoss Tools</keyword>
+        </keywordset>
+    </chapterinfo>
+    <title>Relevant Resources Links</title>
+    <para>In the <ulink url="http://in.relation.to/Bloggers/UsingMavenWithJBossTools">Using
+        Maven with JBoss Tools</ulink> article written by Max Andersen you&apos;ll find
+    references to the screencasts on how to use the examples of mavenized Seam projects
+    provided by <property>JBoss Tools</property>.</para>
+</chapter>

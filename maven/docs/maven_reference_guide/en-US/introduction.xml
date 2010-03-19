@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+
+
+<chapter id="introduction">
+    <?dbhtml filename="introduction.html"?>
+    <chapterinfo>
+        <keywordset>
+           
+                <keyword>JBoss Developer Studio</keyword>
+                <keyword>Eclipse</keyword>
+                <keyword>JBoss</keyword>
+                <keyword>JBoss Tools</keyword>
+                <keyword>Maven</keyword>
+                <keyword>Seam</keyword>
+           
+        </keywordset>
+        
+    </chapterinfo>
+    <title>Introduction</title>
+    <para>Starting from 3.1 M2 version JBoss Tools  includes new Jboss Maven Integration plug-in which for now allows to create mavenized Seam projects and enable Seam tools support for imported Maven projects.</para>
+        
+    <para>The Jboss Maven Integration requires m2eclipse to be installed.</para>
+    <note>
+        <title>Note:</title>
+        <para>For M2 release of <property>Jboss Tools</property> it is important to use m2eclipse
+            <ulink url="http://m2eclipse.sonatype.org/update/">stable updatesite</ulink> or the
+            <ulink url="http://m2eclipse.sonatype.org/releases/0.9.9.200906081351">latest
+                integration build</ulink> that M2 was developed against. If you want to use the
+            latest development release of m2eclipse you need to use the <ulink
+                url="http://download.jboss.org/jbosstools/updates/nightly/trunk/">nightly
+                builds</ulink> of <property>JBoss Tools</property>.</para>
+    </note>
+</chapter>
