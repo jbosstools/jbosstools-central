@@ -17,18 +17,102 @@
         </keywordset>
         
     </chapterinfo>
+      
+    
     <title>Introduction</title>
-    <para>Starting from 3.1 M2 version JBoss Tools  includes new Jboss Maven Integration plug-in which for now allows to create mavenized Seam projects and enable Seam tools support for imported Maven projects.</para>
+    <section>
+        <title>What Maven is</title>
+        <para>Maven is a flexible project management, build and deployment tool from Apache Foundation. Maven uses Project Object Model to describe a project and consist from the core, plugins and repository, which can be local or remote.</para>
+            <figure>
+                <title>Maven Component structure</title>
+                <mediaobject>
+                    <imageobject>
+                        <imagedata fileref="images/introduction/maven_component_structure.png"/>
+                    </imageobject>
+                    
+                </mediaobject>
+            </figure>
+        <para>The core basing on pom.xml controls a process of calling plugins. Plugins contain all other functionality which Maven provides for  the projects: compile, build, deploy and etc.        </para>
+        <para>Repository is a common place for all plugins which Maven globally uses. Local repository collects  plugins snapshots downloaded from remote repository or from a set of repositories.</para>
+    </section>
+    <section>
+        <title>JBoss Maven Integration Functionality Overview</title>
+        <para>In the beginning, we propose you to look through the table of main features of JBoss Maven Tools Integration Tools: </para>
+        <table>
+            <title>Key Functionality for Maven Integration Tool</title>
+            <tgroup cols="3">
+                <colspec colnum="1" align="left" colwidth="2*"/>
+                <colspec colnum="2" colwidth="4*"/>
+                <colspec colnum="3" align="left" colwidth="2*"/>
+                <thead>
+                    <row>
+                        <entry>Feature</entry>
+                        <entry>Benefit</entry>
+                        <entry>Chapter</entry>
+                    </row>
+                </thead>
+                
+                
+                <tbody>
+                <row>
+                    <entry><para>Library provider</para></entry>
+                    <entry><para>Maven Integration Tool provide possibility to use in Eclipse libraries, which is pointed in dependencies pom.xml section, not adding them into the project Build Path.</para>
+                    </entry>
+                    <entry><para>Library provider chapter</para></entry>
+                </row>
+                    <row>
+                        <entry><para>Server deployment </para>                       </entry>
+                        <entry>Server deployment is supported by Maven Integration Tools. With it you can deploy a project to the server by default Eclipse instruments.
+                        </entry>
+                        <entry>Deploy to the JBoss Server chapter
+                        </entry>
+                    </row>
+                    <row>
+                        <entry>JBoss Maven Integration Facet
+                        </entry>
+                        <entry>The facet gives possibility to mavenizing any Dynamic Web Project.
+                        </entry>
+                        <entry>Mavenizing Dynamic Web Project chapter.
+                        </entry>
+                    </row>
+                
+                
+                
+            </tbody>
+            </tgroup>
+            
+            
+            
+        </table>
+        <para>Starting from 3.1 M2 version JBoss Tools  includes new JBoss Maven Integration plug-in which for now allows to create mavenized Seam projects and enable Seam tools support for imported Maven projects.</para>
         
-    <para>The Jboss Maven Integration requires m2eclipse to be installed.</para>
-    <note>
-        <title>Note:</title>
-        <para>For M2 release of <property>Jboss Tools</property> it is important to use m2eclipse
-            <ulink url="http://m2eclipse.sonatype.org/update/">stable updatesite</ulink> or the
-            <ulink url="http://m2eclipse.sonatype.org/releases/0.9.9.200906081351">latest
-                integration build</ulink> that M2 was developed against. If you want to use the
-            latest development release of m2eclipse you need to use the <ulink
-                url="http://download.jboss.org/jbosstools/updates/nightly/trunk/">nightly
-                builds</ulink> of <property>JBoss Tools</property>.</para>
-    </note>
+         
+    </section>
+    <section>
+        <title>Requirements and Installation</title>
+        <para>The JBoss Maven Integration requires m2eclipse to be installed.</para>
+        <note>
+            <title>Note:</title>
+            <para>For M2 release of <property>JBoss Tools</property> it is important to use m2eclipse
+                <ulink url="http://m2eclipse.sonatype.org/update/">stable update site</ulink> or the
+                <ulink url="http://m2eclipse.sonatype.org/releases/0.9.9.200906081351">latest
+                    integration build</ulink> that M2 was developed against. If you want to use the
+                latest development release of m2eclipse you need to use the <ulink
+                    url="http://download.jboss.org/jbosstools/updates/nightly/trunk/">nightly
+                    builds</ulink> of <property>JBoss Tools</property>.</para>
+        </note> 
+        </section>
+    <section>
+        <title>Other relevant resources on the topic:</title>
+        <itemizedlist>
+            <listitem>
+                <para><ulink url="http://maven.apache.org/">maven.apache.org</ulink> is a official Apache Maven website.</para>
+            </listitem>
+            <listitem>
+                <para><ulink url="http://m2eclipse.sonatype.org/">m2eclipse.sonatype.org</ulink> is a official m2eclipse (Maven Support plugin for Eclipse) website. </para>
+            </listitem>
+            
+        </itemizedlist>
+    </section>
+    
 </chapter>
