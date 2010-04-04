@@ -295,11 +295,9 @@ public class ProjectUtil {
 												includedProjects, ","); //$NON-NLS-1$
 										List<String> projectList = new ArrayList<String>();
 										while (tokenizer.hasMoreTokens()) {
-											projectList.add(tokenizer
-													.nextToken());
+											projectList.add(tokenizer.nextToken().trim());
 										}
-										project
-												.setIncludedProjects(projectList);
+										project.setIncludedProjects(projectList);
 									}
 								}
 								if (nodeName.equals("welcome")) { //$NON-NLS-1$
