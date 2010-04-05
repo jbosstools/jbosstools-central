@@ -30,12 +30,12 @@ import org.jboss.tools.project.examples.model.ProjectFix;
 
 public class WTPRuntimeFix implements ProjectExamplesFix {
 
-	private static final String BPEL = "bpel";
-	private static final String JBOSSESB_SAR = "jbossesb.sar";
-	private static final String JBOSSESB_ESB = "jbossesb.esb";
-	private static final String ESB = "esb";
-	private static final String PORTLET = "portlet";
-	private static final String REQUIRED_COMPONENTS = "required-components";
+	private static final String BPEL = "bpel"; //$NON-NLS-1$
+	private static final String JBOSSESB_SAR = "jbossesb.sar"; //$NON-NLS-1$
+	private static final String JBOSSESB_ESB = "jbossesb.esb"; //$NON-NLS-1$
+	private static final String ESB = "esb"; //$NON-NLS-1$
+	private static final String PORTLET = "portlet"; //$NON-NLS-1$
+	private static final String REQUIRED_COMPONENTS = "required-components"; //$NON-NLS-1$
 
 	public boolean canFix(Project project, ProjectFix fix) {
 		if (!ProjectFix.WTP_RUNTIME.equals(fix.getType())) {
@@ -110,6 +110,9 @@ public class WTPRuntimeFix implements ProjectExamplesFix {
 
 	private IRuntime isComponentPresent(ProjectFix fix, IRuntime runtime) {
 		String required_components = fix.getProperties().get(REQUIRED_COMPONENTS);
+		if (required_components == null) {
+			return runtime;
+		} 
 		List<String> components = tokenize(required_components);
 		if (components == null) {
 			return runtime;
@@ -147,7 +150,7 @@ public class WTPRuntimeFix implements ProjectExamplesFix {
 	}
 
 	private List<String> tokenize(String requiredComponents) {
-		StringTokenizer tokenizer = new StringTokenizer(requiredComponents, ",");
+		StringTokenizer tokenizer = new StringTokenizer(requiredComponents, ","); //$NON-NLS-1$
 		List<String> components = new ArrayList<String>();
 		while (tokenizer.hasMoreTokens()) {
 			components.add(tokenizer.nextToken().trim());
