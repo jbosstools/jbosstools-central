@@ -30,6 +30,7 @@ import org.jboss.tools.project.examples.model.ProjectFix;
 
 public class WTPRuntimeFix implements ProjectExamplesFix {
 
+	private static final String RIFTSAW_SAR = "riftsaw.sar"; //$NON-NLS-1$
 	private static final String BPEL = "bpel"; //$NON-NLS-1$
 	private static final String JBOSSESB_SAR = "jbossesb.sar"; //$NON-NLS-1$
 	private static final String JBOSSESB_ESB = "jbossesb.esb"; //$NON-NLS-1$
@@ -145,8 +146,14 @@ public class WTPRuntimeFix implements ProjectExamplesFix {
 	}
 
 	private boolean isBpelPresent(File location, IRuntime runtime) {
-		// TODO Auto-generated method stub
-		return true;
+		IJBossServerRuntime jbossRuntime = (IJBossServerRuntime)runtime.loadAdapter(IJBossServerRuntime.class, new NullProgressMonitor());
+		if (jbossRuntime != null) {
+			IPath jbossLocation = runtime.getLocation();
+			IPath configPath = jbossLocation.append(IJBossServerConstants.SERVER).append(jbossRuntime.getJBossConfiguration());
+			File configFile = configPath.toFile();
+			return exists(configFile, RIFTSAW_SAR);
+		}
+		return false;
 	}
 
 	private List<String> tokenize(String requiredComponents) {
