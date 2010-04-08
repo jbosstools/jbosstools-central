@@ -1,22 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <chapter id="tasks">
     <?dbhtml filename="tasks.html"?>
     <chapterinfo>
         <keywordset>
-            
-            
-                <keyword>Eclipse</keyword>
-                <keyword>JBoss</keyword>
-                <keyword>JBoss Tools</keyword>
-                <keyword>Maven</keyword>
-                <keyword>Seam</keyword>
-            
+            <keyword>Eclipse</keyword>
+            <keyword>JBoss</keyword>
+            <keyword>JBoss Tools</keyword>
+            <keyword>Maven</keyword>
+            <keyword>Seam</keyword>
         </keywordset>
     </chapterinfo>
-    
     <title>Tasks</title>
-    <para>This chapter will provide you with the information on how to create mavenized projects and import already existing maven project with JBoss Maven Tool.</para>
+    <para>This chapter will provide you with the information on how to create mavenized projects and
+        import already existing maven project with JBoss Maven Tool.</para>
     <section id="create_mavenized_project">
         <title>Creating Maven ready Seam project</title>
         <para>Maven Integration makes the Seam Wizard capable of creating Maven ready projects to
@@ -25,7 +21,7 @@
         <itemizedlist>
             <listitem>
                 <para>Navigate to <emphasis>
-                    <property>File &gt; New Seam Project</property>.</emphasis> Give the project
+                        <property>File &gt; New Seam Project</property>.</emphasis> Give the project
                     a meaningful name, specify a target runtime and server and select the proper
                     configuration for your Seam project:</para>
                 <figure>
@@ -41,7 +37,7 @@
             </listitem>
             <listitem>
                 <para>Click the <emphasis>
-                    <property>Modify</property></emphasis> button to enable the <emphasis>
+                        <property>Modify</property></emphasis> button to enable the <emphasis>
                         <property>Jboss Maven Integration</property></emphasis> facet:</para>
                 <figure>
                     <title>Enabling the Jboss Maven Integration Facet</title>
@@ -114,12 +110,131 @@
             </mediaobject>
         </figure>
     </section>
+    <section id="mavenized_portlet">
+        <title>Create new mavenized Dynamic Web Project with Portlets</title>
+        <para>Select in main <property>Eclipse</property> menu <emphasis><property>File > New >
+                Other</property></emphasis>. Then click <emphasis><property>Web > Dynamic Web Project</property></emphasis>. The <property>New Dynamic
+            Web Project</property> wizard appears. In this wizard you should specify  <property>Project name</property>, <property>Target
+            Runtime</property> and <property>Dynamic Web Module</property>. More about creating Web project with Portlets you can
+            find <ulink url="http://download.jboss.org/jbosstools/nightly-docs/en/jboss_portal_tools_ref_guide/html/portlet_tools_tasks.html#jboss_core_portlet">here</ulink>. </para>
+        <figure>
+            <title>New Dynamic Web Project wizard</title>
+            <mediaobject>
+                <imageobject>
+                    <imagedata fileref="images/create_mavenized_portlet/newPortletProject.png"/>
+                </imageobject>
+            </mediaobject>
+        </figure>
+        <para>Then you should to configure <property>Project Facets</property>, for that you need click <emphasis><property>Modify</property></emphasis> in
+            <property>Configuration</property> area. In <property>Project Facets</property> dialog check <property>JBoss Core Portlet Facet</property> and <property>JBoss Maven Integration Facet</property>, press <emphasis><property>OK</property></emphasis>.</para>
+        <figure>
+            <title>Project Facets</title>
+            <mediaobject>
+                <imageobject>
+                    <imagedata fileref="images/create_mavenized_portlet/mavenIntegrationFacet.png"/>
+                </imageobject>
+            </mediaobject>
+        </figure>
+        <para>On the <property>JBoss M2 capabilities</property> page you will be able to add the following <property>Maven</property>
+            properties: <property>groupId</property>, <property>artifactId</property>, <property>version</property>, <property>type of packaging</property>, <property>name</property> and <property>description</property>.</para>
+        <figure>
+            <title>JBoss M2 capabilities page</title>
+            <mediaobject>
+                <imageobject>
+                    <imagedata fileref="images/create_mavenized_portlet/jbossM2CapabilitiesPage.png"
+                    />
+                </imageobject>
+            </mediaobject>
+        </figure>
+        <para>On the <property>JBoss Portlet Capabilities</property> page configure <property>Portlet Implementation Library</property>.
+            Select <property>Maven Portlet 2.0 Libraries</property> provided by <property>JBoss Maven Integration Tool</property>. Then you
+            can configure <property>Dependencies</property> and <property>Exclusions</property>. </para>
+        <figure>
+            <title>JBoss Portlet Capabilities page</title>
+            <mediaobject>
+                <imageobject>
+                    <imagedata
+                        fileref="images/create_mavenized_portlet/jbossPortletCapabilitiesPage.png"/>
+                </imageobject>
+            </mediaobject>
+        </figure>
+        <para>Thereafter click <emphasis><property>Finished</property></emphasis> and you will get a mavenized <property>Dynamic Web Project</property> with
+            <property>Portlets</property>. In the same way you can create <property>JSF</property> and <property>Seam Project</property> with <property>JBoss Portlet</property>. </para>
+        <figure>
+            <title>JBoss Portlet Capabilities page</title>
+            <mediaobject>
+                <imageobject>
+                    <imagedata
+                        fileref="images/create_mavenized_portlet/portletProjectWithMavenIntegration.png"
+                    />
+                </imageobject>
+            </mediaobject>
+        </figure>
+    </section>
+    <section>
+        <title>Create new JPA project with mavenized Hibernate support</title>
+        <para>To create new <property>JPA</property> project select in main Eclipse menu <emphasis><property>File > New > Other</property></emphasis>. Then choose
+            <emphasis><property>JPA > JPA Project</property></emphasis>. At the first wizard page enter <property>Project name</property>, select <property>Target Runtime</property>.To add Maven Integration you need to configure <property>Project Facets</property>, for that click <emphasis><property>Modify</property></emphasis> button.</para>
+        <figure>
+            <title>New JPA project wizard</title>
+            <mediaobject>
+                <imageobject>
+                    <imagedata
+                        fileref="images/create_jpa_with_mavenized_hibernate/createJPAProject.png"/>
+                </imageobject>
+            </mediaobject>
+        </figure>
+        <para>On the <property>Project Facets</property> page check <property>JBoss Maven Integration Facet</property> .</para>
+        <figure>
+            <title>Project Facets</title>
+            <mediaobject>
+                <imageobject>
+                    <imagedata
+                        fileref="images/create_jpa_with_mavenized_hibernate/projectFacets.png"/>
+                </imageobject>
+            </mediaobject>
+        </figure>
+        <para>On the <property>JBoss M2 capabilities</property> page you need specify <property>groupId</property>, <property>artifactId</property>, <property>version</property>, <property>type
+            of packaging</property>, <property>name</property> and <property>description</property> <property>Maven</property> properties. </para>
+        <figure>
+            <title>JBoss M2 capabilities page</title>
+            <mediaobject>
+                <imageobject>
+                    <imagedata
+                        fileref="images/create_jpa_with_mavenized_hibernate/jbossM2CapabilitiesPage.png"
+                    />
+                </imageobject>
+            </mediaobject>
+        </figure>
+        <para>On the <property>JPA Facet </property>page you need select <property>Hibernate</property> as <property>Target Platform</property> and <property>Hibernate 3.3.2 Library</property> as <property>JPA Implementation Type</property>. After that you can <property>Add</property> or <property>Remove</property> <property>Dependencies</property> and <property>Exclusions</property>. At the end you need to choose <property>Database Connection</property> and configuring its options. </para>
+        <figure>
+            <title>Configuring JPA Facet for mavenized Hibernate support</title>
+            <mediaobject>
+                <imageobject>
+                    <imagedata fileref="images/create_jpa_with_mavenized_hibernate/JPAFacet.png"/>
+                </imageobject>
+            </mediaobject>
+        </figure>
+        <para>Click <emphasis><property>Finish</property></emphasis> and you will see mavenized <property>JPA</property> project with <property>Hibernate</property> support. <property>Hibernate</property>
+            and other libraries used with <property>JPA</property> are managed by <property>Maven Integration Tools</property> and aren't
+            included in <property>Build Path</property>. </para>
+        <figure>
+            <title>Configuring JPA Facet for mavenized Hibernate support</title>
+            <mediaobject>
+                <imageobject>
+                    <imagedata
+                        fileref="images/create_jpa_with_mavenized_hibernate/JPAProjectWithMavenizedHibernate.png"
+                    />
+                </imageobject>
+            </mediaobject>
+        </figure>
+    </section>
     <section id="import_maven_project">
         <title>Existing Maven Projects Import</title>
         <para>Maven Integration includes the Seam Maven configurator which is called when importing
             a project, changing <emphasis>
                 <property>pom.xml</property></emphasis> and/or calling <emphasis>
-                    <property>Maven &gt; Update Project Configuration</property>.</emphasis> When
+                <property>Maven &gt; Update Project Configuration</property>.</emphasis> When
             importing a Maven Seam project, the Seam Maven configurator picks up the settings set up
             in <emphasis>
                 <property>pom.xml</property></emphasis> and adds to the project the
@@ -140,10 +255,10 @@
             </listitem>
         </itemizedlist>
         <para>If the Seam version from <emphasis>
-            <property>pom.xml</property></emphasis> matches a version of a Seam runtime
+                <property>pom.xml</property></emphasis> matches a version of a Seam runtime
             configured in the workspace, Seam configurator will set that runtime, otherwise no Seam
-            runtime will be set and you&apos;ll have to set it manually under <link
-                linkend="project_pref">Seam Settings in the project preferences</link>.</para>
+            runtime will be set and you&apos;ll have to set it manually under Seam Settings in the
+            project preferences.</para>
         <para>Seam configurator recognizes the Seam artifacts in the following way: the view folder
             is a web content folder from the WAR project, the source folder is the first Eclipse
             source folder. If there is a folder containing &quot;hot&quot; in the name, it will be
@@ -151,7 +266,7 @@
             doesn&apos;t have any subpackage. </para>
         <para>Configuring the Seam when importing a Maven project as well as a Seam Runtime, Seam
             artifacts and some facets could be suspended in the JBoss Maven Integration preferences
-            (<emphasis>
+                (<emphasis>
                 <property>Window &gt; Preferences &gt; JBoss Tools &gt; JBoss Maven
                     Integration</property></emphasis>).</para>
         <figure>
@@ -164,8 +279,4 @@
             </mediaobject>
         </figure>
     </section>
-    
-      
-    
-    
 </chapter>
