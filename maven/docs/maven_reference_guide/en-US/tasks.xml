@@ -171,7 +171,7 @@
             </mediaobject>
         </figure>
     </section>
-    <section>
+    <section id="jpa_project_with_maven">
         <title>Create new JPA project with mavenized Hibernate support</title>
         <para>To create new <property>JPA</property> project select in main Eclipse menu <emphasis><property>File > New > Other</property></emphasis>. Then choose
             <emphasis><property>JPA > JPA Project</property></emphasis>. At the first wizard page enter <property>Project name</property>, select <property>Target Runtime</property>.To add Maven Integration you need to configure <property>Project Facets</property>, for that click <emphasis><property>Modify</property></emphasis> button.</para>
@@ -229,7 +229,26 @@
             </mediaobject>
         </figure>
     </section>
-    <section>
+    <section id="maven_archetype">
+        <title>Create new Seam Project with Portlets using Archetypes</title>
+        <para>To create new Maven project with Seam and Portlets from archetype you should have Seam Runtime 2.2 and JBoss AS 5.1.0 Server.</para>
+        <para>If you have necessary runtimes select File > New > Project From the Navigator or Project Explorer. After that The Select a wizard dialog appears.</para>
+        <figure>
+            <title>Select a wizard dialog</title>
+            <mediaobject>
+                <imageobject>
+                    <imagedata fileref="image/create_maven_project_with_archetype/selectWizardDialog.png"/>
+                </imageobject>
+                
+            </mediaobject>
+        </figure>
+        <para>Select Maven > Maven Project and you will see a New Maven Project wizard.
+        </para>
+    
+        
+    </section>
+    
+    <section id="maven_project_import">
         <title>Existing Maven Projects Import</title>
         <section id="import_maven_project">
         <title>Seam Projects Import</title>
