@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<chapter id="referencies">
+    <title>References</title>
+    <section>
+        <title>Jboss Maven Integration facet</title>
+        <para><property>Jboss Maven Integration</property> facet is a <property>Project Facet</property> which add <property>Maven</property> capabilities to the target project. This facet adds a <property>Maven</property> nature, builder and classpath container. Also <property>Maven Integration</property> facet can detect <property>EJB</property>, <property>WAR</property> or <property>EAR</property> facet and add corresponding maven plugins for them. Also <property>Maven Integration</property> facet provides the library providers. More about <property>Maven Integration</property> library providers you can read here.
+            <figure>
+                <title>JBoss Maven Integration facet</title>
+                <mediaobject>
+                    <imageobject>
+                        <imagedata fileref="images/references/JBossMavenIntegrationFacet.png"/>
+                    </imageobject>
+                    
+                </mediaobject>
+            </figure>
+            
+        </para>
+    </section>
+    
+    <section id="preferencespage">
+        <title>JBoss Maven Integration preference page</title>
+        <para>To adjust  <property>Maven</property> project import setting for <property>Jboss Tools</property> projects you need open <property>Preferences</property> dialog by clicking <emphasis><property>Window > Preferences</property></emphasis> and select <emphasis><property>JBoss Tools >Jboss Maven Integration</property></emphasis>. This page provides configuration for <property>Seam</property>, <property>JSF</property> and <property>Portlet</property> projects import.
+        </para>
+        <figure>
+            <title>JBoss Maven Integration preference page</title>
+            <mediaobject>
+                <imageobject>
+                    <imagedata fileref="images/references/JBossMavenIntegrationPreferencePage.png"/>
+                </imageobject>
+                
+            </mediaobject>
+        </figure>
+        <para>On the Jboss Maven Integration preferences page the following preferences are available:
+        </para>
+        <table>
+            <title>JBoss Maven Integration Preferences</title>
+            <tgroup cols="3">
+                <colspec colnum="1" align="left" colwidth="3*"/>
+                <colspec colnum="2" colwidth="4*"/>
+                <colspec colnum="3" align="left" colwidth="2*"/>
+                <thead>
+                    <row>
+                        <entry>Option</entry>
+                        <entry>Description</entry>
+                        <entry>Default</entry>
+                    </row>
+                </thead>
+                
+                
+                <tbody>
+                    <row>
+                        <entry><para>Configure Seam when importing Maven projects                        </para></entry>
+                        <entry><para>If on,the Maven Integration Tool starts to check Seam dependencies and switch on the Seam Configurator for existing Maven projects import.</para>
+                        </entry>
+                        <entry><para>On</para></entry>
+                    </row>
+                    <row>
+                        <entry><para>Configure Seam Runtime</para></entry>
+                        <entry><para>If on, the Maven Integration Tool will try to define Seam Runtime basing on information from pom.xml and workspace configuration.</para></entry>
+                        <entry><para>On</para></entry>
+                    </row>
+                    <row>
+                        <entry><para>Configure Seam Artifacts(view folder, model source folder and package...)</para>
+                            
+                        </entry>
+                        <entry><para>If the option is checked, the Seam configurator will start to recognize Seam Artifacts during importing Seam Maven project.
+                        </para>
+                        </entry>
+                        <entry><para>On</para>
+                        </entry>
+                    </row>
+                    <row>
+                        <entry><para>Configure JSF facet when  importing Maven projects
+                        </para></entry>
+                        <entry><para>This option is switch on picking up  JSF facet from a pom.xml
+                        </para>     </entry>
+                        <entry><para>On</para>
+                        </entry>
+                    </row>
+                    <row><entry><para>Configure JBoss Portlet Core when  importing Maven projects
+                    </para></entry>
+                    <entry></entry>
+                        <entry><para>On</para></entry>
+                    </row>
+                    <row>
+                        <entry><para>Configure JBoss JSF Portlet facet when importing Maven projects
+                        </para></entry>
+                        <entry></entry>
+                        <entry><para>On</para></entry>
+                                               
+                    </row>
+                    <row>
+                        <entry><para>Configure JBoss Seam Portlet facet when  importing Maven projects
+                        </para></entry>
+                        <entry></entry>
+                        <entry><para>Off</para>
+                        </entry>
+                        
+                    </row>
+                    
+                    
+                    
+                    
+                </tbody>
+            </tgroup>
+            
+            
+            
+        </table>
+        
+    </section>
+    
+</chapter>
+    
