@@ -5,7 +5,9 @@
 [<!ENTITY introduction SYSTEM "introduction.xml">
 
 <!ENTITY tasks SYSTEM "tasks.xml">
+<!ENTITY references SYSTEM "references.xml">
 <!ENTITY links SYSTEM "links.xml">
+
 
 
 <!ENTITY seamlink "../../seam/html_single/index.html">
@@ -51,5 +53,6 @@
     <toc/>
     &introduction;
     &tasks;
+    &references;    
     &links;
 </book>

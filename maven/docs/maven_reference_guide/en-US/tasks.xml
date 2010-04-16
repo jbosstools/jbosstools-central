@@ -229,8 +229,10 @@
             </mediaobject>
         </figure>
     </section>
-    <section id="import_maven_project">
+    <section>
         <title>Existing Maven Projects Import</title>
+        <section id="import_maven_project">
+        <title>Seam Projects Import</title>
         <para>Maven Integration includes the Seam Maven configurator which is called when importing
             a project, changing <emphasis>
                 <property>pom.xml</property></emphasis> and/or calling <emphasis>
@@ -254,29 +256,19 @@
                 <para>other required facets (Web Module, Java, JSF, etc.)</para>
             </listitem>
         </itemizedlist>
-        <para>If the Seam version from <emphasis>
-                <property>pom.xml</property></emphasis> matches a version of a Seam runtime
-            configured in the workspace, Seam configurator will set that runtime, otherwise no Seam
-            runtime will be set and you&apos;ll have to set it manually under Seam Settings in the
-            project preferences.</para>
+           <para>The Maven Integration Tool will try to define Seam Runtime for the project. If it find that the version from pom.xml matches a version of a Seam runtime, a default runtime for the Seam facet exists or there is a non-default runtime matching the Seam facet then runtime will be set. Otherwise no any Seam runtime will be set and you need manually set it up. 
+            </para>
         <para>Seam configurator recognizes the Seam artifacts in the following way: the view folder
             is a web content folder from the WAR project, the source folder is the first Eclipse
             source folder. If there is a folder containing &quot;hot&quot; in the name, it will be
             chosen as the action source folder. Package is the first package that has children or
             doesn&apos;t have any subpackage. </para>
         <para>Configuring the Seam when importing a Maven project as well as a Seam Runtime, Seam
-            artifacts and some facets could be suspended in the JBoss Maven Integration preferences
+            artifacts and some facets could be suspended in the <link linkend="preferencespage">JBoss Maven Integration preferences</link>
                 (<emphasis>
                 <property>Window &gt; Preferences &gt; JBoss Tools &gt; JBoss Maven
                     Integration</property></emphasis>).</para>
-        <figure>
-            <title>JBoss Maven Integration Preferences</title>
-            <mediaobject>
-                <imageobject>
-                    <imagedata
-                        fileref="images/create_mavenized_seam/configure_maven_integration.png"/>
-                </imageobject>
-            </mediaobject>
-        </figure>
+        
+        </section>
     </section>
 </chapter>
