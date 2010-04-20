@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <chapter id="referencies">
     <title>References</title>
-    <section>
+    <section id="mavenintegrationfacets">
         <title>Jboss Maven Integration facet</title>
         <para><property>Jboss Maven Integration</property> facet is a <property>Project Facet</property> which add <property>Maven</property> capabilities to the target project. This facet adds a <property>Maven</property> nature, builder and classpath container. Also <property>Maven Integration</property> facet can detect <property>EJB</property>, <property>WAR</property> or <property>EAR</property> facet and add corresponding maven plugins for them. Also <property>Maven Integration</property> facet provides the library providers. More about <property>Maven Integration</property> library providers you can read here.
             <figure>
@@ -109,6 +109,65 @@
         </table>
         
     </section>
+    <section>
+        <title>Maven Archetypes compatible with JBoss Tools</title>
+        <para>Also <property>JBoss Maven Integration Tool</property> contains <property>Maven Archetypes</property> adapted to <property>JBoss Tools</property>. You can <link linkend="maven_archetype">use a provided archetype to get a ready to work project</link> and deploy the generated <property>WAR</property> to the <property>JBoss server</property>.
+        </para>
+        <para>For  the present situation following archetypes are available to use:</para>
+        <table>
+            <title>Available Archetypes with JBoss Tools support</title>
+            <tgroup cols="2">
+                <colspec colnum="1" align="left" colwidth="2*"/>
+                <colspec colnum="2" colwidth="4*"/>
+                <thead>
+                    <row>
+                        <entry>Archetype                    </entry>
+                        <entry>Parameters                    </entry>
+                        
+                    </row>
+                </thead>
+                <tbody>
+                   <row>
+                       <entry><para>JSF 1.2 Basic</para>
+                       </entry>
+                       <entry>
+                           <para>Archetype Group Id: <property>org.jboss.portletbridge.archetypes</property>                           </para>
+                           <para>Archetype Artifact Id: <property>1.2-basic</property>                           </para>
+                           <para>Archetype Version: <property>2.0.0.BETA </property>
+                           </para>
+                           <para>Repository URL: <property>http://anonsvn.jboss.org/repos/jbosstools/workspace/snjeza/archetypes</property>  </para>
+                       </entry>
+                   </row> 
+                    <row>
+                        <entry><para>RichFaces Basic</para></entry>
+                        <entry>
+                            <para>Archetype Group Id: <property>org.jboss.portletbridge.archetypes</property>                           </para>
+                            <para>Archetype Artifact Id: <property>richfaces-basic</property>                           </para>
+                            <para>Archetype Version: <property>2.0.0.BETA </property>
+                            </para>
+                            <para>Repository URL: <property>http://anonsvn.jboss.org/repos/jbosstools/workspace/snjeza/archetypes</property>  </para>
+                            
+                        </entry>
+                    </row>
+                    <row>
+                        <entry><para>Seam Basic (Modular EAR)</para></entry>
+                        <entry>
+                            <para>Archetype Group Id: <property>org.jboss.portletbridge.archetypes</property>                           </para>
+                            <para>Archetype Artifact Id: <property>seam-basic</property>                           </para>
+                            <para>Archetype Version: <property>2.0.1.BETA </property>
+                            </para>
+                            <para>Repository URL: <property>http://anonsvn.jboss.org/repos/jbosstools/workspace/snjeza/archetypes</property>  </para>
+                            
+                        </entry>
+                    </row>
+                </tbody>
+            </tgroup>
+            
+            
+            
+        </table>
+    </section>
+    
     
 </chapter>
     

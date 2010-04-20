@@ -231,20 +231,108 @@
     </section>
     <section id="maven_archetype">
         <title>Create new Seam Project with Portlets using Archetypes</title>
-        <para>To create new Maven project with Seam and Portlets from archetype you should have Seam Runtime 2.2 and JBoss AS 5.1.0 Server.</para>
-        <para>If you have necessary runtimes select File > New > Project From the Navigator or Project Explorer. After that The Select a wizard dialog appears.</para>
+        
+        <para>To create new <property>Maven project</property> with <property>Seam</property> and <property>Portlets</property> from archetype you should have <property>Seam Runtime 2.2</property> and <property>JBoss AS 5.1.0 Server</property>.</para>
+        <para>If you have necessary runtimes select <emphasis><property>File > New > Project</property></emphasis> from the <property>Navigator</property> or <property>Project Explorer</property>. After that <property>The Select a wizard</property> dialog appears.</para>
         <figure>
             <title>Select a wizard dialog</title>
             <mediaobject>
                 <imageobject>
-                    <imagedata fileref="image/create_maven_project_with_archetype/selectWizardDialog.png"/>
+                    <imagedata fileref="images/create_maven_project_with_archetype/selectWizardDialog.png"/>
                 </imageobject>
                 
             </mediaobject>
         </figure>
-        <para>Select Maven > Maven Project and you will see a New Maven Project wizard.
+        <para>Select <emphasis><property>Maven > Maven Project</property></emphasis> and you will see a <property>New Maven Project</property> wizard. Keep defaults and click <emphasis><property>Next</property></emphasis>.
         </para>
-    
+        <figure>
+            <title>New Maven Project wizard</title>
+            <mediaobject>
+                <imageobject>
+                    <imagedata fileref="images/create_maven_project_with_archetype/newMavenProject.png"/>
+                </imageobject>
+                
+            </mediaobject>
+        </figure>
+        <para>On <property>Select an Archetype</property> page click <emphasis><property>Add Archetype</property></emphasis> button.</para>
+        <figure>
+            <title>Select an Archetype page</title>
+            <mediaobject>
+                <imageobject>
+                    <imagedata fileref="images/create_maven_project_with_archetype/selectArchetypePage.png"/>
+                </imageobject>               
+            </mediaobject>
+        </figure>
+        <para>In <property>Add Archetype</property> dialog you need specify following:</para>
+        <itemizedlist>
+            <listitem><para>Archetype Group Id: <property>org.jboss.portletbridge.archetypes</property></para> 
+            </listitem>
+            <listitem><para>Archetype Artifact Id: <property>seam-basic</property></para> 
+            </listitem>
+            <listitem><para>Archetype Version: <property>2.0.1.BETA</property> </para>
+            </listitem>
+            <listitem><para>Repository URL: <property>http://anonsvn.jboss.org/repos/jbosstools/workspace/snjeza/archetypes</property></para>
+            </listitem>
+        </itemizedlist>
+        <para>Then click <emphasis><property>OK</property></emphasis>.</para>
+        <figure>
+            <title>Add Archetype dialog            </title>
+            <mediaobject>
+                <imageobject>
+                    <imagedata fileref="images/create_maven_project_with_archetype/addArchetypeDialog.png"/>
+                </imageobject>               
+            </mediaobject>
+        </figure>
+        <para>On <property>Select an Archetype</property> page make sure that in <property>Catalog</property> list you select <emphasis><property>Nexus Indexer</property></emphasis> or <emphasis><property>All Catalogs</property></emphasis> option.        </para>
+        <para>After that select the <property>org.jboss.portletbridge.archetypes:seam-basic:2.0.1.BETA</property> archetype and click <emphasis><property>Next</property></emphasis>.
+        </para>
+        <note>
+            <title>Note:</title>
+            <para>If you choose <property>Default Local</property> in  <property>Catalog</property> list you can get a error while creating <property>Maven</property> Project. To avoid this emergency you need to select  <property>Nexus Indexer Catalog</property>.
+            </para>
+        </note>
+        <figure>
+            <title>Select an Archetype page with added PortletBridge Archetype</title>
+            <mediaobject>
+                <imageobject>
+                    <imagedata fileref="images/create_maven_project_with_archetype/selectArchetypePageWithSeamBasic.png"/>
+                </imageobject>               
+            </mediaobject>
+        </figure>
+        <para>On the <property>Archetype parameters</property> page you need complete the <property>Group Id</property>, <property>Artifact Id</property>, <property>Version</property>  fields and enter the <property>Package Name</property>. Then you should click <emphasis><property>Finish</property></emphasis>.
+        </para>
+        <figure>
+            <title>Archetype parameters page </title>
+            <mediaobject>
+                <imageobject>
+                    <imagedata fileref="images/create_maven_project_with_archetype/archetypeParametersPage.png"/>
+                </imageobject>
+                
+            </mediaobject>
+        </figure>
+        <para>As a result you will get the mavenized <property>Seam</property> project with <property>Portlets</property> supports. The archetype create also <property>EAR</property> and <property>EJB</property> projects. The <property>WEB</property> projects is project for deployment while seam-basic project is parent for the <property>EAR</property>, <property>EJB</property> and <property>WEB</property> projects.
+        </para>
+        <figure>
+            <title>Created Maven project in Package Explorer</title>
+            <mediaobject>
+                <imageobject>
+                    <imagedata fileref="images/create_maven_project_with_archetype/createdMavenProjectWithSeamAndPortlet.png"/>
+                </imageobject>
+                
+            </mediaobject>
+        </figure>
+        <para>The created project has a configured <property>Project Facets</property> such as <property>Seam</property>, <property>Maven Integration</property> and <property>JSF</property> facets. Also <property>Seam</property> settings is  automatically configured for the project. In generated project the <property>Code Assist</property>, <property>syntax highlighting</property> and <property>incremental deployment</property> are supported too.
+        </para>
+        <section id="archetypes_links">
+            <title>Relevant Resources Links</title>
+            <para>You can find screencast from <property>Snjezana Peco</property> on <ulink url="http://screencast.com/t/OGMxMmFk">http://screencast.com/t/OGMxMmFk</ulink> .            </para>
+            <para>General information about <property>Maven Archetypes</property> may be found <ulink url="http://maven.apache.org/guides/introduction/introduction-to-archetypes.html">here</ulink> and details about <property>Portlets Archetypes</property> are located <ulink url="http://www.jboss.org/files/portletbridge/docs/1.0.0.CR2/en/html_single/index.html#archetypes">here</ulink>.
+            </para>
+        </section>
+        
+        
+        
+        
         
     </section>
     
