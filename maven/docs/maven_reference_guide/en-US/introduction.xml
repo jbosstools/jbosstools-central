@@ -20,7 +20,7 @@
       
     
     <title>Introduction</title>
-    <section>
+    <section id="whatmavenis">
         <title>What Maven is</title>
         <para>Maven is a flexible project management, build and deployment tool from Apache Foundation. Maven uses Project Object Model to describe a project and consist from the core, plugins and repository, which can be local or remote.</para>
             <figure>
@@ -54,28 +54,29 @@
                 
                 
                 <tbody>
-                <row>
-                    <entry><para>Library provider</para></entry>
-                    <entry><para>Maven Integration Tool provide possibility to use in Eclipse libraries, which is pointed in dependencies pom.xml section, not adding them into the project Build Path.</para>
-                    </entry>
-                    <entry><para>Library provider chapter</para></entry>
-                </row>
                     <row>
-                        <entry><para>Server deployment </para>                       </entry>
-                        <entry>Server deployment is supported by Maven Integration Tools. With it you can deploy a project to the server by default Eclipse instruments.
-                        </entry>
-                        <entry>Deploy to the JBoss Server chapter
-                        </entry>
-                    </row>
-                    <row>
-                        <entry>JBoss Maven Integration Facet
+                        <entry>J<property>Boss Maven Integration Facet</property>
                         </entry>
                         <entry>The facet gives possibility to mavenizing any Dynamic Web Project.
                         </entry>
-                        <entry>Mavenizing Dynamic Web Project chapter.
+                        <entry><link linkend="mavenintegrationfacet">JBoss Maven Integration facet page</link>
                         </entry>
                     </row>
-                
+                    
+                <row>
+                    <entry><para><property>Library providers</property></para></entry>
+                    <entry><para>Maven Integration Tool provide possibility to use libraries, which is pointed in dependencies pom.xml section, not adding them into the project Build Path.</para>
+                    </entry>
+                    <entry><para><link linkend="libraryproviders">Library providers chapter</link></para></entry>
+                </row>
+                    <row>
+                        <entry><para><property>Server deployment</property> </para>                       </entry>
+                        <entry><para>Server deployment is supported by Maven Integration Tools. With it you can deploy a project to the server by default Eclipse instruments.
+                        </para></entry>
+                        <entry><para><link linkend="serverdeploy">Deploy to the JBoss Server chapter</link></para>
+                        </entry>
+                    </row>
+                    
                 
                 
             </tbody>
@@ -88,21 +89,38 @@
         
          
     </section>
-    <section>
-        <title>Requirements and Installation</title>
-        <para>The JBoss Maven Integration requires m2eclipse to be installed.</para>
-        <note>
-            <title>Note:</title>
-            <para>For M2 release of <property>JBoss Tools</property> it is important to use m2eclipse
-                <ulink url="http://m2eclipse.sonatype.org/update/">stable update site</ulink> or the
-                <ulink url="http://m2eclipse.sonatype.org/releases/0.9.9.200906081351">latest
-                    integration build</ulink> that M2 was developed against. If you want to use the
-                latest development release of m2eclipse you need to use the <ulink
-                    url="http://download.jboss.org/jbosstools/updates/nightly/trunk/">nightly
-                    builds</ulink> of <property>JBoss Tools</property>.</para>
-        </note> 
+    <section id="requirements">
+        <title>Requirements</title>
+        <para><property>JBoss Maven Integration Tool </property>needs the following requirements: </para>
+      <itemizedlist>
+          <listitem>
+              <para><property>Eclipse 3.5.2</property> with <property>JBoss Tools 3.1</property> (you can download latest version from <ulink url="http://www.jboss.org/tools/download.html
+                  ">JBoss Tool Download page</ulink>
+              </para>
+          </listitem>
+          <listitem>
+              <para><property>JBoss AS 4.2</property>, <property>EAP 4.3</property> or <property>AS 5.0 GA</property>
+              </para>
+          </listitem>
+          <listitem>
+              <para><property>Seam 2.1.1 GA</property>
+              </para>
+          </listitem>
+          <listitem>
+              <para><property>m2eclipse 0.10</property> or higher from <ulink url="http://m2eclipse.sonatype.org/sites/m2e/
+                  ">Sonatype's Update Site</ulink></para>
+                            
+          </listitem>
+          <listitem>
+              <para><property>Maven Integration</property> for <property>WTP</property> which you can find on  <ulink url="http://m2eclipse.sonatype.org/sites/m2e-extras/
+                  ">Sonatype's Extras Update Site</ulink>
+              </para>
+          </listitem>
+      </itemizedlist>
+        
+      
         </section>
-    <section>
+    <section id="resources">
         <title>Other relevant resources on the topic:</title>
         <itemizedlist>
             <listitem>
