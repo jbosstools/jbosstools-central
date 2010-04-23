@@ -10,13 +10,13 @@
             <keyword>Seam</keyword>
         </keywordset>
     </chapterinfo>
-    <title>Tasks</title>
+    <title>JBoss Maven Integration Tasks</title>
     <para>This chapter will provide you with the information on how to create mavenized projects and
-        import already existing maven project with JBoss Maven Tool.</para>
+        import already existing maven project with <property>JBoss Maven Tool</property>.</para>
     <section id="create_mavenized_project">
         <title>Creating Maven ready Seam project</title>
-        <para>Maven Integration makes the Seam Wizard capable of creating Maven ready projects to
-            let Maven get the libraries instead of using the Seam runtime.</para>
+        <para><property>Maven Integration</property> makes the <property>Seam Wizard</property> capable of creating <property>Maven</property> ready projects to
+            let <property>Maven</property> get the libraries instead of using the <property>Seam</property> runtime.</para>
         <para>To create a mavenized Seam project you should perform the following steps:</para>
         <itemizedlist>
             <listitem>
@@ -52,10 +52,10 @@
             </listitem>
             <listitem>
                 <para>On the <property>JBoss M2 capabilities</property> page you&apos;ll be prompted
-                    to add the following maven properties: groupId, artifactId, version, packaging,
-                    name and description. Here it&apos;s possible to set a maven version of Seam and
-                    also decide whether to remove WTP classpath containers (where the path starts
-                    with org.eclipse.jst). </para>
+                    to add the following maven properties: <property>groupId</property>, <property>artifactId</property>, <property>version</property>, <property>packaging</property>,
+                    <property>name</property> and <property>description</property>. Here it&apos;s possible to set a <property>Maven</property> version of <property>Seam</property> and
+                    also decide whether to remove <property>WTP</property> classpath containers (where the path starts
+                    with <property>org.eclipse.jst</property>). </para>
                 <figure>
                     <title>Adjusting JBoss M2 Capabilities</title>
                     <mediaobject>
@@ -67,10 +67,10 @@
                 </figure>
             </listitem>
             <listitem>
-                <para> On the <property>JSF Capabilities</property> page you can choose Maven as
-                    libraries provider. This is possible when you use Maven JSF 1.2 Libraries as
-                    type of JSF Implementing Library. Also it gives you capability to edit
-                    Dependencies and Exclusions for the mavenized Seam project directly from the
+                <para> On the <property>JSF Capabilities</property> page you can choose <property>Maven</property> as
+                    libraries provider. This is possible when you use <property>Maven JSF 1.2 Libraries</property> as
+                    type of <property>JSF Implementing Library</property>. Also it gives you capability to edit
+                    <property>Dependencies</property> and <property>Exclusions</property> for the mavenized <property>Seam</property> project directly from the
                     wizard. </para>
                 <figure>
                     <title>Using JSF Implementation libraries provided by Maven</title>
@@ -83,7 +83,7 @@
                 </figure>
             </listitem>
             <listitem>
-                <para>On the <property>Seam Facet</property> page configure the Seam Facet settings
+                <para>On the <property>Seam Facet</property> page configure the <property>Seam Facet</property> settings
                     and click <emphasis>
                         <property>Finish</property>:</emphasis></para>
                 <figure>
@@ -96,8 +96,8 @@
                 </figure>
             </listitem>
         </itemizedlist>
-        <para>The organized Seam project contains five projects with the Maven nature, builder,
-            Maven classpath and the <emphasis>
+        <para>The organized <property>Seam</property> project contains five projects with the <property>Maven</property> nature, builder,
+            <property>Maven</property> classpath and the <emphasis>
                 <property>pom.xml</property></emphasis> files added: projectname, projectname-ear,
             projectname-ejb, projectname-parent and projectname-test.</para>
         <figure>
@@ -115,8 +115,8 @@
         <para>Select in main <property>Eclipse</property> menu <emphasis><property>File > New >
                 Other</property></emphasis>. Then click <emphasis><property>Web > Dynamic Web Project</property></emphasis>. The <property>New Dynamic
             Web Project</property> wizard appears. In this wizard you should specify  <property>Project name</property>, <property>Target
-            Runtime</property> and <property>Dynamic Web Module</property>. More about creating Web project with Portlets you can
-            find <ulink url="http://download.jboss.org/jbosstools/nightly-docs/en/jboss_portal_tools_ref_guide/html/portlet_tools_tasks.html#jboss_core_portlet">here</ulink>. </para>
+            Runtime</property> and <property>Dynamic Web Module</property>. More about creating <property>Web</property> project with <property>Portlets</property> you can
+            find in <ulink url="http://download.jboss.org/jbosstools/nightly-docs/en/jboss_portal_tools_ref_guide/html/portlet_tools_tasks.html#jboss_core_portlet">JBoss Portlet Tools User Guide</ulink>. </para>
         <figure>
             <title>New Dynamic Web Project wizard</title>
             <mediaobject>
@@ -326,7 +326,7 @@
         <section id="archetypes_links">
             <title>Relevant Resources Links</title>
             <para>You can find screencast from <property>Snjezana Peco</property> on <ulink url="http://screencast.com/t/OGMxMmFk">http://screencast.com/t/OGMxMmFk</ulink> .            </para>
-            <para>General information about <property>Maven Archetypes</property> may be found <ulink url="http://maven.apache.org/guides/introduction/introduction-to-archetypes.html">here</ulink> and details about <property>Portlets Archetypes</property> are located <ulink url="http://www.jboss.org/files/portletbridge/docs/1.0.0.CR2/en/html_single/index.html#archetypes">here</ulink>.
+            <para>General information about <property>Maven Archetypes</property> may be found on <ulink url="http://maven.apache.org/guides/introduction/introduction-to-archetypes.html">Introduction to Archetypes page</ulink> and details about <property>Portlets Archetypes</property> are located  on <ulink url="http://www.jboss.org/files/portletbridge/docs/1.0.0.CR2/en/html_single/index.html#archetypes">Maven Portlet Archetypes page</ulink>.
             </para>
         </section>
         
@@ -338,7 +338,7 @@
     
     <section id="maven_project_import">
         <title>Existing Maven Projects Import</title>
-        <section id="import_maven_project">
+        <section id="import_seam_project">
         <title>Seam Projects Import</title>
         <para>Maven Integration includes the Seam Maven configurator which is called when importing
             a project, changing <emphasis>
@@ -363,19 +363,35 @@
                 <para>other required facets (Web Module, Java, JSF, etc.)</para>
             </listitem>
         </itemizedlist>
-           <para>The Maven Integration Tool will try to define Seam Runtime for the project. If it find that the version from pom.xml matches a version of a Seam runtime, a default runtime for the Seam facet exists or there is a non-default runtime matching the Seam facet then runtime will be set. Otherwise no any Seam runtime will be set and you need manually set it up. 
+            <para>The Maven Integration Tool will try to define <property>Seam Runtime</property> for the project. If it find that the version from <property>pom.xml</property> matches a version of a <property>Seam Runtime</property>, a default runtime for the <property>Seam </property>facet exists or there is a non-default runtime matching the <property>Seam</property> facet then the runtime will be set. Otherwise no any <property>Seam</property> runtime will be set and you need manually set it up. 
             </para>
-        <para>Seam configurator recognizes the Seam artifacts in the following way: the view folder
-            is a web content folder from the WAR project, the source folder is the first Eclipse
+        <para>The <property>Seam</property> configurator recognizes <property>Seam</property> artifacts in the following way: the view folder
+            is a web content folder from the <property>WAR</property> project, the source folder is the first <property>Eclipse</property>
             source folder. If there is a folder containing &quot;hot&quot; in the name, it will be
             chosen as the action source folder. Package is the first package that has children or
             doesn&apos;t have any subpackage. </para>
-        <para>Configuring the Seam when importing a Maven project as well as a Seam Runtime, Seam
+        <para>Configuring the <property>Seam</property> when importing a <property>Maven</property> project as well as  <property>Seam Runtime</property>, <property>Seam</property>
             artifacts and some facets could be suspended in the <link linkend="preferencespage">JBoss Maven Integration preferences</link>
                 (<emphasis>
                 <property>Window &gt; Preferences &gt; JBoss Tools &gt; JBoss Maven
                     Integration</property></emphasis>).</para>
         
         </section>
+        <section>
+            <title>Portlet Projects Import</title>
+            <para>The <property>Maven Integration Tool</property> contains <property>Portlet Maven</property> configurator, which is called when you import a <property>Maven Portlet</property> project, call <emphasis><property>Maven > Update Project Configuration</property></emphasis> in <property>Project Context</property> menu or change a <property>pom.xml</property> file. This configurator sets up <property>Project Facets</property> picking up information from <property>pom.xml</property> in following way:
+            </para>
+            <itemizedlist>
+                <listitem><para>If the <property>pom.xml</property> file has a <property>portlet-api</property> dependency, the <property>JBoss Core Portlet</property> facet will be added to <property>Project Facets</property>. 
+                </para></listitem>
+                <listitem><para>If the <property>pom.xml</property> file contains <property>portletbridge</property> dependencies, the <property>JBoss JSF Portlet</property> facet appends to <property>Project Facets</property>. 
+                </para></listitem>
+                <listitem><para>If the project dependencies include  <property>Seam</property>, <property>JBoss Core Portlet</property> and <property>JBoss JSF Portlet</property> facet, the <property>JBoss Seam Portlet</property> facet will be added to <property>Project Facets</property>. Also the <property>Seam Configurator</property> will be called to configure <property>Seam</property> settings.
+                </para></listitem>
+            </itemizedlist>
+            <para>Also you can change settings for <property>Portlet Maven</property>configurator on <link linkend="preferencespage">JBoss Maven Integration preference page </link>(<emphasis><property>Window > Preferences > JBoss Tools > JBoss Maven Integration</property></emphasis> ).
+            </para>
+        </section>
+        
     </section>
 </chapter>
