@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <chapter id="referencies">
     <title>References</title>
-    <section id="mavenintegrationfacets">
-        <title>Jboss Maven Integration facet</title>
-        <para><property>Jboss Maven Integration</property> facet is a <property>Project Facet</property> which add <property>Maven</property> capabilities to the target project. This facet adds a <property>Maven</property> nature, builder and classpath container. Also <property>Maven Integration</property> facet can detect <property>EJB</property>, <property>WAR</property> or <property>EAR</property> facet and add corresponding maven plugins for them. Also <property>Maven Integration</property> facet provides the library providers. More about <property>Maven Integration</property> library providers you can read here.
+    <section id="mavenintegrationfacet">
+        <title>JBoss Maven Integration Facet</title>
+        <para><property>JBoss Maven Integration</property> facet is a <property>Project Facet</property> which adds <property>Maven</property> capabilities to the target project. This facet adds a <property>Maven</property> nature, builder and classpath container. Also <property>Maven Integration</property> facet can detect <property>EJB</property>, <property>WAR</property> or <property>EAR</property> facet and add corresponding maven plugins for them. Also <property>Maven Integration</property> facet provides the library providers. More about <property>Maven Integration</property> library providers you can read in the <link linkend="libraryproviders">Maven Library Providers chapter</link>.
             <figure>
                 <title>JBoss Maven Integration facet</title>
                 <mediaobject>
@@ -19,10 +19,10 @@
     
     <section id="preferencespage">
         <title>JBoss Maven Integration preference page</title>
-        <para>To adjust  <property>Maven</property> project import setting for <property>Jboss Tools</property> projects you need open <property>Preferences</property> dialog by clicking <emphasis><property>Window > Preferences</property></emphasis> and select <emphasis><property>JBoss Tools >Jboss Maven Integration</property></emphasis>. This page provides configuration for <property>Seam</property>, <property>JSF</property> and <property>Portlet</property> projects import.
+        <para>To adjust  <property>Maven</property> project import settings for <property>JBoss Tools</property> projects you need to open <property>Preferences</property> dialog by clicking <emphasis><property>Window > Preferences</property></emphasis> and select <emphasis><property>JBoss Tools >JBoss Maven Integration</property></emphasis>. This page provides configuration for <property>Seam</property>, <property>JSF</property> and <property>Portlet</property> projects import.
         </para>
         <figure>
-            <title>JBoss Maven Integration preference page</title>
+            <title>JBoss Maven Integration Preference Page</title>
             <mediaobject>
                 <imageobject>
                     <imagedata fileref="images/references/JBossMavenIntegrationPreferencePage.png"/>
@@ -30,7 +30,7 @@
                 
             </mediaobject>
         </figure>
-        <para>On the Jboss Maven Integration preferences page the following preferences are available:
+        <para>On the JBoss Maven Integration preferences page the following preferences are available:
         </para>
         <table>
             <title>JBoss Maven Integration Preferences</title>
@@ -50,7 +50,7 @@
                 <tbody>
                     <row>
                         <entry><para>Configure Seam when importing Maven projects                        </para></entry>
-                        <entry><para>If on,the Maven Integration Tool starts to check Seam dependencies and switch on the Seam Configurator for existing Maven projects import.</para>
+                        <entry><para>If on, the Maven Integration Tool starts to check Seam dependencies and switch on the Seam Configurator for existing Maven projects import.</para>
                         </entry>
                         <entry><para>On</para></entry>
                     </row>
@@ -60,7 +60,7 @@
                         <entry><para>On</para></entry>
                     </row>
                     <row>
-                        <entry><para>Configure Seam Artifacts(view folder, model source folder and package...)</para>
+                        <entry><para>Configure Seam Artifacts (view folder, model source folder and package...)</para>
                             
                         </entry>
                         <entry><para>If the option is checked, the Seam configurator will start to recognize Seam Artifacts during importing Seam Maven project.
@@ -109,7 +109,7 @@
         </table>
         
     </section>
-    <section>
+    <section id="archetypes">
         <title>Maven Archetypes compatible with JBoss Tools</title>
         <para>Also <property>JBoss Maven Integration Tool</property> contains <property>Maven Archetypes</property> adapted to <property>JBoss Tools</property>. You can <link linkend="maven_archetype">use a provided archetype to get a ready to work project</link> and deploy the generated <property>WAR</property> to the <property>JBoss server</property>.
         </para>
@@ -167,6 +167,242 @@
             
         </table>
     </section>
+    <section id="libraryproviders">
+        <title>Maven Library Providers        </title>
+        <para>When selecting a <property>Maven Integration</property> facet on the <property>Project Facets</property> page <property>Maven Library</property> providers appears.</para>
+            <para><property>JBoss Maven Integration Tool</property> provides <property>JSF</property>, <property>Seam</property>, <property>Hibernate</property> and <property>Portlets Libraries</property>. These libraries are  taken from <property>Maven Repositories</property> provided by <property>JBoss Maven Integration Tool</property> and will be added as dependencies  to the <property>pom.xml</property>.
+            </para>
+        <section id="mavenjsflibraries">
+            <title>Maven JSF Libraries            </title>
+            <para>This provider is available when  <property>JBoss Maven Integration</property>  and <property>JavaServer Faces</property> facets are selected.            </para>
+            <figure>
+                <title>Maven JSF Library Provider</title>
+                <mediaobject>
+                    <imageobject>
+                        <imagedata fileref="images/maven_library_providers/jsfLibraryProviders.png"/>
+                    </imageobject>
+                    
+                </mediaobject>
+            </figure>
+            <para>The following libraries can be used:            </para>
+            <table>
+                <title>Maven JSF Libraries                </title>
+                <tgroup cols="2">
+                    <colspec colnum="1" align="left" colwidth="2*"/>
+                    <colspec colnum="2" colwidth="4*"/>
+                    <thead>
+                        <row>
+                            <entry>Type                            </entry>
+                            <entry>Dependencies                            </entry>
+                            
+                        </row>
+                    </thead>
+                    <tbody>
+                        <row>
+                            <entry><para>Maven JSF 1.1 Libraries</para>
+                            </entry>
+                            <entry>
+                                <itemizedlist>
+                                    <listitem><para>javax.faces:jsf-api:1.1_02</para></listitem>
+                                    <listitem><para>javax.faces:jsf-impl:1.1_02</para></listitem>
+                                </itemizedlist>
+                                                                
+                            </entry>
+                        </row>
+                        <row>
+                            <entry>
+                                <para>Maven JSF 1.2 Libraries</para>
+                            </entry>
+                            <entry>
+                                <itemizedlist>
+                                    <listitem><para>javax.faces:jsf-api:1.2-b19</para></listitem>
+                                    <listitem><para>javax.faces:jsf-impl:1.2-b19</para>  </listitem>
+                                </itemizedlist>
+                            </entry>                  
+                            
+                        </row>
+                                              
+                    </tbody>
+                </tgroup>
+                
+            </table>
+            
+        </section>
+        <section id="mavenhibernatelibraries">
+            <title>Maven Hibernate Libraries            </title>
+            <para>This provider appears when <property>JBoss Maven Integration</property> facet and <property>Java Persistence</property> are selected.            </para>
+            <figure>
+                <title>Maven Hibernate Library Provider</title>
+                <mediaobject>
+                    <imageobject>
+                        <imagedata fileref="images/maven_library_providers/hibernateLibraryProvider.png"/>
+                    </imageobject>
+                    
+                </mediaobject>
+            </figure>
+            <para>The following libraries can be used:            </para>
+            <table>
+                <title>Maven Hibernate Libraries                </title>
+                <tgroup cols="2">
+                    <colspec colnum="1" align="left" colwidth="2*"/>
+                    <colspec colnum="2" colwidth="4*"/>
+                    <thead>
+                        <row>
+                            <entry>Type                            </entry>
+                            <entry>Dependencies                            </entry>
+                            
+                        </row>
+                    </thead>
+                    <tbody>
+                        <row>
+                            <entry><para>Hibernate 3.3.2 Libraries                            </para>
+                            </entry>
+                            <entry>
+                                <itemizedlist>
+                                    <listitem><para>org.hibernate:hibernate-core:3.3.2.GA
+                                    </para></listitem>
+                                    <listitem><para>org.hibernate:hibernate-annotations:3.4.0.GA
+                                    </para></listitem>
+                                    <listitem><para>org.hibernate:hibernate-entitymanager:3.4.0.GA
+                                    </para></listitem>
+                                    <listitem><para>org.hibernate:hibernate-validator:3.1.0.GA
+                                    </para></listitem>
+                                </itemizedlist>
+                                
+                            </entry>
+                        </row>
+                                               
+                    </tbody>
+                </tgroup>
+                
+            </table>
+        </section>
+        <section id="mavencoreportletslibraries">
+            <title>Maven Core Portlets Libraries            </title>
+            <para>You can use <property>Maven Portlet 1.0/2.0 Libraries</property> provider when <property>JBoss Maven Integration</property> facet is selected  simultaneously with <property>JBoss Core Portlet</property> facet on the <property>Project Facets</property> page.            </para>
+            <figure>
+                <title>Maven Portlets Library Provider</title>
+                <mediaobject>
+                    <imageobject>
+                        <imagedata fileref="images/maven_library_providers/portletLibraryProvider.png"/>
+                    </imageobject>                    
+                </mediaobject>
+            </figure>
+            <para>The following libraries can be used:</para>
+            <table>
+                <title>Maven Core Portlets Libraries                </title>
+                <tgroup cols="2">
+                    <colspec colnum="1" align="left" colwidth="2*"/>
+                    <colspec colnum="2" colwidth="4*"/>
+                    <thead>
+                        <row>
+                            <entry>Type                            </entry>
+                            <entry>Dependencies                            </entry>
+                            
+                        </row>
+                    </thead>
+                    <tbody>
+                        <row>
+                            <entry><para>Maven Portlet 1.0 Libraries</para>
+                            </entry>
+                            <entry>
+                                <itemizedlist>
+                                    <listitem><para>javax.portlet:portlet-api:1.0
+                                        
+                                    </para></listitem>
+                                    
+                                </itemizedlist>
+                                
+                            </entry>
+                        </row>
+                        <row>
+                            <entry><para>Maven Portlet 2.0 Libraries                            </para></entry>
+                            <entry>
+                                <itemizedlist>
+                                    <listitem><para>javax.portlet:portlet-api:1.0                            </para></listitem>
+                                </itemizedlist>                                                                
+                            </entry>
+                        </row>
+                        
+                    </tbody>
+                </tgroup>
+                
+            </table>
+        </section>
+        <section id="mavenportletbridgelibraries">
+            <title>Maven Portletbridge Libraries            </title>
+            <para>The <property>Maven Portletbridge Library</property> provider appears when you select  <property>JBoss Maven Integration</property> and <property>JBoss JSF Portlet</property> facets.
+            </para>
+            <figure>
+                <title>Maven Portletbridge Library Provider</title>
+                <mediaobject>
+                    <imageobject>
+                        <imagedata fileref="images/maven_library_providers/portletbridgeLibraryProvider.png"/>
+                    </imageobject>                    
+                </mediaobject>
+            </figure>
+            <para>The following libraries can be used:</para>
+            <table>
+                <title>Maven Portletbridge Libraries                </title>
+                <tgroup cols="2">
+                    <colspec colnum="1" align="left" colwidth="2*"/>
+                    <colspec colnum="2" colwidth="4*"/>
+                    <thead>
+                        <row>
+                            <entry>Type                            </entry>
+                            <entry>Dependencies                            </entry>
+                            
+                        </row>
+                    </thead>
+                    <tbody>
+                        <row>
+                            <entry><para>Maven Portletbridge 2.0.0 ALPHA Libraries                            </para>
+                            </entry>
+                            <entry>
+                                <itemizedlist>
+                                    <listitem><para>org.jboss.portletbridge:portletbridge-api:2.0.0.ALPHA
+                                    </para>
+                                    </listitem>
+                                    <listitem><para>org.jboss.portletbridge:portletbridge-impl:2.0.0.ALPHA
+                                    </para></listitem>
+                                    
+                                </itemizedlist>
+                                
+                            </entry>
+                        </row>
+                        <row>
+                            <entry><para>Maven Portletbridge 2.0.0 ALPHA Libraries with Dependencies
+                            </para></entry>
+                            <entry>
+                                <itemizedlist>
+                                    <listitem><para>javax.portlet:portlet-api:1.0</para>                       </listitem>
+                                    <listitem><para>org.jboss.portletbridge:portletbridge-api:2.0.0.ALPHA</para></listitem>
+                                    <listitem><para>org.jboss.portletbridge:portletbridge-impl:2.0.0.ALPHA</para></listitem>
+                                    <listitem><para>org.richfaces.ui:richfaces-ui:3.3.1.GA</para></listitem>
+                                    <listitem><para>org.richfaces.framework:richfaces-api:3.3.1.GA</para></listitem>
+                                    <listitem><para>org.richfaces.framework:richfaces-impl:3.3.1.GA</para></listitem>
+                                    <listitem><para>com.sun.facelets:jsf-facelets:1.1.15.B1</para></listitem>
+                                </itemizedlist>
+                                
+                            </entry>
+                        </row>
+                        
+                    </tbody>
+                </tgroup>
+                
+            </table>
+        </section>
+        
+        
+        
+        
+    </section>
+    <section>
+        <title>See Also        </title>
+        <para>On <ulink url="http://community.jboss.org/wiki/PortletFacetLibraries">PortletFacetLibraries JBoss Tools Wiki article</ulink>  you can find some extra information about <property>Portlets Library Providers</property>. </para>
+    </section>
+    
+    
     
     
 </chapter>
