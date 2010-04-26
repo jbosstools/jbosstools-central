@@ -2,7 +2,7 @@
 <feature
       id="org.jboss.tools.project.examples.test.feature"
       label="Project Examples Test Suite Feature"
-      version="1.0.0">
+      version="1.1.0.qualifier">
 
    <description url="http://www.example.com/description">
       [Enter Feature Description here.]

@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Project Examples Test Suite
 Bundle-SymbolicName: org.jboss.tools.project.examples.test;singleton:=true
-Bundle-Version: 1.0.0
+Bundle-Version: 1.1.0.qualifier
 Require-Bundle: org.eclipse.core.runtime,
  org.junit;bundle-version="3.8.2",
  org.jboss.tools.tests;bundle-version="2.0.0"
