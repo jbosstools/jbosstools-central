@@ -8,6 +8,20 @@
 	<version>0.0.1-SNAPSHOT</version>
 	
 	<repositories>
+	    <repository>
+          <id>jboss-public-repository-group</id>
+          <name>JBoss Public Maven Repository Group</name>
+          <url>https://repository.jboss.org/nexus/content/groups/public/</url>
+          <layout>default</layout>
+          <releases>
+            <enabled>true</enabled>
+            <updatePolicy>never</updatePolicy>
+          </releases>
+          <snapshots>
+            <enabled>true</enabled>
+            <updatePolicy>never</updatePolicy>
+          </snapshots>
+        </repository>
     	<repository>
       		<id>repository.jboss.org</id>
       		<name>JBoss Repository</name>
