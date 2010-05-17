@@ -42,7 +42,7 @@
    <pluginRepositories>
         <pluginRepository>
           <id>jboss-public-repository-group</id>
-          <name>JBoss Public Maven Repository Group</name>
+          <name>JBoss Community Public Maven Repository</name>
           <url>https://repository.jboss.org/nexus/content/groups/public/</url>
           <layout>default</layout>
           <releases>
@@ -459,7 +459,7 @@
    <repositories>
       <repository>
           <id>jboss-public-repository-group</id>
-          <name>JBoss Public Maven Repository Group</name>
+          <name>JBoss Community Public Maven Repository</name>
           <url>https://repository.jboss.org/nexus/content/groups/public/</url>
           <layout>default</layout>
           <releases>
