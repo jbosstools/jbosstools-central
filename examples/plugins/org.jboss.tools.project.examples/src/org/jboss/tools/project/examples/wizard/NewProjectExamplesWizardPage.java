@@ -128,7 +128,9 @@ public class NewProjectExamplesWizardPage extends WizardPage {
 				SWT.COLOR_WIDGET_BACKGROUND));
 		final TreeViewer viewer = filteredTree.getViewer();
 		Tree tree = viewer.getTree();
-		tree.setLayoutData(new GridData(GridData.FILL_BOTH));
+		gd = new GridData(GridData.FILL_HORIZONTAL);
+		gd.heightHint=75; 
+		tree.setLayoutData(gd);
 		tree.setFont(parent.getFont());
 		
 		viewer.setLabelProvider(new ProjectLabelProvider());
