@@ -14,6 +14,7 @@
     <para>This chapter will provide you with the information on how to create mavenized projects and
         import already existing maven project with <property>JBoss Maven Tool</property>.</para>
     <section id="create_mavenized_project">
+        
         <title>Creating Maven ready Seam project</title>
         <para><property>Maven Integration</property> makes the <property>Seam Wizard</property> capable of creating <property>Maven</property> ready projects to
             let <property>Maven</property> get the libraries instead of using the <property>Seam</property> runtime.</para>
@@ -110,6 +111,46 @@
             </mediaobject>
         </figure>
     </section>
+    <section id="serverdeploy">
+        <title>Deploy Maven Project to the JBoss Server</title>
+        <para>Applying <property>Maven Integration Tools</property> with <property>Seam Tools</property> make possible to handle <property>Maven</property> project in the same way as simple <property>Seam</property> project created with <property>Seam Tools</property>. Also deploying to <property>JBoss Server</property> is available. For this you need to make right click on <property>testmaven</property> project in <property>Package Explorer</property> tab then select <emphasis><property>Run As > Run on Server</property></emphasis>. </para>
+        <figure>
+            <title>Run Mavenize Seam Application on Server</title>
+            <mediaobject>
+                <imageobject>
+                    <imagedata fileref="images/deploy_maven_project/runOnServer.png"/>
+                </imageobject>                
+            </mediaobject>
+        </figure>
+        <para>In opened <property>Run On Server</property> wizard choose <property>JBoss Server</property>, click <emphasis><property>Next</property></emphasis>. On the following page make sure that there is <property>testmaven-ear</property> and <property>testmaven-ear/resources/testmaven-ds.xml</property> in <property>Configured</property> column and click <emphasis><property>Finish</property></emphasis>.</para>
+        <figure>
+            <title>Run On Server</title>
+            <mediaobject>
+                <imageobject>
+                    <imagedata fileref="images/deploy_maven_project/modifyResources.png"/>
+                </imageobject>
+                
+            </mediaobject>
+        </figure>
+        
+        <para>Then <property>Maven Integration Tool</property> builds the project, prepares it to the deploy and will make deployment.</para>
+        <note>
+            <title>Note:</title>
+            <para>To deploy <property>Maven EAR Seam</property> project on <property>JBoss Server</property> you need  to have a latest <property>WTP</property> build (current <property>WTP 3.1.2</property>) and need to apply a WTP patch - "<property>Patches 2010 04 13</property>" for it (it's available from <ulink url="http://download.eclipse.org/webtools/updates/">Eclipse P2 Web Tools Platform Repository</ulink>). Without this patch you are not able to deploy <property>Maven EAR</property> project to the server.</para>
+        </note>
+        <para>Deploying takes a time, after that you can open in you browser <property>http://localhost:8080/testmaven/</property> and see <property>Seam Project</property> Home page.</para>        
+        <figure>
+            <title>Run Mavenize Seam Application on Server</title>
+            <mediaobject>
+                <imageobject>
+                    <imagedata fileref="images/deploy_maven_project/homePage.png"/>
+                </imageobject>                
+            </mediaobject>
+        </figure>
+        <para>That's all! The <property>Maven Seam</property> project is deployed to <property>JBoss Server</property>.</para>
+        
+    </section>
+    
     <section id="mavenized_portlet">
         <title>Create new mavenized Dynamic Web Project with Portlets</title>
         <para>Select in main <property>Eclipse</property> menu <emphasis><property>File > New >
