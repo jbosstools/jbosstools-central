@@ -5,5 +5,11 @@
 	<category-def label="JBoss Tools maven Nightly Build Update Site" name="JBoss Tools maven Nightly Build Update Site">
 		<description>JBoss Tools maven Nightly Build Update Site: contains all features in this build.</description>
 	</category-def>
+	<feature url="features/org.jboss.tools.maven.feature_0.0.0.jar" id="org.jboss.tools.maven.feature" version="0.0.0">
+		<category name="JBoss Tools maven Nightly Build Update Site"/>
+	</feature>
+	<feature url="features/org.jboss.tools.maven.seam.feature_0.0.0.jar" id="org.jboss.tools.maven.seam.feature" version="0.0.0">
+		<category name="JBoss Tools maven Nightly Build Update Site"/>
+	</feature>
 
 </site>
