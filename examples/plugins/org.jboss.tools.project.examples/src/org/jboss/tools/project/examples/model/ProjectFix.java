@@ -4,12 +4,14 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.eclipse.equinox.internal.p2.ui.sdk.ProvSDKUIActivator;
-import org.eclipse.equinox.internal.provisional.p2.core.ProvisionException;
-import org.eclipse.equinox.internal.provisional.p2.ui.IProvHelpContextIds;
-import org.eclipse.equinox.internal.provisional.p2.ui.QueryableMetadataRepositoryManager;
-import org.eclipse.equinox.internal.provisional.p2.ui.dialogs.InstallWizard;
-import org.eclipse.equinox.internal.provisional.p2.ui.dialogs.ProvisioningWizardDialog;
-import org.eclipse.equinox.internal.provisional.p2.ui.policy.Policy;
+import org.eclipse.equinox.p2.core.ProvisionException;
+import org.eclipse.equinox.internal.p2.ui.IProvHelpContextIds;
+import org.eclipse.equinox.internal.p2.ui.ProvUIActivator;
+import org.eclipse.equinox.internal.p2.ui.QueryableMetadataRepositoryManager;
+import org.eclipse.equinox.internal.p2.ui.dialogs.InstallWizard;
+import org.eclipse.equinox.internal.p2.ui.dialogs.ProvisioningWizardDialog;
+import org.eclipse.equinox.p2.ui.Policy;
+import org.eclipse.equinox.p2.ui.ProvisioningUI;
 import org.eclipse.jface.preference.PreferenceDialog;
 import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.swt.widgets.Shell;
@@ -100,20 +102,14 @@ public class ProjectFix {
 			}
 		}
 		if (PLUGIN_TYPE.equals(type)) {
-				try {
-					final String profileId = ProvSDKUIActivator.getSelfProfileId();
-					final QueryableMetadataRepositoryManager manager = new QueryableMetadataRepositoryManager(Policy.getDefault().getQueryContext(), false);
-					InstallWizard wizard = new InstallWizard(Policy.getDefault(), profileId, null, null, manager);
-					WizardDialog dialog = new ProvisioningWizardDialog(getShell(), wizard);
-					dialog.create();
-					PlatformUI.getWorkbench().getHelpSystem().setHelp(dialog.getShell(), IProvHelpContextIds.INSTALL_WIZARD);
-					dialog.open();
-				} catch (ProvisionException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-					ProjectExamplesActivator.log(e);
-				}
-			
+
+			ProvisioningUI ui = ProvisioningUI.getDefaultUI();
+			InstallWizard wizard = new InstallWizard(ui, null, null, null);
+			WizardDialog dialog = new ProvisioningWizardDialog(getShell(), wizard);
+			dialog.create();
+			PlatformUI.getWorkbench().getHelpSystem().setHelp(dialog.getShell(),IProvHelpContextIds.INSTALL_WIZARD);
+			dialog.open();
+
 		}
 	}
 	private Shell getShell() {

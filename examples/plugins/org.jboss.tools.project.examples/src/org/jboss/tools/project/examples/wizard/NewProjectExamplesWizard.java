@@ -67,6 +67,7 @@ import org.eclipse.ui.dialogs.IOverwriteQuery;
 import org.eclipse.ui.internal.cheatsheets.state.DefaultStateManager;
 import org.eclipse.ui.internal.cheatsheets.views.CheatSheetView;
 import org.eclipse.ui.internal.cheatsheets.views.ViewUtilities;
+import org.eclipse.ui.internal.wizards.datatransfer.ZipLeveledStructureProvider;
 import org.eclipse.ui.wizards.datatransfer.IImportStructureProvider;
 import org.eclipse.ui.wizards.datatransfer.ImportOperation;
 import org.eclipse.ui.wizards.datatransfer.ZipFileStructureProvider;
@@ -350,7 +351,7 @@ public class NewProjectExamplesWizard extends Wizard implements INewWizard {
 				project.create(monitor);
 				project.open(monitor);
 				ZipFile sourceFile = new ZipFile(file);
-				ZipFileStructureProvider structureProvider = new ZipFileStructureProvider(
+				ZipLeveledStructureProvider structureProvider = new ZipLeveledStructureProvider(
 						sourceFile);
 
 				Enumeration<? extends ZipEntry> entries = sourceFile.entries();
@@ -363,12 +364,9 @@ public class NewProjectExamplesWizard extends Wizard implements INewWizard {
 						filesToImport.add(entry);
 					}
 				}
-				//ZipEntry entry = sourceFile.getEntry(projectName);
 				
-				//List filesToImport = prepareFileList(structureProvider, entry, null);
-
-				ImportOperation operation = new ImportOperation(workspace
-						.getRoot().getFullPath(), structureProvider.getRoot(),
+				structureProvider.setStrip(1);
+				ImportOperation operation = new ImportOperation(project.getFullPath(), structureProvider.getRoot(),
 						structureProvider, OVERWRITE_ALL_QUERY, filesToImport);
 				operation.setContext(getActiveShell());
 				operation.run(monitor);
@@ -413,10 +411,11 @@ public class NewProjectExamplesWizard extends Wizard implements INewWizard {
 		project.create(monitor);
 		project.open(monitor);
 		ZipFile sourceFile = new ZipFile(file);
-		ZipFileStructureProvider structureProvider = new ZipFileStructureProvider(
+		ZipLeveledStructureProvider structureProvider = new ZipLeveledStructureProvider(
 				sourceFile);
-
-		ImportOperation operation = new ImportOperation(workspace.getRoot()
+		
+		structureProvider.setStrip(1);
+		ImportOperation operation = new ImportOperation(project
 				.getFullPath(), structureProvider.getRoot(), structureProvider,
 				OVERWRITE_ALL_QUERY);
 		operation.setContext(getActiveShell());

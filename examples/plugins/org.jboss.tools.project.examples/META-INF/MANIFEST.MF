@@ -29,7 +29,8 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.equinox.p2.ui,
  org.eclipse.equinox.p2.ui.sdk,
  org.eclipse.equinox.p2.metadata,
- org.jboss.tools.portlet.core
+ org.jboss.tools.portlet.core,
+ org.eclipse.equinox.p2.operations
 Bundle-ActivationPolicy: lazy
 Bundle-Localization: plugin
 Export-Package: org.jboss.tools.project.examples,

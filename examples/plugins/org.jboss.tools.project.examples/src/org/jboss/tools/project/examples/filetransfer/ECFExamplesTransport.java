@@ -41,8 +41,9 @@ import org.eclipse.ecf.filetransfer.identity.FileIDFactory;
 import org.eclipse.ecf.filetransfer.service.IRetrieveFileTransferFactory;
 import org.eclipse.ecf.provider.filetransfer.retrieve.AbstractRetrieveFileTransfer;
 import org.eclipse.equinox.internal.p2.core.helpers.ServiceHelper;
-import org.eclipse.equinox.internal.provisional.p2.core.IServiceUI;
-import org.eclipse.equinox.internal.provisional.p2.core.IServiceUI.AuthenticationInfo;
+import org.eclipse.equinox.p2.core.IProvisioningAgent;
+import org.eclipse.equinox.p2.core.UIServices;
+import org.eclipse.equinox.p2.core.UIServices.AuthenticationInfo;
 import org.eclipse.equinox.security.storage.ISecurePreferences;
 import org.eclipse.equinox.security.storage.SecurePreferencesFactory;
 import org.eclipse.equinox.security.storage.StorageException;
@@ -425,9 +426,8 @@ public class ECFExamplesTransport {
 				// ignore
 			}
 		}
-		ServiceTracker adminUITracker = new ServiceTracker(ProjectExamplesActivator.getBundleContext(), IServiceUI.class.getName(), null);
-		adminUITracker.open();
-		IServiceUI adminUIService = (IServiceUI) adminUITracker.getService();
+		IProvisioningAgent agent = (IProvisioningAgent) ServiceHelper.getService(ProjectExamplesActivator.getBundleContext(), IProvisioningAgent.SERVICE_NAME);
+		UIServices adminUIService = (UIServices) agent.getService(UIServices.SERVICE_NAME);
 		AuthenticationInfo loginDetails = null;
 		if (adminUIService != null)
 			loginDetails = adminUIService.getUsernamePassword(hostLocation.toString());
