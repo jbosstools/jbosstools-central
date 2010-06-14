@@ -34,6 +34,9 @@ public class SeamConfiguratorPreferencesInitializer extends
 		node.putBoolean(
 				MavenSeamActivator.CONFIGURE_SEAMPORTLET,
 				MavenSeamActivator.CONFIGURE_SEAMPORTLET_VALUE);
+		node.putBoolean(
+				MavenSeamActivator.CONFIGURE_CDI,
+				MavenSeamActivator.CONFIGURE_CDI_VALUE);
 	}
 
 }

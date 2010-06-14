@@ -13,6 +13,7 @@ public class Messages extends NLS {
 	public static String SeamConfiguratorPreferencePage_Configure_JBoss_Portlet_Core_facet;
 	public static String SeamConfiguratorPreferencePage_Configure_JBoss_Seam_Portlet_facet;
 	public static String SeamConfiguratorPreferencePage_Configure_JSF_facet;
+	public static String SeamConfiguratorPreferencePage_Configure_CDI_facet;
 	public static String SeamConfiguratorPreferencePage_Configure_Seam_Artifacts;
 	public static String SeamConfiguratorPreferencePage_Configure_Seam_Runtime;
 	public static String SeamConfiguratorPreferencePage_Configure_Seam_when_importing_Maven_projects;

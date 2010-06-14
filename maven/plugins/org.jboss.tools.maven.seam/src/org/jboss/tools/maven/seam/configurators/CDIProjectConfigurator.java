@@ -20,29 +20,25 @@ import org.maven.ide.eclipse.project.MavenProjectChangedEvent;
 import org.maven.ide.eclipse.project.configurator.AbstractProjectConfigurator;
 import org.maven.ide.eclipse.project.configurator.ProjectConfigurationRequest;
 
-public class JSFProjectConfigurator extends AbstractProjectConfigurator {
+public class CDIProjectConfigurator extends AbstractProjectConfigurator {
 
-	private static final String JSF_API_GROUP_ID = "javax.faces"; //$NON-NLS-1$
-	private static final String JSF_API2_GROUP_ID = "com.sun.faces"; //$NON-NLS-1$
-	private static final String JSF_API_ARTIFACT_ID = "jsf-api"; //$NON-NLS-1$
+	private static final String CDI_API_GROUP_ID = "javax.enterprise"; //$NON-NLS-1$
+	private static final String CDI_API_ARTIFACT_ID = "cdi-api"; //$NON-NLS-1$
 	
 	protected static final IProjectFacet dynamicWebFacet;
 	protected static final IProjectFacetVersion dynamicWebVersion;
 	
-	protected static final IProjectFacet jsfFacet;
-	protected static final IProjectFacetVersion jsfVersion20;
-	protected static final IProjectFacetVersion jsfVersion12;
-	protected static final IProjectFacetVersion jsfVersion11;
+	protected static final IProjectFacet cdiFacet;
+	protected static final IProjectFacetVersion cdiVersion;
+	
 	protected static final IProjectFacet m2Facet;
 	protected static final IProjectFacetVersion m2Version;
 	
 	static {
 		dynamicWebFacet = ProjectFacetsManager.getProjectFacet("jst.web"); //$NON-NLS-1$
 		dynamicWebVersion = dynamicWebFacet.getVersion("2.5");  //$NON-NLS-1$
-		jsfFacet = ProjectFacetsManager.getProjectFacet("jst.jsf"); //$NON-NLS-1$
-		jsfVersion20 = jsfFacet.getVersion("2.0"); //$NON-NLS-1$
-		jsfVersion12 = jsfFacet.getVersion("1.2"); //$NON-NLS-1$
-		jsfVersion11 = jsfFacet.getVersion("1.1"); //$NON-NLS-1$
+		cdiFacet = ProjectFacetsManager.getProjectFacet("jst.cdi"); //$NON-NLS-1$
+		cdiVersion = cdiFacet.getVersion("1.0"); //$NON-NLS-1$
 		m2Facet = ProjectFacetsManager.getProjectFacet("jboss.m2"); //$NON-NLS-1$
 		m2Version = m2Facet.getVersion("1.0"); //$NON-NLS-1$
 	}
@@ -58,17 +54,17 @@ public class JSFProjectConfigurator extends AbstractProjectConfigurator {
 	private void configureInternal(MavenProject mavenProject,IProject project,
 			IProgressMonitor monitor) throws CoreException {
 		IPreferenceStore store = MavenSeamActivator.getDefault().getPreferenceStore();
-		boolean configureJSF = store.getBoolean(MavenSeamActivator.CONFIGURE_JSF);
-		if (!configureJSF) {
+		boolean configureCDI = store.getBoolean(MavenSeamActivator.CONFIGURE_CDI);
+		if (!configureCDI) {
 			return;
 		}
 		
 		String packaging = mavenProject.getPackaging();
-	    String jsfVersion = getJSFVersion(mavenProject);
-	    if (jsfVersion != null) {
+	    String cdiVersion = getCDIVersion(mavenProject);
+	    if (cdiVersion != null) {
 	    	final IFacetedProject fproj = ProjectFacetsManager.create(project);
 	    	if (fproj != null && "war".equals(packaging)) { //$NON-NLS-1$
-	    		installWarFacets(fproj, jsfVersion, monitor);
+	    		installWarFacets(fproj, cdiVersion, monitor);
 	    	}
 	    }
 	}
@@ -101,41 +97,31 @@ public class JSFProjectConfigurator extends AbstractProjectConfigurator {
 	}
 
 	
-	private void installWarFacets(IFacetedProject fproj, String jsfVersion,IProgressMonitor monitor) throws CoreException {
+	private void installWarFacets(IFacetedProject fproj, String cdiVersion,IProgressMonitor monitor) throws CoreException {
 		
 		if (!fproj.hasProjectFacet(dynamicWebFacet)) {
 			MavenSeamActivator.log(Messages.JSFProjectConfigurator_The_project_does_not_contain_the_Web_Module_facet);
 		}
-		installJSFFacet(fproj, jsfVersion, monitor);
+		installCDIFacet(fproj, cdiVersion, monitor);
 		installM2Facet(fproj, monitor);
 		
 	}
 
 
-	private void installJSFFacet(IFacetedProject fproj, String jsfVersionString, IProgressMonitor monitor)
+	private void installCDIFacet(IFacetedProject fproj, String cdiVersionString, IProgressMonitor monitor)
 			throws CoreException {
-		if (!fproj.hasProjectFacet(jsfFacet)) {
-			if (jsfVersionString.startsWith("1.1")) { //$NON-NLS-1$
-				IDataModel model = MavenSeamActivator.getDefault().createJSFDataModel(fproj,jsfVersion11);
-				fproj.installProjectFacet(jsfVersion11, model, monitor);	
-			}
-			if (jsfVersionString.startsWith("1.2")) { //$NON-NLS-1$
-				IDataModel model = MavenSeamActivator.getDefault().createJSFDataModel(fproj,jsfVersion12);
-				fproj.installProjectFacet(jsfVersion12, model, monitor);	
-			}
-			if (jsfVersionString.startsWith("2.0")) { //$NON-NLS-1$
-				IDataModel model = MavenSeamActivator.getDefault().createJSFDataModel(fproj,jsfVersion20);
-				fproj.installProjectFacet(jsfVersion20, model, monitor);	
+		if (!fproj.hasProjectFacet(cdiFacet)) {
+			if (cdiVersionString.startsWith("1.0")) { //$NON-NLS-1$
+				IDataModel model = MavenSeamActivator.getDefault().createCDIDataModel(fproj,cdiVersion);
+				fproj.installProjectFacet(cdiVersion, model, monitor);	
 			}
 		}
 	}
 	
-	private String getJSFVersion(MavenProject mavenProject) {
+	private String getCDIVersion(MavenProject mavenProject) {
 		String version = null;
-		version = MavenSeamActivator.getDefault().getDependencyVersion(mavenProject, JSF_API_GROUP_ID, JSF_API_ARTIFACT_ID);
-		if (version == null) {
-			version = MavenSeamActivator.getDefault().getDependencyVersion(mavenProject, JSF_API2_GROUP_ID, JSF_API_ARTIFACT_ID);
-		}
+		version = MavenSeamActivator.getDefault().getDependencyVersion(mavenProject, CDI_API_GROUP_ID, CDI_API_ARTIFACT_ID);
+		
 	    return version;
 	}
 

@@ -40,6 +40,7 @@ import org.eclipse.wst.common.project.facet.core.FacetedProjectFramework;
 import org.eclipse.wst.common.project.facet.core.IFacetedProject;
 import org.eclipse.wst.common.project.facet.core.IProjectFacetVersion;
 import org.eclipse.wst.common.project.facet.core.ProjectFacetsManager;
+import org.jboss.tools.cdi.internal.core.project.facet.CDIFacetInstallDataModelProvider;
 import org.jboss.tools.maven.core.IJBossMavenConstants;
 import org.jboss.tools.maven.core.MavenCoreActivator;
 import org.jboss.tools.seam.core.SeamUtil;
@@ -103,6 +104,10 @@ public class MavenSeamActivator extends AbstractUIPlugin {
 	public static final String CONFIGURE_SEAMPORTLET = "configureSeamPortlet"; //$NON-NLS-1$
 	
 	public static final boolean CONFIGURE_SEAMPORTLET_VALUE = true;
+	
+	public static final String CONFIGURE_CDI = "configureCDI"; //$NON-NLS-1$
+	
+	public static final boolean CONFIGURE_CDI_VALUE = true;
 	
 	// The shared instance
 	private static MavenSeamActivator plugin;
@@ -922,6 +927,12 @@ public class MavenSeamActivator extends AbstractUIPlugin {
 		config.setProperty(IJSFFacetInstallDataModelProperties.LIBRARY_PROVIDER_DELEGATE, libraryDelegate);
 		config.setProperty(IJSFFacetInstallDataModelProperties.SERVLET_NAME, "");
 		config.setProperty(IJSFFacetInstallDataModelProperties.SERVLET_URL_PATTERNS, new String[0]);
+		
+		return config;
+	}
+	
+	public IDataModel createCDIDataModel(IFacetedProject fproj, IProjectFacetVersion facetVersion) {
+		IDataModel config = (IDataModel) new CDIFacetInstallDataModelProvider().create();
 		
 		return config;
 	}

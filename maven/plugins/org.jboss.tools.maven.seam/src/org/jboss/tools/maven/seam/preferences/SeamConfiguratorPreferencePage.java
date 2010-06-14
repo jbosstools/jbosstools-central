@@ -25,6 +25,7 @@ public class SeamConfiguratorPreferencePage extends PreferencePage implements
 	private Button configurePortletButton;
 	private Button configureJSFPortletButton;
 	private Button configureSeamPortletButton;
+	private Button configureCDIButton;
 
 	@Override
 	protected Control createContents(Composite parent) {
@@ -82,6 +83,10 @@ public class SeamConfiguratorPreferencePage extends PreferencePage implements
 		boolean configureSeamPortlet = store.getBoolean(MavenSeamActivator.CONFIGURE_SEAMPORTLET);
 		configureJSFPortletButton.setSelection(configureSeamPortlet);
 		
+		configureCDIButton = new Button(composite,SWT.CHECK);
+		configureCDIButton.setText(Messages.SeamConfiguratorPreferencePage_Configure_CDI_facet);
+		boolean configureCDI = store.getBoolean(MavenSeamActivator.CONFIGURE_CDI);
+		configureCDIButton.setSelection(configureCDI);
 		return composite;
 	}
 
@@ -97,6 +102,8 @@ public class SeamConfiguratorPreferencePage extends PreferencePage implements
 		configurePortletButton.setSelection(MavenSeamActivator.CONFIGURE_PORTLET_VALUE);
 		configureJSFPortletButton.setSelection(MavenSeamActivator.CONFIGURE_JSFPORTLET_VALUE);
 		configureSeamPortletButton.setSelection(MavenSeamActivator.CONFIGURE_SEAMPORTLET_VALUE);
+		configureCDIButton.setSelection(MavenSeamActivator.CONFIGURE_CDI_VALUE);
+		
 		IPreferenceStore store = MavenSeamActivator.getDefault().getPreferenceStore();
 		store.setValue(MavenSeamActivator.CONFIGURE_SEAM, MavenSeamActivator.CONFIGURE_SEAM_VALUE);
 		store.setValue(MavenSeamActivator.CONFIGURE_JSF, MavenSeamActivator.CONFIGURE_JSF_VALUE);
@@ -105,6 +112,7 @@ public class SeamConfiguratorPreferencePage extends PreferencePage implements
 		store.setValue(MavenSeamActivator.CONFIGURE_PORTLET, MavenSeamActivator.CONFIGURE_PORTLET_VALUE);
 		store.setValue(MavenSeamActivator.CONFIGURE_SEAM_RUNTIME, MavenSeamActivator.CONFIGURE_SEAM_RUNTIME_VALUE);
 		store.setValue(MavenSeamActivator.CONFIGURE_SEAM_ARTIFACTS, MavenSeamActivator.CONFIGURE_SEAM_ARTIFACTS_VALUE);
+		store.setValue(MavenSeamActivator.CONFIGURE_CDI, MavenSeamActivator.CONFIGURE_CDI_VALUE);
 		configureSeamRuntimeButton.setEnabled(configureSeamButton.getSelection());
 		configureSeamArtifactsButton.setEnabled(configureSeamButton.getSelection());
 		super.performDefaults();
@@ -120,6 +128,7 @@ public class SeamConfiguratorPreferencePage extends PreferencePage implements
 		store.setValue(MavenSeamActivator.CONFIGURE_SEAMPORTLET, configureSeamPortletButton.getSelection());
 		store.setValue(MavenSeamActivator.CONFIGURE_SEAM_RUNTIME, configureSeamRuntimeButton.getSelection());
 		store.setValue(MavenSeamActivator.CONFIGURE_SEAM_ARTIFACTS, configureSeamArtifactsButton.getSelection());
+		store.setValue(MavenSeamActivator.CONFIGURE_CDI, configureCDIButton.getSelection());
 		return super.performOk();
 	}
 
