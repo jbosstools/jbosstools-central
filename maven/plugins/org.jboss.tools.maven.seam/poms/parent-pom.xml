@@ -74,6 +74,12 @@
             <artifactId>hibernate-entitymanager</artifactId>
             <version>${hibernate-entitymanager.version}</version>
             <scope>provided</scope>
+            <exclusions>
+  			  <exclusion>
+  				<artifactId>javassist</artifactId>
+  				<groupId>javassist</groupId>
+  			  </exclusion>
+  		    </exclusions>
          </dependency>
          <dependency>
             <groupId>org.jboss.seam</groupId>

@@ -262,6 +262,25 @@ public class MavenSeamActivator extends AbstractUIPlugin {
 			dependency.setArtifactId("slf4j-nop"); //$NON-NLS-1$
 			dependencies.add(dependency);
 			
+			dependency = new Dependency();
+			dependency.setGroupId("org.drools"); //$NON-NLS-1$
+			dependency.setArtifactId("drools-compiler"); //$NON-NLS-1$
+			dependency.setScope("test"); //$NON-NLS-1$
+			dependencies.add(dependency);
+			
+			dependency = new Dependency();
+			dependency.setGroupId("org.jbpm"); //$NON-NLS-1$
+			dependency.setArtifactId("jbpm-jpdl"); //$NON-NLS-1$
+			dependency.setScope("test"); //$NON-NLS-1$
+			dependencies.add(dependency);
+			
+			dependency = new Dependency();
+			dependency.setGroupId("org.eclipse.jdt"); //$NON-NLS-1$
+			dependency.setArtifactId("core"); //$NON-NLS-1$
+			dependency.setVersion("3.4.2.v_883_R34x"); //$NON-NLS-1$
+			dependency.setScope("test"); //$NON-NLS-1$
+			dependencies.add(dependency);
+			
 			Build build = new Build();
 			try {
 				//build.setFinalName(testProjectName);
