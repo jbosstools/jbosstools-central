@@ -81,7 +81,7 @@ public class SeamConfiguratorPreferencePage extends PreferencePage implements
 		configureSeamPortletButton = new Button(composite,SWT.CHECK);
 		configureSeamPortletButton.setText(Messages.SeamConfiguratorPreferencePage_Configure_JBoss_Seam_Portlet_facet);
 		boolean configureSeamPortlet = store.getBoolean(MavenSeamActivator.CONFIGURE_SEAMPORTLET);
-		configureJSFPortletButton.setSelection(configureSeamPortlet);
+		configureSeamPortletButton.setSelection(configureSeamPortlet);
 		
 		configureCDIButton = new Button(composite,SWT.CHECK);
 		configureCDIButton.setText(Messages.SeamConfiguratorPreferencePage_Configure_CDI_facet);
