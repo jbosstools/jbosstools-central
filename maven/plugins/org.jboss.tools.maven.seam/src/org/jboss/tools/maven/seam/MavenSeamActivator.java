@@ -109,6 +109,10 @@ public class MavenSeamActivator extends AbstractUIPlugin {
 	
 	public static final boolean CONFIGURE_CDI_VALUE = true;
 	
+	public static final String CONFIGURE_HIBERNATE = "configureHibernate"; //$NON-NLS-1$
+	
+	public static final boolean CONFIGURE_HIBERNATE_VALUE = true;
+	
 	// The shared instance
 	private static MavenSeamActivator plugin;
 

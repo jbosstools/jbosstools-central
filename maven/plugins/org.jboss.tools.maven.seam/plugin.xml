@@ -23,6 +23,13 @@
     
     <extension point="org.maven.ide.eclipse.projectConfigurators">
       <configurator 
+          id="org.jboss.tools.maven.cdi.configurator"
+          class="org.jboss.tools.maven.seam.configurators.HibernateProjectConfigurator"
+          name="%Hibernate_Project_configurator" priority="250"/>
+    </extension>
+    
+    <extension point="org.maven.ide.eclipse.projectConfigurators">
+      <configurator 
           id="org.jboss.tools.maven.jsf.configurator"
           class="org.jboss.tools.maven.seam.configurators.JSFProjectConfigurator"
           name="%JSF_Project_configurator" priority="150"/>

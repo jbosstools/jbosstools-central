@@ -9,6 +9,7 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 import org.jboss.tools.maven.seam.MavenSeamActivator;
@@ -26,6 +27,7 @@ public class SeamConfiguratorPreferencePage extends PreferencePage implements
 	private Button configureJSFPortletButton;
 	private Button configureSeamPortletButton;
 	private Button configureCDIButton;
+	private Button configureHibernateButton;
 
 	@Override
 	protected Control createContents(Composite parent) {
@@ -35,6 +37,8 @@ public class SeamConfiguratorPreferencePage extends PreferencePage implements
 		layout.marginHeight = 0;
 		composite.setLayout(layout);
 		
+		Label label = new Label(composite, SWT.NONE);
+		label.setText("When importing Maven projects configure the following:");
 		configureSeamButton = new Button(composite,SWT.CHECK);
 		configureSeamButton.setText(Messages.SeamConfiguratorPreferencePage_Configure_Seam_when_importing_Maven_projects);
 		IPreferenceStore store = MavenSeamActivator.getDefault().getPreferenceStore();
@@ -87,6 +91,12 @@ public class SeamConfiguratorPreferencePage extends PreferencePage implements
 		configureCDIButton.setText(Messages.SeamConfiguratorPreferencePage_Configure_CDI_facet);
 		boolean configureCDI = store.getBoolean(MavenSeamActivator.CONFIGURE_CDI);
 		configureCDIButton.setSelection(configureCDI);
+		
+		configureHibernateButton = new Button(composite,SWT.CHECK);
+		configureHibernateButton.setText(Messages.SeamConfiguratorPreferencePage_Configure_Hibernate);
+		boolean configureHibernate = store.getBoolean(MavenSeamActivator.CONFIGURE_HIBERNATE);
+		configureHibernateButton.setSelection(configureHibernate);
+		
 		return composite;
 	}
 
@@ -103,6 +113,7 @@ public class SeamConfiguratorPreferencePage extends PreferencePage implements
 		configureJSFPortletButton.setSelection(MavenSeamActivator.CONFIGURE_JSFPORTLET_VALUE);
 		configureSeamPortletButton.setSelection(MavenSeamActivator.CONFIGURE_SEAMPORTLET_VALUE);
 		configureCDIButton.setSelection(MavenSeamActivator.CONFIGURE_CDI_VALUE);
+		configureHibernateButton.setSelection(MavenSeamActivator.CONFIGURE_HIBERNATE_VALUE);
 		
 		IPreferenceStore store = MavenSeamActivator.getDefault().getPreferenceStore();
 		store.setValue(MavenSeamActivator.CONFIGURE_SEAM, MavenSeamActivator.CONFIGURE_SEAM_VALUE);
@@ -113,6 +124,7 @@ public class SeamConfiguratorPreferencePage extends PreferencePage implements
 		store.setValue(MavenSeamActivator.CONFIGURE_SEAM_RUNTIME, MavenSeamActivator.CONFIGURE_SEAM_RUNTIME_VALUE);
 		store.setValue(MavenSeamActivator.CONFIGURE_SEAM_ARTIFACTS, MavenSeamActivator.CONFIGURE_SEAM_ARTIFACTS_VALUE);
 		store.setValue(MavenSeamActivator.CONFIGURE_CDI, MavenSeamActivator.CONFIGURE_CDI_VALUE);
+		store.setValue(MavenSeamActivator.CONFIGURE_HIBERNATE, MavenSeamActivator.CONFIGURE_HIBERNATE_VALUE);
 		configureSeamRuntimeButton.setEnabled(configureSeamButton.getSelection());
 		configureSeamArtifactsButton.setEnabled(configureSeamButton.getSelection());
 		super.performDefaults();
@@ -129,6 +141,8 @@ public class SeamConfiguratorPreferencePage extends PreferencePage implements
 		store.setValue(MavenSeamActivator.CONFIGURE_SEAM_RUNTIME, configureSeamRuntimeButton.getSelection());
 		store.setValue(MavenSeamActivator.CONFIGURE_SEAM_ARTIFACTS, configureSeamArtifactsButton.getSelection());
 		store.setValue(MavenSeamActivator.CONFIGURE_CDI, configureCDIButton.getSelection());
+		store.setValue(MavenSeamActivator.CONFIGURE_HIBERNATE, configureHibernateButton.getSelection());
+		
 		return super.performOk();
 	}
 
