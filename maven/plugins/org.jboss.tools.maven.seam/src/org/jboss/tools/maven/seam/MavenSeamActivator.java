@@ -13,9 +13,12 @@ import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Exclusion;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Parent;
+import org.apache.maven.model.Resource;
 import org.apache.maven.project.MavenProject;
+import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.CoreException;
@@ -34,7 +37,10 @@ import org.eclipse.jst.jsf.core.internal.project.facet.IJSFFacetInstallDataModel
 import org.eclipse.jst.jsf.core.internal.project.facet.JSFFacetInstallDataModelProvider;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
+import org.eclipse.wst.common.componentcore.ComponentCore;
 import org.eclipse.wst.common.componentcore.datamodel.properties.IFacetDataModelProperties;
+import org.eclipse.wst.common.componentcore.resources.IVirtualComponent;
+import org.eclipse.wst.common.componentcore.resources.IVirtualFolder;
 import org.eclipse.wst.common.frameworks.datamodel.IDataModel;
 import org.eclipse.wst.common.project.facet.core.FacetedProjectFramework;
 import org.eclipse.wst.common.project.facet.core.IFacetedProject;
@@ -131,6 +137,8 @@ public class MavenSeamActivator extends AbstractUIPlugin {
 	private String testProjectName;
 	private String testArtifactId;
 
+	private String groupId;
+
 	/**
 	 * The constructor
 	 */
@@ -171,6 +179,7 @@ public class MavenSeamActivator extends AbstractUIPlugin {
 		Assert.isNotNull(m2FacetModel);
 		webProjectName = seamFacetModel.getStringProperty(IFacetDataModelProperties.FACET_PROJECT_NAME);
 		artifactId = m2FacetModel.getStringProperty(IJBossMavenConstants.ARTIFACT_ID);
+		groupId = m2FacetModel.getStringProperty(IJBossMavenConstants.GROUP_ID);
 		parentProjectName = webProjectName + PARENT_SUFFIX;
 		parentArtifactId = artifactId + PARENT_SUFFIX;
 		testProjectName = webProjectName + TEST_SUFFIX;
@@ -235,7 +244,7 @@ public class MavenSeamActivator extends AbstractUIPlugin {
 			dependencies.add(dependency);
 			
 			dependency = getSeamDependency();
-			dependency.setScope("test"); //$NON-NLS-1$
+			dependency.setScope("compile"); //$NON-NLS-1$
 			dependencies.add(dependency);
 			
 			dependency = getJSFApi();
@@ -253,7 +262,7 @@ public class MavenSeamActivator extends AbstractUIPlugin {
 			// FIXME
 			dependency.setVersion("${testng.version}"); //$NON-NLS-1$
 			dependency.setClassifier("jdk15"); //$NON-NLS-1$
-			dependency.setScope("test"); //$NON-NLS-1$
+			dependency.setScope("compile"); //$NON-NLS-1$
 			dependencies.add(dependency);
 			
 			dependency = new Dependency();
@@ -266,6 +275,30 @@ public class MavenSeamActivator extends AbstractUIPlugin {
 			dependency.setArtifactId("slf4j-nop"); //$NON-NLS-1$
 			dependencies.add(dependency);
 			
+			dependency = new Dependency();
+			dependency.setGroupId("javax.el"); //$NON-NLS-1$
+			dependency.setArtifactId("el-api"); //$NON-NLS-1$
+			dependency.setScope("test"); //$NON-NLS-1$
+			dependencies.add(dependency);
+			
+			dependency = new Dependency();
+			dependency.setGroupId(groupId);
+			dependency.setArtifactId(artifactId);
+			dependency.setType("war"); //$NON-NLS-1$
+			dependency.setVersion(m2FacetModel.getStringProperty(IJBossMavenConstants.VERSION));
+			dependency.setScope("test"); //$NON-NLS-1$
+			dependencies.add(dependency);
+			
+			if (!SeamFacetAbstractInstallDelegate
+					.isWarConfiguration(seamFacetModel)) {
+				dependency = new Dependency();
+				dependency.setGroupId(groupId);
+				dependency.setArtifactId(ejbArtifactId);
+				dependency.setType("ejb"); //$NON-NLS-1$
+				dependency.setVersion(m2FacetModel.getStringProperty(IJBossMavenConstants.VERSION));
+				dependency.setScope("test"); //$NON-NLS-1$
+				dependencies.add(dependency);
+			}
 			dependency = new Dependency();
 			dependency.setGroupId("org.drools"); //$NON-NLS-1$
 			dependency.setArtifactId("drools-compiler"); //$NON-NLS-1$
@@ -291,10 +324,35 @@ public class MavenSeamActivator extends AbstractUIPlugin {
 				String sourceDirectory = MavenCoreActivator.getSourceDirectory(javaProject);
 				if (sourceDirectory != null) {
 					build.setSourceDirectory(sourceDirectory);
+					build.setTestSourceDirectory(sourceDirectory);
 				}		
 				String outputDirectory = MavenCoreActivator.getOutputDirectory(javaProject);	
 				build.setOutputDirectory(outputDirectory);
+				build.setTestOutputDirectory(outputDirectory);
 				MavenCoreActivator.addResource(build, project, sourceDirectory);
+				Resource resource = new Resource();
+				
+				resource.setDirectory(MavenCoreActivator.BASEDIR + "/bootstrap"); //$NON-NLS-1$
+				List<String> excludes = new ArrayList<String>();
+				excludes.add("**/*.java"); //$NON-NLS-1$
+				resource.setExcludes(excludes);
+				build.getResources().add(resource);
+				
+				resource = new Resource();
+				IProject webProject = ResourcesPlugin.getWorkspace().getRoot().getProject(webProjectName);
+				if (project == null || !project.exists()) {
+					return;
+				}
+				IVirtualComponent component = ComponentCore.createComponent(webProject);
+				IVirtualFolder rootFolder = component.getRootFolder();
+				IContainer root = rootFolder.getUnderlyingFolder();
+				String webContent = root.getProjectRelativePath().toString();
+				resource.setDirectory(MavenCoreActivator.BASEDIR + "/../" + webProjectName + "/" + webContent); //$NON-NLS-1$ //$NON-NLS-2$
+				excludes = new ArrayList<String>();
+				excludes.add("**/*.java"); //$NON-NLS-1$
+				resource.setExcludes(excludes);
+				build.getResources().add(resource);
+				
 				model.setBuild(build);
 				MavenCoreActivator.createMavenProject(testProjectName, null, model, true);
 			} catch (Exception e) {
