@@ -16,6 +16,10 @@ public class ProjectExamplesPreferencesInitializer extends
 		node.putBoolean(
 				ProjectExamplesActivator.SHOW_EXPERIMENTAL_SITES,
 				ProjectExamplesActivator.SHOW_EXPERIMENTAL_SITES_VALUE);
+		
+		node.putBoolean(
+				ProjectExamplesActivator.SHOW_INVALID_SITES,
+				ProjectExamplesActivator.SHOW_INVALID_SITES_VALUE);
 	}
 
 }

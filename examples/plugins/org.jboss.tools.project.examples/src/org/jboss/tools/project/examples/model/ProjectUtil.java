@@ -84,6 +84,8 @@ public class ProjectUtil {
 	private static String EXPERIMENTAL_EXT = "experimental"; //$NON-NLS-1$
 
 	private static Set<ProjectExampleSite> pluginSites;
+
+	private static HashSet<ProjectExampleSite> invalidSites = new HashSet<ProjectExampleSite>();
 	
 	private ProjectUtil() {
 	}
@@ -210,6 +212,7 @@ public class ProjectUtil {
 	public static List<Category> getProjects() {
 		Set<ProjectExampleSite> sites = getSites();
 		List<Category> list = new ArrayList<Category>();
+		invalidSites.clear();
 		Category other = Category.OTHER;
 		try {
 			for (ProjectExampleSite site : sites) {
@@ -221,6 +224,7 @@ public class ProjectUtil {
 						"projectExamples", ".xml", null); //$NON-NLS-1$ //$NON-NLS-2$
 				if (file == null || !file.exists() || !file.isFile()) {
 					ProjectExamplesActivator.log(NLS.bind(Messages.ProjectUtil_Invalid_URL,site.getUrl().toString()));
+					invalidSites.add(site);
 					continue;
 				}
 				DocumentBuilderFactory dbf = DocumentBuilderFactory
@@ -490,5 +494,9 @@ public class ProjectUtil {
 			}
 		}		
 		return root;
+	}
+
+	public static HashSet<ProjectExampleSite> getInvalidSites() {
+		return invalidSites;
 	}	
 }

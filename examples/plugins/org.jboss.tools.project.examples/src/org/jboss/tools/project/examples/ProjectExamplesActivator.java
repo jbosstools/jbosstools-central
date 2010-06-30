@@ -42,6 +42,8 @@ public class ProjectExamplesActivator extends AbstractUIPlugin {
 	public static final String SHOW_EXPERIMENTAL_SITES = "showExperimentalSites"; //$NON-NLS-1$
 	public static final String USER_SITES = "userSites"; //$NON-NLS-1$
 	public static final boolean SHOW_EXPERIMENTAL_SITES_VALUE = false;
+	public static final String SHOW_INVALID_SITES = "invalidSites"; //$NON-NLS-1$
+	public static final boolean SHOW_INVALID_SITES_VALUE = true;
 	
 	// The shared instance
 	private static ProjectExamplesActivator plugin;

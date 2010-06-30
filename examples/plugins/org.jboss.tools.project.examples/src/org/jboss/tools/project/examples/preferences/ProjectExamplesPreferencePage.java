@@ -35,10 +35,11 @@ import org.jboss.tools.project.examples.model.SiteCategory;
 public class ProjectExamplesPreferencePage extends PreferencePage implements
 		IWorkbenchPreferencePage {
 
-	private Button button;
+	private Button showExperimentalSites;
 	private Sites sites;
 	private TreeViewer viewer;
 	private ProjectExampleSite selectedSite;
+	private Button showInvalidSites;
 	
 	@Override
 	protected Control createContents(Composite parent) {
@@ -48,10 +49,15 @@ public class ProjectExamplesPreferencePage extends PreferencePage implements
 		layout.marginHeight = 0;
 		composite.setLayout(layout);
 		
-		button = new Button(composite,SWT.CHECK);
-		button.setText(Messages.ProjectExamplesPreferencePage_Show_experimental_sites);
+		showExperimentalSites = new Button(composite,SWT.CHECK);
+		showExperimentalSites.setText(Messages.ProjectExamplesPreferencePage_Show_experimental_sites);
 		IPreferenceStore store = ProjectExamplesActivator.getDefault().getPreferenceStore();
-		button.setSelection(store.getBoolean(ProjectExamplesActivator.SHOW_EXPERIMENTAL_SITES));
+		showExperimentalSites.setSelection(store.getBoolean(ProjectExamplesActivator.SHOW_EXPERIMENTAL_SITES));
+		
+		showInvalidSites = new Button(composite,SWT.CHECK);
+		showInvalidSites.setText(Messages.ProjectExamplesPreferencePage_Show_invalid_sites);
+		showInvalidSites.setSelection(store.getBoolean(ProjectExamplesActivator.SHOW_INVALID_SITES));
+		
 		Group sitesGroup = new Group(composite,SWT.NONE);
 		sitesGroup.setText(Messages.ProjectExamplesPreferencePage_Sites);
 		GridLayout gl = new GridLayout(2,false);
@@ -174,7 +180,8 @@ public class ProjectExamplesPreferencePage extends PreferencePage implements
 
 	@Override
 	protected void performDefaults() {
-		button.setSelection(ProjectExamplesActivator.SHOW_EXPERIMENTAL_SITES_VALUE);
+		showExperimentalSites.setSelection(ProjectExamplesActivator.SHOW_EXPERIMENTAL_SITES_VALUE);
+		showInvalidSites.setSelection(ProjectExamplesActivator.SHOW_INVALID_SITES_VALUE);
 		sites.getUserSites().clear();
 		storeSites();
 		super.performDefaults();
@@ -188,7 +195,9 @@ public class ProjectExamplesPreferencePage extends PreferencePage implements
 
 	private void storeSites() {
 		IPreferenceStore store = ProjectExamplesActivator.getDefault().getPreferenceStore();
-		store.setValue(ProjectExamplesActivator.SHOW_EXPERIMENTAL_SITES, button.getSelection());
+		store.setValue(ProjectExamplesActivator.SHOW_EXPERIMENTAL_SITES, showExperimentalSites.getSelection());
+		store.setValue(ProjectExamplesActivator.SHOW_INVALID_SITES, showInvalidSites.getSelection());
+		
 		try {
 			String userSites = ProjectUtil.getAsXML(sites.getUserSites());
 			store.setValue(ProjectExamplesActivator.USER_SITES, userSites);

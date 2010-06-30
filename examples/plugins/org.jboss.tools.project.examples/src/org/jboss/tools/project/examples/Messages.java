@@ -14,6 +14,7 @@ import org.eclipse.osgi.util.NLS;
 
 public class Messages extends NLS {
 	private static final String BUNDLE_NAME = "org.jboss.tools.project.examples.messages"; //$NON-NLS-1$
+	public static String NewProjectExamplesWizardPage_Cannot_access_the_following_sites;
 	public static String NewProjectExamplesWizardPage_Site;
 	public static String Category_Other;
 	public static String ECFExamplesTransport_Downloading;
@@ -48,12 +49,14 @@ public class Messages extends NLS {
 	public static String NewProjectExamplesWizardPage_Details;
 	public static String NewProjectExamplesWizardPage_Import_Project_Example;
 	public static String NewProjectExamplesWizardPage_Invalid_fix;
+	public static String NewProjectExamplesWizardPage_Invalid_Sites;
 	public static String NewProjectExamplesWizardPage_Note;
 	public static String NewProjectExamplesWizardPage_Project_Example;
 	public static String NewProjectExamplesWizardPage_Project_name;
 	public static String NewProjectExamplesWizardPage_Project_size;
 	public static String NewProjectExamplesWizardPage_Projects;
 	public static String NewProjectExamplesWizardPage_Show_the_Quick_Fix_dialog;
+	public static String NewProjectExamplesWizardPage_Show_this_dialog_next_time;
 	public static String NewProjectExamplesWizardPage_URL;
 	public static String PluginFix_Invalid_plugin_fix;
 	public static String Project_Unknown;
@@ -63,6 +66,7 @@ public class Messages extends NLS {
 	public static String ProjectExamplesPreferencePage_Edit;
 	public static String ProjectExamplesPreferencePage_Remove;
 	public static String ProjectExamplesPreferencePage_Show_experimental_sites;
+	public static String ProjectExamplesPreferencePage_Show_invalid_sites;
 	public static String ProjectExamplesPreferencePage_Sites;
 	public static String ProjectFix_Missing_Drools_Runtime;
 	public static String ProjectFix_Missing_plugin;

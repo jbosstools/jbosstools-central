@@ -12,6 +12,7 @@ package org.jboss.tools.project.examples.wizard;
 
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
@@ -19,7 +20,9 @@ import java.util.StringTokenizer;
 import java.util.TreeSet;
 
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.jface.commands.ToggleState;
 import org.eclipse.jface.dialogs.Dialog;
+import org.eclipse.jface.dialogs.MessageDialogWithToggle;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
@@ -58,6 +61,7 @@ import org.jboss.tools.project.examples.fixes.SeamRuntimeFix;
 import org.jboss.tools.project.examples.fixes.WTPRuntimeFix;
 import org.jboss.tools.project.examples.model.Category;
 import org.jboss.tools.project.examples.model.Project;
+import org.jboss.tools.project.examples.model.ProjectExampleSite;
 import org.jboss.tools.project.examples.model.ProjectFix;
 import org.jboss.tools.project.examples.model.ProjectUtil;
 import org.jboss.tools.seam.core.project.facet.SeamRuntime;
@@ -136,7 +140,7 @@ public class NewProjectExamplesWizardPage extends WizardPage {
 		viewer.setLabelProvider(new ProjectLabelProvider());
 		viewer.setContentProvider(new ProjectContentProvider());
 		
-		refresh(viewer);
+		refresh(viewer, false);
 		final SiteFilter siteFilter = new SiteFilter();
 		viewer.addFilter(siteFilter);
 		
@@ -265,7 +269,7 @@ public class NewProjectExamplesWizardPage extends WizardPage {
 			public void widgetSelected(SelectionEvent e) {
 				IPreferenceStore store = ProjectExamplesActivator.getDefault().getPreferenceStore();
 				store.setValue(ProjectExamplesActivator.SHOW_EXPERIMENTAL_SITES, button.getSelection());
-				refresh(viewer);
+				refresh(viewer, true);
 				if (siteCombo != null) {
 					String[] items = getItems();
 					int index = siteCombo.getSelectionIndex();
@@ -303,18 +307,30 @@ public class NewProjectExamplesWizardPage extends WizardPage {
 		return true;
 	}
 	
-	private void refresh(final TreeViewer viewer) {
-		AdaptableList input = new AdaptableList(getCategories());
+	private void refresh(final TreeViewer viewer, boolean show) {
+		AdaptableList input = new AdaptableList(getCategories(show));
 		viewer.setInput(input);
 		viewer.refresh();
 	}
 
-	private List<Category> getCategories() {
-		return ProjectUtil.getProjects();
+	private List<Category> getCategories(boolean show) {
+		List<Category> categories = ProjectUtil.getProjects();
+		HashSet<ProjectExampleSite> invalidSites = ProjectUtil.getInvalidSites();
+		boolean showInvalidSites = ProjectExamplesActivator.getDefault().getPreferenceStore().getBoolean(ProjectExamplesActivator.SHOW_INVALID_SITES);
+		if (invalidSites.size() > 0 && showInvalidSites && show) {
+			String message = Messages.NewProjectExamplesWizardPage_Cannot_access_the_following_sites;
+			for (ProjectExampleSite site:invalidSites) {
+				message = message + site.getName() + "\n"; //$NON-NLS-1$
+			}
+			MessageDialogWithToggle dialog = MessageDialogWithToggle.openInformation(getShell(), Messages.NewProjectExamplesWizardPage_Invalid_Sites, message, Messages.NewProjectExamplesWizardPage_Show_this_dialog_next_time, true, ProjectExamplesActivator.getDefault().getPreferenceStore(), ProjectExamplesActivator.SHOW_INVALID_SITES);
+			boolean toggleState = dialog.getToggleState();
+			ProjectExamplesActivator.getDefault().getPreferenceStore().setValue(ProjectExamplesActivator.SHOW_INVALID_SITES, toggleState);
+		}
+		return categories;
 	}
 	
 	private String[] getItems() {
-		List<Category> categories = getCategories();
+		List<Category> categories = getCategories(true);
 		Set<String> sites = new TreeSet<String>();
 		sites.add(ProjectExamplesActivator.ALL_SITES);
 		for (Category category:categories) {
