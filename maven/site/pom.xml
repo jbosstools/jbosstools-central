@@ -6,8 +6,9 @@
 		<artifactId>org.jboss.tools.parent.pom</artifactId>
 		<version>0.0.1-SNAPSHOT</version>
 	</parent>
-	<groupId>org.jboss.tools</groupId>
-	<artifactId>maven.site</artifactId> 
+	<groupId>org.jboss.tools.maven</groupId>
+	<artifactId>site</artifactId> 
+	<name>maven.site</name>
 	<version>0.0.1-SNAPSHOT</version>
 	<packaging>eclipse-update-site</packaging>
 </project>
