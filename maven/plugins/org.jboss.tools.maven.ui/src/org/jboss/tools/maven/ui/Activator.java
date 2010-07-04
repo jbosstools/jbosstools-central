@@ -1,16 +1,18 @@
 package org.jboss.tools.maven.ui;
 
-import java.net.URL;
-import java.util.Collections;
+import java.util.List;
 
-import org.eclipse.core.runtime.CoreException;
+import org.apache.maven.model.Dependency;
+import org.apache.maven.project.MavenProject;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.emf.common.util.URI;
-import org.eclipse.emf.ecore.resource.Resource;
+import org.eclipse.jst.common.project.facet.core.libprov.ILibraryProvider;
+import org.eclipse.jst.common.project.facet.core.libprov.LibraryInstallDelegate;
+import org.eclipse.jst.common.project.facet.core.libprov.LibraryProviderFramework;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
-import org.maven.ide.components.pom.util.PomResourceFactoryImpl;
-import org.maven.ide.components.pom.util.PomResourceImpl;
+import org.eclipse.wst.common.frameworks.datamodel.IDataModel;
+import org.eclipse.wst.common.project.facet.core.IFacetedProject;
+import org.eclipse.wst.common.project.facet.core.IProjectFacetVersion;
 import org.osgi.framework.BundleContext;
 
 /**
@@ -20,6 +22,42 @@ public class Activator extends AbstractUIPlugin {
 
 	// The plug-in ID
 	public static final String PLUGIN_ID = "org.jboss.tools.maven.ui"; //$NON-NLS-1$
+
+	public static final String CONFIGURE_SEAM = "configureSeam"; //$NON-NLS-1$
+
+	public static final String CONFIGURE_PORTLET = "configurePortlet"; //$NON-NLS-1$
+
+	public static final boolean CONFIGURE_SEAM_VALUE = true;
+
+	public static final String CONFIGURE_SEAM_RUNTIME = "configureSeamRuntime"; //$NON-NLS-1$
+  
+	public static final boolean CONFIGURE_SEAM_RUNTIME_VALUE = true;
+
+	public static final String CONFIGURE_SEAM_ARTIFACTS = "configureSeamArtifacts"; //$NON-NLS-1$
+	
+	public static final boolean CONFIGURE_SEAM_ARTIFACTS_VALUE = true;
+
+	public static final String CONFIGURE_JSF = "configureJSF"; //$NON-NLS-1$
+	
+	public static final boolean CONFIGURE_JSF_VALUE = true;
+
+	public static final boolean CONFIGURE_PORTLET_VALUE = true;
+
+	public static final String CONFIGURE_JSFPORTLET = "configureJSFPortlet"; //$NON-NLS-1$
+	
+	public static final boolean CONFIGURE_JSFPORTLET_VALUE = true;
+
+	public static final String CONFIGURE_SEAMPORTLET = "configureSeamPortlet"; //$NON-NLS-1$
+	
+	public static final boolean CONFIGURE_SEAMPORTLET_VALUE = true;
+	
+	public static final String CONFIGURE_CDI = "configureCDI"; //$NON-NLS-1$
+	
+	public static final boolean CONFIGURE_CDI_VALUE = true;
+	
+	public static final String CONFIGURE_HIBERNATE = "configureHibernate"; //$NON-NLS-1$
+	
+	public static final boolean CONFIGURE_HIBERNATE_VALUE = true;
 
 	// The shared instance
 	private static Activator plugin;
@@ -67,4 +105,18 @@ public class Activator extends AbstractUIPlugin {
 		getDefault().getLog().log(status);
 	}
 
+	public String getDependencyVersion(MavenProject mavenProject, String gid, String aid) {
+		List<Dependency> dependencies = mavenProject.getDependencies();
+		for (Dependency dependency:dependencies) {
+	    	String groupId = dependency.getGroupId();
+    		if (groupId != null && (groupId.equals(gid)) ) {
+    			String artifactId = dependency.getArtifactId();
+    			if (artifactId != null && artifactId.equals(aid)) {
+	    			return dependency.getVersion();
+	    		} 
+	    	}
+	    }
+	    return null;
+	}
+	
 }

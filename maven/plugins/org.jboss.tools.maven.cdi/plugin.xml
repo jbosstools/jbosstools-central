@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+
+	<extension point="org.maven.ide.eclipse.projectConfigurators">
+      <configurator 
+          id="org.jboss.tools.maven.cdi.configurator"
+          class="org.jboss.tools.maven.cdi.configurators.CDIProjectConfigurator"
+          name="%CDI_Project_configurator" priority="250"/>
+    </extension>
+    
+</plugin>

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+	<extension point="org.maven.ide.eclipse.projectConfigurators">
+      <configurator 
+          id="org.jboss.tools.maven.jsf.configurator"
+          class="org.jboss.tools.maven.jsf.configurators.JSFProjectConfigurator"
+          name="%JSF_Project_configurator" priority="150"/>
+    </extension>
+</plugin>

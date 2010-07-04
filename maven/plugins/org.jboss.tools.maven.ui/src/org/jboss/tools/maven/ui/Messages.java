@@ -28,6 +28,17 @@ public class Messages extends NLS {
 	public static String MavenUserLibraryProviderInstallPanel_Scope;
 	public static String MavenUserLibraryProviderInstallPanel_Type;
 	public static String MavenUserLibraryProviderInstallPanel_Version;
+	public static String ConfiguratorPreferencePage_Configure_JBoss_JSF_Portlet_facet;
+	public static String ConfiguratorPreferencePage_Configure_JBoss_Portlet_Core_facet;
+	public static String ConfiguratorPreferencePage_Configure_JBoss_Seam_Portlet_facet;
+	public static String ConfiguratorPreferencePage_Configure_JSF_facet;
+	public static String ConfiguratorPreferencePage_Configure_CDI_facet;
+	public static String ConfiguratorPreferencePage_Configure_Hibernate;
+	public static String ConfiguratorPreferencePage_Configure_Seam_Artifacts;
+	public static String ConfiguratorPreferencePage_Configure_Seam_Runtime;
+	public static String ConfiguratorPreferencePage_Configure_Seam_when_importing_Maven_projects;
+	public static String ConfiguratorPreferencePage_When_importing_Maven_projects_configure_the_following;
+	
 	static {
 		// initialize resource bundle
 		NLS.initializeMessages(BUNDLE_NAME, Messages.class);
