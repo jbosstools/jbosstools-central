@@ -45,8 +45,10 @@ import org.jboss.tools.common.model.util.EclipseResourceUtil;
 import org.jboss.tools.jst.web.kb.IKbProject;
 import org.jboss.tools.maven.core.IJBossMavenConstants;
 import org.jboss.tools.maven.core.internal.project.facet.MavenFacetInstallDataModelProvider;
+import org.jboss.tools.maven.jsf.MavenJSFActivator;
 import org.jboss.tools.maven.seam.MavenSeamActivator;
 import org.jboss.tools.maven.seam.Messages;
+import org.jboss.tools.maven.ui.Activator;
 import org.jboss.tools.seam.core.ISeamProject;
 import org.jboss.tools.seam.core.SeamCorePlugin;
 import org.jboss.tools.seam.core.SeamUtil;
@@ -127,8 +129,8 @@ public class SeamProjectConfigurator extends AbstractProjectConfigurator {
 	
 	private void configureInternal(MavenProject mavenProject,IProject project,
 			IProgressMonitor monitor) throws CoreException {
-		IPreferenceStore store = MavenSeamActivator.getDefault().getPreferenceStore();
-		boolean configureSeam = store.getBoolean(MavenSeamActivator.CONFIGURE_SEAM);
+		IPreferenceStore store = Activator.getDefault().getPreferenceStore();
+		boolean configureSeam = store.getBoolean(Activator.CONFIGURE_SEAM);
 		if (!configureSeam) {
 			return;
 		}
@@ -170,7 +172,7 @@ public class SeamProjectConfigurator extends AbstractProjectConfigurator {
 		    		if (ejbProject != null) {
 		    			prefs.put(ISeamFacetDataModelProperties.SEAM_EJB_PROJECT, ejbProject.getName());
 		    			IJavaProject javaProject = JavaCore.create(ejbProject);
-		    			boolean configureSeamArtifacts = store.getBoolean(MavenSeamActivator.CONFIGURE_SEAM_ARTIFACTS);
+		    			boolean configureSeamArtifacts = store.getBoolean(Activator.CONFIGURE_SEAM_ARTIFACTS);
 						if (configureSeamArtifacts) {
 							if (javaProject != null && javaProject.isOpen()) {
 								try {
@@ -293,7 +295,7 @@ public class SeamProjectConfigurator extends AbstractProjectConfigurator {
 			String deploying = model.getStringProperty(ISeamFacetDataModelProperties.JBOSS_AS_DEPLOY_AS);
 			if (deploying != null && deploying.equals(ISeamFacetDataModelProperties.DEPLOY_AS_WAR)) {
 				IPreferenceStore store = MavenSeamActivator.getDefault().getPreferenceStore();
-				boolean configureSeamArtifacts = store.getBoolean(MavenSeamActivator.CONFIGURE_SEAM_ARTIFACTS);
+				boolean configureSeamArtifacts = store.getBoolean(Activator.CONFIGURE_SEAM_ARTIFACTS);
 				if (!configureSeamArtifacts) {
 					return;
 				}
@@ -306,7 +308,7 @@ public class SeamProjectConfigurator extends AbstractProjectConfigurator {
 			}
 		}
 		IPreferenceStore store = MavenSeamActivator.getDefault().getPreferenceStore();
-		boolean configureSeamPortlet = store.getBoolean(MavenSeamActivator.CONFIGURE_SEAMPORTLET);
+		boolean configureSeamPortlet = store.getBoolean(Activator.CONFIGURE_SEAMPORTLET);
 		if (!configureSeamPortlet) {
 			return;
 		}
@@ -327,7 +329,7 @@ public class SeamProjectConfigurator extends AbstractProjectConfigurator {
 	private void installJSFFacet(IFacetedProject fproj, IProgressMonitor monitor)
 			throws CoreException {
 		if (!fproj.hasProjectFacet(jsfFacet)) {
-			IDataModel model = MavenSeamActivator.getDefault().createJSFDataModel(fproj,jsfVersion);
+			IDataModel model = MavenJSFActivator.getDefault().createJSFDataModel(fproj,jsfVersion);
 			fproj.installProjectFacet(jsfVersion, model, monitor);
 		}
 	}
@@ -479,7 +481,7 @@ public class SeamProjectConfigurator extends AbstractProjectConfigurator {
 		config.setBooleanProperty(ISeamFacetDataModelProperties.CONFIGURE_DEFAULT_SEAM_RUNTIME, false);
 		config.setBooleanProperty(ISeamFacetDataModelProperties.CONFIGURE_WAR_PROJECT, false);
 		IPreferenceStore store = MavenSeamActivator.getDefault().getPreferenceStore();
-		boolean configureSeamArtifacts = store.getBoolean(MavenSeamActivator.CONFIGURE_SEAM_ARTIFACTS);
+		boolean configureSeamArtifacts = store.getBoolean(Activator.CONFIGURE_SEAM_ARTIFACTS);
 		if (!configureSeamArtifacts) {
 			return config;
 		}
@@ -547,7 +549,7 @@ public class SeamProjectConfigurator extends AbstractProjectConfigurator {
 			return null;
 		}
 		IPreferenceStore store = MavenSeamActivator.getDefault().getPreferenceStore();
-		boolean configureSeamRuntime = store.getBoolean(MavenSeamActivator.CONFIGURE_SEAM_RUNTIME);
+		boolean configureSeamRuntime = store.getBoolean(Activator.CONFIGURE_SEAM_RUNTIME);
 		if (!configureSeamRuntime) {
 			return null;
 		}

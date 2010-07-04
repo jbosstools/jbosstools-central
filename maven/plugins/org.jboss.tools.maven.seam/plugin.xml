@@ -13,46 +13,5 @@
           class="org.jboss.tools.maven.seam.configurators.SeamProjectConfigurator"
           name="%Seam_Project_configurator" priority="200"/>
     </extension>
-   
-    <extension point="org.maven.ide.eclipse.projectConfigurators">
-      <configurator 
-          id="org.jboss.tools.maven.cdi.configurator"
-          class="org.jboss.tools.maven.seam.configurators.CDIProjectConfigurator"
-          name="%CDI_Project_configurator" priority="250"/>
-    </extension>
     
-    <extension point="org.maven.ide.eclipse.projectConfigurators">
-      <configurator 
-          id="org.jboss.tools.maven.cdi.configurator"
-          class="org.jboss.tools.maven.seam.configurators.HibernateProjectConfigurator"
-          name="%Hibernate_Project_configurator" priority="250"/>
-    </extension>
-    
-    <extension point="org.maven.ide.eclipse.projectConfigurators">
-      <configurator 
-          id="org.jboss.tools.maven.jsf.configurator"
-          class="org.jboss.tools.maven.seam.configurators.JSFProjectConfigurator"
-          name="%JSF_Project_configurator" priority="150"/>
-    </extension>
-    
-    <extension point="org.maven.ide.eclipse.projectConfigurators">
-      <configurator 
-          id="org.jboss.tools.maven.portlet.configurator"
-          class="org.jboss.tools.maven.seam.configurators.PortletProjectConfigurator"
-          name="%Portlet_Core_Project_configurator" priority="155"/>
-    </extension>
-    
-    <extension
-        point="org.eclipse.ui.preferencePages">
-     <page
-           category="org.jboss.tools.common.model.ui.MainPreferencePage"
-           class="org.jboss.tools.maven.seam.preferences.SeamConfiguratorPreferencePage"
-           id="org.jboss.tools.maven.seam.preferences.seamConfiguratorPreferencePage"
-           name="%JBoss_Maven_Integration"/>
-    </extension>
-    
-    <extension
-         point="org.eclipse.core.runtime.preferences">
-      <initializer class="org.jboss.tools.maven.seam.preferences.SeamConfiguratorPreferencesInitializer"/>
-   </extension>
 </plugin>
