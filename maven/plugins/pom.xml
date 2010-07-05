@@ -8,6 +8,7 @@ xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xs
 	<packaging>pom</packaging>
 	<modules>
 		<module>org.jboss.tools.maven.core</module>
+		<module>org.jboss.tools.maven.jsf</module>
 		<module>org.jboss.tools.maven.seam</module>
 		<module>org.jboss.tools.maven.ui</module>
 	</modules>
