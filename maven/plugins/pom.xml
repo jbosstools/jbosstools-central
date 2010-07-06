@@ -11,6 +11,9 @@ xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xs
 		<module>org.jboss.tools.maven.jsf</module>
 		<module>org.jboss.tools.maven.seam</module>
 		<module>org.jboss.tools.maven.ui</module>
+		<module>org.jboss.tools.maven.cdi</module>
+		<module>org.jboss.tools.maven.hibernate</module>
+		<module>org.jboss.tools.maven.portlet</module>
 	</modules>
 </project>
 	
