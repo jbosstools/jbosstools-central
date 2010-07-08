@@ -11,11 +11,13 @@ public class ParentAdder extends ProjectUpdater {
     private final String groupId;
     private final String artifactId;
     private final String version;
+	private String relativePath;
 
-    public ParentAdder(String groupId, String artifactId, String version) {
+    public ParentAdder(String groupId, String artifactId, String version, String relativePath) {
       this.groupId = groupId;
       this.artifactId = artifactId;
       this.version = version;
+      this.relativePath = relativePath;
     }
 
     public void update(Model model) {
@@ -25,6 +27,9 @@ public class ParentAdder extends ProjectUpdater {
         parent.setArtifactId(artifactId);
         parent.setGroupId(groupId);
         parent.setVersion(version);
+        if (relativePath != null) {
+        	parent.setRelativePath(relativePath);
+        }
         model.setParent(parent);
       }
     }

@@ -68,7 +68,7 @@ import org.osgi.framework.BundleContext;
  */
 public class MavenCoreActivator extends Plugin {
 
-	private static final String SEPARATOR = "/"; //$NON-NLS-1$
+	public static final String SEPARATOR = "/"; //$NON-NLS-1$
 
 	// The plug-in ID
 	public static final String PLUGIN_ID = "org.jboss.tools.maven.core"; //$NON-NLS-1$

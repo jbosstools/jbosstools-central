@@ -5,7 +5,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 
 import org.apache.maven.model.Build;
@@ -23,7 +25,10 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.emf.common.util.EList;
+import org.eclipse.emf.ecore.xmi.XMIResource;
 import org.eclipse.jdt.core.IClasspathEntry;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.JavaCore;
@@ -46,22 +51,27 @@ import org.jboss.tools.seam.core.project.facet.SeamRuntimeManager;
 import org.jboss.tools.seam.core.project.facet.SeamVersion;
 import org.jboss.tools.seam.internal.core.project.facet.ISeamFacetDataModelProperties;
 import org.jboss.tools.seam.internal.core.project.facet.SeamFacetAbstractInstallDelegate;
+import org.maven.ide.components.pom.Configuration;
+import org.maven.ide.components.pom.Plugin;
+import org.maven.ide.components.pom.PluginExecution;
+import org.maven.ide.components.pom.PomFactory;
+import org.maven.ide.components.pom.util.PomResourceImpl;
 import org.maven.ide.eclipse.MavenPlugin;
 import org.maven.ide.eclipse.core.IMavenConstants;
 import org.maven.ide.eclipse.embedder.MavenModelManager;
+import org.maven.ide.eclipse.embedder.ProjectUpdater;
 import org.maven.ide.eclipse.project.MavenProjectManager;
 import org.maven.ide.eclipse.project.ResolverConfiguration;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
+import org.w3c.dom.Node;
 
 /**
  * The activator class controls the plug-in life cycle
  */
 public class MavenSeamActivator extends AbstractUIPlugin {
 
-	private static final String WAR_ARCHIVE_SUFFIX = ".war"; //$NON-NLS-1$
-	
-	private static final String EJB_ARCHIVE_SUFFIX = ".jar"; //$NON-NLS-1$
+	private static final String ORG_CODEHAUS_MOJO = "org.codehaus.mojo"; //$NON-NLS-1$
 
 	private static final String TEST_SUFFIX = "-test"; //$NON-NLS-1$
 
@@ -298,10 +308,7 @@ public class MavenSeamActivator extends AbstractUIPlugin {
 				if (project == null || !project.exists()) {
 					return;
 				}
-				IVirtualComponent component = ComponentCore.createComponent(webProject);
-				IVirtualFolder rootFolder = component.getRootFolder();
-				IContainer root = rootFolder.getUnderlyingFolder();
-				String webContent = root.getProjectRelativePath().toString();
+				String webContent = getRootComponent(webProject);
 				resource.setDirectory(MavenCoreActivator.BASEDIR + "/../" + webProjectName + "/" + webContent); //$NON-NLS-1$ //$NON-NLS-2$
 				excludes = new ArrayList<String>();
 				excludes.add("**/*.java"); //$NON-NLS-1$
@@ -567,7 +574,13 @@ public class MavenSeamActivator extends AbstractUIPlugin {
 			String artifactId = parentProjectName;
 			String groupId = m2FacetModel.getStringProperty(IJBossMavenConstants.GROUP_ID);
 			String version = m2FacetModel.getStringProperty(IJBossMavenConstants.VERSION);
-			modelManager.updateProject(pomFile, new ParentAdder(groupId, artifactId, version));
+			String relativePath = null;
+			if (SeamFacetAbstractInstallDelegate
+					.isWarConfiguration(seamFacetModel)) {
+				relativePath = "../" + parentProjectName; //$NON-NLS-1$
+			}
+			ParentAdder parentAdder = new ParentAdder(groupId, artifactId, version, relativePath);
+			modelManager.updateProject(pomFile, parentAdder);
 			
 			Dependency dependency = getHibernateValidator();
 			//dependency.setScope("provided");
@@ -697,6 +710,7 @@ public class MavenSeamActivator extends AbstractUIPlugin {
 				dependency.setGroupId("commons-digester"); //$NON-NLS-1$
 				dependency.setArtifactId("commons-digester"); //$NON-NLS-1$
 				modelManager.addDependency(pomFile,dependency);
+				modelManager.updateProject(pomFile, new WarProjectUpdater(webProject));
 			}
 			
 			// ejb project
@@ -711,10 +725,42 @@ public class MavenSeamActivator extends AbstractUIPlugin {
 				dependency.setScope("provided"); //$NON-NLS-1$
 				modelManager.addDependency(pomFile,dependency);
 			}
+			
+			modelManager.updateProject(pomFile, new WarProjectUpdater(webProject));
 			removeWTPContainers(m2FacetModel, webProject);
 		} catch (Exception e) {
 			MavenSeamActivator.log(e);
 		}
+	}
+
+	
+
+	private static String getRootComponent(IProject webProject) {
+		IVirtualComponent component = ComponentCore.createComponent(webProject);
+		IVirtualFolder rootFolder = component.getRootFolder();
+		IContainer root = rootFolder.getUnderlyingFolder();
+		String webContentRoot = root.getProjectRelativePath().toString();
+		return webContentRoot;
+	}
+
+	private static Plugin getPlugin(org.maven.ide.components.pom.Build build,
+			String groupId, String artifactId) {
+		EList<Plugin> plugins = build.getPlugins();
+		for (Plugin plugin : plugins) {
+			String group = plugin.getGroupId();
+			if (group == null) {
+				group = ORG_CODEHAUS_MOJO;
+			}
+			String artifact = plugin.getArtifactId();
+			if (group.equals(groupId) && artifactId.equals(artifact)) {
+				return plugin;
+			}
+		}
+		Plugin newPlugin = PomFactory.eINSTANCE.createPlugin();
+		newPlugin.setGroupId(groupId);
+		newPlugin.setArtifactId(artifactId);
+		build.getPlugins().add(newPlugin);
+		return newPlugin;
 	}
 
 	private void removeWTPContainers(IDataModel m2FacetModel,
@@ -941,4 +987,168 @@ public class MavenSeamActivator extends AbstractUIPlugin {
 		getDefault().getLog().log(status);
 	}
 	
+	public static class WarProjectUpdater extends ProjectUpdater {
+	
+		private static final String WAR_SOURCE_DIRECTORY = "warSourceDirectory"; //$NON-NLS-1$
+		private static final String WAR_SOURCE_EXCLUDES = "warSourceExcludes"; //$NON-NLS-1$
+		private IProject webProject;
+		
+		public WarProjectUpdater(IProject project) {
+			webProject = project;
+		}
+
+		public void update(org.maven.ide.components.pom.Model projectModel) {
+			org.maven.ide.components.pom.Build build = projectModel.getBuild();
+			if (build == null) {
+				// FIXME
+				return;
+			}
+			IJavaProject javaProject = JavaCore.create(webProject);
+			if (javaProject == null) {
+				return;
+			}
+			if (!javaProject.isOpen()) {
+				try {
+					javaProject.open(new NullProgressMonitor());
+				} catch (JavaModelException e) {
+					MavenSeamActivator.log(e);
+					return;
+				}
+			}
+			IPath projectOutput;
+			IClasspathEntry[] entries;
+			try {
+				projectOutput = javaProject.getOutputLocation();
+				entries = javaProject.getRawClasspath();
+			} catch (JavaModelException e) {
+				MavenSeamActivator.log(e);
+				return;
+			}
+			List<IPath> sources = new ArrayList<IPath>();
+			List<IPath> outputs = new ArrayList<IPath>();
+			for (int i = 0; i < entries.length; i++) {
+				if (entries[i].getEntryKind() == IClasspathEntry.CPE_SOURCE) {
+					IPath path = entries[i].getPath();
+					sources.add(path);
+					IPath output = entries[i].getOutputLocation();
+					if (output != null && !output.equals(projectOutput)) {
+						outputs.add(output);
+					}
+				}
+			}
+			int indexSource = 0;
+			for (IPath source:sources) {
+				if (source != null && source.toString().contains("main")) { //$NON-NLS-1$
+					indexSource = sources.indexOf(source);
+				}
+			}
+			if (sources.size() > 0) {
+				
+				IPath path = sources.get(indexSource);
+				path = path.makeRelativeTo(javaProject.getPath());
+				String value = path.toString();
+				if (value.startsWith(MavenCoreActivator.SEPARATOR)) {
+					value = MavenCoreActivator.BASEDIR + value;
+				} else {
+					value = MavenCoreActivator.BASEDIR + MavenCoreActivator.SEPARATOR + value;
+				}
+				build.setSourceDirectory(value);
+			}
+			
+			if (projectOutput != null) {
+				String value = projectOutput.toString();
+				if (value.startsWith(MavenCoreActivator.SEPARATOR)) {
+					value = MavenCoreActivator.BASEDIR + value;
+				} else {
+					value = MavenCoreActivator.BASEDIR + MavenCoreActivator.SEPARATOR + value;
+				}
+				build.setOutputDirectory(value);
+			}
+			
+			EList<org.maven.ide.components.pom.Resource> resources = build.getResources();
+			resources.clear();
+			for (IPath source:sources) {
+				org.maven.ide.components.pom.Resource resource = PomFactory.eINSTANCE.createResource();
+				String value = source.makeRelativeTo(javaProject.getPath()).toString();
+				if (value.startsWith(MavenCoreActivator.SEPARATOR)) {
+					value = MavenCoreActivator.BASEDIR + value;
+				} else {
+					value = MavenCoreActivator.BASEDIR + MavenCoreActivator.SEPARATOR + value;
+				}
+				resource.setDirectory(value);
+				resource.getExcludes().add("**/*.java"); //$NON-NLS-1$
+				resources.add(resource);
+			}
+			
+			if (outputs.size() > 0) {
+				Plugin plugin = getPlugin(build, ORG_CODEHAUS_MOJO, "maven-war-plugin"); //$NON-NLS-1$
+				Configuration configuration = plugin.getConfiguration();
+				
+				if (configuration == null) {
+					configuration = PomFactory.eINSTANCE.createConfiguration();
+					plugin.setConfiguration(configuration);
+					configuration.createNode(WAR_SOURCE_DIRECTORY);
+					String value = getRootComponent(webProject);
+					if (value.startsWith(MavenCoreActivator.SEPARATOR)) {
+						value = MavenCoreActivator.BASEDIR + value;
+					} else {
+						value = MavenCoreActivator.BASEDIR + MavenCoreActivator.SEPARATOR + value;
+					}
+					configuration.setStringValue(WAR_SOURCE_DIRECTORY, value);
+				}
+				StringBuffer buffer = new StringBuffer();
+				boolean first = true;
+				for (IPath output:outputs) {
+					if (first) {
+						first = false;
+					} else {
+						buffer.append(","); //$NON-NLS-1$
+					}
+					String root = getRootComponent(webProject);
+					output=output.makeRelativeTo(javaProject.getPath());
+					String outputString = output.toString();
+					if (outputString.startsWith(root)) {
+						outputString = outputString.substring(root.length());
+					}
+					outputString = outputString.trim();
+					buffer.append(outputString);
+					buffer.append("/**"); //$NON-NLS-1$
+					
+				}
+				String excludeString = buffer.toString().trim();
+				if (excludeString.startsWith(MavenCoreActivator.SEPARATOR)) {
+					excludeString = excludeString.substring(1);
+				}
+				configuration.setStringValue(WAR_SOURCE_EXCLUDES, excludeString);
+			}
+			sources.remove(indexSource);
+			if (sources.size() > 0) {
+				
+				Plugin plugin = getPlugin(build, ORG_CODEHAUS_MOJO , "build-helper-maven-plugin"); //$NON-NLS-1$
+				plugin.setVersion("1.5"); //$NON-NLS-1$
+				plugin.getExecutions().clear();
+				
+				PluginExecution execution = PomFactory.eINSTANCE.createPluginExecution();
+				execution.setId("add-source"); //$NON-NLS-1$
+				execution.setPhase("generate-sources"); //$NON-NLS-1$
+				execution.getGoals().add("add-source"); //$NON-NLS-1$
+				plugin.getExecutions().add(execution);
+				Configuration configuration = PomFactory.eINSTANCE.createConfiguration();	
+				execution.setConfiguration(configuration);
+				Node n = configuration.createNode("sources"); //$NON-NLS-1$
+				for (IPath source:sources) {
+					Node node = n.getOwnerDocument().createElement("source"); //$NON-NLS-1$
+					n.appendChild(node);
+					source = source.makeRelativeTo(javaProject.getPath());
+					String value = source.toString();
+					if (value.startsWith(MavenCoreActivator.SEPARATOR)) {
+						value = MavenCoreActivator.BASEDIR + value;
+					} else {
+						value = MavenCoreActivator.BASEDIR + MavenCoreActivator.SEPARATOR + value;
+					}
+					node.appendChild(node.getOwnerDocument().createTextNode(value));
+				}
+			}
+		}
+	}
 }
