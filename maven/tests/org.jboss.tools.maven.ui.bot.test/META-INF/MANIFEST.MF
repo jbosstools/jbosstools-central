@@ -16,13 +16,21 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.swtbot.swt.finder,
  org.junit4,
  org.jboss.tools.seam.core,
+ org.jboss.tools.maven.core,
+ org.jboss.tools.maven.hibernate,
+ org.jboss.tools.maven.jsf,
+ org.jboss.tools.maven.portlet,
+ org.jboss.tools.maven.seam,
+ org.jboss.tools.maven.ui,
  org.eclipse.wst.server.core,
  org.eclipse.datatools.connectivity;visibility:=reexport,
  org.eclipse.datatools.connectivity.db.generic,
  org.jboss.tools.common,
  org.jboss.tools.tests,
  org.maven.ide.eclipse;bundle-version="0.10.0",
- org.jboss.ide.eclipse.as.core
+ org.jboss.ide.eclipse.as.core,
+ org.maven.ide.eclipse.maven_model_edit;bundle-version="0.10.0",
+ org.hamcrest
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Eclipse-RegisterBuddy: org.apache.log4j

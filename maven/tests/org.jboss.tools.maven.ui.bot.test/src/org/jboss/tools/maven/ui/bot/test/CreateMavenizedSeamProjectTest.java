@@ -11,6 +11,7 @@
 
 package org.jboss.tools.maven.ui.bot.test;
 
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import java.io.File;
@@ -19,6 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
@@ -47,12 +49,15 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotEditor;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
+import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotViewMenu;
+import org.eclipse.swtbot.swt.finder.SWTBot;
 import org.eclipse.swtbot.swt.finder.exceptions.WidgetNotFoundException;
 import org.eclipse.swtbot.swt.finder.finders.UIThreadRunnable;
 import org.eclipse.swtbot.swt.finder.junit.SWTBotJunit4ClassRunner;
 import org.eclipse.swtbot.swt.finder.results.Result;
 import org.eclipse.swtbot.swt.finder.results.VoidResult;
 import org.eclipse.swtbot.swt.finder.utils.SWTBotPreferences;
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotMenu;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
@@ -64,6 +69,7 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.internal.IPreferenceConstants;
 import org.eclipse.ui.internal.WorkbenchPlugin;
 import org.eclipse.ui.internal.util.PrefUtil;
+import org.eclipse.wst.server.core.IModule;
 import org.eclipse.wst.server.core.IRuntime;
 import org.eclipse.wst.server.core.IRuntimeType;
 import org.eclipse.wst.server.core.IRuntimeWorkingCopy;
@@ -74,17 +80,24 @@ import org.eclipse.wst.server.core.ServerCore;
 import org.eclipse.wst.server.core.ServerUtil;
 import org.eclipse.wst.server.core.internal.RuntimeWorkingCopy;
 import org.eclipse.wst.server.core.internal.ServerWorkingCopy;
+import org.eclipse.wst.validation.ValidationFramework;
 import org.jboss.tools.seam.core.project.facet.SeamRuntime;
 import org.jboss.tools.seam.core.project.facet.SeamRuntimeManager;
 import org.jboss.tools.seam.core.project.facet.SeamVersion;
 import org.jboss.tools.test.util.JobUtils;
+import org.jboss.tools.test.util.ResourcesUtils;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.maven.ide.components.pom.Model;
+import org.maven.ide.components.pom.Parent;
+import org.maven.ide.components.pom.util.PomResourceImpl;
+import org.maven.ide.eclipse.MavenPlugin;
 import org.maven.ide.eclipse.core.IMavenConstants;
+import org.maven.ide.eclipse.embedder.MavenModelManager;
 
 /**
  * @author Snjeza
@@ -93,24 +106,16 @@ import org.maven.ide.eclipse.core.IMavenConstants;
 @RunWith(SWTBotJunit4ClassRunner.class)
 public class CreateMavenizedSeamProjectTest {
 	
-	/**
-	 * 
-	 */
+	protected static final int IDLE_TIME = 60000;
+
 	private static final String CONNECTION_PROFILE_NAME = "DefaultDS";
 
-	/**
-	 * 
-	 */
 	private static final String SEAM_RUNTIME_NAME = "Seam 2.2";
 
-	/**
-	 * 
-	 */
 	private static final String JBOSS_AS_RUNTIME_NAME = "JBoss AS 5.1 Runtime";
 
-	/**
-	 * 
-	 */
+	public static final String PACKAGE_EXPLORER = "Package Explorer"; //$NON-NLS-1$
+	
 	private static final String JBOSS_AS_SERVER_NAME = "JBoss AS 5.1 Server";
 
 	public static final String JBOSS_AS_HOST = "localhost"; //$NON-NLS-1$
@@ -142,6 +147,13 @@ public class CreateMavenizedSeamProjectTest {
 	
 	public static final String HSQLDB_DRIVER_LOCATION = "/common/lib/" + HSQLDB_DRIVER_JAR_NAME; //$NON-NLS-1$
 	
+	public static final String PROJECT_NAME_WAR = "MavenizedSeamProjectWar";
+	
+	public static final String TEST_PROJECT_NAME_WAR = "MavenizedSeamProjectWar-test";
+	
+	public static final String PARENT_PROJECT_NAME_WAR = "MavenizedSeamProjectWar-parent";
+	
+	
 	public static final String PROJECT_NAME = "MavenizedSeamProject";
 	
 	public static final String EAR_PROJECT_NAME = "MavenizedSeamProject-ear";
@@ -152,7 +164,9 @@ public class CreateMavenizedSeamProjectTest {
 	
 	public static final String PARENT_PROJECT_NAME = "MavenizedSeamProject-parent";
 	
-	public static final String DEPOY_TYPE = "EAR";
+	public static final String DEPLOY_TYPE_EAR = "EAR";
+	
+	public static final String DEPLOY_TYPE_WAR = "WAR";
 	
 	protected static SWTWorkbenchBot bot;
 
@@ -174,14 +188,18 @@ public class CreateMavenizedSeamProjectTest {
 		
 		createDriver(asLocation, HSQLDB_DRIVER_LOCATION);
 		
-		createNewSeamWebProjectWizard(PROJECT_NAME, DEPOY_TYPE);
+		activateSchell();
+		
+		createNewSeamWebProjectWizard(PROJECT_NAME, DEPLOY_TYPE_EAR);
+		
+		createNewSeamWebProjectWizard(PROJECT_NAME_WAR, DEPLOY_TYPE_WAR);
 	}
 
 	private static void initSWTBot() throws CoreException {
 		bot = new SWTWorkbenchBot();
 		SWTBotPreferences.KEYBOARD_LAYOUT = "EN_US";
 		SWTBotPreferences.TIMEOUT = 1000;
-		SWTBotPreferences.PLAYBACK_DELAY = 25;
+		SWTBotPreferences.PLAYBACK_DELAY = 5;
 		JobUtils.waitForIdle(60000);
 		try {
 			SWTBotView view = bot.viewByTitle("Welcome");
@@ -232,6 +250,20 @@ public class CreateMavenizedSeamProjectTest {
 		}, new NullProgressMonitor());
 	}
 
+	private static void removeServers() throws CoreException {
+		IServer server = ServerCore.findServer(JBOSS_AS_SERVER_NAME);
+		IServerWorkingCopy wc = server.createWorkingCopy();
+		IModule[] modules = wc.getModules();
+		IProgressMonitor monitor = new NullProgressMonitor();
+		wc.modifyModules(new IModule[] {} , modules, monitor);
+		wc.save(true, monitor);
+		server.publish(IServer.PUBLISH_INCREMENTAL, monitor);
+		JobUtils.waitForIdle(IDLE_TIME);
+		server.getRuntime().delete();
+		server.delete();
+		JobUtils.waitForIdle(IDLE_TIME);
+	}
+
 	protected static void switchPerspective(final String pid) {
 		Display.getDefault().syncExec(new Runnable() {
 
@@ -249,13 +281,17 @@ public class CreateMavenizedSeamProjectTest {
 	
 	@Before
     public void setUp() throws Exception {
-        UIThreadRunnable.syncExec(new VoidResult() {
+        activateSchell();
+    }
+
+	private static void activateSchell() {
+		UIThreadRunnable.syncExec(new VoidResult() {
             public void run() {
             	PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell()
                         .forceActive();
             }
         });
-    }
+	}
 	
 	@After
 	public void tearDown() throws Exception {
@@ -264,7 +300,16 @@ public class CreateMavenizedSeamProjectTest {
 	
 	@AfterClass
 	public final static void afterClass() throws Exception {
-		removeProjects();
+		boolean buildAutomatically = ResourcesUtils.setBuildAutomatically(false);
+		ValidationFramework.getDefault().suspendAllValidation(true);
+		try {
+			removeServers();
+			removeProjects();
+		} finally {
+			ResourcesUtils.setBuildAutomatically(buildAutomatically);
+			ValidationFramework.getDefault().suspendAllValidation(false);
+		}
+		JobUtils.waitForIdle(IDLE_TIME);
 	}
 	
 	protected static void createJBossServer(File asLocation, String serverType, String runtimeType, String name, String runtimeName) throws CoreException {
@@ -442,7 +487,7 @@ public class CreateMavenizedSeamProjectTest {
 		bot.button("Next >").click();
 		
 		bot.comboBox(0).setSelection(SEAM_RUNTIME_NAME);
-		bot.radio(DEPOY_TYPE).click();
+		bot.radio(deployType).click();
 		bot.comboBox(1).setSelection("HSQL");
 		bot.comboBox(2).setSelection(CONNECTION_PROFILE_NAME);
 		bot.button("Finish").click();
@@ -458,6 +503,9 @@ public class CreateMavenizedSeamProjectTest {
 		checkErrors(EJB_PROJECT_NAME);
 		checkErrors(TEST_PROJECT_NAME);
 		checkErrors(PARENT_PROJECT_NAME);
+		checkErrors(PROJECT_NAME_WAR);
+		checkErrors(TEST_PROJECT_NAME_WAR);
+		checkErrors(PARENT_PROJECT_NAME_WAR);
 	}
 
 	private void checkErrors(String projectName) throws CoreException {
@@ -482,6 +530,9 @@ public class CreateMavenizedSeamProjectTest {
 		isMavenProject(EJB_PROJECT_NAME);
 		isMavenProject(TEST_PROJECT_NAME);
 		isMavenProject(PARENT_PROJECT_NAME);
+		isMavenProject(PROJECT_NAME_WAR);
+		isMavenProject(TEST_PROJECT_NAME_WAR);
+		isMavenProject(PARENT_PROJECT_NAME_WAR);
 	}
 
 	private void isMavenProject(String projectName) throws CoreException {
@@ -489,4 +540,33 @@ public class CreateMavenizedSeamProjectTest {
 		assertTrue("The '" + projectName + "' project isn't a Maven project.", project.hasNature(IMavenConstants.NATURE_ID));
 	}
 
+	// see https://jira.jboss.org/browse/JBIDE-6587
+	@Test
+	public void testMavenWarArchive() throws Exception {
+		final SWTBotView packageExplorer = bot.viewByTitle(PACKAGE_EXPLORER);
+		SWTBot innerBot = packageExplorer.bot();
+		innerBot.activeShell().activate();
+		final SWTBotTree tree = innerBot.tree();
+		final SWTBotTreeItem warProjectItem = tree.getTreeItem(PROJECT_NAME_WAR);
+		warProjectItem.select();
+		
+		SWTBotMenu runAs = tree.contextMenu("Run As");
+		runAs.menu("6 Maven build...").click();
+
+		SWTBotShell shell = bot.shell("Edit Configuration");
+		shell.activate();
+		
+		bot.textWithLabel("Goals:").setText("clean package");
+		bot.button("Run").click();
+		
+		JobUtils.waitForIdle(IDLE_TIME);
+		
+		IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject(PROJECT_NAME_WAR);
+		project.refreshLocal(IResource.DEPTH_INFINITE, new NullProgressMonitor());
+		IPath webInfPath = new Path("target/" + PROJECT_NAME_WAR + "-0.0.1-SNAPSHOT/WEB-INF");
+		assertFalse(project.getFolder(webInfPath.append("src")).exists());
+		assertFalse(project.getFolder(webInfPath.append("dev")).exists());
+		assertTrue(project.getFolder(webInfPath.append("lib")).exists());
+		
+	}
 }
