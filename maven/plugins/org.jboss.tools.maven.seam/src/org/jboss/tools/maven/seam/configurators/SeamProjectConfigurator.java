@@ -7,6 +7,7 @@ import java.util.List;
 
 import org.apache.maven.model.Dependency;
 import org.apache.maven.project.MavenProject;
+import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.ProjectScope;
@@ -25,18 +26,23 @@ import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jst.j2ee.application.Application;
-import org.eclipse.jst.j2ee.application.EjbModule;
 import org.eclipse.jst.j2ee.application.Module;
-import org.eclipse.jst.j2ee.application.WebModule;
+import org.eclipse.jst.j2ee.application.internal.operations.AddComponentToEnterpriseApplicationDataModelProvider;
+import org.eclipse.jst.j2ee.application.internal.operations.RemoveComponentFromEnterpriseApplicationDataModelProvider;
+import org.eclipse.jst.j2ee.application.internal.operations.RemoveComponentFromEnterpriseApplicationOperation;
 import org.eclipse.jst.j2ee.componentcore.util.EARArtifactEdit;
+import org.eclipse.jst.j2ee.internal.common.classpath.J2EEComponentClasspathUpdater;
 import org.eclipse.jst.j2ee.internal.project.J2EEProjectUtilities;
 import org.eclipse.jst.j2ee.project.JavaEEProjectUtilities;
 import org.eclipse.wst.common.componentcore.ComponentCore;
 import org.eclipse.wst.common.componentcore.ModuleCoreNature;
+import org.eclipse.wst.common.componentcore.datamodel.properties.ICreateReferenceComponentsDataModelProperties;
 import org.eclipse.wst.common.componentcore.resources.IVirtualComponent;
 import org.eclipse.wst.common.componentcore.resources.IVirtualFolder;
 import org.eclipse.wst.common.componentcore.resources.IVirtualReference;
+import org.eclipse.wst.common.frameworks.datamodel.DataModelFactory;
 import org.eclipse.wst.common.frameworks.datamodel.IDataModel;
+import org.eclipse.wst.common.frameworks.datamodel.IDataModelOperation;
 import org.eclipse.wst.common.project.facet.core.IFacetedProject;
 import org.eclipse.wst.common.project.facet.core.IProjectFacet;
 import org.eclipse.wst.common.project.facet.core.IProjectFacetVersion;
@@ -47,7 +53,6 @@ import org.jboss.tools.maven.core.IJBossMavenConstants;
 import org.jboss.tools.maven.core.internal.project.facet.MavenFacetInstallDataModelProvider;
 import org.jboss.tools.maven.jsf.MavenJSFActivator;
 import org.jboss.tools.maven.seam.MavenSeamActivator;
-import org.jboss.tools.maven.seam.Messages;
 import org.jboss.tools.maven.ui.Activator;
 import org.jboss.tools.seam.core.ISeamProject;
 import org.jboss.tools.seam.core.SeamCorePlugin;
@@ -616,14 +621,101 @@ public class SeamProjectConfigurator extends AbstractProjectConfigurator {
 						if (uri != null && (uri.startsWith("mvel14") || uri.startsWith("mvel2"))) { //$NON-NLS-1$ //$NON-NLS-2$
 							iterator.remove();
 						}
+						if (uri != null && (uri.equals("jboss-seam.jar"))) { //$NON-NLS-1$ //$NON-NLS-2$
+							iterator.remove();
+						}
 					}
 				}				
-				earArtifactEdit.saveIfNecessary(monitor);
+				
 			}
 		} finally {
 			if(earArtifactEdit!=null) {
+				earArtifactEdit.saveIfNecessary(monitor);
 				earArtifactEdit.dispose();
 			}
 		}
+		try {
+			final IFacetedProject fproj = ProjectFacetsManager.create(project);
+			if (fproj != null && fproj.hasProjectFacet(earFacet)) {
+				IVirtualComponent earComponent = ComponentCore.createComponent(project);
+				IVirtualReference[] refs = earComponent.getReferences();
+				IVirtualReference mvelReference = null;
+				for (IVirtualReference ref:refs) {
+					String archiveName = ref.getArchiveName();
+					if (archiveName != null && archiveName.startsWith("/lib/mvel2")) { //$NON-NLS-1$
+						mvelReference = ref;
+						break;
+					}
+				}
+				if (mvelReference != null) {
+					changeReference(earComponent, mvelReference);
+				}
+			}
+		} catch (CoreException e) {
+			MavenSeamActivator.log(e);
+		}
+		
+	}
+
+	/**
+	 * @param earComponent
+	 * @param mvelReference
+	 */
+	private void changeReference(IVirtualComponent earComponent,
+			IVirtualReference mvelReference) {
+		List<IVirtualComponent> list = new ArrayList<IVirtualComponent>();
+		list.add(mvelReference.getReferencedComponent());
+		
+		IDataModel model = DataModelFactory.createDataModel(new RemoveComponentFromEnterpriseApplicationDataModelProvider() {
+
+			@Override
+			public IDataModelOperation getDefaultOperation() {
+				return new RemoveComponentFromEnterpriseApplicationOperationEx(model);
+			}
+			
+		});
+		model.setProperty(ICreateReferenceComponentsDataModelProperties.SOURCE_COMPONENT, earComponent);
+		
+		model.setProperty(ICreateReferenceComponentsDataModelProperties.TARGET_COMPONENT_LIST, list);
+        model.setProperty(ICreateReferenceComponentsDataModelProperties.TARGET_COMPONENTS_DEPLOY_PATH, "/lib");		 //$NON-NLS-1$
+        IDataModelOperation op = model.getDefaultOperation();
+        try {
+			op.execute(null, null);
+			J2EEComponentClasspathUpdater.getInstance().queueUpdateEAR(earComponent.getProject());
+		} catch (ExecutionException e) {
+			MavenSeamActivator.log(e);
+		}	
+		
+		
+		String archiveName = mvelReference.getArchiveName();
+		archiveName = archiveName.substring(4);
+		mvelReference.setArchiveName(archiveName);
+		IDataModel dm = DataModelFactory.createDataModel(new AddComponentToEnterpriseApplicationDataModelProvider());
+		
+		dm.setProperty(ICreateReferenceComponentsDataModelProperties.SOURCE_COMPONENT, earComponent);					
+		dm.setProperty(ICreateReferenceComponentsDataModelProperties.TARGET_COMPONENT_LIST, list);
+		
+        dm.setProperty(ICreateReferenceComponentsDataModelProperties.TARGET_COMPONENTS_DEPLOY_PATH, "/lib"); //$NON-NLS-1$
+
+		try {
+			dm.getDefaultOperation().execute(null, null);
+		} catch (ExecutionException e) {
+			MavenSeamActivator.log(e);
+		}		
+	}
+	
+	private static class RemoveComponentFromEnterpriseApplicationOperationEx extends RemoveComponentFromEnterpriseApplicationOperation {
+
+		public RemoveComponentFromEnterpriseApplicationOperationEx(
+				IDataModel model) {
+			super(model);
+		}
+
+		@Override
+		protected void updateEARDD(IProgressMonitor monitor) {
+			//super.updateEARDD(monitor);
+		}
+
+		
 	}
 }

@@ -15,6 +15,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import java.io.File;
+import java.io.FilenameFilter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -569,4 +570,33 @@ public class CreateMavenizedSeamProjectTest {
 		assertTrue(project.getFolder(webInfPath.append("lib")).exists());
 		
 	}
+	
+	// see https://jira.jboss.org/browse/JBIDE-6767
+	@Test
+	public void testLibraries() throws Exception {
+		IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject(EAR_PROJECT_NAME);
+		File rootDirectory = new File(project.getLocation().toOSString(), "EarContent");
+		String[] libs = rootDirectory.list(new FilenameFilter() {
+			
+			public boolean accept(File dir, String name) {
+				if (name.endsWith(".jar")) {
+					return true;
+				}
+				return false;
+			}
+		});
+		assertTrue(libs.length == 0);
+		File libDirectory = new File (rootDirectory,"lib");
+		libs = libDirectory.list(new FilenameFilter() {
+			
+			public boolean accept(File dir, String name) {
+				if (name.endsWith(".jar")) {
+					return true;
+				}
+				return false;
+			}
+		});
+		assertTrue(libs.length == 0);
+	}
+	
 }
