@@ -5,6 +5,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -311,17 +313,53 @@ public class MavenCoreActivator extends Plugin {
 	public static void updateMavenProjectConfiguration(IProject project)
 			throws CoreException {
 		ResolverConfiguration resolverConfiguration = new ResolverConfiguration();
-		resolverConfiguration.setIncludeModules(false);
+		//resolverConfiguration.setIncludeModules(false);
 		// FIXME
 		resolverConfiguration.setResolveWorkspaceProjects(true);
 		resolverConfiguration.setActiveProfiles(""); //$NON-NLS-1$
 		IProjectConfigurationManager configurationManager = MavenPlugin
 				.getDefault().getProjectConfigurationManager();
-		IMavenConfiguration mavenConfiguration = MavenPlugin.lookup(IMavenConfiguration.class);
+		//IMavenConfiguration mavenConfiguration = MavenPlugin.lookup(IMavenConfiguration.class);
+		//IMavenConfiguration mavenConfiguration = MavenPlugin.getDefault().getMavenConfiguration();
+		IMavenConfiguration mavenConfiguration = getMavenConfiguration();
 		configurationManager.updateProjectConfiguration(project,
 				resolverConfiguration, //
 				mavenConfiguration
 						.getGoalOnUpdate(), new NullProgressMonitor());
+	}
+	
+	private static IMavenConfiguration getMavenConfiguration() {
+		Class clazz = MavenPlugin.class;
+		try {
+			Method method = clazz.getMethod ("getMavenConfiguration", new Class[0]); //$NON-NLS-1$
+			Object configuration = method.invoke (MavenPlugin.getDefault(), new Object[0]);
+			return (IMavenConfiguration) configuration;
+		} catch (SecurityException e) {
+			log(e);
+		} catch (NoSuchMethodException e) {
+			try {
+				Method method = clazz.getMethod ("lookup", new Class[] {Class.class}); //$NON-NLS-1$
+				Object configuration = method.invoke (null, new Object[] {IMavenConfiguration.class});
+				return (IMavenConfiguration) configuration;
+			} catch (SecurityException e1) {
+				log(e1);
+			} catch (IllegalArgumentException e1) {
+				log(e1);
+			} catch (NoSuchMethodException e1) {
+				log(e1);
+			} catch (IllegalAccessException e1) {
+				log(e1);
+			} catch (InvocationTargetException e1) {
+				log(e1);
+			}
+		} catch (IllegalArgumentException e) {
+			log(e);
+		} catch (IllegalAccessException e) {
+			log(e);
+		} catch (InvocationTargetException e) {
+			log(e);
+		}
+		return null;
 	}
 	
 	public static void addMavenWarPlugin(Build build, IProject project) throws JavaModelException {
