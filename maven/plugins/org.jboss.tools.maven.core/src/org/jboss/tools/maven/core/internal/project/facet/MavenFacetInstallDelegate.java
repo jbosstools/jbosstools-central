@@ -135,9 +135,6 @@ public class MavenFacetInstallDelegate implements IDelegate {
 					IJBossMavenConstants.M2_FACET_ID);
 			MavenCoreActivator.addClasspathAttribute(javaProject, attribute,
 					monitor);
-			if (!hasMavenNature) {
-				MavenCoreActivator.updateMavenProjectConfiguration(project);
-			}
 
 			List<LibraryProviderOperationConfig> configs = MavenCoreActivator
 					.getLibraryProviderOperationConfigs();
