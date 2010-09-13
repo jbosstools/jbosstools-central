@@ -26,6 +26,7 @@ import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.xmi.XMIResource;
@@ -64,6 +65,7 @@ import org.maven.ide.eclipse.project.MavenProjectManager;
 import org.maven.ide.eclipse.project.ResolverConfiguration;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
+import org.osgi.framework.Version;
 import org.w3c.dom.Node;
 
 /**
@@ -288,7 +290,9 @@ public class MavenSeamActivator extends AbstractUIPlugin {
 				//build.setFinalName(testProjectName);
 				String sourceDirectory = MavenCoreActivator.getSourceDirectory(javaProject);
 				if (sourceDirectory != null) {
-					build.setSourceDirectory(sourceDirectory);
+					if (isM2eclipse010()) {
+						build.setSourceDirectory(sourceDirectory);
+					}
 					build.setTestSourceDirectory(sourceDirectory);
 				}		
 				String outputDirectory = MavenCoreActivator.getOutputDirectory(javaProject);	
@@ -323,6 +327,17 @@ public class MavenSeamActivator extends AbstractUIPlugin {
 			
 		}
 		
+	}
+
+	/**
+	 * @return
+	 */
+	private boolean isM2eclipse010() {
+		Bundle bundle = Platform.getBundle("org.maven.ide.eclipse"); //$NON-NLS-1$
+		if (bundle != null && bundle.getVersion().toString().startsWith("0.10")) { //$NON-NLS-1$
+			return true;
+		}
+		return false;
 	}
 
 	private void configureEarProject(IDataModel m2FacetModel,
