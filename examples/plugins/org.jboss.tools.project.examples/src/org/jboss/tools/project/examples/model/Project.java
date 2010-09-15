@@ -33,7 +33,7 @@ public class Project implements ProjectModelElement {
 	private String site;
 	private List<ProjectFix> fixes = new ArrayList<ProjectFix>();
 	private List<ProjectFix> unsatisfiedFixes;
-	
+	private String perspectiveId;
 	
 	public Project() {
 		name=""; //$NON-NLS-1$
@@ -41,6 +41,7 @@ public class Project implements ProjectModelElement {
 		description=""; //$NON-NLS-1$
 		url=""; //$NON-NLS-1$
 		welcome=false;
+		perspectiveId = null;
 		setCategory(Category.OTHER);
 	}
 
@@ -170,5 +171,13 @@ public class Project implements ProjectModelElement {
 
 	public void setUnsatisfiedFixes(List<ProjectFix> unsatisfiedFixes) {
 		this.unsatisfiedFixes = unsatisfiedFixes;
+	}
+
+	public String getPerspectiveId() {
+		return perspectiveId;
+	}
+
+	public void setPerspectiveId(String perspectiveId) {
+		this.perspectiveId = perspectiveId;
 	}
 }

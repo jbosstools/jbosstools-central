@@ -282,6 +282,9 @@ public class ProjectUtil {
 								if (nodeName.equals(URL)) { 
 									project.setUrl(getContent(child));
 								}
+								if (nodeName.equals("perspectiveId")) {  //$NON-NLS-1$
+									project.setPerspectiveId(getContent(child));
+								}
 								if (nodeName.equals("size")) { //$NON-NLS-1$
 									long size = 0;
 									try {
