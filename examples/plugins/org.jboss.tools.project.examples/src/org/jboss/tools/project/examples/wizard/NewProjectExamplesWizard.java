@@ -323,7 +323,6 @@ public class NewProjectExamplesWizard extends Wizard implements INewWizard {
 		if (window == null) {
 			Display.getDefault().syncExec(new Runnable() {
 				
-				@Override
 				public void run() {
 					IWorkbenchWindow win = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
 					switchPerspective(perspectiveId, finalPersp, win);
