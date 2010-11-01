@@ -72,7 +72,7 @@ public class CDIProjectConfigurator extends AbstractProjectConfigurator {
 
 
 	@Override
-	protected void mavenProjectChanged(MavenProjectChangedEvent event,
+	public void mavenProjectChanged(MavenProjectChangedEvent event,
 			IProgressMonitor monitor) throws CoreException {
 		IMavenProjectFacade facade = event.getMavenProject();
 	    if(facade != null) {
