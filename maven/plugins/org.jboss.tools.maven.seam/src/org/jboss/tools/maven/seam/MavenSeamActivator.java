@@ -191,6 +191,7 @@ public class MavenSeamActivator extends AbstractUIPlugin {
 			parent.setArtifactId(parentArtifactId);
 			parent.setGroupId(m2FacetModel.getStringProperty(IJBossMavenConstants.GROUP_ID));
 			parent.setVersion(m2FacetModel.getStringProperty(IJBossMavenConstants.VERSION));
+			parent.setRelativePath("../" + parentProjectName); //$NON-NLS-1$
 			model.setParent(parent);
 			
 			List dependencies = model.getDependencies();
@@ -362,6 +363,7 @@ public class MavenSeamActivator extends AbstractUIPlugin {
 			parent.setArtifactId(parentArtifactId);
 			parent.setGroupId(m2FacetModel.getStringProperty(IJBossMavenConstants.GROUP_ID));
 			parent.setVersion(m2FacetModel.getStringProperty(IJBossMavenConstants.VERSION));
+			parent.setRelativePath("../" + parentProjectName); //$NON-NLS-1$
 			model.setParent(parent);
 			
 			List dependencies = model.getDependencies();
@@ -484,21 +486,12 @@ public class MavenSeamActivator extends AbstractUIPlugin {
 				model.setBuild(build);
 				MavenCoreActivator.createMavenProject(earProjectName, null, model, true);
 				removeWTPContainers(m2FacetModel, project);
-				// configureApplicationXml(project, m2FacetModel, null);
-				//removeRuntime(project);
-				//IProject ejbProject = ResourcesPlugin.getWorkspace().getRoot().getProject(ejbProjectName);
-				//removeRuntime(ejbProject);
-				//EarFacetRuntimeHandler.updateModuleProjectRuntime(project, ejbProject, null);
-				//IProject webProject = ResourcesPlugin.getWorkspace().getRoot().getProject(webProjectName);
-				//removeRuntime(webProject);
-				//EarFacetRuntimeHandler.updateModuleProjectRuntime(project, webProject, null);
 			} catch (Exception e) {
 				MavenSeamActivator.log(e);
 			}
 			
 		}
 	}
-	
 	
 	private void removeRuntime(IProject project) throws CoreException {
 		IFacetedProject facetedProject = ProjectFacetsManager.create( project );
@@ -528,6 +521,7 @@ public class MavenSeamActivator extends AbstractUIPlugin {
 			parent.setArtifactId(parentArtifactId);
 			parent.setGroupId(m2FacetModel.getStringProperty(IJBossMavenConstants.GROUP_ID));
 			parent.setVersion(m2FacetModel.getStringProperty(IJBossMavenConstants.VERSION));
+			parent.setRelativePath("../" + parentProjectName); //$NON-NLS-1$
 			model.setParent(parent);
 			
 			List dependencies = model.getDependencies();
@@ -589,11 +583,8 @@ public class MavenSeamActivator extends AbstractUIPlugin {
 			String artifactId = parentProjectName;
 			String groupId = m2FacetModel.getStringProperty(IJBossMavenConstants.GROUP_ID);
 			String version = m2FacetModel.getStringProperty(IJBossMavenConstants.VERSION);
-			String relativePath = null;
-			if (SeamFacetAbstractInstallDelegate
-					.isWarConfiguration(seamFacetModel)) {
-				relativePath = "../" + parentProjectName; //$NON-NLS-1$
-			}
+			
+			String relativePath = "../" + parentProjectName; //$NON-NLS-1$
 			ParentAdder parentAdder = new ParentAdder(groupId, artifactId, version, relativePath);
 			modelManager.updateProject(pomFile, parentAdder);
 			

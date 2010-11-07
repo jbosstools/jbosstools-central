@@ -322,10 +322,10 @@ public class MavenCoreActivator extends Plugin {
 		//IMavenConfiguration mavenConfiguration = MavenPlugin.lookup(IMavenConfiguration.class);
 		//IMavenConfiguration mavenConfiguration = MavenPlugin.getDefault().getMavenConfiguration();
 		IMavenConfiguration mavenConfiguration = getMavenConfiguration();
+		
 		configurationManager.updateProjectConfiguration(project,
-				resolverConfiguration, //
-				mavenConfiguration
-						.getGoalOnUpdate(), new NullProgressMonitor());
+				resolverConfiguration, mavenConfiguration.getGoalOnUpdate(),
+				new NullProgressMonitor());
 	}
 	
 	private static IMavenConfiguration getMavenConfiguration() {
