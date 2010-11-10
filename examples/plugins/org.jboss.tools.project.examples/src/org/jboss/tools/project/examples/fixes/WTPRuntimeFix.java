@@ -11,7 +11,15 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.jdt.core.IClasspathEntry;
+import org.eclipse.jdt.core.IJavaProject;
+import org.eclipse.jdt.core.JavaCore;
+import org.eclipse.jdt.core.JavaModelException;
+import org.eclipse.jst.server.core.internal.JavaServerPlugin;
+import org.eclipse.jst.server.core.internal.RuntimeClasspathContainer;
+import org.eclipse.jst.server.core.internal.RuntimeClasspathProviderWrapper;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.wst.common.project.facet.core.IFacetedProject;
 import org.eclipse.wst.common.project.facet.core.ProjectFacetsManager;
@@ -37,6 +45,7 @@ public class WTPRuntimeFix implements ProjectExamplesFix {
 	private static final String ESB = "esb"; //$NON-NLS-1$
 	private static final String PORTLET = "portlet"; //$NON-NLS-1$
 	private static final String REQUIRED_COMPONENTS = "required-components"; //$NON-NLS-1$
+	private static final IPath ESB_SERVER_SUPPLIED_CONTAINER_PATH = new Path("org.jboss.esb.runtime.classpath/server.supplied");
 
 	public boolean canFix(Project project, ProjectFix fix) {
 		if (!ProjectFix.WTP_RUNTIME.equals(fix.getType())) {
@@ -69,6 +78,7 @@ public class WTPRuntimeFix implements ProjectExamplesFix {
 							wtpRuntime = RuntimeManager.getRuntime(runtime.getId());
 							facetedProject.addTargetedRuntime(wtpRuntime, monitor);
 							facetedProject.setPrimaryRuntime(wtpRuntime, monitor);
+							fixEsb(eclipseProject, fix, wtpRuntime);
 						}
 					}
 				}
@@ -78,6 +88,61 @@ public class WTPRuntimeFix implements ProjectExamplesFix {
 			}
 		}
 		return ret;
+	}
+
+	private void fixEsb(IProject eclipseProject,
+			ProjectFix fix, org.eclipse.wst.common.project.facet.core.runtime.IRuntime wtpRuntime) throws JavaModelException {
+		String required_components = fix.getProperties().get(REQUIRED_COMPONENTS);
+		if (required_components == null) {
+			return;
+		} 
+		List<String> components = tokenize(required_components);
+		if (components == null) {
+			return;
+		} 
+		boolean esbRequired = false;
+		for (String component:components) {
+			if (ESB.equals(component)) {
+				esbRequired = true;
+				break;
+			}
+		}
+		if (esbRequired) {
+			IJavaProject javaProject = JavaCore.create(eclipseProject);
+			if (javaProject != null) { 
+				if (!javaProject.isOpen()) {
+					javaProject.open(null);
+				}
+				IClasspathEntry[] entries = javaProject.getRawClasspath();
+				IClasspathEntry[] newEntries = new IClasspathEntry[entries.length];
+				boolean changed = false;
+				IRuntime runtime = getRuntime(wtpRuntime);
+				for (int i = 0; i < entries.length; i++) {
+					IClasspathEntry entry = entries[i];
+					if (entry.getEntryKind() == IClasspathEntry.CPE_CONTAINER) {
+						IPath path = entry.getPath();
+						if (new Path(RuntimeClasspathContainer.SERVER_CONTAINER).isPrefixOf(path)) {
+							RuntimeClasspathProviderWrapper rcpw = JavaServerPlugin.findRuntimeClasspathProvider(runtime.getRuntimeType());
+							IPath serverContainerPath = new Path(RuntimeClasspathContainer.SERVER_CONTAINER)
+								.append(rcpw.getId()).append(runtime.getId());
+							newEntries[i] = JavaCore.newContainerEntry(serverContainerPath);
+							changed = true;
+						} else if (ESB_SERVER_SUPPLIED_CONTAINER_PATH.isPrefixOf(path)) {
+							IPath esbContainerPath = ESB_SERVER_SUPPLIED_CONTAINER_PATH.append(runtime.getId());
+							newEntries[i] = JavaCore.newContainerEntry(esbContainerPath);
+							changed = true;
+						} else {
+							newEntries[i] = entry;
+						}
+					} else {
+						newEntries[i] = entry;
+					}
+				}
+				if (changed) {
+					javaProject.setRawClasspath(newEntries, new NullProgressMonitor());
+				}
+			}
+		}
 	}
 
 	private IRuntime getBestRuntime(Project project, ProjectFix fix) {

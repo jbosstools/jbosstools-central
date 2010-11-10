@@ -16,15 +16,13 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
-import java.util.StringTokenizer;
 import java.util.TreeSet;
 
-import org.eclipse.core.runtime.Platform;
-import org.eclipse.jface.commands.ToggleState;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.MessageDialogWithToggle;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.resource.JFaceResources;
+import org.eclipse.jface.util.Geometry;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.ITreeContentProvider;
@@ -37,7 +35,10 @@ import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
@@ -45,14 +46,13 @@ import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Monitor;
+import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.ui.dialogs.FilteredTree;
 import org.eclipse.ui.model.AdaptableList;
 import org.eclipse.ui.part.PageBook;
-import org.eclipse.wst.server.core.IRuntime;
-import org.eclipse.wst.server.core.IRuntimeType;
-import org.eclipse.wst.server.core.ServerCore;
 import org.jboss.tools.project.examples.Messages;
 import org.jboss.tools.project.examples.ProjectExamplesActivator;
 import org.jboss.tools.project.examples.dialog.FixDialog;
@@ -64,9 +64,6 @@ import org.jboss.tools.project.examples.model.Project;
 import org.jboss.tools.project.examples.model.ProjectExampleSite;
 import org.jboss.tools.project.examples.model.ProjectFix;
 import org.jboss.tools.project.examples.model.ProjectUtil;
-import org.jboss.tools.seam.core.project.facet.SeamRuntime;
-import org.jboss.tools.seam.core.project.facet.SeamRuntimeManager;
-import org.osgi.framework.Bundle;
 
 /**
  * @author snjeza
@@ -74,6 +71,7 @@ import org.osgi.framework.Bundle;
  */
 public class NewProjectExamplesWizardPage extends WizardPage {
 
+	private static final int DEFAULT_WIDTH = 600;
 	private IStructuredSelection selection;
 	private Button showQuickFixButton;
 	private Combo siteCombo;
@@ -88,14 +86,14 @@ public class NewProjectExamplesWizardPage extends WizardPage {
         setTitle( Messages.NewProjectExamplesWizardPage_Project_Example );
         setDescription( Messages.NewProjectExamplesWizardPage_Import_Project_Example );
         setImageDescriptor( ProjectExamplesActivator.imageDescriptorFromPlugin(ProjectExamplesActivator.PLUGIN_ID, "icons/new_wiz.gif")); //$NON-NLS-1$
-		
 	}
 
 	public void createControl(Composite parent) {
+		
 		Composite composite = new Composite(parent,SWT.NONE);
 		composite.setLayout(new GridLayout(1,false));
 		
-		GridData gd = new GridData(GridData.FILL_BOTH);
+		GridData gd = new GridData(SWT.FILL, SWT.FILL, false, false);
 		
 		composite.setLayoutData(gd);
 		
@@ -104,11 +102,11 @@ public class NewProjectExamplesWizardPage extends WizardPage {
 		gridLayout.marginHeight = 0;
 		gridLayout.marginWidth = 0;
 		siteComposite.setLayout(gridLayout);
-		gd = new GridData(SWT.FILL, SWT.BEGINNING, true, false);
+		gd = new GridData(SWT.FILL, SWT.BEGINNING, false, false);
 		siteComposite.setLayoutData(gd);
 		
 		final Button button = new Button(siteComposite,SWT.CHECK);
-		gd = new GridData(SWT.FILL, SWT.BEGINNING, true, false);
+		gd = new GridData(SWT.FILL, SWT.BEGINNING, false, false);
 		gd.horizontalSpan = 2;
 		button.setLayoutData(gd);
 		button.setText(Messages.ProjectExamplesPreferencePage_Show_experimental_sites);
@@ -126,14 +124,17 @@ public class NewProjectExamplesWizardPage extends WizardPage {
 		
 		final ProjectExamplesPatternFilter filter = new ProjectExamplesPatternFilter();
 		
-		int styleBits = SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL | SWT.BORDER;
+		int styleBits = SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL | SWT.BORDER | SWT.WRAP;
 		final FilteredTree filteredTree = new FilteredTree(composite, styleBits, filter,true);
 		filteredTree.setBackground(parent.getDisplay().getSystemColor(
 				SWT.COLOR_WIDGET_BACKGROUND));
 		final TreeViewer viewer = filteredTree.getViewer();
 		Tree tree = viewer.getTree();
-		gd = new GridData(GridData.FILL_HORIZONTAL);
-		gd.heightHint=75; 
+		gd = new GridData(SWT.FILL, SWT.FILL, true, true);
+		GC gc = new GC(parent);
+		gd.heightHint = Dialog.convertHeightInCharsToPixels(gc
+				.getFontMetrics(), 7);
+		gc.dispose(); 
 		tree.setLayoutData(gd);
 		tree.setFont(parent.getFont());
 		
@@ -144,16 +145,21 @@ public class NewProjectExamplesWizardPage extends WizardPage {
 		final SiteFilter siteFilter = new SiteFilter();
 		viewer.addFilter(siteFilter);
 		
-		Label descriptionLabel = new Label(composite,SWT.NULL);
+		Label descriptionLabel = new Label(composite,SWT.NONE);
 		descriptionLabel.setText(Messages.NewProjectExamplesWizardPage_Description);
-		final Text text = new Text(composite,SWT.BORDER | SWT.MULTI | SWT.WRAP | SWT.READ_ONLY);
-		gd = new GridData(GridData.FILL_BOTH | GridData.GRAB_HORIZONTAL | GridData.GRAB_VERTICAL);
-		gd.heightHint=75;
-		text.setLayoutData(gd);
+		final Text descriptionText = new Text(composite,SWT.H_SCROLL | SWT.V_SCROLL
+				| SWT.READ_ONLY | SWT.BORDER | SWT.WRAP);
+		gd = new GridData(SWT.FILL, SWT.FILL, true, true);
+		gc = new GC(parent);
+		gd.heightHint = Dialog.convertHeightInCharsToPixels(gc
+				.getFontMetrics(), 4);
+		gc.dispose();
+		descriptionText.setLayoutData(gd);
 		
 		Composite internal = new Composite(composite, SWT.NULL);
 		internal.setLayout(new GridLayout(2,false));
-		gd = new GridData(GridData.FILL_BOTH);
+		gd = new GridData(GridData.FILL, GridData.FILL, true, false);
+		gd.widthHint = DEFAULT_WIDTH;
 		internal.setLayoutData(gd);
 		
 		Label projectNameLabel = new Label(internal,SWT.NULL);
@@ -178,13 +184,13 @@ public class NewProjectExamplesWizardPage extends WizardPage {
 				Object selected = selection.getFirstElement();
 				if (selected instanceof Project && selection.size() == 1) {
 					Project selectedProject = (Project) selected;
-					text.setText(selectedProject.getDescription());
+					descriptionText.setText(selectedProject.getDescription());
 					projectName.setText(selectedProject.getName());
 					projectURL.setText(selectedProject.getUrl());
 					projectSize.setText(selectedProject.getSizeAsText());
 				} else {
 					//Project selectedProject=null;
-					text.setText(""); //$NON-NLS-1$
+					descriptionText.setText(""); //$NON-NLS-1$
 					projectName.setText(""); //$NON-NLS-1$
 					projectURL.setText(""); //$NON-NLS-1$
 					projectSize.setText(""); //$NON-NLS-1$
@@ -197,19 +203,23 @@ public class NewProjectExamplesWizardPage extends WizardPage {
 		
 		notesPageBook = new PageBook( internal , SWT.NONE );
         notesPageBook.setLayout(new GridLayout(1,false));
-        gd=new GridData(GridData.FILL_HORIZONTAL);
+        gd=new GridData(GridData.FILL, GridData.FILL, true, false);
+        gc = new GC(parent);
+		gd.heightHint = Dialog.convertHeightInCharsToPixels(gc
+				.getFontMetrics(), 6);
+		gc.dispose(); 
 		gd.horizontalSpan=2;
 		notesPageBook.setLayoutData( gd );
         
         noteEmptyComposite = new Composite( notesPageBook, SWT.NONE );
         noteEmptyComposite.setLayout( new GridLayout(1, false));
         //notesEmptyComposite.setVisible( false );
-        gd=new GridData(SWT.BEGINNING, SWT.BEGINNING, false, false);
+        gd = new GridData(SWT.FILL, SWT.FILL, true, false);
 		noteEmptyComposite.setLayoutData(gd);
 		
 		noteComposite = new Composite(notesPageBook, SWT.NONE);
 		noteComposite.setLayout(new GridLayout(2,false));
-		gd=new GridData(SWT.BEGINNING, SWT.BEGINNING, false, false);
+		gd = new GridData(SWT.FILL, SWT.FILL, true, false);
 		noteComposite.setLayoutData(gd);
 		noteComposite.setVisible(false);
 		
@@ -217,8 +227,7 @@ public class NewProjectExamplesWizardPage extends WizardPage {
 		
 		Composite messageComposite = new Composite(noteComposite, SWT.BORDER);
 		messageComposite.setLayout(new GridLayout(2, false));
-		gd=new GridData(SWT.BEGINNING, SWT.BEGINNING, false, false);
-		
+		gd = new GridData(SWT.FILL, SWT.FILL, true, false);
 		messageComposite.setLayoutData(gd);
 		
 		Label noteLabel = new Label(messageComposite,SWT.NONE);
@@ -228,16 +237,20 @@ public class NewProjectExamplesWizardPage extends WizardPage {
 		image.setBackground(noteLabel.getBackground());
 		noteLabel.setImage(image);
 		
-		noteText = new Text(messageComposite, SWT.MULTI | SWT.WRAP | SWT.READ_ONLY);
+		noteText = new Text(messageComposite, SWT.H_SCROLL | SWT.V_SCROLL | SWT.WRAP | SWT.READ_ONLY);
 		noteText.setText(""); //$NON-NLS-1$
-		gd = new GridData(GridData.FILL_BOTH | GridData.GRAB_HORIZONTAL | GridData.GRAB_VERTICAL);
-		gd.heightHint=50;
-		gd.widthHint = 400;
+		gd = new GridData(SWT.FILL, SWT.FILL, true, false);
+		gc = new GC(parent);
+		gd.heightHint = Dialog.convertHeightInCharsToPixels(gc
+				.getFontMetrics(), 3);
+		gc.dispose(); 
 		noteText.setLayoutData(gd);
 		noteText.setText(Messages.NewProjectExamplesWizardPage_Note);
 		
 		details = new Button(noteComposite, SWT.PUSH);
 		details.setText(Messages.NewProjectExamplesWizardPage_Details);
+		gd=new GridData(SWT.BEGINNING, SWT.CENTER, false, false);
+		details.setLayoutData(gd);
 		details.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
@@ -246,10 +259,10 @@ public class NewProjectExamplesWizardPage extends WizardPage {
 			}
 		});
 		
-		showQuickFixButton = new Button(internal,SWT.CHECK);
+		showQuickFixButton = new Button(composite,SWT.CHECK);
 		showQuickFixButton.setText(Messages.NewProjectExamplesWizardPage_Show_the_Quick_Fix_dialog);
 		showQuickFixButton.setSelection(true);
-		gd=new GridData(GridData.FILL_HORIZONTAL);
+		gd=new GridData(SWT.BEGINNING, SWT.BOTTOM, false, false);
 		gd.horizontalSpan=2;
 		showQuickFixButton.setLayoutData(gd);
 		
@@ -288,6 +301,91 @@ public class NewProjectExamplesWizardPage extends WizardPage {
 		setPageComplete(false);
 		
 		setControl(composite);
+		
+		configureSizeAndLocation();
+	}
+
+	private void configureSizeAndLocation() {
+		Shell shell = getContainer().getShell();
+		Point size = new Point(DEFAULT_WIDTH,shell.getSize().y);
+		shell.setSize(size);
+		Point location = getInitialLocation(size, shell);
+		shell.setBounds(getConstrainedShellBounds(new Rectangle(location.x,
+				location.y, size.x, size.y)));
+	}
+	
+	private Rectangle getConstrainedShellBounds(Rectangle preferredSize) {
+		Rectangle result = new Rectangle(preferredSize.x, preferredSize.y,
+				preferredSize.width, preferredSize.height);
+
+		Monitor mon = getClosestMonitor(getShell().getDisplay(), Geometry
+				.centerPoint(result));
+
+		Rectangle bounds = mon.getClientArea();
+
+		if (result.height > bounds.height) {
+			result.height = bounds.height;
+		}
+
+		if (result.width > bounds.width) {
+			result.width = bounds.width;
+		}
+
+		result.x = Math.max(bounds.x, Math.min(result.x, bounds.x
+				+ bounds.width - result.width));
+		result.y = Math.max(bounds.y, Math.min(result.y, bounds.y
+				+ bounds.height - result.height));
+
+		return result;
+	}
+
+	private static Monitor getClosestMonitor(Display toSearch, Point toFind) {
+		int closest = Integer.MAX_VALUE;
+
+		Monitor[] monitors = toSearch.getMonitors();
+		Monitor result = monitors[0];
+
+		for (int idx = 0; idx < monitors.length; idx++) {
+			Monitor current = monitors[idx];
+
+			Rectangle clientArea = current.getClientArea();
+
+			if (clientArea.contains(toFind)) {
+				return current;
+			}
+
+			int distance = Geometry.distanceSquared(Geometry
+					.centerPoint(clientArea), toFind);
+			if (distance < closest) {
+				closest = distance;
+				result = current;
+			}
+		}
+
+		return result;
+	}
+
+
+	private Point getInitialLocation(Point initialSize, Shell shell) {
+		Composite parent = shell.getParent();
+
+		Monitor monitor = shell.getDisplay().getPrimaryMonitor();
+		if (parent != null) {
+			monitor = parent.getMonitor();
+		}
+
+		Rectangle monitorBounds = monitor.getClientArea();
+		Point centerPoint;
+		if (parent != null) {
+			centerPoint = Geometry.centerPoint(parent.getBounds());
+		} else {
+			centerPoint = Geometry.centerPoint(monitorBounds);
+		}
+
+		return new Point(centerPoint.x - (initialSize.x / 2), Math.max(
+				monitorBounds.y, Math.min(centerPoint.y
+						- (initialSize.y * 2 / 3), monitorBounds.y
+						+ monitorBounds.height - initialSize.y)));
 	}
 
 	private boolean canFix(Project project,ProjectFix fix) {
@@ -416,6 +514,9 @@ public class NewProjectExamplesWizardPage extends WizardPage {
 
 	public boolean refresh(boolean force) {
 		boolean canFinish = false;
+		notesPageBook.showPage(noteEmptyComposite);
+		noteComposite.setVisible(false);
+		noteEmptyComposite.setVisible(true);
 		Iterator iterator = selection.iterator();
 		while (iterator.hasNext()) {
 			Object object = iterator.next();
