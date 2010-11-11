@@ -416,7 +416,7 @@ public class MavenCoreActivator extends Plugin {
 		version.setValue("5"); //$NON-NLS-1$
 		configuration.addChild(version);
 		Xpp3Dom generateApplicationXml = new Xpp3Dom("generateApplicationXml"); //$NON-NLS-1$
-		generateApplicationXml.setValue("false"); //$NON-NLS-1$
+		generateApplicationXml.setValue("true"); //$NON-NLS-1$
 		configuration.addChild(generateApplicationXml);
 		Xpp3Dom defaultLibBundleDir = new Xpp3Dom("defaultLibBundleDir"); //$NON-NLS-1$
 		defaultLibBundleDir.setValue("lib"); //$NON-NLS-1$
