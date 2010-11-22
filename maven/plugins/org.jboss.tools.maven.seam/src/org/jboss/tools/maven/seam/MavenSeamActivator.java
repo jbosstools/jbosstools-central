@@ -75,12 +75,6 @@ public class MavenSeamActivator extends AbstractUIPlugin {
 
 	private static final String ORG_CODEHAUS_MOJO = "org.codehaus.mojo"; //$NON-NLS-1$
 
-	private static final String TEST_SUFFIX = "-test"; //$NON-NLS-1$
-
-	private static final String EJB_SUFFIX = "-ejb"; //$NON-NLS-1$
-
-	private static final String EAR_SUFFIX = "-ear"; //$NON-NLS-1$
-
 	private static final String PARENT_SUFFIX = "-parent"; //$NON-NLS-1$
 
 	// The plug-in ID
@@ -149,12 +143,12 @@ public class MavenSeamActivator extends AbstractUIPlugin {
 		groupId = m2FacetModel.getStringProperty(IJBossMavenConstants.GROUP_ID);
 		parentProjectName = webProjectName + PARENT_SUFFIX;
 		parentArtifactId = artifactId + PARENT_SUFFIX;
-		testProjectName = webProjectName + TEST_SUFFIX;
-		testArtifactId = artifactId + TEST_SUFFIX;
-		earProjectName = webProjectName + EAR_SUFFIX;
-		earArtifactId = artifactId + EAR_SUFFIX;
-		ejbProjectName = webProjectName + EJB_SUFFIX;
-		ejbArtifactId = artifactId + EJB_SUFFIX;
+		testProjectName = seamFacetModel.getStringProperty(ISeamFacetDataModelProperties.SEAM_TEST_PROJECT);
+		testArtifactId = testProjectName;
+		earProjectName = seamFacetModel.getStringProperty(ISeamFacetDataModelProperties.SEAM_EAR_PROJECT);
+		earArtifactId = earProjectName;
+		ejbProjectName = seamFacetModel.getStringProperty(ISeamFacetDataModelProperties.SEAM_EJB_PROJECT);;
+		ejbArtifactId = ejbProjectName;
 		configureParentProject(m2FacetModel, seamFacetModel);
 		configureWarProject(m2FacetModel, seamFacetModel);
 		configureTestProject(m2FacetModel, seamFacetModel);
@@ -482,7 +476,7 @@ public class MavenSeamActivator extends AbstractUIPlugin {
 					build.setSourceDirectory(sourceDirectory);
 				}
 				build.setOutputDirectory("target/classes"); //$NON-NLS-1$
-				MavenCoreActivator.addMavenEarPlugin(build, project, m2FacetModel, true);
+				MavenCoreActivator.addMavenEarPlugin(build, project, m2FacetModel, ejbArtifactId, true);
 				model.setBuild(build);
 				MavenCoreActivator.createMavenProject(earProjectName, null, model, true);
 				removeWTPContainers(m2FacetModel, project);

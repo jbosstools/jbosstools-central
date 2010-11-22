@@ -100,7 +100,7 @@ public class MavenFacetInstallDelegate implements IDelegate {
 				if (fpwc
 						.hasProjectFacet(IJ2EEFacetConstants.ENTERPRISE_APPLICATION_FACET)) {
 					MavenCoreActivator.addMavenEarPlugin(build, project,
-							config, false);
+							config, null, false);
 					MavenCoreActivator.createMavenProject(project.getName(),
 							monitor, model, true);
 				}

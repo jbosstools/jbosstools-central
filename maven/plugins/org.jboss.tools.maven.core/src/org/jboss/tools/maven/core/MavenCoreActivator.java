@@ -404,7 +404,7 @@ public class MavenCoreActivator extends Plugin {
 		build.getResources().add(resource);
 	}
 	
-	public static void addMavenEarPlugin(Build build, IProject project, IDataModel m2FacetModel, boolean addModule) throws JavaModelException {
+	public static void addMavenEarPlugin(Build build, IProject project, IDataModel m2FacetModel, String ejbArtifactId, boolean addModule) throws JavaModelException {
 		String sourceDirectory = getEarRoot(project);
 		build.setSourceDirectory(sourceDirectory);
 		org.apache.maven.model.Plugin plugin = new org.apache.maven.model.Plugin();
@@ -429,14 +429,15 @@ public class MavenCoreActivator extends Plugin {
 			Xpp3Dom modules = new Xpp3Dom("modules"); //$NON-NLS-1$
 			configuration.addChild(modules);
 
-			String ejbModuleName = m2FacetModel.getStringProperty(IJBossMavenConstants.ARTIFACT_ID) + "-ejb.jar"; //$NON-NLS-1$
-			Xpp3Dom ejbProject = getEarModule(
-					"ejbModule", //$NON-NLS-1$
-					m2FacetModel.getStringProperty(IJBossMavenConstants.GROUP_ID),
-					m2FacetModel.getStringProperty(IJBossMavenConstants.ARTIFACT_ID)
-							+ "-ejb", "/", ejbModuleName ); //$NON-NLS-1$ //$NON-NLS-2$
-			modules.addChild(ejbProject);
-
+			if (ejbArtifactId != null) {
+				String ejbModuleName = ejbArtifactId + ".jar"; //$NON-NLS-1$
+				Xpp3Dom ejbProject = getEarModule(
+						"ejbModule", //$NON-NLS-1$
+						m2FacetModel.getStringProperty(IJBossMavenConstants.GROUP_ID),
+						ejbArtifactId, "/", ejbModuleName); //$NON-NLS-1$ 
+				modules.addChild(ejbProject);
+			}
+			
 			Xpp3Dom seamModule = getEarModule("ejbModule", "org.jboss.seam", //$NON-NLS-1$ //$NON-NLS-2$
 					"jboss-seam", "/", null); //$NON-NLS-1$ //$NON-NLS-2$
 			modules.addChild(seamModule);
