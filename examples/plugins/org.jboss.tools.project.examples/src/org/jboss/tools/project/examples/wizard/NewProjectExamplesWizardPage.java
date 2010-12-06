@@ -11,6 +11,7 @@
 package org.jboss.tools.project.examples.wizard;
 
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -18,8 +19,11 @@ import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.MessageDialogWithToggle;
+import org.eclipse.jface.dialogs.ProgressMonitorDialog;
+import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.util.Geometry;
@@ -80,6 +84,7 @@ public class NewProjectExamplesWizardPage extends WizardPage {
 	private PageBook notesPageBook;
 	private Composite noteEmptyComposite;
 	private Composite noteComposite;
+	private List<Category> categories;
 	
 	public NewProjectExamplesWizardPage() {
 		super("org.jboss.tools.project.examples"); //$NON-NLS-1$
@@ -116,8 +121,7 @@ public class NewProjectExamplesWizardPage extends WizardPage {
 		new Label(siteComposite,SWT.NONE).setText(Messages.NewProjectExamplesWizardPage_Site);
 		siteCombo = new Combo(siteComposite,SWT.READ_ONLY);
 		siteCombo.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
-		String[] items = getItems();
-		siteCombo.setItems(items);
+		
 		siteCombo.setText(ProjectExamplesActivator.ALL_SITES);
 		
 		new Label(composite,SWT.NONE).setText(Messages.NewProjectExamplesWizardPage_Projects);
@@ -141,7 +145,6 @@ public class NewProjectExamplesWizardPage extends WizardPage {
 		viewer.setLabelProvider(new ProjectLabelProvider());
 		viewer.setContentProvider(new ProjectContentProvider());
 		
-		refresh(viewer, false);
 		final SiteFilter siteFilter = new SiteFilter();
 		viewer.addFilter(siteFilter);
 		
@@ -303,6 +306,7 @@ public class NewProjectExamplesWizardPage extends WizardPage {
 		setControl(composite);
 		
 		configureSizeAndLocation();
+		refresh(viewer, false);
 	}
 
 	private void configureSizeAndLocation() {
@@ -409,10 +413,22 @@ public class NewProjectExamplesWizardPage extends WizardPage {
 		AdaptableList input = new AdaptableList(getCategories(show));
 		viewer.setInput(input);
 		viewer.refresh();
+		String[] items = getItems();
+		siteCombo.setItems(items);		
 	}
 
 	private List<Category> getCategories(boolean show) {
-		List<Category> categories = ProjectUtil.getProjects();
+		IRunnableWithProgress op = new IRunnableWithProgress() {
+			
+			public void run(IProgressMonitor monitor) {
+				categories = ProjectUtil.getProjects(monitor);
+			}
+		};
+		try {
+			new ProgressMonitorDialog(getShell()).run(true, true, op);
+		} catch (Exception e) {
+			ProjectExamplesActivator.log(e);
+		}
 		HashSet<ProjectExampleSite> invalidSites = ProjectUtil.getInvalidSites();
 		boolean showInvalidSites = ProjectExamplesActivator.getDefault().getPreferenceStore().getBoolean(ProjectExamplesActivator.SHOW_INVALID_SITES);
 		if (invalidSites.size() > 0 && showInvalidSites && show) {
@@ -428,7 +444,7 @@ public class NewProjectExamplesWizardPage extends WizardPage {
 	}
 	
 	private String[] getItems() {
-		List<Category> categories = getCategories(true);
+		//List<Category> categories = getCategories(true);
 		Set<String> sites = new TreeSet<String>();
 		sites.add(ProjectExamplesActivator.ALL_SITES);
 		for (Category category:categories) {

@@ -23,7 +23,6 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -209,7 +208,8 @@ public class ProjectUtil {
 		return null;
 	}
 
-	public static List<Category> getProjects() {
+	public static List<Category> getProjects(IProgressMonitor monitor) {
+		monitor.setTaskName(Messages.ProjectUtil_Parsing_project_description_files);
 		Set<ProjectExampleSite> sites = getSites();
 		List<Category> list = new ArrayList<Category>();
 		invalidSites.clear();
@@ -220,13 +220,22 @@ public class ProjectUtil {
 				if (!showExperimentalSites && site.isExperimental()) {
 					continue;
 				}
+				if (monitor.isCanceled()) {
+					invalidSites.add(site);
+					continue;
+				}
 				File file = getProjectExamplesFile(site.getUrl(),
-						"projectExamples", ".xml", null); //$NON-NLS-1$ //$NON-NLS-2$
+						"projectExamples", ".xml", monitor); //$NON-NLS-1$ //$NON-NLS-2$
+				if (monitor.isCanceled()) {
+					invalidSites.add(site);
+					continue;
+				} 
 				if (file == null || !file.exists() || !file.isFile()) {
 					ProjectExamplesActivator.log(NLS.bind(Messages.ProjectUtil_Invalid_URL,site.getUrl().toString()));
 					invalidSites.add(site);
 					continue;
 				}
+				
 				DocumentBuilderFactory dbf = DocumentBuilderFactory
 						.newInstance();
 				DocumentBuilder db = dbf.newDocumentBuilder();
@@ -419,10 +428,19 @@ public class ProjectUtil {
 				return null;
 		} else {
 			try {
+				if (monitor.isCanceled()) {
+					return null;
+				}
 				file = File.createTempFile(prefix, suffix);
 				file.deleteOnExit();
+				if (monitor.isCanceled()) {
+					return null;
+				}
 				BufferedOutputStream destination = new BufferedOutputStream(
 						new FileOutputStream(file));
+				if (monitor.isCanceled()) {
+					return null;
+				}
 				IStatus result = getTransport().download(prefix,
 						url.toExternalForm(), destination, monitor);
 				if (!result.isOK()) {

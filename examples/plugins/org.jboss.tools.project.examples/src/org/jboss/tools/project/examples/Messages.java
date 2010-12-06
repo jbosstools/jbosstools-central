@@ -77,6 +77,7 @@ public class Messages extends NLS {
 	public static String ProjectUtil_Invalid_property;
 	public static String ProjectUtil_Invalid_URL;
 	public static String ProjectUtil_Invalid_welcome_element;
+	public static String ProjectUtil_Parsing_project_description_files;
 	public static String ProjectUtil_Test;
 	public static String SeamRuntimeFix_Invalid_seam_runtime_fix;
 	public static String SiteDialog_Add_Project_Example_Site;

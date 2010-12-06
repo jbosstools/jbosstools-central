@@ -45,7 +45,7 @@ public class WTPRuntimeFix implements ProjectExamplesFix {
 	private static final String ESB = "esb"; //$NON-NLS-1$
 	private static final String PORTLET = "portlet"; //$NON-NLS-1$
 	private static final String REQUIRED_COMPONENTS = "required-components"; //$NON-NLS-1$
-	private static final IPath ESB_SERVER_SUPPLIED_CONTAINER_PATH = new Path("org.jboss.esb.runtime.classpath/server.supplied");
+	private static final IPath ESB_SERVER_SUPPLIED_CONTAINER_PATH = new Path("org.jboss.esb.runtime.classpath/server.supplied"); //$NON-NLS-1$
 
 	public boolean canFix(Project project, ProjectFix fix) {
 		if (!ProjectFix.WTP_RUNTIME.equals(fix.getType())) {
