@@ -1,7 +1,6 @@
 package org.jboss.tools.project.examples.fixes;
 
 import java.io.File;
-import java.io.FilenameFilter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.StringTokenizer;
@@ -29,7 +28,6 @@ import org.eclipse.wst.server.core.IRuntimeType;
 import org.eclipse.wst.server.core.ServerCore;
 import org.jboss.ide.eclipse.as.core.server.IJBossServerConstants;
 import org.jboss.ide.eclipse.as.core.server.IJBossServerRuntime;
-import org.jboss.tools.portlet.core.IPortletConstants;
 import org.jboss.tools.portlet.core.internal.PortletRuntimeComponentProvider;
 import org.jboss.tools.project.examples.Messages;
 import org.jboss.tools.project.examples.ProjectExamplesActivator;
@@ -161,13 +159,22 @@ public class WTPRuntimeFix implements ProjectExamplesFix {
 			IRuntime[] runtimes = ServerCore.getRuntimes();
 			if (runtimes.length > 0
 					&& ProjectFix.ANY.equals(allowedType)) {
-				return isComponentPresent(fix, runtimes[0]);
+				for (IRuntime runtime:runtimes) {
+					IRuntime componentPresent = isComponentPresent(fix, runtime);
+					if (componentPresent != null) {
+						return isComponentPresent(fix, runtime);
+					}
+				}
+				return null;
 			}
 			for (int i = 0; i < runtimes.length; i++) {
 				IRuntime runtime = runtimes[i];
 				IRuntimeType runtimeType = runtime.getRuntimeType();
 				if (runtimeType.getId().equals(allowedType)) {
-					return isComponentPresent(fix, runtime);
+					IRuntime componentPresent = isComponentPresent(fix, runtime);
+					if (componentPresent != null) {
+						return isComponentPresent(fix, runtime);
+					}
 				}
 			}
 		}
