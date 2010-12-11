@@ -294,6 +294,12 @@ public class ProjectUtil {
 								if (nodeName.equals("perspectiveId")) {  //$NON-NLS-1$
 									project.setPerspectiveId(getContent(child));
 								}
+								if (nodeName.equals("importType")) {  //$NON-NLS-1$
+									project.setImportType(getContent(child));
+								}
+								if (nodeName.equals("importTypeDescription")) {  //$NON-NLS-1$
+									project.setImportTypeDescription(getContent(child));
+								}
 								if (nodeName.equals("size")) { //$NON-NLS-1$
 									long size = 0;
 									try {

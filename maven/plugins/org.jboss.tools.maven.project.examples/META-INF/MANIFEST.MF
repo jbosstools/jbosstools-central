@@ -1,0 +1,15 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: %Bundle-Name
+Bundle-SymbolicName: org.jboss.tools.maven.project.examples;singleton:=true
+Bundle-Version: 1.0.0.qualifier
+Bundle-Activator: org.jboss.tools.maven.project.examples.MavenProjectExamplesActivator
+Bundle-Localization: plugin
+Require-Bundle: org.eclipse.ui,
+ org.eclipse.core.runtime,
+ org.jboss.tools.maven.core,
+ org.jboss.tools.project.examples,
+ org.eclipse.ui.ide
+Bundle-ActivationPolicy: lazy
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-Vendor: %Bundle-Vendor

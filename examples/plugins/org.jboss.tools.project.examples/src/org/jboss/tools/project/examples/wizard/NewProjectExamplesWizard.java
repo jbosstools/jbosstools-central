@@ -98,6 +98,7 @@ import org.jboss.tools.project.examples.ProjectExamplesActivator;
 import org.jboss.tools.project.examples.dialog.MarkerDialog;
 import org.jboss.tools.project.examples.fixes.SeamRuntimeFix;
 import org.jboss.tools.project.examples.fixes.WTPRuntimeFix;
+import org.jboss.tools.project.examples.model.IImportProjectExample;
 import org.jboss.tools.project.examples.model.Project;
 import org.jboss.tools.project.examples.model.ProjectFix;
 import org.jboss.tools.project.examples.model.ProjectUtil;
@@ -179,9 +180,28 @@ public class NewProjectExamplesWizard extends Wizard implements INewWizard {
 				try {
 					int i = 0;
 					setName(Messages.NewProjectExamplesWizard_Importing);
-					for (Project project : projects) {
-						importProject(project, files.get(i++), monitor);
-						fix(project, monitor);
+					for (final Project project : projects) {
+						if (project.getImportType() == null) {
+							importProject(project, files.get(i++), monitor);
+							ProjectExamplesActivator.fix(project, monitor);
+						} else {
+							IImportProjectExample importProjectExample = 
+								ProjectExamplesActivator.getDefault().getImportProjectExample(project.getImportType());
+							if (importProjectExample == null) {
+								Display.getDefault().syncExec(new Runnable() {
+
+									public void run() {
+										MessageDialogWithToggle.openError(getShell(),
+												Messages.NewProjectExamplesWizard_Error, 
+												"Cannot import a project of the '" + project.getImportType() + "' type.");
+									}
+
+								});
+								return Status.OK_STATUS;
+							}
+							projects = importProjectExample.importProject(project, files.get(i++), monitor);
+							importProjectExample.fix(project, monitor);
+						}
 					}
 					
 				} catch (final Exception e) {
@@ -203,7 +223,7 @@ public class NewProjectExamplesWizard extends Wizard implements INewWizard {
 
 		};
 		workspaceJob.setUser(true);
-		final boolean showQuickFix = page.showQuickFix();
+		final boolean showQuickFix = page.showQuickFix() && projects != null && projects.size() > 0;
 
 		if (showQuickFix) {
 			workspaceJob.addJobChangeListener(new IJobChangeListener() {
@@ -255,6 +275,7 @@ public class NewProjectExamplesWizard extends Wizard implements INewWizard {
 
 			});
 		} else {
+			updatePerspective();
 			openWelcome();
 		}
 		workspaceJob.schedule();
@@ -529,19 +550,6 @@ public class NewProjectExamplesWizard extends Wizard implements INewWizard {
 
 		});
 	}
-
-	public static void fix(Project project, IProgressMonitor monitor) {
-		List<ProjectFix> fixes = project.getFixes();
-		for (ProjectFix fix:fixes) {
-			if (ProjectFix.WTP_RUNTIME.equals(fix.getType())) {
-				new WTPRuntimeFix().fix(project, fix, monitor);
-			}
-			if (ProjectFix.SEAM_RUNTIME.equals(fix.getType())) {
-				new SeamRuntimeFix().fix(project, fix, monitor);
-			}
-		}
-	}
-	
 	
 	public static void importProject(Project projectDescription, File file,
 			IProgressMonitor monitor) throws Exception {

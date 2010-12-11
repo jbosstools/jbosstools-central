@@ -11,7 +11,6 @@
 package org.jboss.tools.project.examples.wizard;
 
 
-import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -64,6 +63,7 @@ import org.jboss.tools.project.examples.fixes.PluginFix;
 import org.jboss.tools.project.examples.fixes.SeamRuntimeFix;
 import org.jboss.tools.project.examples.fixes.WTPRuntimeFix;
 import org.jboss.tools.project.examples.model.Category;
+import org.jboss.tools.project.examples.model.IImportProjectExample;
 import org.jboss.tools.project.examples.model.Project;
 import org.jboss.tools.project.examples.model.ProjectExampleSite;
 import org.jboss.tools.project.examples.model.ProjectFix;
@@ -85,6 +85,7 @@ public class NewProjectExamplesWizardPage extends WizardPage {
 	private Composite noteEmptyComposite;
 	private Composite noteComposite;
 	private List<Category> categories;
+	private Text descriptionText;
 	
 	public NewProjectExamplesWizardPage() {
 		super("org.jboss.tools.project.examples"); //$NON-NLS-1$
@@ -150,12 +151,12 @@ public class NewProjectExamplesWizardPage extends WizardPage {
 		
 		Label descriptionLabel = new Label(composite,SWT.NONE);
 		descriptionLabel.setText(Messages.NewProjectExamplesWizardPage_Description);
-		final Text descriptionText = new Text(composite,SWT.H_SCROLL | SWT.V_SCROLL
+		descriptionText = new Text(composite,SWT.H_SCROLL | SWT.V_SCROLL
 				| SWT.READ_ONLY | SWT.BORDER | SWT.WRAP);
 		gd = new GridData(SWT.FILL, SWT.FILL, true, true);
 		gc = new GC(parent);
 		gd.heightHint = Dialog.convertHeightInCharsToPixels(gc
-				.getFontMetrics(), 4);
+				.getFontMetrics(), 8);
 		gc.dispose();
 		descriptionText.setLayoutData(gd);
 		
@@ -241,14 +242,12 @@ public class NewProjectExamplesWizardPage extends WizardPage {
 		noteLabel.setImage(image);
 		
 		noteText = new Text(messageComposite, SWT.H_SCROLL | SWT.V_SCROLL | SWT.WRAP | SWT.READ_ONLY);
-		noteText.setText(""); //$NON-NLS-1$
 		gd = new GridData(SWT.FILL, SWT.FILL, true, false);
 		gc = new GC(parent);
 		gd.heightHint = Dialog.convertHeightInCharsToPixels(gc
 				.getFontMetrics(), 3);
 		gc.dispose(); 
 		noteText.setLayoutData(gd);
-		noteText.setText(Messages.NewProjectExamplesWizardPage_Note);
 		
 		details = new Button(noteComposite, SWT.PUSH);
 		details.setText(Messages.NewProjectExamplesWizardPage_Details);
@@ -261,7 +260,7 @@ public class NewProjectExamplesWizardPage extends WizardPage {
 				dialog.open();
 			}
 		});
-		
+		setDefaultNote();
 		showQuickFixButton = new Button(composite,SWT.CHECK);
 		showQuickFixButton.setText(Messages.NewProjectExamplesWizardPage_Show_the_Quick_Fix_dialog);
 		showQuickFixButton.setSelection(true);
@@ -539,6 +538,21 @@ public class NewProjectExamplesWizardPage extends WizardPage {
 			if (object instanceof Project) {
 				canFinish=true;
 				Project project = (Project) object;
+				String importType = project.getImportType();
+				if (importType != null && importType.length() > 0) {
+					IImportProjectExample importProjectExample = ProjectExamplesActivator.getDefault().getImportProjectExample(importType);
+					if (importProjectExample == null) {
+						notesPageBook.showPage(noteComposite);
+						noteComposite.setVisible(true);
+						noteEmptyComposite.setVisible(false);
+						noteText.setText(project.getImportTypeDescription());
+						details.setEnabled(false);
+						canFinish = false;
+						break;
+					} else {
+						setDefaultNote();
+					}
+				}
 				if (force || project.getUnsatisfiedFixes() == null) {
 					List<ProjectFix> fixes = project.getFixes();
 					List<ProjectFix> unsatisfiedFixes = new ArrayList<ProjectFix>();
@@ -565,5 +579,10 @@ public class NewProjectExamplesWizardPage extends WizardPage {
 			}
 		}
 		return canFinish;
+	}
+
+	private void setDefaultNote() {
+		noteText.setText(Messages.NewProjectExamplesWizardPage_Note);
+		details.setEnabled(true);
 	}
 }

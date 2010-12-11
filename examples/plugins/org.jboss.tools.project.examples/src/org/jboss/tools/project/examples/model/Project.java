@@ -34,6 +34,8 @@ public class Project implements ProjectModelElement {
 	private List<ProjectFix> fixes = new ArrayList<ProjectFix>();
 	private List<ProjectFix> unsatisfiedFixes;
 	private String perspectiveId;
+	private String importType;
+	private String importTypeDescription;
 	
 	public Project() {
 		name=""; //$NON-NLS-1$
@@ -42,6 +44,7 @@ public class Project implements ProjectModelElement {
 		url=""; //$NON-NLS-1$
 		welcome=false;
 		perspectiveId = null;
+		importType = null;
 		setCategory(Category.OTHER);
 	}
 
@@ -179,5 +182,21 @@ public class Project implements ProjectModelElement {
 
 	public void setPerspectiveId(String perspectiveId) {
 		this.perspectiveId = perspectiveId;
+	}
+
+	public String getImportType() {
+		return importType;
+	}
+
+	public void setImportType(String importType) {
+		this.importType = importType;
+	}
+
+	public String getImportTypeDescription() {
+		return importTypeDescription;
+	}
+
+	public void setImportTypeDescription(String importTypeDescription) {
+		this.importTypeDescription = importTypeDescription;
 	}
 }
