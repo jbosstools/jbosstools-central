@@ -123,8 +123,6 @@ public class NewProjectExamplesWizardPage extends WizardPage {
 		siteCombo = new Combo(siteComposite,SWT.READ_ONLY);
 		siteCombo.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
 		
-		siteCombo.setText(ProjectExamplesActivator.ALL_SITES);
-		
 		new Label(composite,SWT.NONE).setText(Messages.NewProjectExamplesWizardPage_Projects);
 		
 		final ProjectExamplesPatternFilter filter = new ProjectExamplesPatternFilter();
@@ -306,6 +304,7 @@ public class NewProjectExamplesWizardPage extends WizardPage {
 		
 		configureSizeAndLocation();
 		refresh(viewer, false);
+		siteCombo.setText(ProjectExamplesActivator.ALL_SITES);
 	}
 
 	private void configureSizeAndLocation() {
