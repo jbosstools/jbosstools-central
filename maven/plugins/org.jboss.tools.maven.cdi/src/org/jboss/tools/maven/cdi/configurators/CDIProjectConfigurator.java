@@ -4,6 +4,7 @@ import org.apache.maven.project.MavenProject;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.wst.common.componentcore.ModuleCoreNature;
 import org.eclipse.wst.common.frameworks.datamodel.IDataModel;
@@ -11,6 +12,7 @@ import org.eclipse.wst.common.project.facet.core.IFacetedProject;
 import org.eclipse.wst.common.project.facet.core.IProjectFacet;
 import org.eclipse.wst.common.project.facet.core.IProjectFacetVersion;
 import org.eclipse.wst.common.project.facet.core.ProjectFacetsManager;
+import org.jboss.tools.cdi.core.CDIUtil;
 import org.jboss.tools.maven.cdi.MavenCDIActivator;
 import org.jboss.tools.maven.core.IJBossMavenConstants;
 import org.jboss.tools.maven.core.internal.project.facet.MavenFacetInstallDataModelProvider;
@@ -64,8 +66,10 @@ public class CDIProjectConfigurator extends AbstractProjectConfigurator {
 	    String cdiVersion = getCDIVersion(mavenProject);
 	    if (cdiVersion != null) {
 	    	final IFacetedProject fproj = ProjectFacetsManager.create(project);
-	    	if (fproj != null && "war".equals(packaging)) { //$NON-NLS-1$
+	    	if ( (fproj != null) && ("war".equals(packaging) || "ejb".equals(packaging)) ) { //$NON-NLS-1$
 	    		installWarFacets(fproj, cdiVersion, monitor);
+	    	} else {
+	    		CDIUtil.enableCDI(project, false, new NullProgressMonitor());
 	    	}
 	    }
 	}

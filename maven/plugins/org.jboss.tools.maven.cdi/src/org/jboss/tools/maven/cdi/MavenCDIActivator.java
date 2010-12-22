@@ -66,7 +66,7 @@ public class MavenCDIActivator extends AbstractUIPlugin {
 	
 	public IDataModel createCDIDataModel(IFacetedProject fproj, IProjectFacetVersion facetVersion) {
 		IDataModel config = (IDataModel) new CDIFacetInstallDataModelProvider().create();
-		
+		config.setBooleanProperty(CDIFacetInstallDataModelProvider.GENERATE_BEANS_XML,false);
 		return config;
 	}
 
