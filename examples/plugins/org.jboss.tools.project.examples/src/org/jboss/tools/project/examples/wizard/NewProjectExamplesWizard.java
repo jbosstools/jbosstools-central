@@ -223,7 +223,7 @@ public class NewProjectExamplesWizard extends Wizard implements INewWizard {
 
 		};
 		workspaceJob.setUser(true);
-		final boolean showQuickFix = page.showQuickFix() && projects != null && projects.size() > 0;
+		final boolean showQuickFix = page.showQuickFix();
 
 		if (showQuickFix) {
 			workspaceJob.addJobChangeListener(new IJobChangeListener() {
@@ -246,7 +246,7 @@ public class NewProjectExamplesWizard extends Wizard implements INewWizard {
 					} catch (InterruptedException e) {
 						return;
 					}
-					if (showQuickFix) {
+					if (showQuickFix  && projects != null && projects.size() > 0) {
 						try {
 							Thread.sleep(100);
 						} catch (InterruptedException e) {
