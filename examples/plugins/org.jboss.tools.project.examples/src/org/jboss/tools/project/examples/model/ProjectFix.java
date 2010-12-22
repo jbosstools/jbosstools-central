@@ -89,14 +89,14 @@ public class ProjectFix {
 	public void fix() {
 		if (SEAM_RUNTIME.equals(type)) {
 			Shell shell = getShell();
-			PreferenceDialog dialog = PreferencesUtil.createPreferenceDialogOn(shell,SEAM_PREFERENCES_ID, new String[] {SEAM_PREFERENCES_ID},null);
+			PreferenceDialog dialog = PreferencesUtil.createPreferenceDialogOn(shell,SEAM_PREFERENCES_ID, null ,null);
 			if (dialog != null) {
 				dialog.open();
 			}
 		}
 		if (WTP_RUNTIME.equals(type)) {
 			Shell shell = getShell();
-			PreferenceDialog dialog = PreferencesUtil.createPreferenceDialogOn(shell,WTP_PREFERENCES_ID, new String[] {SEAM_PREFERENCES_ID},null);
+			PreferenceDialog dialog = PreferencesUtil.createPreferenceDialogOn(shell,WTP_PREFERENCES_ID, null ,null);
 			if (dialog != null) {
 				dialog.open();
 			}
