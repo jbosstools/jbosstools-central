@@ -136,13 +136,13 @@ public class CreateMavenizedSeamProjectTest {
 	
 	public static final String HSQL_PROFILE_ID = "org.eclipse.datatools.enablement.hsqldb.connectionProfile";
 
-	public static final String JBOSS_AS_HOME = System.getProperty("jbosstools.test.jboss.home.5.1", "E:\\jboss-5.1.0.GA");
+	public static final String JBOSS_AS_HOME = System.getProperty("jbosstools.test.jboss.home.5.1", "E:\\JBossRuntimes\\jboss-5.1.0.GA");
 
 	public static final String JBOSS_AS_RUNTIME_ID = "org.jboss.ide.eclipse.as.runtime.51";
 	
 	public static final String JBOSS_AS_SERVER_ID = "org.jboss.ide.eclipse.as.51";
 	
-	public static final String SEAM_HOME_PROPERTY = System.getProperty("jbosstools.test.seam.2.0.1.GA.home", "E:\\jboss-seam-2.2.0.GA");
+	public static final String SEAM_HOME_PROPERTY = System.getProperty("jbosstools.test.seam.2.0.1.GA.home", "E:\\JBossRuntimes\\jboss-seam-2.2.1.CR3");
 
 	public static final String HSQLDB_DRIVER_JAR_NAME = "hsqldb.jar"; //$NON-NLS-1$
 	
