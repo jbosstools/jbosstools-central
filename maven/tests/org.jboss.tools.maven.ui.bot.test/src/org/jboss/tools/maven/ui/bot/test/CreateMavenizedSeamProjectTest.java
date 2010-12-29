@@ -587,16 +587,18 @@ public class CreateMavenizedSeamProjectTest {
 		});
 		assertTrue(libs.length == 0);
 		File libDirectory = new File (rootDirectory,"lib");
-		libs = libDirectory.list(new FilenameFilter() {
-			
-			public boolean accept(File dir, String name) {
-				if (name.endsWith(".jar")) {
-					return true;
+		if (libDirectory.isDirectory()) {
+			libs = libDirectory.list(new FilenameFilter() {
+
+				public boolean accept(File dir, String name) {
+					if (name.endsWith(".jar")) {
+						return true;
+					}
+					return false;
 				}
-				return false;
-			}
-		});
-		assertTrue(libs.length == 0);
+			});
+			assertTrue(libs.length == 0);
+		}
 	}
 	
 }

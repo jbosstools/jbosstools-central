@@ -1,6 +1,5 @@
 package org.jboss.tools.maven.ui.bot.test;
 
-import org.jboss.tools.ui.bot.ext.RequirementAwareSuite;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 
@@ -10,10 +9,10 @@ import org.junit.runners.Suite;
  * 
  */
 
-@RunWith(RequirementAwareSuite.class)
 @Suite.SuiteClasses({
 	CreateMavenizedSeamProjectTest.class,
 })
+@RunWith(Suite.class)
 public class MavenAllBotTests {
 
 }
