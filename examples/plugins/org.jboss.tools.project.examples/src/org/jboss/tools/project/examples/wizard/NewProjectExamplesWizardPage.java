@@ -75,6 +75,7 @@ import org.jboss.tools.project.examples.model.ProjectUtil;
  */
 public class NewProjectExamplesWizardPage extends WizardPage {
 
+	private static final int DEFAULT_HEIGHT = 350;
 	private static final int DEFAULT_WIDTH = 600;
 	private IStructuredSelection selection;
 	private Button showQuickFixButton;
@@ -309,13 +310,21 @@ public class NewProjectExamplesWizardPage extends WizardPage {
 
 	private void configureSizeAndLocation() {
 		Shell shell = getContainer().getShell();
-		Point size = new Point(DEFAULT_WIDTH,shell.getSize().y);
+		Point size = new Point(DEFAULT_WIDTH, getHeight());
 		shell.setSize(size);
 		Point location = getInitialLocation(size, shell);
 		shell.setBounds(getConstrainedShellBounds(new Rectangle(location.x,
 				location.y, size.x, size.y)));
 	}
 	
+	private int getHeight() {
+		GC gc = new GC(getControl());
+		int height = Dialog.convertVerticalDLUsToPixels(gc
+				.getFontMetrics(), DEFAULT_HEIGHT);
+		gc.dispose(); 
+		return height;
+	}
+
 	private Rectangle getConstrainedShellBounds(Rectangle preferredSize) {
 		Rectangle result = new Rectangle(preferredSize.x, preferredSize.y,
 				preferredSize.width, preferredSize.height);
