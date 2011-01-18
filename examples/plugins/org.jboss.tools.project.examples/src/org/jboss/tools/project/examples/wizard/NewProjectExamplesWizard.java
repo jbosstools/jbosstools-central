@@ -587,6 +587,9 @@ public class NewProjectExamplesWizard extends Wizard implements INewWizard {
 				String prefix = projectName + "/"; //$NON-NLS-1$
 				while (entries.hasMoreElements()) {
 					entry = entries.nextElement();
+					if (entry.isDirectory()) {
+						continue;
+					}
 					if (entry.getName().startsWith(prefix)) {
 						filesToImport.add(entry);
 					}
