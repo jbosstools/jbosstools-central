@@ -75,7 +75,7 @@ import org.jboss.tools.project.examples.model.ProjectUtil;
  */
 public class NewProjectExamplesWizardPage extends WizardPage {
 
-	private static final int DEFAULT_HEIGHT = 350;
+	private static final int DEFAULT_HEIGHT = 400;
 	private static final int DEFAULT_WIDTH = 600;
 	private IStructuredSelection selection;
 	private Button showQuickFixButton;
