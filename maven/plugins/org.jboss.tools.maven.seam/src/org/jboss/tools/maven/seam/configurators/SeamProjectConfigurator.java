@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import org.apache.maven.artifact.Artifact;
+import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.project.MavenProject;
 import org.eclipse.core.commands.ExecutionException;
@@ -455,21 +457,28 @@ public class SeamProjectConfigurator extends AbstractProjectConfigurator {
 	}
 
 	private String getSeamVersion(MavenProject mavenProject) {
-		List<Dependency> dependencies = mavenProject.getDependencies();
-		Dependency seamDependency = null;
-	    for (Dependency dependency:dependencies) {
-	    	String groupId = dependency.getGroupId();
+		List<Artifact> artifacts = new ArrayList<Artifact>();
+		ArtifactFilter filter = new org.apache.maven.artifact.resolver.filter.ScopeArtifactFilter(
+				Artifact.SCOPE_TEST);
+		for (Artifact artifact : mavenProject.getArtifacts()) {
+			if (filter.include(artifact)) {
+				artifacts.add(artifact);
+			}
+		}
+		Artifact seamArtifact = null;
+		for (Artifact artifact:artifacts) {
+	    	String groupId = artifact.getGroupId();
     		if (groupId != null && ORG_JBOSS_SEAM_GROUP_ID.equals(groupId)) {
-    			String artifactId = dependency.getArtifactId();
+    			String artifactId = artifact.getArtifactId();
     			if (artifactId != null && JBOSS_SEAM_ARTIFACT_ID.equals(artifactId)) {
-	    			return dependency.getVersion();
+	    			return artifact.getVersion();
 	    		} else if (artifactId != null && artifactId.startsWith(JBOSS_SEAM_ARTIFACT_PREFIX)) {
-	    			seamDependency = dependency;
+	    			seamArtifact = artifact;
 	    		}
 	    	}
 	    }
-	    if (seamDependency != null) {
-	    	return seamDependency.getVersion();
+	    if (seamArtifact != null) {
+	    	return seamArtifact.getVersion();
 	    }
 	    return null;
 	}
