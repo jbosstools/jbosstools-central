@@ -1,7 +1,10 @@
 package org.jboss.tools.maven.hibernate.configurators;
 
+import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.maven.artifact.Artifact;
+import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.project.MavenProject;
 import org.eclipse.core.resources.IProject;
@@ -67,14 +70,21 @@ public class HibernateProjectConfigurator extends AbstractProjectConfigurator {
 	}
 
 	private boolean isHibernateProject(MavenProject mavenProject) {
-		List<Dependency> dependencies = mavenProject.getDependencies();
-		for (Dependency dependency:dependencies) {
-	    	String groupId = dependency.getGroupId();
-    		if (groupId != null && HIBERNATE_GROUP_ID.equals(groupId)) {
-    			String artifactId = dependency.getArtifactId();
+		List<Artifact> artifacts = new ArrayList<Artifact>();
+		ArtifactFilter filter = new org.apache.maven.artifact.resolver.filter.ScopeArtifactFilter(
+				Artifact.SCOPE_TEST);
+		for (Artifact artifact : mavenProject.getArtifacts()) {
+			if (filter.include(artifact)) {
+				artifacts.add(artifact);
+			}
+		}
+        for (Artifact artifact:artifacts) {
+	    	String groupId = artifact.getGroupId();
+    		if (HIBERNATE_GROUP_ID.equals(groupId)) {
+    			String artifactId = artifact.getArtifactId();
     			if (artifactId != null && artifactId.startsWith(HIBERNATE_ARTIFACT_ID_PREFIX)) {
 	    			return true;
-	    		}
+	    		} 
 	    	}
 	    }
 	    return false;

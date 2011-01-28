@@ -1,7 +1,10 @@
 package org.jboss.tools.maven.ui;
 
+import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.maven.artifact.Artifact;
+import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.project.MavenProject;
 import org.eclipse.core.runtime.IStatus;
@@ -106,13 +109,20 @@ public class Activator extends AbstractUIPlugin {
 	}
 
 	public String getDependencyVersion(MavenProject mavenProject, String gid, String aid) {
-		List<Dependency> dependencies = mavenProject.getDependencies();
-		for (Dependency dependency:dependencies) {
-	    	String groupId = dependency.getGroupId();
+		List<Artifact> artifacts = new ArrayList<Artifact>();
+		ArtifactFilter filter = new org.apache.maven.artifact.resolver.filter.ScopeArtifactFilter(
+				Artifact.SCOPE_TEST);
+		for (Artifact artifact : mavenProject.getArtifacts()) {
+			if (filter.include(artifact)) {
+				artifacts.add(artifact);
+			}
+		}
+        for (Artifact artifact:artifacts) {
+	    	String groupId = artifact.getGroupId();
     		if (groupId != null && (groupId.equals(gid)) ) {
-    			String artifactId = dependency.getArtifactId();
+    			String artifactId = artifact.getArtifactId();
     			if (artifactId != null && artifactId.equals(aid)) {
-	    			return dependency.getVersion();
+	    			return artifact.getVersion();
 	    		} 
 	    	}
 	    }
