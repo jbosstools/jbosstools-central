@@ -54,6 +54,9 @@ public class ProjectExamplesActivator extends AbstractUIPlugin {
 	public static final boolean SHOW_EXPERIMENTAL_SITES_VALUE = false;
 	public static final String SHOW_INVALID_SITES = "invalidSites"; //$NON-NLS-1$
 	public static final boolean SHOW_INVALID_SITES_VALUE = true;
+	public static final String MAVEN_ARCHETYPE = "mavenArchetype"; //$NON-NLS-1$
+	public static final Object PROJECT_EXAMPLES_FAMILY = new Object();
+	
 	private static final String IMPORT_PROJECT_EXAMPLES_EXTENSION_ID = "org.jboss.tools.project.examples.importProjectExamples"; //$NON-NLS-1$
 	private static final String NAME = "name"; //$NON-NLS-1$
 	private static final String TYPE = "type"; //$NON-NLS-1$
@@ -68,6 +71,7 @@ public class ProjectExamplesActivator extends AbstractUIPlugin {
 		@Override
 		protected IStatus run(IProgressMonitor monitor) {
 			try {
+				Job.getJobManager().join(PROJECT_EXAMPLES_FAMILY, monitor);
 				Job.getJobManager().join(ResourcesPlugin.FAMILY_AUTO_BUILD,
 						monitor);
 				Job.getJobManager().join(

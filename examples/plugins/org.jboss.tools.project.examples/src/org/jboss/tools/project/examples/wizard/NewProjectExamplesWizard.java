@@ -155,23 +155,26 @@ public class NewProjectExamplesWizard extends Wizard implements INewWizard {
 				Iterator iterator = selection.iterator();
 				projects.clear();
 				List<File> files = new ArrayList<File>();
+				File file = null;
 				while (iterator.hasNext()) {
 					Object object = iterator.next();
 					if (object instanceof Project) {
 						Project project = (Project) object;
-						String urlString = project.getUrl();
-						String name = project.getName();
-						URL url = null;
-						try {
-							url = new URL(urlString);
-						} catch (MalformedURLException e) {
-							ProjectExamplesActivator.log(e);
-							continue;
-						}
-						final File file = ProjectUtil.getProjectExamplesFile(
-								url, name, ".zip", monitor); //$NON-NLS-1$
-						if (file == null) {
-							return Status.CANCEL_STATUS;
+						if (project.isURLRequired()) {
+							String urlString = project.getUrl();
+							String name = project.getName();
+							URL url = null;
+							try {
+								url = new URL(urlString);
+							} catch (MalformedURLException e) {
+								ProjectExamplesActivator.log(e);
+								continue;
+							}
+							file = ProjectUtil.getProjectExamplesFile(url, name,
+											".zip", monitor); //$NON-NLS-1$
+							if (file == null) {
+								return Status.CANCEL_STATUS;
+							}
 						}
 						projects.add(project);
 						files.add(file);
@@ -199,7 +202,7 @@ public class NewProjectExamplesWizard extends Wizard implements INewWizard {
 								});
 								return Status.OK_STATUS;
 							}
-							projects = importProjectExample.importProject(project, files.get(i++), monitor);
+							importProjectExample.importProject(project, files.get(i++), monitor);
 							importProjectExample.fix(project, monitor);
 						}
 					}

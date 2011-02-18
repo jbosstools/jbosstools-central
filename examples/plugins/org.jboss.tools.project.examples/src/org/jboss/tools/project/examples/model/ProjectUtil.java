@@ -338,6 +338,9 @@ public class ProjectUtil {
 										project.setWelcomeURL(attribute.trim());
 									}
 								}
+								if (nodeName.equals("mavenArchetype")) {  //$NON-NLS-1$
+									parseMavenArchetype(project, child);
+								}
 							}
 						}
 					}
@@ -367,7 +370,72 @@ public class ProjectUtil {
 				Element child = (Element) cNode;
 				String nodeName = child.getNodeName();
 				if (nodeName.equals("fix")) { //$NON-NLS-1$
-					parseFix(project,child);
+					parseFix(project, child);
+				}
+			}
+		}
+	}
+	
+	private static void parseMavenArchetype(Project project, Element node) {
+		NodeList children = node.getChildNodes();
+		int cLen = children.getLength();
+		ArchetypeModel archetypeModel = project.getArchetypeModel();
+		for (int i = 0; i < cLen; i++) {
+			Node cNode = children.item(i);
+			if (cNode.getNodeType() == Node.ELEMENT_NODE) {
+				Element child = (Element) cNode;
+				String nodeName = child.getNodeName();
+				if (nodeName.equals("archetypeGroupId")) { //$NON-NLS-1$
+					archetypeModel.setArchetypeGroupId(getContent(child));
+				}
+				if (nodeName.equals("archetypeArtifactId")) { //$NON-NLS-1$
+					archetypeModel.setArchetypeArtifactId(getContent(child));
+				}
+				if (nodeName.equals("archetypeVersion")) { //$NON-NLS-1$
+					archetypeModel.setArchetypeVersion(getContent(child));
+				}
+				if (nodeName.equals("archetypeRepository")) { //$NON-NLS-1$
+					archetypeModel.setArchetypeRepository(getContent(child));
+				}
+				if (nodeName.equals("groupId")) { //$NON-NLS-1$
+					archetypeModel.setGroupId(getContent(child));
+				}
+				if (nodeName.equals("artifactId")) { //$NON-NLS-1$
+					archetypeModel.setArtifactId(getContent(child));
+				}
+				if (nodeName.equals("version")) { //$NON-NLS-1$
+					archetypeModel.setVersion(getContent(child));
+				}
+				if (nodeName.equals("javaPackage")) { //$NON-NLS-1$
+					archetypeModel.setJavaPackage(getContent(child));
+				}
+				if (nodeName.equals("properties")) { //$NON-NLS-1$
+					parseProperties(project, child);
+				}
+			}
+		}
+	}
+	
+	private static void parseProperties(Project project, Element node) {
+		NodeList children = node.getChildNodes();
+		int cLen = children.getLength();
+		for (int i = 0; i < cLen; i++) {
+			Node cNode = children.item(i);
+			if (cNode.getNodeType() == Node.ELEMENT_NODE) {
+				Element child = (Element) cNode;
+				String nodeName = child.getNodeName();
+				if (nodeName.equals("property")) { //$NON-NLS-1$
+					String key = child.getAttribute("name"); //$NON-NLS-1$
+					if (key == null || key.trim().length() <= 0) {
+						ProjectExamplesActivator.log(Messages.ProjectUtil_Invalid_property);
+						return;
+					}
+					String value = child.getAttribute("value"); //$NON-NLS-1$
+					if (value == null || value.trim().length() <= 0) {
+						ProjectExamplesActivator.log(Messages.ProjectUtil_Invalid_property);
+						return;
+					}
+					project.getArchetypeModel().addProperty(key, value);
 				}
 			}
 		}

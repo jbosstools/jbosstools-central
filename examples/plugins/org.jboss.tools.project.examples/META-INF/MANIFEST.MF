@@ -39,6 +39,9 @@ Export-Package: org.jboss.tools.project.examples,
  org.jboss.tools.project.examples.dialog,
  org.jboss.tools.project.examples.dialog.xpl,
  org.jboss.tools.project.examples.filetransfer,
+ org.jboss.tools.project.examples.fixes,
+ org.jboss.tools.project.examples.job,
  org.jboss.tools.project.examples.model,
+ org.jboss.tools.project.examples.preferences,
  org.jboss.tools.project.examples.wizard
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6

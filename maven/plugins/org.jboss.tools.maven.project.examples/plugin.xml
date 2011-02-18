@@ -9,5 +9,14 @@
             type="maven">
       </importProjectExample>
    </extension>
+   
+   <extension
+         point="org.jboss.tools.project.examples.importProjectExamples">
+      <importProjectExample
+            class="org.jboss.tools.maven.project.examples.ImportMavenArchetypeProjectExample"
+            name="Import Maven Archetype Project Examples"
+            type="mavenArchetype">
+      </importProjectExample>
+   </extension>
 
 </plugin>

@@ -9,7 +9,7 @@ import org.osgi.framework.BundleContext;
  * The activator class controls the plug-in life cycle
  */
 public class MavenProjectExamplesActivator extends AbstractUIPlugin {
-
+ 
 	// The plug-in ID
 	public static final String PLUGIN_ID = "org.jboss.tools.maven.project.examples"; //$NON-NLS-1$
 

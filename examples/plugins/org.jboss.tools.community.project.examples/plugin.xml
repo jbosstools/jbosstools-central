@@ -23,5 +23,11 @@
         name="%JBoss_Tools_Community_Maven_Examples">
         <url>http://download.jboss.org/jbosstools/examples/project-examples-maven-3.2.xml</url>
         <experimental>false</experimental>
-   </extension>
+  </extension>
+  <extension
+        point="org.jboss.tools.project.examples.projectExamplesXml"
+        name="%JBoss_Tools_33_Community_Maven_Examples">
+        <url>http://download.jboss.org/jbosstools/examples/project-examples-maven-3.3.xml</url>
+        <experimental>false</experimental>
+  </extension>
 </plugin>

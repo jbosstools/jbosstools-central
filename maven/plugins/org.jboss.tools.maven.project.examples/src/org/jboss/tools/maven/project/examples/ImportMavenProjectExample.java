@@ -11,7 +11,6 @@
 
 package org.jboss.tools.maven.project.examples;
 
-import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -26,39 +25,32 @@ import java.util.zip.ZipFile;
 
 import org.apache.maven.model.Model;
 import org.eclipse.core.resources.IProject;
-import org.eclipse.core.resources.IProjectDescription;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
-import org.eclipse.core.resources.WorkspaceJob;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
-import org.eclipse.jface.dialogs.Dialog;
-import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.progress.IProgressConstants;
+import org.jboss.tools.project.examples.job.ProjectExamplesJob;
 import org.jboss.tools.project.examples.model.AbstractImportProjectExample;
 import org.jboss.tools.project.examples.model.Project;
 import org.maven.ide.eclipse.MavenPlugin;
 import org.maven.ide.eclipse.actions.OpenMavenConsoleAction;
-import org.maven.ide.eclipse.core.IMavenConstants;
 import org.maven.ide.eclipse.core.MavenConsole;
 import org.maven.ide.eclipse.embedder.IMaven;
 import org.maven.ide.eclipse.embedder.MavenModelManager;
 import org.maven.ide.eclipse.project.AbstractProjectScanner;
-import org.maven.ide.eclipse.project.IMavenProjectImportResult;
 import org.maven.ide.eclipse.project.LocalProjectScanner;
 import org.maven.ide.eclipse.project.MavenProjectInfo;
 import org.maven.ide.eclipse.project.ProjectImportConfiguration;
-import org.maven.ide.eclipse.project.ResolverConfiguration;
 
 /**
  * @author snjeza
@@ -145,7 +137,7 @@ public class ImportMavenProjectExample extends AbstractImportProjectExample {
 	}
 
 	private void importMavenProjects(final File destination) {
-		Job job = new WorkspaceJob("Importing Maven projects") {
+		Job job = new ProjectExamplesJob("Importing Maven projects") {
 			public IStatus runInWorkspace(IProgressMonitor monitor) {
 				setProperty(IProgressConstants.ACTION_PROPERTY,
 						new OpenMavenConsoleAction());

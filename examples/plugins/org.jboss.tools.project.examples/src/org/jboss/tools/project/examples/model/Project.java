@@ -14,6 +14,8 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.jboss.tools.project.examples.ProjectExamplesActivator;
+
 /**
  * @author snjeza
  * 
@@ -36,6 +38,7 @@ public class Project implements ProjectModelElement {
 	private String perspectiveId;
 	private String importType;
 	private String importTypeDescription;
+	private ArchetypeModel  archetypeModel = new ArchetypeModel();
 	
 	public Project() {
 		name=""; //$NON-NLS-1$
@@ -198,5 +201,13 @@ public class Project implements ProjectModelElement {
 
 	public void setImportTypeDescription(String importTypeDescription) {
 		this.importTypeDescription = importTypeDescription;
+	}
+
+	public ArchetypeModel getArchetypeModel() {
+		return archetypeModel;
+	}
+	
+	public boolean isURLRequired() {
+		return !ProjectExamplesActivator.MAVEN_ARCHETYPE.equals(importType);
 	}
 }
