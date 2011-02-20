@@ -12,6 +12,7 @@ import org.eclipse.core.resources.ProjectScope;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.preferences.IScopeContext;
+import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.hibernate.eclipse.console.properties.HibernatePropertiesConstants;
 import org.hibernate.eclipse.console.utils.ProjectUtils;
@@ -43,7 +44,7 @@ public class HibernateProjectConfigurator extends AbstractProjectConfigurator {
 			return;
 		}
 		
-		if (isHibernateProject(mavenProject)) {
+		if (project.hasNature(JavaCore.NATURE_ID) && isHibernateProject(mavenProject)) {
 			IScopeContext scope = new ProjectScope(project);
 			Preferences node = scope.getNode(HibernatePropertiesConstants.HIBERNATE_CONSOLE_NODE);
 			if (node != null) {
