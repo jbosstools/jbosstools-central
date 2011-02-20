@@ -304,7 +304,7 @@ public class NewProjectExamplesWizardPage extends WizardPage {
 		setControl(composite);
 		
 		configureSizeAndLocation();
-		refresh(viewer, false);
+		refresh(viewer, true);
 		siteCombo.setText(ProjectExamplesActivator.ALL_SITES);
 	}
 
