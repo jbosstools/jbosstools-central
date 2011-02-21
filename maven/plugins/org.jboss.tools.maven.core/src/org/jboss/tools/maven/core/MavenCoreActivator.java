@@ -70,6 +70,8 @@ import org.osgi.framework.BundleContext;
  */
 public class MavenCoreActivator extends Plugin {
 
+	private static final String ROOT_DIR = "/";
+
 	public static final String SEPARATOR = "/"; //$NON-NLS-1$
 
 	// The plug-in ID
@@ -429,18 +431,18 @@ public class MavenCoreActivator extends Plugin {
 			Xpp3Dom modules = new Xpp3Dom("modules"); //$NON-NLS-1$
 			configuration.addChild(modules);
 
+			Xpp3Dom seamModule = getEarModule("ejbModule", "org.jboss.seam", //$NON-NLS-1$ //$NON-NLS-2$
+					"jboss-seam", ROOT_DIR, null); //$NON-NLS-1$ //$NON-NLS-2$
+			modules.addChild(seamModule);
+			
 			if (ejbArtifactId != null) {
 				String ejbModuleName = ejbArtifactId + ".jar"; //$NON-NLS-1$
 				Xpp3Dom ejbProject = getEarModule(
 						"ejbModule", //$NON-NLS-1$
 						m2FacetModel.getStringProperty(IJBossMavenConstants.GROUP_ID),
-						ejbArtifactId, "/", ejbModuleName); //$NON-NLS-1$ 
+						ejbArtifactId, ROOT_DIR, ejbModuleName); //$NON-NLS-1$ 
 				modules.addChild(ejbProject);
 			}
-			
-			Xpp3Dom seamModule = getEarModule("ejbModule", "org.jboss.seam", //$NON-NLS-1$ //$NON-NLS-2$
-					"jboss-seam", "/", null); //$NON-NLS-1$ //$NON-NLS-2$
-			modules.addChild(seamModule);
 
 			String webModuleName = m2FacetModel.getStringProperty(IJBossMavenConstants.ARTIFACT_ID) + ".war"; //$NON-NLS-1$
 			
@@ -448,7 +450,7 @@ public class MavenCoreActivator extends Plugin {
 					"webModule", //$NON-NLS-1$
 					m2FacetModel.getStringProperty(IJBossMavenConstants.GROUP_ID),
 					m2FacetModel.getStringProperty(IJBossMavenConstants.ARTIFACT_ID),
-					"/", webModuleName); //$NON-NLS-1$
+					ROOT_DIR, webModuleName); //$NON-NLS-1$
 			Xpp3Dom contextRoot = new Xpp3Dom("contextRoot"); //$NON-NLS-1$
 			contextRoot.setValue(m2FacetModel
 					.getStringProperty(IJBossMavenConstants.ARTIFACT_ID));
@@ -484,9 +486,11 @@ public class MavenCoreActivator extends Plugin {
 		Xpp3Dom artifactId = new Xpp3Dom("artifactId"); //$NON-NLS-1$
 		artifactId.setValue(artifactIdString);
 		earModule.addChild(artifactId);
-		Xpp3Dom bundleDir = new Xpp3Dom("bundleDir"); //$NON-NLS-1$
-		bundleDir.setValue(bundleDirString);
-		earModule.addChild(bundleDir);
+		if (!ROOT_DIR.equals(bundleDirString)) {
+			Xpp3Dom bundleDir = new Xpp3Dom("bundleDir"); //$NON-NLS-1$
+			bundleDir.setValue(bundleDirString);
+			earModule.addChild(bundleDir);
+		}
 		if (bundleFileNameString != null) {
 			Xpp3Dom bundleFileName = new Xpp3Dom("bundleFileName"); //$NON-NLS-1$
 			bundleFileName.setValue(bundleFileNameString);
