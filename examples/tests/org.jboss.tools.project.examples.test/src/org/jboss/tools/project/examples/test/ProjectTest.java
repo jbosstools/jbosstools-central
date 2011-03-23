@@ -119,9 +119,17 @@ public class ProjectTest {
 	}
 	
 	@Test
-	public void testErrors() throws Exception {
+	public void testWarErrors() throws Exception {
 		checkErrors("numberguess");
+	}
+	
+	@Test
+	public void testEjbErrors() throws Exception {
 		checkErrors("numberguess-ejb");
+	}
+	
+	@Test
+	public void testEarErrors() throws Exception {
 		checkErrors("numberguess-ear");
 	}
 	
@@ -137,6 +145,6 @@ public class ProjectTest {
 				markers.add(projectMarkers[i]);
 			}
 		}
-		assertTrue("The '" + projectName + "' contains errors.", markers.size() == 0);
+		assertTrue("The '" + projectName + "' contains " + markers.size() + " error(s).", markers.size() == 0);
 	}
 }

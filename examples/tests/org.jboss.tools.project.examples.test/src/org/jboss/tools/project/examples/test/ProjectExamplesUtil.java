@@ -92,33 +92,13 @@ public class ProjectExamplesUtil {
 	
 	public static final String JBOSS_AS_SERVER_ID = "org.jboss.ide.eclipse.as.42";
 	
-	public static final String SEAM_HOME_PROPERTY = System.getProperty("jbosstools.test.seam.2.0.1.GA.home", "E:\\jboss-seam-2.0.2.SP1");
+	public static final String SEAM_HOME_PROPERTY = System.getProperty("jbosstools.test.seam.2.0.1.GA.home", "E:\\JBossRuntimes\\jboss-seam-2.0.1.GA");
 
 	public static final String HSQLDB_DRIVER_JAR_NAME = "hsqldb.jar"; //$NON-NLS-1$
 	
 	public static final String HSQLDB_DRIVER_LOCATION = "/common/lib/" + HSQLDB_DRIVER_JAR_NAME; //$NON-NLS-1$
 	
-	public static final String PROJECT_NAME_WAR = "MavenizedSeamProjectWar";
-	
-	public static final String TEST_PROJECT_NAME_WAR = "MavenizedSeamProjectWar-test";
-	
-	public static final String PARENT_PROJECT_NAME_WAR = "MavenizedSeamProjectWar-parent";
-	
-	
-	public static final String PROJECT_NAME = "MavenizedSeamProject";
-	
-	public static final String EAR_PROJECT_NAME = "MavenizedSeamProject-ear";
-	
-	public static final String EJB_PROJECT_NAME = "MavenizedSeamProject-ejb";
-	
-	public static final String TEST_PROJECT_NAME = "MavenizedSeamProject-test";
-	
-	public static final String PARENT_PROJECT_NAME = "MavenizedSeamProject-parent";
-	
-	public static final String DEPLOY_TYPE_EAR = "EAR";
-	
-	public static final String DEPLOY_TYPE_WAR = "WAR";
-	
+		
 	public static void initRuntimes() throws Exception {
 		switchPerspective("org.jboss.tools.seam.ui.SeamPerspective");
 
