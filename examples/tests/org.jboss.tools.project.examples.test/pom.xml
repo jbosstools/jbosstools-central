@@ -8,11 +8,25 @@
 	</parent>
 	<groupId>org.jboss.tools.examples.tests</groupId>
 	<artifactId>org.jboss.tools.project.examples.test</artifactId> 
-	<version>1.1.0-SNAPSHOT</version>
+	<version>1.2.0-SNAPSHOT</version>
 	<packaging>eclipse-test-plugin</packaging>
 
 	<properties>
-		<emma.filter>org.jboss.tools.project.examples*</emma.filter>
-		<emma.instrument.bundles>org.jboss.tools.project.examples</emma.instrument.bundles>
+		<systemProperties>-Djbosstools.test.jboss.home.4.2=${requirement.build.root}/jboss-4.2.3.GA -Djbosstools.test.seam.2.0.1.GA.home=${requirement.build.root}/jboss-seam-2.0.2.SP1</systemProperties>
 	</properties>
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.sonatype.tycho</groupId>
+				<artifactId>maven-osgi-test-plugin</artifactId>
+				<version>${tychoVersion}</version>
+				<configuration>
+					<useUIThread>false</useUIThread>
+					<useUIHarness>true</useUIHarness>
+					<testSuite>org.jboss.tools.project.examples.test</testSuite>
+                    <testClass>org.jboss.tools.project.examples.test.ProjectExamplesAllTests</testClass> 
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
 </project>
