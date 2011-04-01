@@ -10,7 +10,8 @@ Require-Bundle: org.eclipse.ui,
  org.jboss.tools.maven.core,
  org.jboss.tools.project.examples,
  org.eclipse.ui.ide,
- org.maven.ide.eclipse.archetype_common;bundle-version="[0.10.0,0.13.0)"
+ org.eclipse.m2e.archetype.common;bundle-version="0.13.0",
+ org.eclipse.m2e.core.ui;bundle-version="0.13.0"
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-Vendor: %Bundle-Vendor

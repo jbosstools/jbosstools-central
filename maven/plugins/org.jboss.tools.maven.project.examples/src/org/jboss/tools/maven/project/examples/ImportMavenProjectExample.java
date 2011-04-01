@@ -1,5 +1,5 @@
 /*************************************************************************************
- * Copyright (c) 2008-2010 JBoss by Red Hat and others.
+ * Copyright (c) 2008-2011 JBoss by Red Hat and others.
  * All rights reserved. This program and the accompanying materials 
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,7 +8,6 @@
  * Contributors:
  *     JBoss by Red Hat - Initial implementation.
  ************************************************************************************/
-
 package org.jboss.tools.maven.project.examples;
 
 import java.io.File;
@@ -36,21 +35,21 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.m2e.core.MavenPlugin;
+import org.eclipse.m2e.core.embedder.IMaven;
+import org.eclipse.m2e.core.embedder.MavenModelManager;
+import org.eclipse.m2e.core.project.AbstractProjectScanner;
+import org.eclipse.m2e.core.project.LocalProjectScanner;
+import org.eclipse.m2e.core.project.MavenProjectInfo;
+import org.eclipse.m2e.core.project.ProjectImportConfiguration;
+import org.eclipse.m2e.core.ui.internal.actions.OpenMavenConsoleAction;
+import org.eclipse.m2e.core.ui.internal.console.MavenConsole;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.progress.IProgressConstants;
 import org.jboss.tools.project.examples.job.ProjectExamplesJob;
 import org.jboss.tools.project.examples.model.AbstractImportProjectExample;
 import org.jboss.tools.project.examples.model.Project;
-import org.maven.ide.eclipse.MavenPlugin;
-import org.maven.ide.eclipse.actions.OpenMavenConsoleAction;
-import org.maven.ide.eclipse.core.MavenConsole;
-import org.maven.ide.eclipse.embedder.IMaven;
-import org.maven.ide.eclipse.embedder.MavenModelManager;
-import org.maven.ide.eclipse.project.AbstractProjectScanner;
-import org.maven.ide.eclipse.project.LocalProjectScanner;
-import org.maven.ide.eclipse.project.MavenProjectInfo;
-import org.maven.ide.eclipse.project.ProjectImportConfiguration;
 
 /**
  * @author snjeza
@@ -186,7 +185,7 @@ public class ImportMavenProjectExample extends AbstractImportProjectExample {
 					plugin.getProjectConfigurationManager().importProjects(
 							infos, importConfiguration, monitor);
 				} catch (CoreException ex) {
-					plugin.getConsole().logError("Projects imported with errors");
+					MavenProjectExamplesActivator.log(ex, "Projects imported with errors");
 					return ex.getStatus();
 				} catch (InterruptedException e) {
 					return Status.CANCEL_STATUS;
@@ -223,9 +222,8 @@ public class ImportMavenProjectExample extends AbstractImportProjectExample {
 				.toFile();
 		MavenPlugin mavenPlugin = MavenPlugin.getDefault();
 		MavenModelManager modelManager = mavenPlugin.getMavenModelManager();
-		MavenConsole console = mavenPlugin.getConsole();
 		return new LocalProjectScanner(root, folder.getAbsolutePath(), false,
-				modelManager, console);
+				modelManager);
 	}
 	
 	private static Shell getActiveShell() {

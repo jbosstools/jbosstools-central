@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<lifecycleMappingMetadata>
+
+	<pluginExecutions>
+		<pluginExecution>
+			<pluginExecutionFilter>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<versionRange>[2.0,)</versionRange>
+				<goals>
+					<goal>compile</goal>
+					<goal>testCompile</goal>
+				</goals>
+			</pluginExecutionFilter>
+			<action>
+				<configurator>
+					<id>org.jboss.tools.maven.cdi.configurator.jdt</id>
+				</configurator>
+			</action>
+		</pluginExecution>
+		<pluginExecution>
+			<pluginExecutionFilter>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-war-plugin</artifactId>
+				<versionRange>[1.0,)</versionRange>
+				<goals>
+					<goal>war</goal>
+				</goals>
+			</pluginExecutionFilter>
+			<action>
+				<configurator>
+					<id>org.jboss.tools.maven.cdi.configurator.wtp</id>
+				</configurator>
+			</action>
+		</pluginExecution>
+		<pluginExecution>
+			<pluginExecutionFilter>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-ejb-plugin</artifactId>
+				<versionRange>[1.0,)</versionRange>
+				<goals>
+					<goal>ejb</goal>
+				</goals>
+			</pluginExecutionFilter>
+			<action>
+				<configurator>
+					<id>org.jboss.tools.maven.cdi.configurator.wtp</id>
+				</configurator>
+			</action>
+		</pluginExecution>
+	</pluginExecutions>
+
+</lifecycleMappingMetadata>

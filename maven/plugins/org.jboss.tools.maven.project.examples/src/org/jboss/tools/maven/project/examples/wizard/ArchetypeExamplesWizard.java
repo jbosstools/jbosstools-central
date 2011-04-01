@@ -1,3 +1,13 @@
+/*************************************************************************************
+ * Copyright (c) 2008-2011 JBoss by Red Hat and others.
+ * All rights reserved. This program and the accompanying materials 
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ * 
+ * Contributors:
+ *     JBoss by Red Hat - Initial implementation.
+ ************************************************************************************/
 package org.jboss.tools.maven.project.examples.wizard;
 
 import java.io.File;
@@ -12,28 +22,22 @@ import org.eclipse.core.resources.IWorkspaceRunnable;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Path;
-import org.eclipse.core.runtime.Status;
-import org.eclipse.core.runtime.jobs.IJobChangeEvent;
-import org.eclipse.core.runtime.jobs.Job;
-import org.eclipse.core.runtime.jobs.JobChangeAdapter;
-import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.wizard.Wizard;
-import org.eclipse.swt.widgets.Display;
+import org.eclipse.m2e.core.MavenPlugin;
+import org.eclipse.m2e.core.project.ProjectImportConfiguration;
+import org.eclipse.m2e.core.ui.internal.MavenImages;
 import org.eclipse.ui.INewWizard;
 import org.eclipse.ui.IWorkbench;
-import org.eclipse.ui.progress.IProgressConstants;
-import org.jboss.tools.project.examples.job.ProjectExamplesJob;
 import org.jboss.tools.project.examples.model.Project;
-import org.maven.ide.eclipse.MavenImages;
-import org.maven.ide.eclipse.MavenPlugin;
-import org.maven.ide.eclipse.actions.OpenMavenConsoleAction;
-import org.maven.ide.eclipse.core.Messages;
-import org.maven.ide.eclipse.project.ProjectImportConfiguration;
 
+/**
+ * 
+ * @author snjeza
+ *
+ */
 public class ArchetypeExamplesWizard extends Wizard implements INewWizard {
 
 	private Project projectDescription;

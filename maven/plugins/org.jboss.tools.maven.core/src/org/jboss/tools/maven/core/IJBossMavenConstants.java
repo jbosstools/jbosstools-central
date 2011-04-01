@@ -10,13 +10,10 @@
  ************************************************************************************/
 package org.jboss.tools.maven.core;
 
-
-
 /**
  * @author snjeza
  * 
  */
-
 public interface IJBossMavenConstants {
 
 	static final String M2_FACET_ID="jboss.m2"; //$NON-NLS-1$

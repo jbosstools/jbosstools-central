@@ -1,3 +1,13 @@
+/*************************************************************************************
+ * Copyright (c) 2008-2011 JBoss by Red Hat and others.
+ * All rights reserved. This program and the accompanying materials 
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ * 
+ * Contributors:
+ *     JBoss by Red Hat - Initial implementation.
+ ************************************************************************************/
 package org.jboss.tools.maven.core;
 
 import java.io.File;
@@ -5,8 +15,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -45,24 +53,24 @@ import org.eclipse.jst.common.project.facet.JavaFacetUtils;
 import org.eclipse.jst.common.project.facet.core.libprov.ILibraryProvider;
 import org.eclipse.jst.common.project.facet.core.libprov.LibraryProviderOperationConfig;
 import org.eclipse.jst.j2ee.project.facet.IJ2EEFacetConstants;
+import org.eclipse.m2e.core.MavenPlugin;
+import org.eclipse.m2e.core.core.IMavenConstants;
+import org.eclipse.m2e.core.embedder.IMavenConfiguration;
+import org.eclipse.m2e.core.embedder.MavenModelManager;
+import org.eclipse.m2e.core.project.IProjectConfigurationManager;
+import org.eclipse.m2e.core.project.ResolverConfiguration;
+import org.eclipse.m2e.jdt.internal.BuildPathManager;
+import org.eclipse.m2e.model.edit.pom.Dependency;
+import org.eclipse.m2e.model.edit.pom.PomFactory;
+import org.eclipse.m2e.model.edit.pom.PropertyElement;
+import org.eclipse.m2e.model.edit.pom.Repository;
+import org.eclipse.m2e.model.edit.pom.util.PomResourceFactoryImpl;
+import org.eclipse.m2e.model.edit.pom.util.PomResourceImpl;
 import org.eclipse.wst.common.componentcore.ComponentCore;
 import org.eclipse.wst.common.componentcore.resources.IVirtualComponent;
 import org.eclipse.wst.common.componentcore.resources.IVirtualFolder;
 import org.eclipse.wst.common.frameworks.datamodel.IDataModel;
 import org.eclipse.wst.common.project.facet.core.FacetedProjectFramework;
-import org.maven.ide.components.pom.Dependency;
-import org.maven.ide.components.pom.PomFactory;
-import org.maven.ide.components.pom.PropertyElement;
-import org.maven.ide.components.pom.Repository;
-import org.maven.ide.components.pom.util.PomResourceFactoryImpl;
-import org.maven.ide.components.pom.util.PomResourceImpl;
-import org.maven.ide.eclipse.MavenPlugin;
-import org.maven.ide.eclipse.core.IMavenConstants;
-import org.maven.ide.eclipse.embedder.IMavenConfiguration;
-import org.maven.ide.eclipse.embedder.MavenModelManager;
-import org.maven.ide.eclipse.jdt.BuildPathManager;
-import org.maven.ide.eclipse.project.IProjectConfigurationManager;
-import org.maven.ide.eclipse.project.ResolverConfiguration;
 import org.osgi.framework.BundleContext;
 
 /**
@@ -283,7 +291,7 @@ public class MavenCoreActivator extends Plugin {
 		IClasspathEntry[] cp = javaProject.getRawClasspath();
 		for (int i = 0; i < cp.length; i++) {
 			if (IClasspathEntry.CPE_CONTAINER == cp[i].getEntryKind()
-					&& BuildPathManager.isMaven2ClasspathContainer(cp[i]
+					&& BuildPathManager.CONTAINER_ID.equals(cp[i]
 							.getPath())) {
 				LinkedHashMap<String, IClasspathAttribute> attrs = new LinkedHashMap<String, IClasspathAttribute>();
 				for (IClasspathAttribute attr : cp[i].getExtraAttributes()) {
@@ -314,54 +322,10 @@ public class MavenCoreActivator extends Plugin {
 
 	public static void updateMavenProjectConfiguration(IProject project)
 			throws CoreException {
-		ResolverConfiguration resolverConfiguration = new ResolverConfiguration();
-		//resolverConfiguration.setIncludeModules(false);
-		// FIXME
-		resolverConfiguration.setResolveWorkspaceProjects(true);
-		resolverConfiguration.setActiveProfiles(""); //$NON-NLS-1$
 		IProjectConfigurationManager configurationManager = MavenPlugin
 				.getDefault().getProjectConfigurationManager();
-		//IMavenConfiguration mavenConfiguration = MavenPlugin.lookup(IMavenConfiguration.class);
-		//IMavenConfiguration mavenConfiguration = MavenPlugin.getDefault().getMavenConfiguration();
-		IMavenConfiguration mavenConfiguration = getMavenConfiguration();
-		
 		configurationManager.updateProjectConfiguration(project,
-				resolverConfiguration, mavenConfiguration.getGoalOnUpdate(),
 				new NullProgressMonitor());
-	}
-	
-	private static IMavenConfiguration getMavenConfiguration() {
-		Class clazz = MavenPlugin.class;
-		try {
-			Method method = clazz.getMethod ("getMavenConfiguration", new Class[0]); //$NON-NLS-1$
-			Object configuration = method.invoke (MavenPlugin.getDefault(), new Object[0]);
-			return (IMavenConfiguration) configuration;
-		} catch (SecurityException e) {
-			log(e);
-		} catch (NoSuchMethodException e) {
-			try {
-				Method method = clazz.getMethod ("lookup", new Class[] {Class.class}); //$NON-NLS-1$
-				Object configuration = method.invoke (null, new Object[] {IMavenConfiguration.class});
-				return (IMavenConfiguration) configuration;
-			} catch (SecurityException e1) {
-				log(e1);
-			} catch (IllegalArgumentException e1) {
-				log(e1);
-			} catch (NoSuchMethodException e1) {
-				log(e1);
-			} catch (IllegalAccessException e1) {
-				log(e1);
-			} catch (InvocationTargetException e1) {
-				log(e1);
-			}
-		} catch (IllegalArgumentException e) {
-			log(e);
-		} catch (IllegalAccessException e) {
-			log(e);
-		} catch (InvocationTargetException e) {
-			log(e);
-		}
-		return null;
 	}
 	
 	public static void addMavenWarPlugin(Build build, IProject project) throws JavaModelException {
@@ -538,7 +502,7 @@ public class MavenCoreActivator extends Plugin {
 		return sourceDirectory;
 	}
 	
-	public static void mergeModel(org.maven.ide.components.pom.Model projectModel, org.maven.ide.components.pom.Model libraryModel) {
+	public static void mergeModel(org.eclipse.m2e.model.edit.pom.Model projectModel, org.eclipse.m2e.model.edit.pom.Model libraryModel) {
 		if (projectModel == null || libraryModel == null) {
 			return;
 		}
@@ -548,9 +512,9 @@ public class MavenCoreActivator extends Plugin {
 		addDependencies(projectModel,libraryModel);
 	}
 
-	private static void addDependencies(org.maven.ide.components.pom.Model projectModel, org.maven.ide.components.pom.Model libraryModel) {
-		List<org.maven.ide.components.pom.Dependency> projectDependencies = projectModel.getDependencies();
-		List<org.maven.ide.components.pom.Dependency> libraryDependencies = libraryModel.getDependencies();
+	private static void addDependencies(org.eclipse.m2e.model.edit.pom.Model projectModel, org.eclipse.m2e.model.edit.pom.Model libraryModel) {
+		List<org.eclipse.m2e.model.edit.pom.Dependency> projectDependencies = projectModel.getDependencies();
+		List<org.eclipse.m2e.model.edit.pom.Dependency> libraryDependencies = libraryModel.getDependencies();
 		for (Dependency dependency:libraryDependencies) {
 			if (!dependencyExists(dependency,projectDependencies)) {
 				Dependency newDependency = (Dependency) EcoreUtil.copy(dependency);
@@ -583,33 +547,33 @@ public class MavenCoreActivator extends Plugin {
 		return false;
 	}
 
-	private static void addPlugins(org.maven.ide.components.pom.Model projectModel, org.maven.ide.components.pom.Model libraryModel) {
-		org.maven.ide.components.pom.Build libraryBuild = libraryModel.getBuild();
+	private static void addPlugins(org.eclipse.m2e.model.edit.pom.Model projectModel, org.eclipse.m2e.model.edit.pom.Model libraryModel) {
+		org.eclipse.m2e.model.edit.pom.Build libraryBuild = libraryModel.getBuild();
 		if (libraryBuild == null) {
 			return;
 		}
-		List<org.maven.ide.components.pom.Plugin> libraryPlugins = projectModel.getBuild().getPlugins();
-		for (org.maven.ide.components.pom.Plugin plugin:libraryPlugins) {
-			org.maven.ide.components.pom.Build projectBuild = projectModel.getBuild();
+		List<org.eclipse.m2e.model.edit.pom.Plugin> libraryPlugins = projectModel.getBuild().getPlugins();
+		for (org.eclipse.m2e.model.edit.pom.Plugin plugin:libraryPlugins) {
+			org.eclipse.m2e.model.edit.pom.Build projectBuild = projectModel.getBuild();
 			if (projectBuild == null) {
 				projectBuild = PomFactory.eINSTANCE.createBuild();
 		        projectModel.setBuild(projectBuild);
 			}
-			List<org.maven.ide.components.pom.Plugin> projectPlugins = projectBuild.getPlugins();
+			List<org.eclipse.m2e.model.edit.pom.Plugin> projectPlugins = projectBuild.getPlugins();
 			if (!pluginExists(plugin,projectPlugins)) {
-				org.maven.ide.components.pom.Plugin newPlugin = (org.maven.ide.components.pom.Plugin) EcoreUtil.copy(plugin);
+				org.eclipse.m2e.model.edit.pom.Plugin newPlugin = (org.eclipse.m2e.model.edit.pom.Plugin) EcoreUtil.copy(plugin);
 				projectPlugins.add(newPlugin);
 			}
 		}
 	}
 
-	private static boolean pluginExists(org.maven.ide.components.pom.Plugin plugin, List<org.maven.ide.components.pom.Plugin> projectPlugins) {
+	private static boolean pluginExists(org.eclipse.m2e.model.edit.pom.Plugin plugin, List<org.eclipse.m2e.model.edit.pom.Plugin> projectPlugins) {
 		String groupId = plugin.getGroupId();
 		String artifactId = plugin.getArtifactId();
 		if (artifactId == null) {
 			return false;
 		}
-		for (org.maven.ide.components.pom.Plugin projectPlugin:projectPlugins) {
+		for (org.eclipse.m2e.model.edit.pom.Plugin projectPlugin:projectPlugins) {
 			String projectGroupId = projectPlugin.getGroupId();
 			String projectArtifactId = projectPlugin.getArtifactId();
 			if (!artifactId.equals(projectArtifactId)) {
@@ -625,7 +589,7 @@ public class MavenCoreActivator extends Plugin {
 		return false;
 	}
 
-	private static void addRepositories(org.maven.ide.components.pom.Model projectModel, org.maven.ide.components.pom.Model libraryModel) {
+	private static void addRepositories(org.eclipse.m2e.model.edit.pom.Model projectModel, org.eclipse.m2e.model.edit.pom.Model libraryModel) {
 		List<Repository> projectRepositories = projectModel.getRepositories();
 		List<Repository> libraryRepositories = libraryModel.getRepositories();
 		for (Repository repository:libraryRepositories) {
@@ -650,7 +614,7 @@ public class MavenCoreActivator extends Plugin {
 		return false;
 	}
 
-	private static void addProperties(org.maven.ide.components.pom.Model projectModel, org.maven.ide.components.pom.Model libraryModel) {
+	private static void addProperties(org.eclipse.m2e.model.edit.pom.Model projectModel, org.eclipse.m2e.model.edit.pom.Model libraryModel) {
 		List<PropertyElement> projectProperties = projectModel.getProperties();
 		List<PropertyElement> libraryProperties = libraryModel.getProperties();
 		for (PropertyElement libraryProperty:libraryProperties) {
@@ -782,4 +746,21 @@ public class MavenCoreActivator extends Plugin {
 		plugin.setConfiguration(configuration);
 		build.getPlugins().add(plugin);
 	}
+	
+	public static PomResourceImpl loadResource(IFile pomFile) throws CoreException {
+    String path = pomFile.getFullPath().toOSString();
+    URI uri = URI.createFileURI(path);
+    try {
+      PomResourceFactoryImpl factory = new PomResourceFactoryImpl();
+      PomResourceImpl resource = (PomResourceImpl) factory.createResource(uri);
+      resource.load(Collections.EMPTY_MAP);
+      return resource;
+
+    } catch (Exception ex) {
+      String msg = "Can't load model " + pomFile;
+      log(ex);
+      throw new CoreException(new Status(IStatus.ERROR,
+          IMavenConstants.PLUGIN_ID, -1, msg, ex));
+    }
+  }
 }

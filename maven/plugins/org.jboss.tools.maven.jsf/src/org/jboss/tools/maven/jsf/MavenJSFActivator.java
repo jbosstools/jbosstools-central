@@ -1,3 +1,13 @@
+/*******************************************************************************
+ * Copyright (c) 2011 Red Hat, Inc.
+ * Distributed under license by Red Hat, Inc. All rights reserved.
+ * This program is made available under the terms of the
+ * Eclipse Public License v1.0 which accompanies this distribution,
+ * and is available at http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *     Red Hat, Inc. - initial API and implementation
+ ******************************************************************************/
 package org.jboss.tools.maven.jsf;
 
 import org.eclipse.core.runtime.IStatus;
@@ -13,6 +23,11 @@ import org.eclipse.wst.common.project.facet.core.IFacetedProject;
 import org.eclipse.wst.common.project.facet.core.IProjectFacetVersion;
 import org.osgi.framework.BundleContext;
 
+/**
+ * 
+ * @author snjeza
+ *
+ */
 public class MavenJSFActivator extends AbstractUIPlugin {
 
 	// The plug-in ID

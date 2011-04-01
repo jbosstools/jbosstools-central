@@ -1,5 +1,5 @@
 /*************************************************************************************
- * Copyright (c) 2008-2010 JBoss by Red Hat and others.
+ * Copyright (c) 2008-2011 JBoss by Red Hat and others.
  * All rights reserved. This program and the accompanying materials 
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -26,16 +26,16 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.jdt.core.IClasspathEntry;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.JavaCore;
+import org.eclipse.m2e.core.project.IMavenProjectFacade;
+import org.eclipse.m2e.core.project.MavenProjectChangedEvent;
+import org.eclipse.m2e.core.project.configurator.AbstractProjectConfigurator;
+import org.eclipse.m2e.core.project.configurator.ProjectConfigurationRequest;
 import org.jboss.tools.maven.seam.MavenSeamActivator;
-import org.maven.ide.eclipse.project.IMavenProjectFacade;
-import org.maven.ide.eclipse.project.MavenProjectChangedEvent;
-import org.maven.ide.eclipse.project.configurator.AbstractProjectConfigurator;
-import org.maven.ide.eclipse.project.configurator.ProjectConfigurationRequest;
 
 /**
  * A workaround for https://issues.sonatype.org/browse/MNGECLIPSE-2433
  * 
- * @author Snjeza
+ * @author snjeza
  */
 public class FixClasspathConfigurator extends AbstractProjectConfigurator {
 
