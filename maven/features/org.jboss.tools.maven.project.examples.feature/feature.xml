@@ -19,9 +19,9 @@
    </license>
 
    <requires>
-      <import feature="org.maven.ide.eclipse.feature" version="0.10.0" match="greaterOrEqual"/>
-      <import feature="org.maven.ide.eclipse.wtp.feature" version="0.10.0" match="greaterOrEqual"/>
-      <import feature="org.jboss.tools.project.examples.feature" version="1.2.0" match="greaterOrEqual"/>
+      <import feature="org.eclipse.m2e.feature" version="0.13.0" match="greaterOrEqual"/>
+      <import feature="org.maven.ide.eclipse.wtp.feature" version="0.13.0" match="greaterOrEqual"/>
+   	  <import feature="org.jboss.tools.project.examples.feature" version="1.2.0" match="greaterOrEqual"/>
    </requires>
 
    <plugin
