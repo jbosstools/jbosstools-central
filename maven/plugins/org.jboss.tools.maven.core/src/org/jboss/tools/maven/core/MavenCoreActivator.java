@@ -78,7 +78,7 @@ import org.osgi.framework.BundleContext;
  */
 public class MavenCoreActivator extends Plugin {
 
-	private static final String ROOT_DIR = "/";
+	private static final String ROOT_DIR = "/"; //$NON-NLS-1$
 
 	public static final String SEPARATOR = "/"; //$NON-NLS-1$
 
