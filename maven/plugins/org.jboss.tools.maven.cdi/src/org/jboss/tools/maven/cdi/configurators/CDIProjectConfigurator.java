@@ -68,9 +68,8 @@ public class CDIProjectConfigurator extends AbstractProjectConfigurator {
 	    	final IFacetedProject fproj = ProjectFacetsManager.create(project);
 	    	if ( (fproj != null) && ("war".equals(packaging) || "ejb".equals(packaging)) ) { //$NON-NLS-1$
 	    		installWarFacets(fproj, cdiVersion, monitor);
-	    	} else {
-	    		CDIUtil.enableCDI(project, false, new NullProgressMonitor());
 	    	}
+	    	CDIUtil.enableCDI(project, false, new NullProgressMonitor());
 	    }
 	}
 
