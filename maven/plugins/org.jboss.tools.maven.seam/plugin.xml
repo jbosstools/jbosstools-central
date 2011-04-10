@@ -18,7 +18,7 @@
       <configurator 
           id="org.jboss.tools.maven.seam.configurator.fixClasspathConfigurator"
           class="org.jboss.tools.maven.seam.configurators.FixClasspathConfigurator"
-          name="%Seam_Project_configurator" priority="300"/>
+          name="%Fix_classpath" priority="300"/>
     </extension>
     
     
