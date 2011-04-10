@@ -30,9 +30,9 @@
     
     <extension point="org.eclipse.m2e.core.projectConfigurators">
       <configurator 
-          id="org.jboss.tools.maven.seam.configurator.fixClasspathConfigurator"
+          id="org.jboss.tools.maven.seam.configuringator.fixClasspathConfigurator"
           class="org.jboss.tools.maven.seam.configurators.FixClasspathConfigurator"
-          name="%Seam_Project_configurator" 
+          name="%Fix_classpath" 
           secondaryTo="org.eclipse.m2e.jdt.javaConfigurator"/>
     </extension>
     
