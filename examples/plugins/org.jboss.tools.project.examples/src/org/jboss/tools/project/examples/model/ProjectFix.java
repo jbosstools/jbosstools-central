@@ -1,16 +1,21 @@
+/*************************************************************************************
+ * Copyright (c) 2008-2011 JBoss by Red Hat and others.
+ * All rights reserved. This program and the accompanying materials 
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ * 
+ * Contributors:
+ *     JBoss by Red Hat - Initial implementation.
+ ************************************************************************************/
 package org.jboss.tools.project.examples.model;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import org.eclipse.equinox.internal.p2.ui.sdk.ProvSDKUIActivator;
-import org.eclipse.equinox.p2.core.ProvisionException;
 import org.eclipse.equinox.internal.p2.ui.IProvHelpContextIds;
-import org.eclipse.equinox.internal.p2.ui.ProvUIActivator;
-import org.eclipse.equinox.internal.p2.ui.QueryableMetadataRepositoryManager;
 import org.eclipse.equinox.internal.p2.ui.dialogs.InstallWizard;
 import org.eclipse.equinox.internal.p2.ui.dialogs.ProvisioningWizardDialog;
-import org.eclipse.equinox.p2.ui.Policy;
 import org.eclipse.equinox.p2.ui.ProvisioningUI;
 import org.eclipse.jface.preference.PreferenceDialog;
 import org.eclipse.jface.wizard.WizardDialog;
@@ -18,8 +23,12 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.dialogs.PreferencesUtil;
 import org.jboss.tools.project.examples.Messages;
-import org.jboss.tools.project.examples.ProjectExamplesActivator;
 
+/**
+ * 
+ * @author snjeza
+ *
+ */
 public class ProjectFix {
 
 	public final static String WTP_RUNTIME = "wtpruntime"; //$NON-NLS-1$

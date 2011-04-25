@@ -1,3 +1,13 @@
+/*************************************************************************************
+ * Copyright (c) 2008-2011 JBoss by Red Hat and others.
+ * All rights reserved. This program and the accompanying materials 
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ * 
+ * Contributors:
+ *     JBoss by Red Hat - Initial implementation.
+ ************************************************************************************/
 package org.jboss.tools.project.examples.wizard;
 
 import java.util.List;
@@ -9,6 +19,11 @@ import org.jboss.tools.project.examples.model.Category;
 import org.jboss.tools.project.examples.model.Project;
 import org.jboss.tools.project.examples.model.ProjectModelElement;
 
+/**
+ * 
+ * @author snjeza
+ *
+ */
 public class SiteFilter extends ViewerFilter {
 
 	private String site;
