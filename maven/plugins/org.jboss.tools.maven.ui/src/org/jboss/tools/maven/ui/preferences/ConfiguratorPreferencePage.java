@@ -46,6 +46,7 @@ public class ConfiguratorPreferencePage extends PreferencePage implements
 	private Button configureSeamRuntimeButton;
 	private Button configureSeamArtifactsButton;
 	private Button configureJSFButton;
+	private Button configureWebxmlJSF20Button;
 	private Button configurePortletButton;
 	private Button configureJSFPortletButton;
 	private Button configureSeamPortletButton;
@@ -98,6 +99,11 @@ public class ConfiguratorPreferencePage extends PreferencePage implements
 			configureJSFButton.setText(Messages.ConfiguratorPreferencePage_Configure_JSF_facet);
 			boolean configureJSF = store.getBoolean(Activator.CONFIGURE_JSF);
 			configureJSFButton.setSelection(configureJSF);
+			
+			configureWebxmlJSF20Button = new Button(composite,SWT.CHECK);
+			configureWebxmlJSF20Button.setText(Messages.ConfiguratorPreferencePage_Configure_Webxml_JSF20);
+			boolean configureWebxml = store.getBoolean(Activator.CONFIGURE_WEBXML_JSF20);
+			configureWebxmlJSF20Button.setSelection(configureWebxml);
 		}
 		
 		if (bundleExists(ORG_JBOSS_TOOLS_MAVEN_PORTLET)) { 
@@ -147,6 +153,7 @@ public class ConfiguratorPreferencePage extends PreferencePage implements
 	protected void performDefaults() {
 		if (bundleExists(ORG_JBOSS_TOOLS_MAVEN_JSF)) { 
 			configureJSFButton.setSelection(Activator.CONFIGURE_JSF_VALUE);
+			configureWebxmlJSF20Button.setSelection(Activator.CONFIGURE_WEBXML_JSF20_VALUE);
 		}
 		if (bundleExists(ORG_JBOSS_TOOLS_MAVEN_SEAM)) { 
 			configureSeamButton.setSelection(Activator.CONFIGURE_SEAM_VALUE);
@@ -204,6 +211,7 @@ public class ConfiguratorPreferencePage extends PreferencePage implements
 		IPreferenceStore store = Activator.getDefault().getPreferenceStore();
 		if (bundleExists(ORG_JBOSS_TOOLS_MAVEN_JSF)) { 
 			store.setValue(Activator.CONFIGURE_JSF, configureJSFButton.getSelection());
+			store.setValue(Activator.CONFIGURE_WEBXML_JSF20, configureWebxmlJSF20Button.getSelection());
 		}
 		
 		if (bundleExists(ORG_JBOSS_TOOLS_MAVEN_PORTLET)) {

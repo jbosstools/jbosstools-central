@@ -46,6 +46,10 @@ public class Activator extends AbstractUIPlugin {
 	public static final String CONFIGURE_JSF = "configureJSF"; //$NON-NLS-1$
 	
 	public static final boolean CONFIGURE_JSF_VALUE = true;
+	
+	public static final String CONFIGURE_WEBXML_JSF20 = "configureWebxmlJSF20"; //$NON-NLS-1$
+	
+	public static final boolean CONFIGURE_WEBXML_JSF20_VALUE = false;
 
 	public static final boolean CONFIGURE_PORTLET_VALUE = true;
 

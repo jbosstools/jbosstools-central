@@ -40,6 +40,9 @@ public class ConfiguratorPreferencesInitializer extends
 				Activator.CONFIGURE_JSF,
 				Activator.CONFIGURE_JSF_VALUE);
 		node.putBoolean(
+				Activator.CONFIGURE_WEBXML_JSF20,
+				Activator.CONFIGURE_WEBXML_JSF20_VALUE);
+		node.putBoolean(
 				Activator.CONFIGURE_PORTLET,
 				Activator.CONFIGURE_PORTLET_VALUE);
 		node.putBoolean(

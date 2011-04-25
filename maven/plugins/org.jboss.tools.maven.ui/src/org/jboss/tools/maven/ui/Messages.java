@@ -19,6 +19,7 @@ import org.eclipse.osgi.util.NLS;
  */
 public class Messages extends NLS {
 	private static final String BUNDLE_NAME = "org.jboss.tools.maven.ui.messages"; //$NON-NLS-1$
+	public static String ConfiguratorPreferencePage_Configure_Webxml_JSF20;
 	public static String AutoResizeTableLayout_Unknown_column_layout_data;
 	public static String MavenFacetInstallPage_Add_M2_capabilities_to_this_Web_Project;
 	public static String MavenFacetInstallPage_Artifact_Id;
