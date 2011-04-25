@@ -1,3 +1,13 @@
+/*************************************************************************************
+ * Copyright (c) 2008-2011 JBoss by Red Hat and others.
+ * All rights reserved. This program and the accompanying materials 
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ * 
+ * Contributors:
+ *     JBoss by Red Hat - Initial implementation.
+ ************************************************************************************/
 package org.jboss.tools.project.examples.fixes;
 
 import java.io.File;
@@ -28,16 +38,24 @@ import org.eclipse.wst.server.core.IRuntimeType;
 import org.eclipse.wst.server.core.ServerCore;
 import org.jboss.ide.eclipse.as.core.server.IJBossServerConstants;
 import org.jboss.ide.eclipse.as.core.server.IJBossServerRuntime;
+import org.jboss.ide.eclipse.as.core.util.IJBossRuntimeResourceConstants;
 import org.jboss.tools.portlet.core.internal.PortletRuntimeComponentProvider;
 import org.jboss.tools.project.examples.Messages;
 import org.jboss.tools.project.examples.ProjectExamplesActivator;
 import org.jboss.tools.project.examples.model.Project;
 import org.jboss.tools.project.examples.model.ProjectFix;
 
+/**
+ * 
+ * @author snjeza
+ *
+ */
 public class WTPRuntimeFix implements ProjectExamplesFix {
 
+	private static final String TEIID_DEPLOYER = "teiid.deployer"; //$NON-NLS-1$
 	private static final String RIFTSAW_SAR = "riftsaw.sar"; //$NON-NLS-1$
 	private static final String BPEL = "bpel"; //$NON-NLS-1$
+	private static final String TEIID = "teiid"; //$NON-NLS-1$
 	private static final String JBOSSESB_SAR = "jbossesb.sar"; //$NON-NLS-1$
 	private static final String JBOSSESB_ESB = "jbossesb.esb"; //$NON-NLS-1$
 	private static final String ESB = "esb"; //$NON-NLS-1$
@@ -66,6 +84,9 @@ public class WTPRuntimeFix implements ProjectExamplesFix {
 			IProject eclipseProject = eclipseProjects[i];
 			try {
 				IFacetedProject facetedProject = ProjectFacetsManager.create(eclipseProject);
+				if (facetedProject == null) {
+					continue;
+				}
 				org.eclipse.wst.common.project.facet.core.runtime.IRuntime wtpRuntime = facetedProject.getPrimaryRuntime();
 				if (wtpRuntime != null) {
 					IRuntime runtime = getRuntime(wtpRuntime);
@@ -212,6 +233,11 @@ public class WTPRuntimeFix implements ProjectExamplesFix {
 					return null;
 				}
 			}
+			if (TEIID.equals(component)) {
+				if (!isTeiidPresent(location, runtime)) {
+					return null;
+				}
+			}
 			return runtime;
 		}
 		return null;
@@ -245,6 +271,20 @@ public class WTPRuntimeFix implements ProjectExamplesFix {
 			IPath configPath = jbossLocation.append(IJBossServerConstants.SERVER).append(jbossRuntime.getJBossConfiguration());
 			File configFile = configPath.toFile();
 			return exists(configFile, JBOSSESB_ESB) && exists(configFile, JBOSSESB_SAR);
+		}
+		return false;
+	}
+	
+	public static boolean isTeiidPresent(final File location,
+			IRuntime runtime) {
+		IJBossServerRuntime jbossRuntime = (IJBossServerRuntime)runtime.loadAdapter(IJBossServerRuntime.class, new NullProgressMonitor());
+		if (jbossRuntime != null) {
+			IPath jbossLocation = runtime.getLocation();
+			IPath configPath = jbossLocation.append(IJBossServerConstants.SERVER).append(jbossRuntime.getJBossConfiguration());
+			IPath deployersPath = configPath.append(IJBossRuntimeResourceConstants.DEPLOYERS);
+			File deployersFile = deployersPath.toFile();
+			File teiidFile = new File(deployersFile, TEIID_DEPLOYER);
+			return teiidFile.exists();
 		}
 		return false;
 	}
