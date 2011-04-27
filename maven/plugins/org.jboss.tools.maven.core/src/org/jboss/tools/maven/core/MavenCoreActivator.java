@@ -18,6 +18,7 @@ import java.io.OutputStream;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 
@@ -747,20 +748,20 @@ public class MavenCoreActivator extends Plugin {
 		build.getPlugins().add(plugin);
 	}
 	
-	public static PomResourceImpl loadResource(IFile pomFile) throws CoreException {
-    String path = pomFile.getFullPath().toOSString();
-    URI uri = URI.createFileURI(path);
-    try {
-      PomResourceFactoryImpl factory = new PomResourceFactoryImpl();
-      PomResourceImpl resource = (PomResourceImpl) factory.createResource(uri);
-      resource.load(Collections.EMPTY_MAP);
-      return resource;
-
-    } catch (Exception ex) {
-      String msg = "Can't load model " + pomFile;
-      log(ex);
-      throw new CoreException(new Status(IStatus.ERROR,
-          IMavenConstants.PLUGIN_ID, -1, msg, ex));
-    }
-  }
+	public static PomResourceImpl loadResource(IFile pomFile)
+			throws CoreException {
+		String path = pomFile.getFullPath().toOSString();
+		URI uri = URI.createPlatformResourceURI(path, true);
+		try {
+			org.eclipse.emf.ecore.resource.Resource pomResource = new PomResourceFactoryImpl()
+					.createResource(uri);
+			pomResource.load(new HashMap());
+			return (PomResourceImpl) pomResource;
+		} catch (Exception ex) {
+			String msg = "Can't load model " + pomFile;
+			log(ex);
+			throw new CoreException(new Status(IStatus.ERROR,
+					IMavenConstants.PLUGIN_ID, -1, msg, ex));
+		}
+	}
 }

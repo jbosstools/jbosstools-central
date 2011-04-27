@@ -491,6 +491,18 @@ public class CreateMavenizedSeamProjectTest {
 	}
 	
 	@Test
+	public void testAsLocation() {
+		String asLocation = JBOSS_AS_HOME;
+		assertTrue("Invalid JBoss AS location:" + asLocation, new File(asLocation).isDirectory());
+	}
+	
+	@Test
+	public void testSeamLocation() {
+		String seamLocation = SEAM_HOME_PROPERTY;
+		assertTrue("Invalid Seam Runtime location:" + seamLocation, new File(seamLocation).isDirectory());
+	}
+	
+	@Test
 	public void testErrors() throws Exception {
 		checkErrors(PROJECT_NAME);
 		checkErrors(EAR_PROJECT_NAME);
@@ -511,7 +523,9 @@ public class CreateMavenizedSeamProjectTest {
 		for (int i = 0; i < projectMarkers.length; i++) {
 			if (projectMarkers[i].getAttribute(IMarker.SEVERITY,
 					IMarker.SEVERITY_ERROR) == IMarker.SEVERITY_ERROR) {
-				markers.add(projectMarkers[i]);
+				if (!"org.eclipse.m2e.core.maven2Problem.lifecycleMapping".equals(projectMarkers[i].getType())) {
+						markers.add(projectMarkers[i]);
+				}
 			}
 		}
 		assertTrue("The '" + projectName + "' contains errors.", markers.size() == 0);
@@ -545,7 +559,7 @@ public class CreateMavenizedSeamProjectTest {
 		warProjectItem.select();
 		
 		SWTBotMenu runAs = tree.contextMenu("Run As");
-		runAs.menu("6 Maven build...").click();
+		runAs.menu("5 Maven build...").click();
 
 		SWTBotShell shell = bot.shell("Edit Configuration");
 		shell.activate();
