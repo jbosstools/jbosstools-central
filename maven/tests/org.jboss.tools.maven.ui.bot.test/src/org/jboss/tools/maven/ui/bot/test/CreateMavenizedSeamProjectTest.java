@@ -45,7 +45,9 @@ import org.eclipse.datatools.connectivity.drivers.IPropertySet;
 import org.eclipse.datatools.connectivity.drivers.PropertySetImpl;
 import org.eclipse.datatools.connectivity.drivers.models.TemplateDescriptor;
 import org.eclipse.m2e.core.core.IMavenConstants;
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotEditor;
@@ -58,6 +60,7 @@ import org.eclipse.swtbot.swt.finder.results.Result;
 import org.eclipse.swtbot.swt.finder.results.VoidResult;
 import org.eclipse.swtbot.swt.finder.utils.SWTBotPreferences;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotMenu;
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotRadio;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
@@ -481,7 +484,26 @@ public class CreateMavenizedSeamProjectTest {
 		bot.button("Next >").click();
 		
 		bot.comboBox(0).setSelection(SEAM_RUNTIME_NAME);
-		bot.radio(deployType).click();
+		String otherType = DEPLOY_TYPE_EAR;
+		if (DEPLOY_TYPE_EAR.equals(deployType)) {
+			otherType = DEPLOY_TYPE_WAR;
+		}
+		final SWTBotRadio radio = bot.radio(deployType);
+		final SWTBotRadio otherRadio = bot.radio(otherType);
+		radio.click();
+		Display.getDefault().syncExec(new Runnable() {
+
+			public void run() {
+				radio.widget.setSelection(true);
+				otherRadio.widget.setSelection(false);
+				Event event = new Event();
+				event.time = (int) System.currentTimeMillis();
+				event.widget = radio.widget;
+				event.display = Display.getCurrent();
+				radio.widget.notifyListeners(SWT.Selection, event);
+			}
+		});
+			
 		bot.comboBox(1).setSelection("HSQL");
 		bot.comboBox(2).setSelection(CONNECTION_PROFILE_NAME);
 		bot.button("Finish").click();
