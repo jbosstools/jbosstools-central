@@ -20,6 +20,7 @@ import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.project.MavenProjectChangedEvent;
 import org.eclipse.m2e.core.project.configurator.AbstractProjectConfigurator;
 import org.eclipse.m2e.core.project.configurator.ProjectConfigurationRequest;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.wst.common.componentcore.ModuleCoreNature;
 import org.eclipse.wst.common.frameworks.datamodel.IDataModel;
 import org.eclipse.wst.common.project.facet.core.IFacetedProject;
@@ -119,7 +120,11 @@ public class CDIProjectConfigurator extends AbstractProjectConfigurator {
 	private void installWarFacets(IFacetedProject fproj, String cdiVersion,IProgressMonitor monitor) throws CoreException {
 		
 		if (!fproj.hasProjectFacet(dynamicWebFacet)) {
-			MavenCDIActivator.log(Messages.CDIProjectConfigurator_The_project_does_not_contain_the_Web_Module_facet);
+			String name = "";
+			if (fproj.getProject() != null) {
+				name = fproj.getProject().getName();
+			}
+			MavenCDIActivator.log(NLS.bind(Messages.CDIProjectConfigurator_The_project_does_not_contain_the_Web_Module_facet, name));
 		}
 		installCDIFacet(fproj, cdiVersion, monitor);
 		installM2Facet(fproj, monitor);
