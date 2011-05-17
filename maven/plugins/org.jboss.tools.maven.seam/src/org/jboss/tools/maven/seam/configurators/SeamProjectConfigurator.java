@@ -45,11 +45,11 @@ import org.eclipse.jst.j2ee.componentcore.util.EARArtifactEdit;
 import org.eclipse.jst.j2ee.internal.common.classpath.J2EEComponentClasspathUpdater;
 import org.eclipse.jst.j2ee.internal.project.J2EEProjectUtilities;
 import org.eclipse.jst.j2ee.project.JavaEEProjectUtilities;
-import org.eclipse.m2e.core.MavenPlugin;
-import org.eclipse.m2e.core.core.IMavenConstants;
+import org.eclipse.m2e.core.internal.IMavenConstants;
+import org.eclipse.m2e.core.internal.MavenPluginActivator;
+import org.eclipse.m2e.core.internal.project.registry.MavenProjectManager;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.project.MavenProjectChangedEvent;
-import org.eclipse.m2e.core.project.MavenProjectManager;
 import org.eclipse.m2e.core.project.configurator.AbstractProjectConfigurator;
 import org.eclipse.m2e.core.project.configurator.ProjectConfigurationRequest;
 import org.eclipse.wst.common.componentcore.ComponentCore;
@@ -413,7 +413,7 @@ public class SeamProjectConfigurator extends AbstractProjectConfigurator {
 					if (refProject.hasNature(IMavenConstants.NATURE_ID)) {
 						IFile pom = refProject.getFile(IMavenConstants.POM_FILE_NAME);
 						if (pom.exists()) {
-							MavenProjectManager projectManager = MavenPlugin.getDefault().getMavenProjectManager();
+							MavenProjectManager projectManager = MavenPluginActivator.getDefault().getMavenProjectManager();
 						     IMavenProjectFacade facade = projectManager.create(pom, true, null);
 						      if(facade!=null) {
 						        MavenProject mavenProject = facade.getMavenProject(null);
@@ -447,7 +447,7 @@ public class SeamProjectConfigurator extends AbstractProjectConfigurator {
 						IFile pom = refProject
 								.getFile(IMavenConstants.POM_FILE_NAME);
 						if (pom.exists()) {
-							MavenProjectManager projectManager = MavenPlugin
+							MavenProjectManager projectManager = MavenPluginActivator
 									.getDefault().getMavenProjectManager();
 							IMavenProjectFacade facade = projectManager.create(
 									pom, true, null);

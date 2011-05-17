@@ -44,9 +44,11 @@ import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.m2e.core.MavenPlugin;
-import org.eclipse.m2e.core.core.IMavenConstants;
 import org.eclipse.m2e.core.embedder.MavenModelManager;
-import org.eclipse.m2e.core.project.MavenProjectManager;
+import org.eclipse.m2e.core.internal.IMavenConstants;
+import org.eclipse.m2e.core.internal.MavenPluginActivator;
+import org.eclipse.m2e.core.internal.project.ResolverConfigurationIO;
+import org.eclipse.m2e.core.internal.project.registry.MavenProjectManager;
 import org.eclipse.m2e.core.project.ResolverConfiguration;
 import org.eclipse.m2e.model.edit.pom.Configuration;
 import org.eclipse.m2e.model.edit.pom.Plugin;
@@ -961,11 +963,11 @@ public class MavenSeamActivator extends AbstractUIPlugin {
 			location = location.append(parentProjectName);
 			MavenCoreActivator.createMavenProject(parentProjectName, null, model, false, location);
 			// disable workspace resolution
-			MavenProjectManager projectManager = MavenPlugin.getDefault().getMavenProjectManager();
+			MavenProjectManager projectManager = MavenPluginActivator.getDefault().getMavenProjectManager();
 		    IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject(parentProjectName);
-		    ResolverConfiguration configuration = projectManager.getResolverConfiguration(project);
+		    ResolverConfiguration configuration = ResolverConfigurationIO.readResolverConfiguration(project);
 		    configuration.setResolveWorkspaceProjects(false);
-		    projectManager.setResolverConfiguration(project, configuration);
+		    ResolverConfigurationIO.saveResolverConfiguration(project, configuration);
 		} catch (Exception e) {
 			log(e);
 		} finally {
