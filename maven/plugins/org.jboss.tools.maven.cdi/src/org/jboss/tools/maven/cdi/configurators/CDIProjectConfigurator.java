@@ -45,7 +45,9 @@ public class CDIProjectConfigurator extends AbstractProjectConfigurator {
 	private static final String CDI_API_ARTIFACT_ID = "cdi-api"; //$NON-NLS-1$
 	
 	protected static final IProjectFacet dynamicWebFacet;
+	protected static final IProjectFacet ejbFacet;
 	protected static final IProjectFacetVersion dynamicWebVersion;
+	protected static final IProjectFacetVersion ejbVersion;
 	
 	protected static final IProjectFacet cdiFacet;
 	protected static final IProjectFacetVersion cdiVersion;
@@ -56,6 +58,8 @@ public class CDIProjectConfigurator extends AbstractProjectConfigurator {
 	static {
 		dynamicWebFacet = ProjectFacetsManager.getProjectFacet("jst.web"); //$NON-NLS-1$
 		dynamicWebVersion = dynamicWebFacet.getVersion("2.5");  //$NON-NLS-1$
+		ejbFacet = ProjectFacetsManager.getProjectFacet("jst.ejb"); //$NON-NLS-1$
+		ejbVersion = ejbFacet.getVersion("3.0");  //$NON-NLS-1$
 		cdiFacet = ProjectFacetsManager.getProjectFacet("jst.cdi"); //$NON-NLS-1$
 		cdiVersion = cdiFacet.getVersion("1.0"); //$NON-NLS-1$
 		m2Facet = ProjectFacetsManager.getProjectFacet("jboss.m2"); //$NON-NLS-1$
@@ -83,7 +87,7 @@ public class CDIProjectConfigurator extends AbstractProjectConfigurator {
 	    if (cdiVersion != null) {
 	    	final IFacetedProject fproj = ProjectFacetsManager.create(project);
 	    	if ( (fproj != null) && ("war".equals(packaging) || "ejb".equals(packaging)) ) { //$NON-NLS-1$
-	    		installWarFacets(fproj, cdiVersion, monitor);
+	    		installDefaultFacets(fproj, cdiVersion, monitor);
 	    	}
 	    	CDIUtil.enableCDI(project, false, new NullProgressMonitor());
 	    }
@@ -117,16 +121,20 @@ public class CDIProjectConfigurator extends AbstractProjectConfigurator {
 	}
 
 	
-	private void installWarFacets(IFacetedProject fproj, String cdiVersion,IProgressMonitor monitor) throws CoreException {
+	private void installDefaultFacets(IFacetedProject fproj, String cdiVersion,IProgressMonitor monitor) throws CoreException {
+		IProjectFacetVersion currentWebVersion = fproj.getProjectFacetVersion(dynamicWebFacet); 
+		IProjectFacetVersion currentEjbVersion = fproj.getProjectFacetVersion(ejbFacet); 
 		
-		if (!fproj.hasProjectFacet(dynamicWebFacet)) {
+		if ((currentWebVersion != null && currentWebVersion.compareTo(dynamicWebVersion)> -1)
+				|| (currentEjbVersion != null && currentEjbVersion.compareTo(dynamicWebVersion)> -1)) {
+			installCDIFacet(fproj, cdiVersion, monitor);
+		} else {
 			String name = "";
 			if (fproj.getProject() != null) {
 				name = fproj.getProject().getName();
 			}
-			MavenCDIActivator.log(NLS.bind(Messages.CDIProjectConfigurator_The_project_does_not_contain_the_Web_Module_facet, name));
+			MavenCDIActivator.log(NLS.bind(Messages.CDIProjectConfigurator_The_project_does_not_contain_required_facets, name));
 		}
-		installCDIFacet(fproj, cdiVersion, monitor);
 		installM2Facet(fproj, monitor);
 		
 	}
@@ -143,9 +151,7 @@ public class CDIProjectConfigurator extends AbstractProjectConfigurator {
 	}
 	
 	private String getCDIVersion(MavenProject mavenProject) {
-		String version = null;
-		version = Activator.getDefault().getDependencyVersion(mavenProject, CDI_API_GROUP_ID, CDI_API_ARTIFACT_ID);
-		
+		String version = Activator.getDefault().getDependencyVersion(mavenProject, CDI_API_GROUP_ID, CDI_API_ARTIFACT_ID);
 	    return version;
 	}
 
