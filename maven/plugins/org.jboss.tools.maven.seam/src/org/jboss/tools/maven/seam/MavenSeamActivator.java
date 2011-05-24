@@ -198,7 +198,7 @@ public class MavenSeamActivator extends AbstractUIPlugin {
 			parent.setRelativePath("../" + parentProjectName); //$NON-NLS-1$
 			model.setParent(parent);
 			
-			List dependencies = model.getDependencies();
+			List<Dependency> dependencies = model.getDependencies();
 			
 			Dependency dependency = new Dependency();
 			dependency.setGroupId("org.jboss.seam.embedded"); //$NON-NLS-1$
@@ -356,7 +356,7 @@ public class MavenSeamActivator extends AbstractUIPlugin {
 			parent.setRelativePath("../" + parentProjectName); //$NON-NLS-1$
 			model.setParent(parent);
 			
-			List dependencies = model.getDependencies();
+			List<Dependency> dependencies = model.getDependencies();
 			
 			Dependency dependency = new Dependency();
 			dependency.setGroupId(m2FacetModel.getStringProperty(IJBossMavenConstants.GROUP_ID));
@@ -378,7 +378,7 @@ public class MavenSeamActivator extends AbstractUIPlugin {
 			dependency.setVersion("${seam.version}"); //$NON-NLS-1$
 			dependency.setType("ejb"); //$NON-NLS-1$
 			dependency.setScope("compile"); //$NON-NLS-1$
-			List exclusions = dependency.getExclusions();
+			List<Exclusion> exclusions = dependency.getExclusions();
 			Exclusion exclusion = new Exclusion();
 			exclusion.setGroupId("javassist"); //$NON-NLS-1$
 			exclusion.setArtifactId("javassist"); //$NON-NLS-1$

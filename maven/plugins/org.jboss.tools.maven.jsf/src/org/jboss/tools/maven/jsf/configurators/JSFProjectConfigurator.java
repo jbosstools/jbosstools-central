@@ -16,6 +16,7 @@ import java.io.IOException;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
+import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
@@ -27,6 +28,7 @@ import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.project.MavenProjectChangedEvent;
 import org.eclipse.m2e.core.project.configurator.AbstractProjectConfigurator;
 import org.eclipse.m2e.core.project.configurator.ProjectConfigurationRequest;
+import org.eclipse.wst.common.componentcore.ComponentCore;
 import org.eclipse.wst.common.componentcore.ModuleCoreNature;
 import org.eclipse.wst.common.frameworks.datamodel.IDataModel;
 import org.eclipse.wst.common.project.facet.core.IFacetedProject;
@@ -149,15 +151,25 @@ public class JSFProjectConfigurator extends AbstractProjectConfigurator {
 			IProgressMonitor monitor)
 			throws CoreException {
 		if (!fproj.hasProjectFacet(jsfFacet)) {
+			String warSourceDir = getWarSourceDirectory(mavenProject,fproj.getProject());
+			IPath facesConfigPath = new Path("WEB-INF/faces-config.xml");
+			IFile facesConfig = fproj.getProject().getFolder(warSourceDir).getFile(facesConfigPath);
+			IFile generatedFacesConfig = getFileFromUnderlyingresources(fproj.getProject(), facesConfigPath);
+
+			//faces-config.xml will not be created in the source folder and it doesn't exist yet
+			// => We'll have to fix it after setting the JSF facet
+			boolean shouldFixFacesConfig = !generatedFacesConfig.getLocation().equals(facesConfig.getLocation()) 
+					                    && !generatedFacesConfig.exists();  
+			
 			if (jsfVersionString.startsWith("1.1")) { //$NON-NLS-1$
 				IDataModel model = MavenJSFActivator.getDefault().createJSFDataModel(fproj,jsfVersion11);
 				fproj.installProjectFacet(jsfVersion11, model, monitor);	
 			}
-			if (jsfVersionString.startsWith("1.2")) { //$NON-NLS-1$
+			else if (jsfVersionString.startsWith("1.2")) { //$NON-NLS-1$
 				IDataModel model = MavenJSFActivator.getDefault().createJSFDataModel(fproj,jsfVersion12);
 				fproj.installProjectFacet(jsfVersion12, model, monitor);	
 			}
-			if (jsfVersionString.startsWith("2.0")) { //$NON-NLS-1$
+			else if (jsfVersionString.startsWith("2.0")) { //$NON-NLS-1$
 				String webXmlString = null;
 				IFile webXml = null;
 				webXml = getWebXml(fproj, mavenProject);
@@ -194,9 +206,30 @@ public class JSFProjectConfigurator extends AbstractProjectConfigurator {
 					}
 				}
 			}
+
+			if (shouldFixFacesConfig && generatedFacesConfig.exists()) {
+				if (facesConfig.exists()) { 
+					//We have 2 config files. Delete the gen'd one
+					generatedFacesConfig.delete(true, monitor);
+				}
+				else { 
+					//move the gen'd config file to the appropriate source folder
+					IContainer destination = facesConfig.getParent();
+					if (destination != null && !destination.exists()) {
+						  destination.getLocation().toFile().mkdirs();
+					}
+					generatedFacesConfig.move(facesConfig.getFullPath(), true, monitor);
+				}
+			}
+			
 		}
 	}
 	
+	private IFile getFileFromUnderlyingresources(final IProject project, final IPath filePath) {
+			  IContainer underlyingFolder = ComponentCore.createComponent(project).getRootFolder().getUnderlyingFolder();
+			  return project.getFile(underlyingFolder.getProjectRelativePath().append(filePath));
+	}
+
 	private IFile getWebXml(IFacetedProject fproj, MavenProject mavenProject) {
 		IFile webXml;
 		String customWebXml = getCustomWebXml(mavenProject,
