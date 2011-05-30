@@ -12,7 +12,10 @@ package org.jboss.tools.maven.jsf.configurators;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
 
+import org.apache.maven.artifact.Artifact;
+import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
@@ -67,12 +70,13 @@ public class JSFProjectConfigurator extends AbstractProjectConfigurator {
 	protected static final IProjectFacetVersion jsfVersion11;
 	protected static final IProjectFacet m2Facet;
 	protected static final IProjectFacetVersion m2Version;
+	private static final String JSF_VERSION_2_0 = "2.0";
 	
 	static {
 		dynamicWebFacet = ProjectFacetsManager.getProjectFacet("jst.web"); //$NON-NLS-1$
 		dynamicWebVersion = dynamicWebFacet.getVersion("2.5");  //$NON-NLS-1$
 		jsfFacet = ProjectFacetsManager.getProjectFacet("jst.jsf"); //$NON-NLS-1$
-		jsfVersion20 = jsfFacet.getVersion("2.0"); //$NON-NLS-1$
+		jsfVersion20 = jsfFacet.getVersion(JSF_VERSION_2_0); 
 		jsfVersion12 = jsfFacet.getVersion("1.2"); //$NON-NLS-1$
 		jsfVersion11 = jsfFacet.getVersion("1.1"); //$NON-NLS-1$
 		m2Facet = ProjectFacetsManager.getProjectFacet("jboss.m2"); //$NON-NLS-1$
@@ -95,13 +99,16 @@ public class JSFProjectConfigurator extends AbstractProjectConfigurator {
 			return;
 		}
 		
+    	final IFacetedProject fproj = ProjectFacetsManager.create(project);
+		if (fproj != null && fproj.hasProjectFacet(jsfFacet) && fproj.hasProjectFacet(m2Facet)) {
+			//everything already installed. Since there's no support for version update -yet- we bail
+			return;
+		}
+		
 		String packaging = mavenProject.getPackaging();
 	    String jsfVersion = getJSFVersion(mavenProject);
-	    if (jsfVersion != null) {
-	    	final IFacetedProject fproj = ProjectFacetsManager.create(project);
-	    	if (fproj != null && "war".equals(packaging)) { //$NON-NLS-1$
-	    		installWarFacets(fproj, jsfVersion, mavenProject, monitor);
-	    	}
+	    if (fproj != null && jsfVersion != null && "war".equals(packaging)) { //$NON-NLS-1$
+	      installWarFacets(fproj, jsfVersion, mavenProject, monitor);
 	    }
 	}
 
@@ -323,7 +330,38 @@ public class JSFProjectConfigurator extends AbstractProjectConfigurator {
 		if (version == null) {
 			version = Activator.getDefault().getDependencyVersion(mavenProject, JSF_API2_GROUP_ID, JSF_API_ARTIFACT_ID);
 		}
+		if (version == null) {
+			version = inferJsfVersionFromDependencies(mavenProject, JSF_API2_GROUP_ID, JSF_API_ARTIFACT_ID, JSF_VERSION_2_0);
+		}
 	    return version;
 	}
 
+	private String inferJsfVersionFromDependencies(MavenProject mavenProject, String groupId, String artifactId, String defaultVersion) {
+		boolean hasCandidates = false;
+		String jsfVersion = null;
+		List<ArtifactRepository> repos = mavenProject.getRemoteArtifactRepositories();
+		for (Artifact artifact : mavenProject.getArtifacts()) {
+			if (isKnownJsfBasedArtifact(artifact)) {
+				hasCandidates = true;
+				jsfVersion = Activator.getDefault().getDependencyVersion(artifact, repos, groupId, artifactId);
+				if (jsfVersion != null) {
+					//TODO should probably not break and take the highest version returned from all dependencies
+					break;
+				}
+			}
+		}
+		//Fallback to default JSF version
+		if (hasCandidates && jsfVersion == null) {
+			return defaultVersion;
+		}
+		return jsfVersion;
+	}
+
+	private boolean isKnownJsfBasedArtifact(Artifact artifact) {
+		return artifact.getGroupId().startsWith("org.jboss.seam.") 	//$NON-NLS-1$ 
+				&& artifact.getArtifactId().equals("seam-faces") 	//$NON-NLS-1$
+				&& artifact.getVersion().startsWith("3.");			//$NON-NLS-1$
+	}
+
+	
 }

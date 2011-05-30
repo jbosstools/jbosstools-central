@@ -10,6 +10,10 @@
  ************************************************************************************/
 package org.jboss.tools.maven.cdi.configurators;
 
+import java.util.List;
+
+import org.apache.maven.artifact.Artifact;
+import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.project.MavenProject;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
@@ -27,6 +31,7 @@ import org.eclipse.wst.common.project.facet.core.IFacetedProject;
 import org.eclipse.wst.common.project.facet.core.IProjectFacet;
 import org.eclipse.wst.common.project.facet.core.IProjectFacetVersion;
 import org.eclipse.wst.common.project.facet.core.ProjectFacetsManager;
+import org.jboss.tools.cdi.core.CDICoreNature;
 import org.jboss.tools.cdi.core.CDIUtil;
 import org.jboss.tools.maven.cdi.MavenCDIActivator;
 import org.jboss.tools.maven.cdi.Messages;
@@ -54,6 +59,7 @@ public class CDIProjectConfigurator extends AbstractProjectConfigurator {
 	
 	protected static final IProjectFacet m2Facet;
 	protected static final IProjectFacetVersion m2Version;
+	private static final String DEFAULT_CDI_VERSION = "1.0";
 	
 	static {
 		dynamicWebFacet = ProjectFacetsManager.getProjectFacet("jst.web"); //$NON-NLS-1$
@@ -61,7 +67,7 @@ public class CDIProjectConfigurator extends AbstractProjectConfigurator {
 		ejbFacet = ProjectFacetsManager.getProjectFacet("jst.ejb"); //$NON-NLS-1$
 		ejbVersion = ejbFacet.getVersion("3.0");  //$NON-NLS-1$
 		cdiFacet = ProjectFacetsManager.getProjectFacet("jst.cdi"); //$NON-NLS-1$
-		cdiVersion = cdiFacet.getVersion("1.0"); //$NON-NLS-1$
+		cdiVersion = cdiFacet.getVersion(DEFAULT_CDI_VERSION); //$NON-NLS-1$
 		m2Facet = ProjectFacetsManager.getProjectFacet("jboss.m2"); //$NON-NLS-1$
 		m2Version = m2Facet.getVersion("1.0"); //$NON-NLS-1$
 	}
@@ -81,11 +87,15 @@ public class CDIProjectConfigurator extends AbstractProjectConfigurator {
 		if (!configureCDI) {
 			return;
 		}
-		
+    	final IFacetedProject fproj = ProjectFacetsManager.create(project);
+		if (project.hasNature(CDICoreNature.NATURE_ID) 
+				&& (fproj == null || (fproj.hasProjectFacet(cdiFacet) && fproj.hasProjectFacet(m2Facet)))) {
+			//everything already installed. Since there's no support for version update -yet- we stop here
+			return;
+		}
 		String packaging = mavenProject.getPackaging();
 	    String cdiVersion = getCDIVersion(mavenProject);
 	    if (cdiVersion != null) {
-	    	final IFacetedProject fproj = ProjectFacetsManager.create(project);
 	    	if ( (fproj != null) && ("war".equals(packaging) || "ejb".equals(packaging)) ) { //$NON-NLS-1$
 	    		installDefaultFacets(fproj, cdiVersion, monitor);
 	    	}
@@ -121,6 +131,7 @@ public class CDIProjectConfigurator extends AbstractProjectConfigurator {
 	}
 
 	
+	@SuppressWarnings("unchecked")
 	private void installDefaultFacets(IFacetedProject fproj, String cdiVersion,IProgressMonitor monitor) throws CoreException {
 		IProjectFacetVersion currentWebVersion = fproj.getProjectFacetVersion(dynamicWebFacet); 
 		IProjectFacetVersion currentEjbVersion = fproj.getProjectFacetVersion(ejbFacet); 
@@ -152,7 +163,36 @@ public class CDIProjectConfigurator extends AbstractProjectConfigurator {
 	
 	private String getCDIVersion(MavenProject mavenProject) {
 		String version = Activator.getDefault().getDependencyVersion(mavenProject, CDI_API_GROUP_ID, CDI_API_ARTIFACT_ID);
+		if (version == null) {
+			version = inferCdiVersionFromDependencies(mavenProject);
+		}
 	    return version;
+	}
+
+	private String inferCdiVersionFromDependencies(MavenProject mavenProject) {
+		boolean hasCandidates = false;
+		String cdiVersion = null;
+		List<ArtifactRepository> repos = mavenProject.getRemoteArtifactRepositories();
+		for (Artifact artifact : mavenProject.getArtifacts()) {
+			if (isKnownCdiExtension(artifact)) {
+				hasCandidates = true;
+				cdiVersion = Activator.getDefault().getDependencyVersion(artifact, repos, CDI_API_GROUP_ID, CDI_API_ARTIFACT_ID);
+				if (cdiVersion != null) {
+					//TODO should probably not break and take the highest version returned from all dependencies
+					break;
+				}
+			}
+		}
+		//Fallback to default CDI version
+		if (hasCandidates && cdiVersion == null) {
+			return DEFAULT_CDI_VERSION;
+		}
+		return cdiVersion;
+	}
+
+	private boolean isKnownCdiExtension(Artifact artifact) {
+		return artifact.getGroupId().startsWith("org.jboss.seam.") 
+			&& artifact.getVersion().startsWith("3.");
 	}
 
 }
