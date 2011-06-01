@@ -1,18 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-	<modelVersion>4.0.0</modelVersion> 
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
 	<parent>
-	  <groupId>org.jboss.tools</groupId>
-	  <artifactId>org.jboss.tools.parent.pom</artifactId>
-	  <version>0.0.2-SNAPSHOT</version>
+		<groupId>org.jboss.tools.examples</groupId>
+		<artifactId>tests</artifactId>
+		<version>0.0.1-SNAPSHOT</version>
 	</parent>
 	<groupId>org.jboss.tools.examples.tests</groupId>
-	<artifactId>org.jboss.tools.project.examples.test</artifactId> 
+	<artifactId>org.jboss.tools.project.examples.test</artifactId>
 	<version>1.2.0-SNAPSHOT</version>
 	<packaging>eclipse-test-plugin</packaging>
 
 	<properties>
-		<systemProperties>-Djbosstools.test.jboss.home.4.2=${requirement.build.root}/jboss-4.2.3.GA -Djbosstools.test.seam.2.0.1.GA.home=${requirement.build.root}/jboss-seam-2.0.1.GA</systemProperties>
+		<systemProperties>-Djbosstools.test.jboss.home.4.2=${requirement.build.root}/jboss-4.2.3.GA
+			-Djbosstools.test.seam.2.0.1.GA.home=${requirement.build.root}/jboss-seam-2.0.1.GA</systemProperties>
 	</properties>
 	<build>
 		<plugins>
@@ -24,7 +26,7 @@
 					<useUIThread>false</useUIThread>
 					<useUIHarness>true</useUIHarness>
 					<testSuite>org.jboss.tools.project.examples.test</testSuite>
-                    <testClass>org.jboss.tools.project.examples.test.ProjectExamplesAllTests</testClass> 
+					<testClass>org.jboss.tools.project.examples.test.ProjectExamplesAllTests</testClass>
 				</configuration>
 			</plugin>
 		</plugins>
