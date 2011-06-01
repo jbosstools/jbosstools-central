@@ -10,8 +10,8 @@
 	</parent>
 	<groupId>org.jboss.tools</groupId>
 	<artifactId>maven</artifactId>
-	<name>maven.all</name>
 	<version>0.0.1-SNAPSHOT</version>
+	<name>maven.all</name>	
 	<packaging>pom</packaging>
 	<modules>
 		<module>features</module>
