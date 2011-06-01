@@ -11,7 +11,6 @@
 package org.jboss.tools.maven.jsf.configurators;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.List;
 
 import org.apache.maven.artifact.Artifact;
@@ -27,6 +26,7 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.jst.jsf.core.internal.project.facet.IJSFFacetInstallDataModelProperties;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.project.MavenProjectChangedEvent;
 import org.eclipse.m2e.core.project.configurator.AbstractProjectConfigurator;
@@ -38,9 +38,6 @@ import org.eclipse.wst.common.project.facet.core.IFacetedProject;
 import org.eclipse.wst.common.project.facet.core.IProjectFacet;
 import org.eclipse.wst.common.project.facet.core.IProjectFacetVersion;
 import org.eclipse.wst.common.project.facet.core.ProjectFacetsManager;
-import org.eclipse.wst.sse.core.StructuredModelManager;
-import org.eclipse.wst.sse.core.internal.provisional.IStructuredModel;
-import org.eclipse.wst.sse.core.internal.provisional.text.IStructuredDocument;
 import org.jboss.tools.maven.core.IJBossMavenConstants;
 import org.jboss.tools.maven.core.internal.project.facet.MavenFacetInstallDataModelProvider;
 import org.jboss.tools.maven.jsf.MavenJSFActivator;
@@ -177,41 +174,9 @@ public class JSFProjectConfigurator extends AbstractProjectConfigurator {
 				fproj.installProjectFacet(jsfVersion12, model, monitor);	
 			}
 			else if (jsfVersionString.startsWith("2.0")) { //$NON-NLS-1$
-				String webXmlString = null;
-				IFile webXml = null;
-				webXml = getWebXml(fproj, mavenProject);
-				boolean webXmlExists = webXml != null && webXml.exists();
-				if (!configureWebxml() && webXmlExists) {
-					IStructuredModel webXmlModel = null;
-					try {
-						webXmlModel = StructuredModelManager.getModelManager().getModelForRead(webXml);
-						IStructuredDocument doc = webXmlModel.getStructuredDocument();
-						webXmlString = doc.get();
-					} catch (IOException e) {
-						MavenJSFActivator.log(e);
-					} finally {
-						if (webXmlModel != null) {
-							webXmlModel.releaseFromRead();
-						}
-					}
-				}
 				IDataModel model = MavenJSFActivator.getDefault().createJSFDataModel(fproj,jsfVersion20);
+				model.setBooleanProperty(IJSFFacetInstallDataModelProperties.CONFIGURE_SERVLET,configureWebxml());
 				fproj.installProjectFacet(jsfVersion20, model, monitor);
-				if (!configureWebxml() && webXmlExists && webXmlString != null) {
-					IStructuredModel webXmlModel = null;
-					try {
-						webXmlModel = StructuredModelManager.getModelManager().getModelForEdit(webXml);
-						IStructuredDocument doc = webXmlModel.getStructuredDocument();
-						doc.set(webXmlString);
-						webXmlModel.save();
-					} catch (IOException e) {
-						MavenJSFActivator.log(e);
-					} finally {
-						if (webXmlModel != null) {
-							webXmlModel.releaseFromEdit();
-						}
-					}
-				}
 			}
 
 			if (shouldFixFacesConfig && generatedFacesConfig.exists()) {
