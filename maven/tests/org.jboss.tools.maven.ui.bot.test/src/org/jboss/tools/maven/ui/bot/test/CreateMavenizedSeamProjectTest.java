@@ -103,7 +103,7 @@ import org.junit.runner.RunWith;
 @RunWith(SWTBotJunit4ClassRunner.class)
 public class CreateMavenizedSeamProjectTest {
 	
-	protected static final int IDLE_TIME = 60000;
+	protected static final long IDLE_TIME = 20 * 60 * 1000L;
 
 	private static final String CONNECTION_PROFILE_NAME = "DefaultDS";
 
@@ -197,7 +197,7 @@ public class CreateMavenizedSeamProjectTest {
 		SWTBotPreferences.KEYBOARD_LAYOUT = "EN_US";
 		SWTBotPreferences.TIMEOUT = 1000;
 		SWTBotPreferences.PLAYBACK_DELAY = 5;
-		JobUtils.waitForIdle(60000);
+		JobUtils.waitForIdle(IDLE_TIME);
 		try {
 			SWTBotView view = bot.viewByTitle("Welcome");
 			if (view != null) {
@@ -453,7 +453,7 @@ public class CreateMavenizedSeamProjectTest {
 	}
 	
 	public static void createNewSeamWebProjectWizard(String projectName, String deployType) throws Exception {
-		JobUtils.waitForIdle(60000);
+		JobUtils.waitForIdle(IDLE_TIME);
 		bot.menu("File").menu("New").menu("Seam Web Project").click();
 		 
 		SWTBotShell mainShell = bot.shell("New Seam Project");
@@ -508,7 +508,7 @@ public class CreateMavenizedSeamProjectTest {
 		bot.comboBox(2).setSelection(CONNECTION_PROFILE_NAME);
 		bot.button("Finish").click();
 		
-		JobUtils.waitForIdle(60000);
+		JobUtils.waitForIdle(IDLE_TIME);
 		
 	}
 	
