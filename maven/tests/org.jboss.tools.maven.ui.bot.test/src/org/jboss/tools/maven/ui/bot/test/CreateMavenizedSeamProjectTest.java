@@ -33,6 +33,7 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.datatools.connectivity.ConnectionProfileConstants;
 import org.eclipse.datatools.connectivity.ConnectionProfileException;
 import org.eclipse.datatools.connectivity.ProfileManager;
@@ -87,7 +88,6 @@ import org.eclipse.wst.validation.ValidationFramework;
 import org.jboss.tools.seam.core.project.facet.SeamRuntime;
 import org.jboss.tools.seam.core.project.facet.SeamRuntimeManager;
 import org.jboss.tools.seam.core.project.facet.SeamVersion;
-import org.jboss.tools.test.util.JobUtils;
 import org.jboss.tools.test.util.ResourcesUtils;
 import org.junit.After;
 import org.junit.AfterClass;
@@ -197,7 +197,7 @@ public class CreateMavenizedSeamProjectTest {
 		SWTBotPreferences.KEYBOARD_LAYOUT = "EN_US";
 		SWTBotPreferences.TIMEOUT = 1000;
 		SWTBotPreferences.PLAYBACK_DELAY = 5;
-		JobUtils.waitForIdle(IDLE_TIME);
+		waitForIdle();
 		try {
 			SWTBotView view = bot.viewByTitle("Welcome");
 			if (view != null) {
@@ -255,10 +255,10 @@ public class CreateMavenizedSeamProjectTest {
 		wc.modifyModules(new IModule[] {} , modules, monitor);
 		wc.save(true, monitor);
 		server.publish(IServer.PUBLISH_INCREMENTAL, monitor);
-		JobUtils.waitForIdle(IDLE_TIME);
+		waitForIdle();
 		server.getRuntime().delete();
 		server.delete();
-		JobUtils.waitForIdle(IDLE_TIME);
+		waitForIdle();
 	}
 
 	protected static void switchPerspective(final String pid) {
@@ -306,7 +306,7 @@ public class CreateMavenizedSeamProjectTest {
 			ResourcesUtils.setBuildAutomatically(buildAutomatically);
 			ValidationFramework.getDefault().suspendAllValidation(false);
 		}
-		JobUtils.waitForIdle(IDLE_TIME);
+		waitForIdle();
 	}
 	
 	protected static void createJBossServer(File asLocation, String serverType, String runtimeType, String name, String runtimeName) throws CoreException {
@@ -453,7 +453,7 @@ public class CreateMavenizedSeamProjectTest {
 	}
 	
 	public static void createNewSeamWebProjectWizard(String projectName, String deployType) throws Exception {
-		JobUtils.waitForIdle(IDLE_TIME);
+		waitForIdle();
 		bot.menu("File").menu("New").menu("Seam Web Project").click();
 		 
 		SWTBotShell mainShell = bot.shell("New Seam Project");
@@ -508,7 +508,7 @@ public class CreateMavenizedSeamProjectTest {
 		bot.comboBox(2).setSelection(CONNECTION_PROFILE_NAME);
 		bot.button("Finish").click();
 		
-		JobUtils.waitForIdle(IDLE_TIME);
+		waitForIdle();
 		
 	}
 	
@@ -589,7 +589,7 @@ public class CreateMavenizedSeamProjectTest {
 		bot.textWithLabel("Goals:").setText("clean package");
 		bot.button("Run").click();
 		
-		JobUtils.waitForIdle(IDLE_TIME);
+		waitForIdle();
 		
 		IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject(PROJECT_NAME_WAR);
 		project.refreshLocal(IResource.DEPTH_INFINITE, new NullProgressMonitor());
@@ -598,6 +598,46 @@ public class CreateMavenizedSeamProjectTest {
 		assertFalse(project.getFolder(webInfPath.append("dev")).exists());
 		assertTrue(project.getFolder(webInfPath.append("lib")).exists());
 		
+	}
+	
+	private static void waitForIdle() {
+		long start = System.currentTimeMillis();
+		int delay = 50;
+		while (!Job.getJobManager().isIdle()) {
+			delay(delay);
+			if ((System.currentTimeMillis() - start) > IDLE_TIME) {
+				Job[] jobs = Job.getJobManager().find(null);
+				StringBuffer str = new StringBuffer();
+				for (Job job : jobs) {
+					if (job.getThread() != null) {
+						str.append("\n").append(job.getName()).append(" (")
+								.append(job.getClass()).append(")");
+					}
+				}
+				throw new RuntimeException(
+						"Long running tasks detected:" + str.toString()); //$NON-NLS-1$
+			}
+		}
+	}
+
+	public static void delay(long waitTimeMillis) {
+		Display display = Display.getCurrent();
+		if (display != null) {
+			long endTimeMillis = System.currentTimeMillis() + waitTimeMillis;
+			while (System.currentTimeMillis() < endTimeMillis) {
+				if (!display.readAndDispatch())
+					display.sleep();
+			}
+			display.update();
+		}
+		// Otherwise, perform a simple sleep.
+		else {
+			try {
+				Thread.sleep(waitTimeMillis);
+			} catch (InterruptedException e) {
+				// Ignored.
+			}
+		}
 	}
 	
 	// see https://jira.jboss.org/browse/JBIDE-6767
