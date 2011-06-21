@@ -91,6 +91,7 @@ public class Messages extends NLS {
 	public static String SiteDialog_URL;
 	public static String Sites_Plugin_provided_sites;
 	public static String Sites_User_sites;
+	public static String InvalideSite;
 	public static String WTPRuntimeFix_Invalid_WTP_runtime_fix;
 	static {
 		// initialize resource bundle
