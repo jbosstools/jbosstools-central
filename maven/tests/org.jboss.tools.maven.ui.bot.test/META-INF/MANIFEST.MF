@@ -36,8 +36,8 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.jst.jee.ejb,
  org.eclipse.jst.jee.ui,
  org.eclipse.jst.jee.web,
- org.eclipse.m2e.lifecyclemapping.defaults;bundle-version="[0.13.0,1.0.100)",
- org.eclipse.m2e.launching;bundle-version="[0.13.0,1.0.100)"
+ org.eclipse.m2e.lifecyclemapping.defaults;bundle-version="[1.0,1.1)",
+ org.eclipse.m2e.launching;bundle-version="[1.0,1.1)"
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Eclipse-RegisterBuddy: org.apache.log4j
