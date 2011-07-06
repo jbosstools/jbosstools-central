@@ -137,7 +137,7 @@ public class CDIProjectConfigurator extends AbstractProjectConfigurator {
 		IProjectFacetVersion currentEjbVersion = fproj.getProjectFacetVersion(ejbFacet); 
 		
 		if ((currentWebVersion != null && currentWebVersion.compareTo(dynamicWebVersion)> -1)
-				|| (currentEjbVersion != null && currentEjbVersion.compareTo(dynamicWebVersion)> -1)) {
+				|| (currentEjbVersion != null && currentEjbVersion.compareTo(ejbVersion)> -1)) {
 			installCDIFacet(fproj, cdiVersion, monitor);
 		} else {
 			String name = "";
