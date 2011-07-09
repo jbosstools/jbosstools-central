@@ -11,7 +11,7 @@
   
   <extension point="org.eclipse.jst.common.project.facet.ui.libraryProviderActionPanels">
     <panel 
-      provider="maven-library-provider"
+      provider="mapass-library-provider"
       class="org.jboss.tools.maven.ui.internal.libprov.MavenUserLibraryProviderInstallPanel"/>
   </extension>
   
@@ -29,4 +29,84 @@
       <initializer class="org.jboss.tools.maven.ui.preferences.ConfiguratorPreferencesInitializer"/>
    </extension>
    
+   <!-- Maven Profile Selection-->
+    <extension
+          point="org.eclipse.ui.commands">
+       <category
+             id="org.jboss.tools.maven.ui.commands.profiles"
+             name="Maven Profiles">
+       </category>
+       <command
+             categoryId="org.jboss.tools.maven.ui.commands.profiles"
+             id="org.jboss.tools.maven.ui.commands.selectMavenProfileCommand"
+             name="Select Maven Profiles">
+       </command>
+    </extension>
+    
+    <extension
+          point="org.eclipse.ui.handlers">
+       <handler
+             class="org.jboss.tools.maven.ui.internal.profiles.handlers.ProfileSelectionHandler"
+             commandId="org.jboss.tools.maven.ui.commands.selectMavenProfileCommand">
+       </handler>
+    </extension>
+    <extension
+          point="org.eclipse.ui.bindings">
+       <key
+             commandId="org.jboss.tools.maven.ui.commands.selectMavenProfileCommand"
+             contextId="org.eclipse.ui.contexts.window"
+             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+             sequence="Ctrl+Shift+P">
+       </key>
+    </extension>
+    
+    <!--FIXME I can't make the menu appear in the maven menu-->
+    <extension
+          point="org.eclipse.ui.menus">
+       <menuContribution locationURI="popup:org.eclipse.m2e.core.mavenMenu?after=update" allPopups="true">
+       <!--menuContribution locationURI="popup:common.new.menu?after=new" allPopups="true" -->
+         <command
+               commandId="org.jboss.tools.maven.ui.commands.selectMavenProfileCommand"
+               id="org.jboss.tools.maven.ui.menus.selectMavenProfileCommand"
+               mnemonic="P">
+               
+               <!--reference
+                    definitionId="org.jboss.tools.maven.ui.mavenProject">
+              </reference-->
+               
+         </command>
+       </menuContribution>
+    </extension>
+    
+      <extension
+          point="org.eclipse.ui.menus">  
+           <menuContribution
+             locationURI="toolbar:org.eclipse.ui.main.toolbar?after=additions">
+          <toolbar
+                id="org.jboss.tools.maven.ui.toolbars.selectMavenProfilesToolbar">
+             <command
+                   commandId="org.jboss.tools.maven.ui.commands.selectMavenProfileCommand"
+                   icon="icons/maven-profiles.gif"
+                   id="org.jboss.tools.maven.ui.toolbars.selectMavenProfilesCommand"
+                   tooltip="Select Maven Profiles">
+             </command>
+          </toolbar>
+       </menuContribution>
+        </extension>
+        
+     <extension
+         point="org.eclipse.core.expressions.definitions">
+      <definition id="org.jboss.tools.maven.ui.mavenProject">
+              <with variable="selection">
+                 <iterate ifEmpty="false" operator="or">
+                    <adapt type="org.eclipse.core.resources.IProject">
+			           <and>
+			             <objectState name="open" value="true"/>
+			             <objectState name="nature" value="org.eclipse.m2e.core.maven2Nature"/>
+			           </and>
+                    </adapt>
+                 </iterate>
+              </with>
+      </definition>
+    </extension>
 </plugin>

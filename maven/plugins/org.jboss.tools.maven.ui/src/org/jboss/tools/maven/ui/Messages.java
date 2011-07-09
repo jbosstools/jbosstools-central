@@ -54,7 +54,22 @@ public class Messages extends NLS {
 	public static String ConfiguratorPreferencePage_Configure_Seam_Runtime;
 	public static String ConfiguratorPreferencePage_Configure_Seam_when_importing_Maven_projects;
 	public static String ConfiguratorPreferencePage_When_importing_Maven_projects_configure_the_following;
+	public static String ProfileManager_Updating_maven_profiles;
 	
+	public static String SelectProfilesDialog_autoactivated;
+	public static String SelectProfilesDialog_Activate_menu;
+	public static String SelectProfilesDialog_Available_profiles;
+	public static String SelectProfilesDialog_deactivated;
+	public static String SelectProfilesDialog_Deactivate_menu;
+	public static String SelectProfilesDialog_DeselectAll;
+	public static String SelectProfilesDialog_Force_update;
+	public static String SelectProfilesDialog_Maven_profile_selection;
+	public static String SelectProfilesDialog_Offline;
+	public static String SelectProfilesDialog_Project_has_no_available_profiles;
+	public static String SelectProfilesDialog_Select_Maven_profiles;
+	public static String SelectProfilesDialog_Select_the_active_Maven_profiles;
+	public static String SelectProfilesDialog_SelectAll;
+
 	static {
 		// initialize resource bundle
 		NLS.initializeMessages(BUNDLE_NAME, Messages.class);
