@@ -34,12 +34,12 @@
           point="org.eclipse.ui.commands">
        <category
              id="org.jboss.tools.maven.ui.commands.profiles"
-             name="Maven Profiles">
+             name="%Maven_Profiles">
        </category>
        <command
              categoryId="org.jboss.tools.maven.ui.commands.profiles"
              id="org.jboss.tools.maven.ui.commands.selectMavenProfileCommand"
-             name="Select Maven Profiles">
+             name="%Select_Maven_Profiles">
        </command>
     </extension>
     
@@ -63,7 +63,7 @@
     <!--FIXME I can't make the menu appear in the maven menu-->
     <extension
           point="org.eclipse.ui.menus">
-       <menuContribution locationURI="popup:org.eclipse.m2e.core.mavenMenu?after=update" allPopups="true">
+       <menuContribution locationURI="popup:org.eclipse.m2e.core.mavenMenu?after=additions" allPopups="true">
        <!--menuContribution locationURI="popup:common.new.menu?after=new" allPopups="true" -->
          <command
                commandId="org.jboss.tools.maven.ui.commands.selectMavenProfileCommand"
@@ -88,7 +88,7 @@
                    commandId="org.jboss.tools.maven.ui.commands.selectMavenProfileCommand"
                    icon="icons/maven-profiles.gif"
                    id="org.jboss.tools.maven.ui.toolbars.selectMavenProfilesCommand"
-                   tooltip="Select Maven Profiles">
+                   tooltip="%Select_Maven_Profiles">
              </command>
           </toolbar>
        </menuContribution>
@@ -109,4 +109,48 @@
               </with>
       </definition>
     </extension>
+
+  <extension  point="org.eclipse.ui.editors.templates">    
+        <template id="org.jboss.tools.maven.editor.xml.templates.repository.jboss.public"
+         contextTypeId="org.eclipse.m2e.editor.xml.templates.contextType.repositories"
+         name="%JBoss_Public_Repo_name" 
+         description="%JBoss_Public_Repo_description">
+      <pattern>             &lt;!-- You should seriously consider using a repository manager or declare repositories in your settings.xml.
+              See http://www.sonatype.com/people/2009/02/why-putting-repositories-in-your-poms-is-a-bad-idea/   --&gt;
+     &lt;repository&gt;
+        &lt;!-- The JBoss Public repository is a composite repository of several major repositories. 
+              See http://community.jboss.org/wiki/MavenGettingStarted-Users --&gt;
+        &lt;id&gt;${cursor}jboss-public-repository&lt;/id&gt;
+        &lt;url&gt;http://repository.jboss.org/nexus/content/groups/public&lt;/url&gt;
+        &lt;releases&gt;
+           &lt;enabled&gt;true&lt;/enabled&gt;
+        &lt;/releases&gt;
+        &lt;!-- You can disable snapshot resolution to speed up your builds --&gt;
+        &lt;snapshots&gt;
+          &lt;enabled&gt;true&lt;/enabled&gt;
+        &lt;/snapshots&gt;        
+     &lt;/repository&gt;</pattern>
+    </template>
+  </extension>
+  <extension  point="org.eclipse.ui.editors.templates">    
+        <template id="org.jboss.tools.maven.editor.xml.templates.repository.jboss.releases"
+         contextTypeId="org.eclipse.m2e.editor.xml.templates.contextType.repositories"
+         name="%JBoss_Releases_Repo_name" 
+         description="%JBoss_Releases_Repo_description">
+      <pattern>             &lt;!-- You should seriously consider using a repository manager or declare repositories in your settings.xml.
+              See http://www.sonatype.com/people/2009/02/why-putting-repositories-in-your-poms-is-a-bad-idea/   --&gt;
+     &lt;repository&gt;
+        &lt;!-- The JBoss Release repository mostly contains JBoss projects artifacts. 
+              See http://community.jboss.org/wiki/MavenGettingStarted-Users --&gt;
+        &lt;id&gt;${cursor}jboss-releases-repository&lt;/id&gt;
+        &lt;url&gt;https://repository.jboss.org/nexus/content/repositories/releases/&lt;/url&gt;
+        &lt;releases&gt;
+           &lt;enabled&gt;true&lt;/enabled&gt;
+        &lt;/releases&gt;
+        &lt;snapshots&gt;
+          &lt;enabled&gt;false&lt;/enabled&gt;
+        &lt;/snapshots&gt;        
+     &lt;/repository&gt;</pattern>
+    </template>
+  </extension>  
 </plugin>
