@@ -56,7 +56,7 @@
              commandId="org.jboss.tools.maven.ui.commands.selectMavenProfileCommand"
              contextId="org.eclipse.ui.contexts.window"
              schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
-             sequence="Ctrl+Shift+P">
+             sequence="Ctrl+Alt+P">
        </key>
     </extension>
     
