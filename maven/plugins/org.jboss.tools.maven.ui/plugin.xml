@@ -46,7 +46,7 @@
     <extension
           point="org.eclipse.ui.handlers">
        <handler
-             class="org.jboss.tools.maven.ui.internal.profiles.handlers.ProfileSelectionHandler"
+             class="org.jboss.tools.maven.ui.internal.profiles.ProfileSelectionHandler"
              commandId="org.jboss.tools.maven.ui.commands.selectMavenProfileCommand">
        </handler>
     </extension>

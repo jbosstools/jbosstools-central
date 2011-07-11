@@ -1,4 +1,4 @@
-package org.jboss.tools.maven.ui.internal.profiles.handlers;
+package org.jboss.tools.maven.ui.internal.profiles;
 
 import java.util.Map;
 
@@ -8,7 +8,11 @@ import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.WorkspaceJob;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.window.Window;
@@ -19,27 +23,25 @@ import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IFileEditorInput;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.handlers.HandlerUtil;
-import org.jboss.tools.maven.ui.internal.profiles.IProfileManager;
-import org.jboss.tools.maven.ui.internal.profiles.ProfileManager;
-import org.jboss.tools.maven.ui.internal.profiles.SelectProfilesDialog;
+import org.jboss.tools.maven.core.MavenCoreActivator;
+import org.jboss.tools.maven.core.profiles.IProfileManager;
+import org.jboss.tools.maven.ui.Activator;
+import org.jboss.tools.maven.ui.Messages;
 
 /**
- * Our sample handler extends AbstractHandler, an IHandler base class.
- * @see org.eclipse.core.commands.IHandler
- * @see org.eclipse.core.commands.AbstractHandler
+ * Handles profile selection commands. 
  */
 public class ProfileSelectionHandler extends AbstractHandler {
 
 	/**
-	 * the command has been executed, so extract extract the needed information
-	 * from the application context.
+	 * Opens the Maven profile selection Dialog window. 
 	 */
 	public Object execute(ExecutionEvent event) throws ExecutionException {
 		IWorkbenchWindow window = HandlerUtil.getActiveWorkbenchWindowChecked(event);
-		IMavenProjectFacade facade = getSelectedMavenProject(event);
+		final IMavenProjectFacade facade = getSelectedMavenProject(event);
 		if (facade != null) {
 			
-			IProfileManager profileManager = new ProfileManager();
+			final IProfileManager profileManager = MavenCoreActivator.getDefault().getProfileManager();
 			
 			Map<Profile, Boolean> availableProfiles;
 			Map<Profile, Boolean> availableSettingsProfiles;
@@ -52,22 +54,37 @@ public class ProfileSelectionHandler extends AbstractHandler {
 			} catch (CoreException e) {
 				throw new ExecutionException("Unable to open the Maven Profile selection dialog", e);
 			}
-			SelectProfilesDialog dialog = new SelectProfilesDialog(window.getShell(), 
+			final SelectProfilesDialog dialog = new SelectProfilesDialog(window.getShell(), 
 																	facade, 
 																	availableProfiles,
 																	availableSettingsProfiles);
 		    if(dialog.open() == Window.OK) {
-		    	try {
-					profileManager.updateActiveProfiles(facade, dialog.getSelectedProfiles(), 
-							dialog.isOffline(), dialog.isForceUpdate());
-				} catch (CoreException e) {
-					throw new ExecutionException("Unable to update the profiles for "+facade.getProject().getName(), e);
-				}
+				WorkspaceJob job = new WorkspaceJob(Messages.ProfileManager_Updating_maven_profiles) {
+
+					public IStatus runInWorkspace(IProgressMonitor monitor) {
+						try {
+
+							profileManager.updateActiveProfiles(facade, dialog.getSelectedProfiles(), 
+									dialog.isOffline(), dialog.isForceUpdate(), monitor); 
+						} catch (CoreException ex) {
+							Activator.log(ex);
+							return ex.getStatus();
+						}
+						return Status.OK_STATUS;
+					}
+				};
+				job.setRule( MavenPlugin.getProjectConfigurationManager().getRule());
+				job.schedule();
 		    }		
 		}
 	    return null;
 	}
 
+	/**
+	 * Returns an IMavenProjectFacade from the selected IResource, or from the active editor 
+	 * @param event
+	 * @return the selected IMavenProjectFacade
+	 */
 	private IMavenProjectFacade getSelectedMavenProject(ExecutionEvent event) {
 		ISelection selection = HandlerUtil.getCurrentSelection(event);
 		IProject project = getSelectedProject(selection);
@@ -83,7 +100,7 @@ public class ProfileSelectionHandler extends AbstractHandler {
 				return MavenPlugin.getMavenProjectRegistry().getProject(project);
 			}
 		} catch (CoreException e) {
-			e.printStackTrace();
+			Activator.log(e);
 		}
 
 		return null;

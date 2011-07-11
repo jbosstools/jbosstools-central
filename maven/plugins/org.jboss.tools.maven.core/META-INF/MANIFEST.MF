@@ -30,4 +30,5 @@ Bundle-Vendor: %Bundle-Vendor
 Export-Package: org.jboss.tools.maven.core,
  org.jboss.tools.maven.core.internal.project.facet,
  org.jboss.tools.maven.core.libprov,
+ org.jboss.tools.maven.core.profiles,
  org.jboss.tools.maven.core.xpl

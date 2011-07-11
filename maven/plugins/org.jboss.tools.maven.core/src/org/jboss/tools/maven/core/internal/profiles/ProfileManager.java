@@ -1,4 +1,4 @@
-package org.jboss.tools.maven.ui.internal.profiles;
+package org.jboss.tools.maven.core.internal.profiles;
 
 import java.util.Collections;
 import java.util.LinkedHashMap;
@@ -9,24 +9,22 @@ import org.apache.maven.model.Profile;
 import org.apache.maven.settings.Settings;
 import org.apache.maven.settings.SettingsUtils;
 import org.eclipse.core.resources.IProject;
-import org.eclipse.core.resources.WorkspaceJob;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Status;
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.project.IProjectConfigurationManager;
 import org.eclipse.m2e.core.project.MavenUpdateRequest;
 import org.eclipse.m2e.core.project.ResolverConfiguration;
-import org.jboss.tools.maven.ui.Messages;
+import org.jboss.tools.maven.core.profiles.IProfileManager;
 
 public class ProfileManager implements IProfileManager {
 
 	public void updateActiveProfiles(final IMavenProjectFacade mavenProjectFacade, 
 									 final List<String> profiles, 
 									 final boolean isOffline, 
-									 final boolean isForceUpdate) throws CoreException {
+									 final boolean isForceUpdate, 
+									 IProgressMonitor monitor) throws CoreException {
 		
 		final IProjectConfigurationManager configurationManager = MavenPlugin.getProjectConfigurationManager();
 		final ResolverConfiguration configuration =configurationManager
@@ -38,28 +36,15 @@ public class ProfileManager implements IProfileManager {
 			return;
 		}
 		
-		WorkspaceJob job = new WorkspaceJob(Messages.ProfileManager_Updating_maven_profiles) {
+		IProject project = mavenProjectFacade.getProject();
+		
+		configuration.setActiveProfiles(profilesAsString);
+		boolean isSet = configurationManager.setResolverConfiguration(project, configuration);
+		if (isSet) {
+			MavenUpdateRequest request = new MavenUpdateRequest(project, isOffline, isForceUpdate);
+			configurationManager.updateProjectConfiguration(request, monitor);
+		}
 
-			public IStatus runInWorkspace(IProgressMonitor monitor) {
-				try {
-
-					IProject project = mavenProjectFacade.getProject();
-					
-					configuration.setActiveProfiles(profilesAsString);
-					boolean isSet = configurationManager.setResolverConfiguration(project, configuration);
-					if (isSet) {
-						MavenUpdateRequest request = new MavenUpdateRequest(project, isOffline, isForceUpdate);
-						configurationManager.updateProjectConfiguration(request, monitor);
-					}
-
-				} catch (CoreException ex) {
-					return ex.getStatus();
-				}
-				return Status.OK_STATUS;
-			}
-		};
-		job.setRule(configurationManager.getRule());
-		job.schedule();
 	}
 	
 	private String getAsString(List<String> profiles) {
@@ -97,7 +82,6 @@ public class ProfileManager implements IProfileManager {
 											&& !resolverConfiguration.getActiveProfileList().contains(p.getId());
 			projectProfiles.put(p, isAutomaticallyActivated);
 		}
-		System.err.println(projectProfiles);
 		return Collections.unmodifiableMap(projectProfiles);
 	}
 
