@@ -39,13 +39,13 @@ public class ProfileSelectionHandler extends AbstractHandler {
 	public Object execute(ExecutionEvent event) throws ExecutionException {
 		IWorkbenchWindow window = HandlerUtil.getActiveWorkbenchWindowChecked(event);
 		final IMavenProjectFacade facade = getSelectedMavenProject(event);
-		if (facade != null) {
+		if (facade != null ) {
 			
 			final IProfileManager profileManager = MavenCoreActivator.getDefault().getProfileManager();
 			
 			Map<Profile, Boolean> availableProfiles;
 			Map<Profile, Boolean> availableSettingsProfiles;
-			facade.getMavenProject().getActiveProfiles();
+
 			try {
 				availableProfiles = profileManager.getAvailableProfiles(facade);
 			
