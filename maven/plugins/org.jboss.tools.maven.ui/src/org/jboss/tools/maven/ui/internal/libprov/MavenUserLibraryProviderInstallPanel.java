@@ -1,3 +1,13 @@
+/*************************************************************************************
+ * Copyright (c) 2009-2011 Red Hat, Inc. and others.
+ * All rights reserved. This program and the accompanying materials 
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ * 
+ * Contributors:
+ *     JBoss by Red Hat - Initial implementation.
+ ************************************************************************************/
 package org.jboss.tools.maven.ui.internal.libprov;
 
 import java.io.File;
@@ -26,6 +36,11 @@ import org.eclipse.jface.viewers.TableViewerColumn;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jst.common.project.facet.core.libprov.ILibraryProvider;
 import org.eclipse.jst.common.project.facet.ui.libprov.LibraryProviderOperationPanel;
+import org.eclipse.m2e.model.edit.pom.Dependency;
+import org.eclipse.m2e.model.edit.pom.Exclusion;
+import org.eclipse.m2e.model.edit.pom.Model;
+import org.eclipse.m2e.model.edit.pom.PomFactory;
+import org.eclipse.m2e.model.edit.pom.util.PomResourceImpl;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.DisposeEvent;
@@ -43,12 +58,12 @@ import org.eclipse.swt.widgets.Table;
 import org.jboss.tools.maven.core.MavenCoreActivator;
 import org.jboss.tools.maven.core.libprov.MavenLibraryProviderInstallOperationConfig;
 import org.jboss.tools.maven.ui.Messages;
-import org.maven.ide.components.pom.Dependency;
-import org.maven.ide.components.pom.Exclusion;
-import org.maven.ide.components.pom.Model;
-import org.maven.ide.components.pom.PomFactory;
-import org.maven.ide.components.pom.util.PomResourceImpl;
 
+/**
+ * 
+ * @author snjeza
+ *
+ */
 public class MavenUserLibraryProviderInstallPanel extends
 		LibraryProviderOperationPanel {
 

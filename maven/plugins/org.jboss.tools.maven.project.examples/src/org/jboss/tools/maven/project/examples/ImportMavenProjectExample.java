@@ -11,7 +11,6 @@
 
 package org.jboss.tools.maven.project.examples;
 
-import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -26,7 +25,6 @@ import java.util.zip.ZipFile;
 
 import org.apache.maven.model.Model;
 import org.eclipse.core.resources.IProject;
-import org.eclipse.core.resources.IProjectDescription;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.IWorkspaceRoot;
@@ -36,29 +34,22 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
-import org.eclipse.jface.dialogs.Dialog;
-import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.m2e.core.MavenPlugin;
+import org.eclipse.m2e.core.embedder.IMaven;
+import org.eclipse.m2e.core.embedder.MavenModelManager;
+import org.eclipse.m2e.core.project.AbstractProjectScanner;
+import org.eclipse.m2e.core.project.LocalProjectScanner;
+import org.eclipse.m2e.core.project.MavenProjectInfo;
+import org.eclipse.m2e.core.project.ProjectImportConfiguration;
+import org.eclipse.m2e.core.ui.internal.actions.OpenMavenConsoleAction;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.progress.IProgressConstants;
 import org.jboss.tools.project.examples.model.AbstractImportProjectExample;
 import org.jboss.tools.project.examples.model.Project;
-import org.maven.ide.eclipse.MavenPlugin;
-import org.maven.ide.eclipse.actions.OpenMavenConsoleAction;
-import org.maven.ide.eclipse.core.IMavenConstants;
-import org.maven.ide.eclipse.core.MavenConsole;
-import org.maven.ide.eclipse.embedder.IMaven;
-import org.maven.ide.eclipse.embedder.MavenModelManager;
-import org.maven.ide.eclipse.project.AbstractProjectScanner;
-import org.maven.ide.eclipse.project.IMavenProjectImportResult;
-import org.maven.ide.eclipse.project.LocalProjectScanner;
-import org.maven.ide.eclipse.project.MavenProjectInfo;
-import org.maven.ide.eclipse.project.ProjectImportConfiguration;
-import org.maven.ide.eclipse.project.ResolverConfiguration;
 
 /**
  * @author snjeza
@@ -149,7 +140,6 @@ public class ImportMavenProjectExample extends AbstractImportProjectExample {
 			public IStatus runInWorkspace(IProgressMonitor monitor) {
 				setProperty(IProgressConstants.ACTION_PROPERTY,
 						new OpenMavenConsoleAction());
-				MavenPlugin plugin = MavenPlugin.getDefault();
 				try {
 					AbstractProjectScanner<MavenProjectInfo> projectScanner = getProjectScanner(destination);
 					projectScanner.run(monitor);
@@ -186,15 +176,15 @@ public class ImportMavenProjectExample extends AbstractImportProjectExample {
 									// ignore
 								}
 								project.delete(true, true, monitor);
-							}
+							}	
 						} else {
 							return Status.CANCEL_STATUS;
 						}
 					}
-					plugin.getProjectConfigurationManager().importProjects(
+					MavenPlugin.getProjectConfigurationManager().importProjects(
 							infos, importConfiguration, monitor);
 				} catch (CoreException ex) {
-					plugin.getConsole().logError("Projects imported with errors");
+					MavenProjectExamplesActivator.log(ex, "Projects imported with errors");
 					return ex.getStatus();
 				} catch (InterruptedException e) {
 					return Status.CANCEL_STATUS;
@@ -202,8 +192,7 @@ public class ImportMavenProjectExample extends AbstractImportProjectExample {
 				return Status.OK_STATUS;
 			}
 		};
-		job.setRule(MavenPlugin.getDefault().getProjectConfigurationManager()
-				.getRule());
+		job.setRule(MavenPlugin.getProjectConfigurationManager().getRule());
 		job.schedule();
 	}
 
@@ -229,11 +218,9 @@ public class ImportMavenProjectExample extends AbstractImportProjectExample {
 			File folder) {
 		File root = ResourcesPlugin.getWorkspace().getRoot().getLocation()
 				.toFile();
-		MavenPlugin mavenPlugin = MavenPlugin.getDefault();
-		MavenModelManager modelManager = mavenPlugin.getMavenModelManager();
-		MavenConsole console = mavenPlugin.getConsole();
+		MavenModelManager modelManager = MavenPlugin.getMavenModelManager();
 		return new LocalProjectScanner(root, folder.getAbsolutePath(), false,
-				modelManager, console);
+				modelManager);
 	}
 	
 	private static Shell getActiveShell() {

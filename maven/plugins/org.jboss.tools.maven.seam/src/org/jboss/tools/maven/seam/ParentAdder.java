@@ -1,10 +1,25 @@
+/*************************************************************************************
+ * Copyright (c) 2008-2011 Red Hat, Inc. and others.
+ * All rights reserved. This program and the accompanying materials 
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ * 
+ * Contributors:
+ *     JBoss by Red Hat - Initial implementation.
+ ************************************************************************************/
 package org.jboss.tools.maven.seam;
 
-import org.maven.ide.components.pom.Model;
-import org.maven.ide.components.pom.Parent;
-import org.maven.ide.components.pom.PomFactory;
-import org.maven.ide.eclipse.embedder.ProjectUpdater;
+import org.eclipse.m2e.model.edit.pom.Model;
+import org.eclipse.m2e.model.edit.pom.Parent;
+import org.eclipse.m2e.model.edit.pom.PomFactory;
+import org.jboss.tools.maven.core.xpl.ProjectUpdater;
 
+/**
+ * 
+ * @author snjeza
+ *
+ */
 public class ParentAdder extends ProjectUpdater {
 
 	private static final PomFactory POM_FACTORY = PomFactory.eINSTANCE;

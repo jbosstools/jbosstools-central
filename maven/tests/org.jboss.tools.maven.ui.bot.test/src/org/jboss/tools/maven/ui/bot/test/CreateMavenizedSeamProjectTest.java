@@ -21,7 +21,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
-import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
@@ -34,6 +33,7 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.datatools.connectivity.ConnectionProfileConstants;
 import org.eclipse.datatools.connectivity.ConnectionProfileException;
 import org.eclipse.datatools.connectivity.ProfileManager;
@@ -45,12 +45,14 @@ import org.eclipse.datatools.connectivity.drivers.IDriverMgmtConstants;
 import org.eclipse.datatools.connectivity.drivers.IPropertySet;
 import org.eclipse.datatools.connectivity.drivers.PropertySetImpl;
 import org.eclipse.datatools.connectivity.drivers.models.TemplateDescriptor;
+import org.eclipse.m2e.core.internal.IMavenConstants;
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotEditor;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
-import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotViewMenu;
 import org.eclipse.swtbot.swt.finder.SWTBot;
 import org.eclipse.swtbot.swt.finder.exceptions.WidgetNotFoundException;
 import org.eclipse.swtbot.swt.finder.finders.UIThreadRunnable;
@@ -59,6 +61,7 @@ import org.eclipse.swtbot.swt.finder.results.Result;
 import org.eclipse.swtbot.swt.finder.results.VoidResult;
 import org.eclipse.swtbot.swt.finder.utils.SWTBotPreferences;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotMenu;
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotRadio;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
@@ -85,7 +88,6 @@ import org.eclipse.wst.validation.ValidationFramework;
 import org.jboss.tools.seam.core.project.facet.SeamRuntime;
 import org.jboss.tools.seam.core.project.facet.SeamRuntimeManager;
 import org.jboss.tools.seam.core.project.facet.SeamVersion;
-import org.jboss.tools.test.util.JobUtils;
 import org.jboss.tools.test.util.ResourcesUtils;
 import org.junit.After;
 import org.junit.AfterClass;
@@ -93,12 +95,6 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.maven.ide.components.pom.Model;
-import org.maven.ide.components.pom.Parent;
-import org.maven.ide.components.pom.util.PomResourceImpl;
-import org.maven.ide.eclipse.MavenPlugin;
-import org.maven.ide.eclipse.core.IMavenConstants;
-import org.maven.ide.eclipse.embedder.MavenModelManager;
 
 /**
  * @author Snjeza
@@ -107,7 +103,7 @@ import org.maven.ide.eclipse.embedder.MavenModelManager;
 @RunWith(SWTBotJunit4ClassRunner.class)
 public class CreateMavenizedSeamProjectTest {
 	
-	protected static final int IDLE_TIME = 60000;
+	protected static final long IDLE_TIME = 20 * 60 * 1000L;
 
 	private static final String CONNECTION_PROFILE_NAME = "DefaultDS";
 
@@ -181,10 +177,11 @@ public class CreateMavenizedSeamProjectTest {
 		
 		String runtimeType = JBOSS_AS_RUNTIME_ID;
 		String serverType = JBOSS_AS_SERVER_ID;
-		
+		System.out.println("Creating a server from "+asLocation);
 		createJBossServer(new File(asLocation), serverType, runtimeType, JBOSS_AS_SERVER_NAME, JBOSS_AS_RUNTIME_NAME);
 		
 		String seamPath = SEAM_HOME_PROPERTY;
+		System.out.println("Using seam from "+seamPath);
 		createSeamRuntime(SEAM_RUNTIME_NAME, seamPath, SeamVersion.SEAM_2_2);
 		
 		createDriver(asLocation, HSQLDB_DRIVER_LOCATION);
@@ -201,7 +198,7 @@ public class CreateMavenizedSeamProjectTest {
 		SWTBotPreferences.KEYBOARD_LAYOUT = "EN_US";
 		SWTBotPreferences.TIMEOUT = 1000;
 		SWTBotPreferences.PLAYBACK_DELAY = 5;
-		JobUtils.waitForIdle(60000);
+		waitForIdle();
 		try {
 			SWTBotView view = bot.viewByTitle("Welcome");
 			if (view != null) {
@@ -259,10 +256,10 @@ public class CreateMavenizedSeamProjectTest {
 		wc.modifyModules(new IModule[] {} , modules, monitor);
 		wc.save(true, monitor);
 		server.publish(IServer.PUBLISH_INCREMENTAL, monitor);
-		JobUtils.waitForIdle(IDLE_TIME);
+		waitForIdle();
 		server.getRuntime().delete();
 		server.delete();
-		JobUtils.waitForIdle(IDLE_TIME);
+		waitForIdle();
 	}
 
 	protected static void switchPerspective(final String pid) {
@@ -310,7 +307,7 @@ public class CreateMavenizedSeamProjectTest {
 			ResourcesUtils.setBuildAutomatically(buildAutomatically);
 			ValidationFramework.getDefault().suspendAllValidation(false);
 		}
-		JobUtils.waitForIdle(IDLE_TIME);
+		waitForIdle();
 	}
 	
 	protected static void createJBossServer(File asLocation, String serverType, String runtimeType, String name, String runtimeName) throws CoreException {
@@ -457,7 +454,7 @@ public class CreateMavenizedSeamProjectTest {
 	}
 	
 	public static void createNewSeamWebProjectWizard(String projectName, String deployType) throws Exception {
-		JobUtils.waitForIdle(60000);
+		waitForIdle();
 		bot.menu("File").menu("New").menu("Seam Web Project").click();
 		 
 		SWTBotShell mainShell = bot.shell("New Seam Project");
@@ -488,13 +485,44 @@ public class CreateMavenizedSeamProjectTest {
 		bot.button("Next >").click();
 		
 		bot.comboBox(0).setSelection(SEAM_RUNTIME_NAME);
-		bot.radio(deployType).click();
+		String otherType = DEPLOY_TYPE_EAR;
+		if (DEPLOY_TYPE_EAR.equals(deployType)) {
+			otherType = DEPLOY_TYPE_WAR;
+		}
+		final SWTBotRadio radio = bot.radio(deployType);
+		final SWTBotRadio otherRadio = bot.radio(otherType);
+		radio.click();
+		Display.getDefault().syncExec(new Runnable() {
+
+			public void run() {
+				radio.widget.setSelection(true);
+				otherRadio.widget.setSelection(false);
+				Event event = new Event();
+				event.time = (int) System.currentTimeMillis();
+				event.widget = radio.widget;
+				event.display = Display.getCurrent();
+				radio.widget.notifyListeners(SWT.Selection, event);
+			}
+		});
+			
 		bot.comboBox(1).setSelection("HSQL");
 		bot.comboBox(2).setSelection(CONNECTION_PROFILE_NAME);
 		bot.button("Finish").click();
 		
-		JobUtils.waitForIdle(60000);
+		waitForIdle();
 		
+	}
+	
+	@Test
+	public void testAsLocation() {
+		String asLocation = JBOSS_AS_HOME;
+		assertTrue("Invalid JBoss AS location:" + asLocation, new File(asLocation).isDirectory());
+	}
+	
+	@Test
+	public void testSeamLocation() {
+		String seamLocation = SEAM_HOME_PROPERTY;
+		assertTrue("Invalid Seam Runtime location:" + seamLocation, new File(seamLocation).isDirectory());
 	}
 	
 	@Test
@@ -518,7 +546,9 @@ public class CreateMavenizedSeamProjectTest {
 		for (int i = 0; i < projectMarkers.length; i++) {
 			if (projectMarkers[i].getAttribute(IMarker.SEVERITY,
 					IMarker.SEVERITY_ERROR) == IMarker.SEVERITY_ERROR) {
-				markers.add(projectMarkers[i]);
+				if (!"org.eclipse.m2e.core.maven2Problem.lifecycleMapping".equals(projectMarkers[i].getType())) {
+						markers.add(projectMarkers[i]);
+				}
 			}
 		}
 		assertTrue("The '" + projectName + "' contains errors.", markers.size() == 0);
@@ -552,7 +582,7 @@ public class CreateMavenizedSeamProjectTest {
 		warProjectItem.select();
 		
 		SWTBotMenu runAs = tree.contextMenu("Run As");
-		runAs.menu("6 Maven build...").click();
+		runAs.menu("5 Maven build...").click();
 
 		SWTBotShell shell = bot.shell("Edit Configuration");
 		shell.activate();
@@ -560,7 +590,7 @@ public class CreateMavenizedSeamProjectTest {
 		bot.textWithLabel("Goals:").setText("clean package");
 		bot.button("Run").click();
 		
-		JobUtils.waitForIdle(IDLE_TIME);
+		waitForIdle();
 		
 		IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject(PROJECT_NAME_WAR);
 		project.refreshLocal(IResource.DEPTH_INFINITE, new NullProgressMonitor());
@@ -569,6 +599,46 @@ public class CreateMavenizedSeamProjectTest {
 		assertFalse(project.getFolder(webInfPath.append("dev")).exists());
 		assertTrue(project.getFolder(webInfPath.append("lib")).exists());
 		
+	}
+	
+	private static void waitForIdle() {
+		long start = System.currentTimeMillis();
+		int delay = 50;
+		while (!Job.getJobManager().isIdle()) {
+			delay(delay);
+			if ((System.currentTimeMillis() - start) > IDLE_TIME) {
+				Job[] jobs = Job.getJobManager().find(null);
+				StringBuffer str = new StringBuffer();
+				for (Job job : jobs) {
+					if (job.getThread() != null) {
+						str.append("\n").append(job.getName()).append(" (")
+								.append(job.getClass()).append(")");
+					}
+				}
+				throw new RuntimeException(
+						"Long running tasks detected:" + str.toString()); //$NON-NLS-1$
+			}
+		}
+	}
+
+	public static void delay(long waitTimeMillis) {
+		Display display = Display.getCurrent();
+		if (display != null) {
+			long endTimeMillis = System.currentTimeMillis() + waitTimeMillis;
+			while (System.currentTimeMillis() < endTimeMillis) {
+				if (!display.readAndDispatch())
+					display.sleep();
+			}
+			display.update();
+		}
+		// Otherwise, perform a simple sleep.
+		else {
+			try {
+				Thread.sleep(waitTimeMillis);
+			} catch (InterruptedException e) {
+				// Ignored.
+			}
+		}
 	}
 	
 	// see https://jira.jboss.org/browse/JBIDE-6767

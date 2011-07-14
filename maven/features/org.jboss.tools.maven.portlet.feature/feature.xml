@@ -2,7 +2,7 @@
 <feature
       id="org.jboss.tools.maven.portlet.feature"
       label="%featureName"
-      version="1.0.0.qualifier"
+      version="1.2.0.qualifier"
       provider-name="%providerName"
       plugin="org.jboss.tools.maven.portlet">
 
@@ -19,8 +19,8 @@
    </license>
 
    <requires>
-      <import feature="org.maven.ide.eclipse.feature" version="0.10.0" match="greaterOrEqual"/>
-      <import feature="org.maven.ide.eclipse.wtp.feature" version="0.10.0" match="greaterOrEqual"/>
+      <import feature="org.eclipse.m2e.feature" version="1.0" match="greaterOrEqual"/>
+      <import feature="org.maven.ide.eclipse.wtp.feature" version="0.13.0" match="greaterOrEqual"/>
    </requires>
 
    <plugin

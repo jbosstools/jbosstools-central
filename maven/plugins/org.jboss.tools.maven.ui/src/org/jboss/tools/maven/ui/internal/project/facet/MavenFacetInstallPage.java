@@ -1,9 +1,14 @@
+/*************************************************************************************
+ * Copyright (c) 2009-2011 Red Hat, Inc. and others.
+ * All rights reserved. This program and the accompanying materials 
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ * 
+ * Contributors:
+ *     JBoss by Red Hat - Initial implementation.
+ ************************************************************************************/
 package org.jboss.tools.maven.ui.internal.project.facet;
-
-import java.util.Map;
-import java.util.SortedSet;
-
-import javax.swing.JButton;
 
 import org.apache.maven.model.Model;
 import org.eclipse.core.resources.IFile;
@@ -12,6 +17,9 @@ import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jst.j2ee.project.facet.IJ2EEFacetConstants;
 import org.eclipse.jst.j2ee.web.project.facet.WebFacetUtils;
+import org.eclipse.m2e.core.MavenPlugin;
+import org.eclipse.m2e.core.embedder.MavenModelManager;
+import org.eclipse.m2e.core.internal.IMavenConstants;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -37,10 +45,12 @@ import org.eclipse.wst.common.project.facet.ui.IWizardContext;
 import org.jboss.tools.maven.core.IJBossMavenConstants;
 import org.jboss.tools.maven.ui.Activator;
 import org.jboss.tools.maven.ui.Messages;
-import org.maven.ide.eclipse.MavenPlugin;
-import org.maven.ide.eclipse.core.IMavenConstants;
-import org.maven.ide.eclipse.embedder.MavenModelManager;
 
+/**
+ * 
+ * @author snjeza
+ *
+ */
 public class MavenFacetInstallPage extends DataModelWizardPage implements
 IFacetWizardPage {
 
@@ -151,7 +161,7 @@ IFacetWizardPage {
 				} else if ("2.1".equals(seamFacetVersion.getVersionString())) { //$NON-NLS-1$ 
 					seamVersion.setText("2.1.1.GA"); //$NON-NLS-1$
 				} else if ("2.2".equals(seamFacetVersion.getVersionString())) { //$NON-NLS-1$
-					seamVersion.setText("2.2.0.GA"); //$NON-NLS-1$
+					seamVersion.setText("2.2.1.Final"); //$NON-NLS-1$
 				}
 				Button removeWTPContainers = new Button(composite,SWT.CHECK);
 				removeWTPContainers.setText(Messages.MavenFacetInstallPage_Remove_WTP_Classpath_containers);

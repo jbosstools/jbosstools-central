@@ -1,3 +1,13 @@
+/*************************************************************************************
+ * Copyright (c) 2008-2011 Red Hat, Inc. and others.
+ * All rights reserved. This program and the accompanying materials 
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ * 
+ * Contributors:
+ *     JBoss by Red Hat - Initial implementation.
+ ************************************************************************************/
 package org.jboss.tools.maven.seam;
 
 import java.io.File;
@@ -5,11 +15,12 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.Properties;
 
+import org.apache.maven.artifact.Artifact;
 import org.apache.maven.model.Build;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Exclusion;
@@ -26,14 +37,24 @@ import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
-import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.emf.common.util.EList;
-import org.eclipse.emf.ecore.xmi.XMIResource;
 import org.eclipse.jdt.core.IClasspathEntry;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.JavaModelException;
+import org.eclipse.m2e.core.MavenPlugin;
+import org.eclipse.m2e.core.embedder.MavenModelManager;
+import org.eclipse.m2e.core.internal.IMavenConstants;
+import org.eclipse.m2e.core.internal.MavenPluginActivator;
+import org.eclipse.m2e.core.internal.project.ResolverConfigurationIO;
+import org.eclipse.m2e.core.internal.project.registry.MavenProjectManager;
+import org.eclipse.m2e.core.project.ResolverConfiguration;
+import org.eclipse.m2e.model.edit.pom.Configuration;
+import org.eclipse.m2e.model.edit.pom.Plugin;
+import org.eclipse.m2e.model.edit.pom.PluginExecution;
+import org.eclipse.m2e.model.edit.pom.PomFactory;
+import org.eclipse.m2e.model.edit.pom.util.PomResourceImpl;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.eclipse.wst.common.componentcore.ComponentCore;
@@ -46,26 +67,15 @@ import org.eclipse.wst.common.project.facet.core.IFacetedProject;
 import org.eclipse.wst.common.project.facet.core.ProjectFacetsManager;
 import org.jboss.tools.maven.core.IJBossMavenConstants;
 import org.jboss.tools.maven.core.MavenCoreActivator;
+import org.jboss.tools.maven.core.xpl.ProjectUpdater;
 import org.jboss.tools.seam.core.SeamUtil;
 import org.jboss.tools.seam.core.project.facet.SeamRuntime;
 import org.jboss.tools.seam.core.project.facet.SeamRuntimeManager;
 import org.jboss.tools.seam.core.project.facet.SeamVersion;
 import org.jboss.tools.seam.internal.core.project.facet.ISeamFacetDataModelProperties;
 import org.jboss.tools.seam.internal.core.project.facet.SeamFacetAbstractInstallDelegate;
-import org.maven.ide.components.pom.Configuration;
-import org.maven.ide.components.pom.Plugin;
-import org.maven.ide.components.pom.PluginExecution;
-import org.maven.ide.components.pom.PomFactory;
-import org.maven.ide.components.pom.util.PomResourceImpl;
-import org.maven.ide.eclipse.MavenPlugin;
-import org.maven.ide.eclipse.core.IMavenConstants;
-import org.maven.ide.eclipse.embedder.MavenModelManager;
-import org.maven.ide.eclipse.embedder.ProjectUpdater;
-import org.maven.ide.eclipse.project.MavenProjectManager;
-import org.maven.ide.eclipse.project.ResolverConfiguration;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
-import org.osgi.framework.Version;
 import org.w3c.dom.Node;
 
 /**
@@ -188,7 +198,7 @@ public class MavenSeamActivator extends AbstractUIPlugin {
 			parent.setRelativePath("../" + parentProjectName); //$NON-NLS-1$
 			model.setParent(parent);
 			
-			List dependencies = model.getDependencies();
+			List<Dependency> dependencies = model.getDependencies();
 			
 			Dependency dependency = new Dependency();
 			dependency.setGroupId("org.jboss.seam.embedded"); //$NON-NLS-1$
@@ -285,9 +295,6 @@ public class MavenSeamActivator extends AbstractUIPlugin {
 				//build.setFinalName(testProjectName);
 				String sourceDirectory = MavenCoreActivator.getSourceDirectory(javaProject);
 				if (sourceDirectory != null) {
-					if (isM2eclipse010()) {
-						build.setSourceDirectory(sourceDirectory);
-					}
 					build.setTestSourceDirectory(sourceDirectory);
 				}		
 				String outputDirectory = MavenCoreActivator.getOutputDirectory(javaProject);	
@@ -324,17 +331,6 @@ public class MavenSeamActivator extends AbstractUIPlugin {
 		
 	}
 
-	/**
-	 * @return
-	 */
-	private boolean isM2eclipse010() {
-		Bundle bundle = Platform.getBundle("org.maven.ide.eclipse"); //$NON-NLS-1$
-		if (bundle != null && bundle.getVersion().toString().startsWith("0.10")) { //$NON-NLS-1$
-			return true;
-		}
-		return false;
-	}
-
 	private void configureEarProject(IDataModel m2FacetModel,
 			IDataModel seamFacetModel) {
 		IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject(earProjectName);
@@ -360,7 +356,7 @@ public class MavenSeamActivator extends AbstractUIPlugin {
 			parent.setRelativePath("../" + parentProjectName); //$NON-NLS-1$
 			model.setParent(parent);
 			
-			List dependencies = model.getDependencies();
+			List<Dependency> dependencies = model.getDependencies();
 			
 			Dependency dependency = new Dependency();
 			dependency.setGroupId(m2FacetModel.getStringProperty(IJBossMavenConstants.GROUP_ID));
@@ -382,7 +378,7 @@ public class MavenSeamActivator extends AbstractUIPlugin {
 			dependency.setVersion("${seam.version}"); //$NON-NLS-1$
 			dependency.setType("ejb"); //$NON-NLS-1$
 			dependency.setScope("compile"); //$NON-NLS-1$
-			List exclusions = dependency.getExclusions();
+			List<Exclusion> exclusions = dependency.getExclusions();
 			Exclusion exclusion = new Exclusion();
 			exclusion.setGroupId("javassist"); //$NON-NLS-1$
 			exclusion.setArtifactId("javassist"); //$NON-NLS-1$
@@ -567,12 +563,33 @@ public class MavenSeamActivator extends AbstractUIPlugin {
 		
 	}
 
+	public void updateProject(IFile pomFile, ProjectUpdater updater) {
+		File pom = pomFile.getLocation().toFile();
+		PomResourceImpl resource = null;
+		try {
+			resource = MavenCoreActivator.loadResource(pomFile);
+			updater.update(resource.getModel());
+			resource.save(Collections.EMPTY_MAP);
+		} catch (Exception ex) {
+			String msg = "Unable to update " + pom;
+			log(ex, msg);
+		} finally {
+			if (resource != null) {
+				resource.unload();
+			}
+		}
+	}
+	
+	public void addDependency(IFile pomFile,
+			org.apache.maven.model.Dependency dependency) {
+		updateProject(pomFile, new DependencyAdder(dependency));
+	}
+	
 	private void configureWarProject(IDataModel m2FacetModel,IDataModel seamFacetModel) {
 		try {
 			IProject webProject = ResourcesPlugin.getWorkspace().getRoot().getProject(webProjectName);
 			
 			IFile pomFile = webProject.getFile(IMavenConstants.POM_FILE_NAME);
-			MavenModelManager modelManager = MavenPlugin.getDefault().getMavenModelManager();
 			
 			String artifactId = parentProjectName;
 			String groupId = m2FacetModel.getStringProperty(IJBossMavenConstants.GROUP_ID);
@@ -580,26 +597,26 @@ public class MavenSeamActivator extends AbstractUIPlugin {
 			
 			String relativePath = "../" + parentProjectName; //$NON-NLS-1$
 			ParentAdder parentAdder = new ParentAdder(groupId, artifactId, version, relativePath);
-			modelManager.updateProject(pomFile, parentAdder);
+			updateProject(pomFile, parentAdder);
 			
 			Dependency dependency = getHibernateValidator();
 			//dependency.setScope("provided");
-			modelManager.addDependency(pomFile,dependency);
+			addDependency(pomFile,dependency);
 			
 			dependency = getHibernateAnnotations();
-			modelManager.addDependency(pomFile,dependency);
+			addDependency(pomFile,dependency);
 			
 			dependency = new Dependency();
 			dependency.setGroupId("org.hibernate"); //$NON-NLS-1$
 			dependency.setArtifactId("hibernate-entitymanager"); //$NON-NLS-1$
-			modelManager.addDependency(pomFile,dependency);
+			addDependency(pomFile,dependency);
 			
 			dependency = getSeamDependency();
 			if (!SeamFacetAbstractInstallDelegate
 					.isWarConfiguration(seamFacetModel)) {
 				dependency.setScope("provided"); //$NON-NLS-1$
 			}
-			modelManager.addDependency(pomFile,dependency);
+			addDependency(pomFile,dependency);
 			
 			dependency = new Dependency();
 			dependency.setGroupId("org.jboss.seam"); //$NON-NLS-1$
@@ -609,7 +626,7 @@ public class MavenSeamActivator extends AbstractUIPlugin {
 			exclusion.setGroupId("org.jboss.seam"); //$NON-NLS-1$
 			exclusion.setArtifactId("jboss-seam"); //$NON-NLS-1$
 			exclusions.add(exclusion);
-			modelManager.addDependency(pomFile,dependency);
+			addDependency(pomFile,dependency);
 			
 			dependency = new Dependency();
 			dependency.setGroupId("org.jboss.seam"); //$NON-NLS-1$
@@ -619,7 +636,7 @@ public class MavenSeamActivator extends AbstractUIPlugin {
 			exclusion.setGroupId("org.jboss.seam"); //$NON-NLS-1$
 			exclusion.setArtifactId("jboss-seam"); //$NON-NLS-1$
 			exclusions.add(exclusion);
-			modelManager.addDependency(pomFile,dependency);
+			addDependency(pomFile,dependency);
 			
 			dependency = new Dependency();
 			dependency.setGroupId("org.jboss.seam"); //$NON-NLS-1$
@@ -627,68 +644,68 @@ public class MavenSeamActivator extends AbstractUIPlugin {
 			// FIXME
 			dependency.setVersion("${seam.version}"); //$NON-NLS-1$
 			
-			modelManager.addDependency(pomFile,dependency);
+			addDependency(pomFile,dependency);
 			
 			dependency = new Dependency();
 			dependency.setGroupId("org.jboss.seam"); //$NON-NLS-1$
 			dependency.setArtifactId("jboss-seam-mail"); //$NON-NLS-1$
 			
-			modelManager.addDependency(pomFile,dependency);
+			addDependency(pomFile,dependency);
 			
 			dependency = new Dependency();
 			dependency.setGroupId("org.jboss.seam"); //$NON-NLS-1$
 			dependency.setArtifactId("jboss-seam-pdf"); //$NON-NLS-1$
 			
-			modelManager.addDependency(pomFile,dependency);
+			addDependency(pomFile,dependency);
 			
 			dependency = new Dependency();
 			dependency.setGroupId("org.jboss.seam"); //$NON-NLS-1$
 			dependency.setArtifactId("jboss-seam-remoting"); //$NON-NLS-1$
 			
-			modelManager.addDependency(pomFile,dependency);
+			addDependency(pomFile,dependency);
 			
 			if (FacetedProjectFramework.hasProjectFacet(webProject, ISeamFacetDataModelProperties.SEAM_FACET_ID, ISeamFacetDataModelProperties.SEAM_FACET_VERSION_21)) {
 				dependency = new Dependency();
 				dependency.setGroupId("org.jboss.seam"); //$NON-NLS-1$
 				dependency.setArtifactId("jboss-seam-excel"); //$NON-NLS-1$
 				
-				modelManager.addDependency(pomFile,dependency);
+				addDependency(pomFile,dependency);
 			}
 			
 			dependency = new Dependency();
 			dependency.setGroupId("javax.servlet"); //$NON-NLS-1$
 			dependency.setArtifactId("servlet-api"); //$NON-NLS-1$
-			modelManager.addDependency(pomFile,dependency);
+			addDependency(pomFile,dependency);
 			
 			dependency = new Dependency();
 			dependency.setGroupId("org.richfaces.ui"); //$NON-NLS-1$
 			dependency.setArtifactId("richfaces-ui"); //$NON-NLS-1$
-			modelManager.addDependency(pomFile,dependency);
+			addDependency(pomFile,dependency);
 			
 			dependency = getRichFacesApi();
 			if (!SeamFacetAbstractInstallDelegate
 					.isWarConfiguration(seamFacetModel)) {
 				dependency.setScope("provided"); //$NON-NLS-1$
 			}
-			modelManager.addDependency(pomFile,dependency);
+			addDependency(pomFile,dependency);
 			
 			dependency = new Dependency();
 			dependency.setGroupId("org.richfaces.framework"); //$NON-NLS-1$
 			dependency.setArtifactId("richfaces-impl"); //$NON-NLS-1$
-			modelManager.addDependency(pomFile,dependency);
+			addDependency(pomFile,dependency);
 			
 			dependency = getJSFApi();
-			modelManager.addDependency(pomFile,dependency);
+			addDependency(pomFile,dependency);
 			
 			dependency = new Dependency();
 			dependency.setGroupId("javax.faces"); //$NON-NLS-1$
 			dependency.setArtifactId("jsf-impl"); //$NON-NLS-1$
-			modelManager.addDependency(pomFile,dependency);
+			addDependency(pomFile,dependency);
 			
 			dependency = new Dependency();
 			dependency.setGroupId("javax.el"); //$NON-NLS-1$
 			dependency.setArtifactId("el-api"); //$NON-NLS-1$
-			modelManager.addDependency(pomFile,dependency);
+			addDependency(pomFile,dependency);
 			
 			if (SeamFacetAbstractInstallDelegate
 					.isWarConfiguration(seamFacetModel)) {
@@ -697,20 +714,20 @@ public class MavenSeamActivator extends AbstractUIPlugin {
 				dependency.setArtifactId("drools-compiler"); //$NON-NLS-1$
 				dependency.setType("jar"); //$NON-NLS-1$
 				dependency.setScope("compile"); //$NON-NLS-1$
-				modelManager.addDependency(pomFile,dependency);
+				addDependency(pomFile,dependency);
 				
 				dependency = new Dependency();
 				dependency.setGroupId("org.jbpm"); //$NON-NLS-1$
 				dependency.setArtifactId("jbpm-jpdl"); //$NON-NLS-1$
 				dependency.setType("jar"); //$NON-NLS-1$
 				dependency.setScope("compile"); //$NON-NLS-1$
-				modelManager.addDependency(pomFile,dependency);
+				addDependency(pomFile,dependency);
 				
 				dependency = new Dependency();
 				dependency.setGroupId("commons-digester"); //$NON-NLS-1$
 				dependency.setArtifactId("commons-digester"); //$NON-NLS-1$
-				modelManager.addDependency(pomFile,dependency);
-				modelManager.updateProject(pomFile, new WarProjectUpdater(webProject));
+				addDependency(pomFile,dependency);
+				updateProject(pomFile, new WarProjectUpdater(webProject));
 			}
 			
 			// ejb project
@@ -723,10 +740,10 @@ public class MavenSeamActivator extends AbstractUIPlugin {
 				dependency.setVersion(m2FacetModel.getStringProperty(IJBossMavenConstants.VERSION));
 				dependency.setType("ejb"); //$NON-NLS-1$
 				dependency.setScope("provided"); //$NON-NLS-1$
-				modelManager.addDependency(pomFile,dependency);
+				addDependency(pomFile,dependency);
 			}
 			
-			modelManager.updateProject(pomFile, new WarProjectUpdater(webProject));
+			updateProject(pomFile, new WarProjectUpdater(webProject));
 			removeWTPContainers(m2FacetModel, webProject);
 		} catch (Exception e) {
 			MavenSeamActivator.log(e);
@@ -743,7 +760,7 @@ public class MavenSeamActivator extends AbstractUIPlugin {
 		return webContentRoot;
 	}
 
-	private static Plugin getPlugin(org.maven.ide.components.pom.Build build,
+	private static Plugin getPlugin(org.eclipse.m2e.model.edit.pom.Build build,
 			String groupId, String artifactId) {
 		EList<Plugin> plugins = build.getPlugins();
 		for (Plugin plugin : plugins) {
@@ -946,11 +963,11 @@ public class MavenSeamActivator extends AbstractUIPlugin {
 			location = location.append(parentProjectName);
 			MavenCoreActivator.createMavenProject(parentProjectName, null, model, false, location);
 			// disable workspace resolution
-			MavenProjectManager projectManager = MavenPlugin.getDefault().getMavenProjectManager();
+			MavenProjectManager projectManager = MavenPluginActivator.getDefault().getMavenProjectManager();
 		    IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject(parentProjectName);
-		    ResolverConfiguration configuration = projectManager.getResolverConfiguration(project);
+		    ResolverConfiguration configuration = ResolverConfigurationIO.readResolverConfiguration(project);
 		    configuration.setResolveWorkspaceProjects(false);
-		    projectManager.setResolverConfiguration(project, configuration);
+		    ResolverConfigurationIO.saveResolverConfiguration(project, configuration);
 		} catch (Exception e) {
 			log(e);
 		} finally {
@@ -982,6 +999,11 @@ public class MavenSeamActivator extends AbstractUIPlugin {
 		getDefault().getLog().log(status);
 	}
 	
+	public static void log(Throwable e, String message) {
+		IStatus status = new Status(IStatus.ERROR, PLUGIN_ID, message, e);
+		getDefault().getLog().log(status);
+	}
+	
 	public static void log(String message) {
 		IStatus status = new Status(IStatus.WARNING, PLUGIN_ID, message, null);
 		getDefault().getLog().log(status);
@@ -997,10 +1019,9 @@ public class MavenSeamActivator extends AbstractUIPlugin {
 			webProject = project;
 		}
 
-		public void update(org.maven.ide.components.pom.Model projectModel) {
-			org.maven.ide.components.pom.Build build = projectModel.getBuild();
+		public void update(org.eclipse.m2e.model.edit.pom.Model projectModel) {
+			org.eclipse.m2e.model.edit.pom.Build build = projectModel.getBuild();
 			if (build == null) {
-				// FIXME
 				return;
 			}
 			IJavaProject javaProject = JavaCore.create(webProject);
@@ -1065,10 +1086,10 @@ public class MavenSeamActivator extends AbstractUIPlugin {
 				build.setOutputDirectory(value);
 			}
 			
-			EList<org.maven.ide.components.pom.Resource> resources = build.getResources();
+			EList<org.eclipse.m2e.model.edit.pom.Resource> resources = build.getResources();
 			resources.clear();
 			for (IPath source:sources) {
-				org.maven.ide.components.pom.Resource resource = PomFactory.eINSTANCE.createResource();
+				org.eclipse.m2e.model.edit.pom.Resource resource = PomFactory.eINSTANCE.createResource();
 				String value = source.makeRelativeTo(javaProject.getPath()).toString();
 				if (value.startsWith(MavenCoreActivator.SEPARATOR)) {
 					value = MavenCoreActivator.BASEDIR + value;
@@ -1151,4 +1172,171 @@ public class MavenSeamActivator extends AbstractUIPlugin {
 			}
 		}
 	}
+	
+	
+	public static class DependencyAdder extends ProjectUpdater {
+
+		private final org.apache.maven.model.Dependency dependency;
+
+		public DependencyAdder(org.apache.maven.model.Dependency dependency) {
+			this.dependency = dependency;
+		}
+
+		public void update(org.eclipse.m2e.model.edit.pom.Model model) {
+			org.eclipse.m2e.model.edit.pom.Dependency dependency = PomFactory.eINSTANCE
+					.createDependency();
+
+			dependency.setGroupId(this.dependency.getGroupId());
+			dependency.setArtifactId(this.dependency.getArtifactId());
+
+			if (this.dependency.getVersion() != null) {
+				dependency.setVersion(this.dependency.getVersion());
+			}
+
+			if (this.dependency.getClassifier() != null) {
+				dependency.setClassifier(this.dependency.getClassifier());
+			}
+
+			if (this.dependency.getType() != null //
+					&& !"jar".equals(this.dependency.getType()) //
+					&& !"null".equals(this.dependency.getType())) { // guard
+																	// against
+																	// MNGECLIPSE-622
+				dependency.setType(this.dependency.getType());
+			}
+
+			if (this.dependency.getScope() != null
+					&& !"compile".equals(this.dependency.getScope())) {
+				dependency.setScope(this.dependency.getScope());
+			}
+
+			if (this.dependency.getSystemPath() != null) {
+				dependency.setSystemPath(this.dependency.getSystemPath());
+			}
+
+			if (this.dependency.isOptional()) {
+				dependency.setOptional("true");
+			}
+
+			if (!this.dependency.getExclusions().isEmpty()) {
+
+				Iterator<org.apache.maven.model.Exclusion> it = this.dependency
+						.getExclusions().iterator();
+				while (it.hasNext()) {
+					Exclusion e = it.next();
+					org.eclipse.m2e.model.edit.pom.Exclusion exclusion = PomFactory.eINSTANCE
+							.createExclusion();
+					exclusion.setGroupId(e.getGroupId());
+					exclusion.setArtifactId(e.getArtifactId());
+					dependency.getExclusions().add(exclusion);
+				}
+			}
+
+			// search for dependency with same GAC and remove if found
+			Iterator<org.eclipse.m2e.model.edit.pom.Dependency> it = model
+					.getDependencies().iterator();
+			boolean mergeScope = false;
+			String oldScope = Artifact.SCOPE_COMPILE;
+			while (it.hasNext()) {
+				org.eclipse.m2e.model.edit.pom.Dependency dep = it.next();
+				if (dep.getGroupId().equals(dependency.getGroupId())
+						&& dep.getArtifactId().equals(
+								dependency.getArtifactId())
+						&& compareNulls(dep.getClassifier(),
+								dependency.getClassifier())) {
+					oldScope = dep.getScope();
+					it.remove();
+					mergeScope = true;
+				}
+			}
+
+			if (mergeScope) {
+				// merge scopes
+				if (oldScope == null) {
+					oldScope = Artifact.SCOPE_COMPILE;
+				}
+
+				String newScope = this.dependency.getScope();
+				if (newScope == null) {
+					newScope = Artifact.SCOPE_COMPILE;
+				}
+
+				if (!oldScope.equals(newScope)) {
+					boolean systemScope = false;
+					boolean providedScope = false;
+					boolean compileScope = false;
+					boolean runtimeScope = false;
+					boolean testScope = false;
+
+					// test old scope
+					if (Artifact.SCOPE_COMPILE.equals(oldScope)) {
+						systemScope = true;
+						providedScope = true;
+						compileScope = true;
+						runtimeScope = false;
+						testScope = false;
+					} else if (Artifact.SCOPE_RUNTIME.equals(oldScope)) {
+						systemScope = false;
+						providedScope = false;
+						compileScope = true;
+						runtimeScope = true;
+						testScope = false;
+					} else if (Artifact.SCOPE_TEST.equals(oldScope)) {
+						systemScope = true;
+						providedScope = true;
+						compileScope = true;
+						runtimeScope = true;
+						testScope = true;
+					}
+
+					// merge with new one
+					if (Artifact.SCOPE_COMPILE.equals(newScope)) {
+						systemScope = systemScope || true;
+						providedScope = providedScope || true;
+						compileScope = compileScope || true;
+						runtimeScope = runtimeScope || false;
+						testScope = testScope || false;
+					} else if (Artifact.SCOPE_RUNTIME.equals(newScope)) {
+						systemScope = systemScope || false;
+						providedScope = providedScope || false;
+						compileScope = compileScope || true;
+						runtimeScope = runtimeScope || true;
+						testScope = testScope || false;
+					} else if (Artifact.SCOPE_TEST.equals(newScope)) {
+						systemScope = systemScope || true;
+						providedScope = providedScope || true;
+						compileScope = compileScope || true;
+						runtimeScope = runtimeScope || true;
+						testScope = testScope || true;
+					}
+
+					if (testScope) {
+						newScope = Artifact.SCOPE_TEST;
+					} else if (runtimeScope) {
+						newScope = Artifact.SCOPE_RUNTIME;
+					} else if (compileScope) {
+						newScope = Artifact.SCOPE_COMPILE;
+					} else {
+						// unchanged
+					}
+
+					dependency.setScope(newScope);
+				}
+			}
+
+			model.getDependencies().add(dependency);
+		}
+
+		@SuppressWarnings("null")
+		private boolean compareNulls(String s1, String s2) {
+			if (s1 == null && s2 == null) {
+				return true;
+			}
+			if ((s1 == null && s2 != null) || (s2 == null && s1 != null)) {
+				return false;
+			}
+			return s1.equals(s2);
+		}
+	}
+
 }

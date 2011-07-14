@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<lifecycleMappingMetadata>
+  
+      <pluginExecutions>
+        <pluginExecution>
+          <pluginExecutionFilter>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-war-plugin</artifactId>
+            <versionRange>[1.0,)</versionRange>
+            <goals>
+              <goal>war</goal>
+            </goals>
+          </pluginExecutionFilter>
+          <action>
+            <configurator>
+              <id>org.jboss.tools.maven.jsf.configurator</id>
+            </configurator>
+          </action>
+        </pluginExecution>
+      </pluginExecutions>
+
+</lifecycleMappingMetadata>

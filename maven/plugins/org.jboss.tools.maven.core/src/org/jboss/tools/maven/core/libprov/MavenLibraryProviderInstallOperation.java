@@ -1,3 +1,13 @@
+/*************************************************************************************
+ * Copyright (c) 2009-2011 Red Hat, Inc. and others.
+ * All rights reserved. This program and the accompanying materials 
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ * 
+ * Contributors:
+ *     JBoss by Red Hat - Initial implementation.
+ ************************************************************************************/
 package org.jboss.tools.maven.core.libprov;
 
 import java.io.File;
@@ -12,19 +22,26 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.emf.common.util.URI;
+import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.ecore.resource.URIConverter;
 import org.eclipse.emf.ecore.xmi.XMIResource;
 import org.eclipse.jst.common.project.facet.core.libprov.ILibraryProvider;
 import org.eclipse.jst.common.project.facet.core.libprov.LibraryProviderOperation;
 import org.eclipse.jst.common.project.facet.core.libprov.LibraryProviderOperationConfig;
+import org.eclipse.m2e.core.internal.IMavenConstants;
+import org.eclipse.m2e.model.edit.pom.Model;
+import org.eclipse.m2e.model.edit.pom.util.PomResourceFactoryImpl;
+import org.eclipse.m2e.model.edit.pom.util.PomResourceImpl;
 import org.eclipse.wst.common.project.facet.core.IFacetedProjectBase;
 import org.jboss.tools.maven.core.MavenCoreActivator;
-import org.maven.ide.components.pom.Model;
-import org.maven.ide.components.pom.util.PomResourceImpl;
-import org.maven.ide.eclipse.MavenPlugin;
-import org.maven.ide.eclipse.core.IMavenConstants;
-import org.maven.ide.eclipse.embedder.MavenModelManager;
 
+/**
+ * @author snjeza
+ * 
+ */
 public class MavenLibraryProviderInstallOperation extends
 		LibraryProviderOperation {
 
@@ -40,8 +57,8 @@ public class MavenLibraryProviderInstallOperation extends
 		}
 		if (pom.exists()) {
 			// JBoss Maven Integration facet has been executed		
-			MavenModelManager modelManager = MavenPlugin.getDefault().getMavenModelManager();
-			PomResourceImpl resource = modelManager.loadResource(pom);
+			//MavenModelManager modelManager = MavenPlugin.getDefault().getMavenModelManager();
+			PomResourceImpl resource = loadResource(pom);
 			Model projectModel = resource.getModel();
 			Model libraryModel = mavenConfig.getModel();
 			MavenCoreActivator.mergeModel(projectModel, libraryModel);
@@ -103,8 +120,23 @@ public class MavenLibraryProviderInstallOperation extends
 		} else {
 			MavenCoreActivator.addLibraryProviderOperationConfig(config);
 		}
-		
 	}
 
-	
+	public static PomResourceImpl loadResource(IFile pomFile)
+			throws CoreException {
+		String path = pomFile.getFullPath().toOSString();
+		URI uri = URI.createPlatformResourceURI(path, true);
+		try {
+			Resource resource = new PomResourceFactoryImpl()
+					.createResource(uri);
+			resource.load(new HashMap());
+			return (PomResourceImpl) resource;
+
+		} catch (Exception ex) {
+			String msg = "Can't load model " + pomFile;
+			MavenCoreActivator.log(ex);
+			throw new CoreException(new Status(IStatus.ERROR,
+					MavenCoreActivator.PLUGIN_ID, -1, msg, ex));
+		}
+	}  
 }

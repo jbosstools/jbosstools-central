@@ -1,3 +1,13 @@
+/*************************************************************************************
+ * Copyright (c) 2008-2011 Red Hat, Inc. and others.
+ * All rights reserved. This program and the accompanying materials 
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ * 
+ * Contributors:
+ *     JBoss by Red Hat - Initial implementation.
+ ************************************************************************************/
 package org.jboss.tools.maven.seam.configurators;
 
 import java.io.File;
@@ -7,7 +17,6 @@ import java.util.List;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
-import org.apache.maven.model.Dependency;
 import org.apache.maven.project.MavenProject;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.resources.IFile;
@@ -36,6 +45,13 @@ import org.eclipse.jst.j2ee.componentcore.util.EARArtifactEdit;
 import org.eclipse.jst.j2ee.internal.common.classpath.J2EEComponentClasspathUpdater;
 import org.eclipse.jst.j2ee.internal.project.J2EEProjectUtilities;
 import org.eclipse.jst.j2ee.project.JavaEEProjectUtilities;
+import org.eclipse.m2e.core.internal.IMavenConstants;
+import org.eclipse.m2e.core.internal.MavenPluginActivator;
+import org.eclipse.m2e.core.internal.project.registry.MavenProjectManager;
+import org.eclipse.m2e.core.project.IMavenProjectFacade;
+import org.eclipse.m2e.core.project.MavenProjectChangedEvent;
+import org.eclipse.m2e.core.project.configurator.AbstractProjectConfigurator;
+import org.eclipse.m2e.core.project.configurator.ProjectConfigurationRequest;
 import org.eclipse.wst.common.componentcore.ComponentCore;
 import org.eclipse.wst.common.componentcore.ModuleCoreNature;
 import org.eclipse.wst.common.componentcore.datamodel.properties.ICreateReferenceComponentsDataModelProperties;
@@ -65,15 +81,13 @@ import org.jboss.tools.seam.core.project.facet.SeamVersion;
 import org.jboss.tools.seam.internal.core.project.facet.ISeamFacetDataModelProperties;
 import org.jboss.tools.seam.internal.core.project.facet.SeamFacetInstallDataModelProvider;
 import org.jboss.tools.seam.ui.wizard.SeamWizardUtils;
-import org.maven.ide.eclipse.MavenPlugin;
-import org.maven.ide.eclipse.core.IMavenConstants;
-import org.maven.ide.eclipse.project.IMavenProjectFacade;
-import org.maven.ide.eclipse.project.MavenProjectChangedEvent;
-import org.maven.ide.eclipse.project.MavenProjectManager;
-import org.maven.ide.eclipse.project.configurator.AbstractProjectConfigurator;
-import org.maven.ide.eclipse.project.configurator.ProjectConfigurationRequest;
 import org.osgi.service.prefs.BackingStoreException;
 
+/**
+ * 
+ * @author snjeza
+ *
+ */
 public class SeamProjectConfigurator extends AbstractProjectConfigurator {
 
 	private static final String JBOSS_SEAM_ARTIFACT_PREFIX = "jboss-seam"; //$NON-NLS-1$
@@ -399,7 +413,7 @@ public class SeamProjectConfigurator extends AbstractProjectConfigurator {
 					if (refProject.hasNature(IMavenConstants.NATURE_ID)) {
 						IFile pom = refProject.getFile(IMavenConstants.POM_FILE_NAME);
 						if (pom.exists()) {
-							MavenProjectManager projectManager = MavenPlugin.getDefault().getMavenProjectManager();
+							MavenProjectManager projectManager = MavenPluginActivator.getDefault().getMavenProjectManager();
 						     IMavenProjectFacade facade = projectManager.create(pom, true, null);
 						      if(facade!=null) {
 						        MavenProject mavenProject = facade.getMavenProject(null);
@@ -433,7 +447,7 @@ public class SeamProjectConfigurator extends AbstractProjectConfigurator {
 						IFile pom = refProject
 								.getFile(IMavenConstants.POM_FILE_NAME);
 						if (pom.exists()) {
-							MavenProjectManager projectManager = MavenPlugin
+							MavenProjectManager projectManager = MavenPluginActivator
 									.getDefault().getMavenProjectManager();
 							IMavenProjectFacade facade = projectManager.create(
 									pom, true, null);

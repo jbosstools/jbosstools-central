@@ -2,23 +2,38 @@
 <?eclipse version="3.4"?>
 <plugin>
 
+	<extension
+         point="org.eclipse.m2e.core.lifecycleMappingMetadataSource">
+    </extension>
+   
+    <extension
+         point="org.eclipse.m2e.core.lifecycleMappings">
+      <lifecycleMapping
+            class="org.jboss.tools.maven.seam.SeamLifecycleMapping"
+            id="org.jboss.tools.maven.seam.SeamLifecycleMapping"
+            name="Seam Lifecycle mapping">
+      </lifecycleMapping>
+    </extension>
+    
 	<extension point="org.eclipse.wst.common.project.facet.core.listeners">
   		<listener class="org.jboss.tools.maven.seam.internal.project.facet.MavenPostInstallListener" 
   		eventTypes="POST_INSTALL"/>
 	</extension>
 	
-	<extension point="org.maven.ide.eclipse.projectConfigurators">
+	<extension point="org.eclipse.m2e.core.projectConfigurators">
       <configurator 
           id="org.jboss.tools.maven.seam.configurator"
           class="org.jboss.tools.maven.seam.configurators.SeamProjectConfigurator"
-          name="%Seam_Project_configurator" priority="200"/>
+          name="%Seam_Project_configurator" 
+          secondaryTo="org.maven.ide.eclipse.configuration.wtp.configurator"/>
     </extension>
     
-    <extension point="org.maven.ide.eclipse.projectConfigurators">
+    <extension point="org.eclipse.m2e.core.projectConfigurators">
       <configurator 
           id="org.jboss.tools.maven.seam.configurator.fixClasspathConfigurator"
           class="org.jboss.tools.maven.seam.configurators.FixClasspathConfigurator"
-          name="%Fix_classpath" priority="300"/>
+          name="%Fix_classpath" 
+          secondaryTo="org.eclipse.m2e.jdt.javaConfigurator"/>
     </extension>
     
     

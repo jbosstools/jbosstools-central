@@ -1,3 +1,13 @@
+/*************************************************************************************
+ * Copyright (c) 2009-2011 Red Hat, Inc. and others.
+ * All rights reserved. This program and the accompanying materials 
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ * 
+ * Contributors:
+ *     JBoss by Red Hat - Initial implementation.
+ ************************************************************************************/
 package org.jboss.tools.maven.ui.internal.libprov;
 
 import org.eclipse.jface.viewers.CellEditor;
@@ -5,9 +15,13 @@ import org.eclipse.jface.viewers.ColumnViewer;
 import org.eclipse.jface.viewers.EditingSupport;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TextCellEditor;
-import org.jboss.tools.maven.ui.Messages;
-import org.maven.ide.components.pom.Exclusion;
+import org.eclipse.m2e.model.edit.pom.Exclusion;
 
+/**
+ * 
+ * @author snjeza
+ *
+ */
 public class ExclusionEditingSupport extends EditingSupport {
 
 	private CellEditor editor;

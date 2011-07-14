@@ -2,14 +2,13 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: %Bundle-Name
 Bundle-SymbolicName: org.jboss.tools.maven.hibernate;singleton:=true
-Bundle-Version: 1.0.0.qualifier
+Bundle-Version: 1.2.0.qualifier
 Bundle-Activator: org.jboss.tools.maven.hibernate.MavenHibernateActivator
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
  org.jboss.tools.maven.core,
  org.jboss.tools.maven.ui,
  org.jboss.tools.common.model,
- org.maven.ide.eclipse.maven_model_edit;bundle-version="0.10.0";visibility:=reexport,
  org.eclipse.jst.j2ee.core,
  org.eclipse.jst.j2ee,
  org.eclipse.wst.common.emfworkbench.integration,
