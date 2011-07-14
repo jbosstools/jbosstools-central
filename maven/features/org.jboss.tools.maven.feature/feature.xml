@@ -19,7 +19,7 @@
    </license>
 
    <requires>
-      <import feature="org.eclipse.m2e.feature" version="1.0" match="greaterOrEqual"/>
+      <import feature="org.eclipse.m2e.feature" version="1.0.0" match="greaterOrEqual"/>
       <import feature="org.maven.ide.eclipse.wtp.feature" version="0.13.0" match="greaterOrEqual"/>
    </requires>
 
