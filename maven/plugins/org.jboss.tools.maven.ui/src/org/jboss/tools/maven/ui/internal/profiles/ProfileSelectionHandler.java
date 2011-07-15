@@ -1,6 +1,9 @@
 package org.jboss.tools.maven.ui.internal.profiles;
 
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.maven.model.Profile;
 import org.eclipse.core.commands.AbstractHandler;
@@ -10,6 +13,7 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.WorkspaceJob;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
@@ -22,6 +26,7 @@ import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IFileEditorInput;
 import org.eclipse.ui.IWorkbenchWindow;
+import org.eclipse.ui.IWorkingSet;
 import org.eclipse.ui.handlers.HandlerUtil;
 import org.jboss.tools.maven.core.MavenCoreActivator;
 import org.jboss.tools.maven.core.profiles.IProfileManager;
@@ -38,14 +43,16 @@ public class ProfileSelectionHandler extends AbstractHandler {
 	 */
 	public Object execute(ExecutionEvent event) throws ExecutionException {
 		IWorkbenchWindow window = HandlerUtil.getActiveWorkbenchWindowChecked(event);
-		final IMavenProjectFacade facade = getSelectedMavenProject(event);
-		if (facade != null ) {
+		final Set<IMavenProjectFacade> facades = getSelectedMavenProjects(event);
+		if (!facades.isEmpty() ) {
+			
+			System.out.print("Select projects "+facades);
 			
 			final IProfileManager profileManager = MavenCoreActivator.getDefault().getProfileManager();
 			
 			Map<Profile, Boolean> availableProfiles;
 			Map<Profile, Boolean> availableSettingsProfiles;
-
+			final IMavenProjectFacade facade = facades.iterator().next();
 			try {
 				availableProfiles = profileManager.getAvailableProfiles(facade);
 			
@@ -85,20 +92,29 @@ public class ProfileSelectionHandler extends AbstractHandler {
 	 * @param event
 	 * @return the selected IMavenProjectFacade
 	 */
-	private IMavenProjectFacade getSelectedMavenProject(ExecutionEvent event) {
+	private Set<IMavenProjectFacade> getSelectedMavenProjects(ExecutionEvent event) {
 		ISelection selection = HandlerUtil.getCurrentSelection(event);
-		IProject project = getSelectedProject(selection);
+		IProject[] projects = getSelectedProjects(selection);
 		try {
-			if (project == null) {
+			if (projects.length == 0) {
 			  IEditorInput input = HandlerUtil.getActiveEditorInput(event);
 	          if(input instanceof IFileEditorInput) {
 	            IFileEditorInput fileInput = (IFileEditorInput) input;
-	            project = fileInput.getFile().getProject();
+	            projects = new IProject[]{fileInput.getFile().getProject()};
 	          }
 			}
-			if (project != null && project.hasNature(IMavenConstants.NATURE_ID)) {
-				return MavenPlugin.getMavenProjectRegistry().getProject(project);
+			Set<IMavenProjectFacade> facades = new HashSet<IMavenProjectFacade>();
+			for (IProject p : projects) {
+				if (p != null && p.hasNature(IMavenConstants.NATURE_ID)) {
+					IMavenProjectFacade facade =MavenPlugin.getMavenProjectRegistry().getProject(p);
+					if (facade.getMavenProject() == null) {
+						System.err.println(facade.getProject() + " facade has no MavenProject!!!");
+					} else {
+						facades.add(facade);
+					}
+				}
 			}
+			return facades;
 		} catch (CoreException e) {
 			Activator.log(e);
 		}
@@ -106,15 +122,33 @@ public class ProfileSelectionHandler extends AbstractHandler {
 		return null;
 	}
 
-	private IProject getSelectedProject(ISelection selection) {
+	private IProject[] getSelectedProjects(ISelection selection) {
+		Set<IProject> projects = new HashSet<IProject>();
 		if (selection instanceof IStructuredSelection) {
 			IStructuredSelection structuredSelection = (IStructuredSelection) selection;
-			Object firstElement = structuredSelection.getFirstElement(); 
-			if (firstElement instanceof IResource) {
-				return ((IResource) firstElement).getProject();
+			Iterator<?> it = structuredSelection.iterator();
+			while (it.hasNext()) {
+				Object o = it.next();
+		        if(o instanceof IProject) {
+		        	projects.add((IProject)o);
+		        } else if (o instanceof IResource) {
+		        	projects.add(((IResource) o).getProject());
+				} else if (o instanceof IWorkingSet) {
+					IAdaptable[] elements = ((IWorkingSet)o).getElements();
+					if (elements != null) {
+						for (IAdaptable e : elements) {
+							IProject p = (IProject) e.getAdapter(IProject.class);
+							if (p != null) {
+					        	projects.add(p);
+							}
+						}
+					}
+				}
 			}
 		}
-		return null;
+		IProject[] array = new IProject[projects.size()];
+		projects.toArray(array);
+		return array;
 	}
 	
 }

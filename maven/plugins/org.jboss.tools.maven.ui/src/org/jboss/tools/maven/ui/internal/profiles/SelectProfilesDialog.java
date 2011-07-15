@@ -183,7 +183,7 @@ public class SelectProfilesDialog extends TitleAreaDialog implements
 
 			addSelectionButton(container, Messages.SelectProfilesDialog_SelectAll, true);
 
-			addSelectionButton(container, Messages.SelectProfilesDialog_DeselectAll, true);
+			addSelectionButton(container, Messages.SelectProfilesDialog_DeselectAll, false);
 
 			offlineModeBtn = addCheckButton(container, Messages.SelectProfilesDialog_Offline, offlineMode);
 
@@ -327,7 +327,7 @@ public class SelectProfilesDialog extends TitleAreaDialog implements
 
 	public List<String> getSelectedProfiles() {
 		return selectedProfiles;
-	}
+	} 
 
 	public boolean isOffline() {
 		return offlineMode;
