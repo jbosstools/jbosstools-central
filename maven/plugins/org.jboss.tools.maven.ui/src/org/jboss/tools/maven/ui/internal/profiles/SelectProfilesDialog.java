@@ -81,6 +81,7 @@ public class SelectProfilesDialog extends TitleAreaDialog implements
 			Map<Profile, Boolean> availableProjectProfiles,
 			Map<Profile, Boolean> availableSettingsProfiles) {
 		super(parentShell);
+		
 		this.facade = facade;
 
 		availableProfiles = new ArrayList<Map.Entry<Profile, Boolean>>(availableProjectProfiles.entrySet());
@@ -106,6 +107,13 @@ public class SelectProfilesDialog extends TitleAreaDialog implements
 	protected void configureShell(Shell shell) {
 		super.configureShell(shell);
 		shell.setText(Messages.SelectProfilesDialog_Select_Maven_profiles);
+	}
+	
+	/**
+	 * Make the dialog resizeable
+	 */
+	protected int getShellStyle() {
+		return super.getShellStyle() | SWT.RESIZE;
 	}
 
 	@Override

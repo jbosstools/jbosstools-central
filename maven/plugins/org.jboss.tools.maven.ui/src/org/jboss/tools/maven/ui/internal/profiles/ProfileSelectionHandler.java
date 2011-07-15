@@ -129,9 +129,7 @@ public class ProfileSelectionHandler extends AbstractHandler {
 			Iterator<?> it = structuredSelection.iterator();
 			while (it.hasNext()) {
 				Object o = it.next();
-		        if(o instanceof IProject) {
-		        	projects.add((IProject)o);
-		        } else if (o instanceof IResource) {
+				if (o instanceof IResource) {
 		        	projects.add(((IResource) o).getProject());
 				} else if (o instanceof IWorkingSet) {
 					IAdaptable[] elements = ((IWorkingSet)o).getElements();
