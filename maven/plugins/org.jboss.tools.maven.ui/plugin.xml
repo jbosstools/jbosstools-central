@@ -153,4 +153,55 @@
      &lt;/repository&gt;</pattern>
     </template>
   </extension>  
+  <!--
+     <extension
+         point="org.eclipse.ui.navigator.viewer">
+      <viewerContentBinding
+            viewerId="org.eclipse.ui.navigator.ProjectExplorer">
+         <includes>
+            <contentExtension
+                  isRoot="false"
+                  pattern="org.jboss.tools.maven.profiles.navigatorContent">
+            </contentExtension>
+         </includes>
+      </viewerContentBinding>
+      </extension>
+  
+  
+     <extension point="org.eclipse.ui.navigator.navigatorContent">
+      <navigatorContent id="org.jboss.tools.maven.profiles.navigatorContent"
+            contentProvider="org.jboss.tools.maven.ui.internal.profiles.ActiveProfilesContentProvider"
+            labelProvider="org.jboss.tools.maven.ui.internal.profiles.ActiveProfilesLabelProvider"
+            appearsBefore="org.eclipse.jdt.java.ui.javaContent"
+            name="Active Maven Profiles"
+            activeByDefault="true"
+            icon="icons/maven-profiles.gif"
+            priority="normal">
+       
+        <possibleChildren>
+          <instanceof value="org.jboss.tools.maven.ui.internal.profiles.ActiveMavenProfilesNode"/>
+        </possibleChildren>
+           
+        <triggerPoints>
+        <or>
+        	<instanceof
+               value="org.jboss.tools.maven.ui.internal.profiles.ActiveMavenProfilesNode">
+        	</instanceof>
+            <and>
+              <instanceof
+                    value="org.eclipse.core.resources.IProject">
+              </instanceof>
+              <test
+	                forcePluginActivation="true"
+	                property="org.eclipse.core.resources.projectNature"
+	                value="org.eclipse.m2e.core.maven2Nature">
+              </test>
+            </and>
+            </or>
+        </triggerPoints>
+        
+      </navigatorContent>
+   </extension>
+  -->
+  
 </plugin>

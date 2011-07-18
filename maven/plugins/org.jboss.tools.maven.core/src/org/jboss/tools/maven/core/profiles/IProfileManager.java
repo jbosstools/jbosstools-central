@@ -2,6 +2,7 @@ package org.jboss.tools.maven.core.profiles;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.maven.model.Profile;
 import org.eclipse.core.runtime.CoreException;
@@ -24,7 +25,9 @@ public interface IProfileManager {
 	 * @throws CoreException
 	 */
 	Map<Profile, Boolean> getAvailableProfiles(IMavenProjectFacade mavenProjectFacade) throws CoreException;
-	
+
+	List<ProfileStatus> getProfilesStatuses(IMavenProjectFacade mavenProjectFacade) throws CoreException;
+
 	/**
 	 * Returns an unmodifiable Map of all the available profiles defined in the
 	 * Maven settings.xml file.<br/>

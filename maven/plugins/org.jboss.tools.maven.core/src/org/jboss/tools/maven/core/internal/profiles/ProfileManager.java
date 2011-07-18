@@ -1,9 +1,14 @@
 package org.jboss.tools.maven.core.internal.profiles;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.maven.model.Profile;
 import org.apache.maven.settings.Settings;
@@ -17,6 +22,8 @@ import org.eclipse.m2e.core.project.IProjectConfigurationManager;
 import org.eclipse.m2e.core.project.MavenUpdateRequest;
 import org.eclipse.m2e.core.project.ResolverConfiguration;
 import org.jboss.tools.maven.core.profiles.IProfileManager;
+import org.jboss.tools.maven.core.profiles.ProfileState;
+import org.jboss.tools.maven.core.profiles.ProfileStatus;
 
 public class ProfileManager implements IProfileManager {
 
@@ -25,7 +32,9 @@ public class ProfileManager implements IProfileManager {
 									 final boolean isOffline, 
 									 final boolean isForceUpdate, 
 									 IProgressMonitor monitor) throws CoreException {
-		
+		if (mavenProjectFacade == null) {
+			return;
+		}
 		final IProjectConfigurationManager configurationManager = MavenPlugin.getProjectConfigurationManager();
 		final ResolverConfiguration configuration =configurationManager
 				.getResolverConfiguration(mavenProjectFacade.getProject());
@@ -117,4 +126,99 @@ public class ProfileManager implements IProfileManager {
 		return false;
 	}
 
+	public List<ProfileStatus> getProfilesStatuses(
+			IMavenProjectFacade facade) throws CoreException {
+		if (facade == null) {
+			return Collections.emptyList();
+		}
+		
+		ResolverConfiguration resolverConfiguration = MavenPlugin.getProjectConfigurationManager()
+														.getResolverConfiguration(facade.getProject());
+
+		List<String> configuredProfiles = resolverConfiguration.getActiveProfileList();
+		
+		final List<Profile> activeProfiles = facade.getMavenProject().getActiveProfiles();
+
+		List<Profile> projectProfiles = new ArrayList<Profile>(facade.getMavenProject().getModel().getProfiles());
+
+		final Map<Profile, Boolean> availableSettingsProfiles = getAvailableSettingProfiles();
+		Set<Profile> settingsProfiles = new HashSet<Profile>(availableSettingsProfiles.keySet());
+		
+		List<ProfileStatus> statuses = new ArrayList<ProfileStatus>();
+		
+		//First we put user configured profiles
+		for (String pId : configuredProfiles) {
+			if ("".equals(pId.trim())) continue;
+			boolean isDisabled = pId.startsWith("!");
+			String id = (isDisabled)?pId.substring(1):pId;
+			ProfileStatus status = new ProfileStatus(id);
+			status.setUserSelected(true);
+			ProfileState state = isDisabled?ProfileState.Disabled
+											:ProfileState.Active;
+			status.setActivationState(state);
+			
+			Profile p = get(id, projectProfiles);
+
+			if (p == null){
+				p = get(id, settingsProfiles);
+				if(p != null){
+					status.setAutoActive(availableSettingsProfiles.get(p));
+				}
+			} 
+
+			if (p == null) {
+				status.setSource("undefined");
+			} else {
+				status.setSource(p.getSource());
+			}
+			statuses.add(status);
+		}
+		
+		//Iterate on the remaining project profiles
+		addStatuses(statuses, projectProfiles, new ActivationPredicate() {
+			@Override
+			boolean isActive(Profile p) {
+				return ProfileManager.this.isActive(p, activeProfiles);
+			}
+		});
+
+		//Iterate on the remaining settings profiles
+		addStatuses(statuses, settingsProfiles, new ActivationPredicate() {
+			@Override
+			boolean isActive(Profile p) {
+				return availableSettingsProfiles.get(p);
+			}
+		});
+		return Collections.unmodifiableList(statuses);
+	}
+
+	private void addStatuses(List<ProfileStatus> statuses, Collection<Profile> profiles, ActivationPredicate predicate) {
+		for (Profile p : profiles) {
+			ProfileStatus status = new ProfileStatus(p.getId());
+			status.setSource(p.getSource());
+			boolean isActive = predicate.isActive(p);
+			ProfileState activationState = (isActive)?ProfileState.Active:ProfileState.Inactive;
+			status.setAutoActive(isActive);
+			status.setActivationState(activationState);
+			statuses.add(status);
+		}
+	}
+
+	private Profile get(String id, Collection<Profile> profiles) {
+		Iterator<Profile> ite = profiles.iterator();
+		Profile found = null;
+		while(ite.hasNext()) {
+			Profile p = ite.next(); 
+			if(p.getId().equals(id)) {
+				found = p;
+				ite.remove();
+				break;
+			}
+		}
+		return found;
+	}
+
+	private abstract class ActivationPredicate {
+		abstract boolean isActive(Profile p);
+	}
 }

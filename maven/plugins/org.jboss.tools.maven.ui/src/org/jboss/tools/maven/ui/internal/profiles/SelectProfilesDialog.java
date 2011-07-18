@@ -1,29 +1,28 @@
-/*******************************************************************************
- * Copyright (c) 2011 Sonatype, Inc.
- * All rights reserved. This program and the accompanying materials
+/*************************************************************************************
+ * Copyright (c) 2009-2011 Red Hat, Inc. and others.
+ * All rights reserved. This program and the accompanying materials 
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- *
+ * 
  * Contributors:
- *      Sonatype, Inc. - initial API and implementation
- *******************************************************************************/
+ *     JBoss by Red Hat - Initial implementation.
+ ************************************************************************************/
 package org.jboss.tools.maven.ui.internal.profiles;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
+import java.util.Set;
 
-import org.apache.maven.model.Profile;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.TitleAreaDialog;
+import org.eclipse.jface.viewers.CheckStateChangedEvent;
 import org.eclipse.jface.viewers.CheckboxTableViewer;
+import org.eclipse.jface.viewers.ICheckStateListener;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.ITableColorProvider;
@@ -33,8 +32,6 @@ import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
-import org.eclipse.m2e.core.project.IProjectConfigurationManager;
-import org.eclipse.m2e.core.project.ResolverConfiguration;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionEvent;
@@ -54,6 +51,7 @@ import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
+import org.jboss.tools.maven.core.profiles.ProfileState;
 import org.jboss.tools.maven.ui.Messages;
 
 public class SelectProfilesDialog extends TitleAreaDialog implements
@@ -66,41 +64,22 @@ public class SelectProfilesDialog extends TitleAreaDialog implements
 	private Button offlineModeBtn;
 	private Button forceUpdateBtn;
 
-	private final IMavenProjectFacade facade;
-
-	private List<Map.Entry<Profile, Boolean>> availableProfiles;
-	private List<String> initialInactiveProfileIds = new ArrayList<String>();
-	private List<String> initialActiveProfileIds = new ArrayList<String>();
-	private List<String> inactiveProfileIds = new ArrayList<String>();
-	private List<String> selectedProfiles;
-
 	private boolean offlineMode ;
 	private boolean forceUpdate;
 
-	public SelectProfilesDialog(Shell parentShell, IMavenProjectFacade facade,
-			Map<Profile, Boolean> availableProjectProfiles,
-			Map<Profile, Boolean> availableSettingsProfiles) {
+	List<ProfileSelection> sharedProfiles;
+	Set<IMavenProjectFacade> facades;
+	IMavenProjectFacade facade;
+	
+	public SelectProfilesDialog(Shell parentShell, Set<IMavenProjectFacade> facades,
+			List<ProfileSelection> sharedProfiles) {
 		super(parentShell);
-		
-		this.facade = facade;
-
-		availableProfiles = new ArrayList<Map.Entry<Profile, Boolean>>(availableProjectProfiles.entrySet());
-		availableProfiles.addAll(availableSettingsProfiles.entrySet());
-
 		offlineMode = MavenPlugin.getMavenConfiguration().isOffline();
-
-		final IProjectConfigurationManager configurationManager = MavenPlugin
-				.getProjectConfigurationManager();
-		final ResolverConfiguration configuration = configurationManager
-				.getResolverConfiguration(facade.getProject());
-		for (String p : configuration.getActiveProfileList()) {
-			if (p.startsWith("!")) { //$NON-NLS-1$
-				initialInactiveProfileIds.add(p.substring(1));
-			} else {
-				initialActiveProfileIds.add(p);
-			}
+		this.facades = facades;
+		if(facades.size() == 1){
+			facade = facades.iterator().next();
 		}
-		inactiveProfileIds.addAll(initialInactiveProfileIds);
+		this.sharedProfiles = sharedProfiles; 
 	}
 
 	@Override
@@ -127,19 +106,34 @@ public class SelectProfilesDialog extends TitleAreaDialog implements
 		container.setLayoutData(new GridData(GridData.FILL_BOTH));
 
 		setTitle(Messages.SelectProfilesDialog_Maven_profile_selection);
-		setMessage(NLS.bind(
-				Messages.SelectProfilesDialog_Select_the_active_Maven_profiles,
-				facade.getProject().getName()));
+		String text;
+		if (facade == null) {
+			text = "Select the active profiles for selected projects";
+		} else {
+			text = NLS.bind(
+					Messages.SelectProfilesDialog_Select_the_active_Maven_profiles,
+					facade.getProject().getName());
+		}
+		setMessage(text);
 
-		boolean hasProfiles = !availableProfiles.isEmpty();
+		boolean hasProfiles = !sharedProfiles.isEmpty();
 		Label lblAvailable = new Label(container, SWT.NONE);
 		String textLabel;
 		if (hasProfiles) {
-			textLabel = Messages.SelectProfilesDialog_Available_profiles;
+			if (facade == null) {
+				textLabel = "Common profiles for selected projects";
+			} else {
+				textLabel = Messages.SelectProfilesDialog_Available_profiles;
+			}
 		} else {
-			textLabel = Messages.SelectProfilesDialog_Project_has_no_available_profiles;
+			if (facade == null) {
+				textLabel = "There are no common profiles for the selected projects";
+			} else {
+				textLabel = 
+				NLS.bind(Messages.SelectProfilesDialog_Project_has_no_available_profiles, facade.getProject().getName());
+			}
 		}
-		lblAvailable.setText(NLS.bind(textLabel, facade.getProject().getName()));
+		lblAvailable.setText(textLabel);
 		lblAvailable.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, true,
 				false, 2, 1));
 
@@ -187,7 +181,22 @@ public class SelectProfilesDialog extends TitleAreaDialog implements
 			profileTableViewer.setLabelProvider(new ProfileLabelProvider(parent
 					.getFont()));
 
-			profileTableViewer.setInput(availableProfiles);
+			
+			profileTableViewer.addCheckStateListener(new ICheckStateListener() {
+				
+				public void checkStateChanged(CheckStateChangedEvent event) {
+					ProfileSelection profile = (ProfileSelection) event.getElement();
+					if (profileTableViewer.getGrayed(profile)) {
+						profileTableViewer.setGrayed(profile, false);
+					}
+					profile.setSelected(profileTableViewer.getChecked(profile));
+					if (profile.getActivationState() == null) {
+						profile.setActivationState(ProfileState.Active);
+					}
+				}
+			});
+			
+			profileTableViewer.setInput(sharedProfiles);
 
 			addSelectionButton(container, Messages.SelectProfilesDialog_SelectAll, true);
 
@@ -220,8 +229,14 @@ public class SelectProfilesDialog extends TitleAreaDialog implements
 		button.setText(label);
 		button.addSelectionListener(new SelectionListener() {
 			public void widgetSelected(SelectionEvent e) {
-				for (Map.Entry<Profile, Boolean> entry : availableProfiles) {
-					profileTableViewer.setChecked(entry, ischecked);
+				profileTableViewer.setAllGrayed(false);
+				for (ProfileSelection profile : sharedProfiles) {
+					profileTableViewer.setChecked(profile, ischecked);
+					
+					profile.setSelected(profileTableViewer.getChecked(profile));
+					if (profile.getActivationState() == null) {
+						profile.setActivationState(ProfileState.Active);
+					}
 				}
 			}
 
@@ -231,19 +246,6 @@ public class SelectProfilesDialog extends TitleAreaDialog implements
 		});
 		
 		return button;
-	}
-
-	@SuppressWarnings("unchecked")
-	private Map.Entry<Profile, Boolean> getEntry(Object o) {
-		if (o instanceof Map.Entry<?, ?>) {
-			return (Map.Entry<Profile, Boolean>) o;
-		}
-		return null;
-	}
-
-	private boolean isDeactivated(Entry<Profile, Boolean> entry) {
-		return entry != null
-				&& inactiveProfileIds.contains(entry.getKey().getId());
 	}
 
 	@Override
@@ -257,20 +259,8 @@ public class SelectProfilesDialog extends TitleAreaDialog implements
 	@Override
 	protected void okPressed() {
 		if (profileTableViewer != null) {
-			Object[] obj = profileTableViewer.getCheckedElements();
-			List<String> selectedProfiles = new ArrayList<String>(obj.length);
-			for (int i = 0; i < obj.length; i++) {
-				@SuppressWarnings("unchecked")
-				Map.Entry<Profile, Boolean> entry = (Map.Entry<Profile, Boolean>) obj[i];
-				String id = entry.getKey().getId();
-				if (isDeactivated(entry)) {
-					selectedProfiles.add("!" + id); //$NON-NLS-1$
-				} else {
-					selectedProfiles.add(id);
-				}
-			}
-			this.selectedProfiles = selectedProfiles;
-
+			//Object[] obj = profileTableViewer.getCheckedElements();
+			//for (int i = 0; i < obj.length; i++) {}
 			offlineMode = offlineModeBtn.getSelection();
 			forceUpdate = forceUpdateBtn.getSelection();
 		}
@@ -285,11 +275,14 @@ public class SelectProfilesDialog extends TitleAreaDialog implements
 		profileTableViewer.getControl().setMenu(contextMenu);
 		menuMgr.setRemoveAllWhenShown(true);
 
-		for (Map.Entry<Profile, Boolean> entry : availableProfiles) {
-			String id = entry.getKey().getId();
-			boolean isSelected = initialActiveProfileIds.contains(id)
-								 || inactiveProfileIds.contains(id);
-			profileTableViewer.setChecked(entry, isSelected);
+		for (ProfileSelection p : sharedProfiles) {
+			Boolean selected = p.getSelected();
+			if (selected ==null || p.getActivationState() == null) {
+				profileTableViewer.setGrayed(p, true);
+				profileTableViewer.setChecked(p, true);
+			} else if(selected != null) {
+				profileTableViewer.setChecked(p, selected );
+			}
 		}
 	}
 
@@ -299,43 +292,52 @@ public class SelectProfilesDialog extends TitleAreaDialog implements
 			IStructuredSelection selection = (IStructuredSelection) profileTableViewer
 					.getSelection();
 			if (!selection.isEmpty()) {
-				final Map.Entry<Profile, Boolean> entry = getEntry(selection.getFirstElement());
-				final boolean isDeactivated = isDeactivated(entry);
-
-				if (isDeactivated) {
-					inactiveProfileIds.remove(entry.getKey().getId());
-				} else {
-					inactiveProfileIds.add(entry.getKey().getId());
-					profileTableViewer.setChecked(entry, true);
-				}
+				final ProfileSelection entry = (ProfileSelection) selection.getFirstElement();
+				entry.setActivationState(ProfileState.Active);
+				profileTableViewer.setChecked(entry, true);
+				profileTableViewer.setGrayed(entry, false);
+				profileTableViewer.refresh();
+			}
+			super.run();
+		}
+	};
+	final Action deActivationAction = new Action("") { //$NON-NLS-1$
+		@Override
+		public void run() {
+			IStructuredSelection selection = (IStructuredSelection) profileTableViewer
+					.getSelection();
+			if (!selection.isEmpty()) {
+				final ProfileSelection entry = (ProfileSelection) selection.getFirstElement();
+				entry.setActivationState(ProfileState.Disabled);
+				profileTableViewer.setChecked(entry, true);
+				profileTableViewer.setGrayed(entry, false);
 				profileTableViewer.refresh();
 			}
 			super.run();
 		}
 	};
 
+	
 	public void menuAboutToShow(IMenuManager manager) {
 
 		IStructuredSelection selection = (IStructuredSelection) profileTableViewer
 				.getSelection();
 		if (!selection.isEmpty()) {
-			final Map.Entry<Profile, Boolean> entry = getEntry(selection
-					.getFirstElement());
-			final boolean isDeactivated = isDeactivated(entry);
-			String text;
-			if (isDeactivated) {
+			final ProfileSelection entry = (ProfileSelection) selection.getFirstElement();
+			String text = "";
+			ProfileState state = entry.getActivationState();
+			if ( state == null || state.equals(ProfileState.Disabled)) {
 				text = Messages.SelectProfilesDialog_Activate_menu;
-			} else {
+				activationAction.setText(NLS.bind(text, entry.getId()));
+				manager.add(activationAction);
+			} 
+			if( !ProfileState.Disabled.equals(state)) {
 				text = Messages.SelectProfilesDialog_Deactivate_menu;
+				deActivationAction.setText(NLS.bind(text, entry.getId()));
+				manager.add(deActivationAction);
 			}
-			activationAction.setText(NLS.bind(text, entry.getKey().getId()));
-			manager.add(activationAction);
 		}
 	}
-
-	public List<String> getSelectedProfiles() {
-		return selectedProfiles;
-	} 
 
 	public boolean isOffline() {
 		return offlineMode;
@@ -362,9 +364,9 @@ public class SelectProfilesDialog extends TitleAreaDialog implements
 		}
 		
 		public Font getFont(Object element, int columnIndex) {
-			Entry<Profile, Boolean> entry = getEntry(element);
+			ProfileSelection entry = (ProfileSelection) element;
 			Font font = null;
-			if (entry != null && Boolean.TRUE.equals(entry.getValue())
+			if (Boolean.TRUE.equals(entry.getAutoActive())
 					&& PROFILE_ID_COLUMN == columnIndex) {
 				font = implicitActivationFont;
 			}
@@ -372,8 +374,8 @@ public class SelectProfilesDialog extends TitleAreaDialog implements
 		}
 		
 		public Color getForeground(Object element, int columnIndex) {
-			Entry<Profile, Boolean> entry = getEntry(element);
-			if (isDeactivated(entry)) {
+			ProfileSelection entry = (ProfileSelection) element;
+			if (ProfileState.Disabled.equals(entry.getActivationState())) {
 				return inactiveColor;
 			}
 			return null;
@@ -388,20 +390,20 @@ public class SelectProfilesDialog extends TitleAreaDialog implements
 		}
 		
 		public String getColumnText(Object element, int columnIndex) {
-			Entry<Profile, Boolean> entry = getEntry(element);
+			ProfileSelection entry = (ProfileSelection) element;
 			StringBuilder text = new StringBuilder();
 			if (entry != null) {
-				boolean isDeactivated = isDeactivated(entry);
-				Profile profile = entry.getKey();
 				if (columnIndex == PROFILE_ID_COLUMN) {
-					text.append(profile.getId());
-					if (isDeactivated) {
+					text.append(entry.getId());
+
+					ProfileState state = entry.getActivationState();
+					if (state == ProfileState.Disabled) {
 						text.append(Messages.SelectProfilesDialog_deactivated);
-					} else if (Boolean.TRUE.equals(entry.getValue())) {
+					} else if (Boolean.TRUE.equals(entry.getAutoActive())) {
 						text.append(Messages.SelectProfilesDialog_autoactivated);
 					}
 				} else if (columnIndex == SOURCE_COLUMN) {
-					text.append(profile.getSource());
+					text.append(entry.getSource());
 				}
 			}
 			return text.toString();
