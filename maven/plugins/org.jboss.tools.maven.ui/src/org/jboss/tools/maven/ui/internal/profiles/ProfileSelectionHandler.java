@@ -121,8 +121,8 @@ public class ProfileSelectionHandler extends AbstractHandler {
 								} else {
 									//Value was displayed and is consistent
 									if (Boolean.TRUE.equals(selection.getSelected())) {
-										id = st.getId();
-										isDisabled = st.getActivationState().equals(ProfileState.Disabled);
+										id = selection.getId();
+										isDisabled = selection.getActivationState().equals(ProfileState.Disabled);
 									}
 								}
 							}
