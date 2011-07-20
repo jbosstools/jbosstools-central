@@ -143,8 +143,9 @@ public class JSFProjectConfigurator extends AbstractProjectConfigurator {
 		
 		if (!fproj.hasProjectFacet(dynamicWebFacet)) {
 			Activator.log(Messages.JSFProjectConfigurator_The_project_does_not_contain_the_Web_Module_facet);
-		}
-		installJSFFacet(fproj, jsfVersion, mavenProject, monitor);
+		} else {
+   		   installJSFFacet(fproj, jsfVersion, mavenProject, monitor);
+        }
 		installM2Facet(fproj, monitor);
 		
 	}
