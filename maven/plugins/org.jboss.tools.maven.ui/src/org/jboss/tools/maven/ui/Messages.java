@@ -73,6 +73,7 @@ public class Messages extends NLS {
 	public static String SelectProfilesDialog_Profile_id_header;
 	public static String SelectProfilesDialog_Profile_source_header;
 	public static String SelectProfilesDialog_Project_has_no_available_profiles;
+	public static String SelectProfilesDialog_Read_Only_profiles;
 	public static String SelectProfilesDialog_Select_active_profiles_for_selected_projects;
 	public static String SelectProfilesDialog_Select_Maven_profiles;
 	public static String SelectProfilesDialog_Select_the_active_Maven_profiles;
