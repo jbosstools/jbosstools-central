@@ -130,8 +130,9 @@ public class SelectProfilesDialog extends TitleAreaDialog implements
 			
 			profilesText = new Text(container, SWT.BORDER);
 			profilesText.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 2, 1));
-			profilesText.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_WHITE));
+			profilesText.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_DARK_GRAY));
 			profilesText.setEditable(false);
+			profilesText.setToolTipText("Active profiles area is read-only");
 			updateProfilesText();
 		}
 
