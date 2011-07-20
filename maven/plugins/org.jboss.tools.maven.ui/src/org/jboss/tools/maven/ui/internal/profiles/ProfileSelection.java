@@ -48,4 +48,12 @@ public class ProfileSelection {
 	public void setSource(String source) {
 		this.source = source;
 	}
+	
+	public String toMavenString() {
+		String s = id;
+		if (ProfileState.Disabled == activationState) {
+			s = "!"+id;
+		}
+		return s;
+	}
 }

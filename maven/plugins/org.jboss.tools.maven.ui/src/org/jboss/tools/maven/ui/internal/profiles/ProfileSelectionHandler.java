@@ -58,7 +58,7 @@ public class ProfileSelectionHandler extends AbstractHandler {
 	public Object execute(ExecutionEvent event) throws ExecutionException {
 		IWorkbenchWindow window = HandlerUtil.getActiveWorkbenchWindowChecked(event);
 		final Set<IMavenProjectFacade> facades = getSelectedMavenProjects(event);
-		if (!facades.isEmpty() ) {
+		if (facades != null && !facades.isEmpty() ) {
 			
 			System.out.print("Select projects "+facades);
 			
@@ -74,6 +74,7 @@ public class ProfileSelectionHandler extends AbstractHandler {
 			final SelectProfilesDialog dialog = new SelectProfilesDialog(window.getShell(), 
 																	facades, 
 																	sharedProfiles);
+			//dialog.setBlockOnOpen(false); doesn't work
 		    if(dialog.open() == Window.OK) {
 		    	
 				WorkspaceJob job = new WorkspaceJob(Messages.ProfileManager_Updating_maven_profiles) {
@@ -252,7 +253,7 @@ public class ProfileSelectionHandler extends AbstractHandler {
 			}
 			Set<IMavenProjectFacade> facades = new HashSet<IMavenProjectFacade>();
 			for (IProject p : projects) {
-				if (p != null && p.hasNature(IMavenConstants.NATURE_ID)) {
+				if (p != null && p.isAccessible() && p.hasNature(IMavenConstants.NATURE_ID)) {
 					IMavenProjectFacade facade =MavenPlugin.getMavenProjectRegistry().getProject(p);
 					if (facade.getMavenProject() == null) {
 						System.err.println(facade.getProject() + " facade has no MavenProject!!!");

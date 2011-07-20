@@ -10,7 +10,6 @@
  ************************************************************************************/
 package org.jboss.tools.maven.ui.internal.profiles;
 
-import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
@@ -20,16 +19,16 @@ import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.TitleAreaDialog;
+import org.eclipse.jface.text.ITextViewer;
+import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.CheckStateChangedEvent;
 import org.eclipse.jface.viewers.CheckboxTableViewer;
 import org.eclipse.jface.viewers.ICheckStateListener;
-import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.ITableColorProvider;
 import org.eclipse.jface.viewers.ITableFontProvider;
 import org.eclipse.jface.viewers.ITableLabelProvider;
 import org.eclipse.jface.viewers.LabelProvider;
-import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.osgi.util.NLS;
@@ -63,7 +62,9 @@ public class SelectProfilesDialog extends TitleAreaDialog implements
 	private CheckboxTableViewer profileTableViewer;
 	private Button offlineModeBtn;
 	private Button forceUpdateBtn;
-
+    private ITextViewer profilesTextViewer;
+    private Label profilesText;
+	
 	private boolean offlineMode ;
 	private boolean forceUpdate;
 
@@ -71,9 +72,18 @@ public class SelectProfilesDialog extends TitleAreaDialog implements
 	Set<IMavenProjectFacade> facades;
 	IMavenProjectFacade facade;
 	
+	
+	
+	
+
+	final Action activationAction = new ChangeProfileStateAction(ProfileState.Active);
+	
+	final Action deActivationAction = new ChangeProfileStateAction(ProfileState.Disabled);
+
 	public SelectProfilesDialog(Shell parentShell, Set<IMavenProjectFacade> facades,
 			List<ProfileSelection> sharedProfiles) {
 		super(parentShell);
+		setShellStyle(super.getShellStyle() | SWT.RESIZE | SWT.MODELESS);
 		offlineMode = MavenPlugin.getMavenConfiguration().isOffline();
 		this.facades = facades;
 		if(facades.size() == 1){
@@ -88,18 +98,13 @@ public class SelectProfilesDialog extends TitleAreaDialog implements
 		shell.setText(Messages.SelectProfilesDialog_Select_Maven_profiles);
 	}
 	
-	/**
-	 * Make the dialog resizeable
-	 */
-	protected int getShellStyle() {
-		return super.getShellStyle() | SWT.RESIZE;
-	}
+
 
 	@Override
 	protected Control createDialogArea(Composite parent) {
 		Composite area = (Composite) super.createDialogArea(parent);
 		Composite container = new Composite(area, SWT.NONE);
-
+        container.setEnabled(true);
 		GridLayout layout = new GridLayout(2, false);
 		layout.marginLeft = 12;
 		container.setLayout(layout);
@@ -108,7 +113,7 @@ public class SelectProfilesDialog extends TitleAreaDialog implements
 		setTitle(Messages.SelectProfilesDialog_Maven_profile_selection);
 		String text;
 		if (facade == null) {
-			text = "Select the active profiles for selected projects";
+			text = Messages.SelectProfilesDialog_Select_active_profiles_for_selected_projects;
 		} else {
 			text = NLS.bind(
 					Messages.SelectProfilesDialog_Select_the_active_Maven_profiles,
@@ -116,18 +121,30 @@ public class SelectProfilesDialog extends TitleAreaDialog implements
 		}
 		setMessage(text);
 
+		if (facade != null) {
+			
+		    Label profilesLabel = new Label(container, SWT.NONE);
+		    profilesLabel.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 2, 1));
+		    profilesLabel.setText(NLS.bind(Messages.SelectProfilesDialog_Active_Profiles_for_Project, facade.getProject().getName()));
+			
+			profilesText = new Label(container, SWT.BORDER);
+			profilesText.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 2, 1));
+			profilesText.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_WHITE));
+			updateProfilesText();
+		}
+
 		boolean hasProfiles = !sharedProfiles.isEmpty();
 		Label lblAvailable = new Label(container, SWT.NONE);
 		String textLabel;
 		if (hasProfiles) {
 			if (facade == null) {
-				textLabel = "Common profiles for selected projects";
+				textLabel = Messages.SelectProfilesDialog_Common_profiles;
 			} else {
 				textLabel = Messages.SelectProfilesDialog_Available_profiles;
 			}
 		} else {
 			if (facade == null) {
-				textLabel = "There are no common profiles for the selected projects";
+				textLabel = Messages.SelectProfilesDialog_No_Common_Profiles;
 			} else {
 				textLabel = 
 				NLS.bind(Messages.SelectProfilesDialog_Project_has_no_available_profiles, facade.getProject().getName());
@@ -140,11 +157,12 @@ public class SelectProfilesDialog extends TitleAreaDialog implements
 		if (hasProfiles) {
 
 			GridData gd = new GridData(SWT.FILL, SWT.FILL, true, true, 1, 4);
-			gd.heightHint = 150;
+			gd.heightHint = 200;
 			gd.widthHint = 500;
 
 			profileTableViewer = CheckboxTableViewer.newCheckList(container, SWT.BORDER);
 			Table table = profileTableViewer.getTable();
+			table.setFocus();
 			table.setLayoutData(gd);
 			table.setLinesVisible(true);
 			table.setHeaderVisible(true);
@@ -152,31 +170,13 @@ public class SelectProfilesDialog extends TitleAreaDialog implements
 			TableColumn profileColumn = new TableColumn(table, SWT.NONE);
 			profileColumn.setText(Messages.SelectProfilesDialog_Profile_id_header);
 			profileColumn.setWidth(350);
-
+			
 			TableColumn sourceColumn = new TableColumn(table, SWT.NONE);
 			sourceColumn.setText(Messages.SelectProfilesDialog_Profile_source_header);
 			sourceColumn.setWidth(120);
+			
 
-			profileTableViewer
-					.setContentProvider(new IStructuredContentProvider() {
-
-						public void inputChanged(Viewer viewer,
-								Object oldInput, Object newInput) {
-							// nothing to do
-						}
-
-						public void dispose() {
-							// nothing to do
-						}
-
-						@SuppressWarnings("rawtypes")
-						public Object[] getElements(Object input) {
-							if (input instanceof Collection) {
-								return ((Collection) input).toArray();
-							}
-							return null;
-						}
-					});
+			profileTableViewer.setContentProvider(ArrayContentProvider.getInstance());
 
 			profileTableViewer.setLabelProvider(new ProfileLabelProvider(parent
 					.getFont()));
@@ -190,9 +190,13 @@ public class SelectProfilesDialog extends TitleAreaDialog implements
 						profileTableViewer.setGrayed(profile, false);
 					}
 					profile.setSelected(profileTableViewer.getChecked(profile));
-					if (profile.getActivationState() == null) {
+					if (Boolean.FALSE.equals(profile.getSelected()) 
+							|| profile.getActivationState() == null) {
 						profile.setActivationState(ProfileState.Active);
 					}
+					
+					updateProfilesText();
+					profileTableViewer.refresh();
 				}
 			});
 			
@@ -201,16 +205,21 @@ public class SelectProfilesDialog extends TitleAreaDialog implements
 			addSelectionButton(container, Messages.SelectProfilesDialog_SelectAll, true);
 
 			addSelectionButton(container, Messages.SelectProfilesDialog_DeselectAll, false);
-
+			
 			offlineModeBtn = addCheckButton(container, Messages.SelectProfilesDialog_Offline, offlineMode);
 
 			forceUpdateBtn = addCheckButton(container, Messages.SelectProfilesDialog_Force_update, forceUpdate);
 
 			createMenu();
-
 		}
 
 		return area;
+	}
+
+	private void updateProfilesText() {
+		if (profilesText != null) {
+			profilesText.setText(ProfileUtil.toString(sharedProfiles));
+		}
 	}
 
 	private Button addCheckButton(Composite container, String label, boolean selected) {
@@ -224,7 +233,7 @@ public class SelectProfilesDialog extends TitleAreaDialog implements
 
 	private Button addSelectionButton(Composite container, String label, final boolean ischecked) {
 		Button button = new Button(container, SWT.NONE);
-		button.setLayoutData(new GridData(SWT.FILL, SWT.CENTER,
+		button.setLayoutData(new GridData(SWT.FILL, SWT.UP,
 				false, false, 1, 1));
 		button.setText(label);
 		button.addSelectionListener(new SelectionListener() {
@@ -235,9 +244,10 @@ public class SelectProfilesDialog extends TitleAreaDialog implements
 					
 					profile.setSelected(profileTableViewer.getChecked(profile));
 					if (profile.getActivationState() == null) {
-						profile.setActivationState(ProfileState.Active);
+ 						profile.setActivationState(ProfileState.Active);
 					}
 				}
+				updateProfilesText();
 			}
 
 			public void widgetDefaultSelected(SelectionEvent e) {
@@ -259,8 +269,6 @@ public class SelectProfilesDialog extends TitleAreaDialog implements
 	@Override
 	protected void okPressed() {
 		if (profileTableViewer != null) {
-			//Object[] obj = profileTableViewer.getCheckedElements();
-			//for (int i = 0; i < obj.length; i++) {}
 			offlineMode = offlineModeBtn.getSelection();
 			forceUpdate = forceUpdateBtn.getSelection();
 		}
@@ -286,45 +294,13 @@ public class SelectProfilesDialog extends TitleAreaDialog implements
 		}
 	}
 
-	final Action activationAction = new Action("") { //$NON-NLS-1$
-		@Override
-		public void run() {
-			IStructuredSelection selection = (IStructuredSelection) profileTableViewer
-					.getSelection();
-			if (!selection.isEmpty()) {
-				final ProfileSelection entry = (ProfileSelection) selection.getFirstElement();
-				entry.setActivationState(ProfileState.Active);
-				profileTableViewer.setChecked(entry, true);
-				profileTableViewer.setGrayed(entry, false);
-				profileTableViewer.refresh();
-			}
-			super.run();
-		}
-	};
-	final Action deActivationAction = new Action("") { //$NON-NLS-1$
-		@Override
-		public void run() {
-			IStructuredSelection selection = (IStructuredSelection) profileTableViewer
-					.getSelection();
-			if (!selection.isEmpty()) {
-				final ProfileSelection entry = (ProfileSelection) selection.getFirstElement();
-				entry.setActivationState(ProfileState.Disabled);
-				profileTableViewer.setChecked(entry, true);
-				profileTableViewer.setGrayed(entry, false);
-				profileTableViewer.refresh();
-			}
-			super.run();
-		}
-	};
-
-	
 	public void menuAboutToShow(IMenuManager manager) {
 
 		IStructuredSelection selection = (IStructuredSelection) profileTableViewer
 				.getSelection();
 		if (!selection.isEmpty()) {
 			final ProfileSelection entry = (ProfileSelection) selection.getFirstElement();
-			String text = "";
+			String text = ""; //$NON-NLS-1$
 			ProfileState state = entry.getActivationState();
 			if ( state == null || state.equals(ProfileState.Disabled)) {
 				text = Messages.SelectProfilesDialog_Activate_menu;
@@ -347,6 +323,146 @@ public class SelectProfilesDialog extends TitleAreaDialog implements
 		return forceUpdate;
 	}
 	
+	
+	/* TODO add content assist to the profiles input text
+	private ITextViewer createTextInput(Composite container) {
+		ITextViewer textViewer = new TextViewer(container, SWT.BORDER | SWT.FILL);
+		textViewer.setDocument(new Document());
+		final ContentAssistant contentAssistant = new ContentAssistant();
+		contentAssistant.enableAutoActivation(true);
+		contentAssistant.setAutoActivationDelay(100);
+		contentAssistant.enableAutoInsert(true);
+		contentAssistant.setContentAssistProcessor(new ProfileContentAssistProcessor(sharedProfiles), 
+												                     IDocument.DEFAULT_CONTENT_TYPE);
+		
+	    textViewer.getTextWidget().addKeyListener(new KeyAdapter() {
+	    	@Override
+	    	public void keyPressed(KeyEvent e) {
+	            if ( (e.character == ' ') && ((e.stateMask & SWT.CTRL) != 0) ) {
+	              contentAssistant.showPossibleCompletions();
+	            }
+	    	}
+	    }); 
+	    
+	    
+		contentAssistant.install(textViewer );
+		return textViewer;
+	}
+	
+	private final class ProfileContentAssistProcessor implements
+			IContentAssistProcessor {
+		
+		private List<String> profileIds;
+		
+		public ProfileContentAssistProcessor(
+				List<ProfileSelection> possibleProfiles) {
+			assert possibleProfiles != null;
+			profileIds = new ArrayList<String>(possibleProfiles.size());
+			for (ProfileSelection ps : possibleProfiles) {
+				profileIds.add(ps.getId());
+			}
+		}
+
+		public String getErrorMessage() {
+			return null;
+		}
+
+		public IContextInformationValidator getContextInformationValidator() {
+			return null;
+		}
+
+		public char[] getContextInformationAutoActivationCharacters() {
+			return null;
+		}
+
+		public char[] getCompletionProposalAutoActivationCharacters() {
+			return new char[]{','};
+		}
+
+		public IContextInformation[] computeContextInformation(ITextViewer viewer,
+				int offset) {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		public ICompletionProposal[] computeCompletionProposals(ITextViewer viewer,
+				int documentOffset) {
+		    IDocument document = viewer.getDocument();
+		    int currOffset = documentOffset -1;
+		    ICompletionProposal[] proposals = null;
+		    try {
+		      String currentWord = getCurrentWord(document, currOffset);
+		      System.err.println(currOffset + " - Current word "+currentWord); //$NON-NLS-1$
+				
+		      int currentWordLength = currentWord.length();
+		      List<ICompletionProposal> suggestions = new ArrayList<ICompletionProposal>(profileIds.size());
+		      for (String id : profileIds) {
+		    	  if (!id.startsWith(currentWord)) {
+		    		  continue;
+		    	  }
+		    	  
+		    	  ICompletionProposal proposal = new CompletionProposal(id,  
+		    			  documentOffset - currentWordLength,
+		    			  currentWordLength, 
+		    			  id.length());		    	  
+		    	  
+		    	  suggestions.add(proposal);
+		      }
+		      if (!suggestions.isEmpty()) {
+		    	  proposals = new ICompletionProposal[suggestions.size()];
+		    	  suggestions.toArray(proposals);
+		      }
+		    } catch (BadLocationException e) {
+		    	System.err.println(e);
+		    }			
+		    return proposals;
+		}
+
+
+		private String getCurrentWord(IDocument document, int currOffset)
+				throws BadLocationException {
+			StringBuilder currWord = new StringBuilder();
+		      char currChar;
+		      
+		      while (currOffset > -1
+		          && !Character.isWhitespace(currChar = document
+		              .getChar(currOffset))
+		          && ',' != currChar) {
+		        currWord.insert(0, currChar);
+		        currOffset--;
+		      }
+			return currWord.toString();
+		}
+	}
+   */
+	
+	private class ChangeProfileStateAction extends Action {
+		
+		private final ProfileState state;
+
+		public ChangeProfileStateAction(ProfileState state) {
+			this.state = state;
+		}
+
+		@Override
+		public void run() {
+			IStructuredSelection selection = (IStructuredSelection) profileTableViewer
+					.getSelection();
+			if (!selection.isEmpty()) {
+				final ProfileSelection entry = (ProfileSelection) selection.getFirstElement();
+				entry.setActivationState(state);
+				profileTableViewer.setChecked(entry, true);
+				profileTableViewer.setGrayed(entry, false);
+				if (ProfileState.Disabled.equals(state)) {
+					entry.setSelected(true);
+				}
+				updateProfilesText();
+				profileTableViewer.refresh();
+			}
+			super.run();
+		}
+	}
+
 	private class ProfileLabelProvider extends LabelProvider implements
 		ITableLabelProvider, ITableFontProvider, ITableColorProvider {
 		
@@ -397,7 +513,7 @@ public class SelectProfilesDialog extends TitleAreaDialog implements
 					text.append(entry.getId());
 
 					ProfileState state = entry.getActivationState();
-					if (state == ProfileState.Disabled) {
+					if (Boolean.TRUE.equals(entry.getSelected()) && state == ProfileState.Disabled) {
 						text.append(Messages.SelectProfilesDialog_deactivated);
 					} else if (Boolean.TRUE.equals(entry.getAutoActive())) {
 						text.append(Messages.SelectProfilesDialog_autoactivated);

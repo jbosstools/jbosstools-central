@@ -58,16 +58,22 @@ public class Messages extends NLS {
 	
 	public static String SelectProfilesDialog_autoactivated;
 	public static String SelectProfilesDialog_Activate_menu;
+	public static String SelectProfilesDialog_Active_Profiles_for_Project;
 	public static String SelectProfilesDialog_Available_profiles;
+	public static String SelectProfilesDialog_Common_profiles;
 	public static String SelectProfilesDialog_deactivated;
 	public static String SelectProfilesDialog_Deactivate_menu;
 	public static String SelectProfilesDialog_DeselectAll;
 	public static String SelectProfilesDialog_Force_update;
 	public static String SelectProfilesDialog_Maven_profile_selection;
+	public static String SelectProfilesDialog_Move_Down;
+	public static String SelectProfilesDialog_Move_Up;
+	public static String SelectProfilesDialog_No_Common_Profiles;
 	public static String SelectProfilesDialog_Offline;
 	public static String SelectProfilesDialog_Profile_id_header;
 	public static String SelectProfilesDialog_Profile_source_header;
 	public static String SelectProfilesDialog_Project_has_no_available_profiles;
+	public static String SelectProfilesDialog_Select_active_profiles_for_selected_projects;
 	public static String SelectProfilesDialog_Select_Maven_profiles;
 	public static String SelectProfilesDialog_Select_the_active_Maven_profiles;
 	public static String SelectProfilesDialog_SelectAll;

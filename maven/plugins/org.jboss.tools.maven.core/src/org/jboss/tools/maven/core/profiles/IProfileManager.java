@@ -2,7 +2,6 @@ package org.jboss.tools.maven.core.profiles;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.apache.maven.model.Profile;
 import org.eclipse.core.runtime.CoreException;
