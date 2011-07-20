@@ -50,6 +50,7 @@ import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
+import org.eclipse.swt.widgets.Text;
 import org.jboss.tools.maven.core.profiles.ProfileState;
 import org.jboss.tools.maven.ui.Messages;
 
@@ -62,8 +63,8 @@ public class SelectProfilesDialog extends TitleAreaDialog implements
 	private CheckboxTableViewer profileTableViewer;
 	private Button offlineModeBtn;
 	private Button forceUpdateBtn;
-    private ITextViewer profilesTextViewer;
-    private Label profilesText;
+    //private ITextViewer profilesTextViewer;
+    private Text profilesText;
 	
 	private boolean offlineMode ;
 	private boolean forceUpdate;
@@ -127,9 +128,10 @@ public class SelectProfilesDialog extends TitleAreaDialog implements
 		    profilesLabel.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 2, 1));
 		    profilesLabel.setText(NLS.bind(Messages.SelectProfilesDialog_Active_Profiles_for_Project, facade.getProject().getName()));
 			
-			profilesText = new Label(container, SWT.BORDER);
+			profilesText = new Text(container, SWT.BORDER);
 			profilesText.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 2, 1));
 			profilesText.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_WHITE));
+			profilesText.setEditable(false);
 			updateProfilesText();
 		}
 
