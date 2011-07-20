@@ -11,6 +11,7 @@
 
 package org.jboss.tools.maven.ui.bot.test;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
@@ -21,6 +22,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
+import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
@@ -45,7 +47,12 @@ import org.eclipse.datatools.connectivity.drivers.IDriverMgmtConstants;
 import org.eclipse.datatools.connectivity.drivers.IPropertySet;
 import org.eclipse.datatools.connectivity.drivers.PropertySetImpl;
 import org.eclipse.datatools.connectivity.drivers.models.TemplateDescriptor;
+import org.eclipse.jface.bindings.keys.KeyStroke;
+import org.eclipse.jface.bindings.keys.ParseException;
 import org.eclipse.m2e.core.internal.IMavenConstants;
+import org.eclipse.m2e.tests.common.AbstractMavenProjectTestCase;
+import org.eclipse.m2e.tests.common.JobHelpers;
+import org.eclipse.m2e.tests.common.WorkspaceHelpers;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
@@ -57,6 +64,7 @@ import org.eclipse.swtbot.swt.finder.SWTBot;
 import org.eclipse.swtbot.swt.finder.exceptions.WidgetNotFoundException;
 import org.eclipse.swtbot.swt.finder.finders.UIThreadRunnable;
 import org.eclipse.swtbot.swt.finder.junit.SWTBotJunit4ClassRunner;
+import org.eclipse.swtbot.swt.finder.keyboard.Keystrokes;
 import org.eclipse.swtbot.swt.finder.results.Result;
 import org.eclipse.swtbot.swt.finder.results.VoidResult;
 import org.eclipse.swtbot.swt.finder.utils.SWTBotPreferences;
@@ -103,7 +111,7 @@ import org.junit.runner.RunWith;
 @RunWith(SWTBotJunit4ClassRunner.class)
 public class CreateMavenizedSeamProjectTest {
 	
-	protected static final long IDLE_TIME = 20 * 60 * 1000L;
+	protected static final long IDLE_TIME = 1 * 60 * 1000L;
 
 	private static final String CONNECTION_PROFILE_NAME = "DefaultDS";
 
@@ -169,7 +177,7 @@ public class CreateMavenizedSeamProjectTest {
 
 	@BeforeClass
 	public final static void beforeClass() throws Exception {
-		initSWTBot();
+		bot = AbstractMavenSWTBotTest.initSWTBot();
 
 		switchPerspective("org.jboss.tools.seam.ui.SeamPerspective");
 
@@ -192,59 +200,10 @@ public class CreateMavenizedSeamProjectTest {
 		createNewSeamWebProjectWizard(PROJECT_NAME_WAR, DEPLOY_TYPE_WAR);
 	}
 
-	private static void initSWTBot() throws CoreException {
-		bot = new SWTWorkbenchBot();
-		SWTBotPreferences.KEYBOARD_LAYOUT = "EN_US";
-		SWTBotPreferences.TIMEOUT = 1000;
-		SWTBotPreferences.PLAYBACK_DELAY = 5;
-		waitForIdle();
-		try {
-			SWTBotView view = bot.viewByTitle("Welcome");
-			if (view != null) {
-				view.close();
-			}
-		} catch (WidgetNotFoundException ignore) {
-		}
 
-		SWTBotShell[] shells = bot.shells();
-		for (SWTBotShell shell : shells) {
-			final Shell widget = shell.widget;
-			Object parent = UIThreadRunnable.syncExec(shell.display,
-					new Result<Object>() {
-						public Object run() {
-							return widget.isDisposed() ? null : widget.getParent();
-						}
-					});
-			if (parent == null) {
-				continue;
-			}
-			shell.close();
-		}
 
-		List<? extends SWTBotEditor> editors = bot.editors();
-		for (SWTBotEditor e : editors) {
-			e.close();
-		}
-
-		removeProjects();
-
-		WorkbenchPlugin.getDefault().getPreferenceStore()
-				.setValue(IPreferenceConstants.RUN_IN_BACKGROUND, true);
-
-		PrefUtil.getAPIPreferenceStore().setValue(
-				IWorkbenchPreferenceConstants.ENABLE_ANIMATIONS, false);
-	}
-
-	private static void removeProjects() throws CoreException {
-		final IWorkspace workspace = ResourcesPlugin.getWorkspace();
-		workspace.run(new IWorkspaceRunnable() {
-			public void run(IProgressMonitor monitor) throws CoreException {
-				IProject[] projects = workspace.getRoot().getProjects();
-				for (int i = 0; i < projects.length; i++) {
-					projects[i].delete(true, true, monitor);
-				}
-			}
-		}, new NullProgressMonitor());
+	private static void removeProjects() throws Exception {
+		WorkspaceHelpers.cleanWorkspace();
 	}
 
 	private static void removeServers() throws CoreException {
@@ -282,12 +241,7 @@ public class CreateMavenizedSeamProjectTest {
     }
 
 	private static void activateSchell() {
-		UIThreadRunnable.syncExec(new VoidResult() {
-            public void run() {
-            	PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell()
-                        .forceActive();
-            }
-        });
+		AbstractMavenSWTBotTest.activateSchell();
 	}
 	
 	@After
@@ -509,7 +463,6 @@ public class CreateMavenizedSeamProjectTest {
 		bot.button("Finish").click();
 		
 		waitForIdle();
-		
 	}
 	
 	@Test
@@ -588,36 +541,24 @@ public class CreateMavenizedSeamProjectTest {
 		
 		bot.textWithLabel("Goals:").setText("clean package");
 		bot.button("Run").click();
-		
 		waitForIdle();
 		
 		IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject(PROJECT_NAME_WAR);
-		project.refreshLocal(IResource.DEPTH_INFINITE, new NullProgressMonitor());
-		IPath webInfPath = new Path("target/" + PROJECT_NAME_WAR + "-0.0.1-SNAPSHOT/WEB-INF");
-		assertFalse(project.getFolder(webInfPath.append("src")).exists());
-		assertFalse(project.getFolder(webInfPath.append("dev")).exists());
-		assertTrue(project.getFolder(webInfPath.append("lib")).exists());
+		project.getFolder("target").refreshLocal(IResource.DEPTH_INFINITE, new NullProgressMonitor());
+
+		IFolder warFolder = project.getFolder("target/" + PROJECT_NAME_WAR + "-0.0.1-SNAPSHOT");
+
+		assertTrue(warFolder +" is missing ", warFolder.exists());
+		
+		IPath webInfPath = new Path("WEB-INF");
+		assertFalse(warFolder.getFolder(webInfPath.append("src")).exists());
+		assertFalse(warFolder.getFolder(webInfPath.append("dev")).exists());
+		assertTrue(warFolder.getFolder(webInfPath.append("lib")).exists());
 		
 	}
 	
 	private static void waitForIdle() {
-		long start = System.currentTimeMillis();
-		int delay = 50;
-		while (!Job.getJobManager().isIdle()) {
-			delay(delay);
-			if ((System.currentTimeMillis() - start) > IDLE_TIME) {
-				Job[] jobs = Job.getJobManager().find(null);
-				StringBuffer str = new StringBuffer();
-				for (Job job : jobs) {
-					if (job.getThread() != null) {
-						str.append("\n").append(job.getName()).append(" (")
-								.append(job.getClass()).append(")");
-					}
-				}
-				throw new RuntimeException(
-						"Long running tasks detected:" + str.toString()); //$NON-NLS-1$
-			}
-		}
+		AbstractMavenSWTBotTest.waitForIdle();
 	}
 
 	public static void delay(long waitTimeMillis) {
@@ -639,6 +580,7 @@ public class CreateMavenizedSeamProjectTest {
 			}
 		}
 	}
+	
 	
 	// see https://jira.jboss.org/browse/JBIDE-6767
 	@Test
