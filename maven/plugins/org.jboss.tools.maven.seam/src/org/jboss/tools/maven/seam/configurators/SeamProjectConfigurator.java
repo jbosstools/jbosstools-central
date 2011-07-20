@@ -482,7 +482,7 @@ public class SeamProjectConfigurator extends AbstractProjectConfigurator {
 		Artifact seamArtifact = null;
 		for (Artifact artifact:artifacts) {
 	    	String groupId = artifact.getGroupId();
-    		if (groupId != null && ORG_JBOSS_SEAM_GROUP_ID.equals(groupId)) {
+    		if (ORG_JBOSS_SEAM_GROUP_ID.equals(groupId)) {
     			String artifactId = artifact.getArtifactId();
     			if (artifactId != null && JBOSS_SEAM_ARTIFACT_ID.equals(artifactId)) {
 	    			return artifact.getVersion();
