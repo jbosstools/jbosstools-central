@@ -19,7 +19,6 @@ import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.TitleAreaDialog;
-import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.CheckStateChangedEvent;
 import org.eclipse.jface.viewers.CheckboxTableViewer;
@@ -106,6 +105,7 @@ public class SelectProfilesDialog extends TitleAreaDialog implements
 		Composite area = (Composite) super.createDialogArea(parent);
 		Composite container = new Composite(area, SWT.NONE);
         container.setEnabled(true);
+        
 		GridLayout layout = new GridLayout(2, false);
 		layout.marginLeft = 12;
 		container.setLayout(layout);
@@ -137,11 +137,16 @@ public class SelectProfilesDialog extends TitleAreaDialog implements
 		}
 
 		boolean hasProfiles = !sharedProfiles.isEmpty();
+		//Label warningLabel = new Label(container,  SWT.CENTER); 
+		//warningLabel.setVisible(false); 
 		Label lblAvailable = new Label(container, SWT.NONE);
 		String textLabel;
+		
 		if (hasProfiles) {
 			if (facade == null) {
 				textLabel = Messages.SelectProfilesDialog_Common_profiles;
+				//warningLabel.setImage(JFaceResources.getImage(DLG_IMG_MESSAGE_WARNING));
+				//warningLabel.setVisible(true);
 			} else {
 				textLabel = Messages.SelectProfilesDialog_Available_profiles;
 			}
@@ -154,7 +159,7 @@ public class SelectProfilesDialog extends TitleAreaDialog implements
 			}
 		}
 		lblAvailable.setText(textLabel);
-		lblAvailable.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, true,
+		lblAvailable.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true,
 				false, 2, 1));
 
 		if (hasProfiles) {

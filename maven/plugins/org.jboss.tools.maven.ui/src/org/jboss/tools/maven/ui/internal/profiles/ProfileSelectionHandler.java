@@ -28,7 +28,9 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
@@ -92,14 +94,17 @@ public class ProfileSelectionHandler extends AbstractHandler {
 
 				public IStatus runInWorkspace(IProgressMonitor monitor) {
 					try {
-						
+						SubMonitor progress = SubMonitor.convert(monitor, Messages.ProfileManager_Updating_maven_profiles, 100);
+						SubMonitor subProgress = SubMonitor.convert(progress.newChild(5), allProfiles.size() * 100);
 						for (Map.Entry<IMavenProjectFacade, List<ProfileStatus>> entry : allProfiles.entrySet()){
-						
+					        if(progress.isCanceled()) {
+					          throw new OperationCanceledException();
+					        } 
 							IMavenProjectFacade facade = entry.getKey();
 							List<String> activeProfiles = getActiveProfiles(sharedProfiles, entry.getValue());
 							
 							profileManager.updateActiveProfiles(facade, activeProfiles, 
-								dialog.isOffline(), dialog.isForceUpdate(), monitor); 
+								dialog.isOffline(), dialog.isForceUpdate(), subProgress.newChild(100)); 
 						}
 					} catch (CoreException ex) {
 						Activator.log(ex);
