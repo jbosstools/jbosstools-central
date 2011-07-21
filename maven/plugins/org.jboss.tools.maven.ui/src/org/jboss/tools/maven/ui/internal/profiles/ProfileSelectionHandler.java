@@ -29,6 +29,7 @@ import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.window.Window;
@@ -57,102 +58,118 @@ public class ProfileSelectionHandler extends AbstractHandler {
 	 */
 	public Object execute(ExecutionEvent event) throws ExecutionException {
 		IWorkbenchWindow window = HandlerUtil.getActiveWorkbenchWindowChecked(event);
-		final Set<IMavenProjectFacade> facades = getSelectedMavenProjects(event);
-		if (facades != null && !facades.isEmpty() ) {
-			
-			System.out.print("Select projects "+facades);
-			
-			final IProfileManager profileManager = MavenCoreActivator.getDefault().getProfileManager();
-			final List<ProfileSelection> sharedProfiles;
-			final Map<IMavenProjectFacade, List<ProfileStatus>> allProfiles;
-			try {
-				allProfiles = getAllProfiles(facades, profileManager);
-				sharedProfiles = getSharedProfiles(allProfiles);
-			} catch (CoreException e) {
-				throw new ExecutionException("Unable to open the Maven Profile selection dialog", e);
-			}
-			final SelectProfilesDialog dialog = new SelectProfilesDialog(window.getShell(), 
-																	facades, 
-																	sharedProfiles);
-			//dialog.setBlockOnOpen(false); doesn't work
-		    if(dialog.open() == Window.OK) {
-		    	
-				WorkspaceJob job = new WorkspaceJob(Messages.ProfileManager_Updating_maven_profiles) {
+		final Set<IMavenProjectFacade> allfacades = getSelectedMavenProjects(event);
+		
+		if (allfacades.isEmpty()) {
+			display(window, Messages.ProfileSelectionHandler_Select_some_maven_projects);
+			return null;
+		}
 
-					public IStatus runInWorkspace(IProgressMonitor monitor) {
-						try {
-							
-							for (Map.Entry<IMavenProjectFacade, List<ProfileStatus>> entry : allProfiles.entrySet()){
-							
-								IMavenProjectFacade facade = entry.getKey();
-								List<String> activeProfiles = getActiveProfiles(sharedProfiles, entry.getValue());
-								
-								profileManager.updateActiveProfiles(facade, activeProfiles, 
-									dialog.isOffline(), dialog.isForceUpdate(), monitor); 
-							}
-						} catch (CoreException ex) {
-							Activator.log(ex);
-							return ex.getStatus();
-						}
-						return Status.OK_STATUS;
-					}
+		Set<IMavenProjectFacade> facades = getValidMavenProjects(allfacades);
+		if (facades.isEmpty()) {
+			display(window, Messages.ProfileSelectionHandler_Maven_Builder_still_processing);
+			return null;
+		}
+		
+		System.out.print("Select projects "+facades); //$NON-NLS-1$
+		
+		final IProfileManager profileManager = MavenCoreActivator.getDefault().getProfileManager();
+		final List<ProfileSelection> sharedProfiles;
+		final Map<IMavenProjectFacade, List<ProfileStatus>> allProfiles;
+		try {
+			allProfiles = getAllProfiles(facades, profileManager);
+			sharedProfiles = getSharedProfiles(allProfiles);
+		} catch (CoreException e) {
+			throw new ExecutionException(Messages.ProfileSelectionHandler_Unable_to_open_profile_dialog, e);
+		}
+		final SelectProfilesDialog dialog = new SelectProfilesDialog(window.getShell(), 
+																facades, 
+																sharedProfiles);
+		//dialog.setBlockOnOpen(false); doesn't work
+	    if(dialog.open() == Window.OK) {
+	    	
+			WorkspaceJob job = new WorkspaceJob(Messages.ProfileManager_Updating_maven_profiles) {
 
-					private List<String> getActiveProfiles(
-							List<ProfileSelection> sharedProfiles,
-							List<ProfileStatus> availableProfiles) {
-						List<String> ids = new ArrayList<String>();
+				public IStatus runInWorkspace(IProgressMonitor monitor) {
+					try {
 						
-						for (ProfileStatus st : availableProfiles) {
-							ProfileSelection selection = findSelectedProfile(st.getId(), sharedProfiles);
-							String id = null;
-							boolean isDisabled = false;
-							if (selection == null) {
-								//was not displayed. Use existing value.
+						for (Map.Entry<IMavenProjectFacade, List<ProfileStatus>> entry : allProfiles.entrySet()){
+						
+							IMavenProjectFacade facade = entry.getKey();
+							List<String> activeProfiles = getActiveProfiles(sharedProfiles, entry.getValue());
+							
+							profileManager.updateActiveProfiles(facade, activeProfiles, 
+								dialog.isOffline(), dialog.isForceUpdate(), monitor); 
+						}
+					} catch (CoreException ex) {
+						Activator.log(ex);
+						return ex.getStatus();
+					}
+					return Status.OK_STATUS;
+				}
+
+				private List<String> getActiveProfiles(
+						List<ProfileSelection> sharedProfiles,
+						List<ProfileStatus> availableProfiles) {
+					List<String> ids = new ArrayList<String>();
+					
+					for (ProfileStatus st : availableProfiles) {
+						ProfileSelection selection = findSelectedProfile(st.getId(), sharedProfiles);
+						String id = null;
+						boolean isDisabled = false;
+						if (selection == null) {
+							//was not displayed. Use existing value.
+							if (st.isUserSelected()) {
+								id = st.getId();
+								isDisabled = st.getActivationState().equals(ProfileState.Disabled);
+							}
+						} else {
+							if (null == selection.getSelected()) {
+								//Value was displayed but its state is unknown, use previous state
 								if (st.isUserSelected()) {
 									id = st.getId();
 									isDisabled = st.getActivationState().equals(ProfileState.Disabled);
 								}
 							} else {
-								if (null == selection.getSelected()) {
-									//Value was displayed but its state is unknown, use previous state
-									if (st.isUserSelected()) {
-										id = st.getId();
-										isDisabled = st.getActivationState().equals(ProfileState.Disabled);
-									}
-								} else {
-									//Value was displayed and is consistent
-									if (Boolean.TRUE.equals(selection.getSelected())) {
-										id = selection.getId();
-										isDisabled = selection.getActivationState().equals(ProfileState.Disabled);
-									}
+								//Value was displayed and is consistent
+								if (Boolean.TRUE.equals(selection.getSelected())) {
+									id = selection.getId();
+									isDisabled = selection.getActivationState().equals(ProfileState.Disabled);
 								}
-							}
-							
-							if (id != null) {
-								if (isDisabled) {
-									id = "!"+id;
-								}
-								ids.add(id);
 							}
 						}
-						return ids;
+						
+						if (id != null) {
+							if (isDisabled) {
+								id = "!"+id; //$NON-NLS-1$
+							}
+							ids.add(id);
+						}
 					}
+					return ids;
+				}
 
-					private ProfileSelection findSelectedProfile(String id,
-							List<ProfileSelection> sharedProfiles) {
-						for (ProfileSelection sel : sharedProfiles) {
-							if (id.equals(sel.getId())) {
-								return sel;
-							}
+				private ProfileSelection findSelectedProfile(String id,
+						List<ProfileSelection> sharedProfiles) {
+					for (ProfileSelection sel : sharedProfiles) {
+						if (id.equals(sel.getId())) {
+							return sel;
 						}
-						return null;
 					}
-				};
-				job.setRule( MavenPlugin.getProjectConfigurationManager().getRule());
-				job.schedule();
-		    }		
-		}
+					return null;
+				}
+			};
+			job.setRule( MavenPlugin.getProjectConfigurationManager().getRule());
+			job.schedule();
+	    }		
 	    return null;
+	}
+
+	private void display(IWorkbenchWindow window, String message) {
+		MessageDialog.openInformation(
+				window.getShell(),
+				Messages.SelectProfilesDialog_Select_Maven_profiles,
+				message);
 	}
 
 	private List<ProfileSelection> getSharedProfiles(
@@ -243,6 +260,7 @@ public class ProfileSelectionHandler extends AbstractHandler {
 	private Set<IMavenProjectFacade> getSelectedMavenProjects(ExecutionEvent event) {
 		ISelection selection = HandlerUtil.getCurrentSelection(event);
 		IProject[] projects = getSelectedProjects(selection);
+		Set<IMavenProjectFacade> facades = new HashSet<IMavenProjectFacade>();
 		try {
 			if (projects.length == 0) {
 			  IEditorInput input = HandlerUtil.getActiveEditorInput(event);
@@ -251,23 +269,30 @@ public class ProfileSelectionHandler extends AbstractHandler {
 	            projects = new IProject[]{fileInput.getFile().getProject()};
 	          }
 			}
-			Set<IMavenProjectFacade> facades = new HashSet<IMavenProjectFacade>();
 			for (IProject p : projects) {
 				if (p != null && p.isAccessible() && p.hasNature(IMavenConstants.NATURE_ID)) {
 					IMavenProjectFacade facade =MavenPlugin.getMavenProjectRegistry().getProject(p);
-					if (facade.getMavenProject() == null) {
-						System.err.println(facade.getProject() + " facade has no MavenProject!!!");
-					} else {
-						facades.add(facade);
-					}
+					facades.add(facade);
 				}
 			}
-			return facades;
 		} catch (CoreException e) {
 			Activator.log(e);
 		}
 
-		return null;
+		return facades;
+	}
+	
+	private Set<IMavenProjectFacade> getValidMavenProjects(Set<IMavenProjectFacade> facades) {
+		Set<IMavenProjectFacade> validFacades = new HashSet<IMavenProjectFacade>(facades);
+		Iterator<IMavenProjectFacade> ite = validFacades.iterator();
+		while (ite.hasNext()) {
+			IMavenProjectFacade facade = ite.next();
+			if (facade.getMavenProject() == null) {
+				System.err.println(facade.getProject() + " facade has no MavenProject!!!"); //$NON-NLS-1$
+				ite.remove();
+			}
+		}
+		return validFacades;
 	}
 
 	private IProject[] getSelectedProjects(ISelection selection) {

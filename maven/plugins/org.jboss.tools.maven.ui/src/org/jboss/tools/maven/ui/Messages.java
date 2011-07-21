@@ -56,6 +56,9 @@ public class Messages extends NLS {
 	public static String ConfiguratorPreferencePage_When_importing_Maven_projects_configure_the_following;
 	public static String ProfileManager_Updating_maven_profiles;
 	
+	public static String ProfileSelectionHandler_Maven_Builder_still_processing;
+	public static String ProfileSelectionHandler_Select_some_maven_projects;
+	public static String ProfileSelectionHandler_Unable_to_open_profile_dialog;
 	public static String SelectProfilesDialog_autoactivated;
 	public static String SelectProfilesDialog_Activate_menu;
 	public static String SelectProfilesDialog_Active_Profiles_for_Project;
