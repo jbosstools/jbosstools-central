@@ -32,14 +32,10 @@
    <!-- Maven Profile Selection-->
     <extension
           point="org.eclipse.ui.commands">
-       <category
-             id="org.jboss.tools.maven.ui.commands.profiles"
-             name="%Maven_Profiles">
-       </category>
        <command
-             categoryId="org.jboss.tools.maven.ui.commands.profiles"
+             categoryId="org.eclipse.ui.category.window"
              id="org.jboss.tools.maven.ui.commands.selectMavenProfileCommand"
-             name="%Select_Maven_Profiles">
+             name="%Select_Maven_Profiles_Cmd">
        </command>
     </extension>
     
@@ -66,7 +62,7 @@
                           adaptable="true">
          <action id="org.jboss.tools.maven.ui.commands.selectMavenProfileAction"
                  class="org.jboss.tools.maven.ui.generic.GenericCommandActionDelegate:org.jboss.tools.maven.ui.commands.selectMavenProfileCommand"
-                 label="%Select_Maven_Profiles"
+                 label="%Select_Maven_Profiles_Menu"
                  style="push"
                  definitionId="org.jboss.tools.maven.ui.commands.selectMavenProfileCommand"
                  menubarPath="org.eclipse.m2e.core.mavenMenu/open"
@@ -84,8 +80,9 @@
                           adaptable="true">
          <action id="org.jboss.tools.maven.ui.commands.selectMavenProfileAction"
                  class="org.jboss.tools.maven.ui.generic.GenericCommandActionDelegate:org.jboss.tools.maven.ui.commands.selectMavenProfileCommand"
-                 label="%Select_Maven_Profiles"
+                 label="%Select_Maven_Profiles_Menu"
                  style="push"
+                 definitionId="org.jboss.tools.maven.ui.commands.selectMavenProfileCommand"
                  menubarPath="org.eclipse.m2e.core.fileMenu/open"
                  enablesFor="+"/>
          <visibility>
@@ -98,8 +95,9 @@
              objectClass="org.eclipse.ui.IWorkingSet">
          <action id="org.jboss.tools.maven.ui.commands.selectMavenProfileAction"
                  class="org.jboss.tools.maven.ui.generic.GenericCommandActionDelegate:org.jboss.tools.maven.ui.commands.selectMavenProfileCommand"
-                 label="%Select_Maven_Profiles"
+                 label="%Select_Maven_Profiles_Menu"
                  style="push"
+                 definitionId="org.jboss.tools.maven.ui.commands.selectMavenProfileCommand"
                  menubarPath="org.eclipse.m2e.core.workingSetMenu/open"
                  enablesFor="+"/>
       </objectContribution>
@@ -116,7 +114,7 @@
                    commandId="org.jboss.tools.maven.ui.commands.selectMavenProfileCommand"
                    icon="icons/maven-profiles.gif"
                    id="org.jboss.tools.maven.ui.toolbars.selectMavenProfilesCommand"
-                   tooltip="%Select_Maven_Profiles">
+                   tooltip="%Select_Maven_Profiles_Cmd">
              </command>
           </toolbar>
        </menuContribution>

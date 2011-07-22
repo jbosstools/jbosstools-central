@@ -74,13 +74,11 @@ public class SelectProfilesDialog extends TitleAreaDialog implements
 	Set<IMavenProjectFacade> facades;
 	IMavenProjectFacade facade;
 	
-	
-	
-	
-
 	final Action activationAction = new ChangeProfileStateAction(ProfileState.Active);
 	
 	final Action deActivationAction = new ChangeProfileStateAction(ProfileState.Disabled);
+	private Label warningImg;
+	private Label warningLabel;
 
 	public SelectProfilesDialog(Shell parentShell, Set<IMavenProjectFacade> facades,
 			List<ProfileSelection> sharedProfiles) {
@@ -122,113 +120,129 @@ public class SelectProfilesDialog extends TitleAreaDialog implements
 			text = NLS.bind(
 					Messages.SelectProfilesDialog_Select_the_active_Maven_profiles,
 					facade.getProject().getName());
+			
+		    displayProfilesAsText(container);
 		}
 		setMessage(text);
 
-		if (facade != null) {
-			
-		    Label profilesLabel = new Label(container, SWT.NONE);
-		    profilesLabel.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
-		    profilesLabel.setText(NLS.bind(Messages.SelectProfilesDialog_Active_Profiles_for_Project, facade.getProject().getName()));
-			
-			profilesText = new Text(container, SWT.BORDER);
-			profilesText.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 2, 1));
-			profilesText.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_DARK_GRAY));
-			profilesText.setEditable(false);
-			profilesText.setToolTipText(Messages.SelectProfilesDialog_Read_Only_profiles);
-			updateProfilesText();
-		}
-
 		boolean hasProfiles = !sharedProfiles.isEmpty();
-		Label warningLabel = new Label(container,  SWT.CENTER); 
-		warningLabel.setVisible(false); 
-		GridDataFactory.fillDefaults().align(SWT.LEFT, SWT.CENTER).applyTo(warningLabel);
-		Label lblAvailable = new Label(container, SWT.NONE);
-		String textLabel;
-		
-		if (hasProfiles) {
-			if (facade == null) {
-				textLabel = Messages.SelectProfilesDialog_Common_profiles;
-				warningLabel.setImage(JFaceResources.getImage(DLG_IMG_MESSAGE_WARNING));
-				warningLabel.setVisible(true);
-			} else {
-				textLabel = Messages.SelectProfilesDialog_Available_profiles;
-			}
-		} else {
-			if (facade == null) {
-				textLabel = Messages.SelectProfilesDialog_No_Common_Profiles;
-			} else {
-				textLabel = 
-				NLS.bind(Messages.SelectProfilesDialog_Project_has_no_available_profiles, facade.getProject().getName());
-			}
+
+		if (hasProfiles && facade == null) {
+			displayWarning(container);
 		}
-		lblAvailable.setText(textLabel);
-		lblAvailable.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true,
+		
+		Label lblAvailable = new Label(container, SWT.NONE);
+		lblAvailable.setLayoutData(new GridData(SWT.WRAP, SWT.CENTER, true,
 				false, 2, 1));
 
+		String textLabel = getAvailableText(hasProfiles);
+		lblAvailable.setText(textLabel);
+
 		if (hasProfiles) {
 
-			GridData gd = new GridData(SWT.FILL, SWT.FILL, true, true, 2, 4);
-			gd.heightHint = 200;
-			gd.widthHint = 500;
-
-			profileTableViewer = CheckboxTableViewer.newCheckList(container, SWT.BORDER);
-			Table table = profileTableViewer.getTable();
-			table.setFocus();
-			table.setLayoutData(gd);
-			table.setLinesVisible(true);
-			table.setHeaderVisible(true);
-
-			TableColumn profileColumn = new TableColumn(table, SWT.NONE);
-			profileColumn.setText(Messages.SelectProfilesDialog_Profile_id_header);
-			profileColumn.setWidth(350);
-			
-			TableColumn sourceColumn = new TableColumn(table, SWT.NONE);
-			sourceColumn.setText(Messages.SelectProfilesDialog_Profile_source_header);
-			sourceColumn.setWidth(120);
-			
-
-			profileTableViewer.setContentProvider(ArrayContentProvider.getInstance());
-
-			profileTableViewer.setLabelProvider(new ProfileLabelProvider(parent
-					.getFont()));
-
-			
-			profileTableViewer.addCheckStateListener(new ICheckStateListener() {
-				
-				public void checkStateChanged(CheckStateChangedEvent event) {
-					ProfileSelection profile = (ProfileSelection) event.getElement();
-					if (profileTableViewer.getGrayed(profile)) {
-						profileTableViewer.setGrayed(profile, false);
-					}
-					profile.setSelected(profileTableViewer.getChecked(profile));
-					if (Boolean.FALSE.equals(profile.getSelected()) 
-							|| profile.getActivationState() == null) {
-						profile.setActivationState(ProfileState.Active);
-					}
-					
-					updateProfilesText();
-					profileTableViewer.refresh();
-				}
-			});
-			
-			profileTableViewer.setInput(sharedProfiles);
+			displayProfilesTable(container);
 
 			addSelectionButton(container, Messages.SelectProfilesDialog_SelectAll, true);
-
 			addSelectionButton(container, Messages.SelectProfilesDialog_DeselectAll, false);
 			
 			offlineModeBtn = addCheckButton(container, Messages.SelectProfilesDialog_Offline, offlineMode);
-
 			forceUpdateBtn = addCheckButton(container, Messages.SelectProfilesDialog_Force_update, forceUpdate);
-
-			createMenu();
 		}
 
 		return area;
 	}
 
-	private void updateProfilesText() {
+	private void displayWarning(Composite container) {
+		warningImg = new Label(container,  SWT.CENTER); 
+		warningLabel = new Label(container, SWT.NONE);
+		warningLabel.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 2, 1));
+		GridDataFactory.fillDefaults().align(SWT.LEFT, SWT.CENTER).applyTo(warningImg);
+		warningImg.setImage(JFaceResources.getImage(DLG_IMG_MESSAGE_WARNING));
+		warningLabel.setText( Messages.SelectProfilesDialog_Warning_Common_profiles);
+	}
+
+	private String getAvailableText(boolean hasProfiles) {
+		String textLabel;
+		if (hasProfiles) {
+			textLabel = Messages.SelectProfilesDialog_Available_profiles;
+		} else {
+			if (facade == null) {
+				textLabel = Messages.SelectProfilesDialog_No_Common_Profiles;
+			} else {
+				textLabel = 
+				NLS.bind(Messages.SelectProfilesDialog_Project_has_no_available_profiles, 
+						facade.getProject().getName());
+			}
+		}
+		return textLabel;
+	}
+
+	private void displayProfilesTable(Composite container) {
+		GridData gd = new GridData(SWT.FILL, SWT.FILL, true, true, 2, 4);
+		gd.heightHint = 200;
+		gd.widthHint = 500;
+
+		profileTableViewer = CheckboxTableViewer.newCheckList(container, SWT.BORDER);
+		Table table = profileTableViewer.getTable();
+		table.setFocus();
+		table.setLayoutData(gd);
+		table.setLinesVisible(true);
+		table.setHeaderVisible(true);
+
+		TableColumn profileColumn = new TableColumn(table, SWT.NONE);
+		profileColumn.setText(Messages.SelectProfilesDialog_Profile_id_header);
+		profileColumn.setWidth(350);
+		
+		TableColumn sourceColumn = new TableColumn(table, SWT.NONE);
+		sourceColumn.setText(Messages.SelectProfilesDialog_Profile_source_header);
+		sourceColumn.setWidth(120);
+		
+
+		profileTableViewer.setContentProvider(ArrayContentProvider.getInstance());
+
+		profileTableViewer.setLabelProvider(new ProfileLabelProvider(container
+				.getFont()));
+
+		
+		profileTableViewer.addCheckStateListener(new ICheckStateListener() {
+			
+			public void checkStateChanged(CheckStateChangedEvent event) {
+				ProfileSelection profile = (ProfileSelection) event.getElement();
+				if (profileTableViewer.getGrayed(profile)) {
+					profileTableViewer.setGrayed(profile, false);
+				}
+				profile.setSelected(profileTableViewer.getChecked(profile));
+				if (Boolean.FALSE.equals(profile.getSelected()) 
+						|| profile.getActivationState() == null) {
+					profile.setActivationState(ProfileState.Active);
+				}
+				
+				updateProfilesAsText();
+				profileTableViewer.refresh();
+			}
+		});
+		
+		profileTableViewer.setInput(sharedProfiles);
+		
+		createMenu();
+	}
+
+	private void displayProfilesAsText(Composite container) {
+		Label profilesLabel = new Label(container, SWT.NONE);
+		profilesLabel.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 2, 1));
+		profilesLabel.setText(NLS.bind(Messages.SelectProfilesDialog_Active_Profiles_for_Project, 
+										facade.getProject().getName()));
+		
+		profilesText = new Text(container, SWT.BORDER);
+		profilesText.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 3, 1));
+		profilesText.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_DARK_GRAY));
+		profilesText.setEditable(false);
+		profilesText.setToolTipText(Messages.SelectProfilesDialog_Read_Only_profiles);
+		
+		updateProfilesAsText();
+	}
+
+	private void updateProfilesAsText() {
 		if (profilesText != null) {
 			profilesText.setText(ProfileUtil.toString(sharedProfiles));
 		}
@@ -253,13 +267,13 @@ public class SelectProfilesDialog extends TitleAreaDialog implements
 				profileTableViewer.setAllGrayed(false);
 				for (ProfileSelection profile : sharedProfiles) {
 					profileTableViewer.setChecked(profile, ischecked);
-					
-					profile.setSelected(profileTableViewer.getChecked(profile));
-					if (profile.getActivationState() == null) {
+					profile.setSelected(ischecked);
+					if (!ischecked || profile.getActivationState() == null) {
  						profile.setActivationState(ProfileState.Active);
 					}
 				}
-				updateProfilesText();
+				profileTableViewer.refresh();
+				updateProfilesAsText();
 			}
 
 			public void widgetDefaultSelected(SelectionEvent e) {
@@ -468,7 +482,7 @@ public class SelectProfilesDialog extends TitleAreaDialog implements
 				if (ProfileState.Disabled.equals(state)) {
 					entry.setSelected(true);
 				}
-				updateProfilesText();
+				updateProfilesAsText();
 				profileTableViewer.refresh();
 			}
 			super.run();
@@ -523,9 +537,9 @@ public class SelectProfilesDialog extends TitleAreaDialog implements
 			if (entry != null) {
 				if (columnIndex == PROFILE_ID_COLUMN) {
 					text.append(entry.getId());
-
 					ProfileState state = entry.getActivationState();
-					if (Boolean.TRUE.equals(entry.getSelected()) && state == ProfileState.Disabled) {
+					if (Boolean.TRUE.equals(entry.getSelected()) 
+							&& state == ProfileState.Disabled) {
 						text.append(Messages.SelectProfilesDialog_deactivated);
 					} else if (Boolean.TRUE.equals(entry.getAutoActive())) {
 						text.append(Messages.SelectProfilesDialog_autoactivated);

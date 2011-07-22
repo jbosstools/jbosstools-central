@@ -63,7 +63,7 @@ public class Messages extends NLS {
 	public static String SelectProfilesDialog_Activate_menu;
 	public static String SelectProfilesDialog_Active_Profiles_for_Project;
 	public static String SelectProfilesDialog_Available_profiles;
-	public static String SelectProfilesDialog_Common_profiles;
+	public static String SelectProfilesDialog_Warning_Common_profiles;
 	public static String SelectProfilesDialog_deactivated;
 	public static String SelectProfilesDialog_Deactivate_menu;
 	public static String SelectProfilesDialog_DeselectAll;
