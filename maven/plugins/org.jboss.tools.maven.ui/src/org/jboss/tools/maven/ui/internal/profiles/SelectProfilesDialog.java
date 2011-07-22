@@ -19,6 +19,8 @@ import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.TitleAreaDialog;
+import org.eclipse.jface.layout.GridDataFactory;
+import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.CheckStateChangedEvent;
 import org.eclipse.jface.viewers.CheckboxTableViewer;
@@ -103,10 +105,11 @@ public class SelectProfilesDialog extends TitleAreaDialog implements
 	@Override
 	protected Control createDialogArea(Composite parent) {
 		Composite area = (Composite) super.createDialogArea(parent);
+
 		Composite container = new Composite(area, SWT.NONE);
         container.setEnabled(true);
         
-		GridLayout layout = new GridLayout(2, false);
+		GridLayout layout = new GridLayout(3, false);
 		layout.marginLeft = 12;
 		container.setLayout(layout);
 		container.setLayoutData(new GridData(GridData.FILL_BOTH));
@@ -125,7 +128,7 @@ public class SelectProfilesDialog extends TitleAreaDialog implements
 		if (facade != null) {
 			
 		    Label profilesLabel = new Label(container, SWT.NONE);
-		    profilesLabel.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 2, 1));
+		    profilesLabel.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
 		    profilesLabel.setText(NLS.bind(Messages.SelectProfilesDialog_Active_Profiles_for_Project, facade.getProject().getName()));
 			
 			profilesText = new Text(container, SWT.BORDER);
@@ -137,16 +140,17 @@ public class SelectProfilesDialog extends TitleAreaDialog implements
 		}
 
 		boolean hasProfiles = !sharedProfiles.isEmpty();
-		//Label warningLabel = new Label(container,  SWT.CENTER); 
-		//warningLabel.setVisible(false); 
+		Label warningLabel = new Label(container,  SWT.CENTER); 
+		warningLabel.setVisible(false); 
+		GridDataFactory.fillDefaults().align(SWT.LEFT, SWT.CENTER).applyTo(warningLabel);
 		Label lblAvailable = new Label(container, SWT.NONE);
 		String textLabel;
 		
 		if (hasProfiles) {
 			if (facade == null) {
 				textLabel = Messages.SelectProfilesDialog_Common_profiles;
-				//warningLabel.setImage(JFaceResources.getImage(DLG_IMG_MESSAGE_WARNING));
-				//warningLabel.setVisible(true);
+				warningLabel.setImage(JFaceResources.getImage(DLG_IMG_MESSAGE_WARNING));
+				warningLabel.setVisible(true);
 			} else {
 				textLabel = Messages.SelectProfilesDialog_Available_profiles;
 			}
@@ -164,7 +168,7 @@ public class SelectProfilesDialog extends TitleAreaDialog implements
 
 		if (hasProfiles) {
 
-			GridData gd = new GridData(SWT.FILL, SWT.FILL, true, true, 1, 4);
+			GridData gd = new GridData(SWT.FILL, SWT.FILL, true, true, 2, 4);
 			gd.heightHint = 200;
 			gd.widthHint = 500;
 
