@@ -21,6 +21,7 @@ import java.util.Set;
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.WorkspaceJob;
@@ -28,6 +29,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
@@ -274,9 +276,11 @@ public class ProfileSelectionHandler extends AbstractHandler {
 	            projects = new IProject[]{fileInput.getFile().getProject()};
 	          }
 			}
+			IProgressMonitor monitor = new NullProgressMonitor();
 			for (IProject p : projects) {
 				if (p != null && p.isAccessible() && p.hasNature(IMavenConstants.NATURE_ID)) {
-					IMavenProjectFacade facade =MavenPlugin.getMavenProjectRegistry().getProject(p);
+					IFile pom = p.getFile(IMavenConstants.POM_FILE_NAME);
+					IMavenProjectFacade facade = MavenPlugin.getMavenProjectRegistry().create(pom, true, monitor);
 					facades.add(facade);
 				}
 			}
