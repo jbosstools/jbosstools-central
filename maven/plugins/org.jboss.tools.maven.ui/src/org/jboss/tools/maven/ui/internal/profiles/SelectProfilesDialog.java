@@ -115,7 +115,9 @@ public class SelectProfilesDialog extends TitleAreaDialog implements
 		setTitle(Messages.SelectProfilesDialog_Maven_profile_selection);
 		String text;
 		if (facade == null) {
-			text = Messages.SelectProfilesDialog_Select_active_profiles_for_selected_projects;
+			text = NLS.bind(Messages.SelectProfilesDialog_Select_active_profiles_for_selected_projects,
+					facades.size()
+					);
 		} else {
 			text = NLS.bind(
 					Messages.SelectProfilesDialog_Select_the_active_Maven_profiles,
@@ -167,7 +169,8 @@ public class SelectProfilesDialog extends TitleAreaDialog implements
 			textLabel = Messages.SelectProfilesDialog_Available_profiles;
 		} else {
 			if (facade == null) {
-				textLabel = Messages.SelectProfilesDialog_No_Common_Profiles;
+				textLabel = NLS.bind(Messages.SelectProfilesDialog_No_Common_Profiles,
+									  facades.size());
 			} else {
 				textLabel = 
 				NLS.bind(Messages.SelectProfilesDialog_Project_has_no_available_profiles, 
