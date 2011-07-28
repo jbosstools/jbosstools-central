@@ -2,7 +2,7 @@
 <feature
       id="org.jboss.tools.project.examples.test.feature"
       label="Project Examples Test Suite Feature"
-      version="1.2.0.qualifier"
+      version="1.2.1.qualifier"
       provider-name="JBoss by Red Hat">
 
    <description>
