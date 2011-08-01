@@ -62,19 +62,13 @@ public class ProfileSelectionHandler extends AbstractHandler {
 	 */
 	public Object execute(ExecutionEvent event) throws ExecutionException {
 		IWorkbenchWindow window = HandlerUtil.getActiveWorkbenchWindowChecked(event);
-		final Set<IMavenProjectFacade> allfacades = getSelectedMavenProjects(event);
+		final Set<IMavenProjectFacade> facades = getSelectedMavenProjects(event);
 		
-		if (allfacades.isEmpty()) {
+		if (facades.isEmpty()) {
 			display(window, Messages.ProfileSelectionHandler_Select_some_maven_projects);
 			return null;
 		}
 
-		Set<IMavenProjectFacade> facades = getValidMavenProjects(allfacades);
-		if (facades.isEmpty()) {
-			display(window, Messages.ProfileSelectionHandler_Maven_Builder_still_processing);
-			return null;
-		}
-		
 		System.out.print("Select projects "+facades); //$NON-NLS-1$
 		
 		final IProfileManager profileManager = MavenCoreActivator.getDefault().getProfileManager();
@@ -253,8 +247,9 @@ public class ProfileSelectionHandler extends AbstractHandler {
 			final IProfileManager profileManager) throws CoreException {
 		Map<IMavenProjectFacade, List<ProfileStatus>> allProfiles = 
 				new HashMap<IMavenProjectFacade, List<ProfileStatus>>(facades.size());
+		IProgressMonitor monitor = new NullProgressMonitor();
 		for (IMavenProjectFacade facade : facades) {
-			allProfiles.put(facade, profileManager.getProfilesStatuses(facade));
+			allProfiles.put(facade, profileManager.getProfilesStatuses(facade, monitor));
 		}
 		return allProfiles;
 	}
@@ -289,19 +284,6 @@ public class ProfileSelectionHandler extends AbstractHandler {
 		}
 
 		return facades;
-	}
-	
-	private Set<IMavenProjectFacade> getValidMavenProjects(Set<IMavenProjectFacade> facades) {
-		Set<IMavenProjectFacade> validFacades = new HashSet<IMavenProjectFacade>(facades);
-		Iterator<IMavenProjectFacade> ite = validFacades.iterator();
-		while (ite.hasNext()) {
-			IMavenProjectFacade facade = ite.next();
-			if (facade.getMavenProject() == null) {
-				System.err.println(facade.getProject() + " facade has no MavenProject!!!"); //$NON-NLS-1$
-				ite.remove();
-			}
-		}
-		return validFacades;
 	}
 
 	private IProject[] getSelectedProjects(ISelection selection) {

@@ -1,5 +1,6 @@
 package org.jboss.tools.maven.core.internal.profiles;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -10,17 +11,25 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.maven.artifact.Artifact;
+import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.model.Model;
+import org.apache.maven.model.Parent;
 import org.apache.maven.model.Profile;
+import org.apache.maven.project.MavenProject;
 import org.apache.maven.settings.Settings;
 import org.apache.maven.settings.SettingsUtils;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.m2e.core.MavenPlugin;
+import org.eclipse.m2e.core.embedder.IMaven;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.project.IProjectConfigurationManager;
 import org.eclipse.m2e.core.project.MavenUpdateRequest;
 import org.eclipse.m2e.core.project.ResolverConfiguration;
+import org.eclipse.osgi.util.NLS;
 import org.jboss.tools.maven.core.profiles.IProfileManager;
 import org.jboss.tools.maven.core.profiles.ProfileState;
 import org.jboss.tools.maven.core.profiles.ProfileStatus;
@@ -36,16 +45,16 @@ public class ProfileManager implements IProfileManager {
 			return;
 		}
 		final IProjectConfigurationManager configurationManager = MavenPlugin.getProjectConfigurationManager();
-		final ResolverConfiguration configuration =configurationManager
-				.getResolverConfiguration(mavenProjectFacade.getProject());
+
+		IProject project = mavenProjectFacade.getProject();
+		
+		final ResolverConfiguration configuration =configurationManager.getResolverConfiguration(project);
 
 		final String profilesAsString = getAsString(profiles);
 		if (profilesAsString.equals(configuration.getActiveProfiles())) {
 			//Nothing changed
 			return;
 		}
-		
-		IProject project = mavenProjectFacade.getProject();
 		
 		configuration.setActiveProfiles(profilesAsString);
 		boolean isSet = configurationManager.setResolverConfiguration(project, configuration);
@@ -71,30 +80,6 @@ public class ProfileManager implements IProfileManager {
 		return sb.toString();
 	}
 	
-	public Map<Profile, Boolean> getAvailableProfiles(IMavenProjectFacade facade) throws CoreException {
-		if (facade == null) {
-			return Collections.emptyMap();
-		}
-		List<Profile> modelProfiles = facade.getMavenProject().getModel().getProfiles();
-		if (modelProfiles == null || modelProfiles.isEmpty()) {
-			return Collections.emptyMap();
-		}
-		
-		ResolverConfiguration resolverConfiguration = MavenPlugin.getProjectConfigurationManager()
-														.getResolverConfiguration(facade.getProject());
-		
-		Map<Profile, Boolean> projectProfiles = new LinkedHashMap<Profile, Boolean>(modelProfiles.size());
-		List<Profile> activeProfiles = facade.getMavenProject().getActiveProfiles();
-		
-		for (Profile p : modelProfiles) {
-			boolean isAutomaticallyActivated = isActive(p, activeProfiles) 
-											&& !resolverConfiguration.getActiveProfileList().contains(p.getId());
-			projectProfiles.put(p, isAutomaticallyActivated);
-		}
-		return Collections.unmodifiableMap(projectProfiles);
-	}
-
-
 	public Map<Profile, Boolean> getAvailableSettingProfiles() throws CoreException {
 		Map<Profile, Boolean> settingsProfiles = new LinkedHashMap<Profile, Boolean>();
 		Settings settings = MavenPlugin.getMaven().getSettings();
@@ -127,7 +112,9 @@ public class ProfileManager implements IProfileManager {
 	}
 
 	public List<ProfileStatus> getProfilesStatuses(
-			IMavenProjectFacade facade) throws CoreException {
+			IMavenProjectFacade facade,
+			IProgressMonitor monitor
+			) throws CoreException {
 		if (facade == null) {
 			return Collections.emptyList();
 		}
@@ -137,9 +124,9 @@ public class ProfileManager implements IProfileManager {
 
 		List<String> configuredProfiles = resolverConfiguration.getActiveProfileList();
 		
-		final List<Profile> activeProfiles = facade.getMavenProject().getActiveProfiles();
-
-		List<Profile> projectProfiles = new ArrayList<Profile>(facade.getMavenProject().getModel().getProfiles());
+		MavenProject mavenProject = facade.getMavenProject(monitor);
+		
+		List<Profile> projectProfiles = getAvailableProfiles(mavenProject.getModel(), new NullProgressMonitor());
 
 		final Map<Profile, Boolean> availableSettingsProfiles = getAvailableSettingProfiles();
 		Set<Profile> settingsProfiles = new HashSet<Profile>(availableSettingsProfiles.keySet());
@@ -158,7 +145,6 @@ public class ProfileManager implements IProfileManager {
 			status.setActivationState(state);
 			
 			Profile p = get(id, projectProfiles);
-
 			if (p == null){
 				p = get(id, settingsProfiles);
 				if(p != null){
@@ -174,6 +160,7 @@ public class ProfileManager implements IProfileManager {
 			statuses.add(status);
 		}
 		
+		final List<Profile> activeProfiles = mavenProject.getActiveProfiles();
 		//Iterate on the remaining project profiles
 		addStatuses(statuses, projectProfiles, new ActivationPredicate() {
 			@Override
@@ -191,6 +178,45 @@ public class ProfileManager implements IProfileManager {
 		});
 		return Collections.unmodifiableList(statuses);
 	}
+
+	protected List<Profile> getAvailableProfiles(Model projectModel, IProgressMonitor monitor) throws CoreException {
+		if (projectModel == null) {
+			return null;
+		}
+		List<Profile> profiles = new ArrayList<Profile>(projectModel.getProfiles());
+		
+		Parent p  = projectModel.getParent();
+		if (p != null) {
+			Model parentModel = resolvePomModel(p.getGroupId(), p.getArtifactId(), p.getVersion(), monitor);
+			List<Profile> parentProfiles = getAvailableProfiles(parentModel, monitor);
+			if (parentProfiles != null && !parentProfiles.isEmpty()) {
+				profiles.addAll(parentProfiles);
+			}
+		}
+		
+		return profiles;
+	}
+
+	 private Model resolvePomModel(String groupId, String artifactId, String version, IProgressMonitor monitor)
+		      throws CoreException {
+	    monitor.subTask(NLS.bind("Resolving {0}:{1}:{2}", new Object[] { groupId, artifactId, version}));
+
+	    IMavenProjectFacade facade = MavenPlugin.getMavenProjectRegistry().getMavenProject(groupId, artifactId, version);
+	    IMaven maven = MavenPlugin.getMaven(); 
+	    
+	    if (facade != null) {
+	    	return facade.getMavenProject(monitor).getModel();
+	    }
+	    
+	    List<ArtifactRepository> repositories = maven.getArtifactRepositories();
+	    Artifact artifact = maven.resolve(groupId, artifactId, version, "pom", null, repositories, monitor); //$NON-NLS-1$
+	    File file = artifact.getFile();
+	    if(file == null) {
+	      return null;
+	    }
+	    
+	    return maven.readModel(file);
+	 }
 
 	private void addStatuses(List<ProfileStatus> statuses, Collection<Profile> profiles, ActivationPredicate predicate) {
 		for (Profile p : profiles) {

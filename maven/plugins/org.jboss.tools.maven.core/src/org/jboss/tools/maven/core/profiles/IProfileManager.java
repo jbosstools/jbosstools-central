@@ -16,16 +16,7 @@ import org.eclipse.m2e.core.project.IMavenProjectFacade;
  */
 public interface IProfileManager {
 	
-	/**
-	 * Returns an unmodifiable Map of all the available profiles for a given project.
-	 * The value of each Map.Entry indicates if the profile is active.
-	 * @param mavenProjectFacade a facade of the maven project
-	 * @return an unmodifiable Map of all the available profiles for a given project.
-	 * @throws CoreException
-	 */
-	Map<Profile, Boolean> getAvailableProfiles(IMavenProjectFacade mavenProjectFacade) throws CoreException;
-
-	List<ProfileStatus> getProfilesStatuses(IMavenProjectFacade mavenProjectFacade) throws CoreException;
+	List<ProfileStatus> getProfilesStatuses(IMavenProjectFacade mavenProjectFacade, IProgressMonitor monitor) throws CoreException;
 
 	/**
 	 * Returns an unmodifiable Map of all the available profiles defined in the

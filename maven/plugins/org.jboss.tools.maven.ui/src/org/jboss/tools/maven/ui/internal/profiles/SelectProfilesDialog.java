@@ -10,6 +10,7 @@
  ************************************************************************************/
 package org.jboss.tools.maven.ui.internal.profiles;
 
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
@@ -25,6 +26,7 @@ import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.CheckStateChangedEvent;
 import org.eclipse.jface.viewers.CheckboxTableViewer;
 import org.eclipse.jface.viewers.ICheckStateListener;
+import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.ITableColorProvider;
 import org.eclipse.jface.viewers.ITableFontProvider;
@@ -146,7 +148,8 @@ public class SelectProfilesDialog extends TitleAreaDialog implements
 
 			addSelectionButton(container, Messages.SelectProfilesDialog_SelectAll, true);
 			addSelectionButton(container, Messages.SelectProfilesDialog_DeselectAll, false);
-			
+			addActivationButton(container, "Activate", true);
+			addActivationButton(container, "Deactivate", false);
 			offlineModeBtn = addCheckButton(container, Messages.SelectProfilesDialog_Offline, offlineMode);
 			forceUpdateBtn = addCheckButton(container, Messages.SelectProfilesDialog_Force_update, forceUpdate);
 		}
@@ -287,6 +290,41 @@ public class SelectProfilesDialog extends TitleAreaDialog implements
 		return button;
 	}
 
+	private Button addActivationButton(Composite container, String label, final boolean ischecked) {
+		Button button = new Button(container, SWT.NONE);
+		button.setLayoutData(new GridData(SWT.FILL, SWT.UP,
+				false, false, 1, 1));
+		button.setText(label);
+		button.addSelectionListener(new SelectionListener() {
+			public void widgetSelected(SelectionEvent e) {
+				ISelection s = profileTableViewer.getSelection();
+				if (s instanceof IStructuredSelection) {
+					IStructuredSelection sel = (IStructuredSelection) s;
+					Iterator<?> ite = sel.iterator();
+					while (ite.hasNext()) {
+						System.err.println(ite.next());
+					}
+				}
+//				for (ProfileSelection profile : sharedProfiles) {
+//					profileTableViewer.setChecked(profile, ischecked);
+//					profile.setSelected(ischecked);
+//					if (!ischecked || profile.getActivationState() == null) {
+// 						profile.setActivationState(ProfileState.Active);
+//					}
+//				}
+				profileTableViewer.refresh();
+				updateProfilesAsText();
+			}
+
+			public void widgetDefaultSelected(SelectionEvent e) {
+
+			}
+		});
+		
+		return button;
+	}
+	
+	
 	@Override
 	protected void createButtonsForButtonBar(Composite parent) {
 		if (profileTableViewer != null) {
