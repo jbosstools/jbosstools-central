@@ -408,9 +408,9 @@ public class CreateMavenizedSeamProjectTest {
 	
 	public static void createNewSeamWebProjectWizard(String projectName, String deployType) throws Exception {
 		waitForIdle();
-		bot.menu("File").menu("New").menu("Seam Web Project").click();
+		bot.menu("File").menu("New").menu("Seam 2 Web Project").click();
 		 
-		SWTBotShell mainShell = bot.shell("New Seam Project");
+		SWTBotShell mainShell = bot.shell("New Seam 2 Project");
 		mainShell.activate();
 
 		bot.textWithLabel("Project name:").setText(projectName);
