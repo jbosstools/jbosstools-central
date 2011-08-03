@@ -11,5 +11,8 @@
 	<feature url="features/org.jboss.tools.community.project.examples.feature_0.0.0.jar" id="org.jboss.tools.community.project.examples.feature" version="0.0.0">
 		<category name="JBoss Tools examples Nightly Build Update Site"/>
 	</feature>
+	<feature url="features/org.jboss.tools.project.examples.test.feature_0.0.0.jar" id="org.jboss.tools.project.examples.test.feature" version="0.0.0">
+		<category name="JBoss Tools examples Nightly Build Update Site"/>
+	</feature>
 
 </site>
