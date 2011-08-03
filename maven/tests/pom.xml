@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>org.jboss.tools</groupId>
 		<artifactId>maven</artifactId>
-		<version>1.2.0-SNAPSHOT</version>
+		<version>1.3.0-SNAPSHOT</version>
 	</parent>
 	<groupId>org.jboss.tools.maven</groupId>
 	<artifactId>tests</artifactId>
@@ -13,7 +13,24 @@
 	<name>maven.tests</name>
 	<packaging>pom</packaging>
 	<modules>
+		<!--module>org.jboss.tools.maven.configurators.tests</module-->
 		<module>org.jboss.tools.maven.ui.bot.test</module>
 	</modules>
+	
+	<build>
+	<pluginManagement>
+	<plugins>
+		<plugin>
+		<!-- Need to move that up to one of the parents (highest?)  -->
+			<groupId>org.eclipse.tycho</groupId>
+			<artifactId>tycho-surefire-plugin</artifactId>
+			<configuration>
+			<appArgLine>-pluginCustomization ${basedir}/plugin_customization.ini</appArgLine>
+			</configuration>
+		</plugin>
+	</plugins>
+	</pluginManagement>
+	</build>
+	
 </project>
 	
