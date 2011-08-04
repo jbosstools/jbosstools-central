@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>org.jboss.tools.maven.tests</groupId>
+	<artifactId>jsf-webxml</artifactId>
+	<version>1.0.0-SNAPSHOT</version>
+	<packaging>war</packaging>
+	<dependencies>
+		<dependency>
+			<groupId>javax.faces</groupId>
+			<!-- not in central, hence requires the JBoss repo -->
+			<artifactId>jsf-api</artifactId>
+			<version>2.0</version>
+		</dependency>
+	</dependencies>
+	
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-war-plugin</artifactId>
+				<version>2.1.1</version>
+				<configuration>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+	<repositories>
+	<!-- You should seriously consider using a repository manager or declare repositories in your settings.xml.
+              See http://www.sonatype.com/people/2009/02/why-putting-repositories-in-your-poms-is-a-bad-idea/   -->
+     <repository>
+        <!-- The JBoss Public repository is a composite repository of several major repositories. 
+              See http://community.jboss.org/wiki/MavenGettingStarted-Users -->
+        <id>jboss-public-repository</id>
+        <url>http://repository.jboss.org/nexus/content/groups/public</url>
+        <releases>
+           <enabled>true</enabled>
+        </releases>
+        <!-- You can disable snapshot resolution to speed up your builds -->
+        <snapshots>
+          <enabled>true</enabled>
+        </snapshots>        
+     </repository>
+	</repositories>
+</project>
+
