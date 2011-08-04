@@ -15,6 +15,8 @@ import java.io.File;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IncrementalProjectBuilder;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jst.common.project.facet.core.JavaFacet;
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.project.IProjectConfigurationManager;
@@ -71,18 +73,18 @@ public abstract class AbstractMavenConfiguratorTest extends
 		if (newPomName != null) {
 			copyContent(project, newPomName, "pom.xml");
 		}
-
+		IProgressMonitor mon = new NullProgressMonitor();
 		IProjectConfigurationManager configurationManager = MavenPlugin.getProjectConfigurationManager();
 		ResolverConfiguration configuration = new ResolverConfiguration();
-		configurationManager.enableMavenNature(project, configuration, monitor);
-		configurationManager.updateProjectConfiguration(project, monitor);
-		waitForJobsToComplete();
+		configurationManager.enableMavenNature(project, configuration, mon);
+		configurationManager.updateProjectConfiguration(project, mon);
+		waitForJobsToComplete(mon);
 
-		project.build(IncrementalProjectBuilder.FULL_BUILD, monitor);
+		project.build(IncrementalProjectBuilder.FULL_BUILD, mon);
 		if (waitTime > 0) {
 			Thread.sleep(waitTime);
 		}
-		waitForJobsToComplete();
+		waitForJobsToComplete(mon);
 	}
 
 	protected void updateProject(IProject project) throws Exception {

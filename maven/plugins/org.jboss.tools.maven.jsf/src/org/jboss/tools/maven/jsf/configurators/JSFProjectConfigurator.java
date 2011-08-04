@@ -189,7 +189,7 @@ public class JSFProjectConfigurator extends AbstractProjectConfigurator {
 					                    && !generatedFacesConfig.exists();  
 			
 			IProjectFacetVersion facetVersion = null;
-			boolean configureServlet = true;
+			boolean configureServlet = false;//Fix for JBIDE-9454, where existing web.xml is completely overwritten.
 			if (jsfVersionString.startsWith(JSF_VERSION_1_1)) { 
 				facetVersion = JSF_FACET_VERSION_1_1;
 			}
@@ -198,7 +198,7 @@ public class JSFProjectConfigurator extends AbstractProjectConfigurator {
 			}
 			else if (jsfVersionString.startsWith(JSF_VERSION_2_0)) { 
 				facetVersion = JSF_FACET_VERSION_2_0;
-				configureServlet = configureWebxml();
+				//configureServlet = configureWebxml();
 			}
 			
 			if (facetVersion != null) {

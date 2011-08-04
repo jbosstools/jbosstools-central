@@ -32,13 +32,13 @@
                    soft="true"
                    version="[1.0"/>
 				<requires
-          facet="jst.appclient"
-          soft="true"
-          version="[1.2"/>
+		          facet="jst.appclient"
+		          soft="true"
+		          version="[1.2"/>
 				<requires
-          facet="jst.connector"
-          soft="true"
-          version="[1.0"/>
+		          facet="jst.connector"
+		          soft="true"
+		          version="[1.0"/>
          	</or>
          </constraint>
       </project-facet-version>
@@ -235,4 +235,5 @@
       		</enablement>
     	</provider>
   	</extension>
+  	
 </plugin>

@@ -83,7 +83,6 @@ public class ProfileSelectionHandler extends AbstractHandler {
 		final SelectProfilesDialog dialog = new SelectProfilesDialog(window.getShell(), 
 																facades, 
 																sharedProfiles);
-		//dialog.setBlockOnOpen(false); doesn't work
 	    if(dialog.open() == Window.OK) {
 	    	
 			WorkspaceJob job = new WorkspaceJob(Messages.ProfileManager_Updating_maven_profiles) {

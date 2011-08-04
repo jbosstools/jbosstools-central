@@ -4,6 +4,7 @@ import java.io.File;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.m2e.core.project.ResolverConfiguration;
 import org.eclipse.m2e.tests.common.WorkspaceHelpers;
 import org.eclipse.wst.common.project.facet.core.IFacetedProject;
@@ -24,7 +25,7 @@ public class JSFConfiguratorTest extends AbstractMavenConfiguratorTest {
 														  "jsf-myfaces/pom.xml",
 														  "jsf-jsfapi-12/pom.xml"}, 
 											new ResolverConfiguration());
-		waitForJobsToComplete();
+		waitForJobsToComplete(new NullProgressMonitor());
 		IProject mojarra = projects[0];
 		assertNoErrors(mojarra);
 		assertIsJSFProject(mojarra, JSFProjectConfigurator.JSF_FACET_VERSION_2_0);
@@ -54,7 +55,7 @@ public class JSFConfiguratorTest extends AbstractMavenConfiguratorTest {
 		String webxmlRelPath = "src/main/webapp/WEB-INF/web.xml";
 		
 		IProject jsfProject = importProject(projectLocation+"/pom.xml");
-		waitForJobsToComplete();
+		waitForJobsToComplete(new NullProgressMonitor());
 		assertIsJSFProject(jsfProject, JSFProjectConfigurator.JSF_FACET_VERSION_2_0);
 
 		IFile webXml = jsfProject.getFile(webxmlRelPath);
@@ -67,7 +68,7 @@ public class JSFConfiguratorTest extends AbstractMavenConfiguratorTest {
 	public void testJBIDE9455_errorMarkers() throws Exception {
 		String projectLocation = "projects/jsf/jsf-error";
 		IProject jsfProject = importProject(projectLocation+"/pom.xml");
-		waitForJobsToComplete();
+		waitForJobsToComplete(new NullProgressMonitor());
 		IFacetedProject facetedProject = ProjectFacetsManager.create(jsfProject);
 		assertNotNull(jsfProject.getName() + " is not a faceted project", facetedProject);
 		assertFalse("JSF Facet should be missing", facetedProject.hasProjectFacet(JSFProjectConfigurator.JSF_FACET));

@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+	<parent>
+		<artifactId>samples</artifactId>
+		<groupId>org.richfaces</groupId>
+		<version>3.3.3.Final</version>
+	</parent>
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>org.richfaces.samples</groupId>
+	<artifactId>seamIntegration</artifactId>
+	<packaging>war</packaging>
+	<name>seamIntegration Maven Webapp</name>
+	<properties>
+		<seam.version>2.1.2</seam.version>
+	</properties>
+	<build>
+		<finalName>seamIntegration</finalName>
+		<plugins>
+			<plugin>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<inherited>true</inherited>
+				<configuration>
+					<source>1.5</source>
+					<target>1.5</target>
+				</configuration>
+			</plugin>
+			<plugin>
+				<artifactId>maven-war-plugin</artifactId>
+				<configuration>
+					<!--
+						<webResources> <resource> <directory>${seamHome}</directory>
+						<targetPath>WEB-INF/lib</targetPath> <includes>
+						<include>jboss-seam.jar</include>
+						<include>jboss-seam-ui.jar</include>
+						<include>jboss-seam-debug.jar</include> <include>
+						jboss-seam-remoting.jar </include> <include> jboss-seam-pdf.jar
+						</include> </includes> </resource> <resource>
+						<directory>${seamHome}/lib</directory>
+						<targetPath>WEB-INF/lib</targetPath> <includes>
+						<include>jboss-el.jar</include> </includes> </resource>
+						</webResources>
+					-->
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+	<dependencies>
+		<dependency>
+			<groupId>org.richfaces.ui</groupId>
+			<artifactId>richfaces-ui</artifactId>
+			<version>${version}</version>
+		</dependency>
+		<dependency>
+			<groupId>hsqldb</groupId>
+			<artifactId>hsqldb</artifactId>
+			<version>1.8.0.7</version>
+			<scope>runtime</scope>
+		</dependency>
+		<dependency>
+			<groupId>commons-dbcp</groupId>
+			<artifactId>commons-dbcp</artifactId>
+			<version>1.2.2</version>
+			<scope>runtime</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.hibernate</groupId>
+			<artifactId>hibernate-entitymanager</artifactId>
+			<version>3.4.0.GA</version>
+		</dependency>
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-jcl</artifactId>
+			<version>1.4.2</version>
+			<scope>runtime</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.hibernate</groupId>
+			<artifactId>hibernate-validator</artifactId>
+			<version>3.1.0.GA</version>
+		</dependency>
+		<dependency>
+			<groupId>org.jboss.seam</groupId>
+			<artifactId>jboss-seam</artifactId>
+			<version>${seam.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.jboss.el</groupId>
+			<artifactId>jboss-el</artifactId>
+			<version>2.0.2.CR1</version>
+		</dependency>
+		<dependency>
+			<groupId>javax.el</groupId>
+			<artifactId>el-api</artifactId>
+			<version>1.0</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.jboss.seam</groupId>
+			<artifactId>jboss-seam-ui</artifactId>
+			<version>${seam.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.jboss.seam</groupId>
+			<artifactId>jboss-seam-ioc</artifactId>
+			<version>${seam.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.jboss.seam</groupId>
+			<artifactId>jboss-seam-debug</artifactId>
+			<version>${seam.version}</version>
+			<scope>runtime</scope>
+		</dependency>
+		<dependency>
+			<groupId>javax.servlet</groupId>
+			<artifactId>jstl</artifactId>
+			<version>1.2</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.myfaces.trinidad</groupId>
+			<artifactId>trinidad-api</artifactId>
+			<version>1.2.10</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.myfaces.trinidad</groupId>
+			<artifactId>trinidad-impl</artifactId>
+			<version>1.2.10</version>
+			<scope>runtime</scope>
+		</dependency>
+	</dependencies>
+	<repositories>
+	<!-- You should seriously consider using a repository manager or declare repositories in your settings.xml.
+              See http://www.sonatype.com/people/2009/02/why-putting-repositories-in-your-poms-is-a-bad-idea/   -->
+	  <repository>
+	      <!-- The JBoss Public repository is a composite repository of several major repositories. 
+		    See http://community.jboss.org/wiki/MavenGettingStarted-Users -->
+	      <id>jboss-public-repository</id>
+	      <url>http://repository.jboss.org/nexus/content/groups/public</url>
+	      <releases>
+		<enabled>true</enabled>
+	      </releases>
+	      <!-- You can disable snapshot resolution to speed up your builds -->
+	      <snapshots>
+		<enabled>true</enabled>
+	      </snapshots>        
+	  </repository>
+	</repositories>	
+</project>
