@@ -1,11 +1,14 @@
 package org.jboss.tools.maven.configurators.tests;
 
+import java.io.File;
+
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
-import org.eclipse.jst.common.project.facet.core.JavaFacet;
 import org.eclipse.m2e.core.project.ResolverConfiguration;
+import org.eclipse.m2e.tests.common.WorkspaceHelpers;
 import org.eclipse.wst.common.project.facet.core.IFacetedProject;
-import org.eclipse.wst.common.project.facet.core.IProjectFacetVersion;
 import org.eclipse.wst.common.project.facet.core.ProjectFacetsManager;
+import org.jboss.tools.maven.jsf.MavenJSFConstants;
 import org.jboss.tools.maven.jsf.configurators.JSFProjectConfigurator;
 import org.junit.Test;
 
@@ -21,6 +24,7 @@ public class JSFConfiguratorTest extends AbstractMavenConfiguratorTest {
 														  "jsf-myfaces/pom.xml",
 														  "jsf-jsfapi-12/pom.xml"}, 
 											new ResolverConfiguration());
+		waitForJobsToComplete();
 		IProject mojarra = projects[0];
 		assertNoErrors(mojarra);
 		assertIsJSFProject(mojarra, JSFProjectConfigurator.JSF_FACET_VERSION_2_0);
@@ -44,10 +48,40 @@ public class JSFConfiguratorTest extends AbstractMavenConfiguratorTest {
 
 	}
 
-	private void assertIsJSFProject(IProject project, IProjectFacetVersion expectedJSFVersion) throws Exception {
-		  IFacetedProject facetedProject = ProjectFacetsManager.create(project);
-		    assertNotNull(project.getName() + " is not a faceted project", facetedProject);
-		    assertEquals("Unexpected JSF Version", expectedJSFVersion, facetedProject.getInstalledVersion(JSFProjectConfigurator.JSF_FACET));
-		    assertTrue("Java Facet is missing", facetedProject.hasProjectFacet(JavaFacet.FACET));
+	@Test
+	public void testJBIDE8687_webXml_changed() throws Exception {
+		String projectLocation = "projects/jsf/jsf-webxml";
+		String webxmlRelPath = "src/main/webapp/WEB-INF/web.xml";
+		
+		IProject jsfProject = importProject(projectLocation+"/pom.xml");
+		waitForJobsToComplete();
+		assertIsJSFProject(jsfProject, JSFProjectConfigurator.JSF_FACET_VERSION_2_0);
+
+		IFile webXml = jsfProject.getFile(webxmlRelPath);
+		assertTrue(webXml.exists());
+		File originalWebXml = new File(projectLocation, webxmlRelPath);
+		assertEquals("web.xml content changed ", toString(originalWebXml), toString(webXml));
+	}	
+	
+	@Test
+	public void testJBIDE9455_errorMarkers() throws Exception {
+		String projectLocation = "projects/jsf/jsf-error";
+		IProject jsfProject = importProject(projectLocation+"/pom.xml");
+		waitForJobsToComplete();
+		IFacetedProject facetedProject = ProjectFacetsManager.create(jsfProject);
+		assertNotNull(jsfProject.getName() + " is not a faceted project", facetedProject);
+		assertFalse("JSF Facet should be missing", facetedProject.hasProjectFacet(JSFProjectConfigurator.JSF_FACET));
+		assertHasJSFConfigurationError(jsfProject, "JavaServer Faces 2.0 can not be installed : One or more constraints have not been satisfied.");
+		assertHasJSFConfigurationError(jsfProject, "JavaServer Faces 2.0 requires Dynamic Web Module 2.5 or newer.");
+		
+		//Check markers are removed upon configuration update
+		copyContent(jsfProject, "src/main/webapp/WEB-INF/good-web.xml", "src/main/webapp/WEB-INF/web.xml", true);
+		updateProject(jsfProject);
+		assertNoErrors(jsfProject);
+		assertIsJSFProject(jsfProject, JSFProjectConfigurator.JSF_FACET_VERSION_2_0);
+	}
+
+	private void assertHasJSFConfigurationError(IProject project, String message) throws Exception {
+		WorkspaceHelpers.assertErrorMarker(MavenJSFConstants.JSF_CONFIGURATION_ERROR_MARKER_ID, message, 1, "", project);
 	}
 }

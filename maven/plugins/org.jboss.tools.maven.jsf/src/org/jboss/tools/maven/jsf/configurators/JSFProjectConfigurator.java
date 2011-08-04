@@ -20,10 +20,12 @@ import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IType;
@@ -47,6 +49,7 @@ import org.jboss.tools.common.util.EclipseJavaUtil;
 import org.jboss.tools.maven.core.IJBossMavenConstants;
 import org.jboss.tools.maven.core.internal.project.facet.MavenFacetInstallDataModelProvider;
 import org.jboss.tools.maven.jsf.MavenJSFActivator;
+import org.jboss.tools.maven.jsf.MavenJSFConstants;
 import org.jboss.tools.maven.jsf.Messages;
 import org.jboss.tools.maven.ui.Activator;
 
@@ -56,12 +59,11 @@ import org.jboss.tools.maven.ui.Activator;
  *
  */
 public class JSFProjectConfigurator extends AbstractProjectConfigurator {
-
+	
 	private static final String JSF_API_GROUP_ID = "javax.faces"; //$NON-NLS-1$
 	private static final String JSF_API2_GROUP_ID = "com.sun.faces"; //$NON-NLS-1$
 	private static final String JSF_API_ARTIFACT_ID = "jsf-api"; //$NON-NLS-1$
 	
-	private static final String WEB_XML = "WEB-INF/web.xml";
 	private static final String WAR_SOURCE_FOLDER = "/src/main/webapp";
 
 	protected static final IProjectFacet dynamicWebFacet;
@@ -172,6 +174,8 @@ public class JSFProjectConfigurator extends AbstractProjectConfigurator {
 			String jsfVersionString, MavenProject mavenProject,
 			IProgressMonitor monitor)
 			throws CoreException {
+
+		markerManager.deleteMarkers(fproj.getProject(), MavenJSFConstants.JSF_CONFIGURATION_ERROR_MARKER_ID);
 		if (!fproj.hasProjectFacet(JSF_FACET)) {
 			String warSourceDir = getWarSourceDirectory(mavenProject,fproj.getProject());
 			IPath facesConfigPath = new Path("WEB-INF/faces-config.xml");
@@ -184,20 +188,33 @@ public class JSFProjectConfigurator extends AbstractProjectConfigurator {
 					                    && !generatedFacesConfig.getLocation().equals(facesConfig.getLocation()) 
 					                    && !generatedFacesConfig.exists();  
 			
+			IProjectFacetVersion facetVersion = null;
+			boolean configureServlet = true;
 			if (jsfVersionString.startsWith(JSF_VERSION_1_1)) { 
-				IDataModel model = MavenJSFActivator.getDefault().createJSFDataModel(fproj,JSF_FACET_VERSION_1_1);
-				fproj.installProjectFacet(JSF_FACET_VERSION_1_1, model, monitor);	
+				facetVersion = JSF_FACET_VERSION_1_1;
 			}
 			else if (jsfVersionString.startsWith(JSF_VERSION_1_2)) { 
-				IDataModel model = MavenJSFActivator.getDefault().createJSFDataModel(fproj,JSF_FACET_VERSION_1_2);
-				fproj.installProjectFacet(JSF_FACET_VERSION_1_2, model, monitor);	
+				facetVersion = JSF_FACET_VERSION_1_2;	
 			}
 			else if (jsfVersionString.startsWith(JSF_VERSION_2_0)) { 
-				IDataModel model = MavenJSFActivator.getDefault().createJSFDataModel(fproj,JSF_FACET_VERSION_2_0);
-				model.setBooleanProperty(IJSFFacetInstallDataModelProperties.CONFIGURE_SERVLET,configureWebxml());
-				fproj.installProjectFacet(JSF_FACET_VERSION_2_0, model, monitor);
+				facetVersion = JSF_FACET_VERSION_2_0;
+				configureServlet = configureWebxml();
 			}
-
+			
+			if (facetVersion != null) {
+				IStatus status = facetVersion.getConstraint().check(fproj.getProjectFacets());
+				if (status.isOK()) {
+					IDataModel model = MavenJSFActivator.getDefault().createJSFDataModel(fproj,facetVersion);
+					model.setBooleanProperty(IJSFFacetInstallDataModelProperties.CONFIGURE_SERVLET, configureServlet );
+					fproj.installProjectFacet(facetVersion, model, monitor);
+				} else {
+			        addErrorMarker(fproj.getProject(), facetVersion + " can not be installed : "+ status.getMessage());
+					for (IStatus st : status.getChildren()) {
+				        addErrorMarker(fproj.getProject(), st.getMessage());
+					}
+				}
+			}
+			
 			if (shouldFixFacesConfig && generatedFacesConfig.exists()) {
 				if (facesConfig.exists()) { 
 					//We have 2 config files. Delete the gen'd one
@@ -216,6 +233,14 @@ public class JSFProjectConfigurator extends AbstractProjectConfigurator {
 		}
 	}
 	
+	private void addErrorMarker(IProject project, String message) {
+	    markerManager.addMarker(project, 
+	    		MavenJSFConstants.JSF_CONFIGURATION_ERROR_MARKER_ID, 
+	    		message
+	    		,-1,  IMarker.SEVERITY_ERROR);
+		
+	}
+
 	private IFile getFileFromUnderlyingresources(final IProject project, final IPath filePath) {
 			  IVirtualComponent component = ComponentCore.createComponent(project);
 			  if (component == null) {
