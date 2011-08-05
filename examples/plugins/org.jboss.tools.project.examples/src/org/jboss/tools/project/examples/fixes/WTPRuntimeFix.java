@@ -85,6 +85,7 @@ public class WTPRuntimeFix implements ProjectExamplesFix {
 			try {
 				IFacetedProject facetedProject = ProjectFacetsManager.create(eclipseProject);
 				if (facetedProject == null) {
+					fixNonFacetedEsbProject(project, fix, eclipseProject);
 					continue;
 				}
 				org.eclipse.wst.common.project.facet.core.runtime.IRuntime wtpRuntime = facetedProject.getPrimaryRuntime();
@@ -97,9 +98,11 @@ public class WTPRuntimeFix implements ProjectExamplesFix {
 							wtpRuntime = RuntimeManager.getRuntime(runtime.getId());
 							facetedProject.addTargetedRuntime(wtpRuntime, monitor);
 							facetedProject.setPrimaryRuntime(wtpRuntime, monitor);
-							fixEsb(eclipseProject, fix, wtpRuntime);
+							fixEsb(eclipseProject, fix, runtime);
 						}
 					}
+				} else {
+					fixNonFacetedEsbProject(project, fix, eclipseProject);
 				}
 			} catch (CoreException e) {
 				ProjectExamplesActivator.log(e);
@@ -109,8 +112,16 @@ public class WTPRuntimeFix implements ProjectExamplesFix {
 		return ret;
 	}
 
+	private void fixNonFacetedEsbProject(Project project, ProjectFix fix,
+			IProject eclipseProject) throws JavaModelException {
+		IRuntime runtime = getBestRuntime(project, fix);
+		if (runtime != null) {
+			fixEsb(eclipseProject, fix, runtime);
+		}
+	}
+
 	private void fixEsb(IProject eclipseProject,
-			ProjectFix fix, org.eclipse.wst.common.project.facet.core.runtime.IRuntime wtpRuntime) throws JavaModelException {
+			ProjectFix fix, IRuntime runtime) throws JavaModelException {
 		String required_components = fix.getProperties().get(REQUIRED_COMPONENTS);
 		if (required_components == null) {
 			return;
@@ -135,7 +146,6 @@ public class WTPRuntimeFix implements ProjectExamplesFix {
 				IClasspathEntry[] entries = javaProject.getRawClasspath();
 				IClasspathEntry[] newEntries = new IClasspathEntry[entries.length];
 				boolean changed = false;
-				IRuntime runtime = getRuntime(wtpRuntime);
 				for (int i = 0; i < entries.length; i++) {
 					IClasspathEntry entry = entries[i];
 					if (entry.getEntryKind() == IClasspathEntry.CPE_CONTAINER) {
