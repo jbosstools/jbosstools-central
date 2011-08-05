@@ -643,11 +643,23 @@ public class NewProjectExamplesWizard extends Wizard implements INewWizard {
 		ZipFile sourceFile = new ZipFile(file);
 		ZipLeveledStructureProvider structureProvider = new ZipLeveledStructureProvider(
 				sourceFile);
+		Enumeration<? extends ZipEntry> entries = sourceFile.entries();
+		ZipEntry entry = null;
+		List<ZipEntry> filesToImport = new ArrayList<ZipEntry>();
+		String prefix = projectName + "/"; //$NON-NLS-1$
+		while (entries.hasMoreElements()) {
+			entry = entries.nextElement();
+			if (entry.isDirectory()) {
+				continue;
+			}
+			if (entry.getName().startsWith(prefix)) {
+				filesToImport.add(entry);
+			}
+		}
 		
 		structureProvider.setStrip(1);
-		ImportOperation operation = new ImportOperation(project
-				.getFullPath(), structureProvider.getRoot(), structureProvider,
-				OVERWRITE_ALL_QUERY);
+		ImportOperation operation = new ImportOperation(project.getFullPath(), structureProvider.getRoot(),
+				structureProvider, OVERWRITE_ALL_QUERY, filesToImport);
 		operation.setContext(getActiveShell());
 		operation.run(monitor);
 		reconfigure(project, monitor);
