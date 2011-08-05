@@ -101,7 +101,7 @@ public class JSFProjectConfigurator extends AbstractProjectConfigurator {
 	private void configureInternal(MavenProject mavenProject,IProject project,
 			IProgressMonitor monitor) throws CoreException {
 		
-		if ("war".equals(mavenProject.getPackaging()))  {//$NON-NLS-1$
+		if (!"war".equals(mavenProject.getPackaging()))  {//$NON-NLS-1$
 			return;
 		}
 		
