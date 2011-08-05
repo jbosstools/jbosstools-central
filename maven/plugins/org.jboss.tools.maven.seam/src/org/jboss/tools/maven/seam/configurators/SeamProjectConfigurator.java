@@ -45,6 +45,7 @@ import org.eclipse.jst.j2ee.componentcore.util.EARArtifactEdit;
 import org.eclipse.jst.j2ee.internal.common.classpath.J2EEComponentClasspathUpdater;
 import org.eclipse.jst.j2ee.internal.project.J2EEProjectUtilities;
 import org.eclipse.jst.j2ee.project.JavaEEProjectUtilities;
+import org.eclipse.jst.jsf.core.internal.project.facet.IJSFFacetInstallDataModelProperties;
 import org.eclipse.m2e.core.internal.IMavenConstants;
 import org.eclipse.m2e.core.internal.MavenPluginActivator;
 import org.eclipse.m2e.core.internal.project.registry.MavenProjectManager;
@@ -351,6 +352,8 @@ public class SeamProjectConfigurator extends AbstractProjectConfigurator {
 			throws CoreException {
 		if (!fproj.hasProjectFacet(jsfFacet)) {
 			IDataModel model = MavenJSFActivator.getDefault().createJSFDataModel(fproj,jsfVersion);
+			//Fix for JBIDE-9454, to prevent complete overwrite of web.xml 
+			model.setBooleanProperty(IJSFFacetInstallDataModelProperties.CONFIGURE_SERVLET,false);
 			fproj.installProjectFacet(jsfVersion, model, monitor);
 		}
 	}

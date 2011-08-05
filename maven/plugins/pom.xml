@@ -21,6 +21,7 @@
 		<module>org.jboss.tools.maven.hibernate</module>
 		<module>org.jboss.tools.maven.portlet</module>
 		<module>org.jboss.tools.maven.project.examples</module>
+		<module>org.jboss.tools.maven.jaxrs</module>
 	</modules>
 </project>
 	

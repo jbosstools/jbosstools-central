@@ -41,6 +41,7 @@ public class ConfiguratorPreferencePage extends PreferencePage implements
 	private static final String ORG_JBOSS_TOOLS_MAVEN_CDI = "org.jboss.tools.maven.cdi"; //$NON-NLS-1$
 	private static final String ORG_JBOSS_TOOLS_MAVEN_HIBERNATE = "org.jboss.tools.maven.hibernate"; //$NON-NLS-1$
 	private static final String ORG_JBOSS_TOOLS_MAVEN_SEAM = "org.jboss.tools.maven.seam"; //$NON-NLS-1$
+	private static final String ORG_JBOSS_TOOLS_MAVEN_JAXRS = "org.jboss.tools.maven.jaxrs"; //$NON-NLS-1$
 	
 	private Button configureSeamButton;
 	private Button configureSeamRuntimeButton;
@@ -52,6 +53,7 @@ public class ConfiguratorPreferencePage extends PreferencePage implements
 	private Button configureSeamPortletButton;
 	private Button configureCDIButton;
 	private Button configureHibernateButton;
+	private Button configureJaxRsButton;
 
 	@Override
 	protected Control createContents(Composite parent) {
@@ -138,6 +140,13 @@ public class ConfiguratorPreferencePage extends PreferencePage implements
 			configureHibernateButton.setSelection(configureHibernate);
 		}
 		
+		if (bundleExists(ORG_JBOSS_TOOLS_MAVEN_JAXRS)) { 
+			configureJaxRsButton = new Button(composite,SWT.CHECK);
+			configureJaxRsButton.setText(Messages.ConfiguratorPreferencePage_Configure_JAX_RS_facet);
+			boolean configureJaxRs = store.getBoolean(Activator.CONFIGURE_JAXRS);
+			configureJaxRsButton.setSelection(configureJaxRs);
+		}
+		
 		return composite;
 	}
 
@@ -175,6 +184,10 @@ public class ConfiguratorPreferencePage extends PreferencePage implements
 			configureHibernateButton.setSelection(Activator.CONFIGURE_HIBERNATE_VALUE);
 		}
 		
+		if (bundleExists(ORG_JBOSS_TOOLS_MAVEN_JAXRS)) { 
+			configureJaxRsButton.setSelection(Activator.CONFIGURE_JAXRS_VALUE);
+		}
+		
 		IPreferenceStore store = Activator.getDefault().getPreferenceStore();
 		
 		if (bundleExists(ORG_JBOSS_TOOLS_MAVEN_JSF)) { 
@@ -201,6 +214,10 @@ public class ConfiguratorPreferencePage extends PreferencePage implements
 		
 		if (bundleExists(ORG_JBOSS_TOOLS_MAVEN_HIBERNATE)) { 
 			store.setValue(Activator.CONFIGURE_HIBERNATE, Activator.CONFIGURE_HIBERNATE_VALUE);
+		}
+
+		if (bundleExists(ORG_JBOSS_TOOLS_MAVEN_JAXRS)) { 
+			store.setValue(Activator.CONFIGURE_JAXRS, Activator.CONFIGURE_JAXRS_VALUE);
 		}
 		
 		super.performDefaults();
@@ -233,7 +250,11 @@ public class ConfiguratorPreferencePage extends PreferencePage implements
 		if (bundleExists(ORG_JBOSS_TOOLS_MAVEN_HIBERNATE)) {
 			store.setValue(Activator.CONFIGURE_HIBERNATE, configureHibernateButton.getSelection());
 		}
-		
+
+		if (bundleExists(ORG_JBOSS_TOOLS_MAVEN_JAXRS)) {
+			store.setValue(Activator.CONFIGURE_JAXRS, configureJaxRsButton.getSelection());
+		}
+
 		return super.performOk();
 	}
 

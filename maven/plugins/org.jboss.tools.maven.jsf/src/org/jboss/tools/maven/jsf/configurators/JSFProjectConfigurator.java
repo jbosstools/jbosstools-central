@@ -100,6 +100,11 @@ public class JSFProjectConfigurator extends AbstractProjectConfigurator {
 	
 	private void configureInternal(MavenProject mavenProject,IProject project,
 			IProgressMonitor monitor) throws CoreException {
+		
+		if ("war".equals(mavenProject.getPackaging()))  {//$NON-NLS-1$
+			return;
+		}
+		
 		IPreferenceStore store = Activator.getDefault().getPreferenceStore();
 		boolean configureJSF = store.getBoolean(Activator.CONFIGURE_JSF);
 		if (!configureJSF) {
@@ -112,9 +117,8 @@ public class JSFProjectConfigurator extends AbstractProjectConfigurator {
 			return;
 		}
 		
-		String packaging = mavenProject.getPackaging();
 	    String jsfVersion = getJSFVersion(mavenProject, project);
-	    if (fproj != null && jsfVersion != null && "war".equals(packaging)) { //$NON-NLS-1$
+	    if (fproj != null && jsfVersion != null) { 
 	      installWarFacets(fproj, jsfVersion, mavenProject, monitor);
 	    }
 	}

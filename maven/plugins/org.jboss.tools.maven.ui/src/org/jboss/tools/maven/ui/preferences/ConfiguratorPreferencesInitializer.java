@@ -57,6 +57,9 @@ public class ConfiguratorPreferencesInitializer extends
 		node.putBoolean(
 				Activator.CONFIGURE_HIBERNATE,
 				Activator.CONFIGURE_HIBERNATE_VALUE);
+		node.putBoolean(
+				Activator.CONFIGURE_JAXRS,
+				Activator.CONFIGURE_JAXRS_VALUE);
 	}
 
 }

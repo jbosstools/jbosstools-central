@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+
+	<extension
+         point="org.eclipse.m2e.core.lifecycleMappingMetadataSource">
+    </extension>
+   
+    <extension
+         point="org.eclipse.m2e.core.lifecycleMappings">
+      <lifecycleMapping
+            class="org.jboss.tools.maven.jaxrs.JaxrsLifecycleMapping"
+            id="org.jboss.tools.maven.jaxrs.JaxrsLifecycleMapping"
+            name="JAX-RS Lifecycle mapping">
+      </lifecycleMapping>
+    </extension>
+    
+	<extension point="org.eclipse.m2e.core.projectConfigurators">
+      <configurator 
+          id="org.jboss.tools.maven.jaxrs.configurator"
+          class="org.jboss.tools.maven.jaxrs.configurators.JaxrsProjectConfigurator"
+          name="%JAXRS_Project_configurator" 
+          secondaryTo="org.maven.ide.eclipse.configuration.wtp.configurator"/>
+    </extension>
+    
+     <extension point="org.eclipse.core.resources.markers"
+         id="org.jbosstools.maven.configuration.jaxrs"
+         name="%Maven_Configuration_Problem">
+      <super type="org.eclipse.m2e.core.maven2Problem.configuration"/>
+      <persistent value="true"/>
+    </extension>
+   
+    <extension
+         point="org.eclipse.ui.ide.markerSupport">
+      <markerTypeCategory
+            name="%Maven_Configuration_Problems">
+         <markerTypeReference
+               id="org.jbosstools.maven.configuration.jaxrs">
+         </markerTypeReference>
+      </markerTypeCategory>
+   </extension>    
+</plugin>

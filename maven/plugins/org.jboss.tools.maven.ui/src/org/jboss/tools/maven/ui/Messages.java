@@ -44,6 +44,7 @@ public class Messages extends NLS {
 	public static String MavenUserLibraryProviderInstallPanel_Scope;
 	public static String MavenUserLibraryProviderInstallPanel_Type;
 	public static String MavenUserLibraryProviderInstallPanel_Version;
+	public static String ConfiguratorPreferencePage_Configure_JAX_RS_facet;
 	public static String ConfiguratorPreferencePage_Configure_JBoss_JSF_Portlet_facet;
 	public static String ConfiguratorPreferencePage_Configure_JBoss_Portlet_Core_facet;
 	public static String ConfiguratorPreferencePage_Configure_JBoss_Seam_Portlet_facet;
