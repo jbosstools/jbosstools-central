@@ -15,25 +15,30 @@ import org.junit.Test;
 @SuppressWarnings("restriction")
 public class JaxRsConfiguratorTest extends AbstractMavenConfiguratorTest {
 
-	/*@Test
-	public void testJBIDE9290_supportMultipleJaxRsDependencies() throws Exception {
+	@Test
+	public void testJBIDE9290_supportMultipleJaxRsImplems() throws Exception {
 		IProject[] projects = importProjects("projects/jaxrs/", 
 											new String[]{ 
 												"jaxrs-jersey/pom.xml",
-												"jaxrs-resteasy/pom.xml"
+												"jaxrs-resteasy/pom.xml",
+												"jaxrs-javaee-api/pom.xml",
+												"jaxrs-rest-10/pom.xml",
 											}, 
 											new ResolverConfiguration());
 		waitForJobsToComplete(new NullProgressMonitor());
 		IProject jersey = projects[0];
-		assertNoErrors(jersey);
 		assertIsJaxRsProject(jersey, JaxrsProjectConfigurator.JAX_RS_FACET_1_1);
 		
 		IProject resteasy = projects[1];
-		assertNoErrors(resteasy);
 		assertIsJaxRsProject(resteasy, JaxrsProjectConfigurator.JAX_RS_FACET_1_1);
+
+		IProject javaeeapi = projects[2];
+		assertIsJaxRsProject(javaeeapi, JaxrsProjectConfigurator.JAX_RS_FACET_1_1);
 		
+		IProject rest_10 = projects[3];
+		assertIsJaxRsProject(rest_10, JaxrsProjectConfigurator.JAX_RS_FACET_1_0);
+				
 	}
-	*/
 
 	
 	@Test
@@ -60,6 +65,7 @@ public class JaxRsConfiguratorTest extends AbstractMavenConfiguratorTest {
 	
 	private void assertIsJaxRsProject(IProject project,
 			IProjectFacetVersion expectedJaxRsVersion) throws Exception {
+		assertNoErrors(project);
 		IFacetedProject facetedProject = ProjectFacetsManager.create(project);
 		assertNotNull(project.getName() + " is not a faceted project", facetedProject);
 		assertEquals("Unexpected JAX-RS Version", expectedJaxRsVersion, facetedProject.getInstalledVersion(JaxrsProjectConfigurator.JAX_RS_FACET));
