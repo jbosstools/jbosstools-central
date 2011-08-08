@@ -74,8 +74,6 @@ public class ProfileSelectionHandler extends AbstractHandler {
 			return null;
 		}
 
-		System.out.print("Select projects " + facades); //$NON-NLS-1$
-
 		final IProfileManager profileManager = MavenCoreActivator.getDefault().getProfileManager();
 
 		GetProfilesJob getProfilesJob = new GetProfilesJob(facades, profileManager);
@@ -250,7 +248,7 @@ public class ProfileSelectionHandler extends AbstractHandler {
 							p.setAutoActive(null);
 						}
 						if (p.getSource() != null && !p.getSource().equals(s.getSource())) {
-							p.setSource(null);
+							p.setSource("multiple definitions");
 						}
 						if (p.getSelected() != null && !p.getSelected().equals(s.isUserSelected())) {
 							p.setSelected(null);
