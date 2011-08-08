@@ -299,13 +299,7 @@ public class SelectProfilesDialog extends TitleAreaDialog implements
 				ISelection s = profileTableViewer.getSelection();
 				if (s instanceof IStructuredSelection) {
 					IStructuredSelection sel = (IStructuredSelection) s;
-					Iterator<?> ite = sel.iterator();
-					while (ite.hasNext()) {
-						Object o = ite.next();
-						if (o instanceof ProfileSelection) {
-							setActivationState((ProfileSelection)o, state);
-						}
-					}
+					setActivationState(sel, state);
 				}
 				refresh();
 			}
@@ -360,17 +354,26 @@ public class SelectProfilesDialog extends TitleAreaDialog implements
 		IStructuredSelection selection = (IStructuredSelection) profileTableViewer
 				.getSelection();
 		if (!selection.isEmpty()) {
-			final ProfileSelection entry = (ProfileSelection) selection.getFirstElement();
-			String text = ""; //$NON-NLS-1$
-			ProfileState state = entry.getActivationState();
-			if ( state == null || state.equals(ProfileState.Disabled)) {
+			boolean multiSelection = selection.size() > 1;
+			ProfileState state = null;
+			String selectionText;
+			String text;
+			if (multiSelection) {
+				selectionText = "selected profiles";
+			} else {
+				ProfileSelection entry = (ProfileSelection) selection.getFirstElement();
+				state = entry.getActivationState();
+				selectionText = entry.getId();
+			}
+			
+			if ( state == null || ProfileState.Disabled.equals(state)) {
 				text = Messages.SelectProfilesDialog_Activate_menu;
-				activationAction.setText(NLS.bind(text, entry.getId()));
+				activationAction.setText(NLS.bind(text, selectionText));
 				manager.add(activationAction);
 			} 
 			if( !ProfileState.Disabled.equals(state)) {
 				text = Messages.SelectProfilesDialog_Deactivate_menu;
-				deActivationAction.setText(NLS.bind(text, entry.getId()));
+				deActivationAction.setText(NLS.bind(text, selectionText));
 				manager.add(deActivationAction);
 			}
 		}
@@ -497,12 +500,20 @@ public class SelectProfilesDialog extends TitleAreaDialog implements
 	}
    */
 	
-	private void setActivationState(final ProfileSelection profileSelection, ProfileState state) {
-		profileSelection.setActivationState(state);
-		profileTableViewer.setChecked(profileSelection, true);
-		profileTableViewer.setGrayed(profileSelection, false);
-		if (ProfileState.Disabled.equals(state)) {
-			profileSelection.setSelected(true);
+	private void setActivationState(final IStructuredSelection sel, ProfileState state) {
+		if (sel == null) return;
+		Iterator<?> ite = sel.iterator();
+		while (ite.hasNext()) {
+			Object o = ite.next();
+			if (o instanceof ProfileSelection) {
+				ProfileSelection ps = (ProfileSelection) o;
+				ps.setActivationState(state);
+				profileTableViewer.setGrayed(ps, false);
+				if (ProfileState.Disabled.equals(state)) {
+					profileTableViewer.setChecked(ps, true);
+					ps.setSelected(true);
+				}
+			}
 		}
 	}
 
@@ -526,8 +537,7 @@ public class SelectProfilesDialog extends TitleAreaDialog implements
 			IStructuredSelection selection = (IStructuredSelection) profileTableViewer
 					.getSelection();
 			if (!selection.isEmpty()) {
-				final ProfileSelection entry = (ProfileSelection) selection.getFirstElement();
-				setActivationState(entry, state);
+				setActivationState(selection, state);
 				refresh();
 			}
 			super.run();

@@ -37,6 +37,8 @@ import org.jboss.tools.maven.core.profiles.ProfileStatus;
 
 public class ProfileManager implements IProfileManager {
 
+	private static final String ARTIFACT_SEPARATOR = ":"; //$NON-NLS-1$
+	
 	public void updateActiveProfiles(final IMavenProjectFacade mavenProjectFacade, 
 									 final List<String> profiles, 
 									 final boolean isOffline, 
@@ -183,18 +185,21 @@ public class ProfileManager implements IProfileManager {
 
 	private String findSource(Profile profile, List<Model> modelHierarchy) {
 		if (profile != null) {
-			if ("settings.xml".equals(profile.getSource())) {
+			if ("settings.xml".equals(profile.getSource())) { //$NON-NLS-1$
 				return profile.getSource();
 			}
 			for (Model m : modelHierarchy) {
 				for (Profile p : m.getProfiles()) {
 					if(p.equals(profile)) {
-						return m.getArtifactId();
+						return  //m.getGroupId()+ARTIFACT_SEPARATOR+
+								m.getArtifactId()
+								//+ (m.getVersion()==null?"":ARTIFACT_SEPARATOR+m.getVersion())//$NON-NLS-1$
+								;
 					}
 				}
 			}
 		} 
-		return "undefined";
+		return "undefined"; //$NON-NLS-1$
 	}
 
 	protected List<Profile> collectAvailableProfiles(List<Model> models, IProgressMonitor monitor) throws CoreException {
