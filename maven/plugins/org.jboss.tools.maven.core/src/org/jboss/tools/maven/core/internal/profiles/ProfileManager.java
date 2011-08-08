@@ -19,6 +19,7 @@ import org.apache.maven.model.Profile;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.settings.Settings;
 import org.apache.maven.settings.SettingsUtils;
+import org.codehaus.plexus.util.StringUtils;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -126,7 +127,11 @@ public class ProfileManager implements IProfileManager {
 		
 		MavenProject mavenProject = facade.getMavenProject(monitor);
 		
-		List<Profile> projectProfiles = getAvailableProfiles(mavenProject.getModel(), new NullProgressMonitor());
+		
+		List<Model> modelHierarchy = new ArrayList<Model>();
+		getModelHierarchy(modelHierarchy, mavenProject.getModel(), new NullProgressMonitor());
+
+		List<Profile> availableProfiles = collectAvailableProfiles(modelHierarchy, new NullProgressMonitor());
 
 		final Map<Profile, Boolean> availableSettingsProfiles = getAvailableSettingProfiles();
 		Set<Profile> settingsProfiles = new HashSet<Profile>(availableSettingsProfiles.keySet());
@@ -135,7 +140,7 @@ public class ProfileManager implements IProfileManager {
 		
 		//First we put user configured profiles
 		for (String pId : configuredProfiles) {
-			if ("".equals(pId.trim())) continue;
+			if (StringUtils.isEmpty(pId)) continue;
 			boolean isDisabled = pId.startsWith("!");
 			String id = (isDisabled)?pId.substring(1):pId;
 			ProfileStatus status = new ProfileStatus(id);
@@ -144,7 +149,8 @@ public class ProfileManager implements IProfileManager {
 											:ProfileState.Active;
 			status.setActivationState(state);
 			
-			Profile p = get(id, projectProfiles);
+			Profile p = get(id, availableProfiles);
+			
 			if (p == null){
 				p = get(id, settingsProfiles);
 				if(p != null){
@@ -152,17 +158,13 @@ public class ProfileManager implements IProfileManager {
 				}
 			} 
 
-			if (p == null) {
-				status.setSource("undefined");
-			} else {
-				status.setSource(p.getSource());
-			}
+			status.setSource(findSource(p, modelHierarchy));
 			statuses.add(status);
 		}
 		
 		final List<Profile> activeProfiles = mavenProject.getActiveProfiles();
 		//Iterate on the remaining project profiles
-		addStatuses(statuses, projectProfiles, new ActivationPredicate() {
+		addStatuses(statuses, availableProfiles, modelHierarchy, new ActivationPredicate() {
 			@Override
 			boolean isActive(Profile p) {
 				return ProfileManager.this.isActive(p, activeProfiles);
@@ -170,7 +172,7 @@ public class ProfileManager implements IProfileManager {
 		});
 
 		//Iterate on the remaining settings profiles
-		addStatuses(statuses, settingsProfiles, new ActivationPredicate() {
+		addStatuses(statuses, settingsProfiles, modelHierarchy, new ActivationPredicate() {
 			@Override
 			boolean isActive(Profile p) {
 				return availableSettingsProfiles.get(p);
@@ -179,24 +181,45 @@ public class ProfileManager implements IProfileManager {
 		return Collections.unmodifiableList(statuses);
 	}
 
-	protected List<Profile> getAvailableProfiles(Model projectModel, IProgressMonitor monitor) throws CoreException {
-		if (projectModel == null) {
-			return null;
-		}
-		List<Profile> profiles = new ArrayList<Profile>(projectModel.getProfiles());
-		
-		Parent p  = projectModel.getParent();
-		if (p != null) {
-			Model parentModel = resolvePomModel(p.getGroupId(), p.getArtifactId(), p.getVersion(), monitor);
-			List<Profile> parentProfiles = getAvailableProfiles(parentModel, monitor);
-			if (parentProfiles != null && !parentProfiles.isEmpty()) {
-				profiles.addAll(parentProfiles);
+	private String findSource(Profile profile, List<Model> modelHierarchy) {
+		if (profile != null) {
+			if ("settings.xml".equals(profile.getSource())) {
+				return profile.getSource();
 			}
+			for (Model m : modelHierarchy) {
+				for (Profile p : m.getProfiles()) {
+					if(p.equals(profile)) {
+						return m.getArtifactId();
+					}
+				}
+			}
+		} 
+		return "undefined";
+	}
+
+	protected List<Profile> collectAvailableProfiles(List<Model> models, IProgressMonitor monitor) throws CoreException {
+		List<Profile> profiles = new ArrayList<Profile>();
+		for (Model m : models) {
+			profiles.addAll(m.getProfiles());
 		}
-		
 		return profiles;
 	}
 
+	protected List<Model> getModelHierarchy(List<Model> models, Model projectModel, IProgressMonitor monitor) throws CoreException {
+		if (projectModel == null) {
+			return null;
+		}
+		models.add(projectModel);
+		Parent p  = projectModel.getParent();
+		if (p != null) {
+			Model parentModel = resolvePomModel(p.getGroupId(), p.getArtifactId(), p.getVersion(), monitor);
+			if (parentModel != null) {
+				getModelHierarchy(models, parentModel, monitor);
+			}
+		}
+		return models;
+	}
+	
 	 private Model resolvePomModel(String groupId, String artifactId, String version, IProgressMonitor monitor)
 		      throws CoreException {
 	    monitor.subTask(NLS.bind("Resolving {0}:{1}:{2}", new Object[] { groupId, artifactId, version}));
@@ -218,10 +241,10 @@ public class ProfileManager implements IProfileManager {
 	    return maven.readModel(file);
 	 }
 
-	private void addStatuses(List<ProfileStatus> statuses, Collection<Profile> profiles, ActivationPredicate predicate) {
+	private void addStatuses(List<ProfileStatus> statuses, Collection<Profile> profiles, List<Model> modelHierarchy, ActivationPredicate predicate) {
 		for (Profile p : profiles) {
 			ProfileStatus status = new ProfileStatus(p.getId());
-			status.setSource(p.getSource());
+			status.setSource(findSource(p, modelHierarchy));
 			boolean isActive = predicate.isActive(p);
 			ProfileState activationState = (isActive)?ProfileState.Active:ProfileState.Inactive;
 			status.setAutoActive(isActive);

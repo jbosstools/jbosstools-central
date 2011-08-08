@@ -188,7 +188,7 @@ public class SelectProfilesDialog extends TitleAreaDialog implements
 		gd.heightHint = 200;
 		gd.widthHint = 500;
 
-		profileTableViewer = CheckboxTableViewer.newCheckList(container, SWT.BORDER);
+		profileTableViewer = CheckboxTableViewer.newCheckList(container, SWT.BORDER | SWT.MULTI);
 		Table table = profileTableViewer.getTable();
 		table.setFocus();
 		table.setLayoutData(gd);
