@@ -148,8 +148,8 @@ public class SelectProfilesDialog extends TitleAreaDialog implements
 
 			addSelectionButton(container, Messages.SelectProfilesDialog_SelectAll, true);
 			addSelectionButton(container, Messages.SelectProfilesDialog_DeselectAll, false);
-			addActivationButton(container, "Activate", true);
-			addActivationButton(container, "Deactivate", false);
+			addActivationButton(container, "Activate", ProfileState.Active);
+			addActivationButton(container, "Deactivate", ProfileState.Disabled);
 			offlineModeBtn = addCheckButton(container, Messages.SelectProfilesDialog_Offline, offlineMode);
 			forceUpdateBtn = addCheckButton(container, Messages.SelectProfilesDialog_Force_update, forceUpdate);
 		}
@@ -278,8 +278,7 @@ public class SelectProfilesDialog extends TitleAreaDialog implements
  						profile.setActivationState(ProfileState.Active);
 					}
 				}
-				profileTableViewer.refresh();
-				updateProfilesAsText();
+				refresh();
 			}
 
 			public void widgetDefaultSelected(SelectionEvent e) {
@@ -290,7 +289,7 @@ public class SelectProfilesDialog extends TitleAreaDialog implements
 		return button;
 	}
 
-	private Button addActivationButton(Composite container, String label, final boolean ischecked) {
+	private Button addActivationButton(Composite container, String label, final ProfileState state) {
 		Button button = new Button(container, SWT.NONE);
 		button.setLayoutData(new GridData(SWT.FILL, SWT.UP,
 				false, false, 1, 1));
@@ -302,18 +301,13 @@ public class SelectProfilesDialog extends TitleAreaDialog implements
 					IStructuredSelection sel = (IStructuredSelection) s;
 					Iterator<?> ite = sel.iterator();
 					while (ite.hasNext()) {
-						System.err.println(ite.next());
+						Object o = ite.next();
+						if (o instanceof ProfileSelection) {
+							setActivationState((ProfileSelection)o, state);
+						}
 					}
 				}
-//				for (ProfileSelection profile : sharedProfiles) {
-//					profileTableViewer.setChecked(profile, ischecked);
-//					profile.setSelected(ischecked);
-//					if (!ischecked || profile.getActivationState() == null) {
-// 						profile.setActivationState(ProfileState.Active);
-//					}
-//				}
-				profileTableViewer.refresh();
-				updateProfilesAsText();
+				refresh();
 			}
 
 			public void widgetDefaultSelected(SelectionEvent e) {
@@ -503,6 +497,22 @@ public class SelectProfilesDialog extends TitleAreaDialog implements
 	}
    */
 	
+	private void setActivationState(final ProfileSelection profileSelection, ProfileState state) {
+		profileSelection.setActivationState(state);
+		profileTableViewer.setChecked(profileSelection, true);
+		profileTableViewer.setGrayed(profileSelection, false);
+		if (ProfileState.Disabled.equals(state)) {
+			profileSelection.setSelected(true);
+		}
+	}
+
+
+	private void refresh() {
+		profileTableViewer.refresh();
+		updateProfilesAsText();
+	}
+
+
 	private class ChangeProfileStateAction extends Action {
 		
 		private final ProfileState state;
@@ -517,14 +527,8 @@ public class SelectProfilesDialog extends TitleAreaDialog implements
 					.getSelection();
 			if (!selection.isEmpty()) {
 				final ProfileSelection entry = (ProfileSelection) selection.getFirstElement();
-				entry.setActivationState(state);
-				profileTableViewer.setChecked(entry, true);
-				profileTableViewer.setGrayed(entry, false);
-				if (ProfileState.Disabled.equals(state)) {
-					entry.setSelected(true);
-				}
-				updateProfilesAsText();
-				profileTableViewer.refresh();
+				setActivationState(entry, state);
+				refresh();
 			}
 			super.run();
 		}
