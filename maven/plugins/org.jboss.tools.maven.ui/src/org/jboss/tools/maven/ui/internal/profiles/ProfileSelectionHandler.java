@@ -186,7 +186,7 @@ public class ProfileSelectionHandler extends AbstractHandler {
 		private List<ProfileSelection> sharedProfiles;
 
 		private GetProfilesJob(final Set<IMavenProjectFacade> facades, IProfileManager profileManager) {
-			super("get profiles");
+			super(Messages.ProfileSelectionHandler_Loading_maven_profiles);
 			this.facades = facades;
 			this.profileManager = profileManager;
 		}
@@ -248,7 +248,7 @@ public class ProfileSelectionHandler extends AbstractHandler {
 							p.setAutoActive(null);
 						}
 						if (p.getSource() != null && !p.getSource().equals(s.getSource())) {
-							p.setSource("multiple definitions");
+							p.setSource(Messages.ProfileSelectionHandler_multiple_definitions);
 						}
 						if (p.getSelected() != null && !p.getSelected().equals(s.isUserSelected())) {
 							p.setSelected(null);
