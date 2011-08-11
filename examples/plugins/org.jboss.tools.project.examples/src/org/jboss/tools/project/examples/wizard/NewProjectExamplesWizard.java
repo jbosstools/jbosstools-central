@@ -584,14 +584,16 @@ public class NewProjectExamplesWizard extends Wizard implements INewWizard {
 				Enumeration<? extends ZipEntry> entries = sourceFile.entries();
 				ZipEntry entry = null;
 				List<ZipEntry> filesToImport = new ArrayList<ZipEntry>();
+				List<ZipEntry> directories = new ArrayList<ZipEntry>();
 				String prefix = projectName + "/"; //$NON-NLS-1$
 				while (entries.hasMoreElements()) {
 					entry = entries.nextElement();
-					if (entry.isDirectory()) {
-						continue;
-					}
 					if (entry.getName().startsWith(prefix)) {
-						filesToImport.add(entry);
+						if (!entry.isDirectory()) {
+							filesToImport.add(entry);
+						} else {
+							directories.add(entry);
+						}
 					}
 				}
 				
@@ -600,6 +602,14 @@ public class NewProjectExamplesWizard extends Wizard implements INewWizard {
 						structureProvider, OVERWRITE_ALL_QUERY, filesToImport);
 				operation.setContext(getActiveShell());
 				operation.run(monitor);
+				for (ZipEntry directory:directories) {
+					IPath resourcePath = new Path(directory.getName());
+					try {
+						workspace.getRoot().getFolder(resourcePath).create(false, true, null);
+					} catch (Exception e) {
+						ProjectExamplesActivator.log(e);
+					}
+				}
 				reconfigure(project, monitor);
 			}
 		}
@@ -646,14 +656,16 @@ public class NewProjectExamplesWizard extends Wizard implements INewWizard {
 		Enumeration<? extends ZipEntry> entries = sourceFile.entries();
 		ZipEntry entry = null;
 		List<ZipEntry> filesToImport = new ArrayList<ZipEntry>();
+		List<ZipEntry> directories = new ArrayList<ZipEntry>();
 		String prefix = projectName + "/"; //$NON-NLS-1$
 		while (entries.hasMoreElements()) {
 			entry = entries.nextElement();
-			if (entry.isDirectory()) {
-				continue;
-			}
 			if (entry.getName().startsWith(prefix)) {
-				filesToImport.add(entry);
+				if (!entry.isDirectory()) {
+					filesToImport.add(entry);
+				} else {
+					directories.add(entry);
+				}
 			}
 		}
 		
@@ -662,6 +674,14 @@ public class NewProjectExamplesWizard extends Wizard implements INewWizard {
 				structureProvider, OVERWRITE_ALL_QUERY, filesToImport);
 		operation.setContext(getActiveShell());
 		operation.run(monitor);
+		for (ZipEntry directory:directories) {
+			IPath resourcePath = new Path(directory.getName());
+			try {
+				workspace.getRoot().getFolder(resourcePath).create(false, true, null);
+			} catch (Exception e) {
+				ProjectExamplesActivator.log(e);
+			}
+		}
 		reconfigure(project, monitor);
 	}
 
