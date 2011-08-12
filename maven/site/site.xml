@@ -29,6 +29,9 @@
 	<feature url="features/org.jboss.tools.maven.jaxrs.feature_0.0.0.jar" id="org.jboss.tools.maven.jaxrs.feature" version="0.0.0">
 		<category name="JBoss Tools maven Nightly Build Update Site"/>
 	</feature>
+	<feature url="features/org.jboss.tools.maven.jbosspackaging.feature_0.0.0.jar" id="org.jboss.tools.maven.jbosspackaging.feature" version="0.0.0">
+		<category name="JBoss Tools maven Nightly Build Update Site"/>
+	</feature>
 	<feature url="features/org.jboss.tools.maven.tests.feature_0.0.0.jar" id="org.jboss.tools.maven.tests.feature" version="0.0.0">
 		<category name="JBoss Tools maven Nightly Build Update Site"/>
 	</feature>
