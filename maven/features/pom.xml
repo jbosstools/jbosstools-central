@@ -22,6 +22,7 @@
 		<module>org.jboss.tools.maven.project.examples.feature</module>
 		<module>org.jboss.tools.maven.tests.feature</module>
 		<module>org.jboss.tools.maven.jaxrs.feature</module>
+		<module>org.jboss.tools.maven.jbosspackaging.feature</module>	
 	</modules>
 </project>
 	
