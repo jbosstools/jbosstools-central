@@ -22,6 +22,7 @@
 		<module>org.jboss.tools.maven.portlet</module>
 		<module>org.jboss.tools.maven.project.examples</module>
 		<module>org.jboss.tools.maven.jaxrs</module>
+		<module>org.jboss.tools.maven.jbosspackaging</module>
 	</modules>
 </project>
 	

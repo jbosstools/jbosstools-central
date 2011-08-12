@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<lifecycleMappingMetadata>
+   <lifecycleMappings>
+    <lifecycleMapping>
+      <packagingType>jboss-sar</packagingType>
+      <lifecycleMappingId>org.jboss.tools.maven.jbosspackaging.SarLifecycleMapping</lifecycleMappingId>
+      <pluginExecutions>
+        <pluginExecution>
+          <pluginExecutionFilter>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>jboss-packaging-maven-plugin</artifactId>
+            <versionRange>[1.0,)</versionRange>
+            <goals>
+              <goal>sar</goal>
+              <goal>sar-exploded</goal>
+              <goal>sar-inplace</goal>
+            </goals>
+          </pluginExecutionFilter>
+          <action>
+            <configurator>
+              <id>org.jboss.tools.maven.jbosspackaging.sarconfigurator</id>
+            </configurator>
+          </action>
+        </pluginExecution>        
+        <pluginExecution>
+          <pluginExecutionFilter>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>jboss-packaging-maven-plugin</artifactId>
+            <versionRange>[1.0,)</versionRange>
+            <goals>
+              <goal>sar</goal>
+              <goal>sar-exploded</goal>
+              <goal>sar-inplace</goal>
+            </goals>
+          </pluginExecutionFilter>
+          <action>
+            <configurator>
+              <id>org.jboss.tools.maven.jbosspackaging.sararchiverconfigurator</id>
+            </configurator>
+          </action>
+        </pluginExecution> 
+      </pluginExecutions>
+    </lifecycleMapping>
+  </lifecycleMappings>
+</lifecycleMappingMetadata>

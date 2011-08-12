@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+    <extension
+         point="org.eclipse.m2e.core.lifecycleMappingMetadataSource">
+    </extension>
+   
+    <extension
+         point="org.eclipse.m2e.core.lifecycleMappings">
+      <lifecycleMapping
+            class="org.jboss.tools.maven.jbosspackaging.SarLifecycleMapping"
+            id="org.jboss.tools.maven.jbosspackaging.SarLifecycleMapping"
+            name="SAR Lifecycle mapping">
+      </lifecycleMapping>
+    </extension>
+ 
+    <extension point="org.eclipse.m2e.core.projectConfigurators">
+      <configurator 
+          id="org.jboss.tools.maven.jbosspackaging.sarconfigurator"
+          class="org.jboss.tools.maven.jbosspackaging.configurators.SarProjectConfigurator"
+          name="%SAR_Project_configurator"
+	  />
+    </extension>
+	<extension point="org.eclipse.m2e.core.projectConfigurators">
+      <configurator 
+          id="org.jboss.tools.maven.jbosspackaging.sararchiverconfigurator"
+          class="org.jboss.tools.maven.jbosspackaging.configurators.SarArchiverConfigurator"
+          name="%SAR_MavenArchiver_configurator" 
+          secondaryTo="org.jboss.tools.maven.jbosspackaging.sarconfigurator"
+          />
+    </extension>
+        
+     <extension point="org.eclipse.core.resources.markers"
+         id="org.jbosstools.maven.configuration.jboss.sar"
+         name="%Maven_Configuration_Problem">
+      <super type="org.eclipse.m2e.core.maven2Problem.configuration"/>
+      <persistent value="true"/>
+    </extension>
+   
+    <extension
+         point="org.eclipse.ui.ide.markerSupport">
+      <markerTypeCategory
+            name="%Maven_Configuration_Problems">
+         <markerTypeReference
+               id="org.jbosstools.maven.configuration.jboss.sar">
+         </markerTypeReference>
+      </markerTypeCategory>
+   </extension>
+</plugin>
