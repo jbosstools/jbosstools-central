@@ -30,15 +30,19 @@ import org.eclipse.jdt.core.IClasspathEntry;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.JavaModelException;
+import org.eclipse.jst.common.project.facet.core.JavaFacet;
+import org.eclipse.jst.common.project.facet.core.internal.JavaFacetUtil;
 import org.eclipse.jst.j2ee.classpathdep.IClasspathDependencyConstants;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.project.MavenProjectChangedEvent;
+import org.eclipse.m2e.core.project.MavenProjectUtils;
 import org.eclipse.m2e.core.project.configurator.AbstractProjectConfigurator;
 import org.eclipse.m2e.core.project.configurator.ProjectConfigurationRequest;
 import org.eclipse.m2e.jdt.internal.MavenClasspathHelpers;
 import org.eclipse.wst.common.componentcore.ComponentCore;
 import org.eclipse.wst.common.componentcore.ModuleCoreNature;
 import org.eclipse.wst.common.componentcore.resources.IVirtualComponent;
+import org.eclipse.wst.common.componentcore.resources.IVirtualFolder;
 import org.eclipse.wst.common.componentcore.resources.IVirtualReference;
 import org.eclipse.wst.common.frameworks.datamodel.IDataModel;
 import org.eclipse.wst.common.project.facet.core.IFacetedProject;
@@ -110,7 +114,7 @@ public class SarProjectConfigurator extends AbstractProjectConfigurator {
 
 		ModuleCoreNature.addModuleCoreNatureIfNecessary(project, monitor);
 
-		WTPProjectsUtil.removeTestFolderLinks(project, mavenProject, monitor, "/");
+		removeTestFolderLinks(project, mavenProject, monitor, "/");
 
 		setNonDependencyAttributeToContainer(project, monitor);
 
@@ -119,6 +123,38 @@ public class SarProjectConfigurator extends AbstractProjectConfigurator {
 		fileCleaner.cleanUp();
 	}
 
+	//TODO Fix/refactor that method from WTPProjectUtils in m2e-wtp 0.14.x
+   public static void removeTestFolderLinks(IProject project, MavenProject mavenProject, IProgressMonitor monitor,
+	      String folder) throws CoreException {
+	    IVirtualComponent component = ComponentCore.createComponent(project);
+	    if (component != null){
+	      IVirtualFolder jsrc = component.getRootFolder().getFolder(folder);
+	      for(IPath location : MavenProjectUtils.getSourceLocations(project, mavenProject.getTestCompileSourceRoots())) {
+	        if (location == null) continue;
+	        jsrc.removeLink(location, 0, monitor);
+	      }
+	      for(IPath location : MavenProjectUtils.getResourceLocations(project, mavenProject.getTestResources())) {
+	        if (location == null) continue;
+	        jsrc.removeLink(location, 0, monitor);
+	      }
+	    }
+    }
+
+   /**
+    * @param actions
+    * @param project
+    * @param facetedProject
+    */
+	//TODO Fix/refactor that method from WTPProjectUtils in m2e-wtp 0.14.x
+   public static void installJavaFacet(Set<Action> actions, IProject project, IFacetedProject facetedProject) {
+       IProjectFacetVersion javaFv = JavaFacet.FACET.getVersion(JavaFacetUtil.getCompilerLevel(project));
+       if(!facetedProject.hasProjectFacet(JavaFacet.FACET)) {
+         actions.add(new IFacetedProject.Action(IFacetedProject.Action.Type.INSTALL, javaFv, null));
+       } else if(!facetedProject.hasProjectFacet(javaFv)) {
+         actions.add(new IFacetedProject.Action(IFacetedProject.Action.Type.VERSION_CHANGE, javaFv, null));
+       } 
+    }
+   
 	private void installM2Facet(IFacetedProject fproj, IProgressMonitor monitor) throws CoreException {
 		if (!fproj.hasProjectFacet(m2Facet)) {
 			IDataModel config = (IDataModel) new MavenFacetInstallDataModelProvider().create();
