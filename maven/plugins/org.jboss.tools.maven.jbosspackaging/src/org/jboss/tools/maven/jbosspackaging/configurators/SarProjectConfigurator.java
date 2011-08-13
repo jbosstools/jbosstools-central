@@ -104,7 +104,7 @@ public class SarProjectConfigurator extends AbstractProjectConfigurator {
 		
 		IPath source = facade.getResourceLocations()[0];
 		
-		WTPProjectsUtil.installJavaFacet(actions, project, facetedProject);
+		installJavaFacet(actions, project, facetedProject);
 		if (!actions.isEmpty()) {
 			facetedProject.modify(actions, monitor);
 		}
