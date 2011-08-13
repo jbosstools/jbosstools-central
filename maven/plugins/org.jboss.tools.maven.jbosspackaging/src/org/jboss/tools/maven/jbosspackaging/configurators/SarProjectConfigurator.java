@@ -51,7 +51,6 @@ import org.jboss.ide.eclipse.as.ui.mbeans.project.JBossSARFacetDataModelProvider
 import org.jboss.tools.maven.core.IJBossMavenConstants;
 import org.jboss.tools.maven.core.internal.project.facet.MavenFacetInstallDataModelProvider;
 import org.maven.ide.eclipse.wtp.ArtifactHelper;
-import org.maven.ide.eclipse.wtp.ResourceCleaner;
 import org.maven.ide.eclipse.wtp.WTPProjectsUtil;
 
 /**
