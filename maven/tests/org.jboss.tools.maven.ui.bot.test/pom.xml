@@ -20,10 +20,8 @@
 			<plugin>
 				<groupId>org.eclipse.tycho</groupId>
 				<artifactId>tycho-surefire-plugin</artifactId>
-				<version>${tychoVersion}</version>
 				<configuration>
 					<useUIThread>false</useUIThread>
-					<useUIHarness>true</useUIHarness>
 					<testSuite>org.jboss.tools.maven.ui.bot.test</testSuite>
 					<testClass>org.jboss.tools.maven.ui.bot.test.MavenAllBotTests</testClass>
 				</configuration>
