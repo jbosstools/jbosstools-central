@@ -20,7 +20,7 @@
 		<module>org.jboss.tools.maven.hibernate.feature</module>
 		<module>org.jboss.tools.maven.portlet.feature</module>
 		<module>org.jboss.tools.maven.project.examples.feature</module>
-		<module>org.jboss.tools.maven.tests.feature</module>
+		<module>org.jboss.tools.maven.test.feature</module>
 		<module>org.jboss.tools.maven.jaxrs.feature</module>
 		<module>org.jboss.tools.maven.jbosspackaging.feature</module>	
 	</modules>
