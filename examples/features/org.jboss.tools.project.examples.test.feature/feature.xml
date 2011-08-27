@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<feature id="org.jboss.tools.project.examples.test.feature" label="Project Examples Test Suite Feature" version="1.2.1.qualifier" provider-name="JBoss by Red Hat">
+<feature id="org.jboss.tools.project.examples.test.feature" label="JBoss Tools - Tests - Project Examples" version="1.2.1.qualifier" provider-name="JBoss by Red Hat">
 
 	<description>
       %description
