@@ -10,6 +10,7 @@
  ************************************************************************************/
 package org.jboss.tools.project.examples.model;
 
+import java.io.File;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
@@ -39,6 +40,7 @@ public class Project implements ProjectModelElement {
 	private String importType;
 	private String importTypeDescription;
 	private ArchetypeModel  archetypeModel = new ArchetypeModel();
+	private File file;
 	
 	public Project() {
 		name=""; //$NON-NLS-1$
@@ -209,5 +211,13 @@ public class Project implements ProjectModelElement {
 	
 	public boolean isURLRequired() {
 		return !ProjectExamplesActivator.MAVEN_ARCHETYPE.equals(importType);
+	}
+
+	public File getFile() {
+		return file;
+	}
+
+	public void setFile(File file) {
+		this.file = file;
 	}
 }

@@ -31,6 +31,7 @@ import org.eclipse.core.runtime.Status;
 import org.jboss.tools.project.examples.Messages;
 import org.jboss.tools.project.examples.ProjectExamplesActivator;
 import org.jboss.tools.project.examples.model.Category;
+import org.jboss.tools.project.examples.model.IImportProjectExample;
 import org.jboss.tools.project.examples.model.Project;
 import org.jboss.tools.project.examples.model.ProjectUtil;
 import org.jboss.tools.project.examples.wizard.NewProjectExamplesWizard;
@@ -101,8 +102,9 @@ public class ProjectTest {
 		File file = ProjectUtil.getProjectExamplesFile(
 				url, name, ".zip", monitor); //$NON-NLS-1$
 		assertNotNull(file);
-		NewProjectExamplesWizard.importProject(projectExample, file, monitor);
-		ProjectExamplesActivator.fix(projectExample, monitor);
+		IImportProjectExample importProjectExample = ProjectExamplesActivator.getDefault().getImportProjectExample(projectExample.getImportType());
+		importProjectExample.importProject(projectExample, file, monitor);
+		importProjectExample.fix(projectExample, monitor);
 	}
 	
 	@Test

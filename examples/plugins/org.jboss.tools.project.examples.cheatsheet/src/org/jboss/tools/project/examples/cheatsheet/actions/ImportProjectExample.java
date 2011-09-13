@@ -21,6 +21,7 @@ import org.eclipse.ui.cheatsheets.ICheatSheetManager;
 import org.jboss.tools.project.examples.Messages;
 import org.jboss.tools.project.examples.ProjectExamplesActivator;
 import org.jboss.tools.project.examples.cheatsheet.Activator;
+import org.jboss.tools.project.examples.model.IImportProjectExample;
 import org.jboss.tools.project.examples.model.Project;
 import org.jboss.tools.project.examples.model.ProjectUtil;
 import org.jboss.tools.project.examples.wizard.NewProjectExamplesWizard;
@@ -68,7 +69,9 @@ public class ImportProjectExample extends Action implements ICheatSheetAction {
 				
 				setName(Messages.NewProjectExamplesWizard_Importing);
 				try {
-					NewProjectExamplesWizard.importProject(project, file, monitor);
+					IImportProjectExample importProjectExample = ProjectExamplesActivator.getDefault().getImportProjectExample(project.getImportType());
+					importProjectExample.importProject(project, file, monitor);
+					importProjectExample.fix(project, monitor);
 				} catch (Exception e) {
 					IStatus status = new Status(IStatus.ERROR,Activator.PLUGIN_ID,e.getMessage(),e);
 					throw new CoreException(status);
