@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+	<extension
+         point="org.eclipse.mylyn.discovery.core.connectorDiscovery">
+      <certification
+            id="com.jboss.jbds.discovery.JbdsCertified"
+            name="JBDS Certified"
+            url="https://engineering.redhat.com/pp/product/jbds/">
+         <description>
+            Features certified with JBoss Developer Studio have been tested by Red Hat. We will provide best-effort assistance on using these plugins.
+         </description>
+         <icon
+               image48="images/redhat_48.png">
+         </icon>
+      </certification>
+      
+      <connectorCategory
+            description="a category for testing purposes"
+            id="org.jboss.tools.category.test"
+            name="Test Category"
+            relevance="60">
+ 			<group id="bundled" /> 
+ 			<group id="extra" />
+      </connectorCategory>
+      
+      <connectorDescriptor
+            categoryId="org.jboss.tools.category.test"
+            description="Eclipse EGit."
+            id="org.eclipse.egit"
+            kind="task"
+            license="Free, EPL, Incubation"
+            name="An Eclipse Git Team provider in pure Java."
+            provider="Eclipse Git"
+            siteUrl="http://download.eclipse.org/egit/updates">
+         <icon
+               image32="images/egit_32.png">
+         </icon>
+         <overview
+               url="http://www.eclipse.org/egit/">
+         </overview>
+      </connectorDescriptor>
+      <connectorDescriptor
+            categoryId="org.jboss.tools.category.test"
+            description="m2e - Maven Integration for Eclipse."
+            id="org.eclipse.m2e.feature"
+            kind="task"
+            license="Free, EPL"
+            name="m2e - Maven Integration for Eclipse."
+            provider="Eclipse.org - m2e"
+            siteUrl="http://download.eclipse.org/technology/m2e/releases">
+         <icon
+               image32="images/m2e_32.gif">
+         </icon>
+         <overview
+               url="http://www.eclipse.org/m2e/">
+         </overview>
+      </connectorDescriptor>
+	  <connectorDescriptor
+            categoryId="org.jboss.tools.category.test"
+            certificationId="com.jboss.jbds.discovery.JbdsCertified"
+            description="TestNG plug-in for Eclipse."
+            id="org.testng.eclipse"
+            kind="task"
+            license="Free, ASL"
+            name="TestNG"
+            provider="Cedric Beust"
+            siteUrl="http://beust.com/eclipse">
+         <icon
+               image32="images/testng_16.gif">
+         </icon>
+         <overview
+         	   summary="TestNG plug-in for Eclipse."
+         	   screenshot="images/testng_screenshot.png"
+               url="http://testng.org/">
+         </overview>
+      </connectorDescriptor>
+            
+	</extension>
+</plugin>

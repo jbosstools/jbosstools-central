@@ -1,0 +1,218 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+
+   <extension-point id="downloadJBossRuntimes" name="%DownloadJBossRuntimes" schema="schema/downloadJBossRuntimes.exsd"/>
+   <extension-point id="projectExamplesTutorials" name="%ProjectExamplesTutorial" schema="schema/projectExamplesTutorials.exsd"/>
+   
+   <extension
+         point="org.eclipse.ui.editors">
+      <editor
+            name="JBoss Central"
+            icon="icons/jboss.gif"
+            contributorClass="org.jboss.tools.central.editors.JBossCentralEditorContributor"
+            class="org.jboss.tools.central.editors.JBossCentralEditor"
+            id="org.jboss.tools.central.editors.JBossCentralEditor">
+      </editor>
+   </extension>
+   
+   <extension
+         point="org.eclipse.ui.startup">
+      <startup class="org.jboss.tools.central.ShowJBossCentral">
+      </startup>
+   </extension>
+   
+   <extension
+        point="org.eclipse.ui.preferencePages">
+     <page
+           category="org.jboss.tools.common.model.ui.MainPreferencePage"
+           class="org.jboss.tools.central.preferences.JBossCentralPreferencePage"
+           id="org.jboss.tools.central.preferences.JBossCentralPreferencePage"
+           name="JBoss Central"/>
+   </extension>
+
+   <extension
+         point="org.eclipse.ui.menus">
+      <menuContribution
+            locationURI="menu:help?before=group.intro">
+            <command
+                  commandId="org.jboss.tools.central.show"
+                  icon="icons/jboss.gif"
+                  id="org.jboss.tools.central.show">
+            </command>
+                        
+      </menuContribution>
+   </extension>
+   
+   <extension
+         point="org.eclipse.ui.commands">
+      <command
+      		defaultHandler="org.jboss.tools.central.actions.DownloadJBossAs701Handler"
+            name="Download and Install JBoss AS 7.0.1"
+            id="org.jboss.tools.central.downloadJBossAs701Handler">
+      </command>
+      <command
+      		defaultHandler="org.jboss.tools.central.actions.ShowJBossCentralHandler"
+            name="JBoss Central"
+            id="org.jboss.tools.central.show">
+      </command>
+      <command
+      		defaultHandler="org.jboss.tools.central.actions.OpenJBossToolsHomeHandler"
+            name="JBoss Tools Home"
+            id="org.jboss.tools.central.openJBossToolsHome">
+      </command>
+      
+      <command
+      		defaultHandler="org.jboss.tools.central.actions.OpenJBossNewsHandler"
+            name="News"
+            id="org.jboss.tools.central.openJBossNews">
+      </command>
+      
+      <command
+      		defaultHandler="org.jboss.tools.central.actions.RefreshJBossNewsHandler"
+            name="Refresh"
+            id="org.jboss.tools.central.refreshJBossNews">
+      </command>
+      <command
+      		defaultHandler="org.jboss.tools.central.actions.RefreshDiscoveryHandler"
+            name="Refresh"
+            id="org.jboss.tools.central.refreshDiscovery">
+      </command>
+      
+      
+      <command
+      		defaultHandler="org.jboss.tools.central.actions.OpenJBossToolsTwitterHandler"
+            name="Twitter"
+            id="org.jboss.tools.central.openJBossToolsTwitter">
+      </command>
+      
+      <command
+      		defaultHandler="org.jboss.tools.central.actions.NewProjectExamplesWizardHandler"
+            name="Project Examples Wizard"
+            id="org.jboss.tools.central.newProjectExamplesWizard">
+      </command>
+      
+      <command
+      		defaultHandler="org.jboss.tools.central.actions.FavoriteAtEclipseMarketplaceHandler"
+            name="Favorite this @ Eclipse Marketplace"
+            id="org.jboss.tools.central.favoriteAtEclipseMarketplace">
+      </command>
+      
+      <command
+      		defaultHandler="org.jboss.tools.central.actions.JBossCentralPreferencesHandler"
+            name="Preferences"
+            id="org.jboss.tools.central.preferences">
+      </command>
+      
+      <command
+      		defaultHandler="org.jboss.tools.central.actions.JBossRuntimeDetectionPreferencesHandler"
+            name="JBoss Runtime Detection"
+            id="org.jboss.tools.runtime.preferences">
+      </command>
+      
+      <command
+      		defaultHandler="org.jboss.tools.central.actions.JBossSeamRuntimePreferencesHandler"
+            name="JBoss Seam 2 Runtime Preferences"
+            id="org.jboss.tools.seam.runtime.preferences">
+      </command>
+      
+      
+      <command
+      		defaultHandler="org.jboss.tools.central.actions.WTPRuntimePreferencesHandler"
+            name="WTP Runtime Preferences"
+            id="org.jboss.tools.wtp.runtime.preferences">
+      </command>
+      
+   </extension>
+   
+   <extension
+         point="org.eclipse.ui.commandImages">
+      <image
+            commandId="org.jboss.tools.central.downloadJBossAs701Handler"
+            icon="icons/jbossas7.png">
+      </image>
+      <image
+            commandId="org.jboss.tools.central.openJBossToolsHome"
+            icon="icons/jbosstools_icon16.png">
+      </image>
+      <image
+            commandId="org.jboss.tools.central.openJBossNews"
+            icon="icons/news.gif">
+      </image>
+      <image
+            commandId="org.jboss.tools.central.refreshJBossNews"
+            icon="icons/refresh.gif">
+      </image>
+      <image
+            commandId="org.jboss.tools.central.refreshDiscovery"
+            icon="icons/refresh.gif">
+      </image>
+      
+      <image
+            commandId="org.jboss.tools.central.openJBossToolsTwitter"
+            icon="icons/twitter.png">
+      </image>
+      <image
+            commandId="org.jboss.tools.central.favoriteAtEclipseMarketplace"
+            icon="icons/star.png">
+      </image>
+      <image
+            commandId="org.jboss.tools.central.preferences"
+            icon="icons/preferences.gif">
+      </image>
+      <image
+            commandId="org.jboss.tools.runtime.preferences"
+            icon="icons/search_local.png">
+      </image>
+      
+      <image
+            commandId="org.jboss.tools.wtp.runtime.preferences"
+            icon="icons/wtp_server.gif">
+      </image>
+      
+      <image
+            commandId="org.jboss.tools.seam.runtime.preferences"
+            icon="icons/seam16.png">
+      </image>
+      
+      <image
+            commandId="org.jboss.tools.central.newProjectExamplesWizard"
+            icon="icons/examples_wiz.gif">
+      </image>
+   </extension>
+   <extension
+         point="org.jboss.tools.central.downloadJBossRuntimes">
+      <runtime
+            id="org.jboss.tools.central.as.701" 
+            name="JBoss AS 7.0.1 Everything (NOT Java EE6 Certified)"
+            version="7.0.1.Final"
+            size="68MB"
+            url="http://download.jboss.org/jbossas/7.0/jboss-as-7.0.1.Final/jboss-as-7.0.1.Final.zip?use_mirror=autoselect"/>
+      <runtime
+            id="org.jboss.tools.central.seam.222" 
+            name="JBoss Seam 2.2.2.Final"
+            version="2.2.2.Final"
+            size="113.2MB"
+            url="http://sourceforge.net/projects/jboss/files/JBoss%20Seam/2.2.2.Final/jboss-seam-2.2.2.Final.zip?use_mirror=autoselect"/>
+      <runtime
+            id="org.jboss.tools.central.as.610" 
+            name="JBoss AS 6.1.0"
+            version="6.1.0.Final"
+            size="183MB"
+            url="http://download.jboss.org/jbossas/6.1/jboss-as-distribution-6.1.0.Final.zip?use_mirror=autoselect"/>
+      
+   </extension>
+   
+   <extension
+         point="org.jboss.tools.central.projectExamplesTutorials">
+      <tutorial
+            id="org.jboss.tools.central.booking22"
+            category="Seam"
+            name="booking22"
+            description="JBoss Seam 2 Booking Examples"
+            wtpRuntimes="org.jboss.tools.central.as.610"
+            seamRuntimes="org.jboss.tools.central.seam.222"
+            eclipseIU="org.testng.eclipse" />      
+   </extension>
+   
+</plugin>
