@@ -457,9 +457,9 @@ public class CreateMavenizedSeamProjectTest {
 				radio.widget.notifyListeners(SWT.Selection, event);
 			}
 		});
-			
-		bot.comboBox(1).setSelection("HSQL");
-		bot.comboBox(2).setSelection(CONNECTION_PROFILE_NAME);
+		//comboBox(1) = Libraries
+		bot.comboBox(2).setSelection("HSQL");
+		bot.comboBox(3).setSelection(CONNECTION_PROFILE_NAME);
 		bot.button("Finish").click();
 		
 		waitForIdle();
