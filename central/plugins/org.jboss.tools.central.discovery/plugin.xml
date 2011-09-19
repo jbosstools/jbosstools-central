@@ -59,10 +59,10 @@
       <connectorDescriptor
             categoryId="org.jboss.tools.category.test"
             description="Maven Integration for WTP."
-            id="org.maven.ide.eclipse.wtp"
+            id="org.maven.ide.eclipse.wtp.feature"
             kind="task"
             license="Free, EPL"
-            name="m2e - Maven Integration for Eclipse."
+            name="Maven Integration for WTP."
             provider="Eclipse.org - m2e"
             siteUrl="http://download.jboss.org/jbosstools/updates/m2eclipse-wtp/">
          <icon
