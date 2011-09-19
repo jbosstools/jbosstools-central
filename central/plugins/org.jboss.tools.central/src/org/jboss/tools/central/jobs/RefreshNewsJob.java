@@ -27,7 +27,7 @@ public class RefreshNewsJob extends Job {
 	public static RefreshNewsJob INSTANCE = new RefreshNewsJob();
 	
 	private RefreshNewsJob() {
-		super("Refresh JBoss News...");
+		super("Refreshing JBoss News...");
 		setPriority(LONG);
 	}
 

@@ -1,15 +1,22 @@
 package org.jboss.tools.central.editors;
 
+import java.io.IOException;
+
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.DisposeEvent;
+import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.forms.editor.FormEditor;
 import org.eclipse.ui.forms.editor.FormPage;
+import org.eclipse.ui.forms.widgets.ExpandableComposite;
+import org.eclipse.ui.forms.widgets.FormText;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.Section;
+import org.jboss.tools.central.JBossCentralActivator;
 
 public class AbstractJBossCentralPage extends FormPage {
 
@@ -19,20 +26,9 @@ public class AbstractJBossCentralPage extends FormPage {
 		super(editor, id, title);
 	}
 
-	protected Section createSection(FormToolkit toolkit, Composite composite, String title, int style) {
-		Section section = toolkit.createSection(composite, style);
-		GridDataFactory.fillDefaults().grab(true, false).applyTo(section);
-	    section.setText(title);
-	    GridLayout layout = new GridLayout();
-	    layout.marginWidth = 0;
-	    layout.marginHeight = 0;
-	    section.setLayout(layout);
-	    return section;
-	}
-
 	protected Composite createComposite(FormToolkit toolkit, Composite body) {
 		Composite composite = toolkit.createComposite(body, SWT.NONE);
-	    composite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+	    composite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, false));
 	    GridLayout layout = new GridLayout();
 	    layout.marginWidth = 0;
 	    layout.marginHeight = 0;
@@ -46,5 +42,46 @@ public class AbstractJBossCentralPage extends FormPage {
 			display = Display.getDefault();
 		}
 		return display;
+	}
+
+	protected Section createSection(FormToolkit toolkit, Composite parent, String name, int style) {
+		final Section section = toolkit.createSection(parent, style);
+		section.setText(name);
+	    section.setLayout(new GridLayout());
+		return section;
+	}
+
+	protected Composite createLoadingComposite(FormToolkit toolkit, Composite parent) {
+		Composite composite = toolkit.createComposite(parent, SWT.WRAP);
+		composite.setLayout(new GridLayout(2, false));
+		GridData gd = new GridData(GridData.FILL, GridData.FILL, false, false);
+		composite.setLayoutData(gd);
+		try {
+			final RefreshIndicator indicator = new RefreshIndicator(composite, "/icons/loader.gif", SWT.NONE);
+			gd = new GridData(GridData.FILL, GridData.FILL, false, false);
+			gd.widthHint = 30;
+			gd.heightHint = 10;
+			indicator.setLayoutData(gd);
+			indicator.setBusy(true);
+			toolkit.adapt(indicator, true, false);
+			composite.addDisposeListener(new DisposeListener() {
+				
+				@Override
+				public void widgetDisposed(DisposeEvent e) {
+					indicator.dispose();
+				}
+			});
+			
+		} catch (IOException e) {
+			JBossCentralActivator.log(e);
+		}
+		FormText formText = toolkit.createFormText(composite, true);
+		gd = new GridData(GridData.FILL, GridData.FILL, false, false);
+	    formText.setLayoutData(gd);
+		String text = JBossCentralActivator.FORM_START_TAG +
+				"Refreshing..." +
+				JBossCentralActivator.FORM_END_TAG;
+		formText.setText(text, true, false);
+		return composite;
 	}
 }

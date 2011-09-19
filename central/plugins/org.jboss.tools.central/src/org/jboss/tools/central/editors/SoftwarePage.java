@@ -23,7 +23,6 @@ import org.eclipse.mylyn.internal.discovery.ui.DiscoveryUi;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ControlAdapter;
 import org.eclipse.swt.events.ControlEvent;
-import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -35,7 +34,6 @@ import org.eclipse.swt.widgets.Event;
 import org.eclipse.ui.forms.IManagedForm;
 import org.eclipse.ui.forms.editor.FormEditor;
 import org.eclipse.ui.forms.widgets.ExpandableComposite;
-import org.eclipse.ui.forms.widgets.FormText;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.ScrolledForm;
 import org.eclipse.ui.forms.widgets.Section;
@@ -50,15 +48,13 @@ import org.osgi.framework.Version;
 
 public class SoftwarePage extends AbstractJBossCentralPage implements IRunnableContext {
 
-	private static final String JBOSS_DISCOVERY_DIRECTORY_3_3_0_XML = "https://anonsvn.jboss.org/repos/jbosstools/workspace/snjeza/discovery/directory-3.3.0.xml";
 	public static final String ID = ID_PREFIX + "SoftwarePage";
 
 	private Dictionary<Object, Object> environment;
 	private ScrolledForm form;
 	private IProgressMonitor monitor;
 	private PageBook pageBook;
-	private Image loaderImage;
-	private FormText loadingText;
+	private Composite loadingComposite;
 	private Composite featureComposite;
 	private DiscoveryViewer discoveryViewer;
 	private RefreshJobChangeListener refreshJobChangeListener;
@@ -116,7 +112,7 @@ public class SoftwarePage extends AbstractJBossCentralPage implements IRunnableC
 	    discoveryViewer = new DiscoveryViewer(getSite(), this);
 	    discoveryViewer.setShowConnectorDescriptorKindFilter(false);
 	    discoveryViewer.setShowInstalledFilterEnabled(true);
-		discoveryViewer.setDirectoryUrl(JBOSS_DISCOVERY_DIRECTORY_3_3_0_XML);
+		discoveryViewer.setDirectoryUrl(JBossCentralActivator.JBOSS_DISCOVERY_DIRECTORY_3_3_0_XML);
 		discoveryViewer.createControl(pageBook);
 		discoveryViewer.setEnvironment(getEnvironment());
 		discoveryViewer.addFilter(new ViewerFilter() {
@@ -152,7 +148,7 @@ public class SoftwarePage extends AbstractJBossCentralPage implements IRunnableC
 			}
 		});
 	    
-	    loadingText = createLoadingText(toolkit);	    
+	    loadingComposite = createLoadingComposite(toolkit, pageBook);	    
 		
 	    form.addControlListener(new ControlAdapter() {
 
@@ -185,6 +181,13 @@ public class SoftwarePage extends AbstractJBossCentralPage implements IRunnableC
 				
 	}
 
+	private Dictionary<Object, Object> getEnvironment() {
+		if (environment == null) {
+			environment = JBossCentralActivator.getEnvironment();
+		}
+		return environment;
+	}
+
 	private void createFeaturesToolbar(FormToolkit toolkit, Section section) {
 		Composite headerComposite = toolkit.createComposite(section, SWT.NONE);
 	    RowLayout rowLayout = new RowLayout();
@@ -210,40 +213,15 @@ public class SoftwarePage extends AbstractJBossCentralPage implements IRunnableC
 		section.setTextClient(headerComposite);
 	}
 
-	private FormText createLoadingText(FormToolkit toolkit) {
-		FormText formText = toolkit.createFormText(pageBook, true);
-		GridData gd = new GridData(GridData.FILL, GridData.FILL, false, false);
-	    formText.setLayoutData(gd);
-		String text = JBossCentralActivator.FORM_START_TAG +
-				"<img href=\"image\"/> <b>Refreshing...</b>" +
-				JBossCentralActivator.FORM_END_TAG;
-		formText.setText(text, true, false);
-		Image image = getLoaderImage();
-		formText.setImage("image", image);
-		return formText;
-	}
+	
 	private void adapt(FormToolkit toolkit, Control control) {
-;		toolkit.adapt(control, true, true);
+		toolkit.adapt(control, true, true);
 		if (control instanceof Composite) {
 			Control[] children = ((Composite) control).getChildren();
 			for (Control c:children) {
 				adapt(toolkit, c);
 			}
 		}
-	}
-
-	private Dictionary<Object, Object> getEnvironment() {
-		if (environment == null) {
-		environment = new Hashtable<Object, Object>(System.getProperties());
-		
-		Bundle bundle = Platform.getBundle("org.jboss.tools.central"); //$NON-NLS-1$
-		Version version = bundle.getVersion();
-		environment.put("org.jboss.tools.central.version", version.toString()); //$NON-NLS-1$
-		environment.put("org.jboss.tools.central.version.major", version.getMajor()); //$NON-NLS-1$
-		environment.put("org.jboss.tools.central.version.minor", version.getMinor()); //$NON-NLS-1$
-		environment.put("org.jboss.tools.central.version.micro", version.getMicro()); //$NON-NLS-1$
-		}
-		return environment;
 	}
 
 	@Override
@@ -262,7 +240,7 @@ public class SoftwarePage extends AbstractJBossCentralPage implements IRunnableC
 			
 			@Override
 			public void run() {
-				pageBook.showPage(loadingText);
+				pageBook.showPage(loadingComposite);
 				form.reflow(true);
 				form.redraw();
 			}
@@ -289,19 +267,8 @@ public class SoftwarePage extends AbstractJBossCentralPage implements IRunnableC
 		return true;
 	}
 	
-	private Image getLoaderImage() {
-		if (loaderImage == null) {
-			loaderImage = JBossCentralActivator.imageDescriptorFromPlugin(JBossCentralActivator.PLUGIN_ID, "/icons/loader.gif").createImage();
-		}
-		return loaderImage;
-	}
-
 	@Override
 	public void dispose() {
-		if (loaderImage != null) {
-			loaderImage.dispose();
-			loaderImage = null;
-		}
 		if (refreshJobChangeListener != null) {
 			RefreshDiscoveryJob.INSTANCE.removeJobChangeListener(refreshJobChangeListener);
 			refreshJobChangeListener = null;

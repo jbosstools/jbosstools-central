@@ -2,8 +2,7 @@
 <?eclipse version="3.4"?>
 <plugin>
 
-   <extension-point id="downloadJBossRuntimes" name="%DownloadJBossRuntimes" schema="schema/downloadJBossRuntimes.exsd"/>
-   <extension-point id="projectExamplesTutorials" name="%ProjectExamplesTutorial" schema="schema/projectExamplesTutorials.exsd"/>
+   <extension-point id="tutorials" name="%Tutorials" schema="schema/tutorials.exsd"/>
    
    <extension
          point="org.eclipse.ui.editors">
@@ -47,11 +46,6 @@
    <extension
          point="org.eclipse.ui.commands">
       <command
-      		defaultHandler="org.jboss.tools.central.actions.DownloadJBossAs701Handler"
-            name="Download and Install JBoss AS 7.0.1"
-            id="org.jboss.tools.central.downloadJBossAs701Handler">
-      </command>
-      <command
       		defaultHandler="org.jboss.tools.central.actions.ShowJBossCentralHandler"
             name="JBoss Central"
             id="org.jboss.tools.central.show">
@@ -68,6 +62,11 @@
             id="org.jboss.tools.central.openJBossNews">
       </command>
       
+      <command
+      		defaultHandler="org.jboss.tools.central.actions.RefreshJBossTutorialsHandler"
+            name="Refresh"
+            id="org.jboss.tools.central.refreshJBossTutorials">
+      </command>
       <command
       		defaultHandler="org.jboss.tools.central.actions.RefreshJBossNewsHandler"
             name="Refresh"
@@ -128,10 +127,6 @@
    <extension
          point="org.eclipse.ui.commandImages">
       <image
-            commandId="org.jboss.tools.central.downloadJBossAs701Handler"
-            icon="icons/jbossas7.png">
-      </image>
-      <image
             commandId="org.jboss.tools.central.openJBossToolsHome"
             icon="icons/jbosstools_icon16.png">
       </image>
@@ -141,6 +136,10 @@
       </image>
       <image
             commandId="org.jboss.tools.central.refreshJBossNews"
+            icon="icons/refresh.gif">
+      </image>
+      <image
+            commandId="org.jboss.tools.central.refreshJBossTutorials"
             icon="icons/refresh.gif">
       </image>
       <image
@@ -180,39 +179,93 @@
             icon="icons/examples_wiz.gif">
       </image>
    </extension>
-   <extension
-         point="org.jboss.tools.central.downloadJBossRuntimes">
-      <runtime
-            id="org.jboss.tools.central.as.701" 
-            name="JBoss AS 7.0.1 Everything (NOT Java EE6 Certified)"
-            version="7.0.1.Final"
-            size="68MB"
-            url="http://download.jboss.org/jbossas/7.0/jboss-as-7.0.1.Final/jboss-as-7.0.1.Final.zip?use_mirror=autoselect"/>
-      <runtime
-            id="org.jboss.tools.central.seam.222" 
-            name="JBoss Seam 2.2.2.Final"
-            version="2.2.2.Final"
-            size="113.2MB"
-            url="http://sourceforge.net/projects/jboss/files/JBoss%20Seam/2.2.2.Final/jboss-seam-2.2.2.Final.zip?use_mirror=autoselect"/>
-      <runtime
-            id="org.jboss.tools.central.as.610" 
-            name="JBoss AS 6.1.0"
-            version="6.1.0.Final"
-            size="183MB"
-            url="http://download.jboss.org/jbossas/6.1/jboss-as-distribution-6.1.0.Final.zip?use_mirror=autoselect"/>
       
-   </extension>
-   
    <extension
-         point="org.jboss.tools.central.projectExamplesTutorials">
+         point="org.jboss.tools.central.tutorials">
+      <category 
+      		id="org.jboss.tools.central.jbossas.quickstart"
+      		name="JBoss AS 7 Quickstarts"
+      		priority="1" />
+      <category 
+      		id="org.jboss.tools.central.seam2"
+      		name="Seam 2 tutorials"
+      		priority="5" />
       <tutorial
-            id="org.jboss.tools.central.booking22"
-            category="Seam"
-            name="booking22"
-            description="JBoss Seam 2 Booking Examples"
-            wtpRuntimes="org.jboss.tools.central.as.610"
-            seamRuntimes="org.jboss.tools.central.seam.222"
-            eclipseIU="org.testng.eclipse" />      
+            id="org.jboss.tools.central.jbossas.quickstart.helloworld"
+            categoryId="org.jboss.tools.central.jbossas.quickstart"
+            name="Helloworld quickstart"
+            type="projectExample"
+            priority="1"
+            icon="icons/jbossas7.png"
+            reference="JBoss AS 7 Quickstarts::helloworld"/>
+      <tutorial
+            id="org.jboss.tools.central.jbossas.quickstart.numberguess"
+            categoryId="org.jboss.tools.central.jbossas.quickstart"
+            name="Numberguess quickstart"
+            type="projectExample"
+            priority="2"
+            icon="icons/jbossas7.png"
+            reference="JBoss AS 7 Quickstarts::numberguess"/>
+      
+      <tutorial
+            id="org.jboss.tools.central.jbossas.quickstart.login"
+            categoryId="org.jboss.tools.central.jbossas.quickstart"
+            name="Login quickstart"
+            type="projectExample"
+            priority="3"
+            icon="icons/jbossas7.png"
+            reference="JBoss AS 7 Quickstarts::login"/>
+      
+      <tutorial
+            id="org.jboss.tools.central.jbossas.quickstart.kitchensink"
+            categoryId="org.jboss.tools.central.jbossas.quickstart"
+            name="Kitchensink quickstart"
+            type="projectExample"
+            priority="4"
+            icon="icons/jbossas7.png"
+            reference="JBoss AS 7 Quickstarts::kitchensink"/>
+      
+      <tutorial
+            id="org.jboss.tools.central.Seam.registration2"
+            categoryId="org.jboss.tools.central.seam2"
+            name="Registration Example"
+            type="projectExample"
+            priority="1"
+            icon="icons/seam16.png"
+            reference="Seam::registration2"/>
+      <tutorial
+            id="org.jboss.tools.central.Seam.messages"
+            categoryId="org.jboss.tools.central.seam2"
+            name="Message Example"
+            type="projectExample"
+            priority="2"
+            icon="icons/seam16.png"
+            reference="Seam::messages"/>
+      <tutorial
+            id="org.jboss.tools.central.Seam.todo"
+            categoryId="org.jboss.tools.central.seam2"
+            name="Todo Example"
+            type="projectExample"
+            priority="3"
+            icon="icons/seam16.png"
+            reference="Seam::todo"/>
+      <tutorial
+            id="org.jboss.tools.central.Seam.numberguess"
+            categoryId="org.jboss.tools.central.seam2"
+            name="Numberguess Example"
+            type="projectExample"
+            priority="4"
+            icon="icons/seam16.png"
+            reference="Seam::numberguess"/>
+      <tutorial
+            id="org.jboss.tools.central.Seam.booking22"
+            categoryId="org.jboss.tools.central.seam2"
+            name="Boooking Example"
+            type="projectExample"
+            priority="5"
+            icon="icons/seam16.png"
+            reference="Seam::booking22"/>
+       
    </extension>
    
 </plugin>

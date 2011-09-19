@@ -3,6 +3,8 @@ package org.jboss.tools.central.editors;
 import org.eclipse.jface.window.ToolTip;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.browser.Browser;
+import org.eclipse.swt.browser.OpenWindowListener;
+import org.eclipse.swt.browser.WindowEvent;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.MouseEvent;
@@ -30,6 +32,22 @@ public class NewsToolTip extends ToolTip {
 	private int x;
 	private int y;
 	private boolean focused = false;
+	
+	private Listener deactivateListener = new Listener() {
+		
+		@Override
+		public void handleEvent(Event event) {
+			if (focused) {
+				if (CURRENT_TOOLTIP != null) {
+					CURRENT_TOOLTIP.dispose();
+					CURRENT_TOOLTIP = null;
+				}
+				activate();
+				hide();
+				focused = false;
+			}
+		}
+	};
 	
 	private MouseMoveListener mouseMoveListener = new MouseMoveListener() {
 		public void mouseMove(MouseEvent e) {
@@ -64,9 +82,20 @@ public class NewsToolTip extends ToolTip {
 	
 	public NewsToolTip(FormText formText, String toolText) {
 		super(formText);
-		this.toolText = toolText;
+		this.toolText = "<html>" +
+				"<head>" +
+				"<title>Aggregated feed of all JBoss feeds</title>" +
+				"<style>" +
+				"html, body { font-size: 12px;font-family: Arial, Helvetica, sans-serif; }" +
+				"h1, h2, h3, h4, h5, h6 { font-size: 14px;font-weight:bold;font-family: Arial, Helvetica, sans-serif; }" +
+				"</style>" +
+				"</head>" +
+				"<body" +
+				toolText +
+				"</body>" +
+				"</html>";
 		this.formText = formText;
-		setShift(new Point(10, 3));
+		setShift(new Point(0, 15));
 		setPopupDelay(400);
 		setHideOnMouseDown(true);
 	}
@@ -75,7 +104,7 @@ public class NewsToolTip extends ToolTip {
 		final Shell stickyTooltip = new Shell(control.getShell(), SWT.ON_TOP | SWT.TOOL
 				| SWT.NO_FOCUS);
 		stickyTooltip.setLayout(new GridLayout());
-		stickyTooltip.setBackground(stickyTooltip.getDisplay().getSystemColor(SWT.COLOR_INFO_BACKGROUND));
+		//stickyTooltip.setBackground(stickyTooltip.getDisplay().getSystemColor(SWT.COLOR_INFO_BACKGROUND));
 		
 		control.getDisplay().asyncExec(new Runnable() {
 			public void run() {
@@ -100,6 +129,9 @@ public class NewsToolTip extends ToolTip {
 		if (!focused) {
 			formText.setFocus();
 		}
+		if (formText.getShell() != null) {
+			formText.getShell().addListener(SWT.Deactivate, deactivateListener);
+		}
 		formText.addMouseMoveListener(mouseMoveListener);
 		formText.addListener(SWT.KeyDown, keyListener);
 
@@ -110,8 +142,10 @@ public class NewsToolTip extends ToolTip {
 				if (formText != null && !formText.isDisposed()) {
 					formText.removeMouseMoveListener(mouseMoveListener);
 					formText.removeListener(SWT.KeyDown, keyListener);
+					if (formText.getShell() != null && !formText.getShell().isDisposed()) {
+						formText.getShell().removeListener(SWT.Deactivate, deactivateListener);
+					}
 				}
-
 			}
 		});		
 	
@@ -121,8 +155,14 @@ public class NewsToolTip extends ToolTip {
 		parent.setLayoutData(gd);
 		
 		Browser browser = new Browser(parent, SWT.NONE);
+		browser.setJavascriptEnabled(false);
+		browser.addOpenWindowListener(new OpenWindowListener() {
+			public void open(WindowEvent event) {
+				event.required= true;
+			}
+		});
 		gd = new GridData(SWT.FILL, SWT.FILL, true, true);
-		gd.heightHint = 250;
+		gd.heightHint = 150;
 		gd.widthHint = 400;
 		browser.setLayoutData(gd);
 		browser.setText(toolText);

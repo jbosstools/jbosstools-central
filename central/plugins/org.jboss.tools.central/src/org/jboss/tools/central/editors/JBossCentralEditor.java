@@ -10,9 +10,6 @@
  ************************************************************************************/
 package org.jboss.tools.central.editors;
 
-
-import javax.tools.Tool;
-
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.jface.action.IToolBarManager;
@@ -24,7 +21,6 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.PartInitException;
@@ -48,7 +44,7 @@ public class JBossCentralEditor extends SharedHeaderFormEditor {
 
 	private static final String JBDS_CENTRAL = "JBoss Developer Studio Central";
 	
-	private GettingStartedPage gettingStartedPage;
+	private AbstractJBossCentralPage gettingStartedPage;
 	
 	private SoftwarePage softwarePage;
 	
@@ -204,7 +200,7 @@ public class JBossCentralEditor extends SharedHeaderFormEditor {
 		return headerImage;
 	}
 
-	public GettingStartedPage getGettingStartedPage() {
+	public AbstractJBossCentralPage getGettingStartedPage() {
 		return gettingStartedPage;
 	}
 

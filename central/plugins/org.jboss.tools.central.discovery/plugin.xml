@@ -56,6 +56,22 @@
                url="http://www.eclipse.org/m2e/">
          </overview>
       </connectorDescriptor>
+      <connectorDescriptor
+            categoryId="org.jboss.tools.category.test"
+            description="Maven Integration for WTP."
+            id="org.maven.ide.eclipse.wtp"
+            kind="task"
+            license="Free, EPL"
+            name="m2e - Maven Integration for Eclipse."
+            provider="Eclipse.org - m2e"
+            siteUrl="http://download.jboss.org/jbosstools/updates/m2eclipse-wtp/">
+         <icon
+               image32="images/m2e_32.gif">
+         </icon>
+         <overview
+               url="http://www.eclipse.org/m2e/">
+         </overview>
+      </connectorDescriptor>
 	  <connectorDescriptor
             categoryId="org.jboss.tools.category.test"
             certificationId="com.jboss.jbds.discovery.JbdsCertified"
@@ -75,6 +91,125 @@
                url="http://testng.org/">
          </overview>
       </connectorDescriptor>
-            
+      <connectorDescriptor
+            categoryId="org.jboss.tools.category.test"
+            certificationId="com.jboss.jbds.discovery.JbdsCertified"
+            description="JBoss Maven Integration."
+            id="org.jboss.tools.maven.feature"
+            kind="task"
+            license="Free, EPL"
+            name="JBoss Maven Integration."
+            provider="JBoss by Red Hat"
+            siteUrl="http://download.jboss.org/jbosstools/updates/development/indigo">
+         <icon
+               image32="images/jbosstools_icon32.png">
+         </icon>
+         <overview
+         	   summary="JBoss Maven Integration."
+               url="http://jboss.org/tools">
+         </overview>
+      </connectorDescriptor>
+      <connectorDescriptor
+            categoryId="org.jboss.tools.category.test"
+            certificationId="com.jboss.jbds.discovery.JbdsCertified"
+            description="JBoss Maven CDI Configurator."
+            id="org.jboss.tools.maven.cdi.feature"
+            kind="task"
+            license="Free, EPL"
+            name="JBoss Maven CDI Configurator."
+            provider="JBoss by Red Hat"
+            siteUrl="http://download.jboss.org/jbosstools/updates/development/indigo">
+         <icon
+               image32="images/jbosstools_icon32.png">
+         </icon>
+         <overview
+               url="http://jboss.org/tools">
+         </overview>
+      </connectorDescriptor>
+      <connectorDescriptor
+            categoryId="org.jboss.tools.category.test"
+            certificationId="com.jboss.jbds.discovery.JbdsCertified"
+            description="JBoss Maven Hibernate Configurator."
+            id="org.jboss.tools.maven.hibernate.feature"
+            kind="task"
+            license="Free, EPL"
+            name="JBoss Maven Hibernate Configurator."
+            provider="JBoss by Red Hat"
+            siteUrl="http://download.jboss.org/jbosstools/updates/development/indigo">
+         <icon
+               image32="images/jbosstools_icon32.png">
+         </icon>
+         <overview
+               url="http://jboss.org/tools">
+         </overview>
+      </connectorDescriptor>
+      <connectorDescriptor
+            categoryId="org.jboss.tools.category.test"
+            certificationId="com.jboss.jbds.discovery.JbdsCertified"
+            description="JBoss Maven JAX-RS Configurator."
+            id="org.jboss.tools.maven.jaxrs.feature"
+            kind="task"
+            license="Free, EPL"
+            name="JBoss Maven JAX-RS Configurator."
+            provider="JBoss by Red Hat"
+            siteUrl="http://download.jboss.org/jbosstools/updates/development/indigo">
+         <icon
+               image32="images/jbosstools_icon32.png">
+         </icon>
+         <overview
+               url="http://jboss.org/tools">
+         </overview>
+      </connectorDescriptor>
+      <connectorDescriptor
+            categoryId="org.jboss.tools.category.test"
+            certificationId="com.jboss.jbds.discovery.JbdsCertified"
+            description="JBoss Maven JSF Configurator."
+            id="org.jboss.tools.maven.jsf.feature"
+            kind="task"
+            license="Free, EPL"
+            name="JBoss Maven JSF Configurator."
+            provider="JBoss by Red Hat"
+            siteUrl="http://download.jboss.org/jbosstools/updates/development/indigo">
+         <icon
+               image32="images/jbosstools_icon32.png">
+         </icon>
+         <overview
+               url="http://jboss.org/tools">
+         </overview>
+      </connectorDescriptor>
+      <connectorDescriptor
+            categoryId="org.jboss.tools.category.test"
+            certificationId="com.jboss.jbds.discovery.JbdsCertified"
+            description="JBoss Maven Portlet Configurator."
+            id="org.jboss.tools.maven.portlet.feature"
+            kind="task"
+            license="Free, EPL"
+            name="JBoss Maven Portlet Configurator."
+            provider="JBoss by Red Hat"
+            siteUrl="http://download.jboss.org/jbosstools/updates/development/indigo">
+         <icon
+               image32="images/jbosstools_icon32.png">
+         </icon>
+         <overview
+               url="http://jboss.org/tools">
+         </overview>
+      </connectorDescriptor>
+      <connectorDescriptor
+            categoryId="org.jboss.tools.category.test"
+            certificationId="com.jboss.jbds.discovery.JbdsCertified"
+            description="JBoss Maven Seam Configurator."
+            id="org.jboss.tools.maven.seam.feature"
+            kind="task"
+            license="Free, EPL"
+            name="JBoss Maven Seam Configurator."
+            provider="JBoss by Red Hat"
+            siteUrl="http://download.jboss.org/jbosstools/updates/development/indigo">
+         <icon
+               image32="images/jbosstools_icon32.png">
+         </icon>
+         <overview
+               url="http://jboss.org/tools">
+         </overview>
+      </connectorDescriptor>
 	</extension>
 </plugin>

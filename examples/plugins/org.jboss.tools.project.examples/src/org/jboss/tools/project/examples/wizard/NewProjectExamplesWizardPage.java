@@ -399,23 +399,6 @@ public class NewProjectExamplesWizardPage extends WizardPage {
 						+ monitorBounds.height - initialSize.y)));
 	}
 
-	private boolean canFix(Project project,ProjectFix fix) {
-		String type = fix.getType();
-		if (ProjectFix.PLUGIN_TYPE.equals(type)) {
-			return new PluginFix().canFix(project, fix);
-		}
-		
-		if (ProjectFix.WTP_RUNTIME.equals(type)) {
-			return new WTPRuntimeFix().canFix(project, fix);
-		}
-		
-		if (ProjectFix.SEAM_RUNTIME.equals(type)) {
-			return new SeamRuntimeFix().canFix(project, fix);
-		}
-		ProjectExamplesActivator.log(NLS.bind(Messages.NewProjectExamplesWizardPage_Invalid_fix, project.getName()));
-		return true;
-	}
-	
 	private void refresh(final TreeViewer viewer, boolean show) {
 		AdaptableList input = new AdaptableList(getCategories(show));
 		viewer.setInput(input);
@@ -567,7 +550,7 @@ public class NewProjectExamplesWizardPage extends WizardPage {
 					List<ProjectFix> unsatisfiedFixes = new ArrayList<ProjectFix>();
 					project.setUnsatisfiedFixes(unsatisfiedFixes);
 					for (ProjectFix fix:fixes) {
-						if (!canFix(project, fix)) {
+						if (!ProjectExamplesActivator.canFix(project, fix)) {
 							unsatisfiedFixes.add(fix);
 						}
 					}

@@ -13,7 +13,7 @@ public class RefreshDiscoveryJob extends Job {
 	public static RefreshDiscoveryJob INSTANCE = new RefreshDiscoveryJob();
 	
 	private RefreshDiscoveryJob() {
-		super("Refresh JBoss News...");
+		super("Discovering...");
 		setPriority(LONG);
 	}
 

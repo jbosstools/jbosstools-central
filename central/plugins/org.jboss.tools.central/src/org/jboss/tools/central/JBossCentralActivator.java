@@ -12,8 +12,16 @@ package org.jboss.tools.central;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Dictionary;
 import java.util.HashMap;
+import java.util.Hashtable;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.TreeMap;
+import java.util.TreeSet;
 
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExtension;
@@ -44,8 +52,13 @@ import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.eclipse.ui.services.IServiceLocator;
 import org.jboss.tools.central.editors.JBossCentralEditor;
 import org.jboss.tools.central.editors.JBossCentralEditorInput;
+import org.jboss.tools.central.model.Tutorial;
+import org.jboss.tools.central.model.TutorialCategory;
+import org.jboss.tools.project.examples.model.Project;
+import org.jboss.tools.runtime.core.model.DownloadRuntime;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
+import org.osgi.framework.Version;
 import org.osgi.service.prefs.BackingStoreException;
 
 /**
@@ -53,16 +66,38 @@ import org.osgi.service.prefs.BackingStoreException;
  */
 public class JBossCentralActivator extends AbstractUIPlugin {
 
+	public static final String JBOSS_DISCOVERY_DIRECTORY_3_3_0_XML = "https://anonsvn.jboss.org/repos/jbosstools/workspace/snjeza/discovery/directory-3.3.0.xml";
+	
+	public static final String ICON = "icon";
+
+	private static final String DESCRIPTION = "description";
+
+	private static final String TUTORIAL = "tutorial";
+
+	public static final String CATEGORY_ID = "categoryId";
+
+	public static final String REFERENCE = "reference";
+
+	public static final String TYPE = "type";
+
+	public static final String PRIORITY = "priority";
+
+	public static final String ID = "id";
+
+	public static final String NAME = "name";
+
+	public static final String CATEGORY = "category";
+	
+	public static final String PROJECT_EXAMPLE_TYPE = "projectExample";
+
 	// The plug-in ID
 	public static final String PLUGIN_ID = "org.jboss.tools.central"; //$NON-NLS-1$
 
-	public static final String DOWNLOAD_JBOSS_RUNTIMES_EXTENSION_ID = "org.jboss.tools.central.downloadJBossRuntimes";
-	
 	public static final String SHOW_JBOSS_CENTRAL_ON_STARTUP = "showJBossCentralOnStartup";
 
 	public static final boolean SHOW_JBOSS_CENTRAL_ON_STARTUP_DEFAULT_VALUE = true;
 
-	private static final String JBDS_PRODUCT_PLUGIN_ID = "com.jboss.jbds.product";
+	public static final String JBDS_PRODUCT_PLUGIN_ID = "com.jboss.jbds.product";
 	
 	public static final String NEW_PROJECT_EXAMPLES_WIZARD_ID = "org.jboss.tools.project.examples.wizard.NewProjectExamplesWizard";
 	
@@ -75,18 +110,15 @@ public class JBossCentralActivator extends AbstractUIPlugin {
 	public static final String CANCELED = FORM_START_TAG + "<span color=\"header\" font=\"header\">Canceled.</span>" + FORM_END_TAG;
 	public static final String LOADING = FORM_START_TAG + "<span color=\"header\" font=\"header\">Loading...</span>" + FORM_END_TAG;
 	
-	public static final int MAX_FEEDS = 40;
+	public static final String TUTORIALS_EXTENSION_ID = "org.jboss.tools.central.tutorials";
 	
-	private static final String NAME = "name"; //$NON-NLS-1$
-	private static final String ID = "id"; //$NON-NLS-1$
-	private static final String VERSION = "version"; //$NON-NLS-1$
-	private static final String URL = "url"; //$NON-NLS-1$
+	public Map<String, TutorialCategory> tutorialCategories;
+	
+	public static final int MAX_FEEDS = 100;
 	
 	// The shared instance
 	private static JBossCentralActivator plugin;
 
-	private Map<String, DownloadRuntime> downloadRuntimes;
-	
 	/**
 	 * The constructor
 	 */
@@ -108,6 +140,7 @@ public class JBossCentralActivator extends AbstractUIPlugin {
 	 */
 	public void stop(BundleContext context) throws Exception {
 		plugin = null;
+		tutorialCategories = null;
 		super.stop(context);
 	}
 
@@ -251,12 +284,12 @@ public class JBossCentralActivator extends AbstractUIPlugin {
 		return null;
 	}
 	
-	public Map<String, DownloadRuntime> getDownloadJBossRuntimes() {
-		if (downloadRuntimes == null) {
-			downloadRuntimes = new HashMap<String, DownloadRuntime>();
+	public Map<String, TutorialCategory> getTutorialCategories() {
+		if (tutorialCategories == null) {
+			tutorialCategories = new HashMap<String, TutorialCategory>();
 			IExtensionRegistry registry = Platform.getExtensionRegistry();
 			IExtensionPoint extensionPoint = registry
-					.getExtensionPoint(DOWNLOAD_JBOSS_RUNTIMES_EXTENSION_ID);
+					.getExtensionPoint(TUTORIALS_EXTENSION_ID);
 			IExtension[] extensions = extensionPoint.getExtensions();
 			for (int i = 0; i < extensions.length; i++) {
 				IExtension extension = extensions[i];
@@ -264,16 +297,110 @@ public class JBossCentralActivator extends AbstractUIPlugin {
 						.getConfigurationElements();
 				for (int j = 0; j < configurationElements.length; j++) {
 					IConfigurationElement configurationElement = configurationElements[j];
-					String name = configurationElement.getAttribute(NAME);
-					String id = configurationElement.getAttribute(ID);
-					String version = configurationElement.getAttribute(VERSION);
-					String url = configurationElement.getAttribute(URL);
-					DownloadRuntime downloadRuntime = new DownloadRuntime(id, name, version, url);
-					downloadRuntimes.put(id, downloadRuntime);
+					if (CATEGORY.equals(configurationElement.getName())) {
+						String name = configurationElement.getAttribute(NAME);
+						String id = configurationElement.getAttribute(ID);
+						String priorityString = configurationElement.getAttribute(PRIORITY);
+						int priority = Integer.MAX_VALUE;
+						if (priorityString != null) {
+							try {
+								priority = new Integer(priorityString)
+										.intValue();
+							} catch (NumberFormatException e) {
+								log(e);
+							}
+						}
+						TutorialCategory category = new TutorialCategory(id, name, priority);
+						tutorialCategories.put(id, category);
+					}
+				}
+				for (int j = 0; j < configurationElements.length; j++) {
+					IConfigurationElement configurationElement = configurationElements[j];
+					if (TUTORIAL.equals(configurationElement.getName())) {
+						String name = configurationElement.getAttribute(NAME);
+						String id = configurationElement.getAttribute(ID);
+						String type = configurationElement.getAttribute(TYPE);
+						String reference = configurationElement.getAttribute(REFERENCE);
+						String priorityString = configurationElement.getAttribute(PRIORITY);
+						String description = configurationElement.getAttribute(DESCRIPTION);
+						String iconPath = configurationElement.getAttribute(ICON);
+						int priority = Integer.MAX_VALUE;
+						if (priorityString != null) {
+							try {
+								priority = new Integer(priorityString)
+										.intValue();
+							} catch (NumberFormatException e) {
+								log(e);
+							}
+						}
+						String categoryId = configurationElement.getAttribute(CATEGORY_ID);
+						TutorialCategory category = tutorialCategories.get(categoryId);
+						if (category == null) {
+							log("Invalid tutorial: id=" + id);
+							continue;
+						}
+						Tutorial tutorial = new Tutorial(id, name, type, reference, priority, category, description, iconPath);
+						category.getTutorials().add(tutorial);
+					}
 				}
 			}
+			List<TutorialCategory> emptyCategories = new ArrayList<TutorialCategory>();
+			for (TutorialCategory category:tutorialCategories.values()) {
+				if (category.getTutorials().size() == 0) {
+					emptyCategories.add(category);
+				}
+			}
+			for (TutorialCategory category:emptyCategories) {
+				tutorialCategories.remove(category.getId());
+			}
 		}
-		return downloadRuntimes;
+		
+		return tutorialCategories;
+	}
+
+	public Image getImage(String imagePath) {
+		ImageRegistry registry = getImageRegistry();
+		Image image = registry.get(imagePath);
+		if (image != null) {
+			return image;
+		}
+		ImageDescriptor imageDescriptor = getImageDescriptor(imagePath);
+		image = imageDescriptor.createImage();
+		registry.put(imagePath, image);
+		return image;
+	}
+
+	public void setTutorialCategories(
+			Map<String, TutorialCategory> tutorialCategories) {
+		this.tutorialCategories = tutorialCategories;
+	}
+	
+	public String getDescription(Tutorial tutorial) {
+		String description = tutorial.getDescription();
+		Project project = tutorial.getProjectExamples();
+		if (project.getDescription() != null) {
+			description = project.getDescription();
+		}
+		StringBuffer buffer = new StringBuffer();
+		buffer.append(description);
+		buffer.append("\n\n");
+		buffer.append("Size: ");
+		buffer.append(project.getSizeAsText());
+		if (project.getUnsatisfiedFixes().size() > 0) {
+			buffer.append("\n\n");	
+		}
+		return buffer.toString();
+	}
+	
+	public static Dictionary<Object, Object> getEnvironment() {
+		Dictionary<Object, Object> environment = new Hashtable<Object, Object>(System.getProperties());
+		Bundle bundle = Platform.getBundle("org.jboss.tools.central"); //$NON-NLS-1$
+		Version version = bundle.getVersion();
+		environment.put("org.jboss.tools.central.version", version.toString()); //$NON-NLS-1$
+		environment.put("org.jboss.tools.central.version.major", version.getMajor()); //$NON-NLS-1$
+		environment.put("org.jboss.tools.central.version.minor", version.getMinor()); //$NON-NLS-1$
+		environment.put("org.jboss.tools.central.version.micro", version.getMicro()); //$NON-NLS-1$
+		return environment;
 	}
 
 }

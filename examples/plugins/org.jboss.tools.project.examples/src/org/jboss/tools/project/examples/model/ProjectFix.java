@@ -45,6 +45,9 @@ public class ProjectFix {
 	
 	public static final String SEAM_PREFERENCES_ID = "org.jboss.tools.common.model.ui.seam"; //$NON-NLS-1$
 	public static final String WTP_PREFERENCES_ID = "org.eclipse.wst.server.ui.runtime.preferencePage"; //$NON-NLS-1$
+	public static final Object DOWNLOAD_ID = "downloadId"; //$NON-NLS-1$
+	public static final Object CONNECTOR_ID = "connectorIds"; //$NON-NLS-1$
+	
 	private String type;
 	private Map<String,String> properties = new HashMap<String,String>();
 	private static Map<String,String> shortDescriptions = new HashMap<String, String>();

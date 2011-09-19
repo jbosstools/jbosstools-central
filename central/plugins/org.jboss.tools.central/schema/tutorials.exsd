@@ -3,7 +3,7 @@
 <schema targetNamespace="org.jboss.tools.central" xmlns="http://www.w3.org/2001/XMLSchema">
 <annotation>
       <appinfo>
-         <meta.schema plugin="org.jboss.tools.central" id="projectExamplesTutorial" name="Project Examples Tutorial"/>
+         <meta.schema plugin="org.jboss.tools.central" id="tutorials" name="Tutorials"/>
       </appinfo>
       <documentation>
          [Enter description of this extension point.]
@@ -18,6 +18,7 @@
       </annotation>
       <complexType>
          <sequence>
+            <element ref="category" minOccurs="1" maxOccurs="unbounded"/>
             <element ref="tutorial" minOccurs="1" maxOccurs="unbounded"/>
          </sequence>
          <attribute name="point" type="string" use="required">
@@ -49,51 +50,95 @@
 
    <element name="tutorial">
       <complexType>
-         <sequence>
-         </sequence>
-         <attribute name="category" type="string" use="required">
+         <attribute name="categoryId" type="string" use="required">
             <annotation>
                <documentation>
                   
                </documentation>
             </annotation>
          </attribute>
-         <attribute name="name" type="string">
+         <attribute name="name" type="string" use="required">
             <annotation>
                <documentation>
                   
                </documentation>
             </annotation>
          </attribute>
-         <attribute name="wtpRuntimes" type="string">
+         <attribute name="id" type="string" use="required">
             <annotation>
                <documentation>
                   
                </documentation>
             </annotation>
          </attribute>
-         <attribute name="id" type="string">
+         <attribute name="type" use="required">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+            </annotation>
+            <simpleType>
+               <restriction base="string">
+                  <enumeration value="projectExample">
+                  </enumeration>
+                  <enumeration value="cheatsheet">
+                  </enumeration>
+                  <enumeration value="html">
+                  </enumeration>
+               </restriction>
+            </simpleType>
+         </attribute>
+         <attribute name="reference" type="string" use="required">
             <annotation>
                <documentation>
                   
                </documentation>
             </annotation>
          </attribute>
-         <attribute name="seamRuntimes" type="string">
+         <attribute name="priority" type="string">
             <annotation>
                <documentation>
                   
                </documentation>
             </annotation>
          </attribute>
-         <attribute name="eclipseIU" type="string">
+         <attribute name="icon" type="string">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+               <appinfo>
+                  <meta.attribute kind="resource"/>
+               </appinfo>
+            </annotation>
+         </attribute>
+         <attribute name="description" type="string">
             <annotation>
                <documentation>
                   
                </documentation>
             </annotation>
          </attribute>
-         <attribute name="description" type="string" use="required">
+      </complexType>
+   </element>
+
+   <element name="category">
+      <complexType>
+         <attribute name="id" type="string" use="required">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="name" type="string" use="required">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="priority" type="string">
             <annotation>
                <documentation>
                   

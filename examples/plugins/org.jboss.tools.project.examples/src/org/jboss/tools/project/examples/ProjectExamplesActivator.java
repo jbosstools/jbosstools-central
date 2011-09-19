@@ -54,6 +54,7 @@ import org.eclipse.ui.internal.cheatsheets.views.CheatSheetView;
 import org.eclipse.ui.internal.cheatsheets.views.ViewUtilities;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.eclipse.wst.validation.internal.operations.ValidationBuilder;
+import org.jboss.tools.project.examples.fixes.PluginFix;
 import org.jboss.tools.project.examples.fixes.ProjectExamplesFix;
 import org.jboss.tools.project.examples.fixes.SeamRuntimeFix;
 import org.jboss.tools.project.examples.fixes.WTPRuntimeFix;
@@ -441,4 +442,22 @@ public class ProjectExamplesActivator extends AbstractUIPlugin {
 			out.write(buffer, 0, len);
 		}
 	}
+	
+	public static boolean canFix(Project project,ProjectFix fix) {
+		String type = fix.getType();
+		if (ProjectFix.PLUGIN_TYPE.equals(type)) {
+			return new PluginFix().canFix(project, fix);
+		}
+		
+		if (ProjectFix.WTP_RUNTIME.equals(type)) {
+			return new WTPRuntimeFix().canFix(project, fix);
+		}
+		
+		if (ProjectFix.SEAM_RUNTIME.equals(type)) {
+			return new SeamRuntimeFix().canFix(project, fix);
+		}
+		ProjectExamplesActivator.log(NLS.bind(Messages.NewProjectExamplesWizardPage_Invalid_fix, project.getName()));
+		return true;
+	}
+	
 }
