@@ -49,21 +49,21 @@ public class NewsToolTip extends ToolTip {
 	private int y;
 	private boolean focused = false;
 	
-	private Listener deactivateListener = new Listener() {
-		
-		@Override
-		public void handleEvent(Event event) {
-			if (focused) {
-				if (CURRENT_TOOLTIP != null) {
-					CURRENT_TOOLTIP.dispose();
-					CURRENT_TOOLTIP = null;
-				}
-				activate();
-				hide();
-				focused = false;
-			}
-		}
-	};
+//	private Listener deactivateListener = new Listener() {
+//		
+//		@Override
+//		public void handleEvent(Event event) {
+//			if (focused) {
+//				if (CURRENT_TOOLTIP != null) {
+//					CURRENT_TOOLTIP.dispose();
+//					CURRENT_TOOLTIP = null;
+//				}
+//				activate();
+//				hide();
+//				focused = false;
+//			}
+//		}
+//	};
 	
 	private MouseMoveListener mouseMoveListener = new MouseMoveListener() {
 		public void mouseMove(MouseEvent e) {
@@ -145,9 +145,9 @@ public class NewsToolTip extends ToolTip {
 		if (!focused) {
 			formText.setFocus();
 		}
-		if (formText.getShell() != null) {
-			formText.getShell().addListener(SWT.Deactivate, deactivateListener);
-		}
+//		if (formText.getShell() != null) {
+//			formText.getShell().addListener(SWT.Deactivate, deactivateListener);
+//		}
 		formText.addMouseMoveListener(mouseMoveListener);
 		formText.addListener(SWT.KeyDown, keyListener);
 
@@ -158,9 +158,9 @@ public class NewsToolTip extends ToolTip {
 				if (formText != null && !formText.isDisposed()) {
 					formText.removeMouseMoveListener(mouseMoveListener);
 					formText.removeListener(SWT.KeyDown, keyListener);
-					if (formText.getShell() != null && !formText.getShell().isDisposed()) {
-						formText.getShell().removeListener(SWT.Deactivate, deactivateListener);
-					}
+//					if (formText.getShell() != null && !formText.getShell().isDisposed()) {
+//						formText.getShell().removeListener(SWT.Deactivate, deactivateListener);
+//					}
 				}
 			}
 		});		
