@@ -1,11 +1,19 @@
+/*************************************************************************************
+ * Copyright (c) 2008-2011 Red Hat, Inc. and others.
+ * All rights reserved. This program and the accompanying materials 
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ * 
+ * Contributors:
+ *     JBoss by Red Hat - Initial implementation.
+ ************************************************************************************/
 package org.jboss.tools.central.editors;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.Dictionary;
-import java.util.Hashtable;
 
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.jobs.IJobChangeEvent;
 import org.eclipse.core.runtime.jobs.IJobChangeListener;
 import org.eclipse.jface.action.Action;
@@ -43,9 +51,12 @@ import org.eclipse.ui.part.PageBook;
 import org.jboss.tools.central.JBossCentralActivator;
 import org.jboss.tools.central.editors.xpl.DiscoveryViewer;
 import org.jboss.tools.central.jobs.RefreshDiscoveryJob;
-import org.osgi.framework.Bundle;
-import org.osgi.framework.Version;
 
+/**
+ * 
+ * @author snjeza
+ *
+ */
 public class SoftwarePage extends AbstractJBossCentralPage implements IRunnableContext {
 
 	public static final String ID = ID_PREFIX + "SoftwarePage";

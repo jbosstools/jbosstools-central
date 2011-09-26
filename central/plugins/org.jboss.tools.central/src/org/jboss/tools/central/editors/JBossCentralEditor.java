@@ -10,10 +10,19 @@
  ************************************************************************************/
 package org.jboss.tools.central.editors;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+
+import org.eclipse.core.commands.AbstractHandler;
+import org.eclipse.core.commands.ExecutionEvent;
+import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.jface.action.IToolBarManager;
+import org.eclipse.mylyn.internal.provisional.commons.ui.CommonImages;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.MouseEvent;
+import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Image;
@@ -21,14 +30,19 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Menu;
+import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.forms.IManagedForm;
 import org.eclipse.ui.forms.editor.SharedHeaderFormEditor;
+import org.eclipse.ui.forms.widgets.ImageHyperlink;
 import org.eclipse.ui.forms.widgets.ScrolledForm;
 import org.eclipse.ui.menus.CommandContributionItem;
 import org.jboss.tools.central.JBossCentralActivator;
+import org.jboss.tools.central.actions.OpenJBossNewsHandler;
+import org.jboss.tools.central.editors.xpl.TextSearchControl;
 import org.jboss.tools.central.jobs.RefreshNewsJob;
 
 /**
@@ -37,6 +51,8 @@ import org.jboss.tools.central.jobs.RefreshNewsJob;
  *
  */
 public class JBossCentralEditor extends SharedHeaderFormEditor {
+
+	private static final String UTF_8_ENCODING = "UTF-8";
 
 	private static final String JBOSS_TOOLS_CENTRAL = "JBoss Tools Central";
 
@@ -144,18 +160,11 @@ public class JBossCentralEditor extends SharedHeaderFormEditor {
 		getToolkit().decorateFormHeading(form.getForm());
 		
 		Composite headerComposite = getToolkit().createComposite(form.getForm().getHead(), SWT.NONE);
-		headerComposite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, false));
+		headerComposite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
 		headerComposite.setLayout(new GridLayout(2, false));
 		headerComposite.setBackground(null);
 		
 		Button showOnStartup = getToolkit().createButton(headerComposite, "Show on Startup", SWT.CHECK);
-		
-//		Text searchControl = getToolkit().createText(headerComposite, "", SWT.SEARCH | SWT.ICON_SEARCH | SWT.ICON_CANCEL);
-//		searchControl.setMessage("Search");
-//		GridData gd = new GridData(SWT.FILL, SWT.FILL, false, false);
-//		gd.widthHint = 150;
-//		searchControl.setLayoutData(gd);
-		
 		showOnStartup.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, false));
 		showOnStartup.setBackground(null);
 		showOnStartup.setSelection(JBossCentralActivator.getDefault().showJBossCentralOnStartup());
@@ -169,6 +178,133 @@ public class JBossCentralEditor extends SharedHeaderFormEditor {
 				JBossCentralActivator.getDefault().savePreferences();
 			}
 		
+		});
+
+		Composite searchComposite = getToolkit().createComposite(headerComposite);
+		GridData gd = new GridData(SWT.END, SWT.FILL, true, true);
+		gd.widthHint = 200;
+		searchComposite.setLayoutData(gd);
+		searchComposite.setBackground(null);
+		searchComposite.setLayout(new GridLayout(2, false));
+		ImageHyperlink menuLink = getToolkit().createImageHyperlink(searchComposite, SWT.NONE);
+		gd = new GridData(SWT.FILL, SWT.CENTER, false, false);
+		menuLink.setLayoutData(gd);
+		menuLink.setBackground(null);
+		menuLink.setImage(CommonImages.getImage(CommonImages.TOOLBAR_ARROW_DOWN));
+		menuLink.setToolTipText("Search Menu");
+		final TextSearchControl searchControl = new TextSearchControl(searchComposite, false);
+		gd = new GridData(SWT.END, SWT.FILL, true, true);
+		gd.widthHint = 200;
+		searchControl.setLayoutData(gd);
+		searchControl.setBackground(null);
+		getToolkit().adapt(searchControl);
+		searchControl.addSelectionListener(new SelectionAdapter() {
+
+			@Override
+			public void widgetDefaultSelected(SelectionEvent e) {
+				if (e.detail == SWT.CANCEL) {
+					searchControl.getTextControl().setText("");
+					searchControl.setInitialMessage(searchControl.getInitialMessage());
+				} else {
+					try {
+						StringBuffer url = new StringBuffer();
+						String initialMessage = searchControl.getInitialMessage();
+						if (JBossCentralActivator.SEARCH_COMMUNITY_PORTAL.equals(initialMessage)) {
+							url.append("https://access.redhat.com/knowledge/searchResults?col=avalon_portal&topSearchForm=topSearchForm&language=en&quickSearch=");
+							url.append(URLEncoder.encode(searchControl.getText(), UTF_8_ENCODING));
+						} else {
+							url.append("http://community.jboss.org/search.jspa?searchArea=");
+							url.append(URLEncoder.encode(initialMessage, UTF_8_ENCODING));
+							url.append("&as_sitesearch=jboss.org&q=");
+							url.append(URLEncoder.encode(searchControl.getText(), UTF_8_ENCODING));
+						}
+						final String location = url.toString();
+						AbstractHandler handler = new OpenJBossNewsHandler() {
+
+							@Override
+							public String getLocation() {
+								return location;
+							}
+							
+						};
+						handler.execute(new ExecutionEvent());
+					} catch (UnsupportedEncodingException e1) {
+						JBossCentralActivator.log(e1);
+					} catch (ExecutionException e1) {
+						JBossCentralActivator.log(e1);
+					}
+				}
+			}
+		
+		});
+		
+		final Menu menu = new Menu(menuLink);
+		final MenuItem searchCommunity = new MenuItem(menu, SWT.CHECK);
+		searchCommunity.setText(JBossCentralActivator.SEARCH_THE_COMMUNITY);
+		final MenuItem searchProjectPages = new MenuItem(menu, SWT.CHECK);
+		searchProjectPages.setText(JBossCentralActivator.SEARCH_PROJECT_PAGES);
+		final MenuItem searchCommunityPortal = new MenuItem(menu, SWT.CHECK);
+		searchCommunityPortal.setText(JBossCentralActivator.SEARCH_COMMUNITY_PORTAL);
+		
+		String initialMessage = searchControl.getInitialMessage();
+		if (JBossCentralActivator.SEARCH_COMMUNITY_PORTAL.equals(initialMessage)) {
+			searchCommunityPortal.setSelection(true);
+		} else if (JBossCentralActivator.SEARCH_PROJECT_PAGES.equals(initialMessage)) {
+			searchProjectPages.setSelection(true);
+		} else {
+			searchCommunity.setSelection(true);
+		}
+		searchCommunity.addSelectionListener(new SelectionAdapter() {
+			
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				searchCommunity.setSelection(true);
+				searchProjectPages.setSelection(false);
+				searchCommunityPortal.setSelection(false);
+				searchControl.setInitialMessage(JBossCentralActivator.SEARCH_THE_COMMUNITY);
+			}
+		
+		});
+		searchProjectPages.addSelectionListener(new SelectionAdapter() {
+
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				searchProjectPages.setSelection(true);
+				searchCommunity.setSelection(false);
+				searchCommunityPortal.setSelection(false);
+				searchControl.setInitialMessage(JBossCentralActivator.SEARCH_PROJECT_PAGES);
+			}
+		
+		});
+
+		searchCommunityPortal.addSelectionListener(new SelectionAdapter() {
+
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				searchProjectPages.setSelection(false);
+				searchCommunity.setSelection(false);
+				searchCommunityPortal.setSelection(true);
+				searchControl.setInitialMessage(JBossCentralActivator.SEARCH_COMMUNITY_PORTAL);
+			}
+		
+		});
+
+		menuLink.addMouseListener(new MouseListener() {
+			
+			@Override
+			public void mouseUp(MouseEvent e) {
+				menu.setVisible(false);
+			}
+			
+			@Override
+			public void mouseDown(MouseEvent e) {
+				menu.setVisible(true);
+			}
+			
+			@Override
+			public void mouseDoubleClick(MouseEvent e) {
+				
+			}
 		});
 		
 		form.getForm().setHeadClient(headerComposite);

@@ -1,3 +1,14 @@
+/*************************************************************************************
+ * Copyright (c) 2008-2011 Red Hat, Inc. and others.
+ * All rights reserved. This program and the accompanying materials 
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ * 
+ * Contributors:
+ *     JBoss by Red Hat - Initial implementation.
+ ************************************************************************************/
+
 package org.jboss.tools.central.editors;
 
 import java.util.ArrayList;
@@ -6,6 +17,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang.StringEscapeUtils;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IContributor;
@@ -83,6 +95,11 @@ import org.jboss.tools.central.model.TutorialCategory;
 import org.jboss.tools.project.examples.model.Project;
 import org.osgi.framework.Bundle;
 
+/**
+ * 
+ * @author snjeza
+ *
+ */
 public class GettingStartedPage extends AbstractJBossCentralPage {
 
 	private static final String CLASS_ATTRIBUTE = "class";
@@ -134,8 +151,8 @@ public class GettingStartedPage extends AbstractJBossCentralPage {
 	    toolkit.paintBordersFor(body);
 	    
 		Composite left = createComposite(toolkit, body);
-		createTutorialsSection(toolkit, left);
 		createProjectsSection(toolkit, left);
+		createTutorialsSection(toolkit, left);
 		createDocumentationSection(toolkit, left);
 		toolkit.paintBordersFor(left);
 		
@@ -280,7 +297,7 @@ public class GettingStartedPage extends AbstractJBossCentralPage {
 	}
 	
 	private void createTutorialsSection(FormToolkit toolkit, Composite parent) {
-		tutorialsSection = createSection(toolkit, parent, "Project Examples", ExpandableComposite.TITLE_BAR|ExpandableComposite.TWISTIE|ExpandableComposite.EXPANDED);
+		tutorialsSection = createSection(toolkit, parent, "Project Examples", ExpandableComposite.TITLE_BAR|ExpandableComposite.TWISTIE);
 	    GridData gd = new GridData(SWT.FILL, SWT.FILL, false, false);
 	    //gd.widthHint = 350;
 	    //gd.heightHint = 100;
@@ -370,7 +387,7 @@ public class GettingStartedPage extends AbstractJBossCentralPage {
 	}
 	
 	public void createProjectsSection(FormToolkit toolkit, Composite parent) {
-		projectsSection = createSection(toolkit, parent, "Create Projects", ExpandableComposite.TITLE_BAR|ExpandableComposite.TWISTIE);
+		projectsSection = createSection(toolkit, parent, "Create Projects", ExpandableComposite.TITLE_BAR|ExpandableComposite.TWISTIE|ExpandableComposite.EXPANDED);
 		projectsSection.setText("Create Projects");
 	    projectsSection.setLayout(new GridLayout());
 	    GridData gd = new GridData(SWT.FILL, SWT.FILL, false, false);
@@ -633,9 +650,10 @@ public class GettingStartedPage extends AbstractJBossCentralPage {
 	
 	private void showException(PageBook pageBook, FormText exceptionText, Exception e) {
 		JBossCentralActivator.log(e);
+		String message = StringEscapeUtils.escapeXml(e.getMessage());
 		String text = JBossCentralActivator.FORM_START_TAG +
 				"<img href=\"image\"/> " + 
-				e.getMessage() + 
+				message +
 				JBossCentralActivator.FORM_END_TAG;
 		exceptionText.setText(text, true, false);
 		Image image = JFaceResources.getImage(Dialog.DLG_IMG_MESSAGE_WARNING);

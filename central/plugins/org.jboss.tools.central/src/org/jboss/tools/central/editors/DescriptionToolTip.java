@@ -1,3 +1,13 @@
+/*************************************************************************************
+ * Copyright (c) 2008-2011 Red Hat, Inc. and others.
+ * All rights reserved. This program and the accompanying materials 
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ * 
+ * Contributors:
+ *     JBoss by Red Hat - Initial implementation.
+ ************************************************************************************/
 package org.jboss.tools.central.editors;
 
 import org.eclipse.jface.window.ToolTip;
@@ -9,14 +19,17 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Text;
 
+/**
+ * 
+ * @author snjeza
+ *
+ */
 public class DescriptionToolTip extends ToolTip {
 
-	private Control control;
 	private String description;
 
 	public DescriptionToolTip(Control control, String description) {
 		super(control);
-		this.control = control;
 		this.description = description;
 		setHideOnMouseDown(true);
 		setPopupDelay(400);

@@ -13,15 +13,11 @@ package org.jboss.tools.central;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Dictionary;
 import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
-import java.util.TreeMap;
-import java.util.TreeSet;
 
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExtension;
@@ -55,9 +51,9 @@ import org.jboss.tools.central.editors.JBossCentralEditorInput;
 import org.jboss.tools.central.model.Tutorial;
 import org.jboss.tools.central.model.TutorialCategory;
 import org.jboss.tools.project.examples.model.Project;
-import org.jboss.tools.runtime.core.model.DownloadRuntime;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
+import org.osgi.framework.ServiceReference;
 import org.osgi.framework.Version;
 import org.osgi.service.prefs.BackingStoreException;
 
@@ -96,6 +92,10 @@ public class JBossCentralActivator extends AbstractUIPlugin {
 	public static final String SHOW_JBOSS_CENTRAL_ON_STARTUP = "showJBossCentralOnStartup";
 
 	public static final boolean SHOW_JBOSS_CENTRAL_ON_STARTUP_DEFAULT_VALUE = true;
+	
+	public static final String PROFILE_ID = "profileId";
+
+	public static final String PROFILE_TIMESTAMP = "profileTimestamp";
 
 	public static final String JBDS_PRODUCT_PLUGIN_ID = "com.jboss.jbds.product";
 	
@@ -112,7 +112,15 @@ public class JBossCentralActivator extends AbstractUIPlugin {
 	
 	public static final String TUTORIALS_EXTENSION_ID = "org.jboss.tools.central.tutorials";
 	
+	public static final String SEARCH_PROJECT_PAGES = "Search Project Pages";
+
+	public static final String SEARCH_THE_COMMUNITY = "Search the Community";
+
+	public static final String SEARCH_COMMUNITY_PORTAL = "Search Community Portal";
+
 	public Map<String, TutorialCategory> tutorialCategories;
+
+	private BundleContext bundleContext;
 	
 	public static final int MAX_FEEDS = 100;
 	
@@ -131,6 +139,7 @@ public class JBossCentralActivator extends AbstractUIPlugin {
 	 */
 	public void start(BundleContext context) throws Exception {
 		super.start(context);
+		this.bundleContext = context;
 		plugin = this;
 	}
 
@@ -140,6 +149,7 @@ public class JBossCentralActivator extends AbstractUIPlugin {
 	 */
 	public void stop(BundleContext context) throws Exception {
 		plugin = null;
+		bundleContext = null;
 		tutorialCategories = null;
 		super.stop(context);
 	}
@@ -401,6 +411,21 @@ public class JBossCentralActivator extends AbstractUIPlugin {
 		environment.put("org.jboss.tools.central.version.minor", version.getMinor()); //$NON-NLS-1$
 		environment.put("org.jboss.tools.central.version.micro", version.getMicro()); //$NON-NLS-1$
 		return environment;
+	}
+	
+	public Object getService(String name) {
+		if (bundleContext == null)
+			return null;
+		ServiceReference<?> reference = bundleContext.getServiceReference(name);
+		if (reference == null)
+			return null;
+		Object result = bundleContext.getService(reference);
+		bundleContext.ungetService(reference);
+		return result;
+	}
+
+	public BundleContext getBundleContext() {
+		return bundleContext;
 	}
 
 }
