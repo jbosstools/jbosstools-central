@@ -36,6 +36,7 @@ import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.preference.PreferenceDialog;
 import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.jface.resource.JFaceColors;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
@@ -48,9 +49,6 @@ import org.eclipse.swt.events.ControlAdapter;
 import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
-import org.eclipse.swt.events.PaintEvent;
-import org.eclipse.swt.events.PaintListener;
-import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
@@ -80,8 +78,9 @@ import org.eclipse.ui.forms.widgets.Hyperlink;
 import org.eclipse.ui.forms.widgets.ImageHyperlink;
 import org.eclipse.ui.forms.widgets.ScrolledForm;
 import org.eclipse.ui.forms.widgets.Section;
+import org.eclipse.ui.forms.widgets.TableWrapData;
+import org.eclipse.ui.forms.widgets.TableWrapLayout;
 import org.eclipse.ui.ide.IDEActionFactory;
-import org.eclipse.ui.internal.forms.widgets.FormFonts;
 import org.eclipse.ui.menus.CommandContributionItem;
 import org.eclipse.ui.part.PageBook;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
@@ -110,8 +109,6 @@ public class GettingStartedPage extends AbstractJBossCentralPage {
 	private ScrolledForm form;
 	private PageBook newsPageBook;
 	private ScrolledComposite scrollComposite;
-	private static Font authorFont;
-	private Font linkFont;
 	private RefreshNewsJobChangeListener refreshNewsJobChangeListener;
 	private FormText newsNoteText;
 	private FormText tutorialsNoteText;
@@ -169,20 +166,11 @@ public class GettingStartedPage extends AbstractJBossCentralPage {
 		
 		};
 		form.addControlListener(controlAdapter);
-		final PaintListener paintListener = new PaintListener() {
-			
-			@Override
-			public void paintControl(PaintEvent e) {
-				resize();
-			}
-		};
-		//form.addPaintListener(paintListener);
 		form.addDisposeListener(new DisposeListener() {
 			
 			@Override
 			public void widgetDisposed(DisposeEvent e) {
 				form.removeControlListener(controlAdapter);
-				//form.removePaintListener(paintListener);
 				form.removeDisposeListener(this);
 			}
 		});
@@ -197,7 +185,6 @@ public class GettingStartedPage extends AbstractJBossCentralPage {
 	    //gd.widthHint = 350;
 	    //gd.heightHint = 100;
 	    newsSection.setLayoutData(gd);
-	    linkFont = newsSection.getFont();
 		createNewsToolbar(toolkit, newsSection);
 				
 		scrollComposite = new ScrolledComposite(newsSection, SWT.V_SCROLL);
@@ -224,9 +211,9 @@ public class GettingStartedPage extends AbstractJBossCentralPage {
 	    newsExceptionText = createExceptionText(toolkit, newsPageBook);
 		
 	    newsComposite = toolkit.createComposite(newsPageBook, SWT.NONE);	    
-		newsComposite.setLayout(new GridLayout());
-		gd =new GridData(SWT.FILL, SWT.FILL, false, false);
-	    newsComposite.setLayoutData(gd);
+		newsComposite.setLayout(new TableWrapLayout());
+		GridDataFactory.fillDefaults().grab(true, false).applyTo(newsComposite);
+	    //newsComposite.setLayoutData(gd);
 
 		newsSection.setClient(scrollComposite);
 		showLoading(newsPageBook, newsLoadingComposite, scrollComposite);
@@ -631,22 +618,6 @@ public class GettingStartedPage extends AbstractJBossCentralPage {
 			}
 		});
 	}
-
-	private Font getAuthorFont(Display display) {
-		if (authorFont == null) {
-			Font font = JFaceResources.getDefaultFont();
-			authorFont = FormFonts.getInstance().getBoldFont(display, font);
-		}
-		return authorFont;
-	}
-	
-	private Font getLinkFont(Display display) {
-		if (linkFont == null) {
-			linkFont = JFaceResources.getDefaultFont();
-		}
-		return linkFont;
-	}
-	
 	
 	private void showException(PageBook pageBook, FormText exceptionText, Exception e) {
 		JBossCentralActivator.log(e);
@@ -808,12 +779,19 @@ public class GettingStartedPage extends AbstractJBossCentralPage {
 			}
 			String text = entry.getFormString();
 			final FormText formText = toolkit.createFormText(newsComposite, true);
+			TableWrapData td = new TableWrapData();
+			td.indent = 2;
+			Point size = newsComposite.computeSize(SWT.DEFAULT, SWT.DEFAULT);
+			td.maxWidth = size.x - 2;
 			formText.setText(text, true, true);
-			Display display = Display.getCurrent();
-			formText.setFont(getLinkFont(display));
+			//Display display = Display.getCurrent();
+			//formText.setFont(getLinkFont(display));
 			formText.setFont("default", JFaceResources.getDefaultFont());
-			Font boldFont = getAuthorFont(display);
-			formText.setFont("author", boldFont);
+			//formText.setForeground(JFaceColors.getHyperlinkText(getDisplay()));
+			formText.setFont("description", JFaceResources.getDefaultFont());
+			//Font boldFont = getAuthorFont(display);
+			//formText.setFont("author", boldFont);
+			formText.setColor("author", JFaceColors.getHyperlinkText(getDisplay()));
 			formText.setImage("image", getNewsImage());
 			if (entry.getDescription() != null && !entry.getDescription().isEmpty()) {
 				ToolTip toolTip = new NewsToolTip(formText, entry.getDescription());
