@@ -13,6 +13,11 @@
 	<version>1.0.0-SNAPSHOT</version>
 	<name>centrall.all</name>
 	<packaging>pom</packaging>
+	 <!-- 
+		mvn clean install
+			or
+		mvn clean install -B -U -fae -e -P jbosstools-nightly-staging-composite,jboss-requirements-composite-mirror,jboss-requirements-composite-extras-mirror,local.site -Dlocal.site=file://home/nboldt/tmp/JBT_REPO_Indigo/
+	-->
 	<modules>
 		<module>features</module>
 		<module>plugins</module>
