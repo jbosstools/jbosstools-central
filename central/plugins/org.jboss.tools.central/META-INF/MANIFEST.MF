@@ -28,4 +28,4 @@ Require-Bundle: org.eclipse.ui;bundle-version="3.7.0",
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-Localization: plugin
-Bundle-Vendor: %BundleName
+Bundle-Vendor: %BundleVendor
