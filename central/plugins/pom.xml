@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>org.jboss.tools</groupId>
 		<artifactId>central</artifactId>
-		<version>1.2.1-SNAPSHOT</version>
+		<version>1.0.0-SNAPSHOT</version>
 	</parent>
 	<groupId>org.jboss.tools.central</groupId>
 	<artifactId>plugins</artifactId>
