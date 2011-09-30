@@ -107,7 +107,7 @@ public class ImportProjectExample extends Action implements ICheatSheetAction {
 				List<IMarker> markers = ProjectExamplesActivator
 						.getMarkers(projects);
 				if (markers != null && markers.size() > 0) {
-					NewProjectExamplesWizard.showQuickFix(projects);
+					ProjectExamplesActivator.showQuickFix(projects);
 				}
 				
 			}

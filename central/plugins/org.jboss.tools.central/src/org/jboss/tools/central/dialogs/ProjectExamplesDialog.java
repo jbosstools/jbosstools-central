@@ -19,9 +19,13 @@ import java.util.Set;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
+import org.eclipse.core.resources.WorkspaceJob;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.dialogs.IDialogConstants;
+import org.eclipse.jface.dialogs.MessageDialogWithToggle;
 import org.eclipse.jface.operation.IRunnableContext;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.operation.ModalContext;
@@ -60,7 +64,9 @@ import org.jboss.tools.central.JBossCentralActivator;
 import org.jboss.tools.central.actions.JBossRuntimeDetectionPreferencesHandler;
 import org.jboss.tools.central.editors.DescriptionToolTip;
 import org.jboss.tools.central.model.Tutorial;
+import org.jboss.tools.project.examples.Messages;
 import org.jboss.tools.project.examples.ProjectExamplesActivator;
+import org.jboss.tools.project.examples.model.IImportProjectExample;
 import org.jboss.tools.project.examples.model.Project;
 import org.jboss.tools.project.examples.model.ProjectFix;
 import org.jboss.tools.runtime.core.RuntimeCoreActivator;
@@ -78,6 +84,7 @@ public class ProjectExamplesDialog extends FormDialog implements IRunnableContex
 	private ScrolledForm form;
 	private Composite fixesComposite;
 	private IProgressMonitor monitor;
+	private Section reqSection;
 	
 	public ProjectExamplesDialog(Shell parentShell, Tutorial tutorial) {
 		super(parentShell);
@@ -107,7 +114,7 @@ public class ProjectExamplesDialog extends FormDialog implements IRunnableContex
 	    text.setLayoutData(gd);
 		descSection.setClient(text);
 		
-		Section reqSection = toolkit.createSection(form.getBody(), ExpandableComposite.TITLE_BAR|ExpandableComposite.TWISTIE|ExpandableComposite.EXPANDED);
+		reqSection = toolkit.createSection(form.getBody(), ExpandableComposite.TITLE_BAR|ExpandableComposite.TWISTIE|ExpandableComposite.EXPANDED);
 		reqSection.setText("Requirements");
 	    reqSection.setLayout(new GridLayout());
 	    gd = new GridData(SWT.FILL, SWT.FILL, true, true);
@@ -142,6 +149,7 @@ public class ProjectExamplesDialog extends FormDialog implements IRunnableContex
 		}
 		fixes = project.getUnsatisfiedFixes();
 		disposeChildren(fixesComposite);
+		reqSection.setVisible(fixes.size() > 0);
 		if (fixes.size() > 0) {
 			for (ProjectFix projectFix : fixes) {
 				if (ProjectFix.WTP_RUNTIME.equals(projectFix.getType())
@@ -366,7 +374,15 @@ public class ProjectExamplesDialog extends FormDialog implements IRunnableContex
 		form.reflow(true);
 		form.redraw();
 		form.layout(true, true);
+		getShell().pack();
 	}
-	
+
+	@Override
+	protected void okPressed() {
+		super.okPressed();
+		List<Project> selectedProjects = new ArrayList<Project>();
+		selectedProjects.add(tutorial.getProjectExamples());
+		ProjectExamplesActivator.importProjectExamples(selectedProjects, true);
+	}	
 	
 }

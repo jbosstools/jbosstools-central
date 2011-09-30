@@ -14,8 +14,10 @@ package org.jboss.tools.central.editors;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.commons.lang.StringEscapeUtils;
 import org.eclipse.core.runtime.CoreException;
@@ -91,7 +93,9 @@ import org.jboss.tools.central.jobs.RefreshTutorialsJob;
 import org.jboss.tools.central.model.NewsEntry;
 import org.jboss.tools.central.model.Tutorial;
 import org.jboss.tools.central.model.TutorialCategory;
+import org.jboss.tools.project.examples.ProjectExamplesActivator;
 import org.jboss.tools.project.examples.model.Project;
+import org.jboss.tools.project.examples.model.ProjectFix;
 import org.osgi.framework.Bundle;
 
 /**
@@ -128,6 +132,8 @@ public class GettingStartedPage extends AbstractJBossCentralPage {
 	private Section projectsSection;
 	private Composite projectsComposite;
 	private Composite documentationComposite;
+	
+	private Set<TutorialCategory> expandedCategories = new HashSet<TutorialCategory>();
 	
 	public GettingStartedPage(FormEditor editor) {
 		super(editor, ID, "Getting Started");
@@ -669,15 +675,18 @@ public class GettingStartedPage extends AbstractJBossCentralPage {
 		List<TutorialCategory> sortedCategories = new ArrayList<TutorialCategory>();
 		sortedCategories.addAll(tempCategories);
 		Collections.sort(sortedCategories);
-		for (TutorialCategory category:sortedCategories) {
+		for (final TutorialCategory category:sortedCategories) {
+			int style = ExpandableComposite.TITLE_BAR|ExpandableComposite.TWISTIE;
+			if (expandedCategories.contains(category)) {
+				style|=ExpandableComposite.EXPANDED;
+			}
 			final ExpandableComposite categoryComposite = toolkit.createExpandableComposite(tutorialsComposite, 
-					ExpandableComposite.TITLE_BAR|ExpandableComposite.TWISTIE);
+					style);
 			categoryComposite.setTitleBarForeground(toolkit.getColors().getColor(IFormColors.TB_TOGGLE));
 			categoryComposite.setText(category.getName());
 			GridData gd = new GridData(SWT.FILL, SWT.FILL, false, false);
 			categoryComposite.setLayoutData(gd);
 			categoryComposite.setLayout(new GridLayout());
-			
 			final Composite composite = toolkit.createComposite(categoryComposite);
 			gd = new GridData(SWT.FILL, SWT.FILL, false, false);
 			composite.setLayoutData(gd);
@@ -685,6 +694,11 @@ public class GettingStartedPage extends AbstractJBossCentralPage {
 			
 			categoryComposite.addExpansionListener(new ExpansionAdapter() {
 				public void expansionStateChanged(ExpansionEvent e) {
+					if (e.getState()) {
+						expandedCategories.add(category);
+					} else {
+						expandedCategories.remove(category);
+					}
 					resize();
 				}
 			});
@@ -735,6 +749,14 @@ public class GettingStartedPage extends AbstractJBossCentralPage {
 		tutorialText.setText(text , true, false);
 		Image image;
 		Project project = tutorial.getProjectExamples();
+		List<ProjectFix> fixes = project.getFixes();
+		List<ProjectFix> unsatisfiedFixes = new ArrayList<ProjectFix>();
+		project.setUnsatisfiedFixes(unsatisfiedFixes);
+		for (ProjectFix fix:fixes) {
+			if (!ProjectExamplesActivator.canFix(project, fix)) {
+				unsatisfiedFixes.add(fix);
+			}
+		}
 		if (project.getUnsatisfiedFixes().size() > 0) {
 			image = JBossCentralActivator.getDefault().getImage("/icons/nwarning.gif");
 		} else {
@@ -748,8 +770,8 @@ public class GettingStartedPage extends AbstractJBossCentralPage {
 				Object object = e.data;
 				if (object instanceof String) {
 					ProjectExamplesDialog dialog = new ProjectExamplesDialog(getSite().getShell(), tutorial);
-					
 					dialog.open();
+					refreshTutorials();
 				}
 			}
 			
