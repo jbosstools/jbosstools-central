@@ -226,6 +226,15 @@
             reference="JBoss AS 7 Quickstarts::kitchensink"/>
       
       <tutorial
+            id="org.jboss.tools.central.jbossas.quickstart.jbossJavaee6Webapp"
+            categoryId="org.jboss.tools.central.jbossas.quickstart"
+            name="Creating your own application"
+            type="projectExample"
+            priority="5"
+            icon="icons/jbossas7.png"
+            reference="JBoss AS 7 Quickstarts::jboss-javaee6-webapp"/>
+      
+      <tutorial
             id="org.jboss.tools.central.Seam.registration2"
             categoryId="org.jboss.tools.central.seam2"
             name="Registration Example"

@@ -24,7 +24,6 @@ import org.jboss.tools.project.examples.cheatsheet.Activator;
 import org.jboss.tools.project.examples.model.IImportProjectExample;
 import org.jboss.tools.project.examples.model.Project;
 import org.jboss.tools.project.examples.model.ProjectUtil;
-import org.jboss.tools.project.examples.wizard.NewProjectExamplesWizard;
 
 public class ImportProjectExample extends Action implements ICheatSheetAction {
 
