@@ -50,7 +50,7 @@ public class LaunchJUnitTest extends Action implements ICheatSheetAction {
 			if (projectNode != null) {
 				String activeProfiles = projectNode.get(ACTIVE_PROFILES, null);
 				if (!params[1].equals(activeProfiles)) {
-					projectNode.put(ACTIVE_PROFILES, activeProfiles);
+					projectNode.put(ACTIVE_PROFILES, params[1]);
 					try {
 						projectNode.flush();
 					} catch (BackingStoreException e) {
