@@ -441,7 +441,8 @@ public class NewProjectExamplesWizardPage extends WizardPage {
 		for (Category category:categories) {
 			List<Project> projects = category.getProjects();
 			for (Project project:projects) {
-				sites.add(project.getSite());
+				String name = project.getSite() == null ? ProjectExamplesActivator.ALL_SITES : project.getSite().getName();
+				sites.add(name);
 			}
 		}
 		String[] items = sites.toArray(new String[0]);

@@ -10,6 +10,7 @@
  ************************************************************************************/
 package org.jboss.tools.project.examples.model;
 
+import java.net.URL;
 import java.util.Set;
 
 /**
@@ -36,5 +37,29 @@ public class SiteCategory implements IProjectExampleSite {
 
 	public void setSites(Set<ProjectExampleSite> sites) {
 		this.sites = sites;
+	}
+
+	public void setEditable(boolean editable) {
+	}
+
+	public boolean isEditable() {
+		return false;
+	}
+
+	public void setExperimental(boolean experimental) {
+	}
+
+	public boolean isExperimental() {
+		return false;
+	}
+
+	public void setName(String name) {
+	}
+
+	public void setUrl(URL url) {
+	}
+
+	public URL getUrl() {
+		return null;
 	}
 }

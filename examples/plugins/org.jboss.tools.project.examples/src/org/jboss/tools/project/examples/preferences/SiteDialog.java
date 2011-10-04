@@ -35,6 +35,7 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 import org.jboss.tools.project.examples.Messages;
 import org.jboss.tools.project.examples.ProjectExamplesActivator;
+import org.jboss.tools.project.examples.model.IProjectExampleSite;
 import org.jboss.tools.project.examples.model.ProjectExampleSite;
 
 /**
@@ -175,7 +176,7 @@ public class SiteDialog extends TitleAreaDialog {
 			return updateButton(false);
 		}
 		Set<ProjectExampleSite> siteList = sites.getSites();
-		for(ProjectExampleSite site:siteList) {
+		for(IProjectExampleSite site:siteList) {
 			if (site != selectedSite && nameText.getText().equals(site.getName())) {
 				setErrorMessage(Messages.SiteDialog_The_site_already_exists);
 				return updateButton(false);

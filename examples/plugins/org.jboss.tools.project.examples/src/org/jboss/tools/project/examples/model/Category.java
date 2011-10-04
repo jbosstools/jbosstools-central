@@ -14,7 +14,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.jboss.tools.project.examples.Messages;
-import org.jboss.tools.project.examples.ProjectExamplesActivator;
 
 /**
  * @author snjeza
@@ -24,6 +23,7 @@ public class Category implements ProjectModelElement {
 
 	private String name;
 	private List<Project> projects = new ArrayList<Project>();
+	private IProjectExampleSite site;
 	public static Category OTHER = new Category(Messages.Category_Other);
 
 	public Category(String name) {
@@ -80,8 +80,13 @@ public class Category implements ProjectModelElement {
 		return getName();
 	}
 
-	public String getSite() {
-		return ProjectExamplesActivator.ALL_SITES;
+	public IProjectExampleSite getSite() {
+		return site;
+	}
+
+	@Override
+	public void setSite(IProjectExampleSite site) {
+		this.site = site;
 	}
 
 }

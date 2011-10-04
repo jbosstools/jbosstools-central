@@ -179,7 +179,7 @@ public class ProjectExamplesPreferencePage extends PreferencePage implements
 					Object object = treeSelection.getFirstElement();
 					if (object instanceof ProjectExampleSite) {
 						selectedSite = (ProjectExampleSite) object;
-						boolean editable = ((ProjectExampleSite) object).isEditable();
+						boolean editable = ((IProjectExampleSite) object).isEditable();
 						editButton.setEnabled(editable);
 						removeButton.setEnabled(editable);
 					}

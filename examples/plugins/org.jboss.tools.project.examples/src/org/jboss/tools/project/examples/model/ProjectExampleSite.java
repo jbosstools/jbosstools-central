@@ -11,34 +11,42 @@ public class ProjectExampleSite implements IProjectExampleSite {
 	public ProjectExampleSite() {		
 	}
 	
+	@Override
 	public URL getUrl() {
 		return url;
 	}
 	
+	@Override
 	public void setUrl(URL url) {
 		this.url = url;
 	}
 	
+	@Override
 	public String getName() {
 		return name;
 	}
 	
+	@Override
 	public void setName(String name) {
 		this.name = name;
 	}
 	
+	@Override
 	public boolean isExperimental() {
 		return experimental;
 	}
 	
+	@Override
 	public void setExperimental(boolean experimental) {
 		this.experimental = experimental;
 	}
 
+	@Override
 	public boolean isEditable() {
 		return editable;
 	}
 
+	@Override
 	public void setEditable(boolean editable) {
 		this.editable = editable;
 	}

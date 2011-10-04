@@ -12,9 +12,12 @@ package org.jboss.tools.project.examples.model;
 
 import java.io.File;
 import java.math.BigDecimal;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.Path;
 import org.jboss.tools.project.examples.ProjectExamplesActivator;
 
 /**
@@ -23,6 +26,8 @@ import org.jboss.tools.project.examples.ProjectExamplesActivator;
  */
 public class Project implements ProjectModelElement {
 
+	private static final String SEP = "/"; //$NON-NLS-1$
+	private static String[] PREFIXES = { "file:" , "http:", "https:" , "ftp:" }; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 	private String name;
 	private String shortDescription;
 	private String description;
@@ -33,7 +38,6 @@ public class Project implements ProjectModelElement {
 	private boolean welcome;
 	private String type;
 	private String welcomeURL;
-	private String site;
 	private List<ProjectFix> fixes = new ArrayList<ProjectFix>();
 	private List<ProjectFix> unsatisfiedFixes;
 	private String perspectiveId;
@@ -41,6 +45,7 @@ public class Project implements ProjectModelElement {
 	private String importTypeDescription;
 	private ArchetypeModel  archetypeModel = new ArchetypeModel();
 	private File file;
+	private IProjectExampleSite site;
 	
 	public Project() {
 		name=""; //$NON-NLS-1$
@@ -78,7 +83,35 @@ public class Project implements ProjectModelElement {
 	}
 
 	public String getUrl() {
-		return url;
+		if (url == null) {
+			return url;
+		}
+		url = url.trim();
+		for (String prefix:PREFIXES) {
+			if (url.startsWith(prefix)) {
+				return url;
+			}
+		}
+		if (site == null) {
+			return url;
+		}
+		URL siteURL = site.getUrl();
+		if (siteURL == null) {
+			return url;
+		}
+		String urlString = siteURL.toString(); 
+		if (urlString.endsWith(SEP)) {
+			urlString = urlString.substring(0, urlString.length() - 1);
+		} else {
+			int index = urlString.lastIndexOf(SEP);
+			if (index > 0) {
+				urlString = urlString.substring(0, index);
+			}
+		}
+		if (url.startsWith(SEP)) {
+			return urlString + url;
+		}
+		return urlString + SEP + url;
 	}
 
 	public void setUrl(String url) {
@@ -148,7 +181,7 @@ public class Project implements ProjectModelElement {
 		this.welcomeURL = welcomeURL;
 	}
 
-	public String getSite() {
+	public IProjectExampleSite getSite() {
 		/*if (site == null) {
 			if (getUrl().startsWith("http://anonsvn.jboss.org")) { //$NON-NLS-1$
 				site = Messages.Project_JBoss_Tools_Team_from_jboss_org;
@@ -161,7 +194,7 @@ public class Project implements ProjectModelElement {
 		return site;
 	}
 
-	public void setSite(String site) {
+	public void setSite(IProjectExampleSite site) {
 		this.site = site;
 	}
 

@@ -14,6 +14,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.jboss.tools.project.examples.Messages;
+import org.jboss.tools.project.examples.model.IProjectExampleSite;
 import org.jboss.tools.project.examples.model.ProjectExampleSite;
 import org.jboss.tools.project.examples.model.ProjectUtil;
 import org.jboss.tools.project.examples.model.SiteCategory;
@@ -46,7 +47,7 @@ public class Sites {
 		return siteCategories;
 	}
 
-	public void remove(ProjectExampleSite site) {
+	public void remove(IProjectExampleSite site) {
 		userSite.getSites().remove(site);
 		sites.remove(site);
 	}

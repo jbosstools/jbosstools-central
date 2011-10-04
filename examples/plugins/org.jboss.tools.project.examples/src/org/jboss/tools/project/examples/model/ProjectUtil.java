@@ -245,6 +245,7 @@ public class ProjectUtil {
 				for (int i = 0; i < len; i++) {
 					Node node = projects.item(i);
 					Project project = new Project();
+					project.setSite(site);
 					Category category = other;
 					if (node.getNodeType() == Node.ELEMENT_NODE) {
 						Element element = (Element) node;
@@ -271,15 +272,13 @@ public class ProjectUtil {
 									}
 									if (!found) {
 										category = new Category(value);
+										category.setSite(site);
 										list.add(category);
 									}
 									project.setCategory(category);
 								}
 								if (nodeName.equals(NAME)) { 
 									project.setName(getContent(child));
-								}
-								if (nodeName.equals("site")) { //$NON-NLS-1$
-									project.setSite(getContent(child));
 								}
 								if (nodeName.equals("shortDescription")) { //$NON-NLS-1$
 									project
@@ -343,13 +342,6 @@ public class ProjectUtil {
 								}
 							}
 						}
-					}
-					if (project.getSite() == null) {
-						String siteName = site.getName();
-						if (siteName == null) {
-							siteName = Messages.Project_Unknown;
-						}
-						project.setSite(siteName);
 					}
 					category.getProjects().add(project);
 				}
