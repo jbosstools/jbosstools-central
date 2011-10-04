@@ -16,6 +16,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.eclipse.core.runtime.NullProgressMonitor;
+import org.jboss.tools.project.examples.model.IProjectExampleSite;
 import org.jboss.tools.project.examples.model.ProjectExampleSite;
 import org.jboss.tools.project.examples.model.ProjectUtil;
 import org.junit.Test;
@@ -29,7 +30,7 @@ public class SiteTest {
 
 	@Test
 	public void sitesPresent() {
-		Set<ProjectExampleSite> sites = new HashSet<ProjectExampleSite>();
+		Set<IProjectExampleSite> sites = new HashSet<IProjectExampleSite>();
 		sites.addAll(ProjectUtil.getPluginSites());
 		sites.addAll(ProjectUtil.getUserSites());
 		assertTrue(sites.size() > 0);
@@ -38,7 +39,7 @@ public class SiteTest {
 	@Test
 	public void testInvalidSites() {
 		ProjectUtil.getProjects(new NullProgressMonitor());
-		HashSet<ProjectExampleSite> invalidSites = ProjectUtil.getInvalidSites();
+		HashSet<IProjectExampleSite> invalidSites = ProjectUtil.getInvalidSites();
 		assertTrue(invalidSites.size() <= 0);
 	}
 	

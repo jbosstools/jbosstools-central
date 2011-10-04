@@ -31,11 +31,4 @@
 		<nature>org.eclipse.jdt.core.javanature</nature>
 		<nature>org.eclipse.pde.api.tools.apiAnalysisNature</nature>
 	</natures>
-	<linkedResources>
-		<link>
-			<name>lib-org.jboss.tools.jst.web.kb_3.3.0.v20110915-1635-H19-M3</name>
-			<type>2</type>
-			<location>E:/eclipse-3.7/plugins/org.jboss.tools.jst.web.kb_3.3.0.v20110915-1635-H19-M3</location>
-		</link>
-	</linkedResources>
 </projectDescription>

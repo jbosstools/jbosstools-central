@@ -82,16 +82,16 @@ public class ProjectUtil {
 	
 	private static String EXPERIMENTAL_EXT = "experimental"; //$NON-NLS-1$
 
-	private static Set<ProjectExampleSite> pluginSites;
+	private static Set<IProjectExampleSite> pluginSites;
 
-	private static HashSet<ProjectExampleSite> invalidSites = new HashSet<ProjectExampleSite>();
+	private static HashSet<IProjectExampleSite> invalidSites = new HashSet<IProjectExampleSite>();
 	
 	private ProjectUtil() {
 	}
 
-	public static Set<ProjectExampleSite> getPluginSites() {
+	public static Set<IProjectExampleSite> getPluginSites() {
 		if (pluginSites == null) {
-			pluginSites = new HashSet<ProjectExampleSite>();
+			pluginSites = new HashSet<IProjectExampleSite>();
 			IExtensionRegistry registry = Platform.getExtensionRegistry();
 			IExtensionPoint extensionPoint = registry
 					.getExtensionPoint(PROJECT_EXAMPLES_XML_EXTENSION_ID);
@@ -100,7 +100,7 @@ public class ProjectUtil {
 				IExtension extension = extensions[i];
 				IConfigurationElement[] configurationElements = extension
 						.getConfigurationElements();
-				ProjectExampleSite site = new ProjectExampleSite();
+				IProjectExampleSite site = new ProjectExampleSite();
 				site.setName(extension.getLabel());
 				for (int j = 0; j < configurationElements.length; j++) {
 					IConfigurationElement configurationElement = configurationElements[j];
@@ -126,8 +126,8 @@ public class ProjectUtil {
 		return pluginSites;
 	}
 	
-	public static Set<ProjectExampleSite> getUserSites() {
-		Set<ProjectExampleSite> sites = new HashSet<ProjectExampleSite>();
+	public static Set<IProjectExampleSite> getUserSites() {
+		Set<IProjectExampleSite> sites = new HashSet<IProjectExampleSite>();
 		ProjectExampleSite site = getSite(getProjectExamplesXml());
 		if (site != null) {
 			sites.add(site);
@@ -172,8 +172,8 @@ public class ProjectUtil {
 		return sites;
 	}
 	
-	private static Set<ProjectExampleSite> getSites() {
-		Set<ProjectExampleSite> sites = new HashSet<ProjectExampleSite>();
+	private static Set<IProjectExampleSite> getSites() {
+		Set<IProjectExampleSite> sites = new HashSet<IProjectExampleSite>();
 		sites.addAll(getPluginSites());
 		sites.addAll(getUserSites());
 		return sites;
@@ -207,15 +207,19 @@ public class ProjectUtil {
 		}
 		return null;
 	}
-
+	
 	public static List<Category> getProjects(IProgressMonitor monitor) {
+		return getProjects(getSites(), monitor);
+	}
+
+	public static List<Category> getProjects(Set<IProjectExampleSite> sites, IProgressMonitor monitor) {
 		monitor.setTaskName(Messages.ProjectUtil_Parsing_project_description_files);
-		Set<ProjectExampleSite> sites = getSites();
+		
 		List<Category> list = new ArrayList<Category>();
 		invalidSites.clear();
 		Category other = Category.OTHER;
 		try {
-			for (ProjectExampleSite site : sites) {
+			for (IProjectExampleSite site : sites) {
 				boolean showExperimentalSites = ProjectExamplesActivator.getDefault().getPreferenceStore().getBoolean(ProjectExamplesActivator.SHOW_EXPERIMENTAL_SITES);
 				if (!showExperimentalSites && site.isExperimental()) {
 					continue;
@@ -535,7 +539,7 @@ public class ProjectUtil {
 		return doc;
 	}
 	
-	public static String getAsXML(Set<ProjectExampleSite> sites)
+	public static String getAsXML(Set<IProjectExampleSite> sites)
 			throws ParserConfigurationException, TransformerException,
 			UnsupportedEncodingException {
 		if (sites == null || sites.size() == 0) {
@@ -544,7 +548,7 @@ public class ProjectUtil {
 		Document doc = getDocument();
 		Element sitesElement = doc.createElement(SITES); 
 		doc.appendChild(sitesElement);
-		for (ProjectExampleSite site : sites) {
+		for (IProjectExampleSite site : sites) {
 			Element siteElement = doc.createElement(SITE);
 			siteElement.setAttribute(NAME, site.getName());
 			siteElement.setAttribute(URL, site.getUrl().toString());
@@ -583,7 +587,7 @@ public class ProjectUtil {
 		return root;
 	}
 
-	public static HashSet<ProjectExampleSite> getInvalidSites() {
+	public static HashSet<IProjectExampleSite> getInvalidSites() {
 		return invalidSites;
 	}	
 }

@@ -27,20 +27,20 @@ import org.jboss.tools.project.examples.model.SiteCategory;
 public class Sites {
 	private SiteCategory[] siteCategories;
 	private SiteCategory userSite;
-	private Set<ProjectExampleSite> sites;
+	private Set<IProjectExampleSite> sites;
 
 	public SiteCategory[] getSiteCategories() {
 		if (siteCategories == null) {
 			siteCategories = new SiteCategory[2];
 			userSite = new SiteCategory(Messages.Sites_User_sites);
-			Set<ProjectExampleSite> userSites = ProjectUtil.getUserSites();
+			Set<IProjectExampleSite> userSites = ProjectUtil.getUserSites();
 			userSite.setSites(userSites);
 			siteCategories[0]=userSite;
 			SiteCategory pluginSite = new SiteCategory(Messages.Sites_Plugin_provided_sites);
-			Set<ProjectExampleSite> pluginSites = ProjectUtil.getPluginSites();
+			Set<IProjectExampleSite> pluginSites = ProjectUtil.getPluginSites();
 			pluginSite.setSites(pluginSites);
 			siteCategories[1]=pluginSite;
-			sites = new HashSet<ProjectExampleSite>();
+			sites = new HashSet<IProjectExampleSite>();
 			sites.addAll(pluginSites);
 			sites.addAll(userSites);
 		}
@@ -57,11 +57,11 @@ public class Sites {
 		sites.add(site);
 	}
 
-	public Set<ProjectExampleSite> getSites() {
+	public Set<IProjectExampleSite> getSites() {
 		return sites;
 	}
 
-	public Set<ProjectExampleSite> getUserSites() {
+	public Set<IProjectExampleSite> getUserSites() {
 		return userSite.getSites();
 	}
 }

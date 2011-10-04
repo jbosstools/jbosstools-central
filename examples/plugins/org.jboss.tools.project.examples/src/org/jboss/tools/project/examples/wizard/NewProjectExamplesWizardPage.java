@@ -59,13 +59,10 @@ import org.eclipse.ui.part.PageBook;
 import org.jboss.tools.project.examples.Messages;
 import org.jboss.tools.project.examples.ProjectExamplesActivator;
 import org.jboss.tools.project.examples.dialog.FixDialog;
-import org.jboss.tools.project.examples.fixes.PluginFix;
-import org.jboss.tools.project.examples.fixes.SeamRuntimeFix;
-import org.jboss.tools.project.examples.fixes.WTPRuntimeFix;
 import org.jboss.tools.project.examples.model.Category;
 import org.jboss.tools.project.examples.model.IImportProjectExample;
+import org.jboss.tools.project.examples.model.IProjectExampleSite;
 import org.jboss.tools.project.examples.model.Project;
-import org.jboss.tools.project.examples.model.ProjectExampleSite;
 import org.jboss.tools.project.examples.model.ProjectFix;
 import org.jboss.tools.project.examples.model.ProjectUtil;
 
@@ -419,11 +416,11 @@ public class NewProjectExamplesWizardPage extends WizardPage {
 		} catch (Exception e) {
 			ProjectExamplesActivator.log(e);
 		}
-		HashSet<ProjectExampleSite> invalidSites = ProjectUtil.getInvalidSites();
+		HashSet<IProjectExampleSite> invalidSites = ProjectUtil.getInvalidSites();
 		boolean showInvalidSites = ProjectExamplesActivator.getDefault().getPreferenceStore().getBoolean(ProjectExamplesActivator.SHOW_INVALID_SITES);
 		if (invalidSites.size() > 0 && showInvalidSites && show) {
 			String message = Messages.NewProjectExamplesWizardPage_Cannot_access_the_following_sites;
-			for (ProjectExampleSite site:invalidSites) {
+			for (IProjectExampleSite site:invalidSites) {
 				message = message + site.getName() + "\n"; //$NON-NLS-1$
 				ProjectExamplesActivator.log(NLS.bind(Messages.InvalideSite, new Object[] {site.getName(), site.getUrl()} ));
 			}

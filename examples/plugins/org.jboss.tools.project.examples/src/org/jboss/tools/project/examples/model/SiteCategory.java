@@ -21,7 +21,7 @@ import java.util.Set;
 public class SiteCategory implements IProjectExampleSite {
 
 	private String name;
-	private Set<ProjectExampleSite> sites;
+	private Set<IProjectExampleSite> sites;
 	
 	public SiteCategory(String name) {
 		this.name = name;
@@ -31,11 +31,11 @@ public class SiteCategory implements IProjectExampleSite {
 		return name;
 	}
 
-	public Set<ProjectExampleSite> getSites() {
+	public Set<IProjectExampleSite> getSites() {
 		return sites;
 	}
 
-	public void setSites(Set<ProjectExampleSite> sites) {
+	public void setSites(Set<IProjectExampleSite> sites) {
 		this.sites = sites;
 	}
 

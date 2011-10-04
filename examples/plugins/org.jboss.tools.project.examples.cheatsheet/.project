@@ -33,21 +33,6 @@
 	</natures>
 	<linkedResources>
 		<link>
-			<name>lib-org.jboss.tools.common.text.ext_3.3.0.v20111001-0437-H476-M4</name>
-			<type>2</type>
-			<location>E:/eclipse-3.7.1/plugins/org.jboss.tools.common.text.ext_3.3.0.v20111001-0437-H476-M4</location>
-		</link>
-		<link>
-			<name>lib-org.jboss.tools.common.text.xml_3.3.0.v20111001-0437-H476-M4</name>
-			<type>2</type>
-			<location>E:/eclipse-3.7.1/plugins/org.jboss.tools.common.text.xml_3.3.0.v20111001-0437-H476-M4</location>
-		</link>
-		<link>
-			<name>lib-org.jboss.tools.common_3.3.0.v20111001-0437-H476-M4</name>
-			<type>2</type>
-			<location>E:/eclipse-3.7.1/plugins/org.jboss.tools.common_3.3.0.v20111001-0437-H476-M4</location>
-		</link>
-		<link>
 			<name>lib-org.jboss.tools.jst.jsp_3.3.0.v20111001-0515-H542-M4</name>
 			<type>2</type>
 			<location>E:/eclipse-3.7.1/plugins/org.jboss.tools.jst.jsp_3.3.0.v20111001-0515-H542-M4</location>

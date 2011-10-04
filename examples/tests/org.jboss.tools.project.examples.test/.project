@@ -33,11 +33,6 @@
 	</natures>
 	<linkedResources>
 		<link>
-			<name>lib-org.jboss.tools.jsf.vpe.seam_3.3.0.v20111001-0617-H456-M4</name>
-			<type>2</type>
-			<location>E:/eclipse-3.7.1/plugins/org.jboss.tools.jsf.vpe.seam_3.3.0.v20111001-0617-H456-M4</location>
-		</link>
-		<link>
 			<name>lib-org.jboss.tools.jst.web.kb_3.3.0.v20111001-0515-H542-M4</name>
 			<type>2</type>
 			<location>E:/eclipse-3.7.1/plugins/org.jboss.tools.jst.web.kb_3.3.0.v20111001-0515-H542-M4</location>

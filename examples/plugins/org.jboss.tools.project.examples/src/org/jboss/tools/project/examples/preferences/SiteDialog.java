@@ -175,7 +175,7 @@ public class SiteDialog extends TitleAreaDialog {
 			setErrorMessage(Messages.SiteDialog_The_name_field_is_required);
 			return updateButton(false);
 		}
-		Set<ProjectExampleSite> siteList = sites.getSites();
+		Set<IProjectExampleSite> siteList = sites.getSites();
 		for(IProjectExampleSite site:siteList) {
 			if (site != selectedSite && nameText.getText().equals(site.getName())) {
 				setErrorMessage(Messages.SiteDialog_The_site_already_exists);
