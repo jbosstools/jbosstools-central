@@ -66,7 +66,6 @@ public class ArchetypeExamplesWizard extends Wizard implements INewWizard {
 		final String version = model.getVersion();
 		final String javaPackage = wizardPage.getJavaPackage();
 		final Properties properties = wizardPage.getProperties();
-		final MavenPlugin plugin = MavenPlugin.getDefault();
 		final Archetype archetype = wizardPage.getArchetype();
 		final String projectName = configuration.getProjectName(model);
 		final IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject(projectName);
@@ -74,7 +73,7 @@ public class ArchetypeExamplesWizard extends Wizard implements INewWizard {
 		final IWorkspaceRunnable wr = new IWorkspaceRunnable() {
 			public void run(final IProgressMonitor monitor)
 					throws CoreException {
-				plugin.getProjectConfigurationManager().createArchetypeProject(
+				MavenPlugin.getProjectConfigurationManager().createArchetypeProject(
 						project, new Path(location.getAbsolutePath()), archetype,
 						groupId, artifactId, version, javaPackage, properties,
 						configuration, monitor);
@@ -104,6 +103,8 @@ public class ArchetypeExamplesWizard extends Wizard implements INewWizard {
 		return true;
 	}
 
+	
+	
 	public void addPages() {
 	    configuration = new ProjectImportConfiguration();
 	    wizardPage = new ArchetypeExamplesWizardPage(configuration, projectDescription);
