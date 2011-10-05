@@ -39,8 +39,6 @@ public class ImportMavenArchetypeProjectExample extends
 
 	private static final String JBOSS_TOOLS_MAVEN_PROJECTS = "/.JBossToolsMavenProjects"; //$NON-NLS-1$
 
-	private boolean confirm;
-
 	@Override
 	public List<Project> importProject(final Project projectDescription, File file,
 			IProgressMonitor monitor) throws Exception {
@@ -54,47 +52,6 @@ public class ImportMavenArchetypeProjectExample extends
 		}
 		IPath path = mavenProjectsRoot.append(projectName);
 		final File destination = new File(path.toOSString());
-		if (destination.exists()) {
-			final List<IProject> existingProjects = getExistingProjects(destination);
-			if (existingProjects.size() > 0) {
-				Display.getDefault().syncExec(new Runnable() {
-					public void run() {
-						String title = "Overwrite";
-						String msg = getMessage(destination, existingProjects);
-						confirm = MessageDialog.openQuestion(getActiveShell(),
-								title, msg);
-					}
-				});
-				if (confirm) {
-					monitor.setTaskName("Deleting ...");
-					for (IProject project : existingProjects) {
-						monitor.setTaskName("Deleting " + project.getName());
-						project.delete(false, true, monitor);
-					}
-				} else {
-					return projects;
-				}
-			}
-			boolean deleted = deleteDirectory(destination, monitor);
-			if (monitor.isCanceled()) {
-				return projects;
-			}
-			if (!deleted) {
-				Display.getDefault().syncExec(new Runnable() {
-
-					@Override
-					public void run() {
-						MessageDialog.openError(getActiveShell(), "Error",
-							"Cannot delete the '" + destination + "' file.");
-					}
-				});
-				return projects;
-			}
-		}
-		monitor.setTaskName("");
-		if (monitor.isCanceled()) {
-			return projects;
-		}
 
 		Display.getDefault().syncExec(new Runnable() {
 
@@ -113,78 +70,4 @@ public class ImportMavenArchetypeProjectExample extends
 	private static Shell getActiveShell() {
 		return Display.getDefault().getActiveShell();
 	}
-
-	private static boolean deleteDirectory(File path, IProgressMonitor monitor) {
-		if (path.exists()) {
-			File[] files = path.listFiles();
-			for (File file : files) {
-				if (monitor.isCanceled()) {
-					return false;
-				}
-				monitor.setTaskName("Deleting " + file);
-				if (file.isDirectory()) {
-					deleteDirectory(file, monitor);
-				} else {
-					file.delete();
-				}
-			}
-		}
-		return (path.delete());
-	}
-
-	private List<IProject> getExistingProjects(final File destination) {
-		List<IProject> existingProjects = new ArrayList<IProject>();
-		IProject[] projects = ResourcesPlugin.getWorkspace().getRoot()
-				.getProjects();
-		for (IProject project : projects) {
-			if (project != null && project.exists()) {
-				File projectFile = project.getLocation().toFile();
-				if (projectFile.getAbsolutePath().startsWith(
-						destination.getAbsolutePath())) {
-					existingProjects.add(project);
-				}
-			}
-		}
-		return existingProjects;
-	}
-
-	private String getMessage(final File destination, List<IProject> projects) {
-		if (projects.size() > 0) {
-			StringBuilder builder = new StringBuilder();
-			if (projects.size() == 1) {
-				builder.append("\nThere is the '" + projects.get(0).getName()
-						+ "' project on the destination location:\n\n");
-				builder.append("Would you like to overwrite it?");
-			} else {
-				builder.append("\nThere are the following projects on the destination location:\n\n");
-				for (IProject project : projects) {
-					builder.append(project.getName());
-					builder.append("\n"); //$NON-NLS-1$
-				}
-				builder.append("\n"); //$NON-NLS-1$
-				builder.append("Would you like to overwrite them?");
-			}
-			return builder.toString();
-		}
-		return null;
-	}
-
-	private String getWorkspaceMessage(final List<IProject> existingProjects) {
-		StringBuilder builder = new StringBuilder();
-		if (existingProjects.size() == 1) {
-			builder.append("There is the '" + existingProjects.get(0).getName()
-					+ "' project in the workspace.\n\n");
-			builder.append("Would you like to delete it?");
-		} else {
-			builder.append("There are the following projects in the workspace:\n\n");
-			for (IProject project : existingProjects) {
-				builder.append(project.getName());
-				builder.append("\n"); //$NON-NLS-1$
-			}
-			builder.append("\n"); //$NON-NLS-1$
-			builder.append("Would you like to delete them?");
-		}
-		return builder.toString();
-	}
-
 }

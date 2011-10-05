@@ -22,6 +22,7 @@ import org.apache.maven.archetype.metadata.RequiredProperty;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.embedder.IMaven;
@@ -87,7 +88,16 @@ public class ArchetypeExamplesWizardPage extends
 		// It needs to be called AFTER setArchetype(archetype) !!! 
 		archetypeChanged = false;
 		
+		//Use archetype/example name by default
 		artifactIdCombo.setText(artifactId);
+	    
+		//Check if project already exists
+	    IStatus nameStatus = getImportConfiguration().validateProjectName(getModel());
+	    if(!nameStatus.isOK()) {
+	    	//Force the user to change the name if the project exists
+	    	artifactIdCombo.setText("");//$NON-NLS-1$
+	    }
+	    
 		groupIdCombo.setText(groupId);
 		versionCombo.setText(version);
 		packageCombo.setText(javaPackage);
