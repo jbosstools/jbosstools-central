@@ -6,9 +6,9 @@
       <certification
             id="com.jboss.jbds.discovery.JbdsCertified"
             name="JBDS Certified"
-            url="https://engineering.redhat.com/pp/product/jbds/">
+            url="https://issues.jboss.org/browse/JBDS-1627">
          <description>
-            Features certified with JBoss Developer Studio have been tested by Red Hat. We will provide best-effort assistance on using these plugins.
+            Features certified with JBoss Developer Studio have been tested by Red Hat.
          </description>
          <icon
                image48="images/redhat_48.png">
