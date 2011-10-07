@@ -54,7 +54,7 @@ public class JBossCentralEditor extends SharedHeaderFormEditor {
 
 	private static final String UTF_8_ENCODING = "UTF-8";
 
-	private static final String JBOSS_TOOLS_CENTRAL = "JBoss Tools Central";
+	private static final String JBOSS_CENTRAL = "JBoss Central";
 
 	public static final String ID = "org.jboss.tools.central.editors.JBossCentralEditor";
 
@@ -109,7 +109,7 @@ public class JBossCentralEditor extends SharedHeaderFormEditor {
 		if (JBossCentralActivator.isJBDS()) {
 			setPartName(JBDS_CENTRAL);
 		} else {
-			setPartName(JBOSS_TOOLS_CENTRAL);
+			setPartName(JBOSS_CENTRAL);
 		}
 	}
 	/* (non-Javadoc)
@@ -153,8 +153,8 @@ public class JBossCentralEditor extends SharedHeaderFormEditor {
 			form.setText(JBDS_CENTRAL);
 			form.setToolTipText(JBDS_CENTRAL);
 		} else {
-			form.setText(JBOSS_TOOLS_CENTRAL);
-			form.setToolTipText(JBOSS_TOOLS_CENTRAL);
+			form.setText(JBOSS_CENTRAL);
+			form.setToolTipText(JBOSS_CENTRAL);
 		}
 		form.setImage(getHeaderImage());
 		getToolkit().decorateFormHeading(form.getForm());
