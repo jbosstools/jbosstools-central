@@ -731,7 +731,7 @@ public class GettingStartedPage extends AbstractJBossCentralPage {
 	}
 
 	protected void configureTutorialText(FormText tutorialText, final Tutorial tutorial) {
-		StringBuffer buffer = new StringBuffer();
+		StringBuilder buffer = new StringBuilder();
 		buffer.append(JBossCentralActivator.FORM_START_TAG);
 		//boolean haveImage = tutorial.getIconPath() != null && JBossCentralActivator.getDefault().getImage(tutorial.getIconPath()) != null;
 		//if (haveImage) {
@@ -760,7 +760,7 @@ public class GettingStartedPage extends AbstractJBossCentralPage {
 		if (project.getUnsatisfiedFixes().size() > 0) {
 			image = JBossCentralActivator.getDefault().getImage("/icons/nwarning.gif");
 		} else {
-			image = JBossCentralActivator.getDefault().getImage("/icons/import_obj.png");
+			image = JBossCentralActivator.getDefault().getImage(tutorial.getIconPath());
 		}
 		tutorialText.setImage("image", image);
 		tutorialText.addHyperlinkListener(new HyperlinkAdapter() {
@@ -805,7 +805,7 @@ public class GettingStartedPage extends AbstractJBossCentralPage {
 			td.indent = 2;
 			Point size = newsComposite.computeSize(SWT.DEFAULT, SWT.DEFAULT);
 			td.maxWidth = size.x - 2;
-			formText.setText(text, true, true);
+			//formText.setText(text, true, true);
 			//Display display = Display.getCurrent();
 			//formText.setFont(getLinkFont(display));
 			formText.setFont("default", JFaceResources.getDefaultFont());
