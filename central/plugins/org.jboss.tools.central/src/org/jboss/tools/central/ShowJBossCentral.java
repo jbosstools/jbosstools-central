@@ -34,18 +34,27 @@ public class ShowJBossCentral implements IStartup {
 		} else {
 			IProfile profile = profileRegistry
 					.getProfile(IProfileRegistry.SELF);
-			String profileId = profile.getProfileId();
-			IEclipsePreferences prefs = JBossCentralActivator.getDefault().getPreferences();
-			String savedId = prefs.get(JBossCentralActivator.PROFILE_ID, null);
-			if (savedId == null || !savedId.equals(profileId)) {
-				prefs.put(JBossCentralActivator.PROFILE_ID, profileId);
-				showJBossCentral = true;
-			}
-			long timestamp = profile.getTimestamp();
-			long savedTimestamp = prefs.getLong(JBossCentralActivator.PROFILE_TIMESTAMP, -1);
-			if (timestamp != savedTimestamp) {
-				prefs.putLong(JBossCentralActivator.PROFILE_TIMESTAMP, timestamp);
-				showJBossCentral = true;
+			
+			if (profile != null) { // got NPE's when running in PDE
+				String profileId = profile.getProfileId();
+				IEclipsePreferences prefs = JBossCentralActivator.getDefault()
+						.getPreferences();
+				String savedId = prefs.get(JBossCentralActivator.PROFILE_ID,
+						null);
+				if (savedId == null || !savedId.equals(profileId)) {
+					prefs.put(JBossCentralActivator.PROFILE_ID, profileId);
+					showJBossCentral = true;
+				}
+				long timestamp = profile.getTimestamp();
+				long savedTimestamp = prefs.getLong(
+						JBossCentralActivator.PROFILE_TIMESTAMP, -1);
+				if (timestamp != savedTimestamp) {
+					prefs.putLong(JBossCentralActivator.PROFILE_TIMESTAMP,
+							timestamp);
+					showJBossCentral = true;
+				}
+			} else {
+				// TODO: Not sure what is supposed to happen here if profile doesn't exist ?
 			}
 		}
 		if (!showJBossCentral) {
