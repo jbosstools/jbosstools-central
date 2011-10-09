@@ -121,7 +121,7 @@ public class RefreshNewsJob extends Job {
 			author = StringEscapeUtils.escapeHtml(author);
 		}
 		
-		description = "&nbsp; " + description;
+		//description = "&nbsp; " + description;
 		return new NewsEntry(title, link, description, entry.getAuthor(), date);
 	}
 
