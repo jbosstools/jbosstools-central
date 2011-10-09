@@ -120,6 +120,8 @@ public class RefreshNewsJob extends Job {
 		if (author != null) {
 			author = StringEscapeUtils.escapeHtml(author);
 		}
+		
+		description = "&nbsp; " + description;
 		return new NewsEntry(title, link, description, entry.getAuthor(), date);
 	}
 
