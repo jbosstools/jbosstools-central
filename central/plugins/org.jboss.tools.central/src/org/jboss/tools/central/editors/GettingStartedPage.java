@@ -805,7 +805,7 @@ public class GettingStartedPage extends AbstractJBossCentralPage {
 			td.indent = 2;
 			Point size = newsComposite.computeSize(SWT.DEFAULT, SWT.DEFAULT);
 			td.maxWidth = size.x - 2;
-			//formText.setText(text, true, true);
+			formText.setText(text, true, true);
 			//Display display = Display.getCurrent();
 			//formText.setFont(getLinkFont(display));
 			formText.setFont("default", JFaceResources.getDefaultFont());
