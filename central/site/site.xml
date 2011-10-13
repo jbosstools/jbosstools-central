@@ -8,5 +8,8 @@
 	<feature url="features/org.jboss.tools.central.feature_0.0.0.jar" id="org.jboss.tools.central.feature" version="0.0.0">
 		<category name="JBoss Central Nightly Build Update Site"/>
 	</feature>
+	<!-- hidden feature: only want to include the plugin w/o exposing the feature for users to install -->
+	<feature url="features/org.jboss.tools.central.discovery.feature_0.0.0.jar" id="org.jboss.tools.central.discovery.feature" version="0.0.0">
+	</feature>
 
 </site>
