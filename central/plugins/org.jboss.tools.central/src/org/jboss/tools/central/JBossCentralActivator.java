@@ -62,7 +62,7 @@ import org.osgi.service.prefs.BackingStoreException;
  */
 public class JBossCentralActivator extends AbstractUIPlugin {
 
-	public static final String JBOSS_DISCOVERY_DIRECTORY_3_3_0_XML = "https://anonsvn.jboss.org/repos/jbosstools/workspace/snjeza/discovery/directory-3.3.0.xml";
+	public static final String JBOSS_DISCOVERY_DIRECTORY_3_3_0_XML = "http://download.jboss.org/jbosstools/updates/nightly/trunk/directory.xml";
 	
 	public static final String ICON = "icon";
 
