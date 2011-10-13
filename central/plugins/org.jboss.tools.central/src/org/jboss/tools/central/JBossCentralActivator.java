@@ -101,9 +101,9 @@ public class JBossCentralActivator extends AbstractUIPlugin {
 	
 	public static final String NEW_PROJECT_EXAMPLES_WIZARD_ID = "org.jboss.tools.project.examples.wizard.NewProjectExamplesWizard";
 	
-	public static final String NEWS_URL = "http://planet.jboss.org/view/all";
+	public static final String NEWS_URL = "http://planet.jboss.org/feeds/blogs";
 
-	public static final String NEWS_ATOM_URL = "http://planet.jboss.org/xml/all?type=atom";
+	public static final String NEWS_ATOM_URL = "http://planet.jboss.org/feeds/blogs";
 
 	public static final String FORM_END_TAG = "</p></form>";
 	public static final String FORM_START_TAG = "<form><p>";

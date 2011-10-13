@@ -5,6 +5,8 @@ import java.util.Date;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.jboss.tools.central.JBossCentralActivator;
 
+import com.ocpsoft.pretty.time.PrettyTime;
+
 public class NewsEntry {
 	private String title;
 	private String link;
@@ -81,12 +83,15 @@ public class NewsEntry {
 		boolean cr = false;
 		if (date != null) {
 			buffer.append("<span font=\"default\">");
-			buffer.append("posted on ");
-			buffer.append(date);
+			buffer.append("posted ");
 			buffer.append("</span>");
+			buffer.append("<b>");
+			PrettyTime prettyTime = new PrettyTime(new Date());
+			buffer.append("&#160;" + prettyTime.format(date));
+			buffer.append("</b>");
 			cr = true;
 		}
-		if (author != null && !author.isEmpty()) {
+		if (author != null && !author.isEmpty() && !"(author unknown)".equalsIgnoreCase(author)) {
 			buffer.append(" ");
 			buffer.append("<span font=\"default\">");
 			buffer.append(" by");

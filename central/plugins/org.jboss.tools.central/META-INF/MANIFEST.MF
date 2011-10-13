@@ -29,3 +29,5 @@ Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-Localization: plugin
 Bundle-Vendor: %BundleVendor
+Bundle-ClassPath: lib/ocpsoft-pretty-time-1.0.7.jar,
+ .

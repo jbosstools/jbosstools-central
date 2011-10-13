@@ -24,11 +24,14 @@ public class RefreshNewsJob extends Job {
 
 	private List<NewsEntry> entries = new ArrayList<NewsEntry>();
 	private Exception exception;
-	public static RefreshNewsJob INSTANCE = new RefreshNewsJob();
+	public static RefreshNewsJob INSTANCE = new RefreshNewsJob(JBossCentralActivator.NEWS_ATOM_URL);
 	
-	private RefreshNewsJob() {
+	private String newsurl;
+	
+	private RefreshNewsJob(String newsurl) {
 		super("Refreshing JBoss News...");
 		setPriority(LONG);
+		this.newsurl=newsurl;
 	}
 
 	@Override
@@ -40,7 +43,7 @@ public class RefreshNewsJob extends Job {
 		SyndFeedInput input = new SyndFeedInput();
 		URL url;
 		try {
-			url = new URL(JBossCentralActivator.NEWS_ATOM_URL);
+			url = new URL(newsurl);
 		} catch (MalformedURLException e) {
 			exception = e;
 			return Status.CANCEL_STATUS;
@@ -110,6 +113,8 @@ public class RefreshNewsJob extends Job {
 				}
 			}
 		}
+		
+		
 		Date date;
 		if (entry.getUpdatedDate() != null) {
 			date = entry.getUpdatedDate();

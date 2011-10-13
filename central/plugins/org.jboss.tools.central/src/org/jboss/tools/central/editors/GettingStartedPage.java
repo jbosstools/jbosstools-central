@@ -45,6 +45,7 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.window.ToolTip;
 import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.SWTException;
 import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.events.ControlAdapter;
@@ -805,10 +806,21 @@ public class GettingStartedPage extends AbstractJBossCentralPage {
 			td.indent = 2;
 			Point size = newsComposite.computeSize(SWT.DEFAULT, SWT.DEFAULT);
 			td.maxWidth = size.x - 2;
-			formText.setText(text, true, true);
-			//Display display = Display.getCurrent();
+			try {
+				// to avoid illegal argumentexception on formtext fields.
+				// we replace the HTML entity &nbsp; with the standard xml version 
+				// TODO: should probably be done earlier on but couldn't find where.
+				text = text.replaceAll("&nbsp;", "&#160;"); 
+				
+				formText.setText(text, true, true);
+			} catch(IllegalArgumentException se) {
+				formText.setText("Problem rendering entry - " + se.getMessage(),false,false);
+			}
+				//Display display = Display.getCurrent();
 			//formText.setFont(getLinkFont(display));
 			formText.setFont("default", JFaceResources.getDefaultFont());
+			formText.setFont("date", JFaceResources.getDefaultFont());
+			formText.setColor("date", JFaceColors.getHyperlinkText(getDisplay()));
 			//formText.setForeground(JFaceColors.getHyperlinkText(getDisplay()));
 			formText.setFont("description", JFaceResources.getDefaultFont());
 			//Font boldFont = getAuthorFont(display);
