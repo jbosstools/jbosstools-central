@@ -6,7 +6,7 @@
       <certification
             id="com.jboss.jbds.discovery.JbdsCertified"
             name="JBDS Certified"
-            url="https://issues.jboss.org/browse/JBDS-1627">
+            url="http://devstudio.jboss.com/updates/4.0/">
          <description>
             Features certified with JBoss Developer Studio have been tested by Red Hat.
          </description>
