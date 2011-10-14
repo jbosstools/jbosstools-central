@@ -79,12 +79,12 @@ public class NewsEntry {
 		} else {
 			buffer.append(title);
 		}
-		buffer.append("<br/>");
+		//buffer.append("<br/>");
 		boolean cr = false;
 		if (date != null) {
-			buffer.append("<span font=\"default\">");
+			/*buffer.append("<span font=\"default\">");
 			buffer.append("posted ");
-			buffer.append("</span>");
+			buffer.append("</span>");*/
 			buffer.append("<b>");
 			PrettyTime prettyTime = new PrettyTime(new Date());
 			buffer.append("&#160;" + prettyTime.format(date));

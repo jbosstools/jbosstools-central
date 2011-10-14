@@ -100,7 +100,7 @@ public class NewsToolTip extends ToolTip {
 		super(formText);
 		this.toolText = "<html>" +
 				"<head>" +
-				"<title>Aggregated feed of all JBoss feeds</title>" +
+				"<title>JBoss</title>" +
 				"<style>" +
 				"html, body { font-size: 12px;font-family: Arial, Helvetica, sans-serif; }" +
 				"h1, h2, h3, h4, h5, h6 { font-size: 14px;font-weight:bold;font-family: Arial, Helvetica, sans-serif; }" +

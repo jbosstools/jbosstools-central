@@ -828,7 +828,7 @@ public class GettingStartedPage extends AbstractJBossCentralPage {
 			formText.setColor("author", JFaceColors.getHyperlinkText(getDisplay()));
 			formText.setImage("image", getNewsImage());
 			if (entry.getDescription() != null && !entry.getDescription().isEmpty()) {
-				ToolTip toolTip = new NewsToolTip(formText, entry.getDescription());
+				ToolTip toolTip = new NewsToolTip(formText, entry.getDate() + " " + entry.getDescription());
 				toolTip.activate();
 			}
 			formText.addHyperlinkListener(new HyperlinkAdapter() {
