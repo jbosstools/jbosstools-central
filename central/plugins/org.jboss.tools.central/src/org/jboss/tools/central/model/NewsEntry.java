@@ -3,6 +3,7 @@ package org.jboss.tools.central.model;
 import java.util.Date;
 
 import org.apache.commons.lang.StringEscapeUtils;
+import org.apache.commons.lang.StringUtils;
 import org.jboss.tools.central.JBossCentralActivator;
 
 import com.ocpsoft.pretty.time.PrettyTime;
@@ -74,7 +75,7 @@ public class NewsEntry {
 			buffer.append("<a href=\"");
 			buffer.append(link);
 			buffer.append("\">");
-			buffer.append(title);
+			buffer.append(StringEscapeUtils.unescapeXml(title));
 			buffer.append("</a>");
 		} else {
 			buffer.append(title);

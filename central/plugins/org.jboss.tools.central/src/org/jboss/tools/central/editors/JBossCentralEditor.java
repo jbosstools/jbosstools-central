@@ -17,7 +17,6 @@ import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.mylyn.internal.provisional.commons.ui.CommonImages;
 import org.eclipse.swt.SWT;
@@ -28,7 +27,6 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
@@ -129,12 +127,12 @@ public class JBossCentralEditor extends SharedHeaderFormEditor {
 			}
 			setPageImage(index, gettingStartedImage);
 			
-			/*softwarePage = new SoftwarePage(this);
+			softwarePage = new SoftwarePage(this);
 			index = addPage(softwarePage);
 			if (softwareImage == null) {
 				softwareImage = JBossCentralActivator.getImageDescriptor("/icons/software.png").createImage();
 			}
-			setPageImage(index, softwareImage);*/
+			setPageImage(index, softwareImage);
 			
 		} catch (PartInitException e) {
 			JBossCentralActivator.log(e, "Error adding page");
@@ -164,24 +162,24 @@ public class JBossCentralEditor extends SharedHeaderFormEditor {
 		headerComposite.setLayout(new GridLayout(2, false));
 		headerComposite.setBackground(null);
 		
-		Button showOnStartup = getToolkit().createButton(headerComposite, "Show on Startup", SWT.CHECK);
-		showOnStartup.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, false));
-		showOnStartup.setBackground(null);
-		showOnStartup.setSelection(JBossCentralActivator.getDefault().showJBossCentralOnStartup());
-		showOnStartup.addSelectionListener(new SelectionAdapter() {
-
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				IEclipsePreferences preferences = JBossCentralActivator.getDefault().getPreferences();
-				boolean showOnStartup = preferences.getBoolean(JBossCentralActivator.SHOW_JBOSS_CENTRAL_ON_STARTUP, JBossCentralActivator.SHOW_JBOSS_CENTRAL_ON_STARTUP_DEFAULT_VALUE);
-				preferences.putBoolean(JBossCentralActivator.SHOW_JBOSS_CENTRAL_ON_STARTUP, !showOnStartup);
-				JBossCentralActivator.getDefault().savePreferences();
-			}
-		
-		});
+//		Button showOnStartup = getToolkit().createButton(headerComposite, "Show on Startup", SWT.CHECK);
+//		showOnStartup.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, false));
+//		showOnStartup.setBackground(null);
+//		showOnStartup.setSelection(JBossCentralActivator.getDefault().showJBossCentralOnStartup());
+//		showOnStartup.addSelectionListener(new SelectionAdapter() {
+//
+//			@Override
+//			public void widgetSelected(SelectionEvent e) {
+//				IEclipsePreferences preferences = JBossCentralActivator.getDefault().getPreferences();
+//				boolean showOnStartup = preferences.getBoolean(JBossCentralActivator.SHOW_JBOSS_CENTRAL_ON_STARTUP, JBossCentralActivator.SHOW_JBOSS_CENTRAL_ON_STARTUP_DEFAULT_VALUE);
+//				preferences.putBoolean(JBossCentralActivator.SHOW_JBOSS_CENTRAL_ON_STARTUP, !showOnStartup);
+//				JBossCentralActivator.getDefault().savePreferences();
+//			}
+//		
+//		});
 
 		Composite searchComposite = getToolkit().createComposite(headerComposite);
-		GridData gd = new GridData(SWT.END, SWT.FILL, true, true);
+		GridData gd = new GridData(SWT.BEGINNING, SWT.FILL, true, true);
 		gd.widthHint = 200;
 		searchComposite.setLayoutData(gd);
 		searchComposite.setBackground(null);
@@ -308,6 +306,7 @@ public class JBossCentralEditor extends SharedHeaderFormEditor {
 		});
 		
 		form.getForm().setHeadClient(headerComposite);
+		//form.getForm().setToolBarVerticalAlignment(SWT.BOTTOM);
 		
 		IToolBarManager toolbar = form.getToolBarManager();
 		CommandContributionItem item = JBossCentralActivator.createContributionItem(getSite(), "org.jboss.tools.central.openJBossToolsHome");

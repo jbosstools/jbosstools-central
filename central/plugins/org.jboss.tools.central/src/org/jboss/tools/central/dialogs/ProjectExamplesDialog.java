@@ -353,7 +353,7 @@ public class ProjectExamplesDialog extends FormDialog implements IRunnableContex
 
 	@Override
 	protected void createButtonsForButtonBar(Composite parent) {
-		createButton(parent, IDialogConstants.OK_ID, "Run",
+		createButton(parent, IDialogConstants.OK_ID, "Start",
 				true);
 		createButton(parent, IDialogConstants.CANCEL_ID,
 				IDialogConstants.CANCEL_LABEL, false);
