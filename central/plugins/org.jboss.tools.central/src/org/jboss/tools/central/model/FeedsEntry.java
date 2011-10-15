@@ -8,17 +8,17 @@ import org.jboss.tools.central.JBossCentralActivator;
 
 import com.ocpsoft.pretty.time.PrettyTime;
 
-public class NewsEntry {
+public class FeedsEntry {
 	private String title;
 	private String link;
 	private String description;
 	private String author;
 	private Date date;
 
-	public NewsEntry() {
+	public FeedsEntry() {
 	}
 
-	public NewsEntry(String title, String link, String description,
+	public FeedsEntry(String title, String link, String description,
 			String author, Date date) {
 		this.title = title;
 		this.link = link;
@@ -165,7 +165,7 @@ public class NewsEntry {
 
 	@Override
 	public String toString() {
-		return "NewsEntry [title=" + title + ", link=" + link
+		return "FeedsEntry [title=" + title + ", link=" + link
 				+ ", description=" + description + ", author=" + author
 				+ ", date=" + date + "]";
 	}

@@ -39,7 +39,7 @@ import org.eclipse.ui.forms.widgets.FormText;
  * @author snjeza
  *
  */
-public class NewsToolTip extends ToolTip {
+public class FeedsToolTip extends ToolTip {
 
 	private String toolText;
 	private static Shell CURRENT_TOOLTIP;
@@ -91,12 +91,12 @@ public class NewsToolTip extends ToolTip {
 					hide();
 				}
 				focused = true;
-				createFocusedTooltip(NewsToolTip.this.formText);
+				createFocusedTooltip(FeedsToolTip.this.formText);
 			}
 		}
 	};
 	
-	public NewsToolTip(FormText formText, String toolText) {
+	public FeedsToolTip(FormText formText, String toolText) {
 		super(formText);
 		this.toolText = "<html>" +
 				"<head>" +

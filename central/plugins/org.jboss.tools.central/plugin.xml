@@ -57,9 +57,9 @@
       </command>
       
       <command
-      		defaultHandler="org.jboss.tools.central.actions.OpenJBossNewsHandler"
-            name="News"
-            id="org.jboss.tools.central.openJBossNews">
+      		defaultHandler="org.jboss.tools.central.actions.OpenJBossBlogsHandler"
+            name="Blogs"
+            id="org.jboss.tools.central.openJBossBlogs">
       </command>
       
       <command
@@ -68,9 +68,9 @@
             id="org.jboss.tools.central.refreshJBossTutorials">
       </command>
       <command
-      		defaultHandler="org.jboss.tools.central.actions.RefreshJBossNewsHandler"
+      		defaultHandler="org.jboss.tools.central.actions.RefreshJBossBlogsHandler"
             name="Refresh"
-            id="org.jboss.tools.central.refreshJBossNews">
+            id="org.jboss.tools.central.refreshJBossBlogs">
       </command>
       <command
       		defaultHandler="org.jboss.tools.central.actions.RefreshDiscoveryHandler"
@@ -131,11 +131,11 @@
             icon="icons/jbosstools_icon16.png">
       </image>
       <image
-            commandId="org.jboss.tools.central.openJBossNews"
-            icon="icons/news.gif">
+            commandId="org.jboss.tools.central.openJBossBlogs"
+            icon="icons/blogs.gif">
       </image>
       <image
-            commandId="org.jboss.tools.central.refreshJBossNews"
+            commandId="org.jboss.tools.central.refreshJBossBlogs"
             icon="icons/refresh.gif">
       </image>
       <image

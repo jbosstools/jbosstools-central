@@ -39,9 +39,9 @@ import org.eclipse.ui.forms.widgets.ImageHyperlink;
 import org.eclipse.ui.forms.widgets.ScrolledForm;
 import org.eclipse.ui.menus.CommandContributionItem;
 import org.jboss.tools.central.JBossCentralActivator;
-import org.jboss.tools.central.actions.OpenJBossNewsHandler;
+import org.jboss.tools.central.actions.OpenJBossBlogsHandler;
 import org.jboss.tools.central.editors.xpl.TextSearchControl;
-import org.jboss.tools.central.jobs.RefreshNewsJob;
+import org.jboss.tools.central.jobs.RefreshBlogsJob;
 
 /**
  * 
@@ -83,7 +83,7 @@ public class JBossCentralEditor extends SharedHeaderFormEditor {
 			softwareImage.dispose();
 			softwareImage = null;
 		}
-		RefreshNewsJob.INSTANCE.cancel();
+		RefreshBlogsJob.INSTANCE.cancel();
 		super.dispose();
 	}
 	
@@ -217,7 +217,7 @@ public class JBossCentralEditor extends SharedHeaderFormEditor {
 							url.append(URLEncoder.encode(searchControl.getText(), UTF_8_ENCODING));
 						}
 						final String location = url.toString();
-						AbstractHandler handler = new OpenJBossNewsHandler() {
+						AbstractHandler handler = new OpenJBossBlogsHandler() {
 
 							@Override
 							public String getLocation() {

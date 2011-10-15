@@ -15,19 +15,19 @@ import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.runtime.jobs.Job;
-import org.jboss.tools.central.jobs.RefreshNewsJob;
+import org.jboss.tools.central.jobs.RefreshBlogsJob;
 
 /** 
  * 
  * @author snjeza
  *
  */
-public class RefreshJBossNewsHandler extends AbstractHandler {
+public class RefreshJBossBlogsHandler extends AbstractHandler {
 
 	@Override
 	public Object execute(ExecutionEvent event) throws ExecutionException {
-		if (RefreshNewsJob.INSTANCE.getState() == Job.NONE) {
-			RefreshNewsJob.INSTANCE.schedule();
+		if (RefreshBlogsJob.INSTANCE.getState() == Job.NONE) {
+			RefreshBlogsJob.INSTANCE.schedule();
 		}
 		return null;
 	}

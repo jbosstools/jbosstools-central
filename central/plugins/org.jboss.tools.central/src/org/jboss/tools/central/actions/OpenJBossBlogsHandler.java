@@ -18,11 +18,11 @@ import org.jboss.tools.central.JBossCentralActivator;
  * @author snjeza
  *
  */
-public class OpenJBossNewsHandler extends OpenWithBrowserHandler {
+public class OpenJBossBlogsHandler extends OpenWithBrowserHandler {
 
 	@Override
 	public String getLocation() {
-		return JBossCentralActivator.NEWS_URL;
+		return JBossCentralActivator.BLOG_URL;
 	}
 
 }

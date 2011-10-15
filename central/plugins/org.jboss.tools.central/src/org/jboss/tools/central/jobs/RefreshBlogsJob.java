@@ -12,7 +12,7 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.jboss.tools.central.JBossCentralActivator;
-import org.jboss.tools.central.model.NewsEntry;
+import org.jboss.tools.central.model.FeedsEntry;
 
 import com.sun.syndication.feed.synd.SyndContent;
 import com.sun.syndication.feed.synd.SyndEntry;
@@ -20,18 +20,18 @@ import com.sun.syndication.feed.synd.SyndFeed;
 import com.sun.syndication.io.SyndFeedInput;
 import com.sun.syndication.io.XmlReader;
 
-public class RefreshNewsJob extends Job {
+public class RefreshBlogsJob extends Job {
 
-	private List<NewsEntry> entries = new ArrayList<NewsEntry>();
+	private List<FeedsEntry> entries = new ArrayList<FeedsEntry>();
 	private Exception exception;
-	public static RefreshNewsJob INSTANCE = new RefreshNewsJob(JBossCentralActivator.NEWS_ATOM_URL);
+	public static RefreshBlogsJob INSTANCE = new RefreshBlogsJob(JBossCentralActivator.BLOGS_ATOM_URL);
 	
-	private String newsurl;
+	private String blogsurl;
 	
-	private RefreshNewsJob(String newsurl) {
-		super("Refreshing JBoss News...");
+	private RefreshBlogsJob(String blogsurl) {
+		super("Refreshing JBoss Blogs...");
 		setPriority(LONG);
-		this.newsurl=newsurl;
+		this.blogsurl=blogsurl;
 	}
 
 	@Override
@@ -43,7 +43,7 @@ public class RefreshNewsJob extends Job {
 		SyndFeedInput input = new SyndFeedInput();
 		URL url;
 		try {
-			url = new URL(newsurl);
+			url = new URL(blogsurl);
 		} catch (MalformedURLException e) {
 			exception = e;
 			return Status.CANCEL_STATUS;
@@ -57,7 +57,7 @@ public class RefreshNewsJob extends Job {
 			int i = 0;
 			
 			for (SyndEntry feed:feeds) {
-				NewsEntry entry = adaptEntry(feed);
+				FeedsEntry entry = adaptEntry(feed);
 				if (entry == null) {
 					continue;
 				}
@@ -74,7 +74,7 @@ public class RefreshNewsJob extends Job {
 	}
 
 	
-	private NewsEntry adaptEntry(SyndEntry entry) {
+	private FeedsEntry adaptEntry(SyndEntry entry) {
 		if (entry == null) {
 			return null;
 		}
@@ -127,7 +127,7 @@ public class RefreshNewsJob extends Job {
 		}
 		
 		//description = "&nbsp; " + description;
-		return new NewsEntry(title, link, description, entry.getAuthor(), date);
+		return new FeedsEntry(title, link, description, entry.getAuthor(), date);
 	}
 
 	public Exception getException() {
@@ -138,7 +138,7 @@ public class RefreshNewsJob extends Job {
 		this.exception = exception;
 	}
 
-	public List<NewsEntry> getEntries() {
+	public List<FeedsEntry> getEntries() {
 		return entries;
 	}
 }
