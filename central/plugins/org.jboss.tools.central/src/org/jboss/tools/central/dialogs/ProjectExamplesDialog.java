@@ -196,6 +196,8 @@ public class ProjectExamplesDialog extends FormDialog implements IRunnableContex
 
 	private void addDescription(ProjectFix projectFix) {
 		FormText fixDescriptionText = toolkit.createFormText(fixesComposite, true);
+		GridData gd = new GridData(SWT.FILL, SWT.FILL, true, false);
+		fixDescriptionText.setLayoutData(gd);
 		StringBuffer buffer = new StringBuffer();
 		buffer.append(JBossCentralActivator.FORM_START_TAG);
 		buffer.append("<img href=\"image\"/> ");
@@ -215,6 +217,8 @@ public class ProjectExamplesDialog extends FormDialog implements IRunnableContex
 
 	protected void addRuntimeFixActions(ProjectFix projectFix) {
 		Button install = toolkit.createButton(fixesComposite, "Install", SWT.PUSH);
+		GridData gd = new GridData(SWT.FILL, SWT.END, false, false);
+		install.setLayoutData(gd);
 		ToolTip tooltip = new DescriptionToolTip(install, "JBoss Runtime Detection");
 		tooltip.activate();
 		//install.setImage(JBossCentralActivator.getDefault().getImage("/icons/search_local.png"));
@@ -237,6 +241,8 @@ public class ProjectExamplesDialog extends FormDialog implements IRunnableContex
 			if (downloadRuntime != null) {
 				haveDownloadId = true;
 				Button download = toolkit.createButton(fixesComposite, "Download and Install...", SWT.PUSH);
+				gd = new GridData(SWT.FILL, SWT.END, false, false);
+				download.setLayoutData(gd);
 				ToolTip tip = new DescriptionToolTip(download, "Download and install " + downloadRuntime.getName());
 				tip.activate();
 				//download.setImage(JBossCentralActivator.getDefault().getImage("/icons/repository-submit.gif"));
@@ -312,7 +318,7 @@ public class ProjectExamplesDialog extends FormDialog implements IRunnableContex
 				connectorDiscovery.getDiscoveryStrategies().add(new BundleDiscoveryStrategy());
 
 				RemoteBundleDiscoveryStrategy remoteDiscoveryStrategy = new RemoteBundleDiscoveryStrategy();
-				remoteDiscoveryStrategy.setDirectoryUrl(JBossCentralActivator.JBOSS_DISCOVERY_DIRECTORY_3_3_0_XML);
+				remoteDiscoveryStrategy.setDirectoryUrl(JBossCentralActivator.getJBossDiscoveryDirectory());
 				connectorDiscovery.getDiscoveryStrategies().add(remoteDiscoveryStrategy);
 
 				connectorDiscovery.setEnvironment(JBossCentralActivator.getEnvironment());

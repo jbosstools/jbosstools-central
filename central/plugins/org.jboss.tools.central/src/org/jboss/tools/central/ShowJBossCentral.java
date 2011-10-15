@@ -10,12 +10,12 @@
  ************************************************************************************/
 package org.jboss.tools.central;
 
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
-import org.eclipse.equinox.p2.core.IProvisioningAgent;
-import org.eclipse.equinox.p2.engine.IProfile;
-import org.eclipse.equinox.p2.engine.IProfileRegistry;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IStartup;
+import org.osgi.framework.Bundle;
+import org.osgi.framework.Version;
 
 /**
  * 
@@ -24,50 +24,52 @@ import org.eclipse.ui.IStartup;
  */
 public class ShowJBossCentral implements IStartup {
 
+	private static final String ORG_JBOSS_TOOLS_USAGE = "org.jboss.tools.usage";
+
 	@Override
 	public void earlyStartup() {
-		boolean showJBossCentral = JBossCentralActivator.getDefault().showJBossCentralOnStartup();
-		IProvisioningAgent agent = (IProvisioningAgent) JBossCentralActivator.getDefault().getService(IProvisioningAgent.SERVICE_NAME);
-		IProfileRegistry profileRegistry = (IProfileRegistry) agent.getService(IProfileRegistry.SERVICE_NAME);
-		if (profileRegistry == null) {
-			showJBossCentral = true;
-		} else {
-			IProfile profile = profileRegistry
-					.getProfile(IProfileRegistry.SELF);
-			
-			if (profile != null) { // got NPE's when running in PDE
-				String profileId = profile.getProfileId();
+		boolean showJBossCentral = JBossCentralActivator.getDefault()
+				.showJBossCentralOnStartup();
+		if (!showJBossCentral) {
+			Bundle usage = Platform.getBundle(ORG_JBOSS_TOOLS_USAGE);
+			if (usage != null) {
+				Version version = usage.getVersion();
+				String versionString = version.toString();
 				IEclipsePreferences prefs = JBossCentralActivator.getDefault()
 						.getPreferences();
-				String savedId = prefs.get(JBossCentralActivator.PROFILE_ID,
-						null);
-				if (savedId == null || !savedId.equals(profileId)) {
-					prefs.put(JBossCentralActivator.PROFILE_ID, profileId);
+				String savedVersion = prefs.get(ORG_JBOSS_TOOLS_USAGE, "");
+				Bundle central = Platform
+						.getBundle(JBossCentralActivator.PLUGIN_ID);
+				if (!savedVersion.equals(versionString)) {
 					showJBossCentral = true;
+					prefs.put(ORG_JBOSS_TOOLS_USAGE, versionString);
+					if (central != null) {
+						prefs.put(JBossCentralActivator.PLUGIN_ID, central.getVersion().toString());
+					}
+				} else {
+					if (central != null) {
+						version = central.getVersion();
+						versionString = version.toString();
+						savedVersion = prefs.get(
+								JBossCentralActivator.PLUGIN_ID, "");
+						if (!savedVersion.equals(versionString)) {
+							showJBossCentral = true;
+							prefs.put(JBossCentralActivator.PLUGIN_ID, versionString);
+						}
+					}
 				}
-				long timestamp = profile.getTimestamp();
-				long savedTimestamp = prefs.getLong(
-						JBossCentralActivator.PROFILE_TIMESTAMP, -1);
-				if (timestamp != savedTimestamp) {
-					prefs.putLong(JBossCentralActivator.PROFILE_TIMESTAMP,
-							timestamp);
-					showJBossCentral = true;
-				}
-			} else {
-				// TODO: Not sure what is supposed to happen here if profile doesn't exist ?
 			}
 		}
 		if (!showJBossCentral) {
 			return;
 		}
 		Display.getDefault().asyncExec(new Runnable() {
-			
+
 			@Override
 			public void run() {
 				JBossCentralActivator.getJBossCentralEditor();
 			}
 		});
-		
 	}
 
 }
