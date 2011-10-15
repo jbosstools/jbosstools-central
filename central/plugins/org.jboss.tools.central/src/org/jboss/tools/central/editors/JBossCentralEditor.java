@@ -207,7 +207,7 @@ public class JBossCentralEditor extends SharedHeaderFormEditor {
 					try {
 						StringBuffer url = new StringBuffer();
 						String initialMessage = searchControl.getInitialMessage();
-						if (JBossCentralActivator.SEARCH_COMMUNITY_PORTAL.equals(initialMessage)) {
+						if (JBossCentralActivator.SEARCH_RED_HAT_CUSTOMER_PORTAL.equals(initialMessage)) {
 							url.append("https://access.redhat.com/knowledge/searchResults?col=avalon_portal&topSearchForm=topSearchForm&language=en&quickSearch=");
 							url.append(URLEncoder.encode(searchControl.getText(), UTF_8_ENCODING));
 						} else {
@@ -237,18 +237,14 @@ public class JBossCentralEditor extends SharedHeaderFormEditor {
 		});
 		
 		final Menu menu = new Menu(menuLink);
+		final MenuItem searchCommunityPortal = new MenuItem(menu, SWT.CHECK);
+		searchCommunityPortal.setText(JBossCentralActivator.SEARCH_RED_HAT_CUSTOMER_PORTAL);
 		final MenuItem searchCommunity = new MenuItem(menu, SWT.CHECK);
 		searchCommunity.setText(JBossCentralActivator.SEARCH_THE_COMMUNITY);
-		final MenuItem searchProjectPages = new MenuItem(menu, SWT.CHECK);
-		searchProjectPages.setText(JBossCentralActivator.SEARCH_PROJECT_PAGES);
-		final MenuItem searchCommunityPortal = new MenuItem(menu, SWT.CHECK);
-		searchCommunityPortal.setText(JBossCentralActivator.SEARCH_COMMUNITY_PORTAL);
 		
 		String initialMessage = searchControl.getInitialMessage();
-		if (JBossCentralActivator.SEARCH_COMMUNITY_PORTAL.equals(initialMessage)) {
+		if (JBossCentralActivator.SEARCH_RED_HAT_CUSTOMER_PORTAL.equals(initialMessage)) {
 			searchCommunityPortal.setSelection(true);
-		} else if (JBossCentralActivator.SEARCH_PROJECT_PAGES.equals(initialMessage)) {
-			searchProjectPages.setSelection(true);
 		} else {
 			searchCommunity.setSelection(true);
 		}
@@ -257,32 +253,19 @@ public class JBossCentralEditor extends SharedHeaderFormEditor {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				searchCommunity.setSelection(true);
-				searchProjectPages.setSelection(false);
 				searchCommunityPortal.setSelection(false);
 				searchControl.setInitialMessage(JBossCentralActivator.SEARCH_THE_COMMUNITY);
 			}
 		
 		});
-		searchProjectPages.addSelectionListener(new SelectionAdapter() {
-
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				searchProjectPages.setSelection(true);
-				searchCommunity.setSelection(false);
-				searchCommunityPortal.setSelection(false);
-				searchControl.setInitialMessage(JBossCentralActivator.SEARCH_PROJECT_PAGES);
-			}
 		
-		});
-
 		searchCommunityPortal.addSelectionListener(new SelectionAdapter() {
 
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				searchProjectPages.setSelection(false);
 				searchCommunity.setSelection(false);
 				searchCommunityPortal.setSelection(true);
-				searchControl.setInitialMessage(JBossCentralActivator.SEARCH_COMMUNITY_PORTAL);
+				searchControl.setInitialMessage(JBossCentralActivator.SEARCH_RED_HAT_CUSTOMER_PORTAL);
 			}
 		
 		});

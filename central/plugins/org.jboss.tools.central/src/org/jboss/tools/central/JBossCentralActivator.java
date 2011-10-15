@@ -62,7 +62,7 @@ import org.osgi.service.prefs.BackingStoreException;
  */
 public class JBossCentralActivator extends AbstractUIPlugin {
 
-	public static final String JBOSS_DISCOVERY_DIRECTORY_3_3_0_XML = "http://download.jboss.org/jbosstools/updates/nightly/trunk/directory.xml";
+	public static final String JBOSS_DISCOVERY_DIRECTORY_3_3_0_XML = "http://download.jboss.org/jbosstools/examples/directory-3.3.0.xml";
 	
 	public static final String ICON = "icon";
 
@@ -112,11 +112,11 @@ public class JBossCentralActivator extends AbstractUIPlugin {
 	
 	public static final String TUTORIALS_EXTENSION_ID = "org.jboss.tools.central.tutorials";
 	
-	public static final String SEARCH_PROJECT_PAGES = "Search Project Pages";
+	//public static final String SEARCH_PROJECT_PAGES = "Search Project Pages";
 
-	public static final String SEARCH_THE_COMMUNITY = "Search the Community";
+	public static final String SEARCH_THE_COMMUNITY = "Search JBoss Community";
 
-	public static final String SEARCH_COMMUNITY_PORTAL = "Search Community Portal";
+	public static final String SEARCH_RED_HAT_CUSTOMER_PORTAL = "Search Red Hat Customer Portal ";
 
 	public Map<String, TutorialCategory> tutorialCategories;
 

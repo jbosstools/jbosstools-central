@@ -225,7 +225,7 @@ public class TextSearchControl extends Composite {
 		}
 		String message = section.get(INITIAL_MESSAGE);
 		if (message == null || message.isEmpty()) {
-			message = JBossCentralActivator.SEARCH_THE_COMMUNITY;
+			message = JBossCentralActivator.SEARCH_RED_HAT_CUSTOMER_PORTAL;
 		}
 		setInitialMessage(message);
 		
