@@ -35,18 +35,18 @@ import com.sun.syndication.io.XmlReader;
  * @author snjeza
  *
  */
-public class RefreshBlogsJob extends Job {
+public class RefreshNewsJob extends Job {
 
 	private List<FeedsEntry> entries = new ArrayList<FeedsEntry>();
 	private Exception exception;
-	public static RefreshBlogsJob INSTANCE = new RefreshBlogsJob(JBossCentralActivator.BLOGS_ATOM_URL);
+	public static RefreshNewsJob INSTANCE = new RefreshNewsJob(JBossCentralActivator.NEWS_ATOM_URL);
 	
-	private String blogsurl;
+	private String newsurl;
 	
-	private RefreshBlogsJob(String blogsurl) {
+	private RefreshNewsJob(String newsurl) {
 		super("Refreshing JBoss Blogs...");
 		setPriority(LONG);
-		this.blogsurl=blogsurl;
+		this.newsurl=newsurl;
 	}
 
 	@Override
@@ -58,7 +58,7 @@ public class RefreshBlogsJob extends Job {
 		SyndFeedInput input = new SyndFeedInput();
 		URL url;
 		try {
-			url = new URL(blogsurl);
+			url = new URL(newsurl);
 		} catch (MalformedURLException e) {
 			exception = e;
 			return Status.CANCEL_STATUS;

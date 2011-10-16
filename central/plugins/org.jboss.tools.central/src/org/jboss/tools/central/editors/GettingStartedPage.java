@@ -89,6 +89,7 @@ import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.jboss.tools.central.JBossCentralActivator;
 import org.jboss.tools.central.dialogs.ProjectExamplesDialog;
 import org.jboss.tools.central.jobs.RefreshBlogsJob;
+import org.jboss.tools.central.jobs.RefreshNewsJob;
 import org.jboss.tools.central.jobs.RefreshTutorialsJob;
 import org.jboss.tools.central.model.FeedsEntry;
 import org.jboss.tools.central.model.Tutorial;
@@ -112,7 +113,7 @@ public class GettingStartedPage extends AbstractJBossCentralPage {
 	private IWorkbenchAction newWizardDropDownAction;
 	private ScrolledForm form;
 	private PageBook blogsPageBook;
-	private ScrolledComposite scrollComposite;
+	private ScrolledComposite blogsScrollComposite;
 	private RefreshBlogsJobChangeListener refreshBlogsJobChangeListener;
 	private FormText blogsNoteText;
 	private FormText tutorialsNoteText;
@@ -134,6 +135,14 @@ public class GettingStartedPage extends AbstractJBossCentralPage {
 	private Composite documentationComposite;
 	
 	private Set<TutorialCategory> expandedCategories = new HashSet<TutorialCategory>();
+	private Section newsSection;
+	private ScrolledComposite newsScrollComposite;
+	private PageBook newsPageBook;
+	private FormText newsNoteText;
+	private Composite newsLoadingComposite;
+	private FormText newsExceptionText;
+	private Composite newsComposite;
+	private RefreshNewsJobChangeListener refreshNewsJobChangeListener;
 	
 	public GettingStartedPage(FormEditor editor) {
 		super(editor, ID, "Getting Started");
@@ -160,7 +169,8 @@ public class GettingStartedPage extends AbstractJBossCentralPage {
 		toolkit.paintBordersFor(left);
 		
 		Composite right = createComposite(toolkit, body);
-	    createBlogsSection(toolkit, right);
+		createNewsSection(toolkit, right);
+		createBlogsSection(toolkit, right);
 		toolkit.paintBordersFor(right);
 		
 		final ControlAdapter controlAdapter = new ControlAdapter() {
@@ -186,26 +196,26 @@ public class GettingStartedPage extends AbstractJBossCentralPage {
 	}
 
 	private void createBlogsSection(FormToolkit toolkit, Composite parent) {
-		blogsSection = createSection(toolkit, parent, "Blogs", ExpandableComposite.TITLE_BAR|ExpandableComposite.EXPANDED);
-	    GridData gd = new GridData(SWT.FILL, SWT.FILL, true, true);
+		blogsSection = createSection(toolkit, parent, "Blogs", ExpandableComposite.TITLE_BAR|ExpandableComposite.EXPANDED|ExpandableComposite.TWISTIE);
+	    GridData gd = new GridData(SWT.FILL, SWT.FILL, true, false);
 	    //gd.widthHint = 350;
 	    //gd.heightHint = 100;
 	    blogsSection.setLayoutData(gd);
 		createBlogsToolbar(toolkit, blogsSection);
 				
-		scrollComposite = new ScrolledComposite(blogsSection, SWT.V_SCROLL);
+		blogsScrollComposite = new ScrolledComposite(blogsSection, SWT.V_SCROLL);
 		gd =new GridData(SWT.FILL, SWT.FILL, true, false);
-		scrollComposite.setLayoutData(gd);
-		scrollComposite.setLayout(new GridLayout());
+		blogsScrollComposite.setLayoutData(gd);
+		blogsScrollComposite.setLayout(new GridLayout());
 		
-		blogsPageBook = new PageBook(scrollComposite, SWT.WRAP);
+		blogsPageBook = new PageBook(blogsScrollComposite, SWT.WRAP);
 		gd =new GridData(SWT.FILL, SWT.FILL, true, false);
 	    blogsPageBook.setLayoutData(gd);
         
-        scrollComposite.setContent(blogsPageBook);
-    	scrollComposite.setExpandVertical(true);
-    	scrollComposite.setExpandHorizontal(true);
-    	scrollComposite.setAlwaysShowScrollBars(false);
+        blogsScrollComposite.setContent(blogsPageBook);
+    	blogsScrollComposite.setExpandVertical(true);
+    	blogsScrollComposite.setExpandHorizontal(true);
+    	blogsScrollComposite.setAlwaysShowScrollBars(false);
 
     	blogsNoteText = createNoteText(toolkit, blogsPageBook);
 	    blogsLoadingComposite = createLoadingComposite(toolkit, blogsPageBook);	    
@@ -215,14 +225,70 @@ public class GettingStartedPage extends AbstractJBossCentralPage {
 		blogsComposite.setLayout(new TableWrapLayout());
 		GridDataFactory.fillDefaults().grab(true, false).applyTo(blogsComposite);
 
-		blogsSection.setClient(scrollComposite);
-		showLoading(blogsPageBook, blogsLoadingComposite, scrollComposite);
+		blogsSection.setClient(blogsScrollComposite);
+		blogsSection.addExpansionListener(new ExpansionAdapter() {
+
+			@Override
+			public void expansionStateChanged(ExpansionEvent e) {
+				resize();
+			}
+			
+		});
+		showLoading(blogsPageBook, blogsLoadingComposite, blogsScrollComposite);
 		blogsPageBook.pack(true);
 		RefreshBlogsJob refreshBlogsJob = RefreshBlogsJob.INSTANCE;
 		refreshBlogsJobChangeListener = new RefreshBlogsJobChangeListener();
 		refreshBlogsJob.addJobChangeListener(refreshBlogsJobChangeListener);
 		refreshBlogsJob.schedule();
 	}
+	
+	private void createNewsSection(FormToolkit toolkit, Composite parent) {
+		newsSection = createSection(toolkit, parent, "News", ExpandableComposite.TITLE_BAR|ExpandableComposite.EXPANDED|ExpandableComposite.TWISTIE);
+	    GridData gd = new GridData(SWT.FILL, SWT.FILL, true, false);
+	    //gd.widthHint = 350;
+	    //gd.heightHint = 100;
+	    newsSection.setLayoutData(gd);
+		createNewsToolbar(toolkit, newsSection);
+				
+		newsScrollComposite = new ScrolledComposite(newsSection, SWT.V_SCROLL);
+		gd =new GridData(SWT.FILL, SWT.FILL, true, false);
+		newsScrollComposite.setLayoutData(gd);
+		newsScrollComposite.setLayout(new GridLayout());
+		
+		newsPageBook = new PageBook(newsScrollComposite, SWT.WRAP);
+		gd =new GridData(SWT.FILL, SWT.FILL, true, false);
+	    newsPageBook.setLayoutData(gd);
+        
+        newsScrollComposite.setContent(newsPageBook);
+    	newsScrollComposite.setExpandVertical(true);
+    	newsScrollComposite.setExpandHorizontal(true);
+    	newsScrollComposite.setAlwaysShowScrollBars(false);
+
+    	newsNoteText = createNoteText(toolkit, newsPageBook);
+	    newsLoadingComposite = createLoadingComposite(toolkit, newsPageBook);	    
+	    newsExceptionText = createExceptionText(toolkit, newsPageBook);
+		
+	    newsComposite = toolkit.createComposite(newsPageBook, SWT.NONE);	    
+		newsComposite.setLayout(new TableWrapLayout());
+		GridDataFactory.fillDefaults().grab(true, false).applyTo(newsComposite);
+
+		newsSection.setClient(newsScrollComposite);
+		newsSection.addExpansionListener(new ExpansionAdapter() {
+
+			@Override
+			public void expansionStateChanged(ExpansionEvent e) {
+				resize();
+			}
+			
+		});
+		showLoading(newsPageBook, newsLoadingComposite, newsScrollComposite);
+		newsPageBook.pack(true);
+		RefreshNewsJob refreshNewsJob = RefreshNewsJob.INSTANCE;
+		refreshNewsJobChangeListener = new RefreshNewsJobChangeListener();
+		refreshNewsJob.addJobChangeListener(refreshNewsJobChangeListener);
+		refreshNewsJob.schedule();
+	}
+
 
 	private FormText createExceptionText(FormToolkit toolkit, Composite parent) {
 		FormText formText = toolkit.createFormText(parent, true);
@@ -282,6 +348,29 @@ public class GettingStartedPage extends AbstractJBossCentralPage {
 	    
 		section.setTextClient(headerComposite);
 	}
+	
+	private void createNewsToolbar(FormToolkit toolkit, Section section) {
+		Composite headerComposite = toolkit.createComposite(section, SWT.NONE);
+	    RowLayout rowLayout = new RowLayout();
+	    rowLayout.marginTop = 0;
+	    rowLayout.marginBottom = 0;
+	    headerComposite.setLayout(rowLayout);
+	    headerComposite.setBackground(null);
+	    
+	    ToolBarManager toolBarManager = new ToolBarManager(SWT.FLAT | SWT.HORIZONTAL);
+		toolBarManager.createControl(headerComposite);
+		
+		CommandContributionItem item = JBossCentralActivator.createContributionItem(getSite(), "org.jboss.tools.central.openJBossNews");
+		toolBarManager.add(item);
+		
+		item = JBossCentralActivator.createContributionItem(getSite(), "org.jboss.tools.central.refreshJBossNews");
+		toolBarManager.add(item);
+
+	    toolBarManager.update(true);
+	    
+		section.setTextClient(headerComposite);
+	}
+
 	
 	private void createTutorialsSection(FormToolkit toolkit, Composite parent) {
 		tutorialsSection = createSection(toolkit, parent, "Project Examples", ExpandableComposite.TITLE_BAR|ExpandableComposite.TWISTIE);
@@ -568,6 +657,10 @@ public class GettingStartedPage extends AbstractJBossCentralPage {
 			RefreshBlogsJob.INSTANCE.removeJobChangeListener(refreshBlogsJobChangeListener);
 			refreshBlogsJobChangeListener = null;
 		}
+		if (refreshNewsJobChangeListener != null) {
+			RefreshNewsJob.INSTANCE.removeJobChangeListener(refreshNewsJobChangeListener);
+			refreshNewsJobChangeListener = null;
+		}
 		if (refreshTutorialsJobChangeListener != null) {
 			RefreshTutorialsJob.INSTANCE.removeJobChangeListener(refreshTutorialsJobChangeListener);
 			refreshTutorialsJobChangeListener = null;
@@ -643,10 +736,27 @@ public class GettingStartedPage extends AbstractJBossCentralPage {
 			}
 			List<FeedsEntry> entries = job.getEntries();
 			if (entries == null || entries.size() == 0) {
-				showNote(blogsPageBook, blogsNoteText, scrollComposite);
+				showNote(blogsPageBook, blogsNoteText, blogsScrollComposite);
 				return;
 			}
-			showBlogs(entries);
+			showEntries(entries, blogsComposite, blogsPageBook, blogsScrollComposite);
+		}
+	}
+	
+	public void refreshNews() {
+		RefreshNewsJob job = RefreshNewsJob.INSTANCE;
+		if (job.getState() == Job.NONE) {
+			if (job.getException() != null) {
+				showException(newsPageBook, newsExceptionText,
+						job.getException());
+				return;
+			}
+			List<FeedsEntry> entries = job.getEntries();
+			if (entries == null || entries.size() == 0) {
+				showNote(newsPageBook, newsNoteText, newsScrollComposite);
+				return;
+			}
+			showEntries(entries, newsComposite, newsPageBook, newsScrollComposite);
 		}
 	}
 	
@@ -786,19 +896,19 @@ public class GettingStartedPage extends AbstractJBossCentralPage {
 		}
 	}
 
-	private void showBlogs(List<FeedsEntry> entries) {
+	private void showEntries(List<FeedsEntry> entries, Composite composite, PageBook pageBook, ScrolledComposite scrollable) {
 		int i = 0;
-		disposeChildren(blogsComposite);
+		disposeChildren(composite);
 		
 		for (final FeedsEntry entry:entries) {
 			if (i++ > JBossCentralActivator.MAX_FEEDS) {
 				return;
 			}
 			String text = entry.getFormString();
-			final FormText formText = toolkit.createFormText(blogsComposite, true);
+			final FormText formText = toolkit.createFormText(composite, true);
 			TableWrapData td = new TableWrapData();
 			td.indent = 2;
-			Point size = blogsComposite.computeSize(SWT.DEFAULT, SWT.DEFAULT);
+			Point size = composite.computeSize(SWT.DEFAULT, SWT.DEFAULT);
 			td.maxWidth = size.x - 2;
 			try {
 				// to avoid illegal argumentexception on formtext fields.
@@ -838,22 +948,49 @@ public class GettingStartedPage extends AbstractJBossCentralPage {
 			});
 			
 		}
-		blogsPageBook.showPage(blogsComposite);
+		pageBook.showPage(composite);
 		form.reflow(true);
 		form.redraw();
-		recomputeScrollComposite(scrollComposite, blogsPageBook);
+		recomputeScrollComposite(scrollable, pageBook);
 	}
 
 	protected void resize() {
-		Point size = form.getSize();
+		Point size = form.getBody().getSize();
 		GridData gd;
+		Point computedSize;
 		int widthHint = size.x/2 - 40;
 		
-		gd = (GridData) blogsSection.getLayoutData();
-		gd.heightHint = size.y - 40;
+		gd = (GridData) newsSection.getLayoutData();
+		if (newsSection.isExpanded()) {
+			if (blogsSection.isExpanded()) {
+				gd.heightHint = size.y/2 - 20;
+			} else {
+				gd.heightHint = size.y - 40;
+			}
+		} else {
+			computedSize = newsSection.computeSize(SWT.DEFAULT, SWT.DEFAULT);
+			gd.heightHint = computedSize.y;
+		}
 		gd.widthHint = widthHint;
 		gd.grabExcessVerticalSpace = false;
-		Point computedSize = blogsSection.computeSize(SWT.DEFAULT, SWT.DEFAULT);
+		computedSize = newsSection.computeSize(SWT.DEFAULT, SWT.DEFAULT);
+		newsSection.setSize(widthHint, computedSize.y);
+
+		gd = (GridData) blogsSection.getLayoutData();
+		if (blogsSection.isExpanded()) {
+			if (newsSection.isExpanded()) {
+				gd.heightHint = size.y/2 - 20;
+			} else {
+				gd.heightHint = size.y - 40;
+			}
+		} else {
+			computedSize = blogsSection.computeSize(SWT.DEFAULT, SWT.DEFAULT);
+			gd.heightHint = computedSize.y;
+		}
+		
+		gd.widthHint = widthHint;
+		gd.grabExcessVerticalSpace = false;
+		computedSize = blogsSection.computeSize(SWT.DEFAULT, SWT.DEFAULT);
 		blogsSection.setSize(widthHint, computedSize.y);
 		
 		gd = (GridData) tutorialsSection.getLayoutData();
@@ -880,7 +1017,8 @@ public class GettingStartedPage extends AbstractJBossCentralPage {
 		
 		form.reflow(true);
 		form.redraw();
-		scrollComposite.setMinSize(widthHint, size.y - 55);
+		blogsScrollComposite.setMinSize(widthHint, size.y - 55);
+		newsScrollComposite.setMinSize(widthHint, size.y - 55);
 		
 		computedSize = tutorialPageBook.computeSize(SWT.DEFAULT, SWT.DEFAULT);
 		int y = computedSize.y;
@@ -888,7 +1026,9 @@ public class GettingStartedPage extends AbstractJBossCentralPage {
 			y = 200;
 		}
 		tutorialScrollComposite.setMinSize(widthHint, y);
+		refreshNews();
 		refreshBlogs();
+		
 		form.layout(true, true);
 	}
 
@@ -924,7 +1064,7 @@ public class GettingStartedPage extends AbstractJBossCentralPage {
 		@Override
 		public void scheduled(IJobChangeEvent event) {
 			RefreshBlogsJob.INSTANCE.setException(null);
-			showLoading(blogsPageBook, blogsLoadingComposite, scrollComposite);
+			showLoading(blogsPageBook, blogsLoadingComposite, blogsScrollComposite);
 		}
 
 		@Override
@@ -976,4 +1116,46 @@ public class GettingStartedPage extends AbstractJBossCentralPage {
 		
 	}
 	
+	private class RefreshNewsJobChangeListener implements IJobChangeListener {
+
+		@Override
+		public void aboutToRun(IJobChangeEvent event) {
+			
+		}
+
+		@Override
+		public void awake(IJobChangeEvent event) {
+			
+		}
+
+		@Override
+		public void done(IJobChangeEvent event) {
+			Display.getDefault().asyncExec(new Runnable() {
+				
+				@Override
+				public void run() {
+					refreshNews();
+				}
+			});
+			
+		}
+
+		@Override
+		public void running(IJobChangeEvent event) {
+			
+		}
+
+		@Override
+		public void scheduled(IJobChangeEvent event) {
+			RefreshNewsJob.INSTANCE.setException(null);
+			showLoading(newsPageBook, newsLoadingComposite, newsScrollComposite);
+		}
+
+		@Override
+		public void sleeping(IJobChangeEvent event) {
+			
+		}
+		
+	}
+
 }
