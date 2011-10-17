@@ -237,7 +237,7 @@ public class ProjectExamplesDialog extends FormDialog implements IRunnableContex
 		final String downloadId = projectFix.getProperties().get(ProjectFix.DOWNLOAD_ID);
 		boolean haveDownloadId = false;
 		if (downloadId != null) {
-			DownloadRuntime downloadRuntime = RuntimeCoreActivator.getDefault().getDownloadJBossRuntimes().get(downloadId);
+			DownloadRuntime downloadRuntime = RuntimeCoreActivator.getDefault().getDownloadRuntimes().get(downloadId);
 			if (downloadRuntime != null) {
 				haveDownloadId = true;
 				Button download = toolkit.createButton(fixesComposite, "Download and Install...", SWT.PUSH);
