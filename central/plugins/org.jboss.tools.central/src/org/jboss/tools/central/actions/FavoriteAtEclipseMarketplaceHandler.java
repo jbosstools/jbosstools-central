@@ -20,7 +20,7 @@ public class FavoriteAtEclipseMarketplaceHandler extends OpenWithBrowserHandler 
 
 	@Override
 	public String getLocation() {
-		return "http://marketplace.eclipse.org/node/15557";
+		return "http://marketplace.eclipse.org/node/121986";
 	}
 
 }
