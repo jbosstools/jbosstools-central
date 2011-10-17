@@ -52,7 +52,7 @@ public class ImportMavenProjectExample extends AbstractImportProjectExample {
 
 	private static final String UNNAMED_PROJECTS = "UnnamedProjects"; //$NON-NLS-1$
 
-	private static final String JBOSS_TOOLS_MAVEN_PROJECTS = "/.JBossToolsMavenProjects"; //$NON-NLS-1$
+	//private static final String JBOSS_TOOLS_MAVEN_PROJECTS = "/.JBossToolsMavenProjects"; //$NON-NLS-1$
 	
 	private boolean confirm;
 
@@ -62,7 +62,7 @@ public class ImportMavenProjectExample extends AbstractImportProjectExample {
 		List<Project> projects = new ArrayList<Project>();
 		IWorkspaceRoot workspaceRoot = ResourcesPlugin.getWorkspace().getRoot();
 		IPath rootPath = workspaceRoot.getLocation();
-		IPath mavenProjectsRoot = rootPath.append(JBOSS_TOOLS_MAVEN_PROJECTS);
+		IPath mavenProjectsRoot = rootPath;//.append(JBOSS_TOOLS_MAVEN_PROJECTS);
 		String projectName = projectDescription.getName();
 		if (projectName == null || projectName.isEmpty()) {
 			projectName = UNNAMED_PROJECTS;
