@@ -373,7 +373,7 @@ public class GettingStartedPage extends AbstractJBossCentralPage {
 
 	
 	private void createTutorialsSection(FormToolkit toolkit, Composite parent) {
-		tutorialsSection = createSection(toolkit, parent, "Project Examples", ExpandableComposite.TITLE_BAR|ExpandableComposite.TWISTIE);
+		tutorialsSection = createSection(toolkit, parent, "Project Examples", ExpandableComposite.TITLE_BAR|ExpandableComposite.TWISTIE|ExpandableComposite.EXPANDED);
 	    GridData gd = new GridData(SWT.FILL, SWT.FILL, false, false);
 	    //gd.widthHint = 350;
 	    //gd.heightHint = 100;
@@ -610,7 +610,7 @@ public class GettingStartedPage extends AbstractJBossCentralPage {
 	}
 	
 	public void createDocumentationSection(FormToolkit toolkit, Composite parent) {
-		documentationSection = createSection(toolkit, parent, "Documentation", ExpandableComposite.TITLE_BAR|ExpandableComposite.TWISTIE);
+		documentationSection = createSection(toolkit, parent, "Documentation", ExpandableComposite.TITLE_BAR|ExpandableComposite.TWISTIE|ExpandableComposite.EXPANDED);
 	    GridData gd = new GridData(SWT.FILL, SWT.FILL, false, false);
 	    //gd.widthHint = 350;
 	    //gd.heightHint = 100;
