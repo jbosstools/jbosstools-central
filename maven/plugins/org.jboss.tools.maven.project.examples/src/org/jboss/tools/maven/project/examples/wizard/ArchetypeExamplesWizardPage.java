@@ -73,12 +73,14 @@ public class ArchetypeExamplesWizardPage extends
 		//This really is an extra-safe guard, as I believe we'll probably always
 		//redefine all required properties in project-examples-maven-xxx.xml
 		Properties defaultRequiredProperties = getRequiredProperties(archetype);
-		Properties properties = new Properties(archetypeModel.getArchetypeProperties());
+		Properties properties = new Properties();
+		for (Object key : archetypeModel.getArchetypeProperties().keySet()) {
+			properties.put(key, archetypeModel.getArchetypeProperties().get(key));
+		}
+		
 		//Add remaining requiredProperties not defined by default in the example project
 		for (Object key : defaultRequiredProperties.keySet()) {
-			if (!properties.containsKey(key)) {
-				properties.put(key, defaultRequiredProperties.get(key));
-			}
+			properties.put(key, defaultRequiredProperties.get(key));
 		}
 		archetype.setProperties(properties);
 		setArchetype(archetype);
