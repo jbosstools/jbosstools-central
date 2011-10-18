@@ -924,7 +924,7 @@ public class GettingStartedPage extends AbstractJBossCentralPage {
 				formText = toolkit.createFormText(composite, false);
 				formText.setLayoutData(td);
 				try {
-					formText.setText("Problem rendering entry - " + StringEscapeUtils.unescapeXml(se.getMessage()), false, false);
+					formText.setText("Problem rendering entry - " + StringEscapeUtils.unescapeHtml(se.getMessage()), false, false);
 				} catch (Exception e1) {
 					JBossCentralActivator.log(se);
 				}
