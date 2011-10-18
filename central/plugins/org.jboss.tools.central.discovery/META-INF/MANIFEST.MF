@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: %BundleVendor
 Bundle-SymbolicName: org.jboss.tools.central.discovery;singleton:=true
-Bundle-Version: 3.3.0
+Bundle-Version: 1.0.0.qualifier
 Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.mylyn.discovery.core;bundle-version="3.6.0"
 Bundle-ActivationPolicy: lazy
