@@ -15,12 +15,10 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
@@ -46,11 +44,11 @@ public class ImportMavenArchetypeProjectExample extends
 		IWorkspaceRoot workspaceRoot = ResourcesPlugin.getWorkspace().getRoot();
 		IPath rootPath = workspaceRoot.getLocation();
 		IPath mavenProjectsRoot = rootPath; //.append(JBOSS_TOOLS_MAVEN_PROJECTS);
-		String projectName = projectDescription.getName();
-		if (projectName == null || projectName.isEmpty()) {
-			projectName = UNNAMED_PROJECTS;
-		}
-		IPath path = mavenProjectsRoot.append(projectName);
+//		String projectName = projectDescription.getName();
+//		if (projectName == null || projectName.isEmpty()) {
+//			projectName = UNNAMED_PROJECTS;
+//		}
+		IPath path = mavenProjectsRoot; //.append(projectName);
 		final File destination = new File(path.toOSString());
 
 		Display.getDefault().syncExec(new Runnable() {
