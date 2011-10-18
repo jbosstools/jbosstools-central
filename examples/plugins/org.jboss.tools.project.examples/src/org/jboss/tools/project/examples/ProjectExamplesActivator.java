@@ -223,13 +223,17 @@ public class ProjectExamplesActivator extends AbstractUIPlugin {
 			String projectName) throws CoreException {
 		IProject eclipseProject = ResourcesPlugin.getWorkspace()
 				.getRoot().getProject(projectName);
-		IMarker[] projectMarkers = eclipseProject.findMarkers(
-				IMarker.PROBLEM, true, IResource.DEPTH_INFINITE);
-		for (int i = 0; i < projectMarkers.length; i++) {
-			if (projectMarkers[i].getAttribute(IMarker.SEVERITY,
-					IMarker.SEVERITY_ERROR) == IMarker.SEVERITY_ERROR) {
-				markers.add(projectMarkers[i]);
+		if (eclipseProject.isAccessible()) {
+			IMarker[] projectMarkers = eclipseProject.findMarkers(
+					IMarker.PROBLEM, true, IResource.DEPTH_INFINITE);
+			for (int i = 0; i < projectMarkers.length; i++) {
+				if (projectMarkers[i].getAttribute(IMarker.SEVERITY,
+						IMarker.SEVERITY_ERROR) == IMarker.SEVERITY_ERROR) {
+					markers.add(projectMarkers[i]);
+				}
 			}
+		} else {
+			log(projectName + " is inaccessible");
 		}
 		return markers;
 	}
