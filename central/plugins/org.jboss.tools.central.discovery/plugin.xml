@@ -4,33 +4,43 @@
 	<extension
          point="org.eclipse.mylyn.discovery.core.connectorDiscovery">
       <certification
-            id="com.jboss.jbds.discovery.JbdsCertified"
-            name="JBDS Certified"
-            url="http://devstudio.jboss.com/updates/4.0/">
+            id="org.jboss.tools.central.discovery.certification"
+            name="JBoss Tools"
+            url="http://jboss.org/tools/">
          <description>
-            Features certified with JBoss Developer Studio have been tested by Red Hat.
+            Plugins for JBoss Tools.
          </description>
          <icon
-               image48="images/redhat_48.png">
+               image48="images/jbosstools_icon32.png">
          </icon>
       </certification>
       
       <connectorCategory
-            description="a category for testing purposes"
-            id="org.jboss.tools.category.test"
-            name="Test Category"
+            description="Plugins related to working with Maven"
+            id="org.jboss.tools.central.discovery.maven"
+            name="Maven"
+            relevance="60">
+ 			<group id="bundled" /> 
+ 			<group id="extra" />
+      </connectorCategory>
+      
+      
+      <connectorCategory
+            description="Plugins related to working with source control systems"
+            id="org.jboss.tools.central.discovery.scm"
+            name="Source Control Management"
             relevance="60">
  			<group id="bundled" /> 
  			<group id="extra" />
       </connectorCategory>
       
       <connectorDescriptor
-            categoryId="org.jboss.tools.category.test"
-            description="Eclipse EGit."
+            categoryId="org.jboss.tools.central.discovery.scm"
+            description="An Eclipse Git Team provider in pure Java"
             id="org.eclipse.egit"
             kind="task"
             license="Free, EPL, Incubation"
-            name="An Eclipse Git Team provider in pure Java."
+            name="Eclipse EGit"
             provider="Eclipse Git"
             siteUrl="http://download.eclipse.org/egit/updates">
          <icon
@@ -41,7 +51,7 @@
          </overview>
       </connectorDescriptor>
       <connectorDescriptor
-            categoryId="org.jboss.tools.category.test"
+            categoryId="org.jboss.tools.central.discovery.maven"
             description="m2e - Maven Integration for Eclipse."
             id="org.eclipse.m2e.feature"
             kind="task"
@@ -57,8 +67,8 @@
          </overview>
       </connectorDescriptor>
       <connectorDescriptor
-            categoryId="org.jboss.tools.category.test"
-            description="Maven Integration for WTP."
+            categoryId="org.jboss.tools.central.discovery.maven"
+            description="Maven Integration for Web Tools."
             id="org.maven.ide.eclipse.wtp.feature"
             kind="task"
             license="Free, EPL"
@@ -73,8 +83,8 @@
          </overview>
       </connectorDescriptor>
 	  <connectorDescriptor
-            categoryId="org.jboss.tools.category.test"
-            certificationId="com.jboss.jbds.discovery.JbdsCertified"
+            categoryId="org.jboss.tools.central.discovery.maven"
+            certificationId="org.jboss.tools.central.discovery.certification"
             description="TestNG plug-in for Eclipse."
             id="org.testng.eclipse"
             kind="task"
@@ -92,8 +102,8 @@
          </overview>
       </connectorDescriptor>
       <connectorDescriptor
-            categoryId="org.jboss.tools.category.test"
-            certificationId="com.jboss.jbds.discovery.JbdsCertified"
+            categoryId="org.jboss.tools.central.discovery.maven"
+            certificationId="org.jboss.tools.central.discovery.certification"
             description="JBoss Maven Integration."
             id="org.jboss.tools.maven.feature"
             kind="task"
@@ -110,8 +120,8 @@
          </overview>
       </connectorDescriptor>
       <connectorDescriptor
-            categoryId="org.jboss.tools.category.test"
-            certificationId="com.jboss.jbds.discovery.JbdsCertified"
+            categoryId="org.jboss.tools.central.discovery.maven"
+            certificationId="org.jboss.tools.central.discovery.certification"
             description="JBoss Maven CDI Configurator."
             id="org.jboss.tools.maven.cdi.feature"
             kind="task"
@@ -127,8 +137,8 @@
          </overview>
       </connectorDescriptor>
       <connectorDescriptor
-            categoryId="org.jboss.tools.category.test"
-            certificationId="com.jboss.jbds.discovery.JbdsCertified"
+            categoryId="org.jboss.tools.central.discovery.maven"
+            certificationId="org.jboss.tools.central.discovery.certification"
             description="JBoss Maven Hibernate Configurator."
             id="org.jboss.tools.maven.hibernate.feature"
             kind="task"
@@ -144,8 +154,8 @@
          </overview>
       </connectorDescriptor>
       <connectorDescriptor
-            categoryId="org.jboss.tools.category.test"
-            certificationId="com.jboss.jbds.discovery.JbdsCertified"
+            categoryId="org.jboss.tools.central.discovery.maven"
+            certificationId="org.jboss.tools.central.discovery.certification"
             description="JBoss Maven JAX-RS Configurator."
             id="org.jboss.tools.maven.jaxrs.feature"
             kind="task"
@@ -161,8 +171,8 @@
          </overview>
       </connectorDescriptor>
       <connectorDescriptor
-            categoryId="org.jboss.tools.category.test"
-            certificationId="com.jboss.jbds.discovery.JbdsCertified"
+            categoryId="org.jboss.tools.central.discovery.maven"
+            certificationId="org.jboss.tools.central.discovery.certification"
             description="JBoss Maven JSF Configurator."
             id="org.jboss.tools.maven.jsf.feature"
             kind="task"
@@ -178,8 +188,8 @@
          </overview>
       </connectorDescriptor>
       <connectorDescriptor
-            categoryId="org.jboss.tools.category.test"
-            certificationId="com.jboss.jbds.discovery.JbdsCertified"
+            categoryId="org.jboss.tools.central.discovery.maven"
+            certificationId="org.jboss.tools.central.discovery.certification"
             description="JBoss Maven Portlet Configurator."
             id="org.jboss.tools.maven.portlet.feature"
             kind="task"
@@ -195,8 +205,8 @@
          </overview>
       </connectorDescriptor>
       <connectorDescriptor
-            categoryId="org.jboss.tools.category.test"
-            certificationId="com.jboss.jbds.discovery.JbdsCertified"
+            categoryId="org.jboss.tools.central.discovery.maven"
+            certificationId="org.jboss.tools.central.discovery.certification"
             description="JBoss Maven Seam Configurator."
             id="org.jboss.tools.maven.seam.feature"
             kind="task"
