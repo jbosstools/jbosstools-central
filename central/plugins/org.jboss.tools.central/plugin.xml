@@ -202,9 +202,13 @@
    <extension
          point="org.jboss.tools.central.tutorials">
       <category 
+      		id="org.jboss.tools.central.javaee6.quickstart"
+      		name="Java EE 6 Quickstarts"
+      		priority="1" />
+      <category 
       		id="org.jboss.tools.central.jbossas.quickstart"
       		name="JBoss AS 7 Quickstarts"
-      		priority="1" />
+      		priority="2" />
       <category 
       		id="org.jboss.tools.central.seam2"
       		name="Seam 2 tutorials"
@@ -246,13 +250,22 @@
       
       <tutorial
             id="org.jboss.tools.central.jbossas.quickstart.jbossJavaee6Webapp"
-            categoryId="org.jboss.tools.central.jbossas.quickstart"
-            name="Creating your own application"
+            categoryId="org.jboss.tools.central.javaee6.quickstart"
+            name="Java EE 6 Web Application"
             type="projectExample"
-            priority="5"
+            priority="1"
             icon="icons/jbossas7.png"
             reference="JBoss AS 7 Quickstarts::jboss-javaee6-webapp"/>
-      
+
+      <tutorial
+            id="org.jboss.tools.central.jbossas.quickstart.jbossJavaee6Ear"
+            categoryId="org.jboss.tools.central.javaee6.quickstart"
+            name="Java EE 6 Enterprise Application"
+            type="projectExample"
+            priority="1"
+            icon="icons/jbossas7.png"
+            reference="Java EE 6 Quickstarts::multi-javaee6-archetype"/>
+                  
       <tutorial
             id="org.jboss.tools.central.Seam.registration2"
             categoryId="org.jboss.tools.central.seam2"
