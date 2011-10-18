@@ -61,6 +61,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
+import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.INewWizard;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
@@ -905,11 +906,12 @@ public class GettingStartedPage extends AbstractJBossCentralPage {
 				return;
 			}
 			String text = entry.getFormString();
-			final FormText formText = toolkit.createFormText(composite, true);
+			FormText formText = toolkit.createFormText(composite, true);
 			TableWrapData td = new TableWrapData();
 			td.indent = 2;
-			Point size = composite.computeSize(SWT.DEFAULT, SWT.DEFAULT);
+			Point size = newsScrollComposite.computeSize(SWT.DEFAULT, SWT.DEFAULT);
 			td.maxWidth = size.x - 2;
+			formText.setLayoutData(td);
 			try {
 				// to avoid illegal argumentexception on formtext fields.
 				// we replace the HTML entity &nbsp; with the standard xml version 
@@ -918,7 +920,15 @@ public class GettingStartedPage extends AbstractJBossCentralPage {
 				
 				formText.setText(text, true, true);
 			} catch(IllegalArgumentException se) {
-				formText.setText("Problem rendering entry - " + se.getMessage(),false,false);
+				formText.dispose();
+				formText = toolkit.createFormText(composite, false);
+				formText.setLayoutData(td);
+				try {
+					formText.setText("Problem rendering entry - " + StringEscapeUtils.unescapeXml(se.getMessage()), false, false);
+				} catch (Exception e1) {
+					JBossCentralActivator.log(se);
+				}
+				continue;
 			}
 				//Display display = Display.getCurrent();
 			//formText.setFont(getLinkFont(display));
@@ -949,13 +959,20 @@ public class GettingStartedPage extends AbstractJBossCentralPage {
 			
 		}
 		pageBook.showPage(composite);
+		composite.layout(true, true);
 		form.reflow(true);
 		form.redraw();
 		recomputeScrollComposite(scrollable, pageBook);
 	}
 
 	protected void resize() {
-		Point size = form.getBody().getSize();
+		Point size;
+		if (Platform.OS_MACOSX.equals(Platform.getOS())) {
+			size = form.getSize();
+			size.y = form.getBody().getSize().y;
+		} else {
+			size = form.getBody().getSize();
+		}
 		GridData gd;
 		Point computedSize;
 		int widthHint = size.x/2 - 40;

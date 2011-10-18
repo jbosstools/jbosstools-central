@@ -113,7 +113,7 @@ public class FeedsEntry {
 			buffer.append("</span>");
 			buffer.append(" ");
 			buffer.append("<span color=\"author\" font=\"author\">");
-			buffer.append(author);
+			buffer.append(StringEscapeUtils.unescapeXml(author));
 			buffer.append("</span>");
 			cr = true;
 		}
@@ -125,7 +125,7 @@ public class FeedsEntry {
 		cr = false;
 		if (shortDescription != null && !shortDescription.isEmpty()) {
 			buffer.append("<span font=\"description\">");
-			buffer.append(shortDescription);
+			buffer.append(StringEscapeUtils.unescapeHtml(shortDescription));
 			buffer.append("</span>");
 			cr = true;
 		}
