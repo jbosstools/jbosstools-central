@@ -89,10 +89,10 @@ public class FeedsEntry {
 			buffer.append("<a href=\"");
 			buffer.append(link);
 			buffer.append("\">");
-			buffer.append(StringEscapeUtils.unescapeXml(title));
+			buffer.append(StringEscapeUtils.unescapeHtml(title));
 			buffer.append("</a>");
 		} else {
-			buffer.append(title);
+			buffer.append(StringEscapeUtils.unescapeHtml(title));
 		}
 		//buffer.append("<br/>");
 		boolean cr = false;
@@ -113,7 +113,7 @@ public class FeedsEntry {
 			buffer.append("</span>");
 			buffer.append(" ");
 			buffer.append("<span color=\"author\" font=\"author\">");
-			buffer.append(StringEscapeUtils.unescapeXml(author));
+			buffer.append(StringEscapeUtils.unescapeHtml(author));
 			buffer.append("</span>");
 			cr = true;
 		}
