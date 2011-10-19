@@ -24,6 +24,14 @@
  			<group id="extra" />
       </connectorCategory>
       
+       <connectorCategory
+            description="Plugins related to testing"
+            id="org.jboss.tools.central.discovery.testing"
+            name="Testing"
+            relevance="60">
+ 			<group id="bundled" /> 
+ 			<group id="extra" />
+      </connectorCategory>
       
       <connectorCategory
             description="Plugins related to working with source control systems"
@@ -83,8 +91,7 @@
          </overview>
       </connectorDescriptor>
 	  <connectorDescriptor
-            categoryId="org.jboss.tools.central.discovery.maven"
-            certificationId="org.jboss.tools.central.discovery.certification"
+            categoryId="org.jboss.tools.central.discovery.testing"
             description="TestNG plug-in for Eclipse."
             id="org.testng.eclipse"
             kind="task"
@@ -103,7 +110,6 @@
       </connectorDescriptor>
       <connectorDescriptor
             categoryId="org.jboss.tools.central.discovery.maven"
-            certificationId="org.jboss.tools.central.discovery.certification"
             description="JBoss Maven Integration."
             id="org.jboss.tools.maven.feature"
             kind="task"

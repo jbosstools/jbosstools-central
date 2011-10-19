@@ -62,7 +62,7 @@ import org.osgi.service.prefs.BackingStoreException;
  */
 public class JBossCentralActivator extends AbstractUIPlugin {
 
-	private static final String JBOSS_DISCOVERY_DIRECTORY = "jboss.discovery.directory";
+	private static final String JBOSS_DISCOVERY_DIRECTORY = "jboss.discovery.directory.url";
 
 	public static final String JBOSS_DISCOVERY_DIRECTORY_3_3_0_XML = "http://download.jboss.org/jbosstools/updates/development/indigo/directory.xml";
 	
