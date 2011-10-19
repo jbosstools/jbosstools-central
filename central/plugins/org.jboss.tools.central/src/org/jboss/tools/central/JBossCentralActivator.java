@@ -98,8 +98,6 @@ public class JBossCentralActivator extends AbstractUIPlugin {
 	public static final String PROFILE_ID = "profileId";
 
 	public static final String PROFILE_TIMESTAMP = "profileTimestamp";
-
-	public static final String JBDS_PRODUCT_PLUGIN_ID = "com.jboss.jbds.product";
 	
 	public static final String NEW_PROJECT_EXAMPLES_WIZARD_ID = "org.jboss.tools.project.examples.wizard.NewProjectExamplesWizard";
 	
@@ -215,10 +213,6 @@ public class JBossCentralActivator extends AbstractUIPlugin {
 		return prefs.getBoolean(SHOW_JBOSS_CENTRAL_ON_STARTUP, SHOW_JBOSS_CENTRAL_ON_STARTUP_DEFAULT_VALUE);
 	}
 	
-	public static boolean isJBDS() {
-		Bundle bundle = Platform.getBundle(JBDS_PRODUCT_PLUGIN_ID);
-		return bundle != null;
-	}
 	
 	public static void openUrl(String location, Shell shell) {
 		URL url = null;

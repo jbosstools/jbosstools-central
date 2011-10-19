@@ -56,8 +56,6 @@ public class JBossCentralEditor extends SharedHeaderFormEditor {
 
 	public static final String ID = "org.jboss.tools.central.editors.JBossCentralEditor";
 
-	private static final String JBDS_CENTRAL = "JBoss Developer Studio Central";
-	
 	private AbstractJBossCentralPage gettingStartedPage;
 	
 	private SoftwarePage softwarePage;
@@ -104,11 +102,7 @@ public class JBossCentralEditor extends SharedHeaderFormEditor {
 		if (!(editorInput instanceof JBossCentralEditorInput))
 			throw new PartInitException("Invalid Input: Must be JBossCentralEditorInput");
 		super.init(site, editorInput);
-		if (JBossCentralActivator.isJBDS()) {
-			setPartName(JBDS_CENTRAL);
-		} else {
-			setPartName(JBOSS_CENTRAL);
-		}
+		setPartName(JBOSS_CENTRAL);
 	}
 	/* (non-Javadoc)
 	 * Method declared on IEditorPart.
@@ -147,13 +141,9 @@ public class JBossCentralEditor extends SharedHeaderFormEditor {
 	@Override
 	protected void createHeaderContents(IManagedForm headerForm) {
 		ScrolledForm form = headerForm.getForm();
-		if (JBossCentralActivator.isJBDS()) {
-			form.setText(JBDS_CENTRAL);
-			form.setToolTipText(JBDS_CENTRAL);
-		} else {
-			form.setText(JBOSS_CENTRAL);
-			form.setToolTipText(JBOSS_CENTRAL);
-		}
+		form.setText(JBOSS_CENTRAL);
+		form.setToolTipText(JBOSS_CENTRAL);
+		
 		form.setImage(getHeaderImage());
 		getToolkit().decorateFormHeading(form.getForm());
 		
@@ -309,11 +299,7 @@ public class JBossCentralEditor extends SharedHeaderFormEditor {
 
 	private Image getHeaderImage() {
 		if (headerImage == null) {
-			if (JBossCentralActivator.isJBDS()) {
-				headerImage = JBossCentralActivator.getImageDescriptor("/icons/jbds16.png").createImage();
-			} else {
-				headerImage = JBossCentralActivator.getImageDescriptor("/icons/jboss.gif").createImage();
-			}
+			headerImage = JBossCentralActivator.getImageDescriptor("/icons/jboss.gif").createImage();
 		}
 		return headerImage;
 	}
