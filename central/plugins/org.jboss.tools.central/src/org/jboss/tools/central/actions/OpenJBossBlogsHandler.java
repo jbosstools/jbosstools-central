@@ -22,7 +22,7 @@ public class OpenJBossBlogsHandler extends OpenWithBrowserHandler {
 
 	@Override
 	public String getLocation() {
-		return JBossCentralActivator.BLOG_URL;
+		return JBossCentralActivator.BLOGS_URL;
 	}
 
 }

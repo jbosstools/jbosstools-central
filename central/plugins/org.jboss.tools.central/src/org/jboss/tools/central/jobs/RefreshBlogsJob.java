@@ -39,7 +39,7 @@ public class RefreshBlogsJob extends Job {
 
 	private List<FeedsEntry> entries = new ArrayList<FeedsEntry>();
 	private Exception exception;
-	public static RefreshBlogsJob INSTANCE = new RefreshBlogsJob(JBossCentralActivator.BLOGS_ATOM_URL);
+	public static RefreshBlogsJob INSTANCE = new RefreshBlogsJob(JBossCentralActivator.BLOGS_URL);
 	
 	private String blogsurl;
 	

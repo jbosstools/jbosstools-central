@@ -39,7 +39,7 @@ public class RefreshNewsJob extends Job {
 
 	private List<FeedsEntry> entries = new ArrayList<FeedsEntry>();
 	private Exception exception;
-	public static RefreshNewsJob INSTANCE = new RefreshNewsJob(JBossCentralActivator.NEWS_ATOM_URL);
+	public static RefreshNewsJob INSTANCE = new RefreshNewsJob(JBossCentralActivator.NEWS_URL);
 	
 	private String newsurl;
 	
