@@ -941,7 +941,7 @@ public class GettingStartedPage extends AbstractJBossCentralPage {
 			//formText.setFont("author", boldFont);
 			formText.setColor("author", JFaceColors.getHyperlinkText(getDisplay()));
 			formText.setImage("image", getFeedsImage());
-			if (entry.getDescription() != null && !entry.getDescription().isEmpty()) {
+			if (JBossCentralActivator.isInternalWebBrowserAvailable() && entry.getDescription() != null && !entry.getDescription().isEmpty()) {
 				ToolTip toolTip = new FeedsToolTip(formText, entry.getDate() + " " + entry.getDescription());
 				toolTip.activate();
 			}

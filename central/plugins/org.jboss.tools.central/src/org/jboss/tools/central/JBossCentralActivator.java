@@ -31,6 +31,8 @@ import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.ImageRegistry;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.browser.Browser;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IEditorInput;
@@ -131,6 +133,8 @@ public class JBossCentralActivator extends AbstractUIPlugin {
 	
 	// The shared instance
 	private static JBossCentralActivator plugin;
+
+	private static Boolean isInternalWebBrowserAvailable;
 
 	/**
 	 * The constructor
@@ -435,5 +439,30 @@ public class JBossCentralActivator extends AbstractUIPlugin {
 			return JBOSS_DISCOVERY_DIRECTORY_3_3_0_XML;
 		}
 		return directory;
+	}
+	
+	public static boolean isInternalWebBrowserAvailable() {
+		if (isInternalWebBrowserAvailable != null) {
+			return isInternalWebBrowserAvailable.booleanValue();
+		}
+		Shell shell = null;
+		try {
+			shell = new Shell(PlatformUI.getWorkbench().getDisplay());
+			new Browser(shell, SWT.NONE);
+			isInternalWebBrowserAvailable = new Boolean(true);
+			return true;
+		} catch (Throwable t) {
+			try {
+				new Browser(shell, SWT.WEBKIT);
+				isInternalWebBrowserAvailable = new Boolean(true);
+				return true;
+			} catch (Throwable e) {
+				isInternalWebBrowserAvailable = new Boolean(false);
+				return false;
+			}
+		} finally {
+			if (shell != null)
+				shell.dispose();
+		}
 	}
 }
