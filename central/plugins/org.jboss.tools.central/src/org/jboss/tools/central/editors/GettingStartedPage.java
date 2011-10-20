@@ -33,6 +33,7 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.IJobChangeEvent;
 import org.eclipse.core.runtime.jobs.IJobChangeListener;
 import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.layout.GridDataFactory;
@@ -51,17 +52,20 @@ import org.eclipse.swt.events.ControlAdapter;
 import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.layout.RowLayout;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
-import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.INewWizard;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
@@ -144,6 +148,8 @@ public class GettingStartedPage extends AbstractJBossCentralPage {
 	private FormText newsExceptionText;
 	private Composite newsComposite;
 	private RefreshNewsJobChangeListener refreshNewsJobChangeListener;
+	private Section settingsSection;
+	private Composite settingsComposite;
 	
 	public GettingStartedPage(FormEditor editor) {
 		super(editor, ID, "Getting Started");
@@ -167,13 +173,14 @@ public class GettingStartedPage extends AbstractJBossCentralPage {
 		createProjectsSection(toolkit, left);
 		createTutorialsSection(toolkit, left);
 		createDocumentationSection(toolkit, left);
+		createSettingsSection(toolkit, left);
 		toolkit.paintBordersFor(left);
-		
+				
 		Composite right = createComposite(toolkit, body);
 		createNewsSection(toolkit, right);
 		createBlogsSection(toolkit, right);
 		toolkit.paintBordersFor(right);
-		
+				
 		final ControlAdapter controlAdapter = new ControlAdapter() {
 
 			@Override
@@ -635,8 +642,37 @@ public class GettingStartedPage extends AbstractJBossCentralPage {
 		addHyperlink(toolkit, documentationComposite, "Screencasts", "http://docs.jboss.org/tools/movies/");
 		addHyperlink(toolkit, documentationComposite, "Issue Tracker", "https://issues.jboss.org/browse/JBIDE");
 		
-		
 		documentationSection.setClient(documentationComposite);
+	}
+	
+	public void createSettingsSection(FormToolkit toolkit, Composite parent) {
+		settingsSection = createSection(toolkit, parent, "Settings", ExpandableComposite.TITLE_BAR|ExpandableComposite.TWISTIE|ExpandableComposite.EXPANDED);
+	    GridData gd = new GridData(SWT.FILL, SWT.FILL, false, false);
+	    settingsSection.setLayoutData(gd);
+	    
+		settingsComposite = toolkit.createComposite(settingsSection);
+	    GridLayout layout = new GridLayout(1, true);
+	    layout.horizontalSpacing = 30;
+	    settingsComposite.setLayout(layout);
+	    GridDataFactory.fillDefaults().grab(true, true).applyTo(settingsComposite);
+		
+	    Button showOnStartup = toolkit.createButton(settingsComposite, "Show on Startup", SWT.CHECK);
+		showOnStartup.setLayoutData(new GridData(SWT.BEGINNING, SWT.BOTTOM, false, false));
+		showOnStartup.setBackground(settingsComposite.getBackground());
+		showOnStartup.setSelection(JBossCentralActivator.getDefault().showJBossCentralOnStartup());
+		showOnStartup.addSelectionListener(new SelectionAdapter() {
+
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				IEclipsePreferences preferences = JBossCentralActivator.getDefault().getPreferences();
+				boolean showOnStartup = preferences.getBoolean(JBossCentralActivator.SHOW_JBOSS_CENTRAL_ON_STARTUP, JBossCentralActivator.SHOW_JBOSS_CENTRAL_ON_STARTUP_DEFAULT_VALUE);
+				preferences.putBoolean(JBossCentralActivator.SHOW_JBOSS_CENTRAL_ON_STARTUP, !showOnStartup);
+				JBossCentralActivator.getDefault().savePreferences();
+			}
+		
+		});
+
+		settingsSection.setClient(settingsComposite);
 	}
 
 	private void addHyperlink(FormToolkit toolkit, Composite composite, String text, final String url) {
@@ -1024,6 +1060,12 @@ public class GettingStartedPage extends AbstractJBossCentralPage {
 		gd.grabExcessVerticalSpace = false;
 		computedSize = documentationSection.computeSize(SWT.DEFAULT, SWT.DEFAULT);
 		documentationSection.setSize(widthHint, computedSize.y);
+		
+		gd = (GridData) settingsSection.getLayoutData();
+		gd.widthHint = widthHint;
+		gd.grabExcessVerticalSpace = false;
+		computedSize = settingsSection.computeSize(SWT.DEFAULT, SWT.DEFAULT);
+		settingsSection.setSize(widthHint, computedSize.y);
 		
 		gd = (GridData) projectsSection.getLayoutData();
 		//gridData.heightHint = size.y - 40;
