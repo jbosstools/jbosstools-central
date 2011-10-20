@@ -211,7 +211,7 @@
       		priority="2" />
       <category 
       		id="org.jboss.tools.central.seam2"
-      		name="Seam 2 tutorials"
+      		name="Seam 2 Tutorials"
       		priority="5" />
       <tutorial
             id="org.jboss.tools.central.jbossas.quickstart.helloworld"
