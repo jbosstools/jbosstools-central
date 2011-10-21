@@ -204,7 +204,7 @@ public class WTPRuntimeFix implements ProjectExamplesFix {
 				if (runtimeType != null && runtimeType.getId().equals(allowedType)) {
 					IRuntime componentPresent = isComponentPresent(fix, runtime);
 					if (componentPresent != null) {
-						return isComponentPresent(fix, runtime);
+						return componentPresent;
 					}
 				}
 			}
