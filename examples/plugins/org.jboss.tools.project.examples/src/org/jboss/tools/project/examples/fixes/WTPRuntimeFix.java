@@ -201,7 +201,7 @@ public class WTPRuntimeFix implements ProjectExamplesFix {
 			for (int i = 0; i < runtimes.length; i++) {
 				IRuntime runtime = runtimes[i];
 				IRuntimeType runtimeType = runtime.getRuntimeType();
-				if (runtimeType.getId().equals(allowedType)) {
+				if (runtimeType != null && runtimeType.getId().equals(allowedType)) {
 					IRuntime componentPresent = isComponentPresent(fix, runtime);
 					if (componentPresent != null) {
 						return isComponentPresent(fix, runtime);
