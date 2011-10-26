@@ -1015,9 +1015,9 @@ public class GettingStartedPage extends AbstractJBossCentralPage {
 		}
 		oldSize = size;
 		GridData gd;
-		Point computedSize;
+		//Point computedSize;
 		int widthHint = size.x/2 - 40;
-		
+		//computedSize = newsSection.computeSize(SWT.DEFAULT, SWT.DEFAULT);
 		gd = (GridData) newsSection.getLayoutData();
 		if (newsSection.isExpanded()) {
 			if (blogsSection.isExpanded()) {
@@ -1026,15 +1026,15 @@ public class GettingStartedPage extends AbstractJBossCentralPage {
 				gd.heightHint = size.y - 40;
 			}
 		} else {
-			computedSize = newsSection.computeSize(SWT.DEFAULT, SWT.DEFAULT);
-			gd.heightHint = computedSize.y;
+			gd.heightHint = 20;
 		}
 		gd.widthHint = widthHint;
 		gd.grabExcessVerticalSpace = false;
-		computedSize = newsSection.computeSize(SWT.DEFAULT, SWT.DEFAULT);
-		newsSection.setSize(widthHint, computedSize.y);
+		//computedSize = newsSection.computeSize(SWT.DEFAULT, SWT.DEFAULT);
+		//newsSection.setSize(widthHint, computedSize.y);
 
 		gd = (GridData) blogsSection.getLayoutData();
+		//computedSize = blogsSection.computeSize(SWT.DEFAULT, SWT.DEFAULT);
 		if (blogsSection.isExpanded()) {
 			if (newsSection.isExpanded()) {
 				gd.heightHint = size.y/2 - 20;
@@ -1042,56 +1042,55 @@ public class GettingStartedPage extends AbstractJBossCentralPage {
 				gd.heightHint = size.y - 40;
 			}
 		} else {
-			computedSize = blogsSection.computeSize(SWT.DEFAULT, SWT.DEFAULT);
-			gd.heightHint = computedSize.y;
+			gd.heightHint = 20;
 		}
 		
 		gd.widthHint = widthHint;
 		gd.grabExcessVerticalSpace = false;
-		computedSize = blogsSection.computeSize(SWT.DEFAULT, SWT.DEFAULT);
-		blogsSection.setSize(widthHint, computedSize.y);
+		//computedSize = blogsSection.computeSize(SWT.DEFAULT, SWT.DEFAULT);
+		//blogsSection.setSize(widthHint, computedSize.y);
 		
 		gd = (GridData) tutorialsSection.getLayoutData();
 		//gridData.heightHint = size.y - 40;
 		gd.widthHint = widthHint;
 		gd.grabExcessVerticalSpace = false;
 		tutorialPageBook.pack();
-		computedSize = tutorialPageBook.computeSize(SWT.DEFAULT, SWT.DEFAULT);
-		tutorialsSection.setSize(widthHint, computedSize.y);
+		//computedSize = tutorialPageBook.computeSize(SWT.DEFAULT, SWT.DEFAULT);
+		//tutorialsSection.setSize(widthHint, computedSize.y);
 		
 		gd = (GridData) documentationSection.getLayoutData();
 		//gridData.heightHint = size.y - 40;
 		gd.widthHint = widthHint;
 		gd.grabExcessVerticalSpace = false;
-		computedSize = documentationSection.computeSize(SWT.DEFAULT, SWT.DEFAULT);
-		documentationSection.setSize(widthHint, computedSize.y);
+		//computedSize = documentationSection.computeSize(SWT.DEFAULT, SWT.DEFAULT);
+		//documentationSection.setSize(widthHint, computedSize.y);
 		
 		gd = (GridData) settingsSection.getLayoutData();
 		gd.widthHint = widthHint;
 		gd.grabExcessVerticalSpace = false;
-		computedSize = settingsSection.computeSize(SWT.DEFAULT, SWT.DEFAULT);
-		settingsSection.setSize(widthHint, computedSize.y);
+		//computedSize = settingsSection.computeSize(SWT.DEFAULT, SWT.DEFAULT);
+		//settingsSection.setSize(widthHint, computedSize.y);
 		
 		gd = (GridData) projectsSection.getLayoutData();
 		//gridData.heightHint = size.y - 40;
 		gd.widthHint = widthHint;
 		gd.grabExcessVerticalSpace = false;
-		computedSize = projectsSection.computeSize(SWT.DEFAULT, SWT.DEFAULT);
-		projectsSection.setSize(widthHint, computedSize.y);
+		//computedSize = projectsSection.computeSize(SWT.DEFAULT, SWT.DEFAULT);
+		//projectsSection.setSize(widthHint, computedSize.y);
 		
 		form.reflow(true);
 		form.redraw();
 		blogsScrollComposite.setMinSize(widthHint, size.y - 55);
 		newsScrollComposite.setMinSize(widthHint, size.y - 55);
 		
-		computedSize = tutorialPageBook.computeSize(SWT.DEFAULT, SWT.DEFAULT);
+		Point computedSize = tutorialPageBook.computeSize(SWT.DEFAULT, SWT.DEFAULT);
 		int y = computedSize.y;
 		if (y > 200) {
 			y = 200;
 		}
 		tutorialScrollComposite.setMinSize(widthHint, y);
-		refreshNews();
-		refreshBlogs();
+		//refreshNews();
+		//refreshBlogs();
 		
 		form.layout(true, true);
 	}
