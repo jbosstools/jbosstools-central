@@ -346,7 +346,7 @@ public class ProjectExamplesDialog extends FormDialog implements IRunnableContex
 	public void run(boolean fork, boolean cancelable,
 			IRunnableWithProgress runnable) throws InvocationTargetException,
 			InterruptedException {
-		ModalContext.run(runnable, fork, monitor, getDisplay());
+		ModalContext.run(runnable, false, monitor, getDisplay());
 	}
 	
 	protected Display getDisplay() {
