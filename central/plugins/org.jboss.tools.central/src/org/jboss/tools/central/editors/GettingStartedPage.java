@@ -150,6 +150,7 @@ public class GettingStartedPage extends AbstractJBossCentralPage {
 	private RefreshNewsJobChangeListener refreshNewsJobChangeListener;
 	private Section settingsSection;
 	private Composite settingsComposite;
+	private Point oldSize;
 	
 	public GettingStartedPage(FormEditor editor) {
 		super(editor, ID, "Getting Started");
@@ -715,12 +716,12 @@ public class GettingStartedPage extends AbstractJBossCentralPage {
 			@Override
 			public void run() {
 				pageBook.showPage(composite);
+				setBusyIndicator(composite, true);
 				form.reflow(true);
 				form.redraw();
 				recomputeScrollComposite(scrolledComposite, pageBook);
 			}
 		});
-		
 		return true;
 	}
 
@@ -1009,6 +1010,10 @@ public class GettingStartedPage extends AbstractJBossCentralPage {
 		} else {
 			size = form.getBody().getSize();
 		}
+		if (size.equals(oldSize)) {
+			return;
+		}
+		oldSize = size;
 		GridData gd;
 		Point computedSize;
 		int widthHint = size.x/2 - 40;
@@ -1109,6 +1114,7 @@ public class GettingStartedPage extends AbstractJBossCentralPage {
 				
 				@Override
 				public void run() {
+					setBusyIndicator(blogsLoadingComposite, false);
 					refreshBlogs();
 				}
 			});
@@ -1151,6 +1157,7 @@ public class GettingStartedPage extends AbstractJBossCentralPage {
 				
 				@Override
 				public void run() {
+					setBusyIndicator(tutorialsLoadingComposite, false);
 					refreshTutorials();
 				}
 			});
@@ -1193,6 +1200,7 @@ public class GettingStartedPage extends AbstractJBossCentralPage {
 				
 				@Override
 				public void run() {
+					setBusyIndicator(newsLoadingComposite, false);
 					refreshNews();
 				}
 			});

@@ -108,6 +108,9 @@ public class RefreshIndicator extends Canvas {
 					while (!stop) {
 						Display.getDefault().syncExec(new Runnable() {
 							public void run() {
+								if (!getParent().isVisible()) {
+									return;
+								}
 								if (!stop) {
 									if (count < maxCount)
 										setImage(images[count]);

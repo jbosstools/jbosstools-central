@@ -252,11 +252,11 @@ public class SoftwarePage extends AbstractJBossCentralPage implements IRunnableC
 			@Override
 			public void run() {
 				pageBook.showPage(loadingComposite);
+				setBusyIndicator(loadingComposite, true);
 				form.reflow(true);
 				form.redraw();
 			}
 		});
-		
 		return true;
 	}
 
@@ -309,6 +309,7 @@ public class SoftwarePage extends AbstractJBossCentralPage implements IRunnableC
 				
 				@Override
 				public void run() {
+					setBusyIndicator(loadingComposite, false);
 					refresh();
 				}
 			});

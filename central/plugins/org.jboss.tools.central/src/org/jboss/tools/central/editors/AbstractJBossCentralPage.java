@@ -19,6 +19,7 @@ import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.forms.editor.FormEditor;
 import org.eclipse.ui.forms.editor.FormPage;
@@ -97,5 +98,15 @@ public class AbstractJBossCentralPage extends FormPage {
 				JBossCentralActivator.FORM_END_TAG;
 		formText.setText(text, true, false);
 		return composite;
+	}
+
+	protected void setBusyIndicator(Composite composite, boolean busy) {
+		Control[] children = composite.getChildren();
+		for (Control child:children) {
+			if (child instanceof RefreshIndicator) {
+				RefreshIndicator indicator = (RefreshIndicator) child;
+				indicator.setBusy(busy);
+			}
+		}
 	}
 }
