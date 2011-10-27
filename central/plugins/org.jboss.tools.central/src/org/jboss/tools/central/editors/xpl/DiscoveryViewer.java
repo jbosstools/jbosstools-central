@@ -1002,6 +1002,9 @@ public class DiscoveryViewer {
 		// have
 		// connectors that are filtered based on version of Mylyn
 		Bundle bundle = Platform.getBundle("org.eclipse.mylyn.tasks.core"); //$NON-NLS-1$
+		if (bundle == null) {
+			bundle = Platform.getBundle("org.eclipse.mylyn.commons.core"); //$NON-NLS-1$
+		}
 		String versionString = (String) bundle.getHeaders().get("Bundle-Version"); //$NON-NLS-1$
 		if (versionString != null) {
 			Version version = new Version(versionString);
