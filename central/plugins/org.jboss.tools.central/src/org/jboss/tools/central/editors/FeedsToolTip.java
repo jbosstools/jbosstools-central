@@ -49,6 +49,7 @@ public class FeedsToolTip extends ToolTip {
 		super(formText);
 		this.toolText = "<html>" +
 				"<head>" +
+				"<meta charset=\"UTF-8\" />" +
 				"<title>JBoss</title>" +
 				"<style>" +
 				"html, body { font-size: 12px;font-family: Arial, Helvetica, sans-serif; }" +
