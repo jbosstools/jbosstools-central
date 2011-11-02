@@ -1,3 +1,13 @@
+/*************************************************************************************
+ * Copyright (c) 2008-2011 Red Hat, Inc. and others.
+ * All rights reserved. This program and the accompanying materials 
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ * 
+ * Contributors:
+ *     JBoss by Red Hat - Initial implementation.
+ ************************************************************************************/
 package org.jboss.tools.project.examples.cheatsheet.actions;
 
 import java.io.File;
@@ -25,8 +35,26 @@ import org.jboss.tools.project.examples.model.IImportProjectExample;
 import org.jboss.tools.project.examples.model.Project;
 import org.jboss.tools.project.examples.model.ProjectUtil;
 
+/**
+ * 
+ * <p>Action that imports project examples to workspace.</p>
+ * 
+ * @author snjeza
+ *
+ */
 public class ImportProjectExample extends Action implements ICheatSheetAction {
 
+	/**
+	 * Execution of the action
+	 * 
+	 * @param params
+	 *            Array of parameters
+	 *            index 0: projectName,
+	 *            index 1: included projects, 
+	 *            index 2: the URL of the project example
+	 * @param manager
+	 *            Cheatsheet Manager
+	 */
 	public void run(String[] params, ICheatSheetManager manager) {
 		if(params == null || params[0] == null || params[1] == null || params[2] == null ) {
 			return;

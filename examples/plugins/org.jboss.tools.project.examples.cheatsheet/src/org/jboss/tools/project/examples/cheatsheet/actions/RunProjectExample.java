@@ -1,3 +1,13 @@
+/*************************************************************************************
+ * Copyright (c) 2008-2011 Red Hat, Inc. and others.
+ * All rights reserved. This program and the accompanying materials 
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ * 
+ * Contributors:
+ *     JBoss by Red Hat - Initial implementation.
+ ************************************************************************************/
 package org.jboss.tools.project.examples.cheatsheet.actions;
 
 import java.util.ArrayList;
@@ -15,8 +25,24 @@ import org.jboss.tools.project.examples.model.Category;
 import org.jboss.tools.project.examples.model.Project;
 import org.jboss.tools.project.examples.model.ProjectUtil;
 
+/**
+ * 
+ * <p>Action that runs a project example.</p>
+ * 
+ * @author snjeza
+ *
+ */
 public class RunProjectExample extends Action implements ICheatSheetAction {
 
+	/**
+	 * Execution of the action
+	 * 
+	 * @param params
+	 *            Array of parameters
+	 *            index 0: <category>::<name> project example
+	 * @param manager
+	 *            Cheatsheet Manager
+	 */
 	public void run(String[] params, ICheatSheetManager manager) {
 		if(params == null || params[0] == null ) {
 			return;

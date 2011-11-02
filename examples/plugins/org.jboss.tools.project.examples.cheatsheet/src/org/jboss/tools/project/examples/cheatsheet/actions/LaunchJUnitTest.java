@@ -1,3 +1,13 @@
+/*************************************************************************************
+ * Copyright (c) 2008-2011 Red Hat, Inc. and others.
+ * All rights reserved. This program and the accompanying materials 
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ * 
+ * Contributors:
+ *     JBoss by Red Hat - Initial implementation.
+ ************************************************************************************/
 package org.jboss.tools.project.examples.cheatsheet.actions;
 
 import org.eclipse.core.resources.IProject;
@@ -26,10 +36,27 @@ import org.jboss.tools.project.examples.cheatsheet.Activator;
 import org.jboss.tools.project.examples.cheatsheet.Messages;
 import org.osgi.service.prefs.BackingStoreException;
 
+/**
+ * 
+ * <p>Action that launches JUnit test.</p>
+ * 
+ * @author snjeza
+ *
+ */
 public class LaunchJUnitTest extends Action implements ICheatSheetAction {
 
 	private static final String ACTIVE_PROFILES = "activeProfiles"; //$NON-NLS-1$
 
+	/**
+	 * Execution of the action
+	 * 
+	 * @param params
+	 *            Array of parameters
+	 *            index 0: projectName,
+	 *            index 1: Maven profile, 
+	 * @param manager
+	 *            Cheatsheet Manager
+	 */
 	public void run(String[] params, ICheatSheetManager manager) {
 		if (params == null || params[0] == null) {
 			return;

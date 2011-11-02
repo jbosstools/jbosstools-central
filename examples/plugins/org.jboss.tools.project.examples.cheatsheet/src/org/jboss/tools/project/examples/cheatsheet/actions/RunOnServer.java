@@ -1,3 +1,13 @@
+/*************************************************************************************
+ * Copyright (c) 2008-2011 Red Hat, Inc. and others.
+ * All rights reserved. This program and the accompanying materials 
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ * 
+ * Contributors:
+ *     JBoss by Red Hat - Initial implementation.
+ ************************************************************************************/
 package org.jboss.tools.project.examples.cheatsheet.actions;
 
 import org.eclipse.core.resources.IFile;
@@ -21,8 +31,25 @@ import org.jboss.ide.eclipse.as.core.modules.SingleDeployableFactory;
 import org.jboss.ide.eclipse.as.core.util.ServerConverter;
 import org.jboss.tools.project.examples.cheatsheet.Activator;
 
+/**
+ * 
+ * <p>Action that runs an application on a server.</p>
+ * 
+ * @author snjeza
+ *
+ */
 public class RunOnServer extends Action implements ICheatSheetAction {
 
+	/**
+	 * Execution of the action
+	 * 
+	 * @param params
+	 *            Array of parameters
+	 *            index 0: projectName,
+	 *            index 1: a file path we want to mark as deployable.
+	 * @param manager
+	 *            Cheatsheet Manager
+	 */
 	public void run(String[] params, ICheatSheetManager manager) {
 		if(params == null || params[0] == null) {
 			return;
