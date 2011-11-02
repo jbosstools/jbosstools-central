@@ -104,7 +104,9 @@ public class ImportDefaultMavenProjectExample extends
 				for (ZipEntry directory:directories) {
 					IPath resourcePath = new Path(directory.getName());
 					try {
-						workspace.getRoot().getFolder(resourcePath).create(false, true, null);
+						if (resourcePath.segmentCount() > 1 && !workspace.getRoot().getFolder(resourcePath).exists()) {
+							workspace.getRoot().getFolder(resourcePath).create(false, true, null);
+						}
 					} catch (Exception e) {
 						ProjectExamplesActivator.log(e);
 					}
@@ -167,7 +169,9 @@ public class ImportDefaultMavenProjectExample extends
 		for (ZipEntry directory:directories) {
 			IPath resourcePath = new Path(directory.getName());
 			try {
-				workspace.getRoot().getFolder(resourcePath).create(false, true, null);
+				if (resourcePath.segmentCount() > 1 && !workspace.getRoot().getFolder(resourcePath).exists()) {
+					workspace.getRoot().getFolder(resourcePath).create(false, true, null);
+				}
 			} catch (Exception e) {
 				ProjectExamplesActivator.log(e);
 			}
