@@ -10,12 +10,17 @@
  ************************************************************************************/
 package org.jboss.tools.maven.jaxrs.configurators;
 
+import java.io.File;
+
 import org.apache.maven.project.MavenProject;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.SubProgressMonitor;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaCore;
@@ -71,12 +76,52 @@ public class JaxrsProjectConfigurator extends AbstractProjectConfigurator {
 	}
 	
 	@Override
-	public void configure(ProjectConfigurationRequest request,
-			IProgressMonitor monitor) throws CoreException {
+	public void configure(ProjectConfigurationRequest request, IProgressMonitor monitor) throws CoreException {
 		MavenProject mavenProject = request.getMavenProject();
+		refreshHierarchy(mavenProject, new SubProgressMonitor(monitor, 1));
 		IProject project = request.getProject();
-		configureInternal(mavenProject,project, monitor);
+		configureInternal(mavenProject, project, monitor);
 	}
+
+	/**
+	 * Refreshes the Maven projects hierarchy. For example, if the project on
+	 * which the JAX-RS facet should be installed is 'Parent1/Parent2/Child',
+	 * then both Parent1, Parent2 and Child are refreshed.
+	 * 
+	 * @param mavenProject
+	 * @throws CoreException
+	 *             in case of problem during refresh
+	 */
+	private void refreshHierarchy(MavenProject mavenProject, IProgressMonitor monitor) throws CoreException {
+		try {
+			File basedir = mavenProject.getBasedir();
+			IProject project = getProjectAt(basedir);
+			while (project != null) {
+				project.refreshLocal(IResource.DEPTH_INFINITE, monitor);
+				basedir = basedir.getParentFile();
+				project = getProjectAt(basedir);
+			}
+		} finally {
+			monitor.done();
+		}
+	}
+	
+	/**
+	 * Returns the project given its absolute location on the filesystem
+	 * @param basedir
+	 * @return the project or null if no project exists at the given location
+	 */
+	private IProject getProjectAt(File basedir) {
+		IProject[] projects = ResourcesPlugin.getWorkspace().getRoot()
+				.getProjects();
+		for (IProject project : projects) {
+			if (project.getLocation().toFile().equals(basedir)) {
+				return project;
+			}
+		}
+		return null;
+	}
+	
 	
 	private void configureInternal(MavenProject mavenProject,IProject project,
 			IProgressMonitor monitor) throws CoreException {

@@ -31,6 +31,7 @@ import org.eclipse.m2e.core.project.ProjectImportConfiguration;
 import org.eclipse.m2e.core.ui.internal.MavenImages;
 import org.eclipse.ui.INewWizard;
 import org.eclipse.ui.IWorkbench;
+import org.jboss.tools.maven.project.examples.MavenProjectExamplesActivator;
 import org.jboss.tools.project.examples.model.Project;
 
 /**
@@ -87,6 +88,7 @@ public class ArchetypeExamplesWizard extends Wizard implements INewWizard {
 					final IWorkspace ws = ResourcesPlugin.getWorkspace();
 					ws.run(wr, ws.getRoot(), IWorkspace.AVOID_UPDATE, monitor);
 				} catch (CoreException e) {
+					MavenProjectExamplesActivator.log(e);
 					throw new InvocationTargetException(e);
 				}
 			}
