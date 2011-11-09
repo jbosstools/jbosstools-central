@@ -1,11 +1,11 @@
 package org.jboss.tools.maven.core;
 
 import java.io.File;
-import java.net.URI;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Iterator;
+import java.util.List;
 
-import org.apache.maven.project.MavenProject;
-import org.eclipse.core.internal.resources.Project;
-import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IWorkspaceRoot;
@@ -14,7 +14,6 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Path;
-import org.eclipse.jdt.core.JavaCore;
 
 /**
  * A utility class for Eclipse Projects.
@@ -40,20 +39,29 @@ public class ProjectUtil {
 		try {
 			int count = 0;
 			final IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
-			final IProject[] projects = root.getProjects();
+			final List<IProject> projects = new ArrayList<IProject>(Arrays.asList(root.getProjects()));
+			
 			final IPath rootLocation = root.getLocation();
 			IPath basedirPath = new Path(basedir.getAbsolutePath());
-			while(basedirPath.matchingFirstSegments(rootLocation) > 0) {
-				for(IProject project : projects) {
+			while(!rootLocation.equals(basedirPath) && rootLocation.isPrefixOf(basedirPath)) {
+				Iterator<IProject> ite = projects.iterator();
+				 
+				// In case of maven module projects, root.findContainersForLocationURI(...) would return an IFolder
+				// instead of an IProject. So we manually loop through all projects and test their path against the 
+				// current basedirPath. Refreshed projects will be removed from the list for subsequent checks
+				while(ite.hasNext()) {
+					IProject project = ite.next();
 					final IPath projectLocation = project.getLocation();
-					if(projectLocation.equals(basedirPath) && project.isOpen()) {
+					if(projectLocation.equals(basedirPath) && project.isAccessible()) {
 						project.refreshLocal(refreshDepth, monitor);
 						count++;
+						ite.remove();
 						break;
 					}
 				}
 				basedirPath = basedirPath.removeLastSegments(1);
 			}
+			
 			return count;
 		} finally {
 			monitor.done();

@@ -10,18 +10,13 @@
  ************************************************************************************/
 package org.jboss.tools.maven.jaxrs.configurators;
 
-import java.io.File;
-
 import org.apache.maven.project.MavenProject;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
-import org.eclipse.core.resources.IWorkspaceRoot;
-import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.SubProgressMonitor;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IType;
@@ -134,7 +129,8 @@ public class JaxrsProjectConfigurator extends AbstractProjectConfigurator {
 		if (facetVersion != null) {
 			IStatus status = facetVersion.getConstraint().check(fproj.getProjectFacets());
 			if (status.isOK()) {
-				// refreshing the project hierarchy to make sure that Eclipse "sees" the .settings folder and file, to be able to add the JAX-RS Facet
+				// refreshing the project hierarchy to make sure that Eclipse "sees" the .settings folder and file, 
+				// to be able to add the JAX-RS Facet. This only occurs if the projects are created via the project example UI.
 				// see https://issues.jboss.org/browse/JBIDE-10037
 				ProjectUtil.refreshHierarchy(mavenProject.getBasedir(), IResource.DEPTH_INFINITE, new SubProgressMonitor(monitor, 1));
 				IDataModel model = createJaxRsDataModel(fproj,facetVersion);
