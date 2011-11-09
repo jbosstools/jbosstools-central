@@ -16,10 +16,12 @@ import org.apache.maven.project.MavenProject;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.SubProgressMonitor;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IType;
@@ -44,6 +46,7 @@ import org.eclipse.wst.common.project.facet.core.IProjectFacetVersion;
 import org.eclipse.wst.common.project.facet.core.ProjectFacetsManager;
 import org.jboss.tools.common.util.EclipseJavaUtil;
 import org.jboss.tools.maven.core.IJBossMavenConstants;
+import org.jboss.tools.maven.core.ProjectUtil;
 import org.jboss.tools.maven.core.internal.project.facet.MavenFacetInstallDataModelProvider;
 import org.jboss.tools.maven.ui.Activator;
 import org.maven.ide.eclipse.wtp.WarPluginConfiguration;
@@ -78,49 +81,11 @@ public class JaxrsProjectConfigurator extends AbstractProjectConfigurator {
 	@Override
 	public void configure(ProjectConfigurationRequest request, IProgressMonitor monitor) throws CoreException {
 		MavenProject mavenProject = request.getMavenProject();
-		refreshHierarchy(mavenProject, new SubProgressMonitor(monitor, 1));
 		IProject project = request.getProject();
 		configureInternal(mavenProject, project, monitor);
 	}
 
-	/**
-	 * Refreshes the Maven projects hierarchy. For example, if the project on
-	 * which the JAX-RS facet should be installed is 'Parent1/Parent2/Child',
-	 * then both Parent1, Parent2 and Child are refreshed.
-	 * 
-	 * @param mavenProject
-	 * @throws CoreException
-	 *             in case of problem during refresh
-	 */
-	private void refreshHierarchy(MavenProject mavenProject, IProgressMonitor monitor) throws CoreException {
-		try {
-			File basedir = mavenProject.getBasedir();
-			IProject project = getProjectAt(basedir);
-			while (project != null) {
-				project.refreshLocal(IResource.DEPTH_INFINITE, monitor);
-				basedir = basedir.getParentFile();
-				project = getProjectAt(basedir);
-			}
-		} finally {
-			monitor.done();
-		}
-	}
 	
-	/**
-	 * Returns the project given its absolute location on the filesystem
-	 * @param basedir
-	 * @return the project or null if no project exists at the given location
-	 */
-	private IProject getProjectAt(File basedir) {
-		IProject[] projects = ResourcesPlugin.getWorkspace().getRoot()
-				.getProjects();
-		for (IProject project : projects) {
-			if (project.getLocation().toFile().equals(basedir)) {
-				return project;
-			}
-		}
-		return null;
-	}
 	
 	
 	private void configureInternal(MavenProject mavenProject,IProject project,
@@ -169,6 +134,9 @@ public class JaxrsProjectConfigurator extends AbstractProjectConfigurator {
 		if (facetVersion != null) {
 			IStatus status = facetVersion.getConstraint().check(fproj.getProjectFacets());
 			if (status.isOK()) {
+				// refreshing the project hierarchy to make sure that Eclipse "sees" the .settings folder and file, to be able to add the JAX-RS Facet
+				// see https://issues.jboss.org/browse/JBIDE-10037
+				ProjectUtil.refreshHierarchy(mavenProject.getBasedir(), IResource.DEPTH_INFINITE, new SubProgressMonitor(monitor, 1));
 				IDataModel model = createJaxRsDataModel(fproj,facetVersion);
 				WarPluginConfiguration config = new WarPluginConfiguration(mavenProject, fproj.getProject());
 				String warSourceDirectory = config.getWarSourceDirectory();
