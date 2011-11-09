@@ -116,6 +116,7 @@ public class SelectProfilesDialog extends TitleAreaDialog implements
 
 		setTitle(Messages.SelectProfilesDialog_Maven_profile_selection);
 		String text;
+		boolean hasProfiles = !sharedProfiles.isEmpty();
 		if (facade == null) {
 			text = NLS.bind(Messages.SelectProfilesDialog_Select_active_profiles_for_selected_projects,
 					facades.size()
@@ -124,12 +125,11 @@ public class SelectProfilesDialog extends TitleAreaDialog implements
 			text = NLS.bind(
 					Messages.SelectProfilesDialog_Select_the_active_Maven_profiles,
 					facade.getProject().getName());
-			
-		    displayProfilesAsText(container);
+			if (hasProfiles) {
+			    displayProfilesAsText(container);
+			}
 		}
 		setMessage(text);
-
-		boolean hasProfiles = !sharedProfiles.isEmpty();
 
 		if (hasProfiles && facade == null) {
 			displayWarning(container);
