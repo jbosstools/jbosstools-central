@@ -170,6 +170,11 @@ public class ProfileSelectionHandler extends AbstractHandler {
 							}
 						}
 					}
+				} else if (o instanceof IAdaptable) {
+					IProject p = (IProject)((IAdaptable) o).getAdapter(IProject.class);
+					if (p != null) {
+						projects.add(p);
+					}
 				}
 			}
 		}
