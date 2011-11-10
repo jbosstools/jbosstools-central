@@ -108,6 +108,10 @@ public class RefreshIndicator extends Canvas {
 					while (!stop) {
 						Display.getDefault().syncExec(new Runnable() {
 							public void run() {
+								if (isDisposed() || getParent() == null || getParent().isDisposed()) {
+									setBusy(false);
+									return;
+								}
 								if (!getParent().isVisible()) {
 									return;
 								}
