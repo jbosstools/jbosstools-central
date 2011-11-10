@@ -872,8 +872,9 @@ public class GettingStartedPage extends AbstractJBossCentralPage {
 		}
 		
 		tutorialPageBook.showPage(tutorialsComposite);
+		tutorialPageBook.layout(true, true);
 		form.reflow(true);
-		form.redraw();
+		//form.redraw();
 		resize();
 		//recomputeScrollComposite(tutorialScrollComposite, tutorialPageBook);
 	}
@@ -959,8 +960,8 @@ public class GettingStartedPage extends AbstractJBossCentralPage {
 			FormText formText = toolkit.createFormText(composite, true);
 			TableWrapData td = new TableWrapData();
 			td.indent = 2;
-			Point size = newsScrollComposite.computeSize(SWT.DEFAULT, SWT.DEFAULT);
-			td.maxWidth = size.x - 2;
+			//Point size = scrollable.computeSize(SWT.DEFAULT, SWT.DEFAULT);
+			//td.maxWidth = size.x - 2;
 			formText.setLayoutData(td);
 			try {
 				// to avoid illegal argumentexception on formtext fields.
@@ -1009,10 +1010,11 @@ public class GettingStartedPage extends AbstractJBossCentralPage {
 			
 		}
 		pageBook.showPage(composite);
-		composite.layout(true, true);
+		pageBook.layout(true, true);
 		form.reflow(true);
-		form.redraw();
+		//form.redraw();
 		recomputeScrollComposite(scrollable, pageBook);
+		resize();
 	}
 
 	private void resize() {
@@ -1021,20 +1023,18 @@ public class GettingStartedPage extends AbstractJBossCentralPage {
 	
 	protected void resize(boolean force) {
 		Point size;
-		if (Platform.OS_MACOSX.equals(Platform.getOS())) {
+		//if (Platform.OS_MACOSX.equals(Platform.getOS())) {
 			size = form.getSize();
 			size.y = form.getBody().getSize().y;
-		} else {
-			size = form.getBody().getSize();
-		}
+		//} else {
+		//	size = form.getBody().getSize();
+		//}
 		if (!force && size.equals(oldSize)) {
 			return;
 		}
 		oldSize = size;
 		GridData gd;
-		//Point computedSize;
 		int widthHint = size.x/2 - 40;
-		//computedSize = newsSection.computeSize(SWT.DEFAULT, SWT.DEFAULT);
 		gd = (GridData) newsSection.getLayoutData();
 		if (newsSection.isExpanded()) {
 			if (blogsSection.isExpanded()) {
@@ -1047,11 +1047,8 @@ public class GettingStartedPage extends AbstractJBossCentralPage {
 		}
 		gd.widthHint = widthHint;
 		gd.grabExcessVerticalSpace = false;
-		//computedSize = newsSection.computeSize(SWT.DEFAULT, SWT.DEFAULT);
-		//newsSection.setSize(widthHint, computedSize.y);
-
+		
 		gd = (GridData) blogsSection.getLayoutData();
-		//computedSize = blogsSection.computeSize(SWT.DEFAULT, SWT.DEFAULT);
 		if (blogsSection.isExpanded()) {
 			if (newsSection.isExpanded()) {
 				gd.heightHint = size.y/2 - 20;
@@ -1064,8 +1061,6 @@ public class GettingStartedPage extends AbstractJBossCentralPage {
 		
 		gd.widthHint = widthHint;
 		gd.grabExcessVerticalSpace = false;
-		//computedSize = blogsSection.computeSize(SWT.DEFAULT, SWT.DEFAULT);
-		//blogsSection.setSize(widthHint, computedSize.y);
 		
 		gd = (GridData) tutorialsSection.getLayoutData();
 		//gridData.heightHint = size.y - 40;
@@ -1095,8 +1090,6 @@ public class GettingStartedPage extends AbstractJBossCentralPage {
 		//computedSize = projectsSection.computeSize(SWT.DEFAULT, SWT.DEFAULT);
 		//projectsSection.setSize(widthHint, computedSize.y);
 		
-		form.reflow(true);
-		form.redraw();
 		blogsScrollComposite.setMinSize(widthHint, size.y - 55);
 		newsScrollComposite.setMinSize(widthHint, size.y - 55);
 		
@@ -1105,11 +1098,16 @@ public class GettingStartedPage extends AbstractJBossCentralPage {
 		if (y > 200) {
 			y = 200;
 		}
-		tutorialScrollComposite.setMinSize(widthHint, y);
-		//refreshNews();
-		//refreshBlogs();
 		
+		tutorialScrollComposite.setMinSize(widthHint, y);
+		//newsPageBook.layout(true, true);
+		//blogsPageBook.layout(true, true);
+		recomputeScrollComposite(blogsScrollComposite, blogsPageBook);
+		recomputeScrollComposite(newsScrollComposite, newsPageBook);
+		//form.redraw();
 		form.layout(true, true);
+		form.reflow(true);
+		
 	}
 
 	private class RefreshBlogsJobChangeListener implements IJobChangeListener {
