@@ -371,6 +371,9 @@ public class GettingStartedPage extends AbstractJBossCentralPage {
 		CommandContributionItem item = JBossCentralActivator.createContributionItem(getSite(), "org.jboss.tools.central.openJBossNews");
 		toolBarManager.add(item);
 		
+		item = JBossCentralActivator.createContributionItem(getSite(), "org.jboss.tools.central.openJBossToolsTwitter");
+		toolBarManager.add(item);
+		
 		item = JBossCentralActivator.createContributionItem(getSite(), "org.jboss.tools.central.refreshJBossNews");
 		toolBarManager.add(item);
 

@@ -291,8 +291,8 @@ public class JBossCentralEditor extends SharedHeaderFormEditor {
 		item = JBossCentralActivator.createContributionItem(getSite(), "org.jboss.tools.central.preferences");
 		toolbar.add(item);
 		
-		item = JBossCentralActivator.createContributionItem(getSite(), "org.jboss.tools.central.openJBossToolsTwitter");
-		toolbar.add(item);
+		//item = JBossCentralActivator.createContributionItem(getSite(), "org.jboss.tools.central.openJBossToolsTwitter");
+		//toolbar.add(item);
 		
 		toolbar.update(true);
 	}
