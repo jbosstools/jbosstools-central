@@ -23,4 +23,9 @@ public class OpenJBossToolsTwitterHandler extends OpenWithBrowserHandler {
 		return "http://twitter.com/#!/jbosstools";
 	}
 
+	@Override
+	public boolean asExternal() {
+		return true;
+	}
+
 }

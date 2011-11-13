@@ -214,15 +214,18 @@ public class JBossCentralActivator extends AbstractUIPlugin {
 		return prefs.getBoolean(SHOW_JBOSS_CENTRAL_ON_STARTUP, SHOW_JBOSS_CENTRAL_ON_STARTUP_DEFAULT_VALUE);
 	}
 	
-	
 	public static void openUrl(String location, Shell shell) {
+		openUrl(location, shell);
+	}
+	
+	public static void openUrl(String location, Shell shell, boolean asExternal) {
 		URL url = null;
 		try {
 			if (location != null) {
 				url = new URL(location);
 			}
 
-			if (WebBrowserPreference.getBrowserChoice() == WebBrowserPreference.EXTERNAL) {
+			if (WebBrowserPreference.getBrowserChoice() == WebBrowserPreference.EXTERNAL || asExternal) {
 				IWorkbenchBrowserSupport support = PlatformUI.getWorkbench()
 						.getBrowserSupport();
 				support.getExternalBrowser().openURL(url);

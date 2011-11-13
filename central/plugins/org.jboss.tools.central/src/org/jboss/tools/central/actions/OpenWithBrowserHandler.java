@@ -25,11 +25,15 @@ import org.jboss.tools.central.JBossCentralActivator;
 public abstract class OpenWithBrowserHandler extends AbstractHandler {
 
 	public Object execute(ExecutionEvent event) throws ExecutionException {
-		JBossCentralActivator.openUrl(getLocation(), getShell());
+		JBossCentralActivator.openUrl(getLocation(), getShell(), asExternal());
 		return null;
 	}
 
 	public abstract String getLocation();
+	
+	public boolean asExternal() {
+		return false;
+	}
 
 	private static Shell getShell() {
 		IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
