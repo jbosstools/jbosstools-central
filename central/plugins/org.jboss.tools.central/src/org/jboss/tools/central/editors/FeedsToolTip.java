@@ -14,6 +14,9 @@ package org.jboss.tools.central.editors;
 import org.eclipse.jface.window.ToolTip;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.browser.Browser;
+import org.eclipse.swt.browser.LocationAdapter;
+import org.eclipse.swt.browser.LocationEvent;
+import org.eclipse.swt.browser.LocationListener;
 import org.eclipse.swt.browser.OpenWindowListener;
 import org.eclipse.swt.browser.WindowEvent;
 import org.eclipse.swt.events.DisposeEvent;
@@ -35,6 +38,7 @@ import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.forms.widgets.FormText;
+import org.jboss.tools.central.JBossCentralActivator;
 
 /**
  * 
@@ -72,16 +76,29 @@ public class FeedsToolTip extends ToolTip {
 		GridData gd = new GridData(SWT.FILL, SWT.FILL, true, true);
 		parent.setLayoutData(gd);
 		
-		Browser browser;
+		Browser browser1;
 		try {
-			browser = new Browser(parent, SWT.NONE);
+			browser1 = new Browser(parent, SWT.NONE);
 		} catch (Exception e1) {
-			browser = new Browser(parent, SWT.WEBKIT);
+			browser1 = new Browser(parent, SWT.WEBKIT);
 		}
+		final Browser browser = browser1;
 		browser.setJavascriptEnabled(false);
+		browser.addLocationListener(new LocationAdapter() {
+			
+			@Override
+			public void changed(LocationEvent event) {
+				String location = event.location;
+				if (location != null && !location.startsWith("about:")) {
+					JBossCentralActivator.openUrl(location, Display.getCurrent().getActiveShell());
+					hide();
+				}
+			}
+		});
 		browser.addOpenWindowListener(new OpenWindowListener() {
 			public void open(WindowEvent event) {
 				event.required= true;
+				event.browser = browser;
 			}
 		});
 		gd = new GridData(SWT.FILL, SWT.FILL, true, true);
