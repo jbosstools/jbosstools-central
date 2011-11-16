@@ -215,7 +215,7 @@ public class JBossCentralActivator extends AbstractUIPlugin {
 	}
 	
 	public static void openUrl(String location, Shell shell) {
-		openUrl(location, shell);
+		openUrl(location, shell, false);
 	}
 	
 	public static void openUrl(String location, Shell shell, boolean asExternal) {
