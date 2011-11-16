@@ -54,6 +54,7 @@ import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
@@ -64,6 +65,9 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.INewWizard;
 import org.eclipse.ui.IWorkbenchWindow;
@@ -87,6 +91,7 @@ import org.eclipse.ui.forms.widgets.Section;
 import org.eclipse.ui.forms.widgets.TableWrapData;
 import org.eclipse.ui.forms.widgets.TableWrapLayout;
 import org.eclipse.ui.ide.IDEActionFactory;
+import org.eclipse.ui.internal.forms.widgets.FormFonts;
 import org.eclipse.ui.menus.CommandContributionItem;
 import org.eclipse.ui.part.PageBook;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
@@ -150,6 +155,7 @@ public class GettingStartedPage extends AbstractJBossCentralPage {
 	private Section settingsSection;
 	private Composite settingsComposite;
 	private Point oldSize;
+	private Font categoryFont;
 	
 	public GettingStartedPage(FormEditor editor) {
 		super(editor, ID, "Getting Started");
@@ -719,6 +725,10 @@ public class GettingStartedPage extends AbstractJBossCentralPage {
 			RefreshTutorialsJob.INSTANCE.removeJobChangeListener(refreshTutorialsJobChangeListener);
 			refreshTutorialsJobChangeListener = null;
 		}
+		if (categoryFont != null) {
+			categoryFont.dispose();
+			categoryFont = null;
+		}
 		super.dispose();
 	}
 
@@ -839,10 +849,15 @@ public class GettingStartedPage extends AbstractJBossCentralPage {
 			if (expandedCategories.contains(category)) {
 				style|=ExpandableComposite.EXPANDED;
 			}
-			final ExpandableComposite categoryComposite = toolkit.createExpandableComposite(tutorialsComposite, 
+			
+			final CategoryExpandableComposite categoryComposite = new CategoryExpandableComposite(tutorialsComposite, toolkit.getOrientation(),
 					style);
+			
+			categoryComposite.setFont(getBoldFont(categoryComposite.getFont()));
+			
 			categoryComposite.setTitleBarForeground(toolkit.getColors().getColor(IFormColors.TB_TOGGLE));
 			categoryComposite.setText(category.getName());
+			
 			GridData gd = new GridData(SWT.FILL, SWT.FILL, false, false);
 			categoryComposite.setLayoutData(gd);
 			categoryComposite.setLayout(new GridLayout());
@@ -872,6 +887,11 @@ public class GettingStartedPage extends AbstractJBossCentralPage {
 				hookTooltip(tutorialText, tutorial);
 			}
 			categoryComposite.setClient(composite);
+			String description = category.getDescription();
+			if (description != null && !description.isEmpty() && categoryComposite.getControl() != null) {
+				final ToolTip toolTip = new DescriptionToolTip(categoryComposite.getControl(), description);
+				toolTip.activate();	
+			}
 		}
 		
 		tutorialPageBook.showPage(tutorialsComposite);
@@ -880,6 +900,18 @@ public class GettingStartedPage extends AbstractJBossCentralPage {
 		//form.redraw();
 		resize();
 		//recomputeScrollComposite(tutorialScrollComposite, tutorialPageBook);
+	}
+
+	private Font getBoldFont(Font font) {
+		if (categoryFont != null) {
+			return categoryFont;
+		}
+		if (font == null || toolkit == null || toolkit.getColors() == null) {
+			return null;
+		}
+		categoryFont = FormFonts.getInstance().getBoldFont(toolkit.getColors().getDisplay(),
+				font);
+		return categoryFont;
 	}
 
 	private void hookTooltip(FormText tutorialText, Tutorial tutorial) {
@@ -1238,6 +1270,21 @@ public class GettingStartedPage extends AbstractJBossCentralPage {
 		@Override
 		public void sleeping(IJobChangeEvent event) {
 			
+		}
+		
+	}
+	
+	private class CategoryExpandableComposite extends ExpandableComposite {
+
+		public CategoryExpandableComposite(Composite parent, int style,
+				int expansionStyle) {
+			super(parent, style, expansionStyle);
+			setMenu(tutorialsComposite.getMenu());
+			toolkit.adapt(this, true, true);
+		}
+		
+		public Control getControl() {
+			return textLabel;
 		}
 		
 	}

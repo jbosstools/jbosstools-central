@@ -208,10 +208,12 @@
       <category 
       		id="org.jboss.tools.central.jbossas.quickstart"
       		name="JBoss AS 7 Quickstarts"
+      		description="These quickstarts are aimed to get you up to writing applications with minimal fuss. We recommend that you work through the quickstarts in the order they are presented in this guide, however if you have previous experience with Java EE 6, you may wish to skip some or all of the quickstarts."
       		priority="2" />
       <category 
       		id="org.jboss.tools.central.seam2"
       		name="Seam 2 Tutorials"
+      		description="These tutorials are intended to help you develop Seam 2 applications."
       		priority="5" />
       <tutorial
             id="org.jboss.tools.central.jbossas.quickstart.helloworld"

@@ -314,6 +314,7 @@ public class JBossCentralActivator extends AbstractUIPlugin {
 					if (CATEGORY.equals(configurationElement.getName())) {
 						String name = configurationElement.getAttribute(NAME);
 						String id = configurationElement.getAttribute(ID);
+						String description = configurationElement.getAttribute(DESCRIPTION);
 						String priorityString = configurationElement.getAttribute(PRIORITY);
 						int priority = Integer.MAX_VALUE;
 						if (priorityString != null) {
@@ -324,7 +325,7 @@ public class JBossCentralActivator extends AbstractUIPlugin {
 								log(e);
 							}
 						}
-						TutorialCategory category = new TutorialCategory(id, name, priority);
+						TutorialCategory category = new TutorialCategory(id, name, priority, description);
 						tutorialCategories.put(id, category);
 					}
 				}
