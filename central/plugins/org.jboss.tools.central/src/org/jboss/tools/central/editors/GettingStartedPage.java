@@ -725,10 +725,6 @@ public class GettingStartedPage extends AbstractJBossCentralPage {
 			RefreshTutorialsJob.INSTANCE.removeJobChangeListener(refreshTutorialsJobChangeListener);
 			refreshTutorialsJobChangeListener = null;
 		}
-		if (categoryFont != null) {
-			categoryFont.dispose();
-			categoryFont = null;
-		}
 		super.dispose();
 	}
 
