@@ -21,6 +21,7 @@ import org.junit.runners.Suite;
 
 @Suite.SuiteClasses({
 	//MavenProfileSelectionTest.class, FIXME enable tests for profiles
+	JBossPerspectiveTest.class,
 	CreateMavenizedSeamProjectTest.class,
 })
 @RunWith(Suite.class)
