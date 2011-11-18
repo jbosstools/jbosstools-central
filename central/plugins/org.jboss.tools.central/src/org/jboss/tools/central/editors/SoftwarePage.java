@@ -31,10 +31,13 @@ import org.eclipse.mylyn.internal.discovery.ui.DiscoveryUi;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ControlAdapter;
 import org.eclipse.swt.events.ControlEvent;
+import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.layout.RowLayout;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
@@ -60,6 +63,8 @@ import org.jboss.tools.central.jobs.RefreshDiscoveryJob;
 public class SoftwarePage extends AbstractJBossCentralPage implements IRunnableContext {
 
 	public static final String ID = ID_PREFIX + "SoftwarePage";
+
+	private static final String ICON_INSTALL = "/icons/repository-submit.gif";
 
 	private Dictionary<Object, Object> environment;
 	private ScrolledForm form;
@@ -150,14 +155,6 @@ public class SoftwarePage extends AbstractJBossCentralPage implements IRunnableC
 		}
 		gd = new GridData(SWT.FILL, SWT.FILL, true, true);
 		discoveryControl.setLayoutData(gd);
-		
-		discoveryViewer.addSelectionChangedListener(new ISelectionChangedListener() {
-			
-			@Override
-			public void selectionChanged(SelectionChangedEvent event) {
-				installAction.setEnabled(discoveryViewer.getInstallableConnectors().size() > 0);
-			}
-		});
 	    
 	    loadingComposite = createLoadingComposite(toolkit, pageBook);	    
 		
@@ -180,7 +177,29 @@ public class SoftwarePage extends AbstractJBossCentralPage implements IRunnableC
 			}
 	    });
 
-	    
+	    final Button installButton = toolkit.createButton(featureComposite, "Install", SWT.PUSH);
+	    installButton.setEnabled(false);
+	    installButton.setImage(JBossCentralActivator.getDefault().getImage(ICON_INSTALL));
+	    installButton.addSelectionListener(new SelectionListener() {
+			
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				installAction.run();
+			}
+			
+			@Override
+			public void widgetDefaultSelected(SelectionEvent e) {
+				
+			}
+		});
+	    discoveryViewer.addSelectionChangedListener(new ISelectionChangedListener() {
+			
+			@Override
+			public void selectionChanged(SelectionChangedEvent event) {
+				installAction.setEnabled(discoveryViewer.getInstallableConnectors().size() > 0);
+				installButton.setEnabled(discoveryViewer.getInstallableConnectors().size() > 0);
+			}
+		});
 		features.setClient(featureComposite);
 		showLoading();
 		pageBook.pack(true);
@@ -336,7 +355,7 @@ public class SoftwarePage extends AbstractJBossCentralPage implements IRunnableC
 	private class InstallAction extends Action {
 
 		public InstallAction() {
-			super("Install", JBossCentralActivator.imageDescriptorFromPlugin(JBossCentralActivator.PLUGIN_ID, "/icons/repository-submit.gif"));
+			super("Install", JBossCentralActivator.imageDescriptorFromPlugin(JBossCentralActivator.PLUGIN_ID, ICON_INSTALL));
 		}
 
 		@Override
