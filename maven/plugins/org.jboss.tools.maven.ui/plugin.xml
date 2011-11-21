@@ -221,4 +221,14 @@
  	 	         </newWizardShortcut>
  	 	</perspectiveExtension>
  	</extension>
+
+	<!-- TODO implement marker resolution as part of JBIDE-9921 	
+    <extension 
+        point="org.eclipse.ui.ide.markerResolution">
+        <markerResolutionGenerator
+            class="org.jboss.tools.maven.ui.internal.problems.MavenDependencyMarkerResolutionGenerator"
+            markerType="org.eclipse.m2e.core.maven2Problem.dependency">
+        </markerResolutionGenerator>
+    </extension>
+    --> 	
 </plugin>
