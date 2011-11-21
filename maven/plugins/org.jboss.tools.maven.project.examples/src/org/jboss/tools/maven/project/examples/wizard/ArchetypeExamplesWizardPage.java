@@ -196,7 +196,7 @@ public class ArchetypeExamplesWizardPage extends
 	private Artifact downloadArchetype(String groupId, String artifactId,
 			String version, ArtifactRepository archetypeRepository,
 			List<ArtifactRepository> repositories) throws CoreException {
-		long start = System.currentTimeMillis();
+		//long start = System.currentTimeMillis();
 		IMaven maven = MavenPlugin.getMaven();
 	    ArrayList<ArtifactRepository> repos = new ArrayList<ArtifactRepository>();
 	    if (archetypeRepository != null) {
@@ -206,8 +206,8 @@ public class ArchetypeExamplesWizardPage extends
 	    IProgressMonitor nullProgressMonitor = new NullProgressMonitor();
 	    maven.resolve(groupId, artifactId, version, "pom", null, repos, nullProgressMonitor); //$NON-NLS-1$
 	    Artifact a = maven.resolve(groupId, artifactId, version, "jar", null, repos, nullProgressMonitor); //$NON-NLS-1$
-	    long stop = System.currentTimeMillis();
-	    System.err.println("download took " + (stop-start) + " ms");
+	    //long stop = System.currentTimeMillis();
+	    //System.err.println("download took " + (stop-start) + " ms");
 	    return a;
 	}
 	
