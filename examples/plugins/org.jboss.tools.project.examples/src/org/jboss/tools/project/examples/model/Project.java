@@ -16,8 +16,6 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.eclipse.core.runtime.IPath;
-import org.eclipse.core.runtime.Path;
 import org.jboss.tools.project.examples.ProjectExamplesActivator;
 
 /**
@@ -46,6 +44,7 @@ public class Project implements ProjectModelElement {
 	private ArchetypeModel  archetypeModel = new ArchetypeModel();
 	private File file;
 	private IProjectExampleSite site;
+	private String defaultProfiles ="";
 	
 	public Project() {
 		name=""; //$NON-NLS-1$
@@ -253,4 +252,13 @@ public class Project implements ProjectModelElement {
 	public void setFile(File file) {
 		this.file = file;
 	}
+	
+	public String getDefaultProfiles() {
+		return defaultProfiles;
+	}
+
+	public void setDefaultProfiles(String defaultProfiles) {
+		this.defaultProfiles = defaultProfiles;
+	}
+
 }

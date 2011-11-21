@@ -99,6 +99,7 @@ public class ArchetypeExamplesWizard extends Wizard implements INewWizard {
 		} catch (InterruptedException e) {
 			return false;
 		} catch (InvocationTargetException e) {
+			
 			return false;
 		}
 
@@ -109,6 +110,10 @@ public class ArchetypeExamplesWizard extends Wizard implements INewWizard {
 	
 	public void addPages() {
 	    configuration = new ProjectImportConfiguration();
+	    String profiles = projectDescription.getDefaultProfiles();
+	    if (profiles != null && profiles.trim().length() > 0) {
+	    	configuration.getResolverConfiguration().setActiveProfiles(profiles);
+	    }
 	    wizardPage = new ArchetypeExamplesWizardPage(configuration, projectDescription);
 	    addPage(wizardPage);
 	}

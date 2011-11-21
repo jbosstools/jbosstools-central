@@ -124,11 +124,11 @@ public class ImportMavenProjectExample extends AbstractImportProjectExample {
 			return projects;
 		}
 		
-		importMavenProjects(destination);
+		importMavenProjects(destination, projectDescription);
 		return projects;
 	}
 
-	private void importMavenProjects(final File destination) {
+	private void importMavenProjects(final File destination, final Project projectDescription) {
 		Job job = new ProjectExamplesJob("Importing Maven projects") {
 			public IStatus runInWorkspace(IProgressMonitor monitor) {
 				setProperty(IProgressConstants.ACTION_PROPERTY,
@@ -144,7 +144,11 @@ public class ImportMavenProjectExample extends AbstractImportProjectExample {
 					addMavenProjects(infos, mavenProjects);
 					final List<IProject> existingProjects = new ArrayList<IProject>();
 					ProjectImportConfiguration importConfiguration = new ProjectImportConfiguration();
-					for(MavenProjectInfo info:infos) {
+				    String profiles = projectDescription.getDefaultProfiles();
+				    if (profiles != null && profiles.trim().length() > 0) {
+				    	importConfiguration.getResolverConfiguration().setActiveProfiles(profiles);
+				    }
+				    for(MavenProjectInfo info:infos) {
 						String projectName = getProjectName(info, importConfiguration);
 						IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject(projectName);
 						if (project != null && project.exists()) {
@@ -175,7 +179,7 @@ public class ImportMavenProjectExample extends AbstractImportProjectExample {
 							return Status.CANCEL_STATUS;
 						}
 					}
-					plugin.getProjectConfigurationManager().importProjects(
+					MavenPlugin.getProjectConfigurationManager().importProjects(
 							infos, importConfiguration, monitor);
 				} catch (CoreException ex) {
 					MavenProjectExamplesActivator.log(ex, "Projects imported with errors");

@@ -264,7 +264,7 @@ public class ProjectUtil {
 									parseFixes(project, child);
 								}
 								
-								if (nodeName.equals("category")) { //$NON-NLS-1$
+								else if (nodeName.equals("category")) { //$NON-NLS-1$
 									String value = getContent(child);
 									boolean found = false;
 									for (Category cat : list) {
@@ -281,29 +281,29 @@ public class ProjectUtil {
 									}
 									project.setCategory(category);
 								}
-								if (nodeName.equals(NAME)) { 
+								else if (nodeName.equals(NAME)) { 
 									project.setName(getContent(child));
 								}
-								if (nodeName.equals("shortDescription")) { //$NON-NLS-1$
+								else if (nodeName.equals("shortDescription")) { //$NON-NLS-1$
 									project
 											.setShortDescription(getContent(child));
 								}
-								if (nodeName.equals("description")) { //$NON-NLS-1$
+								else if (nodeName.equals("description")) { //$NON-NLS-1$
 									project.setDescription(getContent(child));
 								}
-								if (nodeName.equals(URL)) { 
+								else if (nodeName.equals(URL)) { 
 									project.setUrl(getContent(child));
 								}
-								if (nodeName.equals("perspectiveId")) {  //$NON-NLS-1$
+								else if (nodeName.equals("perspectiveId")) {  //$NON-NLS-1$
 									project.setPerspectiveId(getContent(child));
 								}
-								if (nodeName.equals("importType")) {  //$NON-NLS-1$
+								else if (nodeName.equals("importType")) {  //$NON-NLS-1$
 									project.setImportType(getContent(child));
 								}
-								if (nodeName.equals("importTypeDescription")) {  //$NON-NLS-1$
+								else if (nodeName.equals("importTypeDescription")) {  //$NON-NLS-1$
 									project.setImportTypeDescription(getContent(child));
 								}
-								if (nodeName.equals("size")) { //$NON-NLS-1$
+								else if (nodeName.equals("size")) { //$NON-NLS-1$
 									long size = 0;
 									try {
 										size = new Long(getContent(child));
@@ -311,7 +311,7 @@ public class ProjectUtil {
 									}
 									project.setSize(size);
 								}
-								if (nodeName.equals("included-projects")) { //$NON-NLS-1$
+								else if (nodeName.equals("included-projects")) { //$NON-NLS-1$
 									String includedProjects = getContent(child);
 									if (includedProjects != null) {
 										includedProjects = includedProjects
@@ -325,7 +325,10 @@ public class ProjectUtil {
 										project.setIncludedProjects(projectList);
 									}
 								}
-								if (nodeName.equals("welcome")) { //$NON-NLS-1$
+								else if (nodeName.equals("defaultMavenProfiles")) {  //$NON-NLS-1$
+									project.setDefaultProfiles(getContent(child));
+								}
+								else if (nodeName.equals("welcome")) { //$NON-NLS-1$
 									project.setWelcome(true);
 									String attribute = child.getAttribute("type"); //$NON-NLS-1$
 									if (attribute != null && CHEATSHEETS.equals(attribute.trim())) {
@@ -341,7 +344,7 @@ public class ProjectUtil {
 										project.setWelcomeURL(attribute.trim());
 									}
 								}
-								if (nodeName.equals("mavenArchetype")) {  //$NON-NLS-1$
+								else if (nodeName.equals("mavenArchetype")) {  //$NON-NLS-1$
 									parseMavenArchetype(project, child);
 								}
 							}

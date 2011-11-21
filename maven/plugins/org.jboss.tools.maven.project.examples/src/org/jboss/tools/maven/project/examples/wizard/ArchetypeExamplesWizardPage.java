@@ -63,6 +63,7 @@ public class ArchetypeExamplesWizardPage extends
 
 	@Override
 	public void createControl(Composite parent) {
+		long start = System.currentTimeMillis();
 		super.createControl(parent);
 		Archetype archetype = new Archetype();
 		ArchetypeModel archetypeModel = projectDescription.getArchetypeModel();
@@ -113,6 +114,9 @@ public class ArchetypeExamplesWizardPage extends
 		groupIdCombo.setText(groupId);
 		versionCombo.setText(version);
 		packageCombo.setText(javaPackage);
+		
+	    long stop = System.currentTimeMillis();
+	    System.err.println("Create controls took " + (stop-start) + " ms");
 	}
 
 	public Archetype getArchetype() {
@@ -160,10 +164,12 @@ public class ArchetypeExamplesWizardPage extends
 	            }
 	          } catch(UnknownArchetype e) {
 	        	 MavenProjectExamplesActivator.log(e);
-	        	  //TODO don't swallow exceptions
+	        	 e.printStackTrace();
+	        	 //TODO don't swallow exceptions
 	          } catch(CoreException ex) {
 	        	  //TODO don't swallow exceptions
 	        	 MavenProjectExamplesActivator.log(ex);
+	        	 ex.printStackTrace();
 	          } finally {
 	            monitor.done();
 	          }
@@ -190,7 +196,7 @@ public class ArchetypeExamplesWizardPage extends
 	private Artifact downloadArchetype(String groupId, String artifactId,
 			String version, ArtifactRepository archetypeRepository,
 			List<ArtifactRepository> repositories) throws CoreException {
-
+		long start = System.currentTimeMillis();
 		IMaven maven = MavenPlugin.getMaven();
 	    ArrayList<ArtifactRepository> repos = new ArrayList<ArtifactRepository>();
 	    if (archetypeRepository != null) {
@@ -199,7 +205,10 @@ public class ArchetypeExamplesWizardPage extends
 	    repos.addAll(maven.getArtifactRepositories()); // see org.apache.maven.archetype.downloader.DefaultDownloader#download    
 	    IProgressMonitor nullProgressMonitor = new NullProgressMonitor();
 	    maven.resolve(groupId, artifactId, version, "pom", null, repos, nullProgressMonitor); //$NON-NLS-1$
-	    return maven.resolve(groupId, artifactId, version, "jar", null, repos, nullProgressMonitor); //$NON-NLS-1$
+	    Artifact a = maven.resolve(groupId, artifactId, version, "jar", null, repos, nullProgressMonitor); //$NON-NLS-1$
+	    long stop = System.currentTimeMillis();
+	    System.err.println("download took " + (stop-start) + " ms");
+	    return a;
 	}
 	
 }
