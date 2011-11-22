@@ -197,12 +197,13 @@ public class ECFExamplesTransport {
 	 * destination stream will be closed by this method whether it succeeds
 	 * to download or not.
 	 */
-	public IStatus download(String name,String url, OutputStream destination, IProgressMonitor monitor) {
+	public IStatus download(String name, String url, OutputStream destination, IProgressMonitor monitor) {
+		IStatus status = null;
 		try {
 			IConnectContext context = getConnectionContext(url, false);
 			for (int i = 0; i < LOGIN_RETRIES; i++) {
 				try {
-					IStatus status = performDownload(name,url, destination, context, monitor);
+					status = performDownload(name,url, destination, context, monitor);
 					if (status.isOK()) {
 						return status;
 					} else {
@@ -231,6 +232,9 @@ public class ECFExamplesTransport {
 			}
 		}
 		//reached maximum number of retries without success
+		if (status != null) {
+			return status;
+		}
 		return new Status(IStatus.ERROR, ProjectExamplesActivator.PLUGIN_ID,  Messages.ECFExamplesTransport_IO_error, null);
 	}
 

@@ -38,10 +38,12 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExtension;
 import org.eclipse.core.runtime.IExtensionPoint;
 import org.eclipse.core.runtime.IExtensionRegistry;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
@@ -504,8 +506,24 @@ public class ProjectUtil {
 				if (monitor.isCanceled()) {
 					return null;
 				}
-				file = File.createTempFile(prefix, suffix);
-				file.deleteOnExit();
+				long urlModified = -1;
+				file = getFile(url);
+				try {
+					urlModified = ECFExamplesTransport.getInstance().getLastModified(url);
+				} catch (CoreException e) {
+					if (file.exists()) {
+						return file;
+					}
+				}
+				if (file.exists()) {
+					long modified = file.lastModified();
+					if (urlModified == modified) {
+						return file;
+					}
+				}
+				//file = File.createTempFile(prefix, suffix);
+				//file.deleteOnExit();
+				file.getParentFile().mkdirs();
 				if (monitor.isCanceled()) {
 					return null;
 				}
@@ -519,15 +537,24 @@ public class ProjectUtil {
 				if (!result.isOK()) {
 					ProjectExamplesActivator.getDefault().getLog().log(result);
 					return null;
+				} else {
+					if (file.exists()) {
+						file.setLastModified(urlModified);
+					}
 				}
 			} catch (FileNotFoundException e) {
 				ProjectExamplesActivator.log(e);
 				return null;
-			} catch (IOException e) {
-				ProjectExamplesActivator.log(e);
-				return null;
-			}
+			} 
 		}
+		return file;
+	}
+
+	private static File getFile(java.net.URL url2) {
+		IPath location = ProjectExamplesActivator.getDefault().getStateLocation();
+		File root = location.toFile();
+		String urlFile = url2.getFile();
+		File file = new File(root, urlFile);
 		return file;
 	}
 
