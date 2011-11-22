@@ -132,6 +132,14 @@
             name="WTP Runtime Preferences"
             id="org.jboss.tools.wtp.runtime.preferences">
       </command>
+      <command
+      		name="Warning"
+            id="org.jboss.tools.central.newsWarning">
+      </command>
+      <command
+      		name="Warning"
+            id="org.jboss.tools.central.blogsWarning">
+      </command>
       
    </extension>
    

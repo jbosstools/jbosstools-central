@@ -34,6 +34,8 @@ import org.eclipse.core.runtime.jobs.IJobChangeEvent;
 import org.eclipse.core.runtime.jobs.IJobChangeListener;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
+import org.eclipse.jface.action.Action;
+import org.eclipse.jface.action.IContributionItem;
 import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.layout.GridDataFactory;
@@ -65,9 +67,6 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Event;
-import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.INewWizard;
 import org.eclipse.ui.IWorkbenchWindow;
@@ -97,6 +96,7 @@ import org.eclipse.ui.part.PageBook;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.jboss.tools.central.JBossCentralActivator;
 import org.jboss.tools.central.dialogs.ProjectExamplesDialog;
+import org.jboss.tools.central.jobs.AbstractRefreshJob;
 import org.jboss.tools.central.jobs.RefreshBlogsJob;
 import org.jboss.tools.central.jobs.RefreshNewsJob;
 import org.jboss.tools.central.jobs.RefreshTutorialsJob;
@@ -115,6 +115,9 @@ import org.osgi.framework.Bundle;
  */
 public class GettingStartedPage extends AbstractJBossCentralPage {
 
+	private static final String NEWS_WARNING_ID = "org.jboss.tools.central.newsWarning";
+	private static final String BLOGS_WARNING_ID = "org.jboss.tools.central.blogsWarning";
+	
 	private static final String CLASS_ATTRIBUTE = "class";
 	public static final String ID = ID_PREFIX + "GettingStartedPage";
 	
@@ -156,6 +159,10 @@ public class GettingStartedPage extends AbstractJBossCentralPage {
 	private Composite settingsComposite;
 	private Point oldSize;
 	private Font categoryFont;
+	private Action newsWarning;
+	private ToolBarManager newsToolBarManager;
+	private ToolBarManager blogsToolBarManager;
+	private Action blogsWarning;
 	
 	public GettingStartedPage(FormEditor editor) {
 		super(editor, ID, "Getting Started");
@@ -250,10 +257,16 @@ public class GettingStartedPage extends AbstractJBossCentralPage {
 		});
 		showLoading(blogsPageBook, blogsLoadingComposite, blogsScrollComposite);
 		blogsPageBook.pack(true);
-		RefreshBlogsJob refreshBlogsJob = RefreshBlogsJob.INSTANCE;
+		RefreshBlogsJob job = RefreshBlogsJob.INSTANCE;
+		job.setException(null);
+		if (job.getEntries().size() > 0) {
+			job.setNeedsRefresh(true);
+			refreshBlogs();
+			job.setNeedsRefresh(false);
+		}
 		refreshBlogsJobChangeListener = new RefreshBlogsJobChangeListener();
-		refreshBlogsJob.addJobChangeListener(refreshBlogsJobChangeListener);
-		refreshBlogsJob.schedule();
+		job.addJobChangeListener(refreshBlogsJobChangeListener);
+		job.schedule();
 	}
 	
 	private void createNewsSection(FormToolkit toolkit, Composite parent) {
@@ -297,10 +310,16 @@ public class GettingStartedPage extends AbstractJBossCentralPage {
 		});
 		showLoading(newsPageBook, newsLoadingComposite, newsScrollComposite);
 		newsPageBook.pack(true);
-		RefreshNewsJob refreshNewsJob = RefreshNewsJob.INSTANCE;
+		AbstractRefreshJob job = RefreshNewsJob.INSTANCE;
+		job.setException(null);
+		if (job.getEntries().size() > 0) {
+			job.setNeedsRefresh(true);
+			refreshNews();
+			job.setNeedsRefresh(false);
+		}
 		refreshNewsJobChangeListener = new RefreshNewsJobChangeListener();
-		refreshNewsJob.addJobChangeListener(refreshNewsJobChangeListener);
-		refreshNewsJob.schedule();
+		job.addJobChangeListener(refreshNewsJobChangeListener);
+		job.schedule();
 	}
 
 
@@ -349,16 +368,27 @@ public class GettingStartedPage extends AbstractJBossCentralPage {
 	    headerComposite.setLayout(rowLayout);
 	    headerComposite.setBackground(null);
 	    
-	    ToolBarManager toolBarManager = new ToolBarManager(SWT.FLAT | SWT.HORIZONTAL);
-		toolBarManager.createControl(headerComposite);
+	    
+	    blogsToolBarManager = new ToolBarManager(SWT.FLAT | SWT.HORIZONTAL);
+		blogsToolBarManager.createControl(headerComposite);
+		
+		blogsWarning = new Action("Warning", JBossCentralActivator.getImageDescriptor("/icons/nwarning.gif")) {
+			
+		};
+		blogsWarning.setId(BLOGS_WARNING_ID);
+		blogsWarning.setActionDefinitionId(BLOGS_WARNING_ID);
+		//blogsWarning.setEnabled(false);
+		blogsToolBarManager.add(blogsWarning);
+		
+		setItemVisible(blogsToolBarManager, BLOGS_WARNING_ID, false);
 		
 		CommandContributionItem item = JBossCentralActivator.createContributionItem(getSite(), "org.jboss.tools.central.openJBossBlogs");
-		toolBarManager.add(item);
+		blogsToolBarManager.add(item);
 		
 		item = JBossCentralActivator.createContributionItem(getSite(), "org.jboss.tools.central.refreshJBossBlogs");
-		toolBarManager.add(item);
+		blogsToolBarManager.add(item);
 
-	    toolBarManager.update(true);
+	    blogsToolBarManager.update(true);
 	    
 		section.setTextClient(headerComposite);
 	}
@@ -371,21 +401,40 @@ public class GettingStartedPage extends AbstractJBossCentralPage {
 	    headerComposite.setLayout(rowLayout);
 	    headerComposite.setBackground(null);
 	    
-	    ToolBarManager toolBarManager = new ToolBarManager(SWT.FLAT | SWT.HORIZONTAL);
-		toolBarManager.createControl(headerComposite);
+	    newsToolBarManager = new ToolBarManager(SWT.FLAT | SWT.HORIZONTAL);
+		newsToolBarManager.createControl(headerComposite);
+		
+		newsWarning = new Action("Warning", JBossCentralActivator.getImageDescriptor("/icons/nwarning.gif")) {
+			
+		};
+		newsWarning.setId(NEWS_WARNING_ID);
+		newsWarning.setActionDefinitionId(NEWS_WARNING_ID);
+		//newsWarning.setEnabled(false);
+		newsToolBarManager.add(newsWarning);
+		
+		setItemVisible(newsToolBarManager, NEWS_WARNING_ID, false);
 		
 		CommandContributionItem item = JBossCentralActivator.createContributionItem(getSite(), "org.jboss.tools.central.openJBossNews");
-		toolBarManager.add(item);
+		newsToolBarManager.add(item);
 		
 		item = JBossCentralActivator.createContributionItem(getSite(), "org.jboss.tools.central.openJBossToolsTwitter");
-		toolBarManager.add(item);
+		newsToolBarManager.add(item);
 		
 		item = JBossCentralActivator.createContributionItem(getSite(), "org.jboss.tools.central.refreshJBossNews");
-		toolBarManager.add(item);
+		newsToolBarManager.add(item);
 
-	    toolBarManager.update(true);
+	    newsToolBarManager.update(true);
 	    
 		section.setTextClient(headerComposite);
+	}
+
+	protected void setItemVisible(ToolBarManager toolBarManager, String id, boolean value) {
+		IContributionItem[] items = toolBarManager.getItems();
+		for (IContributionItem item:items)  {
+			if (id.equals(item.getId())) {
+				item.setVisible(value);
+			}
+		}
 	}
 
 	
@@ -773,7 +822,7 @@ public class GettingStartedPage extends AbstractJBossCentralPage {
 		});
 	}
 	
-	private void showException(PageBook pageBook, FormText exceptionText, Exception e) {
+	private void showException(PageBook pageBook, FormText exceptionText, Throwable e) {
 		JBossCentralActivator.log(e);
 		String message = StringEscapeUtils.escapeXml(e.getMessage());
 		String text = JBossCentralActivator.FORM_START_TAG +
@@ -790,33 +839,41 @@ public class GettingStartedPage extends AbstractJBossCentralPage {
 		RefreshBlogsJob job = RefreshBlogsJob.INSTANCE;
 		if (job.getState() == Job.NONE) {
 			if (job.getException() != null) {
-				showException(blogsPageBook, blogsExceptionText,
-						job.getException());
-				return;
+				if (job.getEntries().size() <= 0) {
+					showException(blogsPageBook, blogsExceptionText,
+							job.getException());
+					return;
+				}
 			}
 			List<FeedsEntry> entries = job.getEntries();
 			if (entries == null || entries.size() == 0) {
 				showNote(blogsPageBook, blogsNoteText, blogsScrollComposite);
 				return;
 			}
-			showEntries(entries, blogsComposite, blogsPageBook, blogsScrollComposite);
+			if (job.needsRefresh()) {
+				showEntries(entries, blogsComposite, blogsPageBook, blogsScrollComposite);
+			}
 		}
 	}
 	
 	public void refreshNews() {
-		RefreshNewsJob job = RefreshNewsJob.INSTANCE;
+		AbstractRefreshJob job = RefreshNewsJob.INSTANCE;
 		if (job.getState() == Job.NONE) {
 			if (job.getException() != null) {
-				showException(newsPageBook, newsExceptionText,
+				if (job.getEntries().size() <= 0) {
+					showException(newsPageBook, newsExceptionText,
 						job.getException());
-				return;
+					return;
+				}
 			}
 			List<FeedsEntry> entries = job.getEntries();
-			if (entries == null || entries.size() == 0) {
+			if (entries.size() == 0) {
 				showNote(newsPageBook, newsNoteText, newsScrollComposite);
 				return;
 			}
-			showEntries(entries, newsComposite, newsPageBook, newsScrollComposite);
+			if (job.needsRefresh()) {
+				showEntries(entries, newsComposite, newsPageBook, newsScrollComposite);
+			}
 		}
 	}
 	
@@ -1053,6 +1110,9 @@ public class GettingStartedPage extends AbstractJBossCentralPage {
 	}
 	
 	protected void resize(boolean force) {
+		if (blogsSection == null) {
+			return;
+		}
 		Point size;
 		//if (Platform.OS_MACOSX.equals(Platform.getOS())) {
 			size = form.getSize();
@@ -1161,6 +1221,15 @@ public class GettingStartedPage extends AbstractJBossCentralPage {
 				public void run() {
 					setBusyIndicator(blogsLoadingComposite, false);
 					refreshBlogs();
+					setItemVisible(blogsToolBarManager, BLOGS_WARNING_ID, false);
+					RefreshBlogsJob job = RefreshBlogsJob.INSTANCE;
+					if (job.getEntries().size() > 0 && job.getException() != null) {
+						String tooltip = job.getException().getClass().getName() + ": " + job.getException().getLocalizedMessage();
+						blogsWarning.setToolTipText(tooltip);
+						setItemVisible(blogsToolBarManager, BLOGS_WARNING_ID, true);
+					} 
+					blogsToolBarManager.update(true);
+					blogsSection.layout(true, true);
 				}
 			});
 			
@@ -1173,8 +1242,9 @@ public class GettingStartedPage extends AbstractJBossCentralPage {
 
 		@Override
 		public void scheduled(IJobChangeEvent event) {
-			RefreshBlogsJob.INSTANCE.setException(null);
-			showLoading(blogsPageBook, blogsLoadingComposite, blogsScrollComposite);
+			if (RefreshBlogsJob.INSTANCE.getEntries().size() <= 0) {
+				showLoading(blogsPageBook, blogsLoadingComposite, blogsScrollComposite);
+			}
 		}
 
 		@Override
@@ -1247,6 +1317,15 @@ public class GettingStartedPage extends AbstractJBossCentralPage {
 				public void run() {
 					setBusyIndicator(newsLoadingComposite, false);
 					refreshNews();
+					setItemVisible(newsToolBarManager, NEWS_WARNING_ID, false);
+					RefreshNewsJob job = RefreshNewsJob.INSTANCE;
+					if (job.getEntries().size() > 0 && job.getException() != null) {
+						String tooltip = job.getException().getClass().getName() + ": " + job.getException().getLocalizedMessage(); 
+						newsWarning.setToolTipText(tooltip);
+						setItemVisible(newsToolBarManager, NEWS_WARNING_ID, true);
+					} 
+					newsToolBarManager.update(true);
+					newsSection.layout(true, true);
 				}
 			});
 			
@@ -1259,8 +1338,9 @@ public class GettingStartedPage extends AbstractJBossCentralPage {
 
 		@Override
 		public void scheduled(IJobChangeEvent event) {
-			RefreshNewsJob.INSTANCE.setException(null);
-			showLoading(newsPageBook, newsLoadingComposite, newsScrollComposite);
+			if (RefreshNewsJob.INSTANCE.getEntries().size() <= 0) {
+				showLoading(newsPageBook, newsLoadingComposite, newsScrollComposite);
+			}
 		}
 
 		@Override

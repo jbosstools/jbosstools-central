@@ -14,6 +14,8 @@ package org.jboss.tools.central.actions;
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
+import org.eclipse.core.runtime.jobs.IJobChangeEvent;
+import org.eclipse.core.runtime.jobs.IJobChangeListener;
 import org.eclipse.core.runtime.jobs.Job;
 import org.jboss.tools.central.jobs.RefreshBlogsJob;
 
@@ -27,7 +29,39 @@ public class RefreshJBossBlogsHandler extends AbstractHandler {
 	@Override
 	public Object execute(ExecutionEvent event) throws ExecutionException {
 		if (RefreshBlogsJob.INSTANCE.getState() == Job.NONE) {
-			RefreshBlogsJob.INSTANCE.schedule();
+			final RefreshBlogsJob job = RefreshBlogsJob.INSTANCE;
+			job.setForcedDownload(true);
+			job.setException(null);
+			job.setNeedsRefresh(true);
+			job.addJobChangeListener(new IJobChangeListener() {
+				
+				@Override
+				public void sleeping(IJobChangeEvent event) {
+				}
+				
+				@Override
+				public void scheduled(IJobChangeEvent event) {
+				}
+				
+				@Override
+				public void running(IJobChangeEvent event) {
+				}
+				
+				@Override
+				public void done(IJobChangeEvent event) {
+					job.setForcedDownload(false);
+					job.removeJobChangeListener(this);
+				}
+				
+				@Override
+				public void awake(IJobChangeEvent event) {
+				}
+				
+				@Override
+				public void aboutToRun(IJobChangeEvent event) {
+				}
+			});
+			job.schedule();
 		}
 		return null;
 	}
