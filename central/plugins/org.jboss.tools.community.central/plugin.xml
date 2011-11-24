@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="org.jboss.tools.central.tutorials">
+      <category 
+      		id="org.jboss.tools.central.javaee6.quickstart"
+      		name="Java EE 6 Template Projects"
+      		priority="1" />
+      <category 
+      		id="org.jboss.tools.central.jbossas.quickstart"
+      		name="JBoss AS 7 Quickstarts"
+      		description="These quickstarts are aimed to get you up to writing applications with minimal fuss. We recommend that you work through the quickstarts in the order they are presented in this guide, however if you have previous experience with Java EE 6, you may wish to skip some or all of the quickstarts."
+      		priority="2" />
+      <!--
+      <category 
+      		id="org.jboss.tools.central.seam2"
+      		name="Seam 2 Tutorials"
+      		description="These tutorials are intended to help you develop Seam 2 applications."
+      		priority="5" />
+      -->
+      <tutorial
+            id="org.jboss.tools.central.jbossas.quickstart.helloworld"
+            categoryId="org.jboss.tools.central.jbossas.quickstart"
+            name="Helloworld quickstart"
+            type="projectExample"
+            priority="1"
+            icon="icons/jbossas7.png"
+            reference="JBoss AS 7 Quickstarts::helloworld"/>
+      <tutorial
+            id="org.jboss.tools.central.jbossas.quickstart.numberguess"
+            categoryId="org.jboss.tools.central.jbossas.quickstart"
+            name="Numberguess quickstart"
+            type="projectExample"
+            priority="2"
+            icon="icons/jbossas7.png"
+            reference="JBoss AS 7 Quickstarts::numberguess"/>
+      
+      <tutorial
+            id="org.jboss.tools.central.jbossas.quickstart.login"
+            categoryId="org.jboss.tools.central.jbossas.quickstart"
+            name="Login quickstart"
+            type="projectExample"
+            priority="3"
+            icon="icons/jbossas7.png"
+            reference="JBoss AS 7 Quickstarts::login"/>
+      
+      <tutorial
+            id="org.jboss.tools.central.jbossas.quickstart.kitchensink"
+            categoryId="org.jboss.tools.central.jbossas.quickstart"
+            name="Kitchensink quickstart"
+            type="projectExample"
+            priority="4"
+            icon="icons/jbossas7.png"
+            reference="JBoss AS 7 Quickstarts::kitchensink"/>
+      
+      <tutorial
+            id="org.jboss.tools.central.jbossas.quickstart.jbossJavaee6Webapp"
+            categoryId="org.jboss.tools.central.javaee6.quickstart"
+            name="Java EE 6 WAR"
+            type="projectExample"
+            priority="1"
+            icon="icons/jbossas7.png"
+            reference="Java EE 6 Quickstarts::jboss-javaee6-webapp"/>
+
+      <tutorial
+            id="org.jboss.tools.central.jbossas.quickstart.jbossJavaee6Ear"
+            categoryId="org.jboss.tools.central.javaee6.quickstart"
+            name="Java EE 6 EAR"
+            type="projectExample"
+            priority="2"
+            icon="icons/jbossas7.png"
+            reference="Java EE 6 Quickstarts::multi-javaee6-archetype"/>
+
+      <tutorial
+            id="org.jboss.tools.central.jbossas.quickstart.jbossJavaee6Poh5"
+            categoryId="org.jboss.tools.central.javaee6.quickstart"
+            name="HTML5 Project"
+            type="projectExample"
+            priority="3"
+            icon="icons/jbossas7.png"
+            reference="Java EE 6 Quickstarts::jboss-javaee6-poh5-archetype"/>
+
+      <tutorial
+            id="org.jboss.tools.central.jbossas.quickstart.jbossJavaee6SpringMvc"
+            categoryId="org.jboss.tools.central.javaee6.quickstart"
+            name="Spring MVC"
+            type="projectExample"
+            priority="4"
+            icon="icons/jbossas7.png"
+            reference="Java EE 6 Quickstarts::spring-mvc-webapp"/>
+                  
+      <tutorial
+            id="org.jboss.tools.central.jbossas.quickstart.jbossJavaee6Richfaces"
+            categoryId="org.jboss.tools.central.javaee6.quickstart"
+            name="Richfaces Project"
+            type="projectExample"
+            priority="5"
+            icon="icons/jbossas7.png"
+            reference="Java EE 6 Quickstarts::richfaces-archetype-simpleapp"/>
+      <!--                              
+      <tutorial
+            id="org.jboss.tools.central.Seam.registration2"
+            categoryId="org.jboss.tools.central.seam2"
+            name="Registration Example"
+            type="projectExample"
+            priority="1"
+            icon="icons/seam16.png"
+            reference="Seam::registration2"/>
+      <tutorial
+            id="org.jboss.tools.central.Seam.messages"
+            categoryId="org.jboss.tools.central.seam2"
+            name="Message Example"
+            type="projectExample"
+            priority="2"
+            icon="icons/seam16.png"
+            reference="Seam::messages"/>
+      <tutorial
+            id="org.jboss.tools.central.Seam.todo"
+            categoryId="org.jboss.tools.central.seam2"
+            name="Todo Example"
+            type="projectExample"
+            priority="3"
+            icon="icons/seam16.png"
+            reference="Seam::todo"/>
+      <tutorial
+            id="org.jboss.tools.central.Seam.numberguess"
+            categoryId="org.jboss.tools.central.seam2"
+            name="Numberguess Example"
+            type="projectExample"
+            priority="4"
+            icon="icons/seam16.png"
+            reference="Seam::numberguess"/>
+      <tutorial
+            id="org.jboss.tools.central.Seam.booking22"
+            categoryId="org.jboss.tools.central.seam2"
+            name="Boooking Example"
+            type="projectExample"
+            priority="5"
+            icon="icons/seam16.png"
+            reference="Seam::booking22"/>
+      --> 
+   </extension>
+</plugin>
