@@ -128,7 +128,7 @@ public class SoftwarePage extends AbstractJBossCentralPage implements IRunnableC
 	    discoveryViewer = new DiscoveryViewer(getSite(), this);
 	    discoveryViewer.setShowConnectorDescriptorKindFilter(false);
 	    discoveryViewer.setShowInstalledFilterEnabled(true);
-		discoveryViewer.setDirectoryUrl(JBossCentralActivator.getJBossDiscoveryDirectory());
+		discoveryViewer.setDirectoryUrl(JBossCentralActivator.getDefault().getJBossDiscoveryDirectory());
 		discoveryViewer.createControl(pageBook);
 		discoveryViewer.setEnvironment(getEnvironment());
 		discoveryViewer.addFilter(new ViewerFilter() {

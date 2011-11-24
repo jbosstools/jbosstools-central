@@ -27,7 +27,7 @@ public class RefreshNewsJob extends AbstractRefreshJob {
 
 	
 	private RefreshNewsJob() {
-		super("Refreshing JBoss News...", JBossCentralActivator.NEWS_URL);
+		super("Refreshing JBoss News...", JBossCentralActivator.getDefault().getConfigurator().getNewsUrl());
 	}
 
 	@Override

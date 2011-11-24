@@ -121,13 +121,16 @@ public class JBossCentralEditor extends SharedHeaderFormEditor {
 			}
 			setPageImage(index, gettingStartedImage);
 			
-			softwarePage = new SoftwarePage(this);
-			index = addPage(softwarePage);
-			if (softwareImage == null) {
-				softwareImage = JBossCentralActivator.getImageDescriptor("/icons/software.png").createImage();
+			if (JBossCentralActivator.getDefault().getConfigurator()
+					.getJBossDiscoveryDirectory() != null) {
+				softwarePage = new SoftwarePage(this);
+				index = addPage(softwarePage);
+				if (softwareImage == null) {
+					softwareImage = JBossCentralActivator.getImageDescriptor(
+							"/icons/software.png").createImage();
+				}
+				setPageImage(index, softwareImage);
 			}
-			setPageImage(index, softwareImage);
-			
 		} catch (PartInitException e) {
 			JBossCentralActivator.log(e, "Error adding page");
 		}
@@ -151,22 +154,6 @@ public class JBossCentralEditor extends SharedHeaderFormEditor {
 		headerComposite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
 		headerComposite.setLayout(new GridLayout(2, false));
 		headerComposite.setBackground(null);
-		
-//		Button showOnStartup = getToolkit().createButton(headerComposite, "Show on Startup", SWT.CHECK);
-//		showOnStartup.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, false));
-//		showOnStartup.setBackground(null);
-//		showOnStartup.setSelection(JBossCentralActivator.getDefault().showJBossCentralOnStartup());
-//		showOnStartup.addSelectionListener(new SelectionAdapter() {
-//
-//			@Override
-//			public void widgetSelected(SelectionEvent e) {
-//				IEclipsePreferences preferences = JBossCentralActivator.getDefault().getPreferences();
-//				boolean showOnStartup = preferences.getBoolean(JBossCentralActivator.SHOW_JBOSS_CENTRAL_ON_STARTUP, JBossCentralActivator.SHOW_JBOSS_CENTRAL_ON_STARTUP_DEFAULT_VALUE);
-//				preferences.putBoolean(JBossCentralActivator.SHOW_JBOSS_CENTRAL_ON_STARTUP, !showOnStartup);
-//				JBossCentralActivator.getDefault().savePreferences();
-//			}
-//		
-//		});
 
 		Composite searchComposite = getToolkit().createComposite(headerComposite);
 		GridData gd = new GridData(SWT.BEGINNING, SWT.FILL, true, true);
@@ -282,14 +269,12 @@ public class JBossCentralEditor extends SharedHeaderFormEditor {
 		//form.getForm().setToolBarVerticalAlignment(SWT.BOTTOM);
 		
 		IToolBarManager toolbar = form.getToolBarManager();
-		CommandContributionItem item = JBossCentralActivator.createContributionItem(getSite(), "org.jboss.tools.central.openJBossToolsHome");
-		toolbar.add(item);
+		String[] commandIds = JBossCentralActivator.getDefault().getConfigurator().getMainToolbarCommandIds();
+		for (String commandId:commandIds) {
+			CommandContributionItem item = JBossCentralActivator.createContributionItem(getSite(), commandId);
+			toolbar.add(item);
+		}
 		
-		item = JBossCentralActivator.createContributionItem(getSite(), "org.jboss.tools.central.favoriteAtEclipseMarketplace");
-		toolbar.add(item);
-		
-		item = JBossCentralActivator.createContributionItem(getSite(), "org.jboss.tools.central.preferences");
-		toolbar.add(item);
 		
 		//item = JBossCentralActivator.createContributionItem(getSite(), "org.jboss.tools.central.openJBossToolsTwitter");
 		//toolbar.add(item);
@@ -298,10 +283,7 @@ public class JBossCentralEditor extends SharedHeaderFormEditor {
 	}
 
 	private Image getHeaderImage() {
-		if (headerImage == null) {
-			headerImage = JBossCentralActivator.getImageDescriptor("/icons/jboss.gif").createImage();
-		}
-		return headerImage;
+		return JBossCentralActivator.getDefault().getConfigurator().getHeaderImage();
 	}
 
 	public AbstractJBossCentralPage getGettingStartedPage() {

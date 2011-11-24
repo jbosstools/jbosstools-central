@@ -22,7 +22,7 @@ public class OpenJBossNewsHandler extends OpenWithBrowserHandler {
 
 	@Override
 	public String getLocation() {
-		return JBossCentralActivator.NEWS_URL;
+		return JBossCentralActivator.getDefault().getConfigurator().getNewsUrl();
 	}
 
 }

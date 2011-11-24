@@ -573,12 +573,7 @@ public class GettingStartedPage extends AbstractJBossCentralPage {
 	    IExtensionPoint extensionPoint = extensionRegistry.getExtensionPoint("org.eclipse.ui.newWizards");
 	    IExtension[] extensions = extensionPoint.getExtensions();
 	    
-	    List<String> wizardIDs = new ArrayList<String>();
-	    //wizardIDs.add("org.jboss.ide.eclipse.as.openshift.express.ui.wizard.NewServerAdapter");
-	    wizardIDs.add("org.eclipse.jst.servlet.ui.project.facet.WebProjectWizard");
-	    wizardIDs.add("org.jboss.tools.seam.ui.wizards.SeamProjectWizard");
-	    wizardIDs.add("org.eclipse.m2e.core.wizards.Maven2ProjectWizard");
-	    wizardIDs.add(JBossCentralActivator.NEW_PROJECT_EXAMPLES_WIZARD_ID);
+	    List<String> wizardIDs = JBossCentralActivator.getDefault().getConfigurator().getWizardIds();
 	    
 	    List<String> createdIDs = new ArrayList<String>();
 		for (IExtension extension : extensions) {

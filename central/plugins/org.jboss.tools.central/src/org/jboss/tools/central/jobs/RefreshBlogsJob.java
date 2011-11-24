@@ -26,7 +26,7 @@ public class RefreshBlogsJob extends AbstractRefreshJob {
 	public static RefreshBlogsJob INSTANCE = new RefreshBlogsJob();
 	
 	private RefreshBlogsJob() {
-		super("Refreshing JBoss Blogs...", JBossCentralActivator.BLOGS_URL);
+		super("Refreshing JBoss Blogs...", JBossCentralActivator.getDefault().getConfigurator().getBlogsUrl());
 	}
 
 	@Override

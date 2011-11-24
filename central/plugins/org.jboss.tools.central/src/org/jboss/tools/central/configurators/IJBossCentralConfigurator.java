@@ -1,5 +1,5 @@
 /*************************************************************************************
- * Copyright (c) 2008-2011 Red Hat, Inc. and others.
+ * Copyright (c) 2011 Red Hat, Inc. and others.
  * All rights reserved. This program and the accompanying materials 
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,21 +8,25 @@
  * Contributors:
  *     JBoss by Red Hat - Initial implementation.
  ************************************************************************************/
+package org.jboss.tools.central.configurators;
 
-package org.jboss.tools.central.actions;
+import java.util.List;
 
-import org.jboss.tools.central.JBossCentralActivator;
+import org.eclipse.swt.graphics.Image;
 
 /**
  * 
  * @author snjeza
  *
  */
-public class OpenJBossBlogsHandler extends OpenWithBrowserHandler {
+public interface IJBossCentralConfigurator {
 
-	@Override
-	public String getLocation() {
-		return JBossCentralActivator.getDefault().getConfigurator().getBlogsUrl();
-	}
+	String[] getMainToolbarCommandIds();
+	String getJBossDiscoveryDirectory();
+	String getTwitterLink();
+	String getBlogsUrl();
+	String getNewsUrl();
+	List<String> getWizardIds();
+	Image getHeaderImage();
 
 }

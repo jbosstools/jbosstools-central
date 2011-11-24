@@ -31,3 +31,12 @@ Bundle-Localization: plugin
 Bundle-Vendor: %BundleVendor
 Bundle-ClassPath: lib/ocpsoft-pretty-time-1.0.7.jar,
  .
+Export-Package: org.jboss.tools.central,
+ org.jboss.tools.central.actions,
+ org.jboss.tools.central.configurators,
+ org.jboss.tools.central.dialogs,
+ org.jboss.tools.central.editors,
+ org.jboss.tools.central.editors.xpl,
+ org.jboss.tools.central.jobs,
+ org.jboss.tools.central.model,
+ org.jboss.tools.central.preferences

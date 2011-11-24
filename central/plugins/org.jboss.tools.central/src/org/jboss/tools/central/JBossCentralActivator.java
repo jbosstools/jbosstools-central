@@ -19,6 +19,7 @@ import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExtension;
 import org.eclipse.core.runtime.IExtensionPoint;
@@ -48,6 +49,8 @@ import org.eclipse.ui.menus.CommandContributionItem;
 import org.eclipse.ui.menus.CommandContributionItemParameter;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.eclipse.ui.services.IServiceLocator;
+import org.jboss.tools.central.configurators.DefaultJBossCentralConfigurator;
+import org.jboss.tools.central.configurators.IJBossCentralConfigurator;
 import org.jboss.tools.central.editors.JBossCentralEditor;
 import org.jboss.tools.central.editors.JBossCentralEditorInput;
 import org.jboss.tools.central.model.Tutorial;
@@ -67,8 +70,7 @@ public class JBossCentralActivator extends AbstractUIPlugin {
 	private static final String JBOSS_DISCOVERY_DIRECTORY = "jboss.discovery.directory.url";
 
 	//public static final String JBOSS_DISCOVERY_DIRECTORY_3_3_0_XML = "http://download.jboss.org/jbosstools/updates/development/indigo/jbosstools-directory.xml";
-	public static final String JBOSS_DISCOVERY_DIRECTORY_3_3_0_XML = "http://download.jboss.org/jbosstools/updates/nightly/trunk/jbosstools-directory.xml";
-	
+		
 	public static final String ICON = "icon";
 
 	private static final String DESCRIPTION = "description";
@@ -104,16 +106,16 @@ public class JBossCentralActivator extends AbstractUIPlugin {
 	
 	public static final String NEW_PROJECT_EXAMPLES_WIZARD_ID = "org.jboss.tools.project.examples.wizard.NewProjectExamplesWizard";
 	
-	public static final String BLOGS_URL = "http://planet.jboss.org/feeds/blogs";
-
-	public static final String NEWS_URL = "http://planet.jboss.org/feeds/news";
-
 	public static final String FORM_END_TAG = "</p></form>";
 	public static final String FORM_START_TAG = "<form><p>";
 	public static final String CANCELED = FORM_START_TAG + "<span color=\"header\" font=\"header\">Canceled.</span>" + FORM_END_TAG;
 	public static final String LOADING = FORM_START_TAG + "<span color=\"header\" font=\"header\">Loading...</span>" + FORM_END_TAG;
 	
 	public static final String TUTORIALS_EXTENSION_ID = "org.jboss.tools.central.tutorials";
+	
+	public static final String CONFIGURATORS_EXTENSION_ID = "org.jboss.tools.central.configurators";
+	
+	private IJBossCentralConfigurator configurator;
 	
 	//public static final String SEARCH_PROJECT_PAGES = "Search Project Pages";
 
@@ -126,6 +128,8 @@ public class JBossCentralActivator extends AbstractUIPlugin {
 	private BundleContext bundleContext;
 	
 	public static final int MAX_FEEDS = 100;
+
+	private static final Object CONFIGURATOR = "configurator";
 	
 	// The shared instance
 	private static JBossCentralActivator plugin;
@@ -298,6 +302,37 @@ public class JBossCentralActivator extends AbstractUIPlugin {
 		return null;
 	}
 	
+	public IJBossCentralConfigurator getConfigurator() {
+		if (configurator == null) {
+			IExtensionRegistry registry = Platform.getExtensionRegistry();
+			IExtensionPoint extensionPoint = registry
+					.getExtensionPoint(CONFIGURATORS_EXTENSION_ID);
+			IExtension[] extensions = extensionPoint.getExtensions();
+			if (extensions.length > 0) {
+				IExtension extension = extensions[0];
+				IConfigurationElement[] configurationElements = extension
+						.getConfigurationElements();
+				for (int j = 0; j < configurationElements.length; j++) {
+					IConfigurationElement configurationElement = configurationElements[j];
+					if (CONFIGURATOR.equals(configurationElement.getName())) {
+						try {
+							configurator = (IJBossCentralConfigurator) configurationElement.createExecutableExtension("class");
+						} catch (CoreException e) {
+							JBossCentralActivator.log(e);
+							continue;
+						}
+						break;
+					}
+				}
+				
+			}
+			if (configurator == null) {
+				configurator = new DefaultJBossCentralConfigurator();
+			}
+		}
+		return configurator;
+	}
+	
 	public Map<String, TutorialCategory> getTutorialCategories() {
 		if (tutorialCategories == null) {
 			tutorialCategories = new HashMap<String, TutorialCategory>();
@@ -433,10 +468,10 @@ public class JBossCentralActivator extends AbstractUIPlugin {
 		return bundleContext;
 	}
 
-	public static String getJBossDiscoveryDirectory() {
+	public String getJBossDiscoveryDirectory() {
 		String directory = System.getProperty(JBOSS_DISCOVERY_DIRECTORY, null);
 		if (directory == null) {
-			return JBOSS_DISCOVERY_DIRECTORY_3_3_0_XML;
+			return getConfigurator().getJBossDiscoveryDirectory();
 		}
 		return directory;
 	}
@@ -465,4 +500,5 @@ public class JBossCentralActivator extends AbstractUIPlugin {
 				shell.dispose();
 		}
 	}
+
 }
