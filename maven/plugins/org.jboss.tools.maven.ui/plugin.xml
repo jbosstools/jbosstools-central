@@ -222,13 +222,18 @@
  	 	</perspectiveExtension>
  	</extension>
 
-	<!-- TODO implement marker resolution as part of JBIDE-9921 	
-    <extension 
+	<extension 
         point="org.eclipse.ui.ide.markerResolution">
         <markerResolutionGenerator
-            class="org.jboss.tools.maven.ui.internal.problems.MavenDependencyMarkerResolutionGenerator"
+            class="org.jboss.tools.maven.ui.internal.markers.MavenDependencyMarkerResolutionGenerator"
             markerType="org.eclipse.m2e.core.maven2Problem.dependency">
         </markerResolutionGenerator>
     </extension>
-    --> 	
+    <extension 
+        point="org.eclipse.ui.ide.markerResolution">
+        <markerResolutionGenerator
+            class="org.jboss.tools.maven.ui.internal.markers.MavenDependencyMarkerResolutionGenerator"
+            markerType="org.eclipse.m2e.core.maven2Problem.pomloading">
+        </markerResolutionGenerator>
+    </extension>
 </plugin>

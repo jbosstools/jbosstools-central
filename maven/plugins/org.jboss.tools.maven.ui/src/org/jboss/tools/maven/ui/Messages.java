@@ -84,6 +84,8 @@ public class Messages extends NLS {
 	public static String SelectProfilesDialog_Select_Maven_profiles;
 	public static String SelectProfilesDialog_Select_the_active_Maven_profiles;
 	public static String SelectProfilesDialog_SelectAll;
+	public static String Quickfix_setupCommunityRepo;
+	public static String Quickfix_setupEnterpriseRepo;
 
 	static {
 		// initialize resource bundle
