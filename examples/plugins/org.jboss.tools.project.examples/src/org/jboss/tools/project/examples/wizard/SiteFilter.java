@@ -16,6 +16,7 @@ import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerFilter;
 import org.jboss.tools.project.examples.ProjectExamplesActivator;
 import org.jboss.tools.project.examples.model.Category;
+import org.jboss.tools.project.examples.model.IProjectExampleSite;
 import org.jboss.tools.project.examples.model.Project;
 import org.jboss.tools.project.examples.model.ProjectModelElement;
 
@@ -44,9 +45,21 @@ public class SiteFilter extends ViewerFilter {
 			if (site.equals(ProjectExamplesActivator.ALL_SITES)) {
 				size += category.getProjects().size();
 			} else {
+				IProjectExampleSite categorySite = category.getSite();
+				if (categorySite == null) {
+					return false;
+				}
+				if (!site.equals(categorySite.getName())) {
+					return false;
+				}
 				List<Project> projects = category.getProjects();
 				for (Project project:projects) {
-					if (site.equals(project.getSite())) {
+					IProjectExampleSite projectSite = project.getSite();
+					if (projectSite == null) {
+						continue;
+					}
+					
+					if (site.equals(projectSite.getName())) {
 						size++;
 					}
 				}
@@ -54,7 +67,10 @@ public class SiteFilter extends ViewerFilter {
 			return size > 0;
 		}
 		ProjectModelElement model = (ProjectModelElement) element;
-		if ( site.equals(ProjectExamplesActivator.ALL_SITES) || site.equals(model.getSite())) {
+		if (model.getSite() == null) {
+			return false;
+		}
+		if ( site.equals(ProjectExamplesActivator.ALL_SITES) || site.equals(model.getSite().getName())) {
 			return true;
 		}
 		return false;

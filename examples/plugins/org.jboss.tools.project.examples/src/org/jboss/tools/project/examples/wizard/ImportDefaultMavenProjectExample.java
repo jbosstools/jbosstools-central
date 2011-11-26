@@ -46,13 +46,13 @@ public class ImportDefaultMavenProjectExample extends
 	};
 
 	@Override
-	public List<Project> importProject(Project projectDescription, File file,
+	public boolean importProject(Project projectDescription, File file,
 			IProgressMonitor monitor) throws Exception {
 		List<Project> projects = new ArrayList<Project>();
 		if (projectDescription.getIncludedProjects() == null) {
-			importSingleProject(projectDescription, file, monitor);
+			boolean ret = importSingleProject(projectDescription, file, monitor);
 			projects.add(projectDescription);
-			return projects;
+			return ret;
 		} else {
 			List<String> projectNames = projectDescription.getIncludedProjects();
 			for (final String projectName : projectNames) {
@@ -70,7 +70,7 @@ public class ImportDefaultMavenProjectExample extends
 
 					});
 					if (!ret[0]) {
-						return projects;
+						return false;
 					}
 					project.delete(true, true, monitor);
 				}
@@ -109,15 +109,16 @@ public class ImportDefaultMavenProjectExample extends
 						}
 					} catch (Exception e) {
 						ProjectExamplesActivator.log(e);
+						return false;
 					}
 				}
 				reconfigure(project, monitor);
 			}
 		}
-		return projects;
+		return true;
 	}
 	
-	private void importSingleProject(Project projectDescription, File file,
+	private boolean importSingleProject(Project projectDescription, File file,
 			IProgressMonitor monitor) throws CoreException, ZipException,
 			IOException, InvocationTargetException, InterruptedException {
 		final String projectName = projectDescription.getName();
@@ -135,7 +136,7 @@ public class ImportDefaultMavenProjectExample extends
 
 			});
 			if (!ret[0]) {
-				return;
+				return false;
 			}
 			project.delete(true, true, monitor);
 		}
@@ -174,10 +175,11 @@ public class ImportDefaultMavenProjectExample extends
 				}
 			} catch (Exception e) {
 				ProjectExamplesActivator.log(e);
+				return false;
 			}
 		}
 		reconfigure(project, monitor);
-		
+		return true;
 	}
 
 	private static Shell getActiveShell() {

@@ -270,7 +270,10 @@ public class ProjectUtil {
 									String value = getContent(child);
 									boolean found = false;
 									for (Category cat : list) {
-										if (cat.getName().equals(value)) {
+										if (cat.getSite() == null) {
+											cat.setSite(site);
+										}
+										if (cat.getName().equals(value) && site.getName().equals(cat.getSite().getName())) {
 											category = cat;
 											found = true;
 											break;
@@ -282,6 +285,7 @@ public class ProjectUtil {
 										list.add(category);
 									}
 									project.setCategory(category);
+									category.getProjects().add(project);
 								}
 								else if (nodeName.equals(NAME)) { 
 									project.setName(getContent(child));
@@ -352,7 +356,6 @@ public class ProjectUtil {
 							}
 						}
 					}
-					category.getProjects().add(project);
 				}
 			}
 		} catch (Exception e) {

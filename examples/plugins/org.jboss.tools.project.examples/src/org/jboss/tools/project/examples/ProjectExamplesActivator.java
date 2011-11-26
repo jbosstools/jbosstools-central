@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -245,14 +246,18 @@ public class ProjectExamplesActivator extends AbstractUIPlugin {
 		if (pName == null) {
 			List<String> projectNames = project.getIncludedProjects();
 			List<IProject> projects = new ArrayList<IProject>();
-			for (String projectName:projectNames) {
-				IProject eclipseProject = ResourcesPlugin.getWorkspace().getRoot().getProject(projectName);
-				if (eclipseProject != null && eclipseProject.isOpen()) {
-					projects.add(eclipseProject);
+			if (projectNames != null) {
+				for (String projectName : projectNames) {
+					IProject eclipseProject = ResourcesPlugin.getWorkspace()
+							.getRoot().getProject(projectName);
+					if (eclipseProject != null && eclipseProject.isOpen()) {
+						projects.add(eclipseProject);
+					}
 				}
 			}
 			return projects.toArray(new IProject[0]);
 		}
+		pName = replace(pName, project);
 		StringTokenizer tokenizer = new StringTokenizer(pName,","); //$NON-NLS-1$
 		List<IProject> projects = new ArrayList<IProject>();
 		while (tokenizer.hasMoreTokens()) {
@@ -265,6 +270,19 @@ public class ProjectExamplesActivator extends AbstractUIPlugin {
 			}
 		}
 		return projects.toArray(new IProject[0]);
+	}
+
+	protected static String replace(String name, Project project) {
+		List<String> includedProjects = project.getIncludedProjects();
+		if (includedProjects != null) {
+			int i = 0;
+			for (String includedProject : includedProjects) {
+				String expression = "${project[" + i + "]}"; //$NON-NLS-1$ //$NON-NLS-2$
+				name = name.replace(expression, includedProject);
+				i++;
+			}
+		}
+		return name;
 	}
 
 	public IImportProjectExample getImportProjectExample(String importType) {
@@ -357,6 +375,7 @@ public class ProjectExamplesActivator extends AbstractUIPlugin {
 		for(final Project project:projects) {
 			if (project.isWelcome()) {
 				String urlString = project.getWelcomeURL();
+				urlString = replace(urlString, project);
 				URL url = null;
 				if (urlString.startsWith("/")) { //$NON-NLS-1$
 					IPath path = new Path(urlString);

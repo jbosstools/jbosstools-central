@@ -55,8 +55,9 @@ public class NewProjectExamplesJob extends WorkspaceJob {
 					});
 					return Status.OK_STATUS;
 				}
-				importProjectExample.importProject(project, project.getFile(), monitor);
-				importProjectExample.fix(project, monitor);						
+				if (importProjectExample.importProject(project, project.getFile(), monitor)) {
+					importProjectExample.fix(project, monitor);						
+				}
 			}
 		} catch (final Exception e) {
 			Display.getDefault().syncExec(new Runnable() {

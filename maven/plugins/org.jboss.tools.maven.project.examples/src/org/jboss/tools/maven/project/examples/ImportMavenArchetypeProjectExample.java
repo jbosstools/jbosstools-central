@@ -11,15 +11,26 @@
 
 package org.jboss.tools.maven.project.examples;
 
+
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.jface.window.Window;
 import org.eclipse.jface.wizard.WizardDialog;
+import org.eclipse.m2e.core.MavenPlugin;
+import org.eclipse.m2e.core.embedder.MavenModelManager;
+import org.eclipse.m2e.core.project.LocalProjectScanner;
+import org.eclipse.m2e.core.project.MavenProjectInfo;
+import org.eclipse.m2e.core.project.ProjectImportConfiguration;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.jboss.tools.maven.project.examples.wizard.ArchetypeExamplesWizard;
@@ -33,38 +44,91 @@ import org.jboss.tools.project.examples.model.Project;
 public class ImportMavenArchetypeProjectExample extends
 		AbstractImportProjectExample {
 
-	private static final String UNNAMED_PROJECTS = "UnnamedProjects"; //$NON-NLS-1$
-
-	//private static final String JBOSS_TOOLS_MAVEN_PROJECTS = "/.JBossToolsMavenProjects"; //$NON-NLS-1$
-
 	@Override
-	public List<Project> importProject(final Project projectDescription, File file,
-			IProgressMonitor monitor) throws Exception {
+	public boolean importProject(final Project projectDescription, File file,
+			final IProgressMonitor monitor) throws Exception {
 		List<Project> projects = new ArrayList<Project>();
-		IWorkspaceRoot workspaceRoot = ResourcesPlugin.getWorkspace().getRoot();
+		projects.add(projectDescription);
+		final IWorkspaceRoot workspaceRoot = ResourcesPlugin.getWorkspace().getRoot();
 		IPath rootPath = workspaceRoot.getLocation();
-		IPath mavenProjectsRoot = rootPath; //.append(JBOSS_TOOLS_MAVEN_PROJECTS);
-//		String projectName = projectDescription.getName();
-//		if (projectName == null || projectName.isEmpty()) {
-//			projectName = UNNAMED_PROJECTS;
-//		}
-		IPath path = mavenProjectsRoot; //.append(projectName);
+		IPath mavenProjectsRoot = rootPath; 
+		IPath path = mavenProjectsRoot;
 		final File destination = new File(path.toOSString());
 
+		final boolean[] ret = new boolean[1];
+		ret[0] = true;
 		Display.getDefault().syncExec(new Runnable() {
 
 			@Override
 			public void run() {
 				ArchetypeExamplesWizard wizard = new ArchetypeExamplesWizard(destination, projectDescription);
 				WizardDialog wizardDialog = new WizardDialog(getActiveShell(), wizard);
-				wizardDialog.open();
+				int ok = wizardDialog.open();
+				if (ok != Window.OK) {
+					ret[0] = false;
+					return;
+				}
+				List<String> includedProjects = projectDescription.getIncludedProjects();
+				if (includedProjects == null) {
+					includedProjects = new ArrayList<String>();
+					projectDescription.setIncludedProjects(includedProjects);
+				}
+				projectDescription.getIncludedProjects().clear();
+				String projectName = wizard.getProjectName();
+				includedProjects.add(projectName);
+				IPath location = workspaceRoot.getLocation();
+				String artifactId = wizard.getArtifactId();
+				String projectFolder = location.append(artifactId).toFile()
+						.getAbsolutePath();
+				MavenModelManager mavenModelManager = MavenPlugin
+						.getMavenModelManager();
+				LocalProjectScanner scanner = new LocalProjectScanner(
+						workspaceRoot.getLocation().toFile(), //
+						projectFolder, true, mavenModelManager);
+				try {
+					scanner.run(monitor);
+				} catch (InterruptedException e1) {
+					ret[0] = false;
+					return;
+				}
+
+				Set<MavenProjectInfo> projectSet = collectProjects(scanner
+						.getProjects());
+				ProjectImportConfiguration importConfiguration = new ProjectImportConfiguration();
+				for (MavenProjectInfo info : projectSet) {
+					try {
+						projectName = MavenProjectExamplesActivator
+								.getProjectName(info, importConfiguration);
+						if (!includedProjects.contains(projectName)) {
+							includedProjects.add(projectName);
+						}
+					} catch (CoreException e) {
+						MavenProjectExamplesActivator.log(e);
+						ret[0] = false;
+					}
+				}
 			}
 			
 		});
-		return projects;
+		return ret[0];
 	}
 
-	
+	public Set<MavenProjectInfo> collectProjects(
+			Collection<MavenProjectInfo> projects) {
+		return new LinkedHashSet<MavenProjectInfo>() {
+			private static final long serialVersionUID = 1L;
+
+			public Set<MavenProjectInfo> collectProjects(
+					Collection<MavenProjectInfo> projects) {
+				for (MavenProjectInfo projectInfo : projects) {
+					add(projectInfo);
+					collectProjects(projectInfo.getProjects());
+				}
+				return this;
+			}
+		}.collectProjects(projects);
+	}
+
 	private static Shell getActiveShell() {
 		return Display.getDefault().getActiveShell();
 	}

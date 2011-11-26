@@ -1,7 +1,18 @@
 package org.jboss.tools.maven.project.examples;
 
+import java.io.File;
+
+import org.apache.maven.model.Model;
+import org.eclipse.core.resources.IWorkspace;
+import org.eclipse.core.resources.IWorkspaceRoot;
+import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.m2e.core.MavenPlugin;
+import org.eclipse.m2e.core.embedder.IMaven;
+import org.eclipse.m2e.core.project.MavenProjectInfo;
+import org.eclipse.m2e.core.project.ProjectImportConfiguration;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 
@@ -58,5 +69,37 @@ public class MavenProjectExamplesActivator extends AbstractUIPlugin {
 	public static void log(Throwable e, String message) {
 		IStatus status = new Status(IStatus.ERROR, PLUGIN_ID, message, e);
 		getDefault().getLog().log(status);
+	}
+	
+	public static String getProjectName(MavenProjectInfo projectInfo,
+			ProjectImportConfiguration configuration) throws CoreException {
+		IWorkspace workspace = ResourcesPlugin.getWorkspace();
+		IWorkspaceRoot root = workspace.getRoot();
+
+		File pomFile = projectInfo.getPomFile();
+		Model model = projectInfo.getModel();
+		IMaven maven = MavenPlugin.getMaven();
+		if (model == null) {
+			model = maven.readModel(pomFile);
+			projectInfo.setModel(model);
+		}
+
+		String projectName = configuration.getProjectName(model);
+
+		File projectDir = pomFile.getParentFile();
+		String projectParent = projectDir.getParentFile().getAbsolutePath();
+
+		if (projectInfo.getBasedirRename() == MavenProjectInfo.RENAME_REQUIRED) {
+			File newProject = new File(projectDir.getParent(), projectName);
+			if (!projectDir.equals(newProject)) {
+				projectDir = newProject;
+			}
+		} else {
+			if (projectParent.equals(root.getLocation().toFile()
+					.getAbsolutePath())) {
+				projectName = projectDir.getName();
+			}
+		}
+		return projectName;
 	}
 }

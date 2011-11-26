@@ -24,9 +24,6 @@ import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Status;
-import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.embedder.IMaven;
@@ -38,9 +35,7 @@ import org.eclipse.m2e.core.project.ProjectImportConfiguration;
 import org.eclipse.m2e.core.ui.internal.actions.OpenMavenConsoleAction;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
-import org.eclipse.ui.progress.IProgressConstants;
 import org.jboss.tools.project.examples.ProjectExamplesActivator;
-import org.jboss.tools.project.examples.job.ProjectExamplesJob;
 import org.jboss.tools.project.examples.model.AbstractImportProjectExample;
 import org.jboss.tools.project.examples.model.Project;
 
@@ -52,17 +47,16 @@ public class ImportMavenProjectExample extends AbstractImportProjectExample {
 
 	private static final String UNNAMED_PROJECTS = "UnnamedProjects"; //$NON-NLS-1$
 
-	//private static final String JBOSS_TOOLS_MAVEN_PROJECTS = "/.JBossToolsMavenProjects"; //$NON-NLS-1$
-	
 	private boolean confirm;
 
 	@Override
-	public List<Project> importProject(Project projectDescription, File file,
+	public boolean importProject(Project projectDescription, File file,
 			IProgressMonitor monitor) throws Exception {
 		List<Project> projects = new ArrayList<Project>();
+		projects.add(projectDescription);
 		IWorkspaceRoot workspaceRoot = ResourcesPlugin.getWorkspace().getRoot();
 		IPath rootPath = workspaceRoot.getLocation();
-		IPath mavenProjectsRoot = rootPath;//.append(JBOSS_TOOLS_MAVEN_PROJECTS);
+		IPath mavenProjectsRoot = rootPath;
 		String projectName = projectDescription.getName();
 		if (projectName == null || projectName.isEmpty()) {
 			projectName = UNNAMED_PROJECTS;
@@ -87,12 +81,12 @@ public class ImportMavenProjectExample extends AbstractImportProjectExample {
 						project.delete(false, true, monitor);
 					}
 				} else {
-					return projects;
+					return false;
 				}
 			}
 			boolean deleted = deleteDirectory(destination, monitor);
 			if (monitor.isCanceled()) {
-				return projects;
+				return false;
 			}
 			if (!deleted) {
 				Display.getDefault().syncExec(new Runnable() {
@@ -103,13 +97,13 @@ public class ImportMavenProjectExample extends AbstractImportProjectExample {
 								"Error", "Cannot delete the '" + destination + "' file.");
 					}
 				});
-				return projects;
+				return false;
 			}
 		}
 		boolean ok = ProjectExamplesActivator.extractZipFile(file, destination, monitor);
 		monitor.setTaskName("");
 		if (monitor.isCanceled()) {
-			return projects;
+			return false;
 		}
 		if (!ok) {
 			Display.getDefault().syncExec(new Runnable() {
@@ -121,78 +115,86 @@ public class ImportMavenProjectExample extends AbstractImportProjectExample {
 							"Cannot extract the archive.");
 				}
 			});
-			return projects;
+			return false;
 		}
 		
-		importMavenProjects(destination, projectDescription);
-		return projects;
+		List<String> projectNames = importMavenProjects(destination, projectDescription, monitor);
+		new OpenMavenConsoleAction().run();
+		projectDescription.getIncludedProjects().clear();
+		projectDescription.getIncludedProjects().addAll(projectNames);
+		return true;
 	}
 
-	private void importMavenProjects(final File destination, final Project projectDescription) {
-		Job job = new ProjectExamplesJob("Importing Maven projects") {
-			public IStatus runInWorkspace(IProgressMonitor monitor) {
-				setProperty(IProgressConstants.ACTION_PROPERTY,
-						new OpenMavenConsoleAction());
-				MavenPlugin plugin = MavenPlugin.getDefault();
-				try {
-					AbstractProjectScanner<MavenProjectInfo> projectScanner = getProjectScanner(destination);
-					projectScanner.run(monitor);
-					List<MavenProjectInfo> mavenProjects = projectScanner
-							.getProjects();
-					List<MavenProjectInfo> infos = new ArrayList<MavenProjectInfo>();
-					infos.addAll(mavenProjects);
-					addMavenProjects(infos, mavenProjects);
-					final List<IProject> existingProjects = new ArrayList<IProject>();
-					ProjectImportConfiguration importConfiguration = new ProjectImportConfiguration();
-				    String profiles = projectDescription.getDefaultProfiles();
-				    if (profiles != null && profiles.trim().length() > 0) {
-				    	importConfiguration.getResolverConfiguration().setActiveProfiles(profiles);
-				    }
-				    for(MavenProjectInfo info:infos) {
-						String projectName = getProjectName(info, importConfiguration);
-						IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject(projectName);
-						if (project != null && project.exists()) {
-							existingProjects.add(project);
-						}
-					}
-					if (existingProjects.size() > 0) {
-						Display.getDefault().syncExec(new Runnable() {
-							
-							@Override
-							public void run() {
-								String message = getWorkspaceMessage(existingProjects);
-								
-								confirm = MessageDialog.openConfirm(getActiveShell(), 
-										"Confirmation", message);
-							}
-						});
-						if (confirm) {
-							for (IProject project:existingProjects) {
-								try {
-									project.refreshLocal(IResource.DEPTH_INFINITE, monitor);
-								} catch (Exception e) {
-									// ignore
-								}
-								project.delete(true, true, monitor);
-							}
-						} else {
-							return Status.CANCEL_STATUS;
-						}
-					}
-					MavenPlugin.getProjectConfigurationManager().importProjects(
-							infos, importConfiguration, monitor);
-				} catch (CoreException ex) {
-					MavenProjectExamplesActivator.log(ex, "Projects imported with errors");
-					return ex.getStatus();
-				} catch (InterruptedException e) {
-					return Status.CANCEL_STATUS;
-				}
-				return Status.OK_STATUS;
+	private List<String> importMavenProjects(final File destination,
+			final Project projectDescription, IProgressMonitor monitor) {
+		List<String> projectNames = new ArrayList<String>();
+		MavenPlugin plugin = MavenPlugin.getDefault();
+		try {
+			AbstractProjectScanner<MavenProjectInfo> projectScanner = getProjectScanner(destination);
+			projectScanner.run(monitor);
+			List<MavenProjectInfo> mavenProjects = projectScanner.getProjects();
+			List<MavenProjectInfo> infos = new ArrayList<MavenProjectInfo>();
+			infos.addAll(mavenProjects);
+			addMavenProjects(infos, mavenProjects);
+			final List<IProject> existingProjects = new ArrayList<IProject>();
+			ProjectImportConfiguration importConfiguration = new ProjectImportConfiguration();
+			String profiles = projectDescription.getDefaultProfiles();
+			if (profiles != null && profiles.trim().length() > 0) {
+				importConfiguration.getResolverConfiguration()
+						.setActiveProfiles(profiles);
 			}
-		};
-		job.setRule(MavenPlugin.getDefault().getProjectConfigurationManager()
-				.getRule());
-		job.schedule();
+			for (MavenProjectInfo info : infos) {
+				String projectName = MavenProjectExamplesActivator.getProjectName(info, importConfiguration);
+				IProject project = ResourcesPlugin.getWorkspace().getRoot()
+						.getProject(projectName);
+				if (project != null && project.exists()) {
+					existingProjects.add(project);
+				}
+			}
+			if (existingProjects.size() > 0) {
+				Display.getDefault().syncExec(new Runnable() {
+
+					@Override
+					public void run() {
+						String message = getWorkspaceMessage(existingProjects);
+
+						confirm = MessageDialog.openConfirm(getActiveShell(),
+								"Confirmation", message);
+					}
+				});
+				if (confirm) {
+					for (IProject project : existingProjects) {
+						try {
+							project.refreshLocal(IResource.DEPTH_INFINITE,
+									monitor);
+						} catch (Exception e) {
+							// ignore
+						}
+						project.delete(true, true, monitor);
+					}
+				} else {
+					return projectNames;
+				}
+			}
+			MavenPlugin.getProjectConfigurationManager().importProjects(infos,
+					importConfiguration, monitor);
+			for (MavenProjectInfo info : infos) {
+				Model model = info.getModel();
+				if (model != null && model.getArtifactId() != null
+						&& model.getArtifactId().trim().length() > 0) {
+					projectNames.add(model.getArtifactId());
+				}
+			}
+		} catch (CoreException ex) {
+			MavenProjectExamplesActivator.log(ex,
+					"Projects imported with errors");
+			return projectNames;
+		} catch (InterruptedException e) {
+			MavenProjectExamplesActivator.log(e,
+					"Projects imported with errors");
+			return projectNames;
+		}
+		return projectNames;
 	}
 
 	private List<MavenProjectInfo> addMavenProjects(List<MavenProjectInfo> infos, List<MavenProjectInfo> mavenProjects) {
@@ -243,38 +245,6 @@ public class ImportMavenProjectExample extends AbstractImportProjectExample {
 			}
 		}
 		return (path.delete());
-	}
-
-	private String getProjectName(MavenProjectInfo projectInfo,
-			ProjectImportConfiguration configuration) throws CoreException {
-		IWorkspace workspace = ResourcesPlugin.getWorkspace();
-		IWorkspaceRoot root = workspace.getRoot();
-
-		File pomFile = projectInfo.getPomFile();
-		Model model = projectInfo.getModel();
-		IMaven maven = MavenPlugin.getDefault().getMaven();
-		if (model == null) {
-			model = maven.readModel(pomFile);
-			projectInfo.setModel(model);
-		}
-
-		String projectName = configuration.getProjectName(model);
-
-		File projectDir = pomFile.getParentFile();
-		String projectParent = projectDir.getParentFile().getAbsolutePath();
-
-		if (projectInfo.getBasedirRename() == MavenProjectInfo.RENAME_REQUIRED) {
-			File newProject = new File(projectDir.getParent(), projectName);
-			if (!projectDir.equals(newProject)) {
-				projectDir = newProject;
-			}
-		} else {
-			if (projectParent.equals(root.getLocation().toFile()
-					.getAbsolutePath())) {
-				projectName = projectDir.getName();
-			}
-		}
-		return projectName;
 	}
 
 	private List<IProject> getExistingProjects(final File destination) {

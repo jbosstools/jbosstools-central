@@ -45,6 +45,8 @@ public class ArchetypeExamplesWizard extends Wizard implements INewWizard {
 	private File location;
 	private ProjectImportConfiguration configuration;
 	private ArchetypeExamplesWizardPage wizardPage;
+	private String projectName;
+	private String artifactId;
 
 	public ArchetypeExamplesWizard(File location, Project projectDescription) {
 		super();
@@ -63,12 +65,12 @@ public class ArchetypeExamplesWizard extends Wizard implements INewWizard {
 	public boolean performFinish() {
 		final Model model = wizardPage.getModel();
 		final String groupId = model.getGroupId();
-		final String artifactId = model.getArtifactId();
+		artifactId = model.getArtifactId();
 		final String version = model.getVersion();
 		final String javaPackage = wizardPage.getJavaPackage();
 		final Properties properties = wizardPage.getProperties();
 		final Archetype archetype = wizardPage.getArchetype();
-		final String projectName = configuration.getProjectName(model);
+		projectName = configuration.getProjectName(model);
 		final IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject(projectName);
 		
 		final IWorkspaceRunnable wr = new IWorkspaceRunnable() {
@@ -116,5 +118,13 @@ public class ArchetypeExamplesWizard extends Wizard implements INewWizard {
 	    }
 	    wizardPage = new ArchetypeExamplesWizardPage(configuration, projectDescription);
 	    addPage(wizardPage);
+	}
+
+	public String getProjectName() {
+		return projectName;
+	}
+
+	public String getArtifactId() {
+		return artifactId;
 	}
 }

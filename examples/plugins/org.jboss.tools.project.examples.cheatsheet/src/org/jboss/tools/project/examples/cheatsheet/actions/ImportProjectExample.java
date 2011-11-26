@@ -97,8 +97,9 @@ public class ImportProjectExample extends Action implements ICheatSheetAction {
 				setName(Messages.NewProjectExamplesWizard_Importing);
 				try {
 					IImportProjectExample importProjectExample = ProjectExamplesActivator.getDefault().getImportProjectExample(project.getImportType());
-					importProjectExample.importProject(project, file, monitor);
-					importProjectExample.fix(project, monitor);
+					if (importProjectExample.importProject(project, file, monitor)) {
+						importProjectExample.fix(project, monitor);
+					}
 				} catch (Exception e) {
 					IStatus status = new Status(IStatus.ERROR,Activator.PLUGIN_ID,e.getMessage(),e);
 					throw new CoreException(status);
