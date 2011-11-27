@@ -102,6 +102,8 @@ import org.osgi.framework.BundleContext;
  */
 public class ProjectExamplesActivator extends AbstractUIPlugin {
 
+	private static final String README_HTML = "/readme.html";
+	private static final String CHEATSHEET_XML = "/cheatsheet.xml"; //$NON-NLS-1$
 	// The plug-in ID
 	public static final String PLUGIN_ID = "org.jboss.tools.project.examples"; //$NON-NLS-1$
 	public static final String ALL_SITES = Messages.ProjectExamplesActivator_All;
@@ -373,6 +375,7 @@ public class ProjectExamplesActivator extends AbstractUIPlugin {
 			return;
 		}
 		for(final Project project:projects) {
+			fixWelcome(project);
 			if (project.isWelcome()) {
 				String urlString = project.getWelcomeURL();
 				urlString = replace(urlString, project);
@@ -428,6 +431,41 @@ public class ProjectExamplesActivator extends AbstractUIPlugin {
 				}
 			}
 		}
+	}
+
+	private static void fixWelcome(Project project) {
+		if (project == null || project.isWelcome()) {
+			return;
+		}
+		List<String> includedProjects = project.getIncludedProjects();
+		if (includedProjects == null || includedProjects.size() <= 0) {
+			return;
+		}
+		String projectName = includedProjects.get(0);
+		if (projectName == null || projectName.isEmpty()) {
+			return;
+		}
+		IProject eclipseProject = ResourcesPlugin.getWorkspace().getRoot().getProject(projectName);
+		if (eclipseProject == null || !eclipseProject.exists()) {
+			return;
+		}
+		if (checkCheatsheet(project, eclipseProject, CHEATSHEET_XML, ProjectUtil.CHEATSHEETS)) {
+			return;
+		}
+		checkCheatsheet(project, eclipseProject, README_HTML, ProjectUtil.EDITOR);
+		
+	}
+
+	private static boolean checkCheatsheet(Project project,
+			IProject eclipseProject, String path, String type) {
+		IResource cheatsheet = eclipseProject.findMember(path);
+		if (cheatsheet != null && cheatsheet.exists() && cheatsheet.getType() == IResource.FILE) {
+			project.setWelcome(true);
+			project.setType(type);
+			project.setWelcomeURL(cheatsheet.getFullPath().toString());
+			return true;
+		}
+		return false;
 	}
 
 	public static boolean extractZipFile(File file, File destination,

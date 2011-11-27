@@ -72,7 +72,7 @@ public class ProjectUtil {
 
 	private static final String SITE = "site"; //$NON-NLS-1$
 	
-	private static final String EDITOR = "editor"; //$NON-NLS-1$
+	public static final String EDITOR = "editor"; //$NON-NLS-1$
 
 	public static final String CHEATSHEETS = "cheatsheets"; //$NON-NLS-1$
 
