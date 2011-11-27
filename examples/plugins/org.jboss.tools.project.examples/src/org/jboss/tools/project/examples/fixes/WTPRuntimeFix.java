@@ -35,7 +35,10 @@ import org.eclipse.wst.common.project.facet.core.ProjectFacetsManager;
 import org.eclipse.wst.common.project.facet.core.runtime.RuntimeManager;
 import org.eclipse.wst.server.core.IRuntime;
 import org.eclipse.wst.server.core.IRuntimeType;
+import org.eclipse.wst.server.core.IServer;
+import org.eclipse.wst.server.core.IServerType;
 import org.eclipse.wst.server.core.ServerCore;
+import org.eclipse.wst.server.core.internal.RuntimeType;
 import org.jboss.ide.eclipse.as.core.server.IJBossServerConstants;
 import org.jboss.ide.eclipse.as.core.server.IJBossServerRuntime;
 import org.jboss.ide.eclipse.as.core.util.IJBossRuntimeResourceConstants;
@@ -191,6 +194,11 @@ public class WTPRuntimeFix implements ProjectExamplesFix {
 			if (runtimes.length > 0
 					&& ProjectFix.ANY.equals(allowedType)) {
 				for (IRuntime runtime:runtimes) {
+					// https://issues.jboss.org/browse/JBIDE-10131
+					IServer server = getServer(runtime);
+					if (server == null) {
+						continue;
+					}
 					IRuntime componentPresent = isComponentPresent(fix, runtime);
 					if (componentPresent != null) {
 						return isComponentPresent(fix, runtime);
@@ -200,6 +208,11 @@ public class WTPRuntimeFix implements ProjectExamplesFix {
 			}
 			for (int i = 0; i < runtimes.length; i++) {
 				IRuntime runtime = runtimes[i];
+				// https://issues.jboss.org/browse/JBIDE-10131
+				IServer server = getServer(runtime);
+				if (server == null) {
+					continue;
+				}
 				IRuntimeType runtimeType = runtime.getRuntimeType();
 				if (runtimeType != null && runtimeType.getId().equals(allowedType)) {
 					IRuntime componentPresent = isComponentPresent(fix, runtime);
@@ -207,6 +220,31 @@ public class WTPRuntimeFix implements ProjectExamplesFix {
 						return componentPresent;
 					}
 				}
+			}
+		}
+		return null;
+	}
+
+	private IServer getServer(IRuntime runtime) {
+		if (runtime == null) {
+			return null;
+		}
+		IRuntimeType runtimeType = runtime.getRuntimeType();
+		if (runtimeType == null || runtimeType.getId() == null) {
+			return null;
+		}
+		IServer[] servers = ServerCore.getServers();
+		for (IServer server:servers) {
+			IServerType serverType = server.getServerType();
+			if (serverType == null) {
+				continue;
+			}
+			IRuntimeType serverRuntimeType = serverType.getRuntimeType();
+			if (serverRuntimeType == null) {
+				continue;
+			}
+			if (runtimeType.getId().equals(serverRuntimeType.getId())) {
+				return server;
 			}
 		}
 		return null;
