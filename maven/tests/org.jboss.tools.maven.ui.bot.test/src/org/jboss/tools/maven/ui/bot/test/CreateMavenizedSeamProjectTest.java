@@ -11,7 +11,6 @@
 
 package org.jboss.tools.maven.ui.bot.test;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
@@ -26,8 +25,6 @@ import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
-import org.eclipse.core.resources.IWorkspace;
-import org.eclipse.core.resources.IWorkspaceRunnable;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
@@ -35,7 +32,6 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
-import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.datatools.connectivity.ConnectionProfileConstants;
 import org.eclipse.datatools.connectivity.ConnectionProfileException;
 import org.eclipse.datatools.connectivity.ProfileManager;
@@ -47,27 +43,15 @@ import org.eclipse.datatools.connectivity.drivers.IDriverMgmtConstants;
 import org.eclipse.datatools.connectivity.drivers.IPropertySet;
 import org.eclipse.datatools.connectivity.drivers.PropertySetImpl;
 import org.eclipse.datatools.connectivity.drivers.models.TemplateDescriptor;
-import org.eclipse.jface.bindings.keys.KeyStroke;
-import org.eclipse.jface.bindings.keys.ParseException;
 import org.eclipse.m2e.core.internal.IMavenConstants;
-import org.eclipse.m2e.tests.common.AbstractMavenProjectTestCase;
-import org.eclipse.m2e.tests.common.JobHelpers;
 import org.eclipse.m2e.tests.common.WorkspaceHelpers;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
-import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
-import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotEditor;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
 import org.eclipse.swtbot.swt.finder.SWTBot;
-import org.eclipse.swtbot.swt.finder.exceptions.WidgetNotFoundException;
-import org.eclipse.swtbot.swt.finder.finders.UIThreadRunnable;
 import org.eclipse.swtbot.swt.finder.junit.SWTBotJunit4ClassRunner;
-import org.eclipse.swtbot.swt.finder.keyboard.Keystrokes;
-import org.eclipse.swtbot.swt.finder.results.Result;
-import org.eclipse.swtbot.swt.finder.results.VoidResult;
-import org.eclipse.swtbot.swt.finder.utils.SWTBotPreferences;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotMenu;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotRadio;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
@@ -76,11 +60,7 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 import org.eclipse.ui.IPerspectiveDescriptor;
 import org.eclipse.ui.IPerspectiveRegistry;
 import org.eclipse.ui.IWorkbench;
-import org.eclipse.ui.IWorkbenchPreferenceConstants;
 import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.internal.IPreferenceConstants;
-import org.eclipse.ui.internal.WorkbenchPlugin;
-import org.eclipse.ui.internal.util.PrefUtil;
 import org.eclipse.wst.server.core.IModule;
 import org.eclipse.wst.server.core.IRuntime;
 import org.eclipse.wst.server.core.IRuntimeType;
@@ -108,8 +88,9 @@ import org.junit.runner.RunWith;
  * @author Snjeza
  *
  */
+@SuppressWarnings("restriction")
 @RunWith(SWTBotJunit4ClassRunner.class)
-public class CreateMavenizedSeamProjectTest {
+public class CreateMavenizedSeamProjectTest{
 	
 	protected static final long IDLE_TIME = 1 * 60 * 1000L;
 
@@ -139,18 +120,18 @@ public class CreateMavenizedSeamProjectTest {
 								= "org.eclipse.datatools.connectivity.db.URL"; //$NON-NLS-1$
 	
 	public static final String HSQL_PROFILE_ID = "org.eclipse.datatools.enablement.hsqldb.connectionProfile";
-
-	public static final String JBOSS_AS_HOME = System.getProperty("jbosstools.test.jboss.home.5.1", "E:\\JBossRuntimes\\jboss-5.1.0.GA");
+																																	
+	public static final String JBOSS_AS_HOME = System.getProperty("jbosstools.test.jboss.home.5.1", "/home/eiden/Java/RedHat/JBossASs/jboss-5.1.0.GA");//"E:\\JBossRuntimes\\jboss-5.1.0.GA");
 
 	public static final String JBOSS_AS_RUNTIME_ID = "org.jboss.ide.eclipse.as.runtime.51";
 	
 	public static final String JBOSS_AS_SERVER_ID = "org.jboss.ide.eclipse.as.51";
 	
-	public static final String SEAM_HOME_PROPERTY = System.getProperty("jbosstools.test.seam.2.0.1.GA.home", "E:\\JBossRuntimes\\jboss-seam-2.2.1.CR3");
+	public static final String SEAM_HOME_PROPERTY = System.getProperty("jbosstools.test.seam.2.0.1.GA.home", "/home/eiden/Java/RedHat/libs/jboss-seam-2.2.1.Final");//E:\\JBossRuntimes\\jboss-seam-2.2.1.CR3");
 
 	public static final String HSQLDB_DRIVER_JAR_NAME = "hsqldb.jar"; //$NON-NLS-1$
 	
-	public static final String HSQLDB_DRIVER_LOCATION = "/common/lib/" + HSQLDB_DRIVER_JAR_NAME; //$NON-NLS-1$
+	public static final String HSQLDB_DRIVER_LOCATION = "/home/eiden/Java/RedHat/libs + HSQLDB_DRIVER_JAR_NAME"; //"/common/lib/" + HSQLDB_DRIVER_JAR_NAME; //$NON-NLS-1$
 	
 	public static final String PROJECT_NAME_WAR = "MavenizedSeamProjectWar";
 	
@@ -463,7 +444,7 @@ public class CreateMavenizedSeamProjectTest {
 		bot.button("Finish").click();
 		
 		waitForIdle();
-	}
+		}
 	
 	@Test
 	public void testAsLocation() {
@@ -490,6 +471,7 @@ public class CreateMavenizedSeamProjectTest {
 	}
 
 	private void checkErrors(String projectName) throws CoreException {
+		waitForIdle();
 		List<IMarker> markers = new ArrayList<IMarker>();
 		IProject project = ResourcesPlugin.getWorkspace().getRoot()
 				.getProject(projectName);
@@ -526,21 +508,21 @@ public class CreateMavenizedSeamProjectTest {
 	// see https://jira.jboss.org/browse/JBIDE-6587
 	@Test
 	public void testMavenWarArchive() throws Exception {
-		final SWTBotView packageExplorer = bot.viewByTitle(PACKAGE_EXPLORER);
+		final SWTBotView packageExplorer = bot.viewByTitle("Package Explorer");
 		SWTBot innerBot = packageExplorer.bot();
 		innerBot.activeShell().activate();
-		final SWTBotTree tree = innerBot.tree();
+		SWTBotTree tree = innerBot.tree();
 		final SWTBotTreeItem warProjectItem = tree.getTreeItem(PROJECT_NAME_WAR);
 		warProjectItem.select();
 		
 		SWTBotMenu runAs = tree.contextMenu("Run As");
 		runAs.menu("5 Maven build...").click();
-
+		waitForIdle();
 		SWTBotShell shell = bot.shell("Edit Configuration");
 		shell.activate();
-		
-		bot.textWithLabel("Goals:").setText("clean package");
-		bot.button("Run").click();
+		SWTBot b = shell.bot();
+		b.textWithLabel("Goals:").setText("clean package");
+		b.button("Run").click();
 		waitForIdle();
 		
 		IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject(PROJECT_NAME_WAR);

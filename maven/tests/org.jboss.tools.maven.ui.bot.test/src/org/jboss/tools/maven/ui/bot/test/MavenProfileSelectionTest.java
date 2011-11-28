@@ -1,17 +1,10 @@
-/*************************************************************************************
- * Copyright (c) 2008-2011 Red Hat, Inc. and others.
- * All rights reserved. This program and the accompanying materials 
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
- * 
- * Contributors:
- *     JBoss by Red Hat - Initial implementation.
- ************************************************************************************/
 package org.jboss.tools.maven.ui.bot.test;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.jface.bindings.keys.KeyStroke;
+import org.eclipse.jface.bindings.keys.ParseException;
+import org.eclipse.m2e.core.MavenPlugin;
+import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
 import org.eclipse.swtbot.swt.finder.SWTBot;
 import org.eclipse.swtbot.swt.finder.junit.SWTBotJunit4ClassRunner;
@@ -26,31 +19,70 @@ import org.junit.runner.RunWith;
 @RunWith(SWTBotJunit4ClassRunner.class)
 public class MavenProfileSelectionTest extends AbstractMavenSWTBotTest {
 	
+	public static final String AUTOACTIVATED_PROFILE_IN_POM = "active-profile";
+	public static final String AUTOACTIVATED_PROFILE_IN_USER_SETTINGS = "environment";
+	
+	
+	
 	@Test
-	//FIXME Test fail due to Modal Dialog. Need to find a solution
 	public void testOpenMavenProfiles() throws Exception {
-		
 		IProject project = importProject("projects/simple-jar/pom.xml");
 		waitForJobsToComplete();
 		//Select the project
-		final SWTBotView packageExplorer = bot.viewByTitle(PACKAGE_EXPLORER);
+		testAutoActivatedProfiles();
+		final SWTBotView packageExplorer = bot.viewByTitle("Project Explorer");
 		SWTBot innerBot = packageExplorer.bot();
 		innerBot.activeShell().activate();
-		final SWTBotTree tree = innerBot.tree();
-		final SWTBotTreeItem projectItem = tree.getTreeItem(project.getName());
+		SWTBotTree tree = innerBot.tree();
+		SWTBotTreeItem projectItem = tree.getTreeItem(project.getName());
 		projectItem.select();
-		//Open the profiles dialog 
-		projectItem.pressShortcut(Keystrokes.CTRL, Keystrokes.ALT, KeyStroke.getInstance("P"));
-		
-		//FIXME Either the dialog doesn't open abd the test fails
-		//or SWTBot is blocked by the modal dialog
-		final SWTBotShell selectDialogShell = bot.shell("Select Maven profiles");
-		assertNotNull("selectDialogShell not found", selectDialogShell);
-	    assertEquals("Select Maven profiles", selectDialogShell.getText());
+		openProfilesDialog(projectItem);
+		Thread.sleep(2000);
+	    //activate all profiles
+		SWTBot shell = bot.shell("Select Maven profiles").activate().bot();
+		shell.button("Select All").click();
+	    String selectedProfiles = shell.textWithLabel("Active profiles for simple-jar :").getText();
+	    shell.button("OK").click();
+	   
+	    testActivatedProfiles(project.getName(), selectedProfiles);
+	    Thread.sleep(1000);
+	    openProfilesDialog(projectItem);
 	    
-	    selectDialogShell.activate();
-	    Thread.sleep(5000);
-	    //TODO implement real tests
-		bot.button("Cancel").click();
+	    //disable all profiles
+	    shell = bot.shell("Select Maven profiles").activate().bot();
+	    shell.button("Deselect all").click();
+	    selectedProfiles = bot.textWithLabel("Active profiles for simple-jar :").getText();
+	    bot.button("OK").click();
+	    
+	    testActivatedProfiles(project.getName(), selectedProfiles);
+	}
+	
+	private void openProfilesDialog(SWTBotTreeItem projectItem) throws ParseException, InterruptedException{
+		projectItem.pressShortcut(Keystrokes.CTRL, Keystrokes.ALT,KeyStroke.getInstance("P"));
+		projectItem.pressShortcut(Keystrokes.DOWN);
+		projectItem.pressShortcut(Keystrokes.LF);
+		final SWTBotShell selectDialogShell = bot.shell("Select Maven profiles");
+	    assertEquals("Select Maven profiles", selectDialogShell.getText());
+	    Thread.sleep(1000);
+	}
+	
+	private void testActivatedProfiles(String projectName, String profilesToCheck){
+		
+	    SWTBot explorer = bot.viewByTitle("Project Explorer").bot();
+	    SWTBotTreeItem item = explorer.tree().getTreeItem(projectName).select();
+	    item.pressShortcut(Keystrokes.ALT,Keystrokes.LF);
+	    SWTBot shell = bot.shell("Properties for "+projectName).activate().bot();
+	    shell.tree().select("Maven");
+	    assertEquals("Selected profiles doesn't match", shell.textWithLabel("Active Maven Profiles (comma separated):").getText(),profilesToCheck);
+	    shell.button("OK").click();
+	    
+	}
+	
+	private void testAutoActivatedProfiles(){
+		IMavenProjectFacade facade = MavenPlugin.getMavenProjectRegistry().getMavenProject("org.jboss.tools.maven.tests", "simple-jar", "1.0.0-SNAPSHOT");
+	    assertNotNull("facade is null",facade);
+	    facade.getMavenProject().getActiveProfiles().get(0);
+	    assertEquals("Auto Activated profiles from pom.xml doesn't match", AUTOACTIVATED_PROFILE_IN_POM, facade.getMavenProject().getActiveProfiles().get(0).getId());
+	    assertEquals("Auto Activated profiles from settings.xml doesn't match", AUTOACTIVATED_PROFILE_IN_USER_SETTINGS, facade.getMavenProject().getActiveProfiles().get(1).getId());
 	}
 }

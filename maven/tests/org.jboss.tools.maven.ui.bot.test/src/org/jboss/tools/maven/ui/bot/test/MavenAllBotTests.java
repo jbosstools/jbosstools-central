@@ -20,9 +20,10 @@ import org.junit.runners.Suite;
  */
 
 @Suite.SuiteClasses({
-	//MavenProfileSelectionTest.class, FIXME enable tests for profiles
-	JBossPerspectiveTest.class,
+	MavenProfileSelectionTest.class,
 	CreateMavenizedSeamProjectTest.class,
+	CreateMavenizedJSFProjectTest.class,
+	CreateMavenProjectsTest.class
 })
 @RunWith(Suite.class)
 public class MavenAllBotTests {
