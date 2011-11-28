@@ -45,6 +45,7 @@ public class NewProjectExamplesWizard extends Wizard implements INewWizard {
 
 	@Override
 	public boolean performFinish() {
+		page.finishPage();
 		final List<Project> selectedProjects = new ArrayList<Project>();
 		if (page.getSelection() == null || page.getSelection().size() <= 0) {
 			return false;

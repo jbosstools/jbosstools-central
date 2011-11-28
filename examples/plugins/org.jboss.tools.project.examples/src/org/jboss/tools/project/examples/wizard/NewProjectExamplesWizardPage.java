@@ -19,6 +19,7 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.MessageDialogWithToggle;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
@@ -36,6 +37,8 @@ import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.ModifyEvent;
+import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.GC;
@@ -47,7 +50,9 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.DirectoryDialog;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Monitor;
 import org.eclipse.swt.widgets.Shell;
@@ -72,7 +77,7 @@ import org.jboss.tools.project.examples.model.ProjectUtil;
  */
 public class NewProjectExamplesWizardPage extends WizardPage {
 
-	private static final int DEFAULT_HEIGHT = 400;
+	private static final int DEFAULT_HEIGHT = 430;
 	private static final int DEFAULT_WIDTH = 600;
 	private IStructuredSelection selection;
 	private Button showQuickFixButton;
@@ -84,6 +89,8 @@ public class NewProjectExamplesWizardPage extends WizardPage {
 	private Composite noteComposite;
 	private List<Category> categories;
 	private Text descriptionText;
+	private Button isWorkspace;
+	private Text outputDirectoryText;
 	
 	public NewProjectExamplesWizardPage() {
 		super("org.jboss.tools.project.examples"); //$NON-NLS-1$
@@ -93,13 +100,64 @@ public class NewProjectExamplesWizardPage extends WizardPage {
 	}
 
 	public void createControl(Composite parent) {
-		
 		Composite composite = new Composite(parent,SWT.NONE);
 		composite.setLayout(new GridLayout(1,false));
-		
 		GridData gd = new GridData(SWT.FILL, SWT.FILL, false, false);
-		
 		composite.setLayoutData(gd);
+		
+		Group outputDirectoryGroup = new Group(composite, SWT.NONE);
+		GridLayout layout = new GridLayout(2, false);
+		outputDirectoryGroup.setLayout(layout);
+		outputDirectoryGroup.setText(Messages.ProjectExamplesPreferencePage_Output_directory);
+		gd = new GridData(SWT.FILL, SWT.FILL, true, false);
+		outputDirectoryGroup.setLayoutData(gd);
+		
+		isWorkspace = new Button(outputDirectoryGroup, SWT.CHECK);
+		gd = new GridData(SWT.FILL, SWT.FILL, true, false);
+		gd.horizontalSpan = 2;
+		isWorkspace.setLayoutData(gd);
+		isWorkspace.setText(Messages.ProjectExamplesPreferencePage_Use_default_workspace_location);
+		isWorkspace.setSelection(ProjectExamplesActivator.getDefault().getPreferenceStore().getBoolean(ProjectExamplesActivator.PROJECT_EXAMPLES_DEFAULT));
+		
+		outputDirectoryText = new Text(outputDirectoryGroup, SWT.SINGLE|SWT.BORDER);
+		gd = new GridData(SWT.FILL, SWT.FILL, true, false);
+		gd.verticalAlignment = SWT.CENTER;
+		outputDirectoryText.setLayoutData(gd);
+		final IPreferenceStore store = ProjectExamplesActivator.getDefault().getPreferenceStore();
+		String outputDirectoryValue = store.getString(ProjectExamplesActivator.PROJECT_EXAMPLES_OUTPUT_DIRECTORY);
+		outputDirectoryText.setText(outputDirectoryValue == null ? "" : outputDirectoryValue); //$NON-NLS-1$
+		final Button outputDirectoryBrowse = new Button(outputDirectoryGroup, SWT.PUSH);
+		outputDirectoryBrowse.setText(Messages.Browse);
+		outputDirectoryBrowse.addSelectionListener(new SelectionAdapter(){
+		
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				DirectoryDialog dialog = new DirectoryDialog(getShell(), SWT.SINGLE);
+				String value = outputDirectoryText.getText();
+				if (value.trim().length() == 0) {
+					value = Platform.getLocation().toOSString();
+				}
+				dialog.setFilterPath(value);
+			
+				String result = dialog.open();
+				if (result == null || result.trim().length() == 0) {
+					return;
+				}
+				outputDirectoryText.setText(result);
+				
+			}
+		
+		});
+		enableControls(outputDirectoryBrowse);
+		
+		isWorkspace.addSelectionListener(new SelectionAdapter() {
+
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				enableControls(outputDirectoryBrowse);
+			}
+			
+		});
 		
 		Composite siteComposite = new Composite(composite,SWT.NONE);
 		GridLayout gridLayout = new GridLayout(2,false);
@@ -114,7 +172,6 @@ public class NewProjectExamplesWizardPage extends WizardPage {
 		gd.horizontalSpan = 2;
 		button.setLayoutData(gd);
 		button.setText(Messages.ProjectExamplesPreferencePage_Show_experimental_sites);
-		IPreferenceStore store = ProjectExamplesActivator.getDefault().getPreferenceStore();
 		button.setSelection(store.getBoolean(ProjectExamplesActivator.SHOW_EXPERIMENTAL_SITES));
 		
 		new Label(siteComposite,SWT.NONE).setText(Messages.NewProjectExamplesWizardPage_Site);
@@ -303,6 +360,11 @@ public class NewProjectExamplesWizardPage extends WizardPage {
 		configureSizeAndLocation();
 		refresh(viewer, true);
 		siteCombo.setText(ProjectExamplesActivator.ALL_SITES);
+	}
+	
+	protected void enableControls(Button outputDirectoryBrowse) {
+		outputDirectoryText.setEnabled(!isWorkspace.getSelection());
+		outputDirectoryBrowse.setEnabled(!isWorkspace.getSelection());
 	}
 
 	private void configureSizeAndLocation() {
@@ -574,5 +636,13 @@ public class NewProjectExamplesWizardPage extends WizardPage {
 	private void setDefaultNote() {
 		noteText.setText(Messages.NewProjectExamplesWizardPage_Note);
 		details.setEnabled(true);
+	}
+	
+	public void finishPage() {
+		final IPreferenceStore store = ProjectExamplesActivator.getDefault().getPreferenceStore();
+		store.setValue(ProjectExamplesActivator.PROJECT_EXAMPLES_DEFAULT, isWorkspace.getSelection());
+		if (outputDirectoryText.getText().trim().length() > 0) {
+			store.setValue(ProjectExamplesActivator.PROJECT_EXAMPLES_OUTPUT_DIRECTORY, outputDirectoryText.getText());
+		}
 	}
 }

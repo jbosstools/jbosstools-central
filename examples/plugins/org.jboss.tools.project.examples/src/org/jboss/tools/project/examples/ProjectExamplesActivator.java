@@ -116,6 +116,8 @@ public class ProjectExamplesActivator extends AbstractUIPlugin {
 	public static final String MAVEN_ARCHETYPE = "mavenArchetype"; //$NON-NLS-1$
 	public static final Object PROJECT_EXAMPLES_FAMILY = new Object();
 	public static final String PROJECT_EXAMPLES_OUTPUT_DIRECTORY = "projectExamplesOutputDirectory"; //$NON-NLS-1$
+	public static final String PROJECT_EXAMPLES_DEFAULT = "projectExamplesDefaultLocation"; //$NON-NLS-1$
+	public static final boolean PROJECT_EXAMPLES_DEFAULT_VALUE = true;
 	
 	private static final String IMPORT_PROJECT_EXAMPLES_EXTENSION_ID = "org.jboss.tools.project.examples.importProjectExamples"; //$NON-NLS-1$
 	private static final String NAME = "name"; //$NON-NLS-1$

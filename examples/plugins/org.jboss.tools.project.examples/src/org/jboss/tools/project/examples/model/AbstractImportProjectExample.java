@@ -51,11 +51,17 @@ public abstract class AbstractImportProjectExample implements
 	
 	@Override
 	public IPath getLocation() {
-		String location = ProjectExamplesActivator.getDefault().getPreferenceStore().getString(ProjectExamplesActivator.PROJECT_EXAMPLES_OUTPUT_DIRECTORY);
-		if (location == null || location.isEmpty()) {
-			return Platform.getLocation();
+		boolean isWorkspace = ProjectExamplesActivator.getDefault().getPreferenceStore().
+				getBoolean(ProjectExamplesActivator.PROJECT_EXAMPLES_DEFAULT);
+		if (!isWorkspace) {
+			String location = ProjectExamplesActivator.getDefault().getPreferenceStore().
+					getString(ProjectExamplesActivator.PROJECT_EXAMPLES_OUTPUT_DIRECTORY);
+			if (location == null || location.isEmpty()) {
+				return Platform.getLocation();
+			}
+			return new Path(location);
 		}
-		return new Path(location);
+		return Platform.getLocation();
 	}
 
 }

@@ -10,6 +10,7 @@
  ************************************************************************************/
 package org.jboss.tools.maven.project.examples.wizard;
 
+import java.lang.reflect.Field;
 import java.net.URL;
 import java.util.Collections;
 import java.util.LinkedHashMap;
@@ -37,8 +38,10 @@ import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Link;
 import org.eclipse.ui.IWorkingSet;
@@ -49,6 +52,7 @@ import org.eclipse.wst.common.project.facet.core.runtime.RuntimeManager;
 import org.eclipse.wst.server.core.IRuntime;
 import org.eclipse.wst.server.core.internal.facets.FacetUtil;
 import org.jboss.ide.eclipse.as.core.util.RuntimeUtils;
+import org.jboss.tools.maven.project.examples.MavenProjectExamplesActivator;
 import org.jboss.tools.maven.project.examples.Messages;
 import org.jboss.tools.project.examples.model.Project;
 
@@ -326,4 +330,19 @@ public class ArchetypeExamplesWizardFirstPage extends MavenProjectWizardLocation
 		this.propertyModifyListener = propertyModifyListener;
 	}
 
+	public void setUseDefaultWorkspaceLocation(boolean value) {
+		Class clazz = MavenProjectWizardLocationPage.class;
+		try {
+			Field field = clazz.getDeclaredField("useDefaultWorkspaceLocationButton"); //$NON-NLS-1$
+			field.setAccessible(true);
+			Object useDefaultWorkspaceLocation = field.get(this);
+			if (useDefaultWorkspaceLocation instanceof Button) {
+				Button useDefaultWorkspaceLocationButton = (Button) useDefaultWorkspaceLocation;
+				useDefaultWorkspaceLocationButton.setSelection(value);
+				useDefaultWorkspaceLocationButton.notifyListeners(SWT.Selection, new Event());
+			}
+		} catch (Exception e) {
+			MavenProjectExamplesActivator.log(e);
+		} 
+	}
 }

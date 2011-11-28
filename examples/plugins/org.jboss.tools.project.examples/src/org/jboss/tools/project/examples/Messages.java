@@ -69,6 +69,7 @@ public class Messages extends NLS {
 	public static String ProjectExamplesPreferencePage_Show_experimental_sites;
 	public static String ProjectExamplesPreferencePage_Show_invalid_sites;
 	public static String ProjectExamplesPreferencePage_Sites;
+	public static String ProjectExamplesPreferencePage_Use_default_workspace_location;
 	public static String ProjectFix_Missing_Drools_Runtime;
 	public static String ProjectFix_Missing_plugin;
 	public static String ProjectFix_Missing_Seam_Runtime;

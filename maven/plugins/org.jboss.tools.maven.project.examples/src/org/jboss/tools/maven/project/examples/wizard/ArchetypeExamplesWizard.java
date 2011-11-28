@@ -42,10 +42,12 @@ import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.widgets.Combo;
+import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.INewWizard;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkingSet;
+import org.jboss.tools.maven.project.examples.ImportMavenArchetypeProjectExample;
 import org.jboss.tools.maven.project.examples.MavenProjectExamplesActivator;
 import org.jboss.tools.project.examples.ProjectExamplesActivator;
 import org.jboss.tools.project.examples.model.Project;
@@ -58,7 +60,6 @@ import org.jboss.tools.project.examples.model.Project;
 public class ArchetypeExamplesWizard extends Wizard implements INewWizard {
 
 	private Project projectDescription;
-	//private File location;
 	private ProjectImportConfiguration configuration;
 	private ArchetypeExamplesWizardFirstPage simplePage;
 	private ArchetypeExamplesWizardPage wizardPage;
@@ -66,13 +67,11 @@ public class ArchetypeExamplesWizard extends Wizard implements INewWizard {
 	private String projectName;
 	private String artifactId;
 
-
 	public ArchetypeExamplesWizard(File location, Project projectDescription) {
 		super();
 		setWindowTitle("New JBoss project");
 		setDefaultPageImageDescriptor(MavenImages.WIZ_NEW_PROJECT);
 		setNeedsProgressMonitor(true);
-		//this.location = location;
 		this.projectDescription = projectDescription;
 	}
 
@@ -167,7 +166,11 @@ public class ArchetypeExamplesWizard extends Wizard implements INewWizard {
 	    	configuration.getResolverConfiguration().setActiveProfiles(profiles);
 	    }
 	    simplePage = new ArchetypeExamplesWizardFirstPage(configuration, projectDescription, workingSets);
-	    addPage(simplePage);
+	    addPage(simplePage);  
+	    String location = ProjectExamplesActivator.getDefault().getPreferenceStore().getString(ProjectExamplesActivator.PROJECT_EXAMPLES_OUTPUT_DIRECTORY);
+	    if (location != null && location.trim().length() > 0) {
+	    	simplePage.setLocationPath(new Path(location));
+	    }
 	    wizardPage = new ArchetypeExamplesWizardPage(configuration, projectDescription);
 	    wizardPage.setPageComplete(true);//We want to enable the finish button early
 	    addPage(wizardPage);
@@ -209,5 +212,11 @@ public class ArchetypeExamplesWizard extends Wizard implements INewWizard {
 
 	public String getArtifactId() {
 		return artifactId;
+	}
+
+	@Override
+	public void createPageControls(Composite pageContainer) {
+		super.createPageControls(pageContainer);
+	    simplePage.setUseDefaultWorkspaceLocation(ProjectExamplesActivator.getDefault().getPreferenceStore().getBoolean(ProjectExamplesActivator.PROJECT_EXAMPLES_DEFAULT));
 	}
 }
