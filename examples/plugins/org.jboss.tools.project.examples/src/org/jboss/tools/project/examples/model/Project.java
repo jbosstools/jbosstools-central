@@ -261,4 +261,8 @@ public class Project implements ProjectModelElement {
 		this.defaultProfiles = defaultProfiles;
 	}
 
+	@Override
+	public String toString() {
+		return getName();
+	}
 }

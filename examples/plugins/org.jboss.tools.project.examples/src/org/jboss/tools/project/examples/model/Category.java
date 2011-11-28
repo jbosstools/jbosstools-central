@@ -95,4 +95,8 @@ public class Category implements ProjectModelElement {
 		return true;
 	}
 
+	@Override
+	public String toString() {
+		return getName();
+	}
 }

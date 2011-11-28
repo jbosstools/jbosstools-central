@@ -11,6 +11,7 @@
 package org.jboss.tools.maven.project.examples.wizard;
 
 import java.lang.reflect.InvocationTargetException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
@@ -27,21 +28,28 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
-import org.eclipse.core.runtime.Status;
+import org.eclipse.jface.dialogs.Dialog;
+import org.eclipse.jface.layout.GridDataFactory;
+import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.operation.IRunnableWithProgress;
+import org.eclipse.jface.resource.JFaceResources;
+import org.eclipse.jface.viewers.ViewerColumn;
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.embedder.IMaven;
-import org.eclipse.m2e.core.embedder.IMavenConfiguration;
-import org.eclipse.m2e.core.internal.IMavenConstants;
 import org.eclipse.m2e.core.internal.MavenPluginActivator;
-import org.eclipse.m2e.core.internal.Messages;
-import org.eclipse.m2e.core.internal.archetype.ArchetypeManager;
-import org.eclipse.m2e.core.internal.archetype.ArchetypeCatalogFactory.RemoteCatalogFactory;
 import org.eclipse.m2e.core.project.ProjectImportConfiguration;
-import org.eclipse.m2e.core.ui.internal.wizards.MavenProjectWizardArchetypeParametersPage;
 import org.eclipse.osgi.util.NLS;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Link;
+import org.eclipse.swt.widgets.TableItem;
+import org.eclipse.ui.PlatformUI;
 import org.jboss.tools.maven.project.examples.MavenProjectExamplesActivator;
+import org.jboss.tools.maven.project.examples.wizard.xpl.MavenProjectWizardArchetypeParametersPage;
 import org.jboss.tools.project.examples.model.ArchetypeModel;
 import org.jboss.tools.project.examples.model.Project;
 
@@ -54,16 +62,18 @@ public class ArchetypeExamplesWizardPage extends
 		MavenProjectWizardArchetypeParametersPage {
 
 	private Project projectDescription;
+	private Composite warningLink;
+	private Boolean isEnterpriseRepoAvailable;
 
 	public ArchetypeExamplesWizardPage(
 			ProjectImportConfiguration configuration, Project projectDescription) {
 		super(configuration);
+		setTitle(projectDescription.getShortDescription());
 		this.projectDescription = projectDescription;
 	}
 
 	@Override
 	public void createControl(Composite parent) {
-		long start = System.currentTimeMillis();
 		super.createControl(parent);
 		Archetype archetype = new Archetype();
 		ArchetypeModel archetypeModel = projectDescription.getArchetypeModel();
@@ -101,12 +111,11 @@ public class ArchetypeExamplesWizardPage extends
 		// It needs to be called AFTER setArchetype(archetype) !!! 
 		archetypeChanged = false;
 		
-		//Use archetype/example name by default
-		artifactIdCombo.setText(artifactId);
-	    
 		//Check if project already exists
 	    IStatus nameStatus = getImportConfiguration().validateProjectName(getModel());
-	    if(!nameStatus.isOK()) {
+	    if(nameStatus.isOK()) {
+			artifactIdCombo.setText(artifactId);
+	    } else {
 	    	//Force the user to change the name if the project exists
 	    	artifactIdCombo.setText("");//$NON-NLS-1$
 	    }
@@ -114,11 +123,56 @@ public class ArchetypeExamplesWizardPage extends
 		groupIdCombo.setText(groupId);
 		versionCombo.setText(version);
 		packageCombo.setText(javaPackage);
-		
-	    long stop = System.currentTimeMillis();
-	    System.err.println("Create controls took " + (stop-start) + " ms");
 	}
 
+	@Override
+	protected void createAdvancedSettings(Composite composite, GridData gridData) {
+		// TODO Auto-generated method stub
+		super.createAdvancedSettings(composite, gridData);
+		createMissingRepositoriesWarning(composite, gridData);
+	}
+
+	private void createMissingRepositoriesWarning(Composite parent,
+			GridData gridData) {
+		//TODO make that damn component align correctly
+		//warningLink = new MissingRepositoryWarningComponent(parent);
+		
+		//TODO delete that code
+		warningLink = new Composite(parent, SWT.NONE);
+		
+//		Display display = Display.getCurrent();
+//		Color color = display.getSystemColor(SWT.COLOR_BLUE);
+//		warningLink.setBackground(color);
+		GridDataFactory.fillDefaults().align(SWT.LEFT, SWT.CENTER).span(3, 1)
+				.applyTo(warningLink);
+		GridLayoutFactory.fillDefaults().numColumns(2).applyTo(warningLink);
+
+		Label warningImg = new Label(warningLink, SWT.CENTER | SWT.TOP);
+		warningImg.setImage(JFaceResources.getImage(Dialog.DLG_IMG_MESSAGE_WARNING));
+
+		Link link = new Link(warningLink, SWT.NONE);
+		String message = "Artifacts needed from JBoss Enterprise Maven repository do not seem to be available.\nThis might cause build problems. "
+				+ "Follow this <a href=\"http://community.jboss.org/wiki/SettingUpTheJBossEnterpriseRepositories\">link</a> for more details.";
+		link.setText(message);
+		link.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				try {
+					// Open default external browser
+					PlatformUI.getWorkbench().getBrowserSupport()
+							.getExternalBrowser().openURL(new URL(e.text));
+				} catch (Exception ex) {
+					ex.printStackTrace();
+				}
+			}
+		});
+		//link.setBackground(display.getSystemColor(SWT.COLOR_RED));
+		
+		warningLink.setVisible(false);
+	}
+
+
+	
 	public Archetype getArchetype() {
 		return archetype;
 	}
@@ -164,12 +218,10 @@ public class ArchetypeExamplesWizardPage extends
 	            }
 	          } catch(UnknownArchetype e) {
 	        	 MavenProjectExamplesActivator.log(e);
-	        	 e.printStackTrace();
 	        	 //TODO don't swallow exceptions
 	          } catch(CoreException ex) {
 	        	  //TODO don't swallow exceptions
 	        	 MavenProjectExamplesActivator.log(ex);
-	        	 ex.printStackTrace();
 	          } finally {
 	            monitor.done();
 	          }
@@ -196,7 +248,6 @@ public class ArchetypeExamplesWizardPage extends
 	private Artifact downloadArchetype(String groupId, String artifactId,
 			String version, ArtifactRepository archetypeRepository,
 			List<ArtifactRepository> repositories) throws CoreException {
-		//long start = System.currentTimeMillis();
 		IMaven maven = MavenPlugin.getMaven();
 	    ArrayList<ArtifactRepository> repos = new ArrayList<ArtifactRepository>();
 	    if (archetypeRepository != null) {
@@ -206,9 +257,73 @@ public class ArchetypeExamplesWizardPage extends
 	    IProgressMonitor nullProgressMonitor = new NullProgressMonitor();
 	    maven.resolve(groupId, artifactId, version, "pom", null, repos, nullProgressMonitor); //$NON-NLS-1$
 	    Artifact a = maven.resolve(groupId, artifactId, version, "jar", null, repos, nullProgressMonitor); //$NON-NLS-1$
-	    //long stop = System.currentTimeMillis();
-	    //System.err.println("download took " + (stop-start) + " ms");
 	    return a;
 	}
 	
+	
+	public void updateArchetypeProperty(String key, String value){
+		if (propertiesTable == null) return;
+		
+		for(int i = 0; i < propertiesTable.getItemCount(); i++ ) {
+	      TableItem item = propertiesTable.getItem(i);
+	      if (item.getText(KEY_INDEX).equals(key) && !item.getText(VALUE_INDEX).equals(value)) {
+		      item.setText(VALUE_INDEX, value);
+	    	  //don't break, just to be sure
+	      }
+		}
+	}
+
+	public void setArtifactId(String projectName) {
+		if (artifactIdCombo != null) {
+			artifactIdCombo.setText(projectName);
+		}
+	}
+
+	public void setPackageName(String packageName) {
+		if (packageCombo != null) {
+			if (!packageCombo.getText().equals(packageName)){ 
+				packageCombo.setText(packageName);
+			}
+			if (groupIdCombo.getText().equals(packageName)){
+				groupIdCombo.setText(packageName);
+			}
+		}
+	}
+
+	@Override
+	protected void validate() {
+		checkEnterpriseProperty();
+		super.validate();
+	}
+
+	private void checkEnterpriseProperty() {
+		if (warningLink == null) {
+			//Not initialized yet
+			return;
+		}
+		// TODO Auto-generated method stub
+		for(int i = 0; i < propertiesTable.getItemCount(); i++ ) {
+		      TableItem item = propertiesTable.getItem(i);
+		      String value = item.getText(VALUE_INDEX);
+		      if (item.getText(KEY_INDEX).equals("enterprise") 
+		    		  && (Boolean.TRUE.toString().equalsIgnoreCase(value)
+		    		  || "y".equalsIgnoreCase(value)
+		    		  || "yes".equalsIgnoreCase(value))
+		    		  && !assertEnterpriseRepoAccessible()) {
+		    	  warningLink.setVisible(true);
+		    	  return;
+		      }
+		}
+  	  warningLink.setVisible(false);
+	}
+	
+	private boolean assertEnterpriseRepoAccessible() {
+		if (isEnterpriseRepoAvailable != null) {
+			return isEnterpriseRepoAvailable.booleanValue();
+		}
+		
+		isEnterpriseRepoAvailable = MavenArtifactHelper.isEnterpriseRepositoryAvailable();
+		return isEnterpriseRepoAvailable.booleanValue();
+	}
+
 }

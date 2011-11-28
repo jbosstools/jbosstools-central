@@ -484,15 +484,15 @@ public class JBossCentralActivator extends AbstractUIPlugin {
 		try {
 			shell = new Shell(PlatformUI.getWorkbench().getDisplay());
 			new Browser(shell, SWT.NONE);
-			isInternalWebBrowserAvailable = new Boolean(true);
+			isInternalWebBrowserAvailable = Boolean.TRUE.booleanValue();
 			return true;
 		} catch (Throwable t) {
 			try {
 				new Browser(shell, SWT.WEBKIT);
-				isInternalWebBrowserAvailable = new Boolean(true);
+				isInternalWebBrowserAvailable = Boolean.TRUE.booleanValue();
 				return true;
 			} catch (Throwable e) {
-				isInternalWebBrowserAvailable = new Boolean(false);
+				isInternalWebBrowserAvailable = Boolean.FALSE.booleanValue();
 				return false;
 			}
 		} finally {
