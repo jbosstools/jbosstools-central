@@ -93,7 +93,7 @@ import org.jboss.tools.project.examples.model.IImportProjectExample;
 import org.jboss.tools.project.examples.model.Project;
 import org.jboss.tools.project.examples.model.ProjectFix;
 import org.jboss.tools.project.examples.model.ProjectUtil;
-import org.jboss.tools.project.examples.wizard.ImportDefaultMavenProjectExample;
+import org.jboss.tools.project.examples.wizard.ImportDefaultProjectExample;
 import org.jboss.tools.project.examples.wizard.NewProjectExamplesJob;
 import org.osgi.framework.BundleContext;
 
@@ -102,8 +102,9 @@ import org.osgi.framework.BundleContext;
  */
 public class ProjectExamplesActivator extends AbstractUIPlugin {
 
-	private static final String README_HTML = "/readme.html";
+	private static final String README_HTML = "/readme.html"; //$NON-NLS-1$
 	private static final String CHEATSHEET_XML = "/cheatsheet.xml"; //$NON-NLS-1$
+	private static final String PERIOD_CHEATSHEET_XML = "/.cheatsheet.xml"; //$NON-NLS-1$
 	// The plug-in ID
 	public static final String PLUGIN_ID = "org.jboss.tools.project.examples"; //$NON-NLS-1$
 	public static final String ALL_SITES = Messages.ProjectExamplesActivator_All;
@@ -114,6 +115,7 @@ public class ProjectExamplesActivator extends AbstractUIPlugin {
 	public static final boolean SHOW_INVALID_SITES_VALUE = true;
 	public static final String MAVEN_ARCHETYPE = "mavenArchetype"; //$NON-NLS-1$
 	public static final Object PROJECT_EXAMPLES_FAMILY = new Object();
+	public static final String PROJECT_EXAMPLES_OUTPUT_DIRECTORY = "projectExamplesOutputDirectory"; //$NON-NLS-1$
 	
 	private static final String IMPORT_PROJECT_EXAMPLES_EXTENSION_ID = "org.jboss.tools.project.examples.importProjectExamples"; //$NON-NLS-1$
 	private static final String NAME = "name"; //$NON-NLS-1$
@@ -144,7 +146,7 @@ public class ProjectExamplesActivator extends AbstractUIPlugin {
 
 	};
 	private Map<String, IImportProjectExample> importProjectExamplesMap;
-	private ImportDefaultMavenProjectExample defaultImportProjectExample;
+	private ImportDefaultProjectExample defaultImportProjectExample;
 
 	/**
 	 * The constructor
@@ -297,7 +299,7 @@ public class ProjectExamplesActivator extends AbstractUIPlugin {
 
 	private void initImportProjectExamples() {
 		if (importProjectExamplesMap == null) {
-			defaultImportProjectExample = new ImportDefaultMavenProjectExample();
+			defaultImportProjectExample = new ImportDefaultProjectExample();
 			importProjectExamplesMap = new HashMap<String,IImportProjectExample>();
 			IExtensionRegistry registry = Platform.getExtensionRegistry();
 			IExtensionPoint extensionPoint = registry
@@ -437,23 +439,37 @@ public class ProjectExamplesActivator extends AbstractUIPlugin {
 		if (project == null || project.isWelcome()) {
 			return;
 		}
+		checkCheatsheet(project);
+		
+	}
+
+	protected static void checkCheatsheet(Project project) {
 		List<String> includedProjects = project.getIncludedProjects();
 		if (includedProjects == null || includedProjects.size() <= 0) {
 			return;
 		}
-		String projectName = includedProjects.get(0);
-		if (projectName == null || projectName.isEmpty()) {
-			return;
+		for (String projectName : includedProjects) {
+			if (projectName == null || projectName.isEmpty()) {
+				continue;
+			}
+			IProject eclipseProject = ResourcesPlugin.getWorkspace().getRoot()
+					.getProject(projectName);
+			if (eclipseProject == null || !eclipseProject.exists()) {
+				continue;
+			}
+			if (checkCheatsheet(project, eclipseProject, PERIOD_CHEATSHEET_XML,
+					ProjectUtil.CHEATSHEETS)) {
+				return;
+			}
+			if (checkCheatsheet(project, eclipseProject, CHEATSHEET_XML,
+					ProjectUtil.CHEATSHEETS)) {
+				return;
+			}
+			if (checkCheatsheet(project, eclipseProject, README_HTML,
+					ProjectUtil.EDITOR)) {
+				return;
+			}
 		}
-		IProject eclipseProject = ResourcesPlugin.getWorkspace().getRoot().getProject(projectName);
-		if (eclipseProject == null || !eclipseProject.exists()) {
-			return;
-		}
-		if (checkCheatsheet(project, eclipseProject, CHEATSHEET_XML, ProjectUtil.CHEATSHEETS)) {
-			return;
-		}
-		checkCheatsheet(project, eclipseProject, README_HTML, ProjectUtil.EDITOR);
-		
 	}
 
 	private static boolean checkCheatsheet(Project project,
@@ -780,6 +796,9 @@ public class ProjectExamplesActivator extends AbstractUIPlugin {
 			}
 
 			public void done(IJobChangeEvent event) {
+				if (!workspaceJob.getResult().isOK()) {
+					return;
+				}
 				List<Project> projects = workspaceJob.getProjects();
 				try {
 					ProjectExamplesActivator.updatePerspective(projects);

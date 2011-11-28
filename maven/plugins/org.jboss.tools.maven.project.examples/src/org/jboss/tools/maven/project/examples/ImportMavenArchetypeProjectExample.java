@@ -19,11 +19,13 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.eclipse.core.resources.IWorkspaceRoot;
+import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.window.Window;
 import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.m2e.core.MavenPlugin;
@@ -31,6 +33,7 @@ import org.eclipse.m2e.core.embedder.MavenModelManager;
 import org.eclipse.m2e.core.project.LocalProjectScanner;
 import org.eclipse.m2e.core.project.MavenProjectInfo;
 import org.eclipse.m2e.core.project.ProjectImportConfiguration;
+import org.eclipse.m2e.core.ui.internal.UpdateConfigurationJob;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.jboss.tools.maven.project.examples.wizard.ArchetypeExamplesWizard;
@@ -49,11 +52,8 @@ public class ImportMavenArchetypeProjectExample extends
 			final IProgressMonitor monitor) throws Exception {
 		List<Project> projects = new ArrayList<Project>();
 		projects.add(projectDescription);
-		final IWorkspaceRoot workspaceRoot = ResourcesPlugin.getWorkspace().getRoot();
-		IPath rootPath = workspaceRoot.getLocation();
-		IPath mavenProjectsRoot = rootPath; 
-		IPath path = mavenProjectsRoot;
-		final File destination = new File(path.toOSString());
+		final IPath location = getLocation();
+		final File destination = new File(location.toOSString());
 
 		final boolean[] ret = new boolean[1];
 		ret[0] = true;
@@ -76,14 +76,13 @@ public class ImportMavenArchetypeProjectExample extends
 				projectDescription.getIncludedProjects().clear();
 				String projectName = wizard.getProjectName();
 				includedProjects.add(projectName);
-				IPath location = workspaceRoot.getLocation();
 				String artifactId = wizard.getArtifactId();
 				String projectFolder = location.append(artifactId).toFile()
 						.getAbsolutePath();
 				MavenModelManager mavenModelManager = MavenPlugin
 						.getMavenModelManager();
 				LocalProjectScanner scanner = new LocalProjectScanner(
-						workspaceRoot.getLocation().toFile(), //
+						location.toFile(), //
 						projectFolder, true, mavenModelManager);
 				try {
 					scanner.run(monitor);
@@ -95,6 +94,7 @@ public class ImportMavenArchetypeProjectExample extends
 				Set<MavenProjectInfo> projectSet = collectProjects(scanner
 						.getProjects());
 				ProjectImportConfiguration importConfiguration = new ProjectImportConfiguration();
+				
 				for (MavenProjectInfo info : projectSet) {
 					try {
 						projectName = MavenProjectExamplesActivator
@@ -105,6 +105,35 @@ public class ImportMavenArchetypeProjectExample extends
 					} catch (CoreException e) {
 						MavenProjectExamplesActivator.log(e);
 						ret[0] = false;
+					}
+				}
+				IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject(projectName);
+				if (project != null && project.isAccessible()) {
+					try {
+						project.refreshLocal(IResource.DEPTH_INFINITE, monitor);
+					} catch (CoreException e) {
+						// ignore
+					}
+				}
+				if (includedProjects.size() > 0) {
+					IProject[] selectedProjects = new IProject[includedProjects.size()];
+					int i = 0;
+					
+					for (String selectedProjectName:includedProjects) {
+						project = ResourcesPlugin.getWorkspace().getRoot().getProject(selectedProjectName);
+						selectedProjects[i++] = project;
+						try {
+							project.refreshLocal(IResource.DEPTH_INFINITE, monitor);
+						} catch (CoreException e) {
+							// ignore
+						}
+					}
+					Job updateJob = new UpdateConfigurationJob(selectedProjects , true, false);
+					updateJob.schedule();
+					try {
+						updateJob.join();
+					} catch (InterruptedException e) {
+						// ignore
 					}
 				}
 			}

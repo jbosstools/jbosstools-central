@@ -18,15 +18,12 @@ import java.util.List;
 import org.apache.maven.model.Model;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
-import org.eclipse.core.resources.IWorkspace;
-import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.m2e.core.MavenPlugin;
-import org.eclipse.m2e.core.embedder.IMaven;
 import org.eclipse.m2e.core.embedder.MavenModelManager;
 import org.eclipse.m2e.core.project.AbstractProjectScanner;
 import org.eclipse.m2e.core.project.LocalProjectScanner;
@@ -54,8 +51,7 @@ public class ImportMavenProjectExample extends AbstractImportProjectExample {
 			IProgressMonitor monitor) throws Exception {
 		List<Project> projects = new ArrayList<Project>();
 		projects.add(projectDescription);
-		IWorkspaceRoot workspaceRoot = ResourcesPlugin.getWorkspace().getRoot();
-		IPath rootPath = workspaceRoot.getLocation();
+		IPath rootPath = getLocation();
 		IPath mavenProjectsRoot = rootPath;
 		String projectName = projectDescription.getName();
 		if (projectName == null || projectName.isEmpty()) {

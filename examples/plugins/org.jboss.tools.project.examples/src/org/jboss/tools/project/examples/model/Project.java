@@ -44,7 +44,7 @@ public class Project implements ProjectModelElement {
 	private ArchetypeModel  archetypeModel = new ArchetypeModel();
 	private File file;
 	private IProjectExampleSite site;
-	private String defaultProfiles ="";
+	private String defaultProfiles =""; //$NON-NLS-1$
 	
 	public Project() {
 		name=""; //$NON-NLS-1$

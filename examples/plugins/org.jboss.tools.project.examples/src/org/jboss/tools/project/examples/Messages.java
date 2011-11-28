@@ -64,6 +64,7 @@ public class Messages extends NLS {
 	public static String ProjectExamplesActivator_Waiting;
 	public static String ProjectExamplesPreferencePage_Add;
 	public static String ProjectExamplesPreferencePage_Edit;
+	public static String ProjectExamplesPreferencePage_Output_directory;
 	public static String ProjectExamplesPreferencePage_Remove;
 	public static String ProjectExamplesPreferencePage_Show_experimental_sites;
 	public static String ProjectExamplesPreferencePage_Show_invalid_sites;
@@ -81,7 +82,7 @@ public class Messages extends NLS {
 	public static String ProjectUtil_Test;
 	public static String SeamRuntimeFix_Invalid_seam_runtime_fix;
 	public static String SiteDialog_Add_Project_Example_Site;
-	public static String SiteDialog_Browse;
+	public static String Browse;
 	public static String SiteDialog_Edit_Project_Example_Site;
 	public static String SiteDialog_Invalid_URL;
 	public static String SiteDialog_Name;

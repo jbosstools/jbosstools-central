@@ -37,6 +37,8 @@ public class NewProjectExamplesJob extends WorkspaceJob {
 					selectedProject, monitor);
 			if (success) {
 				projects.add(selectedProject);
+			} else {
+				return Status.CANCEL_STATUS;
 			}
 		}
 		try {
@@ -53,10 +55,12 @@ public class NewProjectExamplesJob extends WorkspaceJob {
 									"Cannot import a project of the '" + project.getImportType() + "' type.");
 						}
 					});
-					return Status.OK_STATUS;
+					return Status.CANCEL_STATUS;
 				}
 				if (importProjectExample.importProject(project, project.getFile(), monitor)) {
 					importProjectExample.fix(project, monitor);						
+				} else {
+					return Status.CANCEL_STATUS;
 				}
 			}
 		} catch (final Exception e) {

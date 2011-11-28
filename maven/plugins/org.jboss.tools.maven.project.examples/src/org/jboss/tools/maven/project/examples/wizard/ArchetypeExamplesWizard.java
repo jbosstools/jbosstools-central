@@ -23,6 +23,7 @@ import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.wizard.Wizard;
@@ -32,6 +33,7 @@ import org.eclipse.m2e.core.ui.internal.MavenImages;
 import org.eclipse.ui.INewWizard;
 import org.eclipse.ui.IWorkbench;
 import org.jboss.tools.maven.project.examples.MavenProjectExamplesActivator;
+import org.jboss.tools.project.examples.ProjectExamplesActivator;
 import org.jboss.tools.project.examples.model.Project;
 
 /**
@@ -99,10 +101,13 @@ public class ArchetypeExamplesWizard extends Wizard implements INewWizard {
 		try {
 			getContainer().run(true, false, op);
 		} catch (InterruptedException e) {
-			return false;
+			ProjectExamplesActivator.log(e);
+			return true;
 		} catch (InvocationTargetException e) {
-			
-			return false;
+			ProjectExamplesActivator.log(e);
+			Throwable ex = e.getTargetException();
+			MessageDialog.openError(getShell(), "Error", ex.getMessage());
+			return true;
 		}
 
 		return true;

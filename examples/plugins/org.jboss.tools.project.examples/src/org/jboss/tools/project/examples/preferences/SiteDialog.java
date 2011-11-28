@@ -141,7 +141,7 @@ public class SiteDialog extends TitleAreaDialog {
 			nameText.setText(selectedSite.getName());
 		}
 		Button browse = new Button(container,SWT.PUSH);
-		browse.setText(Messages.SiteDialog_Browse);
+		browse.setText(Messages.Browse);
 		browse.addSelectionListener(new SelectionListener(){
 		
 			public void widgetSelected(SelectionEvent e) {

@@ -12,6 +12,7 @@ package org.jboss.tools.project.examples.preferences;
 
 import java.net.URL;
 
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.PreferencePage;
 import org.eclipse.jface.viewers.ISelection;
@@ -32,7 +33,10 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.DirectoryDialog;
 import org.eclipse.swt.widgets.Group;
+import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 import org.jboss.tools.project.examples.Messages;
@@ -55,6 +59,7 @@ public class ProjectExamplesPreferencePage extends PreferencePage implements
 	private TreeViewer viewer;
 	private ProjectExampleSite selectedSite;
 	private Button showInvalidSites;
+	private Text outputDirectoryText;
 	
 	@Override
 	protected Control createContents(Composite parent) {
@@ -72,6 +77,51 @@ public class ProjectExamplesPreferencePage extends PreferencePage implements
 		showInvalidSites = new Button(composite,SWT.CHECK);
 		showInvalidSites.setText(Messages.ProjectExamplesPreferencePage_Show_invalid_sites);
 		showInvalidSites.setSelection(store.getBoolean(ProjectExamplesActivator.SHOW_INVALID_SITES));
+		
+		Composite outputDirectoryComposite = new Composite(composite, SWT.NONE);
+		layout = new GridLayout(3, false);
+		layout.marginWidth = 0;
+		layout.marginHeight = 0;
+		outputDirectoryComposite.setLayout(layout);
+		GridData gd = new GridData(SWT.FILL, SWT.FILL, true, false);
+		outputDirectoryComposite.setLayoutData(gd);
+		
+		Label outputDirectoryLabel = new Label(outputDirectoryComposite,SWT.NONE);
+		gd = new GridData(SWT.FILL, SWT.FILL, false, false);
+		gd.verticalAlignment = SWT.CENTER;
+		outputDirectoryLabel.setLayoutData(gd);
+		outputDirectoryLabel.setText(Messages.ProjectExamplesPreferencePage_Output_directory);
+		
+		outputDirectoryText = new Text(outputDirectoryComposite, SWT.SINGLE|SWT.BORDER);
+		gd = new GridData(SWT.FILL, SWT.FILL, true, false);
+		gd.verticalAlignment = SWT.CENTER;
+		outputDirectoryText.setLayoutData(gd);
+		String outputDirectoryValue = store.getString(ProjectExamplesActivator.PROJECT_EXAMPLES_OUTPUT_DIRECTORY);
+		outputDirectoryText.setText(outputDirectoryValue == null ? "" : outputDirectoryValue); //$NON-NLS-1$
+		Button outputDirectoryBrowse = new Button(outputDirectoryComposite, SWT.PUSH);
+		outputDirectoryBrowse.setText(Messages.Browse);
+		outputDirectoryBrowse.addSelectionListener(new SelectionListener(){
+		
+			public void widgetSelected(SelectionEvent e) {
+				DirectoryDialog dialog = new DirectoryDialog(getShell(), SWT.SINGLE);
+				String value = outputDirectoryText.getText();
+				if (value.trim().length() == 0) {
+					value = Platform.getLocation().toOSString();
+				}
+				dialog.setFilterPath(value);
+			
+				String result = dialog.open();
+				if (result == null || result.trim().length() == 0) {
+					return;
+				}
+				outputDirectoryText.setText(result);
+				
+			}
+		
+			public void widgetDefaultSelected(SelectionEvent e) {
+				
+			}
+		});
 		
 		Group sitesGroup = new Group(composite,SWT.NONE);
 		sitesGroup.setText(Messages.ProjectExamplesPreferencePage_Sites);
@@ -197,22 +247,26 @@ public class ProjectExamplesPreferencePage extends PreferencePage implements
 	protected void performDefaults() {
 		showExperimentalSites.setSelection(ProjectExamplesActivator.SHOW_EXPERIMENTAL_SITES_VALUE);
 		showInvalidSites.setSelection(ProjectExamplesActivator.SHOW_INVALID_SITES_VALUE);
+		outputDirectoryText.setText(""); //$NON-NLS-1$
 		sites.getUserSites().clear();
-		storeSites();
+		storePreferences();
 		super.performDefaults();
 	}
 
 	@Override
 	public boolean performOk() {
-		storeSites(); 
+		storePreferences(); 
 		return super.performOk();
 	}
 
-	private void storeSites() {
+	private void storePreferences() {
 		IPreferenceStore store = ProjectExamplesActivator.getDefault().getPreferenceStore();
 		store.setValue(ProjectExamplesActivator.SHOW_EXPERIMENTAL_SITES, showExperimentalSites.getSelection());
 		store.setValue(ProjectExamplesActivator.SHOW_INVALID_SITES, showInvalidSites.getSelection());
-		
+		String value = outputDirectoryText.getText();
+		if (!value.isEmpty()) {
+			store.setValue(ProjectExamplesActivator.PROJECT_EXAMPLES_OUTPUT_DIRECTORY, value);
+		}
 		try {
 			String userSites = ProjectUtil.getAsXML(sites.getUserSites());
 			store.setValue(ProjectExamplesActivator.USER_SITES, userSites);

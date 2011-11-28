@@ -11,6 +11,7 @@ import java.util.zip.ZipException;
 import java.util.zip.ZipFile;
 
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IProjectDescription;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.ResourcesPlugin;
@@ -18,6 +19,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.jdt.core.IClasspathEntry;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IPackageFragmentRoot;
@@ -36,7 +38,7 @@ import org.jboss.tools.project.examples.ProjectExamplesActivator;
 import org.jboss.tools.project.examples.model.AbstractImportProjectExample;
 import org.jboss.tools.project.examples.model.Project;
 
-public class ImportDefaultMavenProjectExample extends
+public class ImportDefaultProjectExample extends
 		AbstractImportProjectExample {
 
 	private static final IOverwriteQuery OVERWRITE_ALL_QUERY = new IOverwriteQuery() {
@@ -74,7 +76,7 @@ public class ImportDefaultMavenProjectExample extends
 					}
 					project.delete(true, true, monitor);
 				}
-				project.create(monitor);
+				createProject(project, monitor);
 				project.open(monitor);
 				ZipFile sourceFile = new ZipFile(file);
 				ZipLeveledStructureProvider structureProvider = new ZipLeveledStructureProvider(
@@ -118,6 +120,16 @@ public class ImportDefaultMavenProjectExample extends
 		return true;
 	}
 	
+	private void createProject(IProject project, IProgressMonitor monitor) throws CoreException {
+		IPath location = getLocation();
+		if (!Platform.getLocation().equals(location)) {
+			IProjectDescription desc = project.getWorkspace().newProjectDescription(project.getName());
+			desc.setLocation(location.append(project.getName()));
+			project.create(desc, monitor);
+		} else
+			project.create(monitor);
+	}
+
 	private boolean importSingleProject(Project projectDescription, File file,
 			IProgressMonitor monitor) throws CoreException, ZipException,
 			IOException, InvocationTargetException, InterruptedException {
@@ -140,7 +152,7 @@ public class ImportDefaultMavenProjectExample extends
 			}
 			project.delete(true, true, monitor);
 		}
-		project.create(monitor);
+		createProject(project, monitor);
 		project.open(monitor);
 		ZipFile sourceFile = new ZipFile(file);
 		ZipLeveledStructureProvider structureProvider = new ZipLeveledStructureProvider(

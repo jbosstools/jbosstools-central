@@ -12,8 +12,8 @@
 package org.jboss.tools.project.examples.model;
 
 import java.io.File;
-import java.util.List;
 
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 
 /**
@@ -34,4 +34,6 @@ public interface IImportProjectExample {
 	String getName();
 	
 	String getType();
+	
+	IPath getLocation();
 }
