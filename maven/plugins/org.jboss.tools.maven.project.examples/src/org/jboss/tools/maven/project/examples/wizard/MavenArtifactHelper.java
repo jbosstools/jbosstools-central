@@ -30,12 +30,12 @@ public class MavenArtifactHelper {
 	 */
 	public static boolean isEnterpriseRepositoryAvailable() {
 		String keyString = "org.jboss.spec:jboss-javaee-web-6.0:3.0.0.Beta1-redhat-1::"; //$NON-NLS-1$
-		boolean isRepoAvailable = isArtifactAvailable(keyString, "pom");		
+		boolean isRepoAvailable = isArtifactAvailable(keyString, "pom");		 //$NON-NLS-1$
 		return isRepoAvailable;
 	}
 
 	/**
-	 * Checks is an artifact can be resolved
+	 * Checks if an artifact can be resolved
 	 * @param artifactKey
 	 * @return true is the artifactKey can be resolved to an artifact.
 	 */
