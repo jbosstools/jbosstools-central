@@ -21,12 +21,14 @@ import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.dialogs.IDialogConstants;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.operation.IRunnableContext;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.operation.ModalContext;
 import org.eclipse.jface.window.ToolTip;
-import org.eclipse.mylyn.commons.core.DelegatingProgressMonitor;
+import org.eclipse.jface.wizard.ProgressMonitorPart;
 import org.eclipse.mylyn.internal.discovery.core.model.BundleDiscoveryStrategy;
 import org.eclipse.mylyn.internal.discovery.core.model.ConnectorDescriptor;
 import org.eclipse.mylyn.internal.discovery.core.model.ConnectorDiscovery;
@@ -36,6 +38,7 @@ import org.eclipse.mylyn.internal.discovery.ui.DiscoveryUi;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
@@ -77,15 +80,17 @@ public class ProjectExamplesDialog extends FormDialog implements IRunnableContex
 	private FormToolkit toolkit;
 	private ScrolledForm form;
 	private Composite fixesComposite;
-	private IProgressMonitor monitor;
 	private Section reqSection;
+	private ProgressMonitorPart fProgressMonitorPart;
+	private Control fLastControl;
+	private Set<Button> controls = new HashSet<Button>();
 	
 	public ProjectExamplesDialog(Shell parentShell, Tutorial tutorial) {
 		super(parentShell);
 		setShellStyle(SWT.CLOSE | SWT.MAX | SWT.TITLE | SWT.BORDER
 				| SWT.RESIZE | getDefaultOrientation());
 		this.tutorial = tutorial;
-		this.monitor = new DelegatingProgressMonitor();
+		//setHelpAvailable(false);
 	}
 
 	@Override
@@ -132,6 +137,9 @@ public class ProjectExamplesDialog extends FormDialog implements IRunnableContex
 	}
 
 	protected void refreshFixes() {
+		controls.clear();
+		addButtons();
+		
 		Project project = tutorial.getProjectExamples();
 		List<ProjectFix> fixes = project.getFixes();
 		List<ProjectFix> unsatisfiedFixes = new ArrayList<ProjectFix>();
@@ -179,6 +187,14 @@ public class ProjectExamplesDialog extends FormDialog implements IRunnableContex
 				new Label(fixesComposite, SWT.NONE);
 				new Label(fixesComposite, SWT.NONE);
 			}
+		}
+	}
+
+	protected void addButtons() {
+		Button cancelButton = getButton(IDialogConstants.CANCEL_ID);
+		if (getButton(IDialogConstants.CANCEL_ID) != null) {
+			controls.add(cancelButton);
+			controls.add(getButton(IDialogConstants.OK_ID));
 		}
 	}
 
@@ -234,6 +250,7 @@ public class ProjectExamplesDialog extends FormDialog implements IRunnableContex
 				refresh();
 			}
 		});
+		controls.add(install);
 		final String downloadId = projectFix.getProperties().get(ProjectFix.DOWNLOAD_ID);
 		boolean haveDownloadId = false;
 		if (downloadId != null) {
@@ -246,7 +263,7 @@ public class ProjectExamplesDialog extends FormDialog implements IRunnableContex
 				ToolTip tip = new DescriptionToolTip(download, "Download and install " + downloadRuntime.getName());
 				tip.activate();
 				//download.setImage(JBossCentralActivator.getDefault().getImage("/icons/repository-submit.gif"));
-				
+				controls.add(download);
 				download.addSelectionListener(new SelectionAdapter() {
 
 					@Override
@@ -282,7 +299,7 @@ public class ProjectExamplesDialog extends FormDialog implements IRunnableContex
 					refresh();
 				}
 			});
-
+			controls.add(install);
 		}
 		Button p2install = toolkit.createButton(fixesComposite, "Install New Software", SWT.PUSH);
 		ToolTip tip = new DescriptionToolTip(p2install, "P2 Install New Software");
@@ -303,42 +320,61 @@ public class ProjectExamplesDialog extends FormDialog implements IRunnableContex
 				refresh();
 			}
 		});
-
+		controls.add(p2install);
 		if (connectorIds.size() == 0) {
 			new Label(fixesComposite, SWT.NONE);
 		}
 	}
 
 	protected void install(final Set<String> connectorIds) throws InvocationTargetException, InterruptedException {
-		run(true, true, new IRunnableWithProgress() {
+		final IStatus[] results = new IStatus[1];
+		final ConnectorDiscovery[] connectorDiscoveries = new ConnectorDiscovery[1];
+		IRunnableWithProgress runnable = new IRunnableWithProgress() {
 			public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
-				ConnectorDiscovery connectorDiscovery = new ConnectorDiscovery();
+				connectorDiscoveries[0] = new ConnectorDiscovery();
 
 				// look for descriptors from installed bundles
-				connectorDiscovery.getDiscoveryStrategies().add(new BundleDiscoveryStrategy());
+				connectorDiscoveries[0].getDiscoveryStrategies().add(new BundleDiscoveryStrategy());
 
 				RemoteBundleDiscoveryStrategy remoteDiscoveryStrategy = new RemoteBundleDiscoveryStrategy();
 				remoteDiscoveryStrategy.setDirectoryUrl(JBossCentralActivator.getDefault().getJBossDiscoveryDirectory());
-				connectorDiscovery.getDiscoveryStrategies().add(remoteDiscoveryStrategy);
+				connectorDiscoveries[0].getDiscoveryStrategies().add(remoteDiscoveryStrategy);
 
-				connectorDiscovery.setEnvironment(JBossCentralActivator.getEnvironment());
-				connectorDiscovery.setVerifyUpdateSiteAvailability(true);
-				IStatus result = connectorDiscovery.performDiscovery(monitor);
+				connectorDiscoveries[0].setEnvironment(JBossCentralActivator.getEnvironment());
+				connectorDiscoveries[0].setVerifyUpdateSiteAvailability(true);
+				results[0] = connectorDiscoveries[0].performDiscovery(monitor);
 				if (monitor.isCanceled()) {
-					throw new InterruptedException();
-				}
-				if (result.isOK()) {
-					List<DiscoveryConnector> connectors = connectorDiscovery.getConnectors();
-					List<ConnectorDescriptor> installableConnectors = new ArrayList<ConnectorDescriptor>();
-					for (DiscoveryConnector connector:connectors) {
-						if (connectorIds.contains(connector.getId())) {
-							installableConnectors.add(connector);
-						}
-					}
-					DiscoveryUi.install(installableConnectors, ProjectExamplesDialog.this);
+					results[0] = Status.CANCEL_STATUS;
 				}
 			}
-		});
+		};
+		run(true, true, runnable);
+		if (results[0] == null) {
+			return;
+		}
+		if (results[0].isOK()) {
+			List<DiscoveryConnector> connectors = connectorDiscoveries[0].getConnectors();
+			List<ConnectorDescriptor> installableConnectors = new ArrayList<ConnectorDescriptor>();
+			for (DiscoveryConnector connector:connectors) {
+				if (connectorIds.contains(connector.getId())) {
+					installableConnectors.add(connector);
+				}
+			}
+			DiscoveryUi.install(installableConnectors, ProjectExamplesDialog.this);
+		} else {
+			String message = results[0].toString();
+			switch (results[0].getSeverity()) {
+			case IStatus.ERROR:	
+				MessageDialog.openError(getShell(), "Error", message);
+				break;
+			case IStatus.WARNING:
+				MessageDialog.openWarning(getShell(), "Warning", message);
+				break;
+			case IStatus.INFO:
+				MessageDialog.openInformation(getShell(), "Information", message);
+				break;
+			}
+		}
 
 	}
 
@@ -346,9 +382,43 @@ public class ProjectExamplesDialog extends FormDialog implements IRunnableContex
 	public void run(boolean fork, boolean cancelable,
 			IRunnableWithProgress runnable) throws InvocationTargetException,
 			InterruptedException {
-		ModalContext.run(runnable, false, monitor, getDisplay());
+		//ModalContext.run(runnable, cancelable, monitor, getDisplay());
+		if (getShell() != null && getShell().isVisible()) {
+			// Save focus control
+			fLastControl = getShell().getDisplay().getFocusControl();
+			if (fLastControl != null && fLastControl.getShell() != getShell()) {
+				fLastControl = null;
+			}
+			// Attach the progress monitor part to the cancel button
+			fProgressMonitorPart.attachToCancelComponent(null);
+			fProgressMonitorPart.getParent().setVisible(true);
+			
+			try {
+				updateControls(false);
+				ModalContext.run(runnable, fork, fProgressMonitorPart, getShell().getDisplay());
+			}
+			finally {
+				updateControls(true);
+				if (getShell() != null) {
+					fProgressMonitorPart.getParent().setVisible(false);
+					fProgressMonitorPart.removeFromCancelComponent(null);
+					if (fLastControl != null) {
+						fLastControl.setFocus();
+					}
+				}
+			}
+		}
+		else {
+			PlatformUI.getWorkbench().getProgressService().run(fork, cancelable, runnable);
+		}
 	}
 	
+	private void updateControls(boolean enabled) {
+		for (Button control:controls) {
+			control.setEnabled(enabled);
+		}
+	}
+
 	protected Display getDisplay() {
 		Display display = Display.getCurrent();
 		if (display == null) {
@@ -357,12 +427,73 @@ public class ProjectExamplesDialog extends FormDialog implements IRunnableContex
 		return display;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.jface.dialogs.Dialog#createButtonBar(org.eclipse.swt.widgets.Composite)
+	 */
+	protected Control createButtonBar(Composite parent) {
+		Font font = parent.getFont();
+		Composite composite = new Composite(parent, SWT.NULL);
+		GridLayout layout = new GridLayout();
+		layout.numColumns = 1;
+		layout.marginHeight= 0;
+		layout.marginWidth= 0;
+		layout.marginLeft = convertHorizontalDLUsToPixels(IDialogConstants.HORIZONTAL_MARGIN);
+		composite.setLayout(layout);
+		composite.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+		composite.setFont(font);
+		Label sep = new Label(composite, SWT.HORIZONTAL|SWT.SEPARATOR);
+		sep.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+		Composite buttonComposite = new Composite(composite, SWT.NULL);
+		layout = new GridLayout();
+		if (isHelpAvailable()) {
+			layout.numColumns = 3;
+		} else {
+			layout.numColumns = 2;
+		}
+		layout.marginHeight= 0;
+		layout.marginWidth= 0;
+		layout.marginLeft = convertHorizontalDLUsToPixels(IDialogConstants.HORIZONTAL_MARGIN);
+		buttonComposite.setLayout(layout);
+		buttonComposite.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+		buttonComposite.setFont(font);
+		
+        if (isHelpAvailable()) {
+        	createHelpControl(buttonComposite);
+        }
+		Composite monitorComposite = new Composite(buttonComposite, SWT.NULL);
+		layout = new GridLayout();
+		layout.marginHeight = 0;
+		layout.marginWidth = 0;
+		layout.numColumns = 2;
+		monitorComposite.setLayout(layout);
+		monitorComposite.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+		GridLayout pmLayout = new GridLayout();
+		fProgressMonitorPart= new ProgressMonitorPart(monitorComposite, pmLayout, true);
+		fProgressMonitorPart.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+		fProgressMonitorPart.setFont(font);
+		monitorComposite.setVisible(false);
+
+		boolean helpAvailable = isHelpAvailable();
+		setHelpAvailable(false);
+		super.createButtonBar(buttonComposite);
+		Control[] children = buttonComposite.getChildren();
+		for (Control child:children) {
+			if (child instanceof Label) {
+				child.setVisible(false);
+				child.dispose();
+			}
+		}
+		setHelpAvailable(helpAvailable);
+		return composite;
+	}
+
 	@Override
 	protected void createButtonsForButtonBar(Composite parent) {
 		createButton(parent, IDialogConstants.OK_ID, "Start",
 				true);
 		createButton(parent, IDialogConstants.CANCEL_ID,
 				IDialogConstants.CANCEL_LABEL, false);
+		addButtons();
 	}
 
 	protected void refresh() {

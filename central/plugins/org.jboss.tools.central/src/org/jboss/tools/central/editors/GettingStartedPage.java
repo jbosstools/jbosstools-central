@@ -346,17 +346,6 @@ public class GettingStartedPage extends AbstractJBossCentralPage {
 		Image image = JFaceResources.getImage(Dialog.DLG_IMG_MESSAGE_WARNING);
 
 		formText.setImage("image", image);
-		formText.addHyperlinkListener(new HyperlinkAdapter() {
-			public void linkActivated(HyperlinkEvent e) {
-				if ("networkConnections".equals(e.data)) {
-					PreferenceDialog dialog = PreferencesUtil
-							.createPreferenceDialogOn(null,
-									"org.eclipse.ui.net.NetPreferences", null,
-									null);
-					dialog.open();
-				}
-			}
-		});
 		return formText;
 	}
 

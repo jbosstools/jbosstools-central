@@ -176,7 +176,7 @@ public abstract class AbstractRefreshJob extends Job {
 		if (monitor.isCanceled()) {
 			return Status.CANCEL_STATUS;
 		}
-		if (forcedDownload || urlModified != cacheModified) {
+		if (forcedDownload || cacheModified == 0 || urlModified != cacheModified) {
 			try {
 				File tempFile = File.createTempFile("news", ".xml");
 				tempFile.deleteOnExit();
