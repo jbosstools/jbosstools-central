@@ -29,7 +29,7 @@ public class MavenArtifactHelper {
 	 * @return true if org.jboss.spec:jboss-javaee-web-6.0:3.0.0.Beta1-redhat-1 can be resolved
 	 */
 	public static boolean isEnterpriseRepositoryAvailable() {
-		String keyString = "org.jboss.spec:jboss-javaee-web-6.0:4.0.0.Beta1-redhat-1::"; //$NON-NLS-1$
+		String keyString = "org.jboss.spec:jboss-javaee-web-6.0:3.0.0.Beta1-redhat-1::"; //$NON-NLS-1$
 		boolean isRepoAvailable = isArtifactAvailable(keyString, "pom");		
 		return isRepoAvailable;
 	}
