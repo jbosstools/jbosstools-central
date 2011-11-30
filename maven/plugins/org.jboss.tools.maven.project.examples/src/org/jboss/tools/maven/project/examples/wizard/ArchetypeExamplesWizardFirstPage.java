@@ -32,6 +32,7 @@ import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jst.j2ee.project.facet.IJ2EEFacetConstants;
 import org.eclipse.m2e.core.project.ProjectImportConfiguration;
 import org.eclipse.m2e.core.ui.internal.wizards.MavenProjectWizardLocationPage;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
@@ -268,7 +269,7 @@ public class ArchetypeExamplesWizardFirstPage extends MavenProjectWizardLocation
 		warningImg.setImage(JFaceResources.getImage(Dialog.DLG_IMG_MESSAGE_WARNING));
 
 		Link link = new Link(warningLink, SWT.NONE);
-		link.setText(Messages.ArchetypeExamplesWizardFirstPage_Unresolved_Enterprise_Repo);
+		link.setText(NLS.bind(Messages.ArchetypeExamplesWizardFirstPage_Unresolved_Enterprise_Repo, MavenArtifactHelper.ENTERPRISE_JBOSS_SPEC));
 		link.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {

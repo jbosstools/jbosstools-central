@@ -23,14 +23,17 @@ import org.eclipse.m2e.core.embedder.IMaven;
 
 public class MavenArtifactHelper {
 
+	public static final String ENTERPRISE_JBOSS_SPEC = "org.jboss.spec:jboss-javaee-web-6.0:3.0.0.Beta1-redhat-1"; //$NON-NLS-1$
+	
+	private static final String ENTERPRISE_JBOSS_SPEC_KEYSTRING = ENTERPRISE_JBOSS_SPEC+"::"; //$NON-NLS-1$
+	
 	/**
 	 * Checks if the EAP repository is available
 	 * 
 	 * @return true if org.jboss.spec:jboss-javaee-web-6.0:3.0.0.Beta1-redhat-1 can be resolved
 	 */
 	public static boolean isEnterpriseRepositoryAvailable() {
-		String keyString = "org.jboss.spec:jboss-javaee-web-6.0:3.0.0.Beta1-redhat-1::"; //$NON-NLS-1$
-		boolean isRepoAvailable = isArtifactAvailable(keyString, "pom");		 //$NON-NLS-1$
+		boolean isRepoAvailable = isArtifactAvailable(ENTERPRISE_JBOSS_SPEC_KEYSTRING, "pom");		 //$NON-NLS-1$
 		return isRepoAvailable;
 	}
 
@@ -49,10 +52,10 @@ public class MavenArtifactHelper {
 			ArtifactKey key = ArtifactKey.fromPortableString(artifactKey);
 			Artifact a = MavenPlugin.getMaven().resolve(
 					key.getGroupId(), key.getArtifactId(), key.getVersion(),
-					type, key.getClassifier(), repos, nullProgressMonitor); //$NON-NLS-1$
+					type, key.getClassifier(), repos, nullProgressMonitor);
 			isRepoAvailable = a != null && a.isResolved();
 		} catch (CoreException e) {
-			e.printStackTrace();
+			System.err.println(e.getLocalizedMessage());
 		}
 		return isRepoAvailable;
 	}
