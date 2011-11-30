@@ -116,8 +116,10 @@ public class ImportMavenProjectExample extends AbstractImportProjectExample {
 		
 		List<String> projectNames = importMavenProjects(destination, projectDescription, monitor);
 		new OpenMavenConsoleAction().run();
-		projectDescription.getIncludedProjects().clear();
+		List<String> includedProjects = projectDescription.getIncludedProjects();
+		includedProjects.clear();
 		projectDescription.getIncludedProjects().addAll(projectNames);
+		MavenProjectExamplesActivator.updateMavenConfiguration(projectName, includedProjects, monitor);
 		return true;
 	}
 

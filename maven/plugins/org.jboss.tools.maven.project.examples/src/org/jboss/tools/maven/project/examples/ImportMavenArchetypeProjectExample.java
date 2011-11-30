@@ -107,35 +107,7 @@ public class ImportMavenArchetypeProjectExample extends
 						ret[0] = false;
 					}
 				}
-				IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject(projectName);
-				if (project != null && project.isAccessible()) {
-					try {
-						project.refreshLocal(IResource.DEPTH_INFINITE, monitor);
-					} catch (CoreException e) {
-						// ignore
-					}
-				}
-				if (includedProjects.size() > 0) {
-					IProject[] selectedProjects = new IProject[includedProjects.size()];
-					int i = 0;
-					
-					for (String selectedProjectName:includedProjects) {
-						project = ResourcesPlugin.getWorkspace().getRoot().getProject(selectedProjectName);
-						selectedProjects[i++] = project;
-						try {
-							project.refreshLocal(IResource.DEPTH_INFINITE, monitor);
-						} catch (CoreException e) {
-							// ignore
-						}
-					}
-					Job updateJob = new UpdateConfigurationJob(selectedProjects , true, false);
-					updateJob.schedule();
-					try {
-						updateJob.join();
-					} catch (InterruptedException e) {
-						// ignore
-					}
-				}
+				MavenProjectExamplesActivator.updateMavenConfiguration(projectName, includedProjects, monitor);
 			}
 			
 		});

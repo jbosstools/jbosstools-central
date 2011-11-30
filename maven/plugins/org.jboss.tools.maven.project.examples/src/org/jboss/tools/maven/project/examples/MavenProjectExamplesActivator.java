@@ -1,20 +1,25 @@
 package org.jboss.tools.maven.project.examples;
 
 import java.io.File;
+import java.util.List;
 
 import org.apache.maven.model.Model;
+import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.resource.ImageDescriptor;
-import org.eclipse.jface.resource.ImageRegistry;
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.embedder.IMaven;
 import org.eclipse.m2e.core.project.MavenProjectInfo;
 import org.eclipse.m2e.core.project.ProjectImportConfiguration;
+import org.eclipse.m2e.core.ui.internal.UpdateConfigurationJob;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 
@@ -107,5 +112,37 @@ public class MavenProjectExamplesActivator extends AbstractUIPlugin {
 
 	public static ImageDescriptor getNewWizardImageDescriptor() {
 		return AbstractUIPlugin.imageDescriptorFromPlugin(PLUGIN_ID, "icons/new_wiz.png");
+	}
+	
+	public static void updateMavenConfiguration(String projectName, List<String> includedProjects,final IProgressMonitor monitor) {
+		IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject(projectName);
+		if (project != null && project.isAccessible()) {
+			try {
+				project.refreshLocal(IResource.DEPTH_INFINITE, monitor);
+			} catch (CoreException e) {
+				// ignore
+			}
+		}
+		if (includedProjects.size() > 0) {
+			IProject[] selectedProjects = new IProject[includedProjects.size()];
+			int i = 0;
+			
+			for (String selectedProjectName:includedProjects) {
+				project = ResourcesPlugin.getWorkspace().getRoot().getProject(selectedProjectName);
+				selectedProjects[i++] = project;
+				try {
+					project.refreshLocal(IResource.DEPTH_INFINITE, monitor);
+				} catch (CoreException e) {
+					// ignore
+				}
+			}
+			Job updateJob = new UpdateConfigurationJob(selectedProjects , true, false);
+			updateJob.schedule();
+			try {
+				updateJob.join();
+			} catch (InterruptedException e) {
+				// ignore
+			}
+		}
 	}
 }
