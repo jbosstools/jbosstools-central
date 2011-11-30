@@ -69,4 +69,11 @@
       <initializer class="org.jboss.tools.project.examples.preferences.ProjectExamplesPreferencesInitializer"/>
    </extension>
    
+    <extension
+        point="org.jboss.tools.project.examples.projectExamplesXml"
+        name="Java EE Archetypes">
+        <url>http://download.jboss.org/jbosstools/examples/project-examples-shared-3.3.xml</url>
+        <experimental>false</experimental>
+    </extension>
+   
 </plugin>

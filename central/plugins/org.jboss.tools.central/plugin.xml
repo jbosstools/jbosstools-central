@@ -208,4 +208,56 @@
       </image>
    </extension>
    
+   <extension
+         point="org.jboss.tools.central.tutorials">
+      <category 
+      		id="org.jboss.tools.central.javaee6.quickstart"
+      		name="Java EE Archetypes"
+      		priority="1" />
+      <tutorial
+            id="org.jboss.tools.central.jbossas.quickstart.jbossJavaee6Webapp"
+            categoryId="org.jboss.tools.central.javaee6.quickstart"
+            name="Java EE Web Project"
+            type="projectExample"
+            priority="1"
+            icon="icons/newwebprj_wiz.gif"
+            reference="Java EE 6 Quickstarts::jboss-javaee6-webapp"/>
+
+      <tutorial
+            id="org.jboss.tools.central.jbossas.quickstart.jbossJavaee6Ear"
+            categoryId="org.jboss.tools.central.javaee6.quickstart"
+            name="Java EE Project"
+            type="projectExample"
+            priority="2"
+            icon="icons/ear-wiz-icon.gif"
+            reference="Java EE 6 Quickstarts::multi-javaee6-archetype"/>
+
+      <tutorial
+            id="org.jboss.tools.central.jbossas.quickstart.jbossJavaee6Poh5"
+            categoryId="org.jboss.tools.central.javaee6.quickstart"
+            name="HTML5 Project"
+            type="projectExample"
+            priority="3"
+            icon="icons/html5.png"
+            reference="Java EE 6 Quickstarts::jboss-javaee6-poh5-archetype"/>
+
+      <tutorial
+            id="org.jboss.tools.central.jbossas.quickstart.jbossJavaee6SpringMvc"
+            categoryId="org.jboss.tools.central.javaee6.quickstart"
+            name="Spring MVC Project"
+            type="projectExample"
+            priority="4"
+            icon="icons/spring_wiz.gif"
+            reference="Java EE 6 Quickstarts::spring-mvc-webapp"/>
+                  
+      <tutorial
+            id="org.jboss.tools.central.jbossas.quickstart.jbossJavaee6Richfaces"
+            categoryId="org.jboss.tools.central.javaee6.quickstart"
+            name="RichFaces Project"
+            type="projectExample"
+            priority="5"
+            icon="icons/rf_logo.png"
+            reference="Java EE 6 Quickstarts::richfaces-archetype-simpleapp"/>
+   </extension>
+   
 </plugin>

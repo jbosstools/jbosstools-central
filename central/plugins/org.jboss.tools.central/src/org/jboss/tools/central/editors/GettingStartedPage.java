@@ -39,7 +39,6 @@ import org.eclipse.jface.action.IContributionItem;
 import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.layout.GridDataFactory;
-import org.eclipse.jface.preference.PreferenceDialog;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.JFaceColors;
 import org.eclipse.jface.resource.JFaceResources;
@@ -72,7 +71,6 @@ import org.eclipse.ui.INewWizard;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.actions.ActionFactory.IWorkbenchAction;
-import org.eclipse.ui.dialogs.PreferencesUtil;
 import org.eclipse.ui.forms.IFormColors;
 import org.eclipse.ui.forms.IManagedForm;
 import org.eclipse.ui.forms.editor.FormEditor;
@@ -115,6 +113,7 @@ import org.osgi.framework.Bundle;
  */
 public class GettingStartedPage extends AbstractJBossCentralPage {
 
+	private static final String ORG_JBOSS_TOOLS_CENTRAL_JAVAEE6_QUICKSTART = "org.jboss.tools.central.javaee6.quickstart";
 	private static final String NEWS_WARNING_ID = "org.jboss.tools.central.newsWarning";
 	private static final String BLOGS_WARNING_ID = "org.jboss.tools.central.blogsWarning";
 	
@@ -163,6 +162,7 @@ public class GettingStartedPage extends AbstractJBossCentralPage {
 	private ToolBarManager newsToolBarManager;
 	private ToolBarManager blogsToolBarManager;
 	private Action blogsWarning;
+	private boolean newProjectsInitialized;
 	
 	public GettingStartedPage(FormEditor editor) {
 		super(editor, ID, "Getting Started");
@@ -658,7 +658,22 @@ public class GettingStartedPage extends AbstractJBossCentralPage {
                     IStatus.ERROR, "Cannot create extension" ,e));
 		}
 	}
-	
+
+	private void displayTutorialLinks(final TutorialCategory category, final Composite composite, boolean addTooltips) {
+		for (final Tutorial tutorial:category.getTutorials()) {
+			Project project = tutorial.getProjectExamples();
+			if (project == null) {
+				continue;
+			}
+			
+			FormText tutorialText = toolkit.createFormText(composite, true);
+			configureTutorialText(tutorialText, tutorial);
+			if (addTooltips) {
+				hookTooltip(tutorialText, tutorial);
+			}
+		}
+	}
+
 	private static boolean isActive(Bundle bundle) {
 		if (bundle == null) {
 			return false;
@@ -875,13 +890,28 @@ public class GettingStartedPage extends AbstractJBossCentralPage {
 		showTutorials(categories);
 	}
 
+	@Deprecated
+	//This method should be removed once the EE6 archetypes are wizardified
+	private void updateNewProjects(TutorialCategory tutorialCategory) {
+		if (!newProjectsInitialized) {
+			if (tutorialCategory != null) {
+				newProjectsInitialized = true;
+				displayTutorialLinks(tutorialCategory, projectsComposite, false);
+				resize(true);
+			}
+		}
+	}
+
 	private void showTutorials(Map<String, TutorialCategory> categories) {
 		disposeChildren(tutorialsComposite);
-		Collection<TutorialCategory> tempCategories = categories.values();
-		List<TutorialCategory> sortedCategories = new ArrayList<TutorialCategory>();
-		sortedCategories.addAll(tempCategories);
-		Collections.sort(sortedCategories);
+		List<TutorialCategory> sortedCategories = getSortedCategories(categories);
 		for (final TutorialCategory category:sortedCategories) {
+			//TEMPORARY HACK FOR JBIDE-10053 (Java EE6 archetypes in the project section)
+			//Should be removed once these archetype tutorials are changed to use wizards as per JBIDE-10264  
+			if (ORG_JBOSS_TOOLS_CENTRAL_JAVAEE6_QUICKSTART.equals(category.getId())) {
+				//bail
+				continue;
+			}
 			int style = ExpandableComposite.TITLE_BAR|ExpandableComposite.TWISTIE;
 			if (expandedCategories.contains(category)) {
 				style|=ExpandableComposite.EXPANDED;
@@ -914,15 +944,7 @@ public class GettingStartedPage extends AbstractJBossCentralPage {
 				}
 			});
 
-			for (final Tutorial tutorial:category.getTutorials()) {
-				Project project = tutorial.getProjectExamples();
-				if (project == null) {
-					continue;
-				}
-				FormText tutorialText = toolkit.createFormText(composite, true);
-				configureTutorialText(tutorialText, tutorial);
-				hookTooltip(tutorialText, tutorial);
-			}
+			displayTutorialLinks(category, composite, true);
 			categoryComposite.setClient(composite);
 			String description = category.getDescription();
 			if (description != null && !description.isEmpty() && categoryComposite.getControl() != null) {
@@ -937,6 +959,15 @@ public class GettingStartedPage extends AbstractJBossCentralPage {
 		//form.redraw();
 		resize();
 		//recomputeScrollComposite(tutorialScrollComposite, tutorialPageBook);
+	}
+
+	private List<TutorialCategory> getSortedCategories(
+			Map<String, TutorialCategory> categories) {
+		Collection<TutorialCategory> tempCategories = categories.values();
+		List<TutorialCategory> sortedCategories = new ArrayList<TutorialCategory>();
+		sortedCategories.addAll(tempCategories);
+		Collections.sort(sortedCategories);
+		return sortedCategories;
 	}
 
 	private Font getBoldFont(Font font) {
@@ -1258,6 +1289,14 @@ public class GettingStartedPage extends AbstractJBossCentralPage {
 				public void run() {
 					setBusyIndicator(tutorialsLoadingComposite, false);
 					refreshTutorials();
+					
+					//TEMPORARY HACK FOR JBIDE-10053 (Java EE6 archetypes in the project section)
+					//Should be removed once these archetype tutorials are changed to use wizards as per JBIDE-10264  
+					RefreshTutorialsJob job = RefreshTutorialsJob.INSTANCE;
+					Map<String, TutorialCategory> categories = job.getTutorialCategories();
+					if (categories != null){
+						updateNewProjects(categories.get(ORG_JBOSS_TOOLS_CENTRAL_JAVAEE6_QUICKSTART));						
+					}
 				}
 			});
 			

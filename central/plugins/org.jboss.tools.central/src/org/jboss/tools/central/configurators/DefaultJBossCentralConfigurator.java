@@ -66,9 +66,10 @@ public class DefaultJBossCentralConfigurator implements
 		List<String> wizardIds = new ArrayList<String>();
 	    //wizardIDs.add("org.jboss.ide.eclipse.as.openshift.express.ui.wizard.NewServerAdapter");
 	    wizardIds.add("org.eclipse.jst.servlet.ui.project.facet.WebProjectWizard");
-	    wizardIds.add("org.jboss.tools.seam.ui.wizards.SeamProjectWizard");
-	    wizardIds.add("org.eclipse.m2e.core.wizards.Maven2ProjectWizard");
-	    wizardIds.add(JBossCentralActivator.NEW_PROJECT_EXAMPLES_WIZARD_ID);
+	    //wizardIds.add("org.jboss.tools.seam.ui.wizards.SeamProjectWizard");
+	    //wizardIds.add("org.eclipse.m2e.core.wizards.Maven2ProjectWizard");
+	    //wizardIds.add(JBossCentralActivator.NEW_PROJECT_EXAMPLES_WIZARD_ID);
+	    wizardIds.add("org.jboss.ide.eclipse.as.openshift.express.ui.wizard.NewServerAdapter");
 		return wizardIds;
 	}
 
