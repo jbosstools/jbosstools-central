@@ -95,6 +95,7 @@ public class ArchetypeExamplesWizardFirstPage extends MavenProjectWizardLocation
 		projectNameLabel.setText(Messages.ArchetypeExamplesWizardFirstPage_ProjectName_Label);
 		projectNameCombo = new Combo(container, SWT.BORDER);
 		projectNameCombo.setLayoutData(gridData);
+		addFieldWithHistory("projectNameCombo", projectNameCombo);//$NON-NLS-1$ 
 		projectNameCombo.addModifyListener(new ModifyListener() {
 			@Override
 			public void modifyText(ModifyEvent e) {
