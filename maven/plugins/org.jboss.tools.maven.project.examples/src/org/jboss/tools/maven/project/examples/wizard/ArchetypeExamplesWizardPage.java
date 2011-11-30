@@ -123,6 +123,8 @@ public class ArchetypeExamplesWizardPage extends
 		groupIdCombo.setText(groupId);
 		versionCombo.setText(version);
 		packageCombo.setText(javaPackage);
+		
+		resolverConfigurationComponent.setExpanded(!resolverConfigurationComponent.getResolverConfiguration().getActiveProfileList().isEmpty());
 	}
 
 	@Override
@@ -140,9 +142,6 @@ public class ArchetypeExamplesWizardPage extends
 		//TODO delete that code
 		warningLink = new Composite(parent, SWT.NONE);
 		
-//		Display display = Display.getCurrent();
-//		Color color = display.getSystemColor(SWT.COLOR_BLUE);
-//		warningLink.setBackground(color);
 		GridDataFactory.fillDefaults().align(SWT.LEFT, SWT.CENTER).span(3, 1)
 				.applyTo(warningLink);
 		GridLayoutFactory.fillDefaults().numColumns(2).applyTo(warningLink);
@@ -166,7 +165,6 @@ public class ArchetypeExamplesWizardPage extends
 				}
 			}
 		});
-		//link.setBackground(display.getSystemColor(SWT.COLOR_RED));
 		
 		warningLink.setVisible(false);
 	}
@@ -284,7 +282,7 @@ public class ArchetypeExamplesWizardPage extends
 			if (!packageCombo.getText().equals(packageName)){ 
 				packageCombo.setText(packageName);
 			}
-			if (groupIdCombo.getText().equals(packageName)){
+			if (!groupIdCombo.getText().equals(packageName)){
 				groupIdCombo.setText(packageName);
 			}
 		}

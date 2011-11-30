@@ -9,6 +9,8 @@ import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.jface.resource.ImageRegistry;
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.embedder.IMaven;
 import org.eclipse.m2e.core.project.MavenProjectInfo;
@@ -101,5 +103,9 @@ public class MavenProjectExamplesActivator extends AbstractUIPlugin {
 			}
 		}
 		return projectName;
+	}
+
+	public static ImageDescriptor getNewWizardImageDescriptor() {
+		return AbstractUIPlugin.imageDescriptorFromPlugin(PLUGIN_ID, "icons/new_wiz.png");
 	}
 }

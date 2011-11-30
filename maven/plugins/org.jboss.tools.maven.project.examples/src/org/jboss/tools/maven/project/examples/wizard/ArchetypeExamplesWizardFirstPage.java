@@ -76,12 +76,15 @@ public class ArchetypeExamplesWizardFirstPage extends MavenProjectWizardLocation
 	private ModifyListener projectNameModifyListener;
 	private ModifyListener packageNameModifyListener;
 	private ModifyListener propertyModifyListener;
+	private final Project projectDescription;
 	
 	public ArchetypeExamplesWizardFirstPage(
 			ProjectImportConfiguration configuration,
 			Project projectDescription, List<IWorkingSet> workingSet) {
 		super(configuration, projectDescription.getShortDescription(),Messages.ArchetypeExamplesWizardFirstPage_Title, workingSet);
+		this.projectDescription = projectDescription;
 		setPageComplete(false);
+		
 	}
 
 	@Override
@@ -136,6 +139,11 @@ public class ArchetypeExamplesWizardFirstPage extends MavenProjectWizardLocation
 		emptyLabel.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false,
 				3, 1));
 
+		
+		/*
+		projectNameCombo.setText(projectDescription.getArchetypeModel().getArtifactId());
+		packageCombo.setText(projectDescription.getArchetypeModel().getJavaPackage());
+		*/
 	}
 	
 	@Override
