@@ -66,8 +66,8 @@ public class RefreshTutorialsJob extends Job {
 					for (Category peCategory : categories) {
 						if (projectExampleCategory.equals(peCategory.getName())) {
 							for (Project project : peCategory.getProjects()) {
-								if (projectExampleName
-										.equals(project.getName())) {
+								if (projectExampleName.equals(project.getName())
+								&& canBeImported(project)){
 									projectTutorial = project;
 									break;
 								}
@@ -100,6 +100,11 @@ public class RefreshTutorialsJob extends Job {
 		}
 		
 		return Status.OK_STATUS;
+	}
+
+	private boolean canBeImported(Project project) {
+		return ProjectExamplesActivator.getDefault()
+				.getImportProjectExample(project.getImportType()) != null;
 	}
 
 	public Exception getException() {
