@@ -13,17 +13,36 @@ package org.jboss.tools.central.actions;
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
+import org.eclipse.jface.action.IAction;
+import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.ui.IWorkbenchWindow;
+import org.eclipse.ui.IWorkbenchWindowActionDelegate;
 import org.jboss.tools.central.JBossCentralActivator;
 
 /**
 * @author snjeza
 * 
 */
-public class ShowJBossCentralHandler extends AbstractHandler {
+public class ShowJBossCentralHandler extends AbstractHandler implements IWorkbenchWindowActionDelegate {
 
 	public Object execute(ExecutionEvent event) throws ExecutionException {
 		JBossCentralActivator.getJBossCentralEditor();
 		return null;
+	}
+
+	@Override
+	public void run(IAction action) {
+		JBossCentralActivator.getJBossCentralEditor();
+	}
+
+	@Override
+	public void selectionChanged(IAction action, ISelection selection) {
+		
+	}
+
+	@Override
+	public void init(IWorkbenchWindow window) {
+		
 	}
 
 }
