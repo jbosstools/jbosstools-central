@@ -993,18 +993,12 @@ public class GettingStartedPage extends AbstractJBossCentralPage {
 	protected void configureTutorialText(FormText tutorialText, final Tutorial tutorial) {
 		StringBuilder buffer = new StringBuilder();
 		buffer.append(JBossCentralActivator.FORM_START_TAG);
-		//boolean haveImage = tutorial.getIconPath() != null && JBossCentralActivator.getDefault().getImage(tutorial.getIconPath()) != null;
-		//if (haveImage) {
-		//	buffer.append("<img href=\"image\"/> ");
-		//}
-		//if (project.getUnsatisfiedFixes().size() > 0) {
 		buffer.append("<img href=\"image\"/> ");
-		//}
 		buffer.append("<a href=\"link\">");
 		buffer.append(tutorial.getName());
 		buffer.append("</a> ");
-		
 		buffer.append(JBossCentralActivator.FORM_END_TAG);
+
 		String text = buffer.toString();
 		tutorialText.setText(text , true, false);
 		Image image;
@@ -1017,11 +1011,9 @@ public class GettingStartedPage extends AbstractJBossCentralPage {
 				unsatisfiedFixes.add(fix);
 			}
 		}
-		if (project.getUnsatisfiedFixes().size() > 0) {
-			image = JBossCentralActivator.getDefault().getImage("/icons/nwarning.gif");
-		} else {
-			image = JBossCentralActivator.getDefault().getImage(tutorial.getIconPath());
-		}
+		
+		//JBIDE-10303 : never display a warning image
+		image = JBossCentralActivator.getDefault().getImage(tutorial.getIconPath());
 		tutorialText.setImage("image", image);
 		tutorialText.addHyperlinkListener(new HyperlinkAdapter() {
 
