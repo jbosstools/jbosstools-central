@@ -4,11 +4,22 @@
 	<extension
          point="org.eclipse.mylyn.discovery.core.connectorDiscovery">
       <certification
+            id="com.jboss.jbds.central.discovery.certification.extras"
+            name="JBoss Developer Studio - Extras"
+            url="http://devstudio.jboss.com">
+         <description>
+            Extra Plugins for JBoss Tools or JBoss Developer Studio
+         </description>
+         <icon
+               image48="images/jbds_icon32.png">
+         </icon>
+      </certification>
+      <certification
             id="org.jboss.tools.central.discovery.certification"
             name="JBoss Tools"
-            url="http://jboss.org/tools/">
+            url="http://www.jboss.org/tools/">
          <description>
-            Plugins for JBoss Tools.
+            Plugins for JBoss Tools or JBoss Developer Studio
          </description>
          <icon
                image48="images/jbosstools_icon32.png">
@@ -16,7 +27,7 @@
       </certification>
       
       <connectorCategory
-            description="Plugins related to working with Maven"
+            description="Plugins for working with Maven"
             id="org.jboss.tools.central.discovery.maven"
             name="Maven"
             relevance="60">
@@ -25,7 +36,7 @@
       </connectorCategory>
       
        <connectorCategory
-            description="Plugins related to testing"
+            description="Plugins for testing + code quality"
             id="org.jboss.tools.central.discovery.testing"
             name="Testing"
             relevance="60">
@@ -34,7 +45,7 @@
       </connectorCategory>
       
       <connectorCategory
-            description="Plugins related to working with source control systems"
+            description="Plugins for source control systems"
             id="org.jboss.tools.central.discovery.scm"
             name="Source Control Management"
             relevance="60">
@@ -43,7 +54,7 @@
       </connectorCategory>
       
        <connectorCategory
-            description="Plugins related to web development"
+            description="Plugins for web development"
             id="org.jboss.tools.central.discovery.web"
             name="Web Development"
             relevance="60">
@@ -53,6 +64,7 @@
       
       <connectorDescriptor
             categoryId="org.jboss.tools.central.discovery.scm"
+            certificationId="com.jboss.jbds.central.discovery.certification.extras"
             description="Eclipse Team Provider for the Subversion version control system"
             id="org.tigris.subversion.subclipse"
             kind="task"
@@ -69,6 +81,7 @@
       </connectorDescriptor>
       <connectorDescriptor
             categoryId="org.jboss.tools.central.discovery.testing"
+            certificationId="com.jboss.jbds.central.discovery.certification.extras"
             description="Tool support for PMD"
             id="net.sourceforge.pmd.eclipse"
             kind="task"
@@ -85,6 +98,7 @@
       </connectorDescriptor>
       <connectorDescriptor
             categoryId="org.jboss.tools.central.discovery.testing"
+            certificationId="com.jboss.jbds.central.discovery.certification.extras"
             description="FindBugs Plug-in"
             id="edu.umd.cs.findbugs.plugin.eclipse"
             kind="task"
@@ -101,6 +115,7 @@
       </connectorDescriptor>
       <connectorDescriptor
             categoryId="org.jboss.tools.central.discovery.web"
+            certificationId="com.jboss.jbds.central.discovery.certification.extras"
             description="Tool support for the Spring Framework"
             id="org.springframework.ide.eclipse.feature"
             kind="task"
@@ -117,10 +132,11 @@
       </connectorDescriptor>
       <connectorDescriptor
             categoryId="org.jboss.tools.central.discovery.scm"
+            certificationId="com.jboss.jbds.central.discovery.certification.extras"
             description="An Eclipse Git Team provider in pure Java"
             id="org.eclipse.egit"
             kind="task"
-            license="Free, EPL, Incubation"
+            license="Free, EPL"
             name="Eclipse EGit"
             provider="Eclipse Git"
             siteUrl="http://download.jboss.org/jbosstools/updates/indigo/">
@@ -133,6 +149,7 @@
       </connectorDescriptor>
       <connectorDescriptor
             categoryId="org.jboss.tools.central.discovery.maven"
+            certificationId="com.jboss.jbds.central.discovery.certification.extras"
             description="m2e - Maven Integration for Eclipse"
             id="org.eclipse.m2e.feature"
             kind="task"
@@ -149,6 +166,7 @@
       </connectorDescriptor>
       <connectorDescriptor
             categoryId="org.jboss.tools.central.discovery.maven"
+            certificationId="com.jboss.jbds.central.discovery.certification.extras"
             description="Maven Integration for Web Tools"
             id="org.maven.ide.eclipse.wtp.feature"
             kind="task"
@@ -165,6 +183,7 @@
       </connectorDescriptor>
 	  <connectorDescriptor
             categoryId="org.jboss.tools.central.discovery.testing"
+            certificationId="com.jboss.jbds.central.discovery.certification.extras"
             description="TestNG plug-in for Eclipse"
             id="org.testng.eclipse"
             kind="task"
@@ -183,6 +202,7 @@
       </connectorDescriptor>
       <connectorDescriptor
             categoryId="org.jboss.tools.central.discovery.maven"
+            certificationId="org.jboss.tools.central.discovery.certification"
             description="JBoss Maven Integration"
             id="org.jboss.tools.maven.feature"
             kind="task"
@@ -194,7 +214,6 @@
                image32="images/jbosstools_icon32.png">
          </icon>
          <overview
-         	   summary="JBoss Maven Integration"
                url="http://jboss.org/tools">
          </overview>
       </connectorDescriptor>
