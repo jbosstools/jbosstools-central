@@ -337,9 +337,6 @@ public class GettingStartedPage extends AbstractJBossCentralPage {
 		formText.setText("<form><p>" +
 	    		"<img href=\"image\"/>" + 
 	    		" No entries found." +
-				"Check your internet connection and " +
-				"<a href=\"networkConnections\">Window > Preferences > General > Network Connections</a> " +
-				"preferences" +
 				"</p></form>",
 				true, false);
 		
