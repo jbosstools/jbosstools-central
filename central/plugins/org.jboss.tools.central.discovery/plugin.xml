@@ -214,7 +214,7 @@
                image32="images/jbosstools_icon32.png">
          </icon>
          <overview
-               url="http://jboss.org/tools">
+               url="http://www.jboss.org/tools">
          </overview>
       </connectorDescriptor>
       <connectorDescriptor
@@ -231,7 +231,7 @@
                image32="images/jbosstools_icon32.png">
          </icon>
          <overview
-               url="http://jboss.org/tools">
+               url="http://www.jboss.org/tools">
          </overview>
       </connectorDescriptor>
       <connectorDescriptor
@@ -248,7 +248,7 @@
                image32="images/jbosstools_icon32.png">
          </icon>
          <overview
-               url="http://jboss.org/tools">
+               url="http://www.jboss.org/tools">
          </overview>
       </connectorDescriptor>
       <connectorDescriptor
@@ -265,7 +265,7 @@
                image32="images/jbosstools_icon32.png">
          </icon>
          <overview
-               url="http://jboss.org/tools">
+               url="http://www.jboss.org/tools">
          </overview>
       </connectorDescriptor>
       <connectorDescriptor
@@ -282,7 +282,7 @@
                image32="images/jbosstools_icon32.png">
          </icon>
          <overview
-               url="http://jboss.org/tools">
+               url="http://www.jboss.org/tools">
          </overview>
       </connectorDescriptor>
       <connectorDescriptor
@@ -299,7 +299,7 @@
                image32="images/jbosstools_icon32.png">
          </icon>
          <overview
-               url="http://jboss.org/tools">
+               url="http://www.jboss.org/tools">
          </overview>
       </connectorDescriptor>
       <connectorDescriptor
@@ -316,7 +316,7 @@
                image32="images/jbosstools_icon32.png">
          </icon>
          <overview
-               url="http://jboss.org/tools">
+               url="http://www.jboss.org/tools">
          </overview>
       </connectorDescriptor>
 	</extension>
