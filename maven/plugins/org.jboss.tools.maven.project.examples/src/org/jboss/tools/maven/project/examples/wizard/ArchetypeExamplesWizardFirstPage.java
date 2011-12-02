@@ -65,6 +65,7 @@ import org.jboss.tools.project.examples.model.Project;
  */
 public class ArchetypeExamplesWizardFirstPage extends MavenProjectWizardLocationPage {
 
+	private static final String TARGET_RUNTIME = "targetRuntime";
 	private Label projectNameLabel;
 	private Combo projectNameCombo;
 	private Label packageLabel;
@@ -88,6 +89,7 @@ public class ArchetypeExamplesWizardFirstPage extends MavenProjectWizardLocation
 		
 	}
 
+	
 	@Override
 	protected void createAdditionalControls(Composite container) {
 
@@ -162,11 +164,21 @@ public class ArchetypeExamplesWizardFirstPage extends MavenProjectWizardLocation
 		serverTargetCombo = new Combo(parent, SWT.BORDER | SWT.READ_ONLY);
 		serverTargetCombo.setLayoutData(gridData);
 		serverRuntimes = getServerRuntimes(facetVersion);
-		for (String runtimeName : serverRuntimes.keySet()) {
-			serverTargetCombo.add(runtimeName);
-		}
 		serverTargetCombo.add(Messages.ArchetypeExamplesWizardFirstPage_No_TargetRuntime);
-		serverTargetCombo.select(0);
+		int i =0, selectedRuntimeIdx = 0;
+		String lastUsedRuntime = dialogSettings.get(TARGET_RUNTIME);
+
+		for (Map.Entry<String, IRuntime> entry : serverRuntimes.entrySet()) {
+			serverTargetCombo.add(entry.getKey());
+			++i;
+			IRuntime runtime = entry.getValue();
+			if (lastUsedRuntime != null && lastUsedRuntime.equals(runtime.getId())) {
+				selectedRuntimeIdx = i;
+			}
+		}
+				
+		serverTargetCombo.select(selectedRuntimeIdx);
+		
 		serverTargetCombo.addModifyListener(new ModifyListener() {
 
 			@Override
@@ -174,6 +186,7 @@ public class ArchetypeExamplesWizardFirstPage extends MavenProjectWizardLocation
 				validateEnterpriseRepo();
 			}
 		});
+
 	}
 
 	protected void validate() {
@@ -355,4 +368,16 @@ public class ArchetypeExamplesWizardFirstPage extends MavenProjectWizardLocation
 			MavenProjectExamplesActivator.log(e);
 		} 
 	}
+	
+	@Override
+	public void dispose() {
+		if (dialogSettings != null && serverRuntimes != null && serverTargetCombo != null) {
+			IRuntime lastUsedRuntime = serverRuntimes.get(serverTargetCombo.getText());
+			if (lastUsedRuntime != null) {
+				dialogSettings.put(TARGET_RUNTIME, lastUsedRuntime.getId());
+			}
+		}
+		super.dispose();
+	}
+	
 }
