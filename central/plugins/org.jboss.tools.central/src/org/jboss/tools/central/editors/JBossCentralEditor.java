@@ -205,7 +205,7 @@ public class JBossCentralEditor extends SharedHeaderFormEditor {
 		gridLayout.marginWidth = 0;
 		gridLayout.verticalSpacing = 0;
 		gridLayout.marginLeft = 0;
-		gridLayout.marginRight = 0;
+		gridLayout.marginRight = 10;
 		searchComposite.setLayout(gridLayout);
 		ImageHyperlink menuLink = getToolkit().createImageHyperlink(
 				searchComposite, SWT.NONE);
