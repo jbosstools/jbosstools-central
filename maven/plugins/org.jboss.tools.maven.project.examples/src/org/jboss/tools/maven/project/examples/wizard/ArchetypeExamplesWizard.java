@@ -69,7 +69,7 @@ public class ArchetypeExamplesWizard extends Wizard implements INewWizard {
 
 	public ArchetypeExamplesWizard(File location, Project projectDescription) {
 		super();
-		setWindowTitle("New JBoss project");
+		setWindowTitle("New JBoss Project");
 		setDefaultPageImageDescriptor(MavenProjectExamplesActivator.getNewWizardImageDescriptor());
 		setNeedsProgressMonitor(true);
 		this.projectDescription = projectDescription;
