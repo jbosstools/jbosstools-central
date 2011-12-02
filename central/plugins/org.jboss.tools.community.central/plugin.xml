@@ -18,7 +18,7 @@
       <tutorial
             id="org.jboss.tools.central.jbossas.quickstart.helloworld"
             categoryId="org.jboss.tools.central.jbossas.quickstart"
-            name="Helloworld quickstart"
+            name="Helloworld"
             type="projectExample"
             priority="1"
             icon="icons/jbossas7.png"
@@ -26,7 +26,7 @@
       <tutorial
             id="org.jboss.tools.central.jbossas.quickstart.numberguess"
             categoryId="org.jboss.tools.central.jbossas.quickstart"
-            name="Numberguess quickstart"
+            name="Numberguess"
             type="projectExample"
             priority="2"
             icon="icons/jbossas7.png"
@@ -35,7 +35,7 @@
       <tutorial
             id="org.jboss.tools.central.jbossas.quickstart.login"
             categoryId="org.jboss.tools.central.jbossas.quickstart"
-            name="Login quickstart"
+            name="Login"
             type="projectExample"
             priority="3"
             icon="icons/jbossas7.png"
@@ -44,11 +44,30 @@
       <tutorial
             id="org.jboss.tools.central.jbossas.quickstart.kitchensink"
             categoryId="org.jboss.tools.central.jbossas.quickstart"
-            name="Kitchensink quickstart"
+            name="Kitchensink"
             type="projectExample"
             priority="4"
             icon="icons/jbossas7.png"
             reference="JBoss AS 7 Quickstarts::kitchensink"/>
+
+      <tutorial
+            id="org.jboss.tools.central.jbossas.quickstart.poh5helloworld"
+            categoryId="org.jboss.tools.central.jbossas.quickstart"
+            name="HTML5"
+            type="projectExample"
+            priority="5"
+            icon="icons/jbossas7.png"
+            reference="JBoss AS 7 Quickstarts::poh5-helloworld"/>
+
+      <tutorial
+            id="org.jboss.tools.central.jbossas.quickstart.ticketmonster"
+            categoryId="org.jboss.tools.central.jbossas.quickstart"
+            name="Ticket Monster"
+            type="projectExample"
+            priority="6"
+            icon="icons/jbossas7.png"
+            reference="JBoss AS 7 Quickstarts::ticketmonster"/>
+      
       <!--                              
       <tutorial
             id="org.jboss.tools.central.Seam.registration2"
