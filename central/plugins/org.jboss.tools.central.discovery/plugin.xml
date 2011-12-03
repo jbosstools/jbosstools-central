@@ -11,7 +11,7 @@
             Extra Plugins for JBoss Tools or JBoss Developer Studio
          </description>
          <icon
-               image48="images/jbds_icon32.png">
+               image32="images/jbds_icon32.png">
          </icon>
       </certification>
       <certification
@@ -22,7 +22,7 @@
             Plugins for JBoss Tools or JBoss Developer Studio
          </description>
          <icon
-               image48="images/jbosstools_icon32.png">
+               image32="images/jbosstools_icon32.png">
          </icon>
       </certification>
       
