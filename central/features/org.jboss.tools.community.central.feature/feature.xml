@@ -18,6 +18,10 @@
       %license
    </license>
 
+   <requires>
+      <import feature="org.jboss.tools.community.project.examples.feature" version="1.2.1.qualifier" match="greaterOrEqual"/>
+   </requires>
+
    <plugin
          id="org.jboss.tools.community.central"
          download-size="0"
