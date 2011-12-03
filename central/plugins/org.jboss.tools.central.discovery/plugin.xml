@@ -63,6 +63,55 @@
       </connectorCategory>
       
       <connectorDescriptor
+            categoryId="org.jboss.tools.central.discovery.web"
+            description="Google App Engine for Java 1.6.0 SDK Bundle"
+            id="com.google.appengine.eclipse.sdkbundle.e37.feature"
+            kind="task"
+            license="EPL, Other"
+            name="Google App Engine Java SDK"
+            provider="Google, Inc."
+            siteUrl="http://dl.google.com/eclipse/plugin/3.7/">
+         <icon
+               image32="images/google_32.gif">
+         </icon>
+         <overview
+               url="http://code.google.com/p/google-plugin-for-eclipse/">
+         </overview>
+      </connectorDescriptor>
+      <connectorDescriptor
+            categoryId="org.jboss.tools.central.discovery.web"
+            description="Google Web Toolkit 2.4.0 SDK Bundle"
+            id="com.google.gwt.eclipse.sdkbundle.e37.feature"
+            kind="task"
+            license="EPL, Other"
+            name="Google Web Toolkit SDK"
+            provider="Google, Inc."
+            siteUrl="http://dl.google.com/eclipse/plugin/3.7/">
+         <icon
+               image32="images/google_32.gif">
+         </icon>
+         <overview
+               url="http://code.google.com/p/google-plugin-for-eclipse/">
+         </overview>
+      </connectorDescriptor>
+      <connectorDescriptor
+            categoryId="org.jboss.tools.central.discovery.testing"
+            description="JRebel Eclipse Plug-in"
+            id="org.zeroturnaround.eclipse.feature"
+            kind="task"
+            license="Commercial"
+            name="JRebel for Eclipse"
+            provider="zeroturnaround.org"
+            siteUrl="http://www.zeroturnaround.com/update-site/">
+         <icon
+               image32="images/jrebel_32.gif">
+         </icon>
+         <overview
+               url="http://zeroturnaround.com/jrebel/current/">
+         </overview>
+      </connectorDescriptor>
+
+      <connectorDescriptor
             categoryId="org.jboss.tools.central.discovery.scm"
             certificationId="com.jboss.jbds.central.discovery.certification.extras"
             description="Eclipse Team Provider for the Subversion version control system"
@@ -76,7 +125,7 @@
                image32="images/subclipse_32.gif">
          </icon>
          <overview
-               url="">
+               url="http://subclipse.tigris.org/">
          </overview>
       </connectorDescriptor>
       <connectorDescriptor
@@ -93,7 +142,7 @@
                image32="images/pmd_32.png">
          </icon>
          <overview
-               url="">
+               url="http://pmd.sourceforge.net/">
          </overview>
       </connectorDescriptor>
       <connectorDescriptor
@@ -110,7 +159,7 @@
                image32="images/findbugs_32.png">
          </icon>
          <overview
-               url="">
+               url="http://findbugs.sourceforge.net/">
          </overview>
       </connectorDescriptor>
       <connectorDescriptor
