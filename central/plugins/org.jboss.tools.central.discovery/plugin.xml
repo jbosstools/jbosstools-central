@@ -31,10 +31,223 @@
             id="org.jboss.tools.central.discovery.maven"
             name="Maven"
             relevance="60">
+            <!-- use groups to reorder items in a category; otherwise default to alpha order -->
+ 			<group id="org.jboss.tools.central.discovery.maven.core" /> 
+ 			<group id="org.jboss.tools.central.discovery.maven.configurators" /> 
+ 			<group id="org.jboss.tools.central.discovery.maven.upstream" />
+      </connectorCategory>
+      
+      <connectorDescriptor
+            categoryId="org.jboss.tools.central.discovery.maven"
+            certificationId="org.jboss.tools.central.discovery.certification"
+            groupId="org.jboss.tools.central.discovery.maven.core"
+            description="JBoss Maven Integration"
+            id="org.jboss.tools.maven.feature"
+            kind="task"
+            license="Free, EPL"
+            name="JBoss Maven Integration"
+            provider="JBoss by Red Hat"
+            siteUrl="http://download.jboss.org/jbosstools/updates/development/indigo">
+         <icon
+               image32="images/jbosstools_icon32.png">
+         </icon>
+         <overview
+               url="http://www.jboss.org/tools">
+         </overview>
+      </connectorDescriptor>
+      <connectorDescriptor
+            categoryId="org.jboss.tools.central.discovery.maven"
+            certificationId="org.jboss.tools.central.discovery.certification"
+            groupId="org.jboss.tools.central.discovery.maven.configurators"
+            description="JBoss Maven CDI Configurator"
+            id="org.jboss.tools.maven.cdi.feature"
+            kind="task"
+            license="Free, EPL"
+            name="JBoss Maven CDI Configurator"
+            provider="JBoss by Red Hat"
+            siteUrl="http://download.jboss.org/jbosstools/updates/development/indigo">
+         <icon
+               image32="images/jbosstools_icon32.png">
+         </icon>
+         <overview
+               url="http://www.jboss.org/tools">
+         </overview>
+      </connectorDescriptor>
+      <connectorDescriptor
+            categoryId="org.jboss.tools.central.discovery.maven"
+            certificationId="org.jboss.tools.central.discovery.certification"
+            groupId="org.jboss.tools.central.discovery.maven.configurators"
+            description="JBoss Maven Hibernate Configurator"
+            id="org.jboss.tools.maven.hibernate.feature"
+            kind="task"
+            license="Free, EPL"
+            name="JBoss Maven Hibernate Configurator"
+            provider="JBoss by Red Hat"
+            siteUrl="http://download.jboss.org/jbosstools/updates/development/indigo">
+         <icon
+               image32="images/jbosstools_icon32.png">
+         </icon>
+         <overview
+               url="http://www.jboss.org/tools">
+         </overview>
+      </connectorDescriptor>
+      <connectorDescriptor
+            categoryId="org.jboss.tools.central.discovery.maven"
+            certificationId="org.jboss.tools.central.discovery.certification"
+            groupId="org.jboss.tools.central.discovery.maven.configurators"
+            description="JBoss Maven JAX-RS Configurator"
+            id="org.jboss.tools.maven.jaxrs.feature"
+            kind="task"
+            license="Free, EPL"
+            name="JBoss Maven JAX-RS Configurator"
+            provider="JBoss by Red Hat"
+            siteUrl="http://download.jboss.org/jbosstools/updates/development/indigo">
+         <icon
+               image32="images/jbosstools_icon32.png">
+         </icon>
+         <overview
+               url="http://www.jboss.org/tools">
+         </overview>
+      </connectorDescriptor>
+      <connectorDescriptor
+            categoryId="org.jboss.tools.central.discovery.maven"
+            certificationId="org.jboss.tools.central.discovery.certification"
+            groupId="org.jboss.tools.central.discovery.maven.configurators"
+            description="JBoss Maven JSF Configurator"
+            id="org.jboss.tools.maven.jsf.feature"
+            kind="task"
+            license="Free, EPL"
+            name="JBoss Maven JSF Configurator"
+            provider="JBoss by Red Hat"
+            siteUrl="http://download.jboss.org/jbosstools/updates/development/indigo">
+         <icon
+               image32="images/jbosstools_icon32.png">
+         </icon>
+         <overview
+               url="http://www.jboss.org/tools">
+         </overview>
+      </connectorDescriptor>
+      <connectorDescriptor
+            categoryId="org.jboss.tools.central.discovery.maven"
+            certificationId="org.jboss.tools.central.discovery.certification"
+            groupId="org.jboss.tools.central.discovery.maven.configurators"
+            description="JBoss Maven Portlet Configurator"
+            id="org.jboss.tools.maven.portlet.feature"
+            kind="task"
+            license="Free, EPL"
+            name="JBoss Maven Portlet Configurator"
+            provider="JBoss by Red Hat"
+            siteUrl="http://download.jboss.org/jbosstools/updates/development/indigo">
+         <icon
+               image32="images/jbosstools_icon32.png">
+         </icon>
+         <overview
+               url="http://www.jboss.org/tools">
+         </overview>
+      </connectorDescriptor>
+      <connectorDescriptor
+            categoryId="org.jboss.tools.central.discovery.maven"
+            certificationId="org.jboss.tools.central.discovery.certification"
+            groupId="org.jboss.tools.central.discovery.maven.configurators"
+            description="JBoss Maven Seam Configurator"
+            id="org.jboss.tools.maven.seam.feature"
+            kind="task"
+            license="Free, EPL"
+            name="JBoss Maven Seam Configurator"
+            provider="JBoss by Red Hat"
+            siteUrl="http://download.jboss.org/jbosstools/updates/development/indigo">
+         <icon
+               image32="images/jbosstools_icon32.png">
+         </icon>
+         <overview
+               url="http://www.jboss.org/tools">
+         </overview>
+      </connectorDescriptor>
+      
+      <connectorDescriptor
+            categoryId="org.jboss.tools.central.discovery.maven"
+            certificationId="com.jboss.jbds.central.discovery.certification.extras"
+            groupId="org.jboss.tools.central.discovery.maven.upstream"
+            description="Maven Integration for Eclipse (m2e)"
+            id="org.eclipse.m2e.feature"
+            kind="task"
+            license="Free, EPL"
+            name="Maven Integration for Eclipse (m2e)"
+            provider="eclipse.org"
+            siteUrl="http://download.jboss.org/jbosstools/updates/indigo/">
+         <icon
+               image32="images/m2e_32.gif">
+         </icon>
+         <overview
+               url="http://www.eclipse.org/m2e/">
+         </overview>
+      </connectorDescriptor>
+      <connectorDescriptor
+            categoryId="org.jboss.tools.central.discovery.maven"
+            certificationId="com.jboss.jbds.central.discovery.certification.extras"
+            groupId="org.jboss.tools.central.discovery.maven.upstream"
+            description="Maven Integration for Web Tools (m2e-wtp)"
+            id="org.maven.ide.eclipse.wtp.feature"
+            kind="task"
+            license="Free, EPL"
+            name="Maven Integration for Web Tools (m2e-wtp)"
+            provider="eclipse.org"
+            siteUrl="http://download.jboss.org/jbosstools/updates/indigo/">
+         <icon
+               image32="images/m2e_32.gif">
+         </icon>
+         <overview
+               url="http://www.eclipse.org/m2e/">
+         </overview>
+      </connectorDescriptor>
+
+       <!-- SCM -->
+      <connectorCategory
+            description="Plugins for source control systems"
+            id="org.jboss.tools.central.discovery.scm"
+            name="Source Control Management"
+            relevance="60">
  			<group id="bundled" /> 
  			<group id="extra" />
       </connectorCategory>
-      
+
+      <connectorDescriptor
+            categoryId="org.jboss.tools.central.discovery.scm"
+            certificationId="com.jboss.jbds.central.discovery.certification.extras"
+            description="Eclipse Team Provider for the Git version control system"
+            id="org.eclipse.egit"
+            kind="task"
+            license="Free, EPL"
+            name="Eclipse EGit"
+            provider="eclipse.org"
+            siteUrl="http://download.jboss.org/jbosstools/updates/indigo/">
+         <icon
+               image32="images/egit_32.png">
+         </icon>
+         <overview
+               url="http://www.eclipse.org/egit/">
+         </overview>
+      </connectorDescriptor>
+      <connectorDescriptor
+            categoryId="org.jboss.tools.central.discovery.scm"
+            certificationId="com.jboss.jbds.central.discovery.certification.extras"
+            description="Eclipse Team Provider for the Subversion version control system"
+            id="org.tigris.subversion.subclipse"
+            kind="task"
+            license="Free, Subclipse Software User Agreement"
+            name="Subclipse SVN Team Provider Core"
+            provider="tigris.org"
+            siteUrl="http://download.jboss.org/jbosstools/updates/indigo/extras/">
+         <icon
+               image32="images/subclipse_32.gif">
+         </icon>
+         <overview
+               url="http://subclipse.tigris.org/">
+         </overview>
+      </connectorDescriptor>
+
+       <!-- Testing -->
+
        <connectorCategory
             description="Plugins for testing + code quality"
             id="org.jboss.tools.central.discovery.testing"
@@ -44,15 +257,78 @@
  			<group id="extra" />
       </connectorCategory>
       
-      <connectorCategory
-            description="Plugins for source control systems"
-            id="org.jboss.tools.central.discovery.scm"
-            name="Source Control Management"
-            relevance="60">
- 			<group id="bundled" /> 
- 			<group id="extra" />
-      </connectorCategory>
+      <connectorDescriptor
+            categoryId="org.jboss.tools.central.discovery.testing"
+            certificationId="com.jboss.jbds.central.discovery.certification.extras"
+            description="Tool support for FindBugs"
+            id="edu.umd.cs.findbugs.plugin.eclipse"
+            kind="task"
+            license="Free, LGPL"
+            name="FindBugs"
+            provider="FindBugs Project"
+            siteUrl="http://download.jboss.org/jbosstools/updates/indigo/extras/">
+         <icon
+               image32="images/findbugs_32.png">
+         </icon>
+         <overview
+               url="http://findbugs.sourceforge.net/">
+         </overview>
+      </connectorDescriptor>
+      <connectorDescriptor
+            categoryId="org.jboss.tools.central.discovery.testing"
+            description="Tool support for JRebel"
+            id="org.zeroturnaround.eclipse.feature"
+            kind="task"
+            license="Commercial"
+            name="JRebel"
+            provider="zeroturnaround.org"
+            siteUrl="http://www.zeroturnaround.com/update-site/">
+         <icon
+               image32="images/jrebel_32.png">
+         </icon>
+         <overview
+               url="http://zeroturnaround.com/jrebel/current/">
+         </overview>
+      </connectorDescriptor>
+      <connectorDescriptor
+            categoryId="org.jboss.tools.central.discovery.testing"
+            certificationId="com.jboss.jbds.central.discovery.certification.extras"
+            description="Tool support for PMD"
+            id="net.sourceforge.pmd.eclipse"
+            kind="task"
+            license="Free, PMD License"
+            name="PMD"
+            provider="PMD Development Team"
+            siteUrl="http://download.jboss.org/jbosstools/updates/indigo/extras/">
+         <icon
+               image32="images/pmd_32.png">
+         </icon>
+         <overview
+               url="http://pmd.sourceforge.net/">
+         </overview>
+      </connectorDescriptor>
+	  <connectorDescriptor
+            categoryId="org.jboss.tools.central.discovery.testing"
+            certificationId="com.jboss.jbds.central.discovery.certification.extras"
+            description="Tool support for TestNG"
+            id="org.testng.eclipse"
+            kind="task"
+            license="Free, ASL"
+            name="TestNG"
+            provider="Cedric Beust"
+            siteUrl="http://download.jboss.org/jbosstools/updates/indigo/extras/">
+         <icon
+               image32="images/testng_16.gif">
+         </icon>
+         <overview
+         	   summary="TestNG plug-in for Eclipse"
+         	   screenshot="images/testng_screenshot.png"
+               url="http://testng.org/">
+         </overview>
+      </connectorDescriptor>
       
+      <!-- Web -->
+
        <connectorCategory
             description="Plugins for web development"
             id="org.jboss.tools.central.discovery.web"
@@ -61,7 +337,7 @@
  			<group id="bundled" /> 
  			<group id="extra" />
       </connectorCategory>
-      
+
       <connectorDescriptor
             categoryId="org.jboss.tools.central.discovery.web"
             description="Google App Engine for Java 1.6.0 SDK Bundle"
@@ -95,74 +371,6 @@
          </overview>
       </connectorDescriptor>
       <connectorDescriptor
-            categoryId="org.jboss.tools.central.discovery.testing"
-            description="JRebel Eclipse Plug-in"
-            id="org.zeroturnaround.eclipse.feature"
-            kind="task"
-            license="Commercial"
-            name="JRebel for Eclipse"
-            provider="zeroturnaround.org"
-            siteUrl="http://www.zeroturnaround.com/update-site/">
-         <icon
-               image32="images/jrebel_32.png">
-         </icon>
-         <overview
-               url="http://zeroturnaround.com/jrebel/current/">
-         </overview>
-      </connectorDescriptor>
-
-      <connectorDescriptor
-            categoryId="org.jboss.tools.central.discovery.scm"
-            certificationId="com.jboss.jbds.central.discovery.certification.extras"
-            description="Eclipse Team Provider for the Subversion version control system"
-            id="org.tigris.subversion.subclipse"
-            kind="task"
-            license="Free, Subclipse Software User Agreement"
-            name="Subclipse SVN Team Provider Core"
-            provider="tigris.org"
-            siteUrl="http://download.jboss.org/jbosstools/updates/indigo/extras/">
-         <icon
-               image32="images/subclipse_32.gif">
-         </icon>
-         <overview
-               url="http://subclipse.tigris.org/">
-         </overview>
-      </connectorDescriptor>
-      <connectorDescriptor
-            categoryId="org.jboss.tools.central.discovery.testing"
-            certificationId="com.jboss.jbds.central.discovery.certification.extras"
-            description="Tool support for PMD"
-            id="net.sourceforge.pmd.eclipse"
-            kind="task"
-            license="Free, PMD License"
-            name="PMD for Eclipse"
-            provider="PMD Development Team"
-            siteUrl="http://download.jboss.org/jbosstools/updates/indigo/extras/">
-         <icon
-               image32="images/pmd_32.png">
-         </icon>
-         <overview
-               url="http://pmd.sourceforge.net/">
-         </overview>
-      </connectorDescriptor>
-      <connectorDescriptor
-            categoryId="org.jboss.tools.central.discovery.testing"
-            certificationId="com.jboss.jbds.central.discovery.certification.extras"
-            description="FindBugs Plug-in"
-            id="edu.umd.cs.findbugs.plugin.eclipse"
-            kind="task"
-            license="Free, Lesser GNU Public License"
-            name="FindBugs Feature"
-            provider="FindBugs Project"
-            siteUrl="http://download.jboss.org/jbosstools/updates/indigo/extras/">
-         <icon
-               image32="images/findbugs_32.png">
-         </icon>
-         <overview
-               url="http://findbugs.sourceforge.net/">
-         </overview>
-      </connectorDescriptor>
-      <connectorDescriptor
             categoryId="org.jboss.tools.central.discovery.web"
             certificationId="com.jboss.jbds.central.discovery.certification.extras"
             description="Tool support for the Spring Framework"
@@ -179,194 +387,6 @@
                url="http://www.springsource.com/developer">
          </overview>
       </connectorDescriptor>
-      <connectorDescriptor
-            categoryId="org.jboss.tools.central.discovery.scm"
-            certificationId="com.jboss.jbds.central.discovery.certification.extras"
-            description="An Eclipse Git Team provider in pure Java"
-            id="org.eclipse.egit"
-            kind="task"
-            license="Free, EPL"
-            name="Eclipse EGit"
-            provider="Eclipse Git"
-            siteUrl="http://download.jboss.org/jbosstools/updates/indigo/">
-         <icon
-               image32="images/egit_32.png">
-         </icon>
-         <overview
-               url="http://www.eclipse.org/egit/">
-         </overview>
-      </connectorDescriptor>
-      <connectorDescriptor
-            categoryId="org.jboss.tools.central.discovery.maven"
-            certificationId="com.jboss.jbds.central.discovery.certification.extras"
-            description="m2e - Maven Integration for Eclipse"
-            id="org.eclipse.m2e.feature"
-            kind="task"
-            license="Free, EPL"
-            name="m2e - Maven Integration for Eclipse"
-            provider="Eclipse.org - m2e"
-            siteUrl="http://download.jboss.org/jbosstools/updates/indigo/">
-         <icon
-               image32="images/m2e_32.gif">
-         </icon>
-         <overview
-               url="http://www.eclipse.org/m2e/">
-         </overview>
-      </connectorDescriptor>
-      <connectorDescriptor
-            categoryId="org.jboss.tools.central.discovery.maven"
-            certificationId="com.jboss.jbds.central.discovery.certification.extras"
-            description="Maven Integration for Web Tools"
-            id="org.maven.ide.eclipse.wtp.feature"
-            kind="task"
-            license="Free, EPL"
-            name="Maven Integration for WTP"
-            provider="Eclipse.org - m2e"
-            siteUrl="http://download.jboss.org/jbosstools/updates/indigo/">
-         <icon
-               image32="images/m2e_32.gif">
-         </icon>
-         <overview
-               url="http://www.eclipse.org/m2e/">
-         </overview>
-      </connectorDescriptor>
-	  <connectorDescriptor
-            categoryId="org.jboss.tools.central.discovery.testing"
-            certificationId="com.jboss.jbds.central.discovery.certification.extras"
-            description="TestNG plug-in for Eclipse"
-            id="org.testng.eclipse"
-            kind="task"
-            license="Free, ASL"
-            name="TestNG"
-            provider="Cedric Beust"
-            siteUrl="http://download.jboss.org/jbosstools/updates/indigo/extras/">
-         <icon
-               image32="images/testng_16.gif">
-         </icon>
-         <overview
-         	   summary="TestNG plug-in for Eclipse"
-         	   screenshot="images/testng_screenshot.png"
-               url="http://testng.org/">
-         </overview>
-      </connectorDescriptor>
-      <connectorDescriptor
-            categoryId="org.jboss.tools.central.discovery.maven"
-            certificationId="org.jboss.tools.central.discovery.certification"
-            description="JBoss Maven Integration"
-            id="org.jboss.tools.maven.feature"
-            kind="task"
-            license="Free, EPL"
-            name="JBoss Maven Integration"
-            provider="JBoss by Red Hat"
-            siteUrl="http://download.jboss.org/jbosstools/updates/development/indigo">
-         <icon
-               image32="images/jbosstools_icon32.png">
-         </icon>
-         <overview
-               url="http://www.jboss.org/tools">
-         </overview>
-      </connectorDescriptor>
-      <connectorDescriptor
-            categoryId="org.jboss.tools.central.discovery.maven"
-            certificationId="org.jboss.tools.central.discovery.certification"
-            description="JBoss Maven CDI Configurator"
-            id="org.jboss.tools.maven.cdi.feature"
-            kind="task"
-            license="Free, EPL"
-            name="JBoss Maven CDI Configurator"
-            provider="JBoss by Red Hat"
-            siteUrl="http://download.jboss.org/jbosstools/updates/development/indigo">
-         <icon
-               image32="images/jbosstools_icon32.png">
-         </icon>
-         <overview
-               url="http://www.jboss.org/tools">
-         </overview>
-      </connectorDescriptor>
-      <connectorDescriptor
-            categoryId="org.jboss.tools.central.discovery.maven"
-            certificationId="org.jboss.tools.central.discovery.certification"
-            description="JBoss Maven Hibernate Configurator"
-            id="org.jboss.tools.maven.hibernate.feature"
-            kind="task"
-            license="Free, EPL"
-            name="JBoss Maven Hibernate Configurator"
-            provider="JBoss by Red Hat"
-            siteUrl="http://download.jboss.org/jbosstools/updates/development/indigo">
-         <icon
-               image32="images/jbosstools_icon32.png">
-         </icon>
-         <overview
-               url="http://www.jboss.org/tools">
-         </overview>
-      </connectorDescriptor>
-      <connectorDescriptor
-            categoryId="org.jboss.tools.central.discovery.maven"
-            certificationId="org.jboss.tools.central.discovery.certification"
-            description="JBoss Maven JAX-RS Configurator"
-            id="org.jboss.tools.maven.jaxrs.feature"
-            kind="task"
-            license="Free, EPL"
-            name="JBoss Maven JAX-RS Configurator"
-            provider="JBoss by Red Hat"
-            siteUrl="http://download.jboss.org/jbosstools/updates/development/indigo">
-         <icon
-               image32="images/jbosstools_icon32.png">
-         </icon>
-         <overview
-               url="http://www.jboss.org/tools">
-         </overview>
-      </connectorDescriptor>
-      <connectorDescriptor
-            categoryId="org.jboss.tools.central.discovery.maven"
-            certificationId="org.jboss.tools.central.discovery.certification"
-            description="JBoss Maven JSF Configurator"
-            id="org.jboss.tools.maven.jsf.feature"
-            kind="task"
-            license="Free, EPL"
-            name="JBoss Maven JSF Configurator"
-            provider="JBoss by Red Hat"
-            siteUrl="http://download.jboss.org/jbosstools/updates/development/indigo">
-         <icon
-               image32="images/jbosstools_icon32.png">
-         </icon>
-         <overview
-               url="http://www.jboss.org/tools">
-         </overview>
-      </connectorDescriptor>
-      <connectorDescriptor
-            categoryId="org.jboss.tools.central.discovery.maven"
-            certificationId="org.jboss.tools.central.discovery.certification"
-            description="JBoss Maven Portlet Configurator"
-            id="org.jboss.tools.maven.portlet.feature"
-            kind="task"
-            license="Free, EPL"
-            name="JBoss Maven Portlet Configurator"
-            provider="JBoss by Red Hat"
-            siteUrl="http://download.jboss.org/jbosstools/updates/development/indigo">
-         <icon
-               image32="images/jbosstools_icon32.png">
-         </icon>
-         <overview
-               url="http://www.jboss.org/tools">
-         </overview>
-      </connectorDescriptor>
-      <connectorDescriptor
-            categoryId="org.jboss.tools.central.discovery.maven"
-            certificationId="org.jboss.tools.central.discovery.certification"
-            description="JBoss Maven Seam Configurator"
-            id="org.jboss.tools.maven.seam.feature"
-            kind="task"
-            license="Free, EPL"
-            name="JBoss Maven Seam Configurator"
-            provider="JBoss by Red Hat"
-            siteUrl="http://download.jboss.org/jbosstools/updates/development/indigo">
-         <icon
-               image32="images/jbosstools_icon32.png">
-         </icon>
-         <overview
-               url="http://www.jboss.org/tools">
-         </overview>
-      </connectorDescriptor>
+      
 	</extension>
 </plugin>
