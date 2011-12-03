@@ -72,7 +72,7 @@
             provider="Google, Inc."
             siteUrl="http://dl.google.com/eclipse/plugin/3.7/">
          <icon
-               image32="images/google_32.gif">
+               image32="images/google_32.png">
          </icon>
          <overview
                url="http://code.google.com/p/google-plugin-for-eclipse/">
@@ -88,7 +88,7 @@
             provider="Google, Inc."
             siteUrl="http://dl.google.com/eclipse/plugin/3.7/">
          <icon
-               image32="images/google_32.gif">
+               image32="images/google_32.png">
          </icon>
          <overview
                url="http://code.google.com/p/google-plugin-for-eclipse/">
@@ -104,7 +104,7 @@
             provider="zeroturnaround.org"
             siteUrl="http://www.zeroturnaround.com/update-site/">
          <icon
-               image32="images/jrebel_32.gif">
+               image32="images/jrebel_32.png">
          </icon>
          <overview
                url="http://zeroturnaround.com/jrebel/current/">
