@@ -3,29 +3,6 @@
 <plugin>
 	<extension
          point="org.eclipse.mylyn.discovery.core.connectorDiscovery">
-      <certification
-            id="com.jboss.jbds.central.discovery.certification.extras"
-            name="JBoss Developer Studio - Extras"
-            url="http://devstudio.jboss.com">
-         <description>
-            Extra Plugins for JBoss Tools or JBoss Developer Studio
-         </description>
-         <icon
-               image32="images/jbds_icon32.png">
-         </icon>
-      </certification>
-      <certification
-            id="org.jboss.tools.central.discovery.certification"
-            name="JBoss Tools"
-            url="http://www.jboss.org/tools/">
-         <description>
-            Plugins for JBoss Tools or JBoss Developer Studio
-         </description>
-         <icon
-               image32="images/jbosstools_icon32.png">
-         </icon>
-      </certification>
-      
       <connectorCategory
             description="Plugins for working with Maven"
             id="org.jboss.tools.central.discovery.maven"
@@ -39,7 +16,6 @@
       
       <connectorDescriptor
             categoryId="org.jboss.tools.central.discovery.maven"
-            certificationId="org.jboss.tools.central.discovery.certification"
             groupId="org.jboss.tools.central.discovery.maven.core"
             description="JBoss Maven Integration"
             id="org.jboss.tools.maven.feature"
@@ -57,7 +33,6 @@
       </connectorDescriptor>
       <connectorDescriptor
             categoryId="org.jboss.tools.central.discovery.maven"
-            certificationId="org.jboss.tools.central.discovery.certification"
             groupId="org.jboss.tools.central.discovery.maven.configurators"
             description="JBoss Maven CDI Configurator"
             id="org.jboss.tools.maven.cdi.feature"
@@ -75,7 +50,6 @@
       </connectorDescriptor>
       <connectorDescriptor
             categoryId="org.jboss.tools.central.discovery.maven"
-            certificationId="org.jboss.tools.central.discovery.certification"
             groupId="org.jboss.tools.central.discovery.maven.configurators"
             description="JBoss Maven Hibernate Configurator"
             id="org.jboss.tools.maven.hibernate.feature"
@@ -93,7 +67,6 @@
       </connectorDescriptor>
       <connectorDescriptor
             categoryId="org.jboss.tools.central.discovery.maven"
-            certificationId="org.jboss.tools.central.discovery.certification"
             groupId="org.jboss.tools.central.discovery.maven.configurators"
             description="JBoss Maven JAX-RS Configurator"
             id="org.jboss.tools.maven.jaxrs.feature"
@@ -111,7 +84,6 @@
       </connectorDescriptor>
       <connectorDescriptor
             categoryId="org.jboss.tools.central.discovery.maven"
-            certificationId="org.jboss.tools.central.discovery.certification"
             groupId="org.jboss.tools.central.discovery.maven.configurators"
             description="JBoss Maven JSF Configurator"
             id="org.jboss.tools.maven.jsf.feature"
@@ -129,7 +101,6 @@
       </connectorDescriptor>
       <connectorDescriptor
             categoryId="org.jboss.tools.central.discovery.maven"
-            certificationId="org.jboss.tools.central.discovery.certification"
             groupId="org.jboss.tools.central.discovery.maven.configurators"
             description="JBoss Maven Portlet Configurator"
             id="org.jboss.tools.maven.portlet.feature"
@@ -147,7 +118,6 @@
       </connectorDescriptor>
       <connectorDescriptor
             categoryId="org.jboss.tools.central.discovery.maven"
-            certificationId="org.jboss.tools.central.discovery.certification"
             groupId="org.jboss.tools.central.discovery.maven.configurators"
             description="JBoss Maven Seam Configurator"
             id="org.jboss.tools.maven.seam.feature"
@@ -166,7 +136,6 @@
       
       <connectorDescriptor
             categoryId="org.jboss.tools.central.discovery.maven"
-            certificationId="com.jboss.jbds.central.discovery.certification.extras"
             groupId="org.jboss.tools.central.discovery.maven.upstream"
             description="Maven Integration for Eclipse (m2e)"
             id="org.eclipse.m2e.feature"
@@ -184,7 +153,6 @@
       </connectorDescriptor>
       <connectorDescriptor
             categoryId="org.jboss.tools.central.discovery.maven"
-            certificationId="com.jboss.jbds.central.discovery.certification.extras"
             groupId="org.jboss.tools.central.discovery.maven.upstream"
             description="Maven Integration for Web Tools (m2e-wtp)"
             id="org.maven.ide.eclipse.wtp.feature"
@@ -213,7 +181,6 @@
 
       <connectorDescriptor
             categoryId="org.jboss.tools.central.discovery.scm"
-            certificationId="com.jboss.jbds.central.discovery.certification.extras"
             description="Eclipse Team Provider for the Git version control system"
             id="org.eclipse.egit"
             kind="task"
@@ -230,7 +197,6 @@
       </connectorDescriptor>
       <connectorDescriptor
             categoryId="org.jboss.tools.central.discovery.scm"
-            certificationId="com.jboss.jbds.central.discovery.certification.extras"
             description="Eclipse Team Provider for the Subversion version control system"
             id="org.tigris.subversion.subclipse"
             kind="task"
@@ -259,7 +225,6 @@
       
       <connectorDescriptor
             categoryId="org.jboss.tools.central.discovery.testing"
-            certificationId="com.jboss.jbds.central.discovery.certification.extras"
             description="Tool support for FindBugs"
             id="edu.umd.cs.findbugs.plugin.eclipse"
             kind="task"
@@ -292,7 +257,6 @@
       </connectorDescriptor>
       <connectorDescriptor
             categoryId="org.jboss.tools.central.discovery.testing"
-            certificationId="com.jboss.jbds.central.discovery.certification.extras"
             description="Tool support for PMD"
             id="net.sourceforge.pmd.eclipse"
             kind="task"
@@ -309,7 +273,6 @@
       </connectorDescriptor>
 	  <connectorDescriptor
             categoryId="org.jboss.tools.central.discovery.testing"
-            certificationId="com.jboss.jbds.central.discovery.certification.extras"
             description="Tool support for TestNG"
             id="org.testng.eclipse"
             kind="task"
@@ -372,7 +335,6 @@
       </connectorDescriptor>
       <connectorDescriptor
             categoryId="org.jboss.tools.central.discovery.web"
-            certificationId="com.jboss.jbds.central.discovery.certification.extras"
             description="Tool support for the Spring Framework"
             id="org.springframework.ide.eclipse.feature"
             kind="task"
