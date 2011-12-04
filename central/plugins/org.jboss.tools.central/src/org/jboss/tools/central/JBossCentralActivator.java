@@ -212,6 +212,11 @@ public class JBossCentralActivator extends AbstractUIPlugin {
 		IStatus status = new Status(IStatus.ERROR, PLUGIN_ID, message);
 		plugin.getLog().log(status);
 	}
+	
+	public static void logWarning(String message) {
+		IStatus status = new Status(IStatus.WARNING, PLUGIN_ID, message);
+		plugin.getLog().log(status);
+	}
 
 	public boolean showJBossCentralOnStartup() {
 		IEclipsePreferences prefs = JBossCentralActivator.getDefault().getPreferences();

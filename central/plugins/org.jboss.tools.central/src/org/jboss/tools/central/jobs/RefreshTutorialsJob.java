@@ -91,7 +91,7 @@ public class RefreshTutorialsJob extends Job {
 					if (projectTutorial != null) {
 						tutorial.setProjectExamples(projectTutorial);
 					} else {
-						JBossCentralActivator.log("Invalid Project example:" + tutorial.getId());
+						JBossCentralActivator.log("The " + tutorial.getId() + " project example not found");
 					}
 				} else {
 					// FIXME
