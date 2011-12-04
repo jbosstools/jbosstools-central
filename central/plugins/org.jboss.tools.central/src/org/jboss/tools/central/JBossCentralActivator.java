@@ -67,7 +67,7 @@ import org.osgi.service.prefs.BackingStoreException;
  */
 public class JBossCentralActivator extends AbstractUIPlugin {
 
-	private static final String JBOSS_DISCOVERY_DIRECTORY = "jboss.discovery.directory.url";
+	public static final String JBOSS_DISCOVERY_DIRECTORY = "jboss.discovery.directory.url";
 
 	//public static final String JBOSS_DISCOVERY_DIRECTORY_3_3_0_XML = "http://download.jboss.org/jbosstools/updates/development/indigo/jbosstools-directory.xml";
 		
@@ -466,14 +466,6 @@ public class JBossCentralActivator extends AbstractUIPlugin {
 
 	public BundleContext getBundleContext() {
 		return bundleContext;
-	}
-
-	public String getJBossDiscoveryDirectory() {
-		String directory = System.getProperty(JBOSS_DISCOVERY_DIRECTORY, null);
-		if (directory == null) {
-			return getConfigurator().getJBossDiscoveryDirectory();
-		}
-		return directory;
 	}
 	
 	public static boolean isInternalWebBrowserAvailable() {

@@ -44,7 +44,11 @@ public class DefaultJBossCentralConfigurator implements
 
 	@Override
 	public String getJBossDiscoveryDirectory() {
-		return JBOSS_DISCOVERY_DIRECTORY_3_3_0_XML;
+		String directory = System.getProperty(JBossCentralActivator.JBOSS_DISCOVERY_DIRECTORY, null);
+		if (directory == null) {
+			return JBOSS_DISCOVERY_DIRECTORY_3_3_0_XML;
+		}
+		return directory;
 	}
 
 	@Override

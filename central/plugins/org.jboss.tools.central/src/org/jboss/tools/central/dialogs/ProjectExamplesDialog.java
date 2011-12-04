@@ -337,7 +337,7 @@ public class ProjectExamplesDialog extends FormDialog implements IRunnableContex
 				connectorDiscoveries[0].getDiscoveryStrategies().add(new BundleDiscoveryStrategy());
 
 				RemoteBundleDiscoveryStrategy remoteDiscoveryStrategy = new RemoteBundleDiscoveryStrategy();
-				remoteDiscoveryStrategy.setDirectoryUrl(JBossCentralActivator.getDefault().getJBossDiscoveryDirectory());
+				remoteDiscoveryStrategy.setDirectoryUrl(JBossCentralActivator.getDefault().getConfigurator().getJBossDiscoveryDirectory());
 				connectorDiscoveries[0].getDiscoveryStrategies().add(remoteDiscoveryStrategy);
 
 				connectorDiscoveries[0].setEnvironment(JBossCentralActivator.getEnvironment());
