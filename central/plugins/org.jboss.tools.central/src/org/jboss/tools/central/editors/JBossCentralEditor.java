@@ -105,8 +105,7 @@ public class JBossCentralEditor extends SharedHeaderFormEditor {
 	public void init(IEditorSite site, IEditorInput editorInput)
 			throws PartInitException {
 		if (!(editorInput instanceof JBossCentralEditorInput))
-			throw new PartInitException(
-					"Invalid Input: Must be JBossCentralEditorInput");
+			editorInput = JBossCentralEditorInput.INSTANCE;
 		super.init(site, editorInput);
 		setPartName(JBOSS_CENTRAL);
 	}
