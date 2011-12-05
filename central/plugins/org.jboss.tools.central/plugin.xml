@@ -138,7 +138,7 @@
       
       <command
       		defaultHandler="org.jboss.tools.central.actions.JBossSeamRuntimePreferencesHandler"
-            name="JBoss Seam 2 Runtime Preferences"
+            name="JBoss Seam Runtime Preferences"
             id="org.jboss.tools.seam.runtime.preferences">
       </command>
       
