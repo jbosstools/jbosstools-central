@@ -37,8 +37,6 @@ import org.jboss.tools.maven.core.profiles.ProfileStatus;
 
 public class ProfileManager implements IProfileManager {
 
-	private static final String ARTIFACT_SEPARATOR = ":"; //$NON-NLS-1$
-	
 	public void updateActiveProfiles(final IMavenProjectFacade mavenProjectFacade, 
 									 final List<String> profiles, 
 									 final boolean isOffline, 
@@ -90,7 +88,7 @@ public class ProfileManager implements IProfileManager {
 		
 		for (org.apache.maven.settings.Profile sp : settings.getProfiles()) {
 			Profile p = SettingsUtils.convertFromSettingsProfile(sp);
-			boolean isAutomaticallyActivated = isActive2(p, activeProfiles);
+			boolean isAutomaticallyActivated = isActive(sp, activeProfiles);
 			settingsProfiles.put(p, isAutomaticallyActivated);
 		}
 		return Collections.unmodifiableMap(settingsProfiles);
@@ -105,7 +103,10 @@ public class ProfileManager implements IProfileManager {
 		return false;
 	}
 	
-	private boolean isActive2(Profile p, List<String> activeProfiles) {
+	private boolean isActive(org.apache.maven.settings.Profile p, List<String> activeProfiles) {
+		if (p.getActivation() != null && p.getActivation().isActiveByDefault()){
+			return true;
+		}
 		for (String activeProfile : activeProfiles) {
 			if (activeProfile.equals(p.getId())) {
 				return true;
