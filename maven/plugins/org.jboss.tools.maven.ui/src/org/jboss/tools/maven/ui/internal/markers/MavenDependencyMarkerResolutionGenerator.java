@@ -65,10 +65,12 @@ public class MavenDependencyMarkerResolutionGenerator implements
 
 	private ResolutionType getResolutionType(IMarker marker) {
 		ArtifactKey key = getArtifactKey(marker);
-		if (key.getVersion().contains(REDHAT_SUFFIX)) {
-			return ResolutionType.EAP_REPO;
-		} else if (key.getGroupId().startsWith(ORG_JBOSS_PREFIX)) {
-			return ResolutionType.JBOSS_REPO;
+		if (key != null) {
+			if (key.getVersion().contains(REDHAT_SUFFIX)) {
+				return ResolutionType.EAP_REPO;
+			} else if (key.getGroupId().startsWith(ORG_JBOSS_PREFIX)) {
+				return ResolutionType.JBOSS_REPO;
+			}
 		}
 		return ResolutionType.UNSUPPORTED;
 	}
