@@ -51,7 +51,6 @@ import org.eclipse.swt.widgets.Event;
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
 import org.eclipse.swtbot.swt.finder.SWTBot;
-import org.eclipse.swtbot.swt.finder.junit.SWTBotJunit4ClassRunner;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotMenu;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotRadio;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
@@ -77,19 +76,19 @@ import org.jboss.tools.seam.core.project.facet.SeamRuntime;
 import org.jboss.tools.seam.core.project.facet.SeamRuntimeManager;
 import org.jboss.tools.seam.core.project.facet.SeamVersion;
 import org.jboss.tools.test.util.ResourcesUtils;
+import org.jboss.tools.ui.bot.ext.config.Annotations.Require;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 
 /**
  * @author Snjeza
  *
  */
 @SuppressWarnings("restriction")
-@RunWith(SWTBotJunit4ClassRunner.class)
+@Require(perspective="Seam 2")
 public class CreateMavenizedSeamProjectTest{
 	
 	protected static final long IDLE_TIME = 1 * 60 * 1000L;
@@ -159,8 +158,6 @@ public class CreateMavenizedSeamProjectTest{
 	@BeforeClass
 	public final static void beforeClass() throws Exception {
 		bot = AbstractMavenSWTBotTest.initSWTBot();
-
-		switchPerspective("org.jboss.tools.seam.ui.SeamPerspective");
 
 		String asLocation = JBOSS_AS_HOME;
 		

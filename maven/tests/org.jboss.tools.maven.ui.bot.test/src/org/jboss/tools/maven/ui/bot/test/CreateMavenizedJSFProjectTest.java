@@ -29,6 +29,10 @@ import org.eclipse.swtbot.swt.finder.SWTBot;
 import org.eclipse.swtbot.swt.finder.keyboard.Keystrokes;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 import org.jboss.tools.ui.bot.ext.SWTBotExt;
+import org.jboss.tools.ui.bot.ext.SWTTestExt;
+import org.jboss.tools.ui.bot.ext.config.Annotations.Require;
+import org.jboss.tools.ui.bot.ext.config.Annotations.Server;
+import org.jboss.tools.ui.bot.ext.config.Annotations.ServerState;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.w3c.dom.Document;
@@ -37,8 +41,8 @@ import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
 
 @SuppressWarnings("restriction")
+@Require(perspective = "Web Development")
 public class CreateMavenizedJSFProjectTest{
-	
 	public static final String JBOSS6_AS_HOME=System.getProperty("jbosstools.test.jboss.home.6.1", "/home/eiden/Java/RedHat/JBossASs/jboss-6.1.0.Final");
 	public static final String JBOSS7_AS_HOME=System.getProperty("jbosstools.test.jboss.home.7.0", "/home/eiden/Java/RedHat/JBossASs/jboss-as-7.0.1.Final1");
 	public static final String POM_FILE = "pom.xml";
@@ -136,22 +140,21 @@ public class CreateMavenizedJSFProjectTest{
 	
 	
 	private void createJSFProject(String serverRuntime, String server, String serverHome, String jsfVersion, String projectName) throws InterruptedException, CoreException{
-		bot.menu("File").menu("New").menu("Other...").click();
-		SWTBot shell = bot.shell("New").activate().bot();
-		shell.tree().expandNode("JBoss Tools Web").expandNode("JSF").select("JSF Project");
-		shell.button("Next >").click();
+		bot.menu("File").menu("New").menu("JSF Project").click();
+		SWTBot shell = bot.shell("New JSF Project").activate().bot();
 		shell.textWithLabel("Project Name*").setText(projectName);
 		shell.comboBox(0).setSelection(jsfVersion);
 		shell.comboBox(1).setSelection("JSFKickStartWithoutLibs");
 		shell.button("Next >").click();
+		Thread.sleep(1000);
 		shell.button("New...").click();
 		SWTBot shellRuntime = bot.shell("New Server Runtime").activate().bot();
-		Thread.sleep(1000);
+		Thread.sleep(500);
 		shellRuntime.tree().expandNode("JBoss Community").select(serverRuntime);
 		shellRuntime.button("Next >").click();
 		shellRuntime.textWithLabel("Home Directory").setText(serverHome);
 		shellRuntime.button("Finish").click();
-		Thread.sleep(1000);
+		Thread.sleep(500);
 		shell.button(1).click();
 		shellRuntime = bot.shell("New Server").activate().bot();
 		shellRuntime.tree().expandNode("JBoss Community").select(server);
@@ -197,7 +200,9 @@ public class CreateMavenizedJSFProjectTest{
 	private void activateMavenFacet(String projectName) throws InterruptedException, CoreException{
 		SWTBot explorer = bot.viewByTitle("Package Explorer").bot();
 	    SWTBotTreeItem item = explorer.tree().getTreeItem(projectName).select();
+	    Thread.sleep(500);
 	    item.pressShortcut(Keystrokes.ALT,Keystrokes.LF);
+	    Thread.sleep(1000);
 	    SWTBot shellProperties = bot.shell("Properties for "+projectName).activate().bot();
 	    shellProperties.tree().select("Project Facets");
 	    shellProperties.tree(1).getTreeItem("JBoss Maven Integration").check();
@@ -209,6 +214,7 @@ public class CreateMavenizedJSFProjectTest{
 	    waitForIdle();
 	    IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject(projectName);
 	    assertNoErrors(project);
+		Utils.isMavenProject(projectName);
 	}
 	
 	private void buildProject(String projectName) throws CoreException{
@@ -293,4 +299,5 @@ public class CreateMavenizedJSFProjectTest{
 	private static void assertNoErrors(IProject project) throws CoreException {
 		WorkspaceHelpers.assertNoErrors(project);
 	}
+	
 }

@@ -1,5 +1,17 @@
 package org.jboss.tools.maven.ui.bot.test;
 
+import java.io.File;
+import java.io.IOException;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
+
 import org.eclipse.core.resources.IProject;
 import org.eclipse.jface.bindings.keys.KeyStroke;
 import org.eclipse.jface.bindings.keys.ParseException;
@@ -12,23 +24,71 @@ import org.eclipse.swtbot.swt.finder.keyboard.Keystrokes;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
+import org.jboss.tools.ui.bot.ext.SWTBotExt;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.xml.sax.SAXException;
 
 @SuppressWarnings("restriction")
 @RunWith(SWTBotJunit4ClassRunner.class)
 public class MavenProfileSelectionTest extends AbstractMavenSWTBotTest {
 	
 	public static final String AUTOACTIVATED_PROFILE_IN_POM = "active-profile";
-	public static final String AUTOACTIVATED_PROFILE_IN_USER_SETTINGS = "environment";
+	public static final String AUTOACTIVATED_PROFILE_IN_USER_SETTINGS = "jboss.repository";
 	
-	
+	/*
+	@BeforeClass
+	public static void setUpUserSettings() throws InterruptedException, IOException, SAXException, ParserConfigurationException, TransformerException{
+		SWTBotExt bot = new SWTBotExt();
+		bot.menu("Window").menu("Preferences").click();
+		bot.tree().expandNode("Maven").select("User Settings");
+		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+	    DocumentBuilder docBuilder = factory.newDocumentBuilder();
+	    TransformerFactory transformerFactory = TransformerFactory.newInstance();
+		Transformer transformer = transformerFactory.newTransformer();
+		String settingsLocation = bot.text(1).getText();
+		File settings = null;
+		if(settingsLocation.equals("User settings file doesn't exist")){
+			settingsLocation = bot.text(2).getText();
+			settings = new File(settingsLocation);
+			settings.createNewFile();
+			Document doc = docBuilder.newDocument();
+			Element rootElement = doc.createElement("settings");
+			doc.appendChild(rootElement);
+			DOMSource source = new DOMSource(doc);
+			StreamResult result = new StreamResult(settingsLocation); 
+			transformer.transform(source, result);
+		}
+		settings = new File(settingsLocation);
+		Document docPom = docBuilder.parse(settings);
+		Element rootElement = docPom.getDocumentElement();
+		Element profilesElement = docPom.createElement("profiles");
+		Element profileElement = docPom.createElement("profile");
+		Element idElement = docPom.createElement("id");
+		Element activationElement = docPom.createElement("activation");
+		Element activeByDefaultElement = docPom.createElement("activeByDefault");
+		
+		idElement.setTextContent(AUTOACTIVATED_PROFILE_IN_USER_SETTINGS);
+		activeByDefaultElement.setTextContent("true");
+		
+		activationElement.appendChild(activeByDefaultElement);
+		profileElement.appendChild(activationElement);
+		profileElement.appendChild(idElement);
+		profilesElement.appendChild(profileElement);
+		rootElement.appendChild(profilesElement);
+		DOMSource source = new DOMSource(docPom);
+		StreamResult result = new StreamResult(settingsLocation); 
+		transformer.transform(source, result);
+	}
+	*/
 	
 	@Test
 	public void testOpenMavenProfiles() throws Exception {
 		IProject project = importProject("projects/simple-jar/pom.xml");
 		waitForJobsToComplete();
-		//Select the project
 		testAutoActivatedProfiles();
 		final SWTBotView packageExplorer = bot.viewByTitle("Project Explorer");
 		SWTBot innerBot = packageExplorer.bot();
@@ -59,8 +119,8 @@ public class MavenProfileSelectionTest extends AbstractMavenSWTBotTest {
 	
 	private void openProfilesDialog(SWTBotTreeItem projectItem) throws ParseException, InterruptedException{
 		projectItem.pressShortcut(Keystrokes.CTRL, Keystrokes.ALT,KeyStroke.getInstance("P"));
-		projectItem.pressShortcut(Keystrokes.DOWN);
-		projectItem.pressShortcut(Keystrokes.LF);
+		//projectItem.pressShortcut(Keystrokes.DOWN);
+		//projectItem.pressShortcut(Keystrokes.LF);
 		final SWTBotShell selectDialogShell = bot.shell("Select Maven profiles");
 	    assertEquals("Select Maven profiles", selectDialogShell.getText());
 	    Thread.sleep(1000);

@@ -10,6 +10,7 @@
  ************************************************************************************/
 package org.jboss.tools.maven.ui.bot.test;
 
+import org.jboss.tools.ui.bot.ext.RequirementAwareSuite;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 
@@ -18,14 +19,14 @@ import org.junit.runners.Suite;
  * This is a swtbot testcase for an eclipse application.
  * 
  */
-
+@RunWith(RequirementAwareSuite.class)
 @Suite.SuiteClasses({
-	MavenProfileSelectionTest.class,
-	CreateMavenizedSeamProjectTest.class,
-	CreateMavenizedJSFProjectTest.class,
-	CreateMavenProjectsTest.class
+	//MavenProfileSelectionTest.class,
+	//CreateMavenizedSeamProjectTest.class,
+	//CreateMavenProjectsTest.class,
+	CreateMavenizedEARProjectTest.class,
+	CreateMavenizedJSFProjectTest.class
 })
-@RunWith(Suite.class)
 public class MavenAllBotTests {
 	
 
