@@ -21,9 +21,9 @@ import org.junit.runners.Suite;
  */
 @RunWith(RequirementAwareSuite.class)
 @Suite.SuiteClasses({
-	//MavenProfileSelectionTest.class,
-	//CreateMavenizedSeamProjectTest.class,
-	//CreateMavenProjectsTest.class,
+	MavenProfileSelectionTest.class,
+	CreateMavenizedSeamProjectTest.class,
+	CreateMavenProjectsTest.class,
 	CreateMavenizedEARProjectTest.class,
 	CreateMavenizedJSFProjectTest.class
 })

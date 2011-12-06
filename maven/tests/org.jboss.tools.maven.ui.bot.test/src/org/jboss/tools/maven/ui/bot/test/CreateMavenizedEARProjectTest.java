@@ -58,6 +58,7 @@ public class CreateMavenizedEARProjectTest {
 		botext.textWithLabel("Goals:").setText("clean package");
 		botext.button("Run").click();
 		waitForIdle();
+		
 	}
 	
 	private void createWarProject(String projectName){
