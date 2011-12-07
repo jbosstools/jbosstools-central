@@ -24,8 +24,7 @@ import org.jboss.tools.central.JBossCentralActivator;
 public class DefaultJBossCentralConfigurator implements
 		IJBossCentralConfigurator {
 	
-	//private static final String JBOSS_DISCOVERY_DIRECTORY_3_3_0_XML = "http://localhost/central/site/target/site/jbosstools-directory.xml"; // for testing on localhost
-	private static final String JBOSS_DISCOVERY_DIRECTORY_3_3_0_XML = "http://download.jboss.org/jbosstools/updates/nightly/core/trunk/jbosstools-directory.xml"; // published URL
+	private static final String JBOSS_DISCOVERY_DIRECTORY_3_3_0_XML = "http://download.jboss.org/jbosstools/updates/development/indigo/jbosstools-directory.xml"; // published URL
 
 	private static final String TWITTER_LINK ="http://twitter.com/#!/jbosstools";
 	
