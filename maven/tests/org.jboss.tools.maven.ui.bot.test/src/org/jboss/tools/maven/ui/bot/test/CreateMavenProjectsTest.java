@@ -43,7 +43,7 @@ public class CreateMavenProjectsTest extends AbstractMavenSWTBotTest{
 		createSimpleMavenProject(projectName, "jar");
 		IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject(projectName);
 		assertNoErrors(project);
-		Utils.isMavenProject(projectName);
+		//Utils.isMavenProject(projectName);
 		buildProject(projectName,"5 Maven build...");
 	}
 
@@ -53,7 +53,7 @@ public class CreateMavenProjectsTest extends AbstractMavenSWTBotTest{
 		createSimpleMavenProject(projectName, "war");
 		IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject(projectName);
 		assertNoErrors(project);
-		Utils.isMavenProject(projectName);
+		//Utils.isMavenProject(projectName);
 		buildProject(projectName,"5 Maven build...");
 	}
 
@@ -63,7 +63,7 @@ public class CreateMavenProjectsTest extends AbstractMavenSWTBotTest{
 		createSimpleMavenProjectArchetype(projectName,"maven-archetype-quickstart", "Nexus Indexer");
 		IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject(projectName);
 		assertNoErrors(project);
-		Utils.isMavenProject(projectName);
+		//Utils.isMavenProject(projectName);
 		buildProject(projectName, "6 Maven build...");
 	}
 

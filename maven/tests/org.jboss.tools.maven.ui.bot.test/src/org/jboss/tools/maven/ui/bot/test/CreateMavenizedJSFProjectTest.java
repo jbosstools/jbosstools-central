@@ -214,7 +214,7 @@ public class CreateMavenizedJSFProjectTest{
 	    waitForIdle();
 	    IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject(projectName);
 	    assertNoErrors(project);
-		Utils.isMavenProject(projectName);
+		//Utils.isMavenProject(projectName);
 	}
 	
 	private void buildProject(String projectName) throws CoreException{
