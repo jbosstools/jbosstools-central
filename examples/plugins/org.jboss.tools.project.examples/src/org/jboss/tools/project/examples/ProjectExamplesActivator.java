@@ -16,12 +16,12 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.MalformedURLException;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -29,10 +29,13 @@ import java.util.StringTokenizer;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
+import org.eclipse.core.filesystem.EFS;
+import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
@@ -57,6 +60,7 @@ import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
+import org.eclipse.ui.IFileEditorInput;
 import org.eclipse.ui.IPerspectiveDescriptor;
 import org.eclipse.ui.IPerspectiveRegistry;
 import org.eclipse.ui.IPluginContribution;
@@ -72,6 +76,8 @@ import org.eclipse.ui.activities.IWorkbenchActivitySupport;
 import org.eclipse.ui.activities.WorkbenchActivityHelper;
 import org.eclipse.ui.browser.IWebBrowser;
 import org.eclipse.ui.browser.IWorkbenchBrowserSupport;
+import org.eclipse.ui.editors.text.EditorsUI;
+import org.eclipse.ui.ide.FileStoreEditorInput;
 import org.eclipse.ui.ide.IDE;
 import org.eclipse.ui.internal.IPreferenceConstants;
 import org.eclipse.ui.internal.WorkbenchPlugin;
@@ -82,6 +88,7 @@ import org.eclipse.ui.internal.ide.IDEInternalPreferences;
 import org.eclipse.ui.internal.ide.IDEWorkbenchPlugin;
 import org.eclipse.ui.internal.util.PrefUtil;
 import org.eclipse.ui.internal.wizards.newresource.ResourceMessages;
+import org.eclipse.ui.part.FileEditorInput;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.eclipse.wst.validation.internal.operations.ValidationBuilder;
 import org.jboss.tools.project.examples.dialog.MarkerDialog;
@@ -105,6 +112,7 @@ public class ProjectExamplesActivator extends AbstractUIPlugin {
 	private static final String README_HTML = "/readme.html"; //$NON-NLS-1$
 	private static final String CHEATSHEET_XML = "/cheatsheet.xml"; //$NON-NLS-1$
 	private static final String PERIOD_CHEATSHEET_XML = "/.cheatsheet.xml"; //$NON-NLS-1$
+	private static final String README_MD = "/readme.md"; //$NON-NLS-1$
 	// The plug-in ID
 	public static final String PLUGIN_ID = "org.jboss.tools.project.examples"; //$NON-NLS-1$
 	public static final String ALL_SITES = Messages.ProjectExamplesActivator_All;
@@ -421,9 +429,40 @@ public class ProjectExamplesActivator extends AbstractUIPlugin {
 								view.getCheatSheetViewer().setInput(id, id, finalURL, new DefaultStateManager(), false);
 							} else {
 								try {
-									IWorkbenchBrowserSupport browserSupport = ProjectExamplesActivator.getDefault().getWorkbench().getBrowserSupport();
-									IWebBrowser browser = browserSupport.createBrowser(IWorkbenchBrowserSupport.LOCATION_BAR | IWorkbenchBrowserSupport.NAVIGATION_BAR, null, null, null);
-									browser.openURL(finalURL);
+									if (finalURL.toString().endsWith(README_MD)) {
+										IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
+										IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
+										IFile[] files = null;
+										try {
+											files = root.findFilesForLocationURI(finalURL.toURI());
+										} catch (URISyntaxException e1) {
+											ProjectExamplesActivator.log(e1);
+											return;
+										}
+										if (files.length > 0) {
+											try {
+												IFileEditorInput input = new FileEditorInput(files[0]);
+												IDE.openEditor(page, input, EditorsUI.DEFAULT_TEXT_EDITOR_ID);
+											} catch (PartInitException e) {
+												ProjectExamplesActivator.log(e);
+											}
+										} else {
+											IFileStore store = EFS.getLocalFileSystem().getStore(
+													new Path(finalURL.getPath()));
+											try {
+												IDE.openEditor(page, new FileStoreEditorInput(store),
+														EditorsUI.DEFAULT_TEXT_EDITOR_ID);
+											} catch (PartInitException e) {
+												ProjectExamplesActivator.log(e);
+											}
+										}
+										
+									} else {
+										IWorkbenchBrowserSupport browserSupport = ProjectExamplesActivator.getDefault().getWorkbench().getBrowserSupport();
+										IWebBrowser browser = browserSupport.createBrowser(IWorkbenchBrowserSupport.LOCATION_BAR | IWorkbenchBrowserSupport.NAVIGATION_BAR, 
+												null, null, null);
+										browser.openURL(finalURL);
+									}
 								} catch (PartInitException e) {
 									ProjectExamplesActivator.log(e);
 								}
@@ -468,6 +507,10 @@ public class ProjectExamplesActivator extends AbstractUIPlugin {
 				return;
 			}
 			if (checkCheatsheet(project, eclipseProject, README_HTML,
+					ProjectUtil.EDITOR)) {
+				return;
+			}
+			if (checkCheatsheet(project, eclipseProject, README_MD,
 					ProjectUtil.EDITOR)) {
 				return;
 			}
