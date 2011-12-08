@@ -95,14 +95,16 @@ public class ArchetypeExamplesWizardPage extends
 		//redefine all required properties in project-examples-maven-xxx.xml
 		Properties defaultRequiredProperties = getRequiredProperties(archetype, archetypeModel.getArchetypeRepository());
 		Properties properties = new Properties();
-		for (Object key : archetypeModel.getArchetypeProperties().keySet()) {
-			properties.put(key, archetypeModel.getArchetypeProperties().get(key));
-		}
 		
-		//Add remaining requiredProperties not defined by default in the example project
 		for (Object key : defaultRequiredProperties.keySet()) {
 			properties.put(key, defaultRequiredProperties.get(key));
 		}
+
+		//Override default required properties with our specific JBoss Tools values
+		for (Object key : archetypeModel.getArchetypeProperties().keySet()) {
+			properties.put(key, archetypeModel.getArchetypeProperties().get(key));
+		}
+
 		archetype.setProperties(properties);
 		setArchetype(archetype);
 		
