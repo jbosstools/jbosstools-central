@@ -113,6 +113,8 @@ public class ProjectExamplesActivator extends AbstractUIPlugin {
 	private static final String CHEATSHEET_XML = "/cheatsheet.xml"; //$NON-NLS-1$
 	private static final String PERIOD_CHEATSHEET_XML = "/.cheatsheet.xml"; //$NON-NLS-1$
 	private static final String README_MD = "/readme.md"; //$NON-NLS-1$
+	private static final String README_TXT = "/readme.txt"; //$NON-NLS-1$
+	
 	// The plug-in ID
 	public static final String PLUGIN_ID = "org.jboss.tools.project.examples"; //$NON-NLS-1$
 	public static final String ALL_SITES = Messages.ProjectExamplesActivator_All;
@@ -429,7 +431,7 @@ public class ProjectExamplesActivator extends AbstractUIPlugin {
 								view.getCheatSheetViewer().setInput(id, id, finalURL, new DefaultStateManager(), false);
 							} else {
 								try {
-									if (finalURL.toString().endsWith(README_MD)) {
+									if (finalURL.toString().endsWith(README_MD) || finalURL.toString().endsWith(README_TXT)) {
 										IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
 										IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
 										IFile[] files = null;
@@ -511,6 +513,10 @@ public class ProjectExamplesActivator extends AbstractUIPlugin {
 				return;
 			}
 			if (checkCheatsheet(project, eclipseProject, README_MD,
+					ProjectUtil.EDITOR)) {
+				return;
+			}
+			if (checkCheatsheet(project, eclipseProject, README_TXT,
 					ProjectUtil.EDITOR)) {
 				return;
 			}
