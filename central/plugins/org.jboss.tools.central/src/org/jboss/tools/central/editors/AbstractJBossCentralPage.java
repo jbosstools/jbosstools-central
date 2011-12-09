@@ -101,6 +101,9 @@ public class AbstractJBossCentralPage extends FormPage {
 	}
 
 	protected void setBusyIndicator(Composite composite, boolean busy) {
+		if (composite == null || composite.isDisposed()) {
+			return;
+		}
 		Control[] children = composite.getChildren();
 		for (Control child:children) {
 			if (child instanceof RefreshIndicator) {

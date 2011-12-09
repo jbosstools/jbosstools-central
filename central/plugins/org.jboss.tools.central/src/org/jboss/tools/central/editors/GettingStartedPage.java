@@ -1223,6 +1223,9 @@ public class GettingStartedPage extends AbstractJBossCentralPage {
 				
 				@Override
 				public void run() {
+					if (blogsLoadingComposite == null || blogsLoadingComposite.isDisposed()) {
+						return;
+					}
 					setBusyIndicator(blogsLoadingComposite, false);
 					refreshBlogs();
 					setItemVisible(blogsToolBarManager, BLOGS_WARNING_ID, false);
@@ -1276,6 +1279,9 @@ public class GettingStartedPage extends AbstractJBossCentralPage {
 				
 				@Override
 				public void run() {
+					if (tutorialsLoadingComposite == null || tutorialsLoadingComposite.isDisposed()) {
+						return;
+					}
 					setBusyIndicator(tutorialsLoadingComposite, false);
 					refreshTutorials();
 					
@@ -1327,6 +1333,9 @@ public class GettingStartedPage extends AbstractJBossCentralPage {
 				
 				@Override
 				public void run() {
+					if (newsLoadingComposite == null || newsLoadingComposite.isDisposed()) {
+						return;
+					}
 					setBusyIndicator(newsLoadingComposite, false);
 					refreshNews();
 					setItemVisible(newsToolBarManager, NEWS_WARNING_ID, false);
