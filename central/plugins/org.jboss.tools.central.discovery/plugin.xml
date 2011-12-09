@@ -338,7 +338,7 @@
             description="Tool support for the Spring Framework"
             id="org.springframework.ide.eclipse.feature"
             kind="task"
-            license="Free, Spring IDE Project Software User Agreement, EPL"
+            license="Free, EPL, Other"
             name="Spring IDE Core"
             provider="Spring IDE Developers"
             siteUrl="http://download.jboss.org/jbosstools/updates/indigo/extras/">
