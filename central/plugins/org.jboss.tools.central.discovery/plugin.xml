@@ -175,12 +175,13 @@
             id="org.jboss.tools.central.discovery.scm"
             name="Source Control Management"
             relevance="60">
- 			<group id="bundled" /> 
- 			<group id="extra" />
+ 			<group id="org.jboss.tools.central.discovery.scm.git" /> 
+ 			<group id="org.jboss.tools.central.discovery.scm.svn" />
       </connectorCategory>
 
       <connectorDescriptor
             categoryId="org.jboss.tools.central.discovery.scm"
+            groupId="org.jboss.tools.central.discovery.scm.git"
             description="Eclipse Team Provider for the Git version control system"
             id="org.eclipse.egit"
             kind="task"
@@ -197,11 +198,29 @@
       </connectorDescriptor>
       <connectorDescriptor
             categoryId="org.jboss.tools.central.discovery.scm"
-            description="Eclipse Team Provider for the Subversion version control system"
+            groupId="org.jboss.tools.central.discovery.scm.svn"
+            description="Eclipse Team Provider for the Subversion version control system - Core [1/2]"
             id="org.tigris.subversion.subclipse"
             kind="task"
-            license="Free, Subclipse Software User Agreement"
-            name="Subclipse SVN Team Provider Core"
+            license="Free, Subclipse License"
+            name="Subclipse - Core"
+            provider="tigris.org"
+            siteUrl="http://download.jboss.org/jbosstools/updates/indigo/extras/">
+         <icon
+               image32="images/subclipse_32.gif">
+         </icon>
+         <overview
+               url="http://subclipse.tigris.org/">
+         </overview>
+      </connectorDescriptor>
+      <connectorDescriptor
+            categoryId="org.jboss.tools.central.discovery.scm"
+            groupId="org.jboss.tools.central.discovery.scm.svn"
+            description="Eclipse Team Provider for the Subversion version control system - SVNKit Adapter [2/2]"
+            id="org.tigris.subversion.clientadapter.svnkit.feature"
+            kind="task"
+            license="Free, Subclipse License"
+            name="Subclipse - SVNKit Adapter"
             provider="tigris.org"
             siteUrl="http://download.jboss.org/jbosstools/updates/indigo/extras/">
          <icon
@@ -262,7 +281,7 @@
             kind="task"
             license="Free, PMD License"
             name="PMD"
-            provider="PMD Development Team"
+            provider="PMD Developers"
             siteUrl="http://download.jboss.org/jbosstools/updates/indigo/extras/">
          <icon
                image32="images/pmd_32.png">
