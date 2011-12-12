@@ -312,29 +312,15 @@
 
       <connectorDescriptor
             categoryId="org.jboss.tools.central.discovery.web"
-            description="Google App Engine for Java 1.6.0 SDK Bundle"
-            id="com.google.appengine.eclipse.sdkbundle.e37.feature"
-            kind="task"
-            license="EPL, Other"
-            name="Google App Engine Java SDK"
-            provider="Google, Inc."
-            siteUrl="http://dl.google.com/eclipse/plugin/3.7/">
-         <icon
-               image32="images/google_32.png">
-         </icon>
-         <overview
-               url="http://code.google.com/p/google-plugin-for-eclipse/">
-         </overview>
-      </connectorDescriptor>
-      <connectorDescriptor
-            categoryId="org.jboss.tools.central.discovery.web"
-            description="Google Web Toolkit 2.4.0 SDK Bundle"
+            description="Google Plugin for Eclipse (GPE) + Google Web Toolkit 2.4.0 SDK (GWT)"
             id="com.google.gwt.eclipse.sdkbundle.e37.feature"
             kind="task"
             license="EPL, Other"
-            name="Google Web Toolkit SDK"
+            name="Google Plugin + Web Toolkit"
             provider="Google, Inc."
             siteUrl="http://dl.google.com/eclipse/plugin/3.7/">
+            <iu id="com.google.gwt.eclipse.sdkbundle.e37.feature"/>
+            <iu id="com.google.gdt.eclipse.suite.e37.feature"/>
          <icon
                image32="images/google_32.png">
          </icon>
