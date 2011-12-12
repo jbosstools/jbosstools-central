@@ -206,10 +206,8 @@
             name="Subclipse + SVNKit"
             provider="tigris.org"
             siteUrl="http://download.jboss.org/jbosstools/updates/indigo/extras/">
+            <iu id="org.tigris.subversion.subclipse"/>
             <iu id="org.tigris.subversion.clientadapter.svnkit.feature"/>
-            <iu id="com.sun.jna"/>
-            <iu id="org.tigris.subversion.clientadapter.feature"/>
-            <iu id="org.tmatesoft.svnkit"/>
          <icon
                image32="images/subclipse_32.gif">
          </icon>
@@ -254,6 +252,7 @@
             name="JRebel"
             provider="zeroturnaround.org"
             siteUrl="http://www.zeroturnaround.com/update-site/">
+            <iu id="org.zeroturnaround.eclipse.feature"/>
             <iu id="org.zeroturnaround.eclipse.nature.feature"/>
             <iu id="org.zeroturnaround.eclipse.debug.feature"/>
             <iu id="org.zeroturnaround.eclipse.wtp.feature"/>
