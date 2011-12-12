@@ -199,30 +199,17 @@
       <connectorDescriptor
             categoryId="org.jboss.tools.central.discovery.scm"
             groupId="org.jboss.tools.central.discovery.scm.svn"
-            description="Eclipse Team Provider for the Subversion version control system - Core [1/2]"
+            description="Eclipse Team Provider for the Subversion version control system, including SVNKit"
             id="org.tigris.subversion.subclipse"
             kind="task"
             license="Free, Subclipse License"
-            name="Subclipse - Core"
+            name="Subclipse + SVNKit"
             provider="tigris.org"
             siteUrl="http://download.jboss.org/jbosstools/updates/indigo/extras/">
-         <icon
-               image32="images/subclipse_32.gif">
-         </icon>
-         <overview
-               url="http://subclipse.tigris.org/">
-         </overview>
-      </connectorDescriptor>
-      <connectorDescriptor
-            categoryId="org.jboss.tools.central.discovery.scm"
-            groupId="org.jboss.tools.central.discovery.scm.svn"
-            description="Eclipse Team Provider for the Subversion version control system - SVNKit Adapter [2/2]"
-            id="org.tigris.subversion.clientadapter.svnkit.feature"
-            kind="task"
-            license="Free, Subclipse License"
-            name="Subclipse - SVNKit Adapter"
-            provider="tigris.org"
-            siteUrl="http://download.jboss.org/jbosstools/updates/indigo/extras/">
+            <iu id="org.tigris.subversion.clientadapter.svnkit.feature"/>
+            <iu id="com.sun.jna"/>
+            <iu id="org.tigris.subversion.clientadapter.feature"/>
+            <iu id="org.tmatesoft.svnkit"/>
          <icon
                image32="images/subclipse_32.gif">
          </icon>
