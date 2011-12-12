@@ -348,9 +348,16 @@
             id="org.springframework.ide.eclipse.feature"
             kind="task"
             license="Free, EPL, Other"
-            name="Spring IDE Core"
+            name="Spring IDE"
             provider="Spring IDE Developers"
             siteUrl="http://download.jboss.org/jbosstools/updates/indigo/extras/">
+            <iu id="org.springframework.ide.eclipse.aop.feature"/>
+            <iu id="org.springframework.ide.eclipse.autowire.feature"/>
+            <iu id="org.springframework.ide.eclipse.feature"/>
+            <iu id="org.springframework.ide.eclipse.integration.feature"/>
+            <iu id="org.springframework.ide.eclipse.osgi.feature"/>
+            <iu id="org.springframework.ide.eclipse.webflow.feature"/>
+            <iu id="org.springframework.ide.eclipse.security.feature"/>
          <icon
                image32="images/springide_32.png">
          </icon>
