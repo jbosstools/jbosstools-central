@@ -518,6 +518,11 @@ public class ProjectUtil {
 						return file;
 					}
 				}
+				if (urlModified == 0) {
+					if (file.exists()) {
+						return file;
+					}
+				}
 				if (file.exists()) {
 					long modified = file.lastModified();
 					if (urlModified == modified) {
