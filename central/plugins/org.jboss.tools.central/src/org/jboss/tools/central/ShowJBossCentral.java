@@ -30,22 +30,17 @@ public class ShowJBossCentral implements IStartup {
 	public void earlyStartup() {
 		boolean showJBossCentral = JBossCentralActivator.getDefault()
 				.showJBossCentralOnStartup();
+		IEclipsePreferences prefs = JBossCentralActivator.getDefault()
+				.getPreferences();
+		Bundle usage = Platform.getBundle(ORG_JBOSS_TOOLS_USAGE);
+		Bundle central = Platform.getBundle(JBossCentralActivator.PLUGIN_ID);
 		if (!showJBossCentral) {
-			Bundle usage = Platform.getBundle(ORG_JBOSS_TOOLS_USAGE);
 			if (usage != null) {
 				Version version = usage.getVersion();
 				String versionString = version.toString();
-				IEclipsePreferences prefs = JBossCentralActivator.getDefault()
-						.getPreferences();
 				String savedVersion = prefs.get(ORG_JBOSS_TOOLS_USAGE, "");
-				Bundle central = Platform
-						.getBundle(JBossCentralActivator.PLUGIN_ID);
 				if (!savedVersion.equals(versionString)) {
 					showJBossCentral = true;
-					prefs.put(ORG_JBOSS_TOOLS_USAGE, versionString);
-					if (central != null) {
-						prefs.put(JBossCentralActivator.PLUGIN_ID, central.getVersion().toString());
-					}
 				} else {
 					if (central != null) {
 						version = central.getVersion();
@@ -54,15 +49,18 @@ public class ShowJBossCentral implements IStartup {
 								JBossCentralActivator.PLUGIN_ID, "");
 						if (!savedVersion.equals(versionString)) {
 							showJBossCentral = true;
-							prefs.put(JBossCentralActivator.PLUGIN_ID, versionString);
 						}
 					}
 				}
 			}
 		}
+		saveVersion(prefs, usage, ORG_JBOSS_TOOLS_USAGE);
+		saveVersion(prefs, central, JBossCentralActivator.PLUGIN_ID);
+		
 		if (!showJBossCentral) {
 			return;
 		}
+		
 		Display.getDefault().asyncExec(new Runnable() {
 
 			@Override
@@ -70,6 +68,18 @@ public class ShowJBossCentral implements IStartup {
 				JBossCentralActivator.getJBossCentralEditor();
 			}
 		});
+	}
+
+	protected void saveVersion(IEclipsePreferences prefs, Bundle bundle, String preference) {
+		if (bundle == null || prefs == null || preference == null) {
+			return;
+		}
+		Version version = bundle.getVersion();
+		String versionString = version.toString();
+		String savedVersion = prefs.get(preference, "");
+		if (!savedVersion.equals(versionString)) {
+			prefs.put(preference, versionString);
+		}
 	}
 
 }
