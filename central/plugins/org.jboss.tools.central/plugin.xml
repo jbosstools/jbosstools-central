@@ -9,7 +9,7 @@
          point="org.eclipse.ui.editors">
       <editor
             name="JBoss Central"
-            icon="icons/jboss.gif"
+            icon="icons/jboss.png"
             contributorClass="org.jboss.tools.central.editors.JBossCentralEditorContributor"
             class="org.jboss.tools.central.editors.JBossCentralEditor"
             id="org.jboss.tools.central.editors.JBossCentralEditor">
@@ -38,7 +38,7 @@
             locationURI="menu:help?before=group.intro">
             <command
                   commandId="org.jboss.tools.central.show"
-                  icon="icons/jboss.gif"
+                  icon="icons/jboss.png"
                   id="org.jboss.tools.central.show">
             </command>
       </menuContribution>
@@ -51,7 +51,7 @@
 				visible="true">
 			<action
 					class="org.jboss.tools.central.actions.ShowJBossCentralHandler"
-					icon="icons/jboss.gif"
+					icon="icons/jboss.png"
 					id="org.jboss.tools.central.actions.ShowJBossCentralHandler"
 					label="JBoss Central"
 					toolbarPath="org.eclipse.ui.workbench.help/group.application"

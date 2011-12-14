@@ -80,7 +80,7 @@ public class DefaultJBossCentralConfigurator implements
 	@Override
 	public Image getHeaderImage() {
 		if (headerImage == null) {
-			headerImage = JBossCentralActivator.getDefault().getImage("/icons/jboss.gif");
+			headerImage = JBossCentralActivator.getDefault().getImage("/icons/jboss.png");
 		}
 		return headerImage;
 	}
