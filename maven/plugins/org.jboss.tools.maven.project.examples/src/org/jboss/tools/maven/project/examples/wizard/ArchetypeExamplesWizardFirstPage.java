@@ -231,7 +231,7 @@ public class ArchetypeExamplesWizardFirstPage extends MavenProjectWizardLocation
 	    String packageName = packageCombo.getText();
 	    if(packageName.trim().length() != 0) {
 	      if(!Pattern.matches("[A-Za-z_$][A-Za-z_$\\d]*(?:\\.[A-Za-z_$][A-Za-z_$\\d]*)*", packageName)) { //$NON-NLS-1$
-	        return "";
+	        return Messages.ArchetypeExamplesWizardFirstPage_Error_Package;
 	      }
 	    }
 	    
