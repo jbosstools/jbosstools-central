@@ -20,13 +20,11 @@ import org.apache.maven.archetype.catalog.Archetype;
 import org.apache.maven.model.Model;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IWorkspace;
-import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.IWorkspaceRunnable;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
@@ -35,7 +33,6 @@ import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.internal.IMavenConstants;
 import org.eclipse.m2e.core.project.ProjectImportConfiguration;
-import org.eclipse.m2e.core.ui.internal.MavenImages;
 import org.eclipse.m2e.core.ui.internal.Messages;
 import org.eclipse.m2e.core.ui.internal.actions.SelectionUtil;
 import org.eclipse.osgi.util.NLS;
@@ -43,11 +40,9 @@ import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.INewWizard;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkingSet;
-import org.jboss.tools.maven.project.examples.ImportMavenArchetypeProjectExample;
 import org.jboss.tools.maven.project.examples.MavenProjectExamplesActivator;
 import org.jboss.tools.project.examples.ProjectExamplesActivator;
 import org.jboss.tools.project.examples.model.Project;
@@ -180,15 +175,17 @@ public class ArchetypeExamplesWizard extends Wizard implements INewWizard {
 			@Override
 			public void modifyText(ModifyEvent e) {
 				wizardPage.setArtifactId(simplePage.getProjectName());
+				ArchetypeExamplesWizard.this.getContainer().updateButtons();
 			}
 		});
 
 	    simplePage.setPackageNameModifyListener(new ModifyListener() {
-			
+	
 			@Override
 			public void modifyText(ModifyEvent e) {
 				String packageName = ((Combo)e.getSource()).getText();
 				wizardPage.setPackageName(packageName);
+				ArchetypeExamplesWizard.this.getContainer().updateButtons();
 			}
 		});
 
@@ -201,11 +198,7 @@ public class ArchetypeExamplesWizard extends Wizard implements INewWizard {
 		});
 	    
 	}
-	@Override
-	public boolean canFinish() {
-		// TODO Auto-generated method stub
-		return super.canFinish();
-	}
+	
 	public String getProjectName() {
 		return projectName;
 	}
