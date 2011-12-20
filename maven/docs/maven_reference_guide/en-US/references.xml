@@ -19,7 +19,7 @@
     
     <section id="preferencespage">
         <title>JBoss Maven Integration preference page</title>
-        <para>To adjust  <property>Maven</property> project import settings for <property>JBoss Tools</property> projects you need to open <property>Preferences</property> dialog by clicking <emphasis><property>Window > Preferences</property></emphasis> and select <emphasis><property>JBoss Tools >JBoss Maven Integration</property></emphasis>. This page provides configuration for <property>Seam</property>, <property>JSF</property> and <property>Portlet</property> projects import.
+		<para>To adjust  <property>Maven</property> project import settings for JBoss Tools projects, you need to open the <property>Preferences</property> dialog by navigating to <menuchoice><guimenuitem>Window</guimenuitem><guimenuitem>Preferences</guimenuitem><guimenuitem>JBoss Tools</guimenuitem><guimenuitem>JBoss Maven Integration</guimenuitem></menuchoice>. This page provides configuration for all imported Maven projects.
         </para>
         <figure>
             <title>JBoss Maven Integration Preference Page</title>
@@ -49,51 +49,109 @@
                 
                 <tbody>
                     <row>
-                        <entry><para>Configure Seam when importing Maven projects                        </para></entry>
-                        <entry><para>If on, the Maven Integration Tool starts to check Seam dependencies and switch on the Seam Configurator for existing Maven projects import.</para>
+                        <entry><para>Seam                        </para></entry>
+                        <entry><para>If on, the Maven Integration Tool starts to check Seam dependencies and switch on the Seam Configurator for imported Maven projects.</para>
                         </entry>
                         <entry><para>On</para></entry>
                     </row>
                     <row>
-                        <entry><para>Configure Seam Runtime</para></entry>
-                        <entry><para>If on, the Maven Integration Tool will try to define Seam Runtime basing on information from pom.xml and workspace configuration.</para></entry>
+                        <entry><para>Seam Runtime</para></entry>
+						<entry><para>If on, the Maven Integration Tool will try to define the Seam Runtime based on information from the projects <filename>pom.xml</filename> and workspace configuration.</para></entry>
                         <entry><para>On</para></entry>
                     </row>
                     <row>
-                        <entry><para>Configure Seam Artifacts (view folder, model source folder and package...)</para>
+                        <entry><para>Seam Artifacts (view folder, model source folder and package...)</para>
                             
                         </entry>
-                        <entry><para>If the option is checked, the Seam configurator will start to recognize Seam Artifacts during importing Seam Maven project.
+                        <entry><para>If the option is checked, the Seam configurator will start to recognize Seam Artifacts when importing Seam Maven projects.
                         </para>
                         </entry>
                         <entry><para>On</para>
                         </entry>
                     </row>
                     <row>
-                        <entry><para>Configure JSF facet when  importing Maven projects
+                        <entry><para>JSF facet
                         </para></entry>
-                        <entry><para>This option is switch on picking up  JSF facet from a pom.xml
+						<entry><para>When this option is selected, the <filename>pom.xml</filename> file will be searched for JSF facet information.
                         </para>     </entry>
                         <entry><para>On</para>
                         </entry>
                     </row>
-                    <row><entry><para>Configure JBoss Portlet Core when  importing Maven projects
+					<row>
+					<entry>
+						<para>web.xml for JSF 2 facet
+						</para>
+					</entry>
+					<entry>
+						<para>When this option is selected, a <filename>web.xml</filename> file will be created for Maven imported JSF 2 projects.
+						</para>
+                </entry>
+                        <entry><para>Off</para>
+                        </entry>
+                    </row>
+                    <row><entry><para>JBoss Portlet Core facet
                     </para></entry>
                     <entry></entry>
                         <entry><para>On</para></entry>
                     </row>
                     <row>
-                        <entry><para>Configure JBoss JSF Portlet facet when importing Maven projects
+                        <entry><para>JBoss JSF Portlet Core facet
                         </para></entry>
                         <entry></entry>
                         <entry><para>On</para></entry>
                                                
                     </row>
+					<row>
+					<entry>
+						<para>JBoss JSF Portlet facet
+						</para>
+					</entry>
+					<entry>
+					</entry>
+                        <entry><para>On</para></entry>
+                                               
+                    </row>
                     <row>
-                        <entry><para>Configure JBoss Seam Portlet facet when  importing Maven projects
+                        <entry><para>JBoss Seam Portlet facet
                         </para></entry>
                         <entry></entry>
-                        <entry><para>Off</para>
+                        <entry><para>On</para>
+                        </entry>
+                        
+                    </row>
+					<row>
+					<entry>
+						<para>CDI facet
+						</para>
+					</entry>
+					<entry>
+					</entry>
+					<entry>
+                        <para>On</para>
+                        </entry>
+                        
+                    </row>
+					<row>
+					<entry>
+						<para>Hibernate facet
+						</para>
+					</entry>
+					<entry>
+					</entry>
+					<entry>
+                        <para>On</para>
+                        </entry>
+                        
+                    </row>
+					<row>
+					<entry>
+						<para>JAX-RS facet
+						</para>
+					</entry>
+					<entry>
+					</entry>
+					<entry>
+                        <para>On</para>
                         </entry>
                         
                     </row>
