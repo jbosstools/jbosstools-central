@@ -11,12 +11,14 @@
 package org.jboss.tools.maven.jsf.configurators;
 
 import java.io.File;
+import java.io.InputStream;
 import java.util.List;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.project.MavenProject;
+import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
@@ -32,7 +34,18 @@ import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.jst.j2ee.internal.web.util.WebArtifactEditUtilities;
+import org.eclipse.jst.j2ee.project.JavaEEProjectUtilities;
+import org.eclipse.jst.j2ee.web.componentcore.util.WebArtifactEdit;
+import org.eclipse.jst.j2ee.webapplication.Servlet;
+import org.eclipse.jst.j2ee.webapplication.ServletType;
+import org.eclipse.jst.j2ee.webapplication.WebApp;
+import org.eclipse.jst.j2ee.webapplication.WebType;
+import org.eclipse.jst.jsf.core.JSFVersion;
 import org.eclipse.jst.jsf.core.internal.project.facet.IJSFFacetInstallDataModelProperties;
+import org.eclipse.jst.jsf.core.internal.project.facet.JSFUtilFactory;
+import org.eclipse.jst.jsf.core.internal.project.facet.JSFUtils;
+import org.eclipse.jst.jsf.core.jsfappconfig.JSFAppConfigUtils;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.project.MavenProjectChangedEvent;
 import org.eclipse.m2e.core.project.configurator.AbstractProjectConfigurator;
@@ -51,6 +64,7 @@ import org.jboss.tools.maven.core.internal.project.facet.MavenFacetInstallDataMo
 import org.jboss.tools.maven.jsf.MavenJSFActivator;
 import org.jboss.tools.maven.jsf.MavenJSFConstants;
 import org.jboss.tools.maven.jsf.Messages;
+import org.jboss.tools.maven.jsf.utils.FacesConfigQuickPeek;
 import org.jboss.tools.maven.ui.Activator;
 
 /**
@@ -67,7 +81,8 @@ public class JSFProjectConfigurator extends AbstractProjectConfigurator {
 	private static final String WAR_SOURCE_FOLDER = "/src/main/webapp";
 
 	protected static final IProjectFacet dynamicWebFacet;
-	protected static final IProjectFacetVersion dynamicWebVersion;
+	protected static IProjectFacetVersion dynamicWebVersion;
+	protected static final IProjectFacetVersion WEB_FACET_3_0;
 	
 	public static final IProjectFacet JSF_FACET;
 	public static final IProjectFacetVersion JSF_FACET_VERSION_2_0;
@@ -78,10 +93,11 @@ public class JSFProjectConfigurator extends AbstractProjectConfigurator {
 	public static final String JSF_VERSION_2_0 = "2.0";
 	public static final String JSF_VERSION_1_2 = "1.2";
 	public static final String JSF_VERSION_1_1 = "1.1";
-	
+	private static final String FACES_SERVLET = "javax.faces.webapp.FacesServlet";
 	static {
 		dynamicWebFacet = ProjectFacetsManager.getProjectFacet("jst.web"); //$NON-NLS-1$
 		dynamicWebVersion = dynamicWebFacet.getVersion("2.5");  //$NON-NLS-1$
+		WEB_FACET_3_0 = dynamicWebFacet.getVersion("3.0");  //$NON-NLS-1$
 		JSF_FACET = ProjectFacetsManager.getProjectFacet("jst.jsf"); //$NON-NLS-1$
 		JSF_FACET_VERSION_2_0 = JSF_FACET.getVersion(JSF_VERSION_2_0); 
 		JSF_FACET_VERSION_1_2 = JSF_FACET.getVersion(JSF_VERSION_1_2); //$NON-NLS-1$
@@ -117,7 +133,7 @@ public class JSFProjectConfigurator extends AbstractProjectConfigurator {
 			return;
 		}
 		
-	    String jsfVersion = getJSFVersion(mavenProject, project);
+	    String jsfVersion = getJSFVersion(mavenProject, fproj);
 	    if (fproj != null && jsfVersion != null) { 
 	      installWarFacets(fproj, jsfVersion, mavenProject, monitor);
 	    }
@@ -329,9 +345,14 @@ public class JSFProjectConfigurator extends AbstractProjectConfigurator {
 	}
 
 
-	private String getJSFVersion(MavenProject mavenProject, IProject project) {
+	private String getJSFVersion(MavenProject mavenProject, IFacetedProject fproj) {
 		String version = null;
-		version = Activator.getDefault().getDependencyVersion(mavenProject, JSF_API_GROUP_ID, JSF_API_ARTIFACT_ID);
+		IProject project = fproj.getProject();
+		version = getVersionFromFacesconfig(project);
+		
+		if (version == null) {
+			version = Activator.getDefault().getDependencyVersion(mavenProject, JSF_API_GROUP_ID, JSF_API_ARTIFACT_ID);
+		}
 		if (version == null) {
 			//Check if there's a JSF 2 dependency 
 			version = Activator.getDefault().getDependencyVersion(mavenProject, JSF_API2_GROUP_ID, JSF_API_ARTIFACT_ID);
@@ -343,7 +364,85 @@ public class JSFProjectConfigurator extends AbstractProjectConfigurator {
 		if (version == null) {
 			version = inferJsfVersionFromDependencies(mavenProject, JSF_API2_GROUP_ID, JSF_API_ARTIFACT_ID, JSF_VERSION_2_0);
 		}
+		
+		if (version == null && hasFacesServletInWebXml(project)) {
+			//No dependency on JSF, no faces-config, but uses faces-servlet
+			//so we try to best guess the version depending on the installed web facet
+			IProjectFacetVersion webVersion = fproj.getInstalledVersion(dynamicWebFacet);
+			if (webVersion.compareTo(WEB_FACET_3_0) < 0) {
+				version = JSF_VERSION_1_2;
+			} else {
+				version = JSF_VERSION_2_0;
+			}
+		}
+		
 	    return version;
+	}
+
+	private boolean hasFacesServletInWebXml(IProject project) {
+		//We look for javax.faces.webapp.FacesServlet in web.xml
+		WebArtifactEdit edit = null;
+		try {
+			IVirtualComponent component = ComponentCore.createComponent(project);
+			if (component != null) {
+				edit = WebArtifactEdit.getWebArtifactEditForRead(component);
+				if (edit !=null) {
+					WebApp webapp = edit.getWebApp();
+					if (webapp != null && webapp.getServlets() != null) {
+						for (Object o : webapp.getServlets()) {
+							if (o instanceof Servlet) {
+								WebType webType = ((Servlet) o).getWebType();
+								if (webType != null 
+									&& webType.isServletType() 
+									&& FACES_SERVLET.equals(((ServletType)webType).getClassName())){
+									return true;
+								}
+							}
+						}
+					}
+				}
+			}
+		} finally {
+			if (edit != null)
+				edit.dispose();
+		}
+		return false;
+	}
+
+	private String getVersionFromFacesconfig(IProject project) {
+		
+	    IVirtualComponent component = ComponentCore.createComponent(project);
+	    if (component == null) {
+		   return null;
+	    }
+	    IFile facesConfig = null;
+	    //TODO get custom faces-config.xml path from web.xml
+	    IPath facesConfigPath = new Path("WEB-INF/faces-config.xml");
+	    IContainer[] underlyingFolders = component.getRootFolder().getUnderlyingFolders();
+	    for (IContainer underlyingFolder : underlyingFolders) {
+		  IPath p = underlyingFolder.getProjectRelativePath().append(facesConfigPath);
+		  IFile f = project.getFile(p);
+		  if (f.exists()) {
+			 facesConfig = f;
+			 break;
+		  }
+	    }
+
+	    String version = null;
+		if (facesConfig != null) {
+			InputStream in = null;
+			try {
+				in = facesConfig.getContents();
+				FacesConfigQuickPeek peek = new FacesConfigQuickPeek(in);
+				version = peek.getVersion();
+			} catch (CoreException e) {
+				// ignore
+				Activator.log(e);
+			} finally {
+				IOUtil.close(in);
+			}
+		}
+		return version;
 	}
 
 	/**

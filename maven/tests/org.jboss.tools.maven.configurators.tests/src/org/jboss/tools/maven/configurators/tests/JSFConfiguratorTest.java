@@ -63,6 +63,29 @@ public class JSFConfiguratorTest extends AbstractMavenConfiguratorTest {
 		File originalWebXml = new File(projectLocation, webxmlRelPath);
 		assertEquals("web.xml content changed ", toString(originalWebXml), toString(webXml));
 	}	
+
+
+	@Test
+	public void testJBIDE10468_facesServletInWebXml() throws Exception {
+		String projectLocation = "projects/jsf/JBIDE-10468/jsf-webxml-20";
+		IProject jsfProject = importProject(projectLocation+"/pom.xml");
+		waitForJobsToComplete(new NullProgressMonitor());
+		assertIsJSFProject(jsfProject, JSFProjectConfigurator.JSF_FACET_VERSION_2_0);
+
+		projectLocation = "projects/jsf/JBIDE-10468/jsf-webxml-12";
+		jsfProject = importProject(projectLocation+"/pom.xml");
+		waitForJobsToComplete(new NullProgressMonitor());
+		assertIsJSFProject(jsfProject, JSFProjectConfigurator.JSF_FACET_VERSION_1_2);
+	}	
+	
+	@Test
+	public void testJBIDE10468_detectFacesConfig() throws Exception {
+		String projectLocation = "projects/jsf/JBIDE-10468/jsf-facesconfig";
+		IProject jsfProject = importProject(projectLocation+"/pom.xml");
+		waitForJobsToComplete(new NullProgressMonitor());
+		assertIsJSFProject(jsfProject, JSFProjectConfigurator.JSF_FACET_VERSION_2_0);
+	}	
+	
 	
 	@Test
 	public void testJBIDE9455_errorMarkers() throws Exception {
