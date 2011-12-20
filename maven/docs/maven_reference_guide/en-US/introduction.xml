@@ -89,7 +89,7 @@
         
          
     </section>
-    <section id="requirements">
+<!--    <section id="requirements">
         <title>Requirements</title>
         <para><property>JBoss Maven Integration Tool </property>needs the following requirements: </para>
       <itemizedlist>
@@ -131,6 +131,6 @@
             </listitem>
             
         </itemizedlist>
-    </section>
+	</section> -->
     
 </chapter>
