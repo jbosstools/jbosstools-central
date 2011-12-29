@@ -119,4 +119,8 @@ public class RefreshTutorialsJob extends Job {
 		return tutorialCategories;
 	}
 
+	@Override
+	public boolean belongsTo(Object family) {
+		return family == JBossCentralActivator.JBOSS_CENTRAL_FAMILY;
+	}
 }

@@ -17,6 +17,9 @@ import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.core.runtime.OperationCanceledException;
+import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.action.ControlContribution;
 import org.eclipse.jface.action.GroupMarker;
 import org.eclipse.jface.action.IToolBarManager;
@@ -45,6 +48,9 @@ import org.jboss.tools.central.JBossCentralActivator;
 import org.jboss.tools.central.actions.OpenJBossBlogsHandler;
 import org.jboss.tools.central.editors.xpl.TextSearchControl;
 import org.jboss.tools.central.jobs.RefreshBlogsJob;
+import org.jboss.tools.central.jobs.RefreshDiscoveryJob;
+import org.jboss.tools.central.jobs.RefreshNewsJob;
+import org.jboss.tools.central.jobs.RefreshTutorialsJob;
 
 /**
  * 
@@ -86,7 +92,14 @@ public class JBossCentralEditor extends SharedHeaderFormEditor {
 			softwareImage.dispose();
 			softwareImage = null;
 		}
-		RefreshBlogsJob.INSTANCE.cancel();
+		Job.getJobManager().cancel(JBossCentralActivator.JBOSS_CENTRAL_FAMILY); 
+		try {
+			Job.getJobManager().join(JBossCentralActivator.JBOSS_CENTRAL_FAMILY, new NullProgressMonitor());
+		} catch (OperationCanceledException e) {
+			// ignore
+		} catch (InterruptedException e) {
+			// ignore
+		}
 		super.dispose();
 	}
 

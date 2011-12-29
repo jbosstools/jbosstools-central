@@ -271,5 +271,10 @@ public abstract class AbstractRefreshJob extends Job {
 	public void setNeedsRefresh(boolean needRefresh) {
 		this.needsRefresh = needRefresh;
 	}
+	
+	@Override
+	public boolean belongsTo(Object family) {
+		return family == JBossCentralActivator.JBOSS_CENTRAL_FAMILY;
+	}
 
 }

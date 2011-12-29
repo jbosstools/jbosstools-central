@@ -583,6 +583,9 @@ public class DiscoveryViewer {
 
 	public void createBodyContents() {
 		// remove any existing contents
+		if (body == null || body.isDisposed()) {
+			return;
+		}
 		for (Control child : body.getChildren()) {
 			child.dispose();
 		}
@@ -1050,11 +1053,17 @@ public class DiscoveryViewer {
 	}
 
 	private void discoveryUpdated(final boolean wasCancelled) {
+		if (body == null || body.isDisposed()) {
+			return;
+		}
 		Display.getDefault().syncExec(new Runnable() {
 			
 			@Override
 			public void run() {
 				createBodyContents();
+				if (body == null || body.isDisposed()) {
+					return;
+				}
 				if (discovery != null && !wasCancelled) {
 					int categoryWithConnectorCount = 0;
 					for (DiscoveryCategory category : discovery.getCategories()) {
@@ -1499,6 +1508,9 @@ public class DiscoveryViewer {
 					try {
 						result[0] = connectorDiscovery.performDiscovery(monitor);
 					} finally {
+						if (monitor.isCanceled()) {
+							return;
+						}
 						DiscoveryViewer.this.discovery = connectorDiscovery;
 
 						postDiscovery(connectorDiscovery);
@@ -1516,9 +1528,11 @@ public class DiscoveryViewer {
 		} catch (InvocationTargetException e) {
 			IStatus status = computeStatus(e, Messages.ConnectorDiscoveryWizardMainPage_unexpectedException);
 			StatusManager.getManager().handle(status, StatusManager.SHOW | StatusManager.BLOCK | StatusManager.LOG);
+			return;
 		} catch (InterruptedException e) {
 			// cancelled by user so nothing to do here.
 			wasCancelled = true;
+			return;
 		}
 		if (discovery != null) {
 			discoveryUpdated(wasCancelled);
@@ -1537,6 +1551,7 @@ public class DiscoveryViewer {
 				} catch (InterruptedException e) {
 					// cancelled by user so nothing to do here.
 					wasCancelled = true;
+					return;
 				}
 			}
 			// createBodyContents() shouldn't be necessary but for some
@@ -1555,6 +1570,9 @@ public class DiscoveryViewer {
 		Display.getDefault().syncExec(new Runnable() {
 			@Override
 			public void run() {
+				if (body == null || body.isDisposed()) {
+					return;
+				}
 				body.setData("discoveryComplete", "true"); //$NON-NLS-1$ //$NON-NLS-2$
 			}
 		});

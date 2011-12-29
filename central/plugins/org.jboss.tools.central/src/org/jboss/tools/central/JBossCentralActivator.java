@@ -25,8 +25,10 @@ import org.eclipse.core.runtime.IExtension;
 import org.eclipse.core.runtime.IExtensionPoint;
 import org.eclipse.core.runtime.IExtensionRegistry;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jface.dialogs.MessageDialog;
@@ -70,6 +72,8 @@ import org.osgi.service.prefs.BackingStoreException;
  * The activator class controls the plug-in life cycle
  */
 public class JBossCentralActivator extends AbstractUIPlugin {
+
+	public static final Object JBOSS_CENTRAL_FAMILY = new Object();
 
 	public static final String JBOSS_DISCOVERY_DIRECTORY = "jboss.discovery.directory.url";
 	
@@ -171,6 +175,9 @@ public class JBossCentralActivator extends AbstractUIPlugin {
 	 * )
 	 */
 	public void stop(BundleContext context) throws Exception {
+		Job.getJobManager().cancel(JBOSS_CENTRAL_FAMILY); 
+		Job.getJobManager().join(JBOSS_CENTRAL_FAMILY, new NullProgressMonitor());
+		
 		plugin = null;
 		bundleContext = null;
 		tutorialCategories = null;
