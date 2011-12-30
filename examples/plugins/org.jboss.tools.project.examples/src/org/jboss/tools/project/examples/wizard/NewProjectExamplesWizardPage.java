@@ -25,6 +25,7 @@ import org.eclipse.jface.dialogs.MessageDialogWithToggle;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.jface.preference.PreferenceDialog;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.util.Geometry;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
@@ -37,8 +38,6 @@ import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.ModifyEvent;
-import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.GC;
@@ -54,11 +53,13 @@ import org.eclipse.swt.widgets.DirectoryDialog;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Link;
 import org.eclipse.swt.widgets.Monitor;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.ui.dialogs.FilteredTree;
+import org.eclipse.ui.dialogs.PreferencesUtil;
 import org.eclipse.ui.model.AdaptableList;
 import org.eclipse.ui.part.PageBook;
 import org.jboss.tools.project.examples.Messages;
@@ -70,6 +71,7 @@ import org.jboss.tools.project.examples.model.IProjectExampleSite;
 import org.jboss.tools.project.examples.model.Project;
 import org.jboss.tools.project.examples.model.ProjectFix;
 import org.jboss.tools.project.examples.model.ProjectUtil;
+import org.jboss.tools.project.examples.preferences.ProjectExamplesPreferencePage;
 
 /**
  * @author snjeza
@@ -105,59 +107,7 @@ public class NewProjectExamplesWizardPage extends WizardPage {
 		GridData gd = new GridData(SWT.FILL, SWT.FILL, false, false);
 		composite.setLayoutData(gd);
 		
-		Group outputDirectoryGroup = new Group(composite, SWT.NONE);
-		GridLayout layout = new GridLayout(2, false);
-		outputDirectoryGroup.setLayout(layout);
-		outputDirectoryGroup.setText(Messages.ProjectExamplesPreferencePage_Output_directory);
-		gd = new GridData(SWT.FILL, SWT.FILL, true, false);
-		outputDirectoryGroup.setLayoutData(gd);
-		
-		isWorkspace = new Button(outputDirectoryGroup, SWT.CHECK);
-		gd = new GridData(SWT.FILL, SWT.FILL, true, false);
-		gd.horizontalSpan = 2;
-		isWorkspace.setLayoutData(gd);
-		isWorkspace.setText(Messages.ProjectExamplesPreferencePage_Use_default_workspace_location);
-		isWorkspace.setSelection(ProjectExamplesActivator.getDefault().getPreferenceStore().getBoolean(ProjectExamplesActivator.PROJECT_EXAMPLES_DEFAULT));
-		
-		outputDirectoryText = new Text(outputDirectoryGroup, SWT.SINGLE|SWT.BORDER);
-		gd = new GridData(SWT.FILL, SWT.FILL, true, false);
-		gd.verticalAlignment = SWT.CENTER;
-		outputDirectoryText.setLayoutData(gd);
-		final IPreferenceStore store = ProjectExamplesActivator.getDefault().getPreferenceStore();
-		String outputDirectoryValue = store.getString(ProjectExamplesActivator.PROJECT_EXAMPLES_OUTPUT_DIRECTORY);
-		outputDirectoryText.setText(outputDirectoryValue == null ? "" : outputDirectoryValue); //$NON-NLS-1$
-		final Button outputDirectoryBrowse = new Button(outputDirectoryGroup, SWT.PUSH);
-		outputDirectoryBrowse.setText(Messages.Browse);
-		outputDirectoryBrowse.addSelectionListener(new SelectionAdapter(){
-		
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				DirectoryDialog dialog = new DirectoryDialog(getShell(), SWT.SINGLE);
-				String value = outputDirectoryText.getText();
-				if (value.trim().length() == 0) {
-					value = Platform.getLocation().toOSString();
-				}
-				dialog.setFilterPath(value);
-			
-				String result = dialog.open();
-				if (result == null || result.trim().length() == 0) {
-					return;
-				}
-				outputDirectoryText.setText(result);
-				
-			}
-		
-		});
-		enableControls(outputDirectoryBrowse);
-		
-		isWorkspace.addSelectionListener(new SelectionAdapter() {
-
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				enableControls(outputDirectoryBrowse);
-			}
-			
-		});
+		//createOutputDirectoryGroup(composite);
 		
 		Composite siteComposite = new Composite(composite,SWT.NONE);
 		GridLayout gridLayout = new GridLayout(2,false);
@@ -169,10 +119,23 @@ public class NewProjectExamplesWizardPage extends WizardPage {
 		
 		final Button button = new Button(siteComposite,SWT.CHECK);
 		gd = new GridData(SWT.FILL, SWT.BEGINNING, false, false);
-		gd.horizontalSpan = 2;
+		//gd.horizontalSpan = 2;
 		button.setLayoutData(gd);
 		button.setText(Messages.ProjectExamplesPreferencePage_Show_experimental_sites);
+		final IPreferenceStore store = ProjectExamplesActivator.getDefault().getPreferenceStore();
 		button.setSelection(store.getBoolean(ProjectExamplesActivator.SHOW_EXPERIMENTAL_SITES));
+		
+		Link prefLink = new Link(siteComposite, SWT.NONE);
+		gd = new GridData(SWT.END, SWT.BEGINNING, false, false);
+		//gd.horizontalSpan = 2;
+		prefLink.setLayoutData(gd);
+		prefLink.setText(Messages.NewProjectExamplesWizardPage_Project_Examples_Preferences);
+		prefLink.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				PreferenceDialog dialog = PreferencesUtil.createPreferenceDialogOn(getShell(),ProjectExamplesPreferencePage.ID, null, null);
+				dialog.open();
+			}
+		});
 		
 		new Label(siteComposite,SWT.NONE).setText(Messages.NewProjectExamplesWizardPage_Site);
 		siteCombo = new Combo(siteComposite,SWT.READ_ONLY);
@@ -360,6 +323,63 @@ public class NewProjectExamplesWizardPage extends WizardPage {
 		configureSizeAndLocation();
 		refresh(viewer, true);
 		siteCombo.setText(ProjectExamplesActivator.ALL_SITES);
+	}
+
+	private void createOutputDirectoryGroup(Composite composite) {
+		GridData gd;
+		Group outputDirectoryGroup = new Group(composite, SWT.NONE);
+		GridLayout layout = new GridLayout(2, false);
+		outputDirectoryGroup.setLayout(layout);
+		outputDirectoryGroup.setText(Messages.ProjectExamplesPreferencePage_Output_directory);
+		gd = new GridData(SWT.FILL, SWT.FILL, true, false);
+		outputDirectoryGroup.setLayoutData(gd);
+		
+		isWorkspace = new Button(outputDirectoryGroup, SWT.CHECK);
+		gd = new GridData(SWT.FILL, SWT.FILL, true, false);
+		gd.horizontalSpan = 2;
+		isWorkspace.setLayoutData(gd);
+		isWorkspace.setText(Messages.ProjectExamplesPreferencePage_Use_default_workspace_location);
+		isWorkspace.setSelection(ProjectExamplesActivator.getDefault().getPreferenceStore().getBoolean(ProjectExamplesActivator.PROJECT_EXAMPLES_DEFAULT));
+		
+		outputDirectoryText = new Text(outputDirectoryGroup, SWT.SINGLE|SWT.BORDER);
+		gd = new GridData(SWT.FILL, SWT.FILL, true, false);
+		gd.verticalAlignment = SWT.CENTER;
+		outputDirectoryText.setLayoutData(gd);
+		final IPreferenceStore store = ProjectExamplesActivator.getDefault().getPreferenceStore();
+		String outputDirectoryValue = store.getString(ProjectExamplesActivator.PROJECT_EXAMPLES_OUTPUT_DIRECTORY);
+		outputDirectoryText.setText(outputDirectoryValue == null ? "" : outputDirectoryValue); //$NON-NLS-1$
+		final Button outputDirectoryBrowse = new Button(outputDirectoryGroup, SWT.PUSH);
+		outputDirectoryBrowse.setText(Messages.Browse);
+		outputDirectoryBrowse.addSelectionListener(new SelectionAdapter(){
+		
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				DirectoryDialog dialog = new DirectoryDialog(getShell(), SWT.SINGLE);
+				String value = outputDirectoryText.getText();
+				if (value.trim().length() == 0) {
+					value = Platform.getLocation().toOSString();
+				}
+				dialog.setFilterPath(value);
+			
+				String result = dialog.open();
+				if (result == null || result.trim().length() == 0) {
+					return;
+				}
+				outputDirectoryText.setText(result);
+				
+			}
+		
+		});
+		enableControls(outputDirectoryBrowse);
+		
+		isWorkspace.addSelectionListener(new SelectionAdapter() {
+
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				enableControls(outputDirectoryBrowse);
+			}
+			
+		});
 	}
 	
 	protected void enableControls(Button outputDirectoryBrowse) {

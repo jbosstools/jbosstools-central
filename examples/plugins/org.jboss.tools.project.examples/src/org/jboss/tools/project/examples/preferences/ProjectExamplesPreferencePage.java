@@ -55,6 +55,7 @@ import org.jboss.tools.project.examples.model.SiteCategory;
 public class ProjectExamplesPreferencePage extends PreferencePage implements
 		IWorkbenchPreferencePage {
 
+	public static final String ID = "org.jboss.tools.project.examples.preferences.projectExamplesPreferencePage"; //$NON-NLS-1$
 	private Button showExperimentalSites;
 	private Sites sites;
 	private TreeViewer viewer;

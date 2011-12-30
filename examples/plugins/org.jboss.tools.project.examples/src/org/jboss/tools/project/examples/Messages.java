@@ -52,6 +52,7 @@ public class Messages extends NLS {
 	public static String NewProjectExamplesWizardPage_Invalid_Sites;
 	public static String NewProjectExamplesWizardPage_Note;
 	public static String NewProjectExamplesWizardPage_Project_Example;
+	public static String NewProjectExamplesWizardPage_Project_Examples_Preferences;
 	public static String NewProjectExamplesWizardPage_Project_name;
 	public static String NewProjectExamplesWizardPage_Project_size;
 	public static String NewProjectExamplesWizardPage_Projects;
