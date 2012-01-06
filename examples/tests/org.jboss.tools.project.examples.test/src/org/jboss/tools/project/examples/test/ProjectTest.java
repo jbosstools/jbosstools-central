@@ -14,7 +14,6 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -33,13 +32,11 @@ import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.resources.WorkspaceJob;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.ui.PlatformUI;
 import org.jboss.tools.project.examples.Messages;
 import org.jboss.tools.project.examples.ProjectExamplesActivator;
 import org.jboss.tools.project.examples.model.Category;
@@ -48,7 +45,6 @@ import org.jboss.tools.project.examples.model.IProjectExampleSite;
 import org.jboss.tools.project.examples.model.Project;
 import org.jboss.tools.project.examples.model.ProjectExampleSite;
 import org.jboss.tools.project.examples.model.ProjectUtil;
-import org.jboss.tools.project.examples.wizard.NewProjectExamplesWizard;
 import org.jboss.tools.test.util.JobUtils;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -214,6 +210,12 @@ public class ProjectTest {
 		for (int i = 0; i < projectMarkers.length; i++) {
 			if (projectMarkers[i].getAttribute(IMarker.SEVERITY,
 					IMarker.SEVERITY_ERROR) == IMarker.SEVERITY_ERROR) {
+				String message = projectMarkers[i].getAttribute(IMarker.MESSAGE, null);
+				String location = projectMarkers[i].getAttribute(IMarker.LOCATION, null);
+				String lineNumber = projectMarkers[i].getAttribute(IMarker.LINE_NUMBER, null);
+				String type = projectMarkers[i].getType();
+				System.out.println("projectName=" + projectName);
+				System.out.println("marker: type=" + type + ",message=" + message + ",location=" + location + ",line=" + lineNumber);
 				markers.add(projectMarkers[i]);
 			}
 		}
