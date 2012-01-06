@@ -40,6 +40,7 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.runner.RunWith;
 
+@SuppressWarnings("restriction")
 @RunWith(SWTBotJunit4ClassRunner.class)
 public abstract class AbstractMavenSWTBotTest extends AbstractMavenProjectTestCase {
 

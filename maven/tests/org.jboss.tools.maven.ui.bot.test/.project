@@ -38,9 +38,19 @@
 			<location>/home/eiden/Java/RedHat/Eclipses/jbds5.0.0.M4b/studio/plugins/org.jboss.tools.common_3.3.0.v20111027-1555-H29-M4</location>
 		</link>
 		<link>
+			<name>lib-org.jboss.tools.common_3.3.0.v20111208-2036-H34-M5</name>
+			<type>2</type>
+			<location>/home/eiden/Java/RedHat/Eclipses/jbds5m5a/studio/plugins/org.jboss.tools.common_3.3.0.v20111208-2036-H34-M5</location>
+		</link>
+		<link>
 			<name>lib-org.jboss.tools.jst.web.kb_3.3.0.v20111021-1521-H30-M4</name>
 			<type>2</type>
 			<location>/home/eiden/Java/RedHat/Eclipses/jbds5.0.0.M4b/studio/plugins/org.jboss.tools.jst.web.kb_3.3.0.v20111021-1521-H30-M4</location>
+		</link>
+		<link>
+			<name>lib-org.jboss.tools.jst.web.kb_3.3.0.v20111208-2115-H35-M5</name>
+			<type>2</type>
+			<location>/home/eiden/Java/RedHat/Eclipses/jbds5m5a/studio/plugins/org.jboss.tools.jst.web.kb_3.3.0.v20111208-2115-H35-M5</location>
 		</link>
 		<link>
 			<name>lib-org.jboss.tools.tests_3.2.0.v20111108-2302-Beta1</name>
@@ -48,9 +58,19 @@
 			<location>/home/eiden/Java/RedHat/Eclipses/jbds5.0.0.M4b/studio/plugins/org.jboss.tools.tests_3.2.0.v20111108-2302-Beta1</location>
 		</link>
 		<link>
+			<name>lib-org.jboss.tools.tests_3.2.0.v20111124-2026-H477-M5</name>
+			<type>2</type>
+			<location>/home/eiden/Java/RedHat/Eclipses/jbds5m5a/studio/plugins/org.jboss.tools.tests_3.2.0.v20111124-2026-H477-M5</location>
+		</link>
+		<link>
 			<name>lib-org.jboss.tools.ui.bot.ext_3.2.0.v20111108-2302-Beta1</name>
 			<type>2</type>
 			<location>/home/eiden/Java/RedHat/Eclipses/jbds5.0.0.M4b/studio/plugins/org.jboss.tools.ui.bot.ext_3.2.0.v20111108-2302-Beta1</location>
+		</link>
+		<link>
+			<name>lib-org.jboss.tools.ui.bot.ext_3.2.0.v20111124-2026-H477-M5</name>
+			<type>2</type>
+			<location>/home/eiden/Java/RedHat/Eclipses/jbds5m5a/studio/plugins/org.jboss.tools.ui.bot.ext_3.2.0.v20111124-2026-H477-M5</location>
 		</link>
 	</linkedResources>
 </projectDescription>

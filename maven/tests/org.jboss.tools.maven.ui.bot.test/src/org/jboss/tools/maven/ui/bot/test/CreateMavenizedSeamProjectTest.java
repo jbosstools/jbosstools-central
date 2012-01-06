@@ -120,17 +120,17 @@ public class CreateMavenizedSeamProjectTest{
 	
 	public static final String HSQL_PROFILE_ID = "org.eclipse.datatools.enablement.hsqldb.connectionProfile";
 																																	
-	public static final String JBOSS_AS_HOME = System.getProperty("jbosstools.test.jboss.home.5.1", "/home/eiden/Java/RedHat/JBossASs/jboss-5.1.0.GA");//"E:\\JBossRuntimes\\jboss-5.1.0.GA");
+	public static final String JBOSS_AS_HOME = System.getProperty("jbosstools.test.jboss.home.5.1");
 
 	public static final String JBOSS_AS_RUNTIME_ID = "org.jboss.ide.eclipse.as.runtime.51";
 	
 	public static final String JBOSS_AS_SERVER_ID = "org.jboss.ide.eclipse.as.51";
 	
-	public static final String SEAM_HOME_PROPERTY = System.getProperty("jbosstools.test.seam.2.0.1.GA.home", "/home/eiden/Java/RedHat/libs/jboss-seam-2.2.1.Final");//E:\\JBossRuntimes\\jboss-seam-2.2.1.CR3");
+	public static final String SEAM_HOME_PROPERTY = System.getProperty("jbosstools.test.seam.2.0.1.GA.home");
 
 	public static final String HSQLDB_DRIVER_JAR_NAME = "hsqldb.jar"; //$NON-NLS-1$
 	
-	public static final String HSQLDB_DRIVER_LOCATION = "/home/eiden/Java/RedHat/libs + HSQLDB_DRIVER_JAR_NAME"; //"/common/lib/" + HSQLDB_DRIVER_JAR_NAME; //$NON-NLS-1$
+	public static final String HSQLDB_DRIVER_LOCATION = "lib/ + HSQLDB_DRIVER_JAR_NAME";//$NON-NLS-1$
 	
 	public static final String PROJECT_NAME_WAR = "MavenizedSeamProjectWar";
 	

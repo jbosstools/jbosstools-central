@@ -29,10 +29,7 @@ import org.eclipse.swtbot.swt.finder.SWTBot;
 import org.eclipse.swtbot.swt.finder.keyboard.Keystrokes;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 import org.jboss.tools.ui.bot.ext.SWTBotExt;
-import org.jboss.tools.ui.bot.ext.SWTTestExt;
 import org.jboss.tools.ui.bot.ext.config.Annotations.Require;
-import org.jboss.tools.ui.bot.ext.config.Annotations.Server;
-import org.jboss.tools.ui.bot.ext.config.Annotations.ServerState;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.w3c.dom.Document;
@@ -40,11 +37,11 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
 
+//TODO deployment
 @SuppressWarnings("restriction")
 @Require(perspective = "Web Development")
 public class CreateMavenizedJSFProjectTest{
-	public static final String JBOSS6_AS_HOME=System.getProperty("jbosstools.test.jboss.home.6.1", "/home/eiden/Java/RedHat/JBossASs/jboss-6.1.0.Final");
-	public static final String JBOSS7_AS_HOME=System.getProperty("jbosstools.test.jboss.home.7.0", "/home/eiden/Java/RedHat/JBossASs/jboss-as-7.0.1.Final1");
+	public static final String JBOSS6_AS_HOME=System.getProperty("jbosstools.test.jboss.home.6.0");
 	public static final String POM_FILE = "pom.xml";
 	public static final String PROJECT_NAME6="JSFProject6";
 	public static final String PROJECT_NAME7="JSFProject7";
@@ -90,21 +87,6 @@ public class CreateMavenizedJSFProjectTest{
 	}
 	*/
 	
-	@Test
-	public void createJSFProjectTest_AS7_v2() throws InterruptedException, CoreException{
-		createJSFProject(SERVER_RUNTIME7, SERVER7, JBOSS7_AS_HOME,"JSF 2.0", PROJECT_NAME7);
-	}
-	
-	@Test
-	public void activateMavenFacet_AS7_v2() throws InterruptedException, CoreException{
-		activateMavenFacet(PROJECT_NAME7);
-	}
-	
-	@Test
-	public void buildProject_AS7_v2() throws CoreException, ParserConfigurationException, SAXException, IOException, TransformerException, InterruptedException{
-		addDependencies(PROJECT_NAME7, JSF_VERSION_2);
-		buildProject(PROJECT_NAME7);
-	}
 	
 	@Test
 	public void createJSFProjectTest_AS6_v1() throws InterruptedException, CoreException{
@@ -120,22 +102,6 @@ public class CreateMavenizedJSFProjectTest{
 	public void buildProject_AS6_v1() throws CoreException, ParserConfigurationException, SAXException, IOException, TransformerException, InterruptedException{
 		addDependencies(PROJECT_NAME6_v1, JSF_VERSION_1_2);
 		buildProject(PROJECT_NAME6_v1);
-	}
-	
-	@Test
-	public void createJSFProjectTest_AS7_v1() throws InterruptedException, CoreException{
-		createJSFProject(SERVER_RUNTIME7, SERVER7, JBOSS7_AS_HOME,"JSF 1.2", PROJECT_NAME7_v1);
-	}
-	
-	@Test
-	public void activateMavenFacet_AS7_v1() throws InterruptedException, CoreException{
-		activateMavenFacet(PROJECT_NAME7_v1);
-	}
-	
-	@Test
-	public void buildProject_AS7_v1() throws CoreException, ParserConfigurationException, SAXException, IOException, TransformerException, InterruptedException{
-		addDependencies(PROJECT_NAME7_v1, JSF_VERSION_1_2);
-		buildProject(PROJECT_NAME7_v1);
 	}
 	
 	
@@ -205,6 +171,10 @@ public class CreateMavenizedJSFProjectTest{
 	    Thread.sleep(1000);
 	    SWTBot shellProperties = bot.shell("Properties for "+projectName).activate().bot();
 	    shellProperties.tree().select("Project Facets");
+	    Thread.sleep(500);
+	    SWTBotExt botExt = new SWTBotExt();
+	    botExt.link(0).click("Convert to faceted form...");
+	    waitForIdle();
 	    shellProperties.tree(1).getTreeItem("JBoss Maven Integration").check();
 	    Thread.sleep(500);
 	    SWTBotExt swtBot = new SWTBotExt();
@@ -214,7 +184,7 @@ public class CreateMavenizedJSFProjectTest{
 	    waitForIdle();
 	    IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject(projectName);
 	    assertNoErrors(project);
-		//Utils.isMavenProject(projectName);
+	    assertTrue(Utils.isMavenProject(projectName));
 	}
 	
 	private void buildProject(String projectName) throws CoreException{
