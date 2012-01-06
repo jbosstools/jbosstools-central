@@ -210,6 +210,10 @@ public class ProjectTest {
 		for (int i = 0; i < projectMarkers.length; i++) {
 			if (projectMarkers[i].getAttribute(IMarker.SEVERITY,
 					IMarker.SEVERITY_ERROR) == IMarker.SEVERITY_ERROR) {
+				// ignore XHTML errors
+				if ("org.jboss.tools.jsf.xhtmlsyntaxproblem".equals(projectMarkers[i].getType())) {
+					continue;
+				}
 				String message = projectMarkers[i].getAttribute(IMarker.MESSAGE, null);
 				String location = projectMarkers[i].getAttribute(IMarker.LOCATION, null);
 				String lineNumber = projectMarkers[i].getAttribute(IMarker.LINE_NUMBER, null);
