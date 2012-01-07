@@ -91,8 +91,7 @@ public class NewProjectExamplesWizardPage extends WizardPage {
 	private Composite noteComposite;
 	private List<Category> categories;
 	private Text descriptionText;
-	private Button isWorkspace;
-	private Text outputDirectoryText;
+
 	
 	public NewProjectExamplesWizardPage() {
 		super("org.jboss.tools.project.examples"); //$NON-NLS-1$
@@ -106,8 +105,6 @@ public class NewProjectExamplesWizardPage extends WizardPage {
 		composite.setLayout(new GridLayout(1,false));
 		GridData gd = new GridData(SWT.FILL, SWT.FILL, false, false);
 		composite.setLayoutData(gd);
-		
-		//createOutputDirectoryGroup(composite);
 		
 		Composite siteComposite = new Composite(composite,SWT.NONE);
 		GridLayout gridLayout = new GridLayout(2,false);
@@ -325,68 +322,7 @@ public class NewProjectExamplesWizardPage extends WizardPage {
 		siteCombo.setText(ProjectExamplesActivator.ALL_SITES);
 	}
 
-	private void createOutputDirectoryGroup(Composite composite) {
-		GridData gd;
-		Group outputDirectoryGroup = new Group(composite, SWT.NONE);
-		GridLayout layout = new GridLayout(2, false);
-		outputDirectoryGroup.setLayout(layout);
-		outputDirectoryGroup.setText(Messages.ProjectExamplesPreferencePage_Output_directory);
-		gd = new GridData(SWT.FILL, SWT.FILL, true, false);
-		outputDirectoryGroup.setLayoutData(gd);
-		
-		isWorkspace = new Button(outputDirectoryGroup, SWT.CHECK);
-		gd = new GridData(SWT.FILL, SWT.FILL, true, false);
-		gd.horizontalSpan = 2;
-		isWorkspace.setLayoutData(gd);
-		isWorkspace.setText(Messages.ProjectExamplesPreferencePage_Use_default_workspace_location);
-		isWorkspace.setSelection(ProjectExamplesActivator.getDefault().getPreferenceStore().getBoolean(ProjectExamplesActivator.PROJECT_EXAMPLES_DEFAULT));
-		
-		outputDirectoryText = new Text(outputDirectoryGroup, SWT.SINGLE|SWT.BORDER);
-		gd = new GridData(SWT.FILL, SWT.FILL, true, false);
-		gd.verticalAlignment = SWT.CENTER;
-		outputDirectoryText.setLayoutData(gd);
-		final IPreferenceStore store = ProjectExamplesActivator.getDefault().getPreferenceStore();
-		String outputDirectoryValue = store.getString(ProjectExamplesActivator.PROJECT_EXAMPLES_OUTPUT_DIRECTORY);
-		outputDirectoryText.setText(outputDirectoryValue == null ? "" : outputDirectoryValue); //$NON-NLS-1$
-		final Button outputDirectoryBrowse = new Button(outputDirectoryGroup, SWT.PUSH);
-		outputDirectoryBrowse.setText(Messages.Browse);
-		outputDirectoryBrowse.addSelectionListener(new SelectionAdapter(){
-		
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				DirectoryDialog dialog = new DirectoryDialog(getShell(), SWT.SINGLE);
-				String value = outputDirectoryText.getText();
-				if (value.trim().length() == 0) {
-					value = Platform.getLocation().toOSString();
-				}
-				dialog.setFilterPath(value);
-			
-				String result = dialog.open();
-				if (result == null || result.trim().length() == 0) {
-					return;
-				}
-				outputDirectoryText.setText(result);
-				
-			}
-		
-		});
-		enableControls(outputDirectoryBrowse);
-		
-		isWorkspace.addSelectionListener(new SelectionAdapter() {
-
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				enableControls(outputDirectoryBrowse);
-			}
-			
-		});
-	}
 	
-	protected void enableControls(Button outputDirectoryBrowse) {
-		outputDirectoryText.setEnabled(!isWorkspace.getSelection());
-		outputDirectoryBrowse.setEnabled(!isWorkspace.getSelection());
-	}
-
 	private void configureSizeAndLocation() {
 		Shell shell = getContainer().getShell();
 		Point size = new Point(DEFAULT_WIDTH, getHeight());
@@ -658,11 +594,4 @@ public class NewProjectExamplesWizardPage extends WizardPage {
 		details.setEnabled(true);
 	}
 	
-	public void finishPage() {
-		final IPreferenceStore store = ProjectExamplesActivator.getDefault().getPreferenceStore();
-		store.setValue(ProjectExamplesActivator.PROJECT_EXAMPLES_DEFAULT, isWorkspace.getSelection());
-		if (outputDirectoryText.getText().trim().length() > 0) {
-			store.setValue(ProjectExamplesActivator.PROJECT_EXAMPLES_OUTPUT_DIRECTORY, outputDirectoryText.getText());
-		}
-	}
 }
