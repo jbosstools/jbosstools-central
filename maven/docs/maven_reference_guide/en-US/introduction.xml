@@ -85,7 +85,7 @@
             
             
         </table>
-        <para>Starting from 3.1 M2 version JBoss Tools  includes new JBoss Maven Integration plug-in which for now allows to create mavenized Seam projects and enable Seam tools support for imported Maven projects.</para>
+		<!--    <para>Starting from 3.1 M2 version JBoss Tools  includes new JBoss Maven Integration plug-in which for now allows to create mavenized Seam projects and enable Seam tools support for imported Maven projects.</para> -->
         
          
     </section>
