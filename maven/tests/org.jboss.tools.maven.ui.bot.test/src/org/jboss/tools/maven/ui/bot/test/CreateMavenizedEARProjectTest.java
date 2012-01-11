@@ -26,7 +26,9 @@ public class CreateMavenizedEARProjectTest {
 	@Test
 	public void createEARProject() throws Exception{
 		createWarProject(WAR_PROJECT_NAME);
+		Thread.sleep(500);
 		createEJBProject(EJB_PROJECT_NAME);
+		Thread.sleep(500);
 		botext.menu("File").menu("Enterprise Application Project").click();
 		botext.textWithLabel("Project name:").setText(EAR_PROJECT_NAME);
 		botext.button("Modify...").click();

@@ -1,11 +1,14 @@
 package org.jboss.tools.maven.ui.bot.test;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
 import org.apache.maven.model.Profile;
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.bindings.keys.KeyStroke;
 import org.eclipse.jface.bindings.keys.ParseException;
 import org.eclipse.m2e.core.MavenPlugin;
@@ -17,6 +20,7 @@ import org.eclipse.swtbot.swt.finder.keyboard.Keystrokes;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
+import org.jboss.tools.ui.bot.ext.SWTBotExt;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -26,9 +30,11 @@ public class MavenProfileSelectionTest extends AbstractMavenSWTBotTest {
 	
 	public static final String AUTOACTIVATED_PROFILE_IN_POM = "active-profile";
 	public static final String AUTOACTIVATED_PROFILE_IN_USER_SETTINGS = "jboss.repository";
-
+	public static final String COMMON_PROFILE = "common-profile";
+	
 	@Test
 	public void testOpenMavenProfiles() throws Exception {
+		setUserSettings();
 		IProject project = importProject("projects/simple-jar/pom.xml");
 		waitForJobsToComplete();
 		testAutoActivatedProfiles();
@@ -46,7 +52,7 @@ public class MavenProfileSelectionTest extends AbstractMavenSWTBotTest {
 	    String selectedProfiles = shell.textWithLabel("Active profiles for simple-jar :").getText();
 	    shell.button("OK").click();
 	   
-	    testActivatedProfiles(project.getName(), selectedProfiles);
+	    testActivatedProfiles(project.getName(), selectedProfiles, false);
 	    Thread.sleep(1000);
 	    openProfilesDialog(projectItem);
 	    
@@ -56,7 +62,36 @@ public class MavenProfileSelectionTest extends AbstractMavenSWTBotTest {
 	    selectedProfiles = bot.textWithLabel("Active profiles for simple-jar :").getText();
 	    bot.button("OK").click();
 	    
-	    testActivatedProfiles(project.getName(), selectedProfiles);
+	    testActivatedProfiles(project.getName(), selectedProfiles, true);
+	}
+	
+	@Test
+	public void testOpenMultipleMavenProfiles() throws Exception{
+		IProject project = importProject("projects/simple-jar/pom.xml");
+		IProject project1 = importProject("projects/simple-jar1/pom.xml");
+		IProject project2 = importProject("projects/simple-jar2/pom.xml");
+		waitForJobsToComplete();
+		final SWTBotView packageExplorer = bot.viewByTitle("Project Explorer");
+		SWTBot innerBot = packageExplorer.bot();
+		innerBot.activeShell().activate();
+		SWTBotTree tree = innerBot.tree();
+		tree.select("simple-jar","simple-jar1","simple-jar2").pressShortcut(Keystrokes.CTRL, Keystrokes.ALT,KeyStroke.getInstance("P"));
+		SWTBot shell = bot.shell("Select Maven profiles").activate().bot();
+		shell.button("Select All").click();
+		shell.button("Activate").click();
+		shell.button("OK").click();
+		testActivatedProfiles(project.getName(), COMMON_PROFILE+", "+AUTOACTIVATED_PROFILE_IN_USER_SETTINGS, false);
+		testActivatedProfiles(project1.getName(), COMMON_PROFILE+", "+AUTOACTIVATED_PROFILE_IN_USER_SETTINGS, false);
+		testActivatedProfiles(project2.getName(), COMMON_PROFILE+", "+AUTOACTIVATED_PROFILE_IN_USER_SETTINGS, false);
+	}
+	
+	private void setUserSettings() throws InterruptedException, IOException, CoreException{
+		SWTBotExt botExt = new SWTBotExt();
+		botExt.menu("Window").menu("Preferences").click();
+		botExt.tree().expandNode("Maven").select("User Settings").click();
+		File f = new File("usersettings/settings.xml");
+		botExt.text(1).setText(f.getAbsolutePath());
+		botExt.button("OK").click();
 	}
 	
 	private void openProfilesDialog(SWTBotTreeItem projectItem) throws ParseException, InterruptedException{
@@ -68,7 +103,7 @@ public class MavenProfileSelectionTest extends AbstractMavenSWTBotTest {
 	    Thread.sleep(1000);
 	}
 	
-	private void testActivatedProfiles(String projectName, String profilesToCheck){
+	private void testActivatedProfiles(String projectName, String profilesToCheck, boolean defaultProfile){
 		IMavenProjectFacade facade = MavenPlugin.getMavenProjectRegistry().getMavenProject("org.jboss.tools.maven.tests", "simple-jar", "1.0.0-SNAPSHOT");
 		assertNotNull("facade is null",facade);
 	    
@@ -76,16 +111,19 @@ public class MavenProfileSelectionTest extends AbstractMavenSWTBotTest {
 	    String empty = "";
 	    Set<String> setOfProfiles = new HashSet<String>();
 	    Collections.addAll(setOfProfiles, parsedProfiles);
-	    setOfProfiles.add(AUTOACTIVATED_PROFILE_IN_POM);
 	    setOfProfiles.add(AUTOACTIVATED_PROFILE_IN_USER_SETTINGS);
+	    if(defaultProfile){
+	    	setOfProfiles.add(AUTOACTIVATED_PROFILE_IN_POM);
+	    }
 	    setOfProfiles.remove(empty);
 	    
 	    Set<String> setOfProfilesFacade = new HashSet<String>();
 	    for(Profile profile : facade.getMavenProject().getActiveProfiles()){
+	    		System.out.println(profile.getId());
 	    	    setOfProfilesFacade.add(profile.getId());
 	    }
 	    
-	    assertEquals("Selected profiles doesn't match", setOfProfilesFacade, setOfProfiles);
+	    assertEquals("Selected profiles in project " +projectName+ " doesn't match", setOfProfilesFacade, setOfProfiles);
 	}
 	
 	private void testAutoActivatedProfiles(){

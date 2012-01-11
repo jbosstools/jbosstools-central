@@ -48,6 +48,7 @@ public class CreateMavenProjectsTest extends AbstractMavenSWTBotTest{
 		buildProject(projectName,"5 Maven build...", "jar");
 	}
 
+	
 	@Test
 	public void createSimpleJarProjectArchetype() throws Exception {
 		String projectName = "ArchetypeQuickstart";
@@ -57,6 +58,7 @@ public class CreateMavenProjectsTest extends AbstractMavenSWTBotTest{
 		assertTrue(Utils.isMavenProject(projectName));
 		buildProject(projectName, "6 Maven build...", "jar");
 	}
+	
 	
 	
 	@Test
@@ -142,7 +144,7 @@ public class CreateMavenProjectsTest extends AbstractMavenSWTBotTest{
 		shell.button("Next >").click();
 		Thread.sleep(2000);
 		shell.comboBox().setSelection(catalog);
-		Thread.sleep(1000);
+		Thread.sleep(2000);
 		int index = botExt.table(0).indexOf(projectType, "Artifact Id");
 		if (index == -1) {
 			fail(projectType + " not found");
