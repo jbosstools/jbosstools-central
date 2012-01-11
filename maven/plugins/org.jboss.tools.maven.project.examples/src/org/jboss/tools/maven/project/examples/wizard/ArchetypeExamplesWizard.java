@@ -175,7 +175,9 @@ public class ArchetypeExamplesWizard extends Wizard implements INewWizard {
 			@Override
 			public void modifyText(ModifyEvent e) {
 				wizardPage.setArtifactId(simplePage.getProjectName());
-				ArchetypeExamplesWizard.this.getContainer().updateButtons();
+				if (ArchetypeExamplesWizard.this.getContainer().getCurrentPage() != null) {
+					ArchetypeExamplesWizard.this.getContainer().updateButtons();
+				}
 			}
 		});
 
@@ -185,7 +187,9 @@ public class ArchetypeExamplesWizard extends Wizard implements INewWizard {
 			public void modifyText(ModifyEvent e) {
 				String packageName = ((Combo)e.getSource()).getText();
 				wizardPage.setPackageName(packageName);
-				ArchetypeExamplesWizard.this.getContainer().updateButtons();
+				if (ArchetypeExamplesWizard.this.getContainer().getCurrentPage() != null) {
+					ArchetypeExamplesWizard.this.getContainer().updateButtons();
+				}
 			}
 		});
 

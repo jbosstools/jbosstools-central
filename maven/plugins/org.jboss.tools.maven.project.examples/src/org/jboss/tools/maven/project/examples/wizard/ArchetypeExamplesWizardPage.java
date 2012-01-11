@@ -77,10 +77,7 @@ public class ArchetypeExamplesWizardPage extends
 		Archetype archetype = new Archetype();
 		ArchetypeModel archetypeModel = projectDescription.getArchetypeModel();
 
-		final String groupId = archetypeModel.getGroupId();
-		final String artifactId = archetypeModel.getArtifactId();
 		final String version = archetypeModel.getVersion();
-		final String javaPackage = archetypeModel.getJavaPackage();
 
 		archetype.setGroupId(archetypeModel.getArchetypeGroupId());
 		archetype.setArtifactId(archetypeModel.getArchetypeArtifactId());
@@ -111,19 +108,6 @@ public class ArchetypeExamplesWizardPage extends
 		// when setVisible() is called in MavenProjectWizardArchetypeParametersPage.
 		// It needs to be called AFTER setArchetype(archetype) !!! 
 		archetypeChanged = false;
-		
-		//Check if project already exists
-	    IStatus nameStatus = getImportConfiguration().validateProjectName(getModel());
-	    if(nameStatus.isOK()) {
-			artifactIdCombo.setText(artifactId);
-	    } else {
-	    	//Force the user to change the name if the project exists
-	    	artifactIdCombo.setText("");//$NON-NLS-1$
-	    }
-	    
-		groupIdCombo.setText(groupId);
-		versionCombo.setText(version);
-		packageCombo.setText(javaPackage);
 		
 		resolverConfigurationComponent.setExpanded(!resolverConfigurationComponent.getResolverConfiguration().getActiveProfileList().isEmpty());
 	}

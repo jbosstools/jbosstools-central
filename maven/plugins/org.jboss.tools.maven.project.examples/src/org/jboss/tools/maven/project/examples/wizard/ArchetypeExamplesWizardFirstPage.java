@@ -19,6 +19,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.regex.Pattern;
 
+import org.codehaus.plexus.util.StringUtils;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IWorkspace;
@@ -124,7 +125,7 @@ public class ArchetypeExamplesWizardFirstPage extends MavenProjectWizardLocation
 		if (packageNameModifyListener != null) {
 			packageCombo.addModifyListener(packageNameModifyListener);
 		}
-		
+
 		//TODO read facet version from project example metadata
 		IProjectFacetVersion facetVersion;
 		try {
@@ -260,9 +261,33 @@ public class ArchetypeExamplesWizardFirstPage extends MavenProjectWizardLocation
 	public void setVisible(boolean visible) {
 		super.setVisible(visible);
 
-		if (visible) {
+		if (visible && !initialized) {
+			//Set defaults values from history here as the history is loaded in super.visible()
+			initDefaultValues();
 			initialized = true;
-			// validate();
+			validate();
+		}
+	}
+
+
+	private void initDefaultValues() {
+		//JBIDE-10411 : provide sensible defaults for project name and package
+		String projectName = projectDescription.getArchetypeModel().getArtifactId();
+		if (StringUtils.isNotBlank(projectName)) {
+			IProject p = ResourcesPlugin.getWorkspace().getRoot().getProject(projectName);
+			if (!p.exists()) {
+				projectNameCombo.setText(projectName);
+			}
+		}
+		
+		String packageName = null;
+		if (packageCombo.getItemCount() > 0) {
+			packageName = packageCombo.getItem(0);
+		} else {
+			packageName = projectDescription.getArchetypeModel().getJavaPackage();
+		}
+		if (packageName != null) {
+			packageCombo.setText(packageName);
 		}
 	}
 
