@@ -174,6 +174,23 @@ public class ImportMavenProjectExample extends AbstractImportProjectExample {
 					return projectNames;
 				}
 			}
+			List<String> includedProjects = projectDescription
+					.getIncludedProjects();
+			if (includedProjects != null && includedProjects.size() > 0) {
+				List<MavenProjectInfo> newInfos = new ArrayList<MavenProjectInfo>();
+				for (MavenProjectInfo info : infos) {
+					Model model = info.getModel();
+					if (model != null && model.getArtifactId() != null
+							&& model.getArtifactId().trim().length() > 0) {
+						for (String includedProject : includedProjects) {
+							if (model.getArtifactId().equals(includedProject)) {
+								newInfos.add(info);
+							}
+						}
+					}
+				}
+				infos = newInfos;
+			}
 			MavenPlugin.getProjectConfigurationManager().importProjects(infos,
 					importConfiguration, monitor);
 			for (MavenProjectInfo info : infos) {
