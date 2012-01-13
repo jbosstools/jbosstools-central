@@ -12,7 +12,7 @@
 	<name>central.tests</name>
 	<packaging>pom</packaging>
 	<modules>
-		<!-- TODO: add test modules here -->
+		<module>org.jboss.tools.central.test</module>
 	</modules>
 </project>
 	

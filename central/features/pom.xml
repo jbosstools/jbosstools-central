@@ -16,6 +16,7 @@
 		<module>org.jboss.tools.central.feature</module>
 		<module>org.jboss.tools.central.discovery.feature</module>
 		<module>org.jboss.tools.community.central.feature</module>
+		<module>org.jboss.tools.central.test.feature</module>
 	</modules>
 </project>
 	
