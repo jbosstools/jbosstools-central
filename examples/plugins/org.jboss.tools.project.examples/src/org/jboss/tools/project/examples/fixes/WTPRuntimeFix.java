@@ -271,17 +271,17 @@ public class WTPRuntimeFix implements ProjectExamplesFix {
 					return null;
 				}
 			}
-			if (ESB.equals(component)) {
+			else if (ESB.equals(component)) {
 				if (!isEsbPresent(location, runtime)) {
 					return null;
 				}
 			}
-			if (BPEL.equals(component)) {
+			else if (BPEL.equals(component)) {
 				if (!isBpelPresent(location, runtime)) {
 					return null;
 				}
 			}
-			if (TEIID.equals(component)) {
+			else if (TEIID.equals(component)) {
 				if (!isTeiidPresent(location, runtime)) {
 					return null;
 				}
