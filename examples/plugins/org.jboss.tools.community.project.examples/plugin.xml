@@ -33,8 +33,7 @@
   <extension
         point="org.jboss.tools.project.examples.projectExamplesXml"
         name="%JBoss_Tools_33_Community_Maven_Examples">
-        <!-- TODO : rename to project-examples-maven-3.3.xml once M5 is out the door -->
-        <url>http://download.jboss.org/jbosstools/examples/project-examples-maven-3.3.M5.xml</url>
+        <url>http://download.jboss.org/jbosstools/examples/project-examples-maven-3.3.xml</url>
         <experimental>false</experimental>
   </extension>
 </plugin>

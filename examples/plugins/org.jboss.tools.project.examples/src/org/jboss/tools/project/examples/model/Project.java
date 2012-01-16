@@ -14,7 +14,9 @@ import java.io.File;
 import java.math.BigDecimal;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.jboss.tools.project.examples.ProjectExamplesActivator;
 
@@ -45,6 +47,7 @@ public class Project implements ProjectModelElement {
 	private File file;
 	private IProjectExampleSite site;
 	private String defaultProfiles =""; //$NON-NLS-1$
+  private Set<String> tags;
 	
 	public Project() {
 		name=""; //$NON-NLS-1$
@@ -265,4 +268,16 @@ public class Project implements ProjectModelElement {
 	public String toString() {
 		return getName();
 	}
+
+  public void setTags(Set<String> tags) {
+    this.tags = tags;
+  }
+  
+  public Set<String> setTags() {
+    if (tags == null) {
+      tags = new HashSet<String>();
+    }
+    return tags;
+  }
+  
 }

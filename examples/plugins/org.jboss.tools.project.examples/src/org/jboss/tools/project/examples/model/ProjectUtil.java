@@ -353,6 +353,9 @@ public class ProjectUtil {
 								else if (nodeName.equals("mavenArchetype")) {  //$NON-NLS-1$
 									parseMavenArchetype(project, child);
 								}
+                else if (nodeName.equals("tags")) {  //$NON-NLS-1$
+                  parseTags(project, child);
+                }
 							}
 						}
 					}
@@ -365,7 +368,22 @@ public class ProjectUtil {
 		return list;
 	}
 
-	private static void parseFixes(Project project, Element node) {
+	private static void parseTags(Project project, Element tagElement) {
+    String tagsValue = tagElement.getTextContent();
+    if (tagsValue != null) {
+      StringTokenizer tokenizer = new StringTokenizer(tagsValue.trim(), ",");//$NON-NLS-1$
+      Set<String> tags = new HashSet<String>();
+      while (tokenizer.hasMoreTokens()) {
+        String tag = tokenizer.nextToken().trim();
+        if (tag.length() > 0) {
+          tags.add(tag);
+        }
+      }
+      project.setTags(tags);
+    }
+  }
+
+  private static void parseFixes(Project project, Element node) {
 		NodeList children = node.getChildNodes();
 		int cLen = children.getLength();
 		for (int i = 0; i < cLen; i++) {
@@ -392,28 +410,28 @@ public class ProjectUtil {
 				if (nodeName.equals("archetypeGroupId")) { //$NON-NLS-1$
 					archetypeModel.setArchetypeGroupId(getContent(child));
 				}
-				if (nodeName.equals("archetypeArtifactId")) { //$NON-NLS-1$
+				else if (nodeName.equals("archetypeArtifactId")) { //$NON-NLS-1$
 					archetypeModel.setArchetypeArtifactId(getContent(child));
 				}
-				if (nodeName.equals("archetypeVersion")) { //$NON-NLS-1$
+				else if (nodeName.equals("archetypeVersion")) { //$NON-NLS-1$
 					archetypeModel.setArchetypeVersion(getContent(child));
 				}
-				if (nodeName.equals("archetypeRepository")) { //$NON-NLS-1$
+				else if (nodeName.equals("archetypeRepository")) { //$NON-NLS-1$
 					archetypeModel.setArchetypeRepository(getContent(child));
 				}
-				if (nodeName.equals("groupId")) { //$NON-NLS-1$
+				else if (nodeName.equals("groupId")) { //$NON-NLS-1$
 					archetypeModel.setGroupId(getContent(child));
 				}
-				if (nodeName.equals("artifactId")) { //$NON-NLS-1$
+				else if (nodeName.equals("artifactId")) { //$NON-NLS-1$
 					archetypeModel.setArtifactId(getContent(child));
 				}
-				if (nodeName.equals("version")) { //$NON-NLS-1$
+				else if (nodeName.equals("version")) { //$NON-NLS-1$
 					archetypeModel.setVersion(getContent(child));
 				}
-				if (nodeName.equals("javaPackage")) { //$NON-NLS-1$
+				else if (nodeName.equals("javaPackage")) { //$NON-NLS-1$
 					archetypeModel.setJavaPackage(getContent(child));
 				}
-				if (nodeName.equals("properties")) { //$NON-NLS-1$
+				else if (nodeName.equals("properties")) { //$NON-NLS-1$
 					parseProperties(project, child);
 				}
 			}
