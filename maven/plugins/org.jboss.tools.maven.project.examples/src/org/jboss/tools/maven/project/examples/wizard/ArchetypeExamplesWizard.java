@@ -28,6 +28,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
+import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.m2e.core.MavenPlugin;
@@ -44,6 +45,7 @@ import org.eclipse.ui.INewWizard;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkingSet;
 import org.jboss.tools.maven.project.examples.MavenProjectExamplesActivator;
+import org.jboss.tools.maven.ui.Activator;
 import org.jboss.tools.project.examples.ProjectExamplesActivator;
 import org.jboss.tools.project.examples.model.Project;
 
@@ -61,8 +63,9 @@ public class ArchetypeExamplesWizard extends Wizard implements INewWizard {
 	protected List<IWorkingSet> workingSets = new ArrayList<IWorkingSet>();
 	private String projectName;
 	private String artifactId;
+	private IPath locationPath;
 
-	public ArchetypeExamplesWizard(File location, Project projectDescription) {
+	public ArchetypeExamplesWizard(Project projectDescription) {
 		super();
 		setWindowTitle("New JBoss Project");
 		setDefaultPageImageDescriptor(MavenProjectExamplesActivator.getNewWizardImageDescriptor());
@@ -87,6 +90,7 @@ public class ArchetypeExamplesWizard extends Wizard implements INewWizard {
 		final String javaPackage = wizardPage.getJavaPackage();
 		final Properties properties = wizardPage.getProperties();
 		final Archetype archetype = wizardPage.getArchetype();
+		locationPath = simplePage.getLocationPath();
 		projectName = configuration.getProjectName(model);
 		final IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject(projectName);
 		final IPath location = simplePage.getLocationPath();
@@ -124,7 +128,25 @@ public class ArchetypeExamplesWizard extends Wizard implements INewWizard {
 			}
 		};
 
+		IPreferenceStore store = Activator.getDefault().getPreferenceStore();
+		boolean configureSeam = store.getBoolean(Activator.CONFIGURE_SEAM);
+		boolean configureJSF = store.getBoolean(Activator.CONFIGURE_JSF);
+		boolean configurePortlet = store.getBoolean(Activator.CONFIGURE_PORTLET);
+		boolean configureJSFPortlet = store.getBoolean(Activator.CONFIGURE_JSFPORTLET);
+		boolean configureSeamPortlet = store.getBoolean(Activator.CONFIGURE_SEAMPORTLET);
+		boolean configureCDI = store.getBoolean(Activator.CONFIGURE_CDI);
+		boolean configureHibernate = store.getBoolean(Activator.CONFIGURE_HIBERNATE);
+		boolean configureJaxRs = store.getBoolean(Activator.CONFIGURE_JAXRS);
+		
 		try {
+			store.setValue(Activator.CONFIGURE_SEAM, false);
+			store.setValue(Activator.CONFIGURE_JSF, false);
+			store.setValue(Activator.CONFIGURE_PORTLET, false);
+			store.setValue(Activator.CONFIGURE_JSFPORTLET, false);
+			store.setValue(Activator.CONFIGURE_SEAMPORTLET, false);
+			store.setValue(Activator.CONFIGURE_CDI, false);
+			store.setValue(Activator.CONFIGURE_HIBERNATE, false);
+			store.setValue(Activator.CONFIGURE_JAXRS, false);
 			getContainer().run(true, false, op);
 		} catch (InterruptedException e) {
 			ProjectExamplesActivator.log(e);
@@ -139,6 +161,15 @@ public class ArchetypeExamplesWizard extends Wizard implements INewWizard {
 			}
 			MessageDialog.openError(getShell(), "Error", message);
 			return true;
+		} finally {
+			store.setValue(Activator.CONFIGURE_SEAM, configureSeam);
+			store.setValue(Activator.CONFIGURE_JSF, configureJSF);
+			store.setValue(Activator.CONFIGURE_PORTLET, configurePortlet);
+			store.setValue(Activator.CONFIGURE_JSFPORTLET, configureJSFPortlet);
+			store.setValue(Activator.CONFIGURE_SEAMPORTLET, configureSeamPortlet);
+			store.setValue(Activator.CONFIGURE_CDI, configureCDI);
+			store.setValue(Activator.CONFIGURE_HIBERNATE, configureHibernate);
+			store.setValue(Activator.CONFIGURE_JAXRS, configureJaxRs);
 		}
 
 		return true;
@@ -215,5 +246,9 @@ public class ArchetypeExamplesWizard extends Wizard implements INewWizard {
 	public void createPageControls(Composite pageContainer) {
 		super.createPageControls(pageContainer);
 	    simplePage.setUseDefaultWorkspaceLocation(ProjectExamplesActivator.getDefault().getPreferenceStore().getBoolean(ProjectExamplesActivator.PROJECT_EXAMPLES_DEFAULT));
+	}
+	
+	public IPath getLocationPath() {
+		return locationPath;
 	}
 }

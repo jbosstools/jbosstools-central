@@ -79,7 +79,7 @@ public class Activator extends AbstractUIPlugin {
 	
 	public static final boolean CONFIGURE_HIBERNATE_VALUE = true;
 
-	public static final String CONFIGURE_JAXRS = "configureJAX-RS";
+	public static final String CONFIGURE_JAXRS = "configureJAX-RS"; //$NON-NLS-1$
 
 	public static final boolean CONFIGURE_JAXRS_VALUE = true;
 	// The shared instance

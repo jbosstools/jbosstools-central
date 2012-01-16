@@ -47,8 +47,8 @@ public class ImportMavenArchetypeProjectExample extends
 			final IProgressMonitor monitor) throws Exception {
 		List<Project> projects = new ArrayList<Project>();
 		projects.add(projectDescription);
-		final IPath location = getLocation();
-		final File destination = new File(location.toOSString());
+		//IPath location = getLocation();
+		//final File destination = new File(location.toOSString());
 
 		final boolean[] ret = new boolean[1];
 		ret[0] = true;
@@ -56,7 +56,7 @@ public class ImportMavenArchetypeProjectExample extends
 
 			@Override
 			public void run() {
-				ArchetypeExamplesWizard wizard = new ArchetypeExamplesWizard(destination, projectDescription);
+				ArchetypeExamplesWizard wizard = new ArchetypeExamplesWizard(projectDescription);
 				WizardDialog wizardDialog = new WizardDialog(getActiveShell(), wizard);
 				int ok = wizardDialog.open();
 				if (ok != Window.OK) {
@@ -72,6 +72,7 @@ public class ImportMavenArchetypeProjectExample extends
 				String projectName = wizard.getProjectName();
 				includedProjects.add(projectName);
 				String artifactId = wizard.getArtifactId();
+				IPath location = wizard.getLocationPath();
 				String projectFolder = location.append(artifactId).toFile()
 						.getAbsolutePath();
 				MavenModelManager mavenModelManager = MavenPlugin
