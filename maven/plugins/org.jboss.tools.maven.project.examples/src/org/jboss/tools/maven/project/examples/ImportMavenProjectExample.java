@@ -23,6 +23,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.embedder.MavenModelManager;
 import org.eclipse.m2e.core.project.AbstractProjectScanner;
@@ -32,6 +33,7 @@ import org.eclipse.m2e.core.project.ProjectImportConfiguration;
 import org.eclipse.m2e.core.ui.internal.actions.OpenMavenConsoleAction;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
+import org.jboss.tools.maven.ui.Activator;
 import org.jboss.tools.project.examples.ProjectExamplesActivator;
 import org.jboss.tools.project.examples.model.AbstractImportProjectExample;
 import org.jboss.tools.project.examples.model.Project;
@@ -113,8 +115,36 @@ public class ImportMavenProjectExample extends AbstractImportProjectExample {
 			});
 			return false;
 		}
-		
-		List<String> projectNames = importMavenProjects(destination, projectDescription, monitor);
+		IPreferenceStore store = Activator.getDefault().getPreferenceStore();
+		boolean configureSeam = store.getBoolean(Activator.CONFIGURE_SEAM);
+		boolean configureJSF = store.getBoolean(Activator.CONFIGURE_JSF);
+		boolean configurePortlet = store.getBoolean(Activator.CONFIGURE_PORTLET);
+		boolean configureJSFPortlet = store.getBoolean(Activator.CONFIGURE_JSFPORTLET);
+		boolean configureSeamPortlet = store.getBoolean(Activator.CONFIGURE_SEAMPORTLET);
+		boolean configureCDI = store.getBoolean(Activator.CONFIGURE_CDI);
+		boolean configureHibernate = store.getBoolean(Activator.CONFIGURE_HIBERNATE);
+		boolean configureJaxRs = store.getBoolean(Activator.CONFIGURE_JAXRS);
+		List<String> projectNames;
+		try {
+			store.setValue(Activator.CONFIGURE_SEAM, false);
+			store.setValue(Activator.CONFIGURE_JSF, false);
+			store.setValue(Activator.CONFIGURE_PORTLET, false);
+			store.setValue(Activator.CONFIGURE_JSFPORTLET, false);
+			store.setValue(Activator.CONFIGURE_SEAMPORTLET, false);
+			store.setValue(Activator.CONFIGURE_CDI, false);
+			store.setValue(Activator.CONFIGURE_HIBERNATE, false);
+			store.setValue(Activator.CONFIGURE_JAXRS, false);
+			projectNames = importMavenProjects(destination, projectDescription, monitor);
+		} finally {
+			store.setValue(Activator.CONFIGURE_SEAM, configureSeam);
+			store.setValue(Activator.CONFIGURE_JSF, configureJSF);
+			store.setValue(Activator.CONFIGURE_PORTLET, configurePortlet);
+			store.setValue(Activator.CONFIGURE_JSFPORTLET, configureJSFPortlet);
+			store.setValue(Activator.CONFIGURE_SEAMPORTLET, configureSeamPortlet);
+			store.setValue(Activator.CONFIGURE_CDI, configureCDI);
+			store.setValue(Activator.CONFIGURE_HIBERNATE, configureHibernate);
+			store.setValue(Activator.CONFIGURE_JAXRS, configureJaxRs);
+		}
 		new OpenMavenConsoleAction().run();
 		List<String> includedProjects = projectDescription.getIncludedProjects();
 		includedProjects.clear();
