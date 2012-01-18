@@ -10,7 +10,6 @@
  ************************************************************************************/
 package org.jboss.tools.maven.project.examples.wizard;
 
-import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
