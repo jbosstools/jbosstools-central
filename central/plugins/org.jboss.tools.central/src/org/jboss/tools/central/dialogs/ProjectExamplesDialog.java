@@ -12,6 +12,7 @@ package org.jboss.tools.central.dialogs;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -62,7 +63,6 @@ import org.eclipse.ui.handlers.IHandlerService;
 import org.jboss.tools.central.JBossCentralActivator;
 import org.jboss.tools.central.actions.JBossRuntimeDetectionPreferencesHandler;
 import org.jboss.tools.central.editors.DescriptionToolTip;
-import org.jboss.tools.central.model.Tutorial;
 import org.jboss.tools.project.examples.ProjectExamplesActivator;
 import org.jboss.tools.project.examples.model.Project;
 import org.jboss.tools.project.examples.model.ProjectFix;
@@ -76,7 +76,7 @@ import org.jboss.tools.runtime.ui.actions.DownloadRuntimeAction;
  */
 public class ProjectExamplesDialog extends FormDialog implements IRunnableContext {
 	
-	private Tutorial tutorial;
+	private Project tutorial;
 	private FormToolkit toolkit;
 	private ScrolledForm form;
 	private Composite fixesComposite;
@@ -85,11 +85,11 @@ public class ProjectExamplesDialog extends FormDialog implements IRunnableContex
 	private Control fLastControl;
 	private Set<Button> controls = new HashSet<Button>();
 	
-	public ProjectExamplesDialog(Shell parentShell, Tutorial tutorial) {
+	public ProjectExamplesDialog(Shell parentShell, Project project) {
 		super(parentShell);
 		setShellStyle(SWT.CLOSE | SWT.MAX | SWT.TITLE | SWT.BORDER
 				| SWT.RESIZE | getDefaultOrientation());
-		this.tutorial = tutorial;
+		this.tutorial = project;
 		//setHelpAvailable(false);
 	}
 
@@ -100,7 +100,7 @@ public class ProjectExamplesDialog extends FormDialog implements IRunnableContex
 		toolkit = mform.getToolkit();
 		toolkit.getHyperlinkGroup().setHyperlinkUnderlineMode(HyperlinkSettings.UNDERLINE_HOVER);
 		form.getBody().setLayout(new GridLayout());
-		form.setText(tutorial.getName());
+		form.setText(tutorial.getShortDescription());
 		Section descSection = toolkit.createSection(form.getBody(), ExpandableComposite.TITLE_BAR|ExpandableComposite.EXPANDED);
 		descSection.setText("Description");
 	    descSection.setLayout(new GridLayout());
@@ -140,16 +140,15 @@ public class ProjectExamplesDialog extends FormDialog implements IRunnableContex
 		controls.clear();
 		addButtons();
 		
-		Project project = tutorial.getProjectExamples();
-		List<ProjectFix> fixes = project.getFixes();
+		List<ProjectFix> fixes = tutorial.getFixes();
 		List<ProjectFix> unsatisfiedFixes = new ArrayList<ProjectFix>();
-		project.setUnsatisfiedFixes(unsatisfiedFixes);
+		tutorial.setUnsatisfiedFixes(unsatisfiedFixes);
 		for (ProjectFix fix:fixes) {
-			if (!ProjectExamplesActivator.canFix(project, fix)) {
+			if (!ProjectExamplesActivator.canFix(tutorial, fix)) {
 				unsatisfiedFixes.add(fix);
 			}
 		}
-		fixes = project.getUnsatisfiedFixes();
+		fixes = tutorial.getUnsatisfiedFixes();
 		disposeChildren(fixesComposite);
 		reqSection.setVisible(fixes.size() > 0);
 		if (fixes.size() > 0) {
@@ -511,9 +510,7 @@ public class ProjectExamplesDialog extends FormDialog implements IRunnableContex
 	@Override
 	protected void okPressed() {
 		super.okPressed();
-		List<Project> selectedProjects = new ArrayList<Project>();
-		selectedProjects.add(tutorial.getProjectExamples());
-		ProjectExamplesActivator.importProjectExamples(selectedProjects, true);
+		ProjectExamplesActivator.importProjectExamples(Arrays.asList(tutorial), true);
 	}	
 	
 }

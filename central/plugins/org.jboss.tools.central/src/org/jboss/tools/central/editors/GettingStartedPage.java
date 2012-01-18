@@ -99,11 +99,8 @@ import org.jboss.tools.central.jobs.RefreshBlogsJob;
 import org.jboss.tools.central.jobs.RefreshNewsJob;
 import org.jboss.tools.central.jobs.RefreshTutorialsJob;
 import org.jboss.tools.central.model.FeedsEntry;
-import org.jboss.tools.central.model.Tutorial;
-import org.jboss.tools.central.model.TutorialCategory;
-import org.jboss.tools.project.examples.ProjectExamplesActivator;
+import org.jboss.tools.project.examples.model.Category;
 import org.jboss.tools.project.examples.model.Project;
-import org.jboss.tools.project.examples.model.ProjectFix;
 import org.osgi.framework.Bundle;
 
 /**
@@ -113,7 +110,6 @@ import org.osgi.framework.Bundle;
  */
 public class GettingStartedPage extends AbstractJBossCentralPage {
 
-	private static final String ORG_JBOSS_TOOLS_CENTRAL_JAVAEE6_QUICKSTART = "org.jboss.tools.central.javaee6.quickstart";
 	private static final String NEWS_WARNING_ID = "org.jboss.tools.central.newsWarning";
 	private static final String BLOGS_WARNING_ID = "org.jboss.tools.central.blogsWarning";
 	
@@ -145,7 +141,7 @@ public class GettingStartedPage extends AbstractJBossCentralPage {
 	private Composite projectsComposite;
 	private Composite documentationComposite;
 	
-	private Set<TutorialCategory> expandedCategories = new HashSet<TutorialCategory>();
+	private Set<Category> expandedCategories = new HashSet<Category>();
 	private Section newsSection;
 	private ScrolledComposite newsScrollComposite;
 	private PageBook newsPageBook;
@@ -656,13 +652,8 @@ public class GettingStartedPage extends AbstractJBossCentralPage {
 		}
 	}
 
-	private void displayTutorialLinks(final TutorialCategory category, final Composite composite, boolean addTooltips) {
-		for (final Tutorial tutorial:category.getTutorials()) {
-			Project project = tutorial.getProjectExamples();
-			if (project == null) {
-				continue;
-			}
-			
+	private void displayTutorialLinks(final Collection<Project> tutorials, final Composite composite, boolean addTooltips) {
+		for (final Project tutorial : tutorials) {
 			FormText tutorialText = toolkit.createFormText(composite, true);
 			configureTutorialText(tutorialText, tutorial);
 			if (addTooltips) {
@@ -879,7 +870,7 @@ public class GettingStartedPage extends AbstractJBossCentralPage {
 			showException(tutorialPageBook, tutorialsExceptionText, job.getException());
 			return;
 		}
-		Map<String, TutorialCategory> categories = job.getTutorialCategories();
+		Map<Category, List<Project>> categories = job.getTutorialCategories();
 		if (categories == null || categories.size() == 0) {
 			showNote(tutorialPageBook, tutorialsNoteText, tutorialScrollComposite);
 			return;
@@ -889,26 +880,21 @@ public class GettingStartedPage extends AbstractJBossCentralPage {
 
 	@Deprecated
 	//This method should be removed once the EE6 archetypes are wizardified
-	private void updateNewProjects(TutorialCategory tutorialCategory) {
+	private void updateNewProjects(List<Project> wizardProjects) {
 		if (!newProjectsInitialized) {
-			if (tutorialCategory != null) {
+			if (wizardProjects != null) {
 				newProjectsInitialized = true;
-				displayTutorialLinks(tutorialCategory, projectsComposite, false);
+				displayTutorialLinks(wizardProjects, projectsComposite, false);
 				resize(true);
 			}
 		}
 	}
 
-	private void showTutorials(Map<String, TutorialCategory> categories) {
+	private void showTutorials(Map<Category, List<Project>> categories) {
 		disposeChildren(tutorialsComposite);
-		List<TutorialCategory> sortedCategories = getSortedCategories(categories);
-		for (final TutorialCategory category:sortedCategories) {
-			//TEMPORARY HACK FOR JBIDE-10053 (Java EE6 archetypes in the project section)
-			//Should be removed once these archetype tutorials are changed to use wizards as per JBIDE-10264  
-			if (ORG_JBOSS_TOOLS_CENTRAL_JAVAEE6_QUICKSTART.equals(category.getId())) {
-				//bail
-				continue;
-			}
+		List<Category> sortedCategories = new ArrayList<Category>(categories.keySet()); 
+		Collections.sort(sortedCategories);
+		for (final Category category : sortedCategories) {
 			int style = ExpandableComposite.TITLE_BAR|ExpandableComposite.TWISTIE;
 			if (expandedCategories.contains(category)) {
 				style|=ExpandableComposite.EXPANDED;
@@ -941,7 +927,7 @@ public class GettingStartedPage extends AbstractJBossCentralPage {
 				}
 			});
 
-			displayTutorialLinks(category, composite, true);
+			displayTutorialLinks(categories.get(category), composite, true);
 			categoryComposite.setClient(composite);
 			String description = category.getDescription();
 			if (description != null && !description.isEmpty() && categoryComposite.getControl() != null) {
@@ -958,16 +944,7 @@ public class GettingStartedPage extends AbstractJBossCentralPage {
 		//recomputeScrollComposite(tutorialScrollComposite, tutorialPageBook);
 	}
 
-	private List<TutorialCategory> getSortedCategories(
-			Map<String, TutorialCategory> categories) {
-		Collection<TutorialCategory> tempCategories = categories.values();
-		List<TutorialCategory> sortedCategories = new ArrayList<TutorialCategory>();
-		sortedCategories.addAll(tempCategories);
-		Collections.sort(sortedCategories);
-		return sortedCategories;
-	}
-
-	private Font getBoldFont(Font font) {
+  private Font getBoldFont(Font font) {
 		if (categoryFont != null) {
 			return categoryFont;
 		}
@@ -979,7 +956,7 @@ public class GettingStartedPage extends AbstractJBossCentralPage {
 		return categoryFont;
 	}
 
-	private void hookTooltip(FormText tutorialText, Tutorial tutorial) {
+	private void hookTooltip(FormText tutorialText, Project tutorial) {
 		final String description = JBossCentralActivator.getDefault().getDescription(tutorial);
 		if (description != null && !description.isEmpty()) {
 			ToolTip toolTip = new DescriptionToolTip(tutorialText, description);
@@ -987,33 +964,26 @@ public class GettingStartedPage extends AbstractJBossCentralPage {
 		}
 	}
 
-	protected void configureTutorialText(FormText tutorialText, final Tutorial tutorial) {
+	protected void configureTutorialText(FormText tutorialText, final Project tutorial) {
 		StringBuilder buffer = new StringBuilder();
 		buffer.append(JBossCentralActivator.FORM_START_TAG);
 		buffer.append("<img href=\"image\"/> ");
 		buffer.append("<a href=\"link\">");
-		buffer.append(tutorial.getName());
+		buffer.append(tutorial.getShortDescription());
 		buffer.append("</a> ");
 		buffer.append(JBossCentralActivator.FORM_END_TAG);
 
-		String text = buffer.toString();
-		tutorialText.setText(text , true, false);
-		Image image;
-		Project project = tutorial.getProjectExamples();
-		List<ProjectFix> fixes = project.getFixes();
-		List<ProjectFix> unsatisfiedFixes = new ArrayList<ProjectFix>();
-		project.setUnsatisfiedFixes(unsatisfiedFixes);
-		for (ProjectFix fix:fixes) {
-			if (!ProjectExamplesActivator.canFix(project, fix)) {
-				unsatisfiedFixes.add(fix);
-			}
+		tutorialText.setText(buffer.toString() , true, false);
+		
+		String iconPath = tutorial.getIconPath();
+		if (iconPath != null) {
+		  Image image = JBossCentralActivator.getDefault().getImage(tutorial.getIconPath());
+		  if (image != null) {
+		    tutorialText.setImage("image", image);
+		  }
 		}
 		
-		//JBIDE-10303 : never display a warning image
-		image = JBossCentralActivator.getDefault().getImage(tutorial.getIconPath());
-		tutorialText.setImage("image", image);
 		tutorialText.addHyperlinkListener(new HyperlinkAdapter() {
-
 			@Override
 			public void linkActivated(HyperlinkEvent e) {
 				Object object = e.data;
@@ -1288,9 +1258,9 @@ public class GettingStartedPage extends AbstractJBossCentralPage {
 					//TEMPORARY HACK FOR JBIDE-10053 (Java EE6 archetypes in the project section)
 					//Should be removed once these archetype tutorials are changed to use wizards as per JBIDE-10264  
 					RefreshTutorialsJob job = RefreshTutorialsJob.INSTANCE;
-					Map<String, TutorialCategory> categories = job.getTutorialCategories();
-					if (categories != null){
-						updateNewProjects(categories.get(ORG_JBOSS_TOOLS_CENTRAL_JAVAEE6_QUICKSTART));						
+					List<Project> wizardProjects = job.getWizardProjects();
+					if (wizardProjects != null){
+						updateNewProjects(wizardProjects);						
 					}
 				}
 			});

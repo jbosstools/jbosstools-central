@@ -12,9 +12,7 @@ package org.jboss.tools.central;
 
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.Dictionary;
-import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
@@ -59,8 +57,7 @@ import org.jboss.tools.central.configurators.DefaultJBossCentralConfigurator;
 import org.jboss.tools.central.configurators.IJBossCentralConfigurator;
 import org.jboss.tools.central.editors.JBossCentralEditor;
 import org.jboss.tools.central.editors.JBossCentralEditorInput;
-import org.jboss.tools.central.model.Tutorial;
-import org.jboss.tools.central.model.TutorialCategory;
+import org.jboss.tools.project.examples.model.Category;
 import org.jboss.tools.project.examples.model.Project;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
@@ -133,9 +130,9 @@ public class JBossCentralActivator extends AbstractUIPlugin {
 
 	public static final String SEARCH_RED_HAT_CUSTOMER_PORTAL = "Search Red Hat Customer Portal ";
 
-	public Map<String, TutorialCategory> tutorialCategories;
-
 	private BundleContext bundleContext;
+
+  private Map<Category, List<Project>> tutorialCategories;
 
 	public static final int MAX_FEEDS = 100;
 
@@ -180,7 +177,6 @@ public class JBossCentralActivator extends AbstractUIPlugin {
 		
 		plugin = null;
 		bundleContext = null;
-		tutorialCategories = null;
 		super.stop(context);
 	}
 
@@ -405,92 +401,6 @@ public class JBossCentralActivator extends AbstractUIPlugin {
 		return configurator;
 	}
 
-	public Map<String, TutorialCategory> getTutorialCategories() {
-		if (tutorialCategories == null) {
-			tutorialCategories = new HashMap<String, TutorialCategory>();
-			IExtensionRegistry registry = Platform.getExtensionRegistry();
-			IExtensionPoint extensionPoint = registry
-					.getExtensionPoint(TUTORIALS_EXTENSION_ID);
-			IExtension[] extensions = extensionPoint.getExtensions();
-			for (int i = 0; i < extensions.length; i++) {
-				IExtension extension = extensions[i];
-				IConfigurationElement[] configurationElements = extension
-						.getConfigurationElements();
-				for (int j = 0; j < configurationElements.length; j++) {
-					IConfigurationElement configurationElement = configurationElements[j];
-					if (CATEGORY.equals(configurationElement.getName())) {
-						String name = configurationElement.getAttribute(NAME);
-						String id = configurationElement.getAttribute(ID);
-						String description = configurationElement
-								.getAttribute(DESCRIPTION);
-						String priorityString = configurationElement
-								.getAttribute(PRIORITY);
-						int priority = Integer.MAX_VALUE;
-						if (priorityString != null) {
-							try {
-								priority = new Integer(priorityString)
-										.intValue();
-							} catch (NumberFormatException e) {
-								log(e);
-							}
-						}
-						TutorialCategory category = new TutorialCategory(id,
-								name, priority, description);
-						tutorialCategories.put(id, category);
-					}
-				}
-				for (int j = 0; j < configurationElements.length; j++) {
-					IConfigurationElement configurationElement = configurationElements[j];
-					if (TUTORIAL.equals(configurationElement.getName())) {
-						String name = configurationElement.getAttribute(NAME);
-						String id = configurationElement.getAttribute(ID);
-						String type = configurationElement.getAttribute(TYPE);
-						String reference = configurationElement
-								.getAttribute(REFERENCE);
-						String priorityString = configurationElement
-								.getAttribute(PRIORITY);
-						String description = configurationElement
-								.getAttribute(DESCRIPTION);
-						String iconPath = configurationElement
-								.getAttribute(ICON);
-						int priority = Integer.MAX_VALUE;
-						if (priorityString != null) {
-							try {
-								priority = new Integer(priorityString)
-										.intValue();
-							} catch (NumberFormatException e) {
-								log(e);
-							}
-						}
-						String categoryId = configurationElement
-								.getAttribute(CATEGORY_ID);
-						TutorialCategory category = tutorialCategories
-								.get(categoryId);
-						if (category == null) {
-							log("Invalid tutorial: id=" + id);
-							continue;
-						}
-						Tutorial tutorial = new Tutorial(id, name, type,
-								reference, priority, category, description,
-								iconPath);
-						category.getTutorials().add(tutorial);
-					}
-				}
-			}
-			List<TutorialCategory> emptyCategories = new ArrayList<TutorialCategory>();
-			for (TutorialCategory category : tutorialCategories.values()) {
-				if (category.getTutorials().size() == 0) {
-					emptyCategories.add(category);
-				}
-			}
-			for (TutorialCategory category : emptyCategories) {
-				tutorialCategories.remove(category.getId());
-			}
-		}
-
-		return tutorialCategories;
-	}
-
 	public Image getImage(String imagePath) {
 		ImageRegistry registry = getImageRegistry();
 		Image image = registry.get(imagePath);
@@ -503,23 +413,15 @@ public class JBossCentralActivator extends AbstractUIPlugin {
 		return image;
 	}
 
-	public void setTutorialCategories(
-			Map<String, TutorialCategory> tutorialCategories) {
-		this.tutorialCategories = tutorialCategories;
-	}
-
-	public String getDescription(Tutorial tutorial) {
-		String description = tutorial.getDescription();
-		Project project = tutorial.getProjectExamples();
-		if (project.getDescription() != null) {
-			description = project.getDescription();
-		}
-		StringBuffer buffer = new StringBuffer();
-		buffer.append(description);
+	public String getDescription(Project project) {
+		StringBuilder buffer = new StringBuilder();
+    if (project.getDescription() != null) {
+      buffer.append(project.getDescription());
+    }
 		buffer.append("\n\n");
 		buffer.append("Size: ");
 		buffer.append(project.getSizeAsText());
-		if (project.getUnsatisfiedFixes().size() > 0) {
+		if (project.getUnsatisfiedFixes() != null && project.getUnsatisfiedFixes().size() > 0) {
 			buffer.append("\n\n");
 		}
 		return buffer.toString();

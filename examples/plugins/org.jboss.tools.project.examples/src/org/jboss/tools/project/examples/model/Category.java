@@ -19,7 +19,7 @@ import org.jboss.tools.project.examples.Messages;
  * @author snjeza
  * 
  */
-public class Category implements ProjectModelElement {
+public class Category implements ProjectModelElement, Comparable<Category> {
 
 	private String name;
 	private List<Project> projects = new ArrayList<Project>();
@@ -99,4 +99,23 @@ public class Category implements ProjectModelElement {
 	public String toString() {
 		return getName();
 	}
+
+  @Override
+  public int compareTo(Category o) {
+    if (o == null) {
+      return 1;
+    }
+    //TODO use priorities
+    String otherName = o.getName();
+    if (name == otherName) {
+      return 0;
+    }
+    if (name == null) {
+      return -1;
+    }
+    if (otherName == null) {
+      return 1;
+    }
+    return name.compareTo(otherName);
+  }
 }

@@ -48,6 +48,7 @@ public class Project implements ProjectModelElement {
 	private IProjectExampleSite site;
 	private String defaultProfiles =""; //$NON-NLS-1$
   private Set<String> tags;
+  private String iconPath;
 	
 	public Project() {
 		name=""; //$NON-NLS-1$
@@ -273,11 +274,31 @@ public class Project implements ProjectModelElement {
     this.tags = tags;
   }
   
-  public Set<String> setTags() {
+  public Set<String> getTags() {
     if (tags == null) {
       tags = new HashSet<String>();
     }
     return tags;
   }
   
+  public boolean hasTags(String ... tags) {
+    if (!getTags().isEmpty() 
+        && tags != null && tags.length > 0) {
+      for (String tag : tags) {
+        if (!getTags().contains(tag)) {
+          return false;
+        }
+      }
+      return true;
+    }
+    return false;
+  }
+
+  public void setIconPath(String path) {
+    this.iconPath = path;
+  }  
+  
+  public String getIconPath() {
+    return iconPath;
+  }
 }

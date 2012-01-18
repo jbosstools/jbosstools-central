@@ -47,10 +47,6 @@ import org.eclipse.ui.menus.CommandContributionItem;
 import org.jboss.tools.central.JBossCentralActivator;
 import org.jboss.tools.central.actions.OpenJBossBlogsHandler;
 import org.jboss.tools.central.editors.xpl.TextSearchControl;
-import org.jboss.tools.central.jobs.RefreshBlogsJob;
-import org.jboss.tools.central.jobs.RefreshDiscoveryJob;
-import org.jboss.tools.central.jobs.RefreshNewsJob;
-import org.jboss.tools.central.jobs.RefreshTutorialsJob;
 
 /**
  * 

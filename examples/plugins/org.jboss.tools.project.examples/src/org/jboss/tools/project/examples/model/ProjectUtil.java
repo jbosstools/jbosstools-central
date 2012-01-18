@@ -23,8 +23,11 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
 
@@ -221,8 +224,8 @@ public class ProjectUtil {
 		invalidSites.clear();
 		Category other = Category.OTHER;
 		try {
+		  boolean showExperimentalSites = ProjectExamplesActivator.getDefault().getPreferenceStore().getBoolean(ProjectExamplesActivator.SHOW_EXPERIMENTAL_SITES);
 			for (IProjectExampleSite site : sites) {
-				boolean showExperimentalSites = ProjectExamplesActivator.getDefault().getPreferenceStore().getBoolean(ProjectExamplesActivator.SHOW_EXPERIMENTAL_SITES);
 				if (!showExperimentalSites && site.isExperimental()) {
 					continue;
 				}
@@ -242,8 +245,7 @@ public class ProjectUtil {
 					continue;
 				}
 				
-				DocumentBuilderFactory dbf = DocumentBuilderFactory
-						.newInstance();
+				DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
 				DocumentBuilder db = dbf.newDocumentBuilder();
 				Document doc = db.parse(file);
 				NodeList projects = doc.getElementsByTagName("project"); //$NON-NLS-1$
@@ -356,6 +358,12 @@ public class ProjectUtil {
                 else if (nodeName.equals("tags")) {  //$NON-NLS-1$
                   parseTags(project, child);
                 }
+                else if (nodeName.equals("icon")) {  //$NON-NLS-1$
+                  String path = child.getAttribute("path");
+                  if (path != null) {
+                    project.setIconPath(path);
+                  }
+                }								
 							}
 						}
 					}
@@ -368,7 +376,7 @@ public class ProjectUtil {
 		return list;
 	}
 
-	private static void parseTags(Project project, Element tagElement) {
+  private static void parseTags(Project project, Element tagElement) {
     String tagsValue = tagElement.getTextContent();
     if (tagsValue != null) {
       StringTokenizer tokenizer = new StringTokenizer(tagsValue.trim(), ",");//$NON-NLS-1$
@@ -646,4 +654,19 @@ public class ProjectUtil {
 	public static HashSet<IProjectExampleSite> getInvalidSites() {
 		return invalidSites;
 	}	
+
+	public static List<Project> getProjectsByTags(Collection<Category> categories, String ... tags) {
+	    if (categories == null) {
+	      return null;
+	    }
+	    List<Project> selection = new ArrayList<Project>(); 
+	    for (Category c : categories) {
+	      for (Project p : c.getProjects()) {
+	        if (p.hasTags(tags) && !selection.contains(p)) {
+	          selection.add(p);
+	        }
+	      }
+	    }
+	    return selection;
+	  }
 }
