@@ -280,9 +280,16 @@ public class SeamProjectConfigurator extends AbstractProjectConfigurator {
 		}
 	}
 
-	private IProjectFacetVersion getSeamFacetVersion(String seamVersion) {
+	private IProjectFacetVersion getSeamFacetVersion(String seamVersion) throws CoreException {
 		String version = seamVersion.substring(0, 3);
-		return seamFacet.getVersion(version);
+		IProjectFacetVersion facetVersion = null;
+		try {
+		  facetVersion = seamFacet.getVersion(version);
+		} catch (Exception e) {
+		  MavenSeamActivator.log(e, "Seam version "+ version+ " is not supported, using latest supported facet version instead"); 
+		  facetVersion = seamFacet.getLatestVersion();
+		}
+		return facetVersion;
 	}
 
 	private void installEarFacets(IFacetedProject fproj,IProgressMonitor monitor) throws CoreException {
