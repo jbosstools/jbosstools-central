@@ -14,8 +14,7 @@ The unstable trunk URL is
 
 The same as used for all milestone releases of JBoss Tools; should you want to pull the list of available updates from a NEWER directory file (eg., during a QE cycle when there's a milestone candidate available, but the published milestone site still contains the PREVIOUS milestone), you can do so using a commmandline flag.
 
-Thus, when running Eclipse or JBDS, simply pass in an alternate URL like this:
+Thus, when running Eclipse, simply pass in an alternate URL like this:
 
-./jbdevstudio -vmargs -Djboss.discovery.directory.url=http://download.jboss.org/jbosstools/updates/nightly/core/3.3.indigo/jbosstools-directory.xml
-./eclipse     -vmargs -Djboss.discovery.directory.url=http://download.jboss.org/jbosstools/updates/nightly/core/3.3.indigo/jbosstools-directory.xml
+	./eclipse -vmargs -Djboss.discovery.directory.url=http://download.jboss.org/jbosstools/updates/nightly/core/3.3.indigo/jbosstools-directory.xml
 
