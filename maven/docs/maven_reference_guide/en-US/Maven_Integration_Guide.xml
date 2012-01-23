@@ -6,6 +6,7 @@
 	<xi:include href="Preface.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
 	<xi:include href="introduction.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
 	<xi:include href="tasks.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+	<xi:include href="maven_profile_selection.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
 	<xi:include href="references.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
 	<xi:include href="links.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
 	<xi:include href="Feedback.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />

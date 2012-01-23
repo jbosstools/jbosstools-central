@@ -5,6 +5,7 @@
 [<!ENTITY introduction SYSTEM "introduction.xml">
 
 <!ENTITY tasks SYSTEM "tasks.xml">
+<!ENTITY profile_selection SYSTEM "maven_profile_selection.xml">
 <!ENTITY references SYSTEM "references.xml">
 <!ENTITY links SYSTEM "links.xml">
 
@@ -59,6 +60,7 @@
     <toc/>
     &introduction;
     &tasks;
+    &profile_selection;
     &references;    
     &links;
 </book>

@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<chapter id="maven_profile_selection">
+    <title>Maven Profile Selection</title>
+	<para>
+		The <guilabel>Maven Profile selection</guilabel> interface allows for easy profile selection changes for any Maven project. The interface can be opened by selecting a Maven project in the <guilabel>Project Explorer</guilabel> and either pressing <keycombo><keycap>Ctrl</keycap><keycap>Alt</keycap><keycap>P</keycap></keycombo> or right-clicking and navigating to <menuchoice><guimenuitem>Maven</guimenuitem><guimenuitem>Select Maven Profiles</guimenuitem></menuchoice>.
+	</para>
+	<figure id="maven_profile_selection_01">
+		<title>Maven profile selection screen</title>
+		<mediaobject>
+			<imageobject>
+				<imagedata fileref="images/maven_profile_selection/maven_profile_selection_01.png" format="PNG" />
+			</imageobject>
+			<textobject>
+				<phrase>
+					Maven profile selection screen.
+				</phrase>
+			</textobject>
+		</mediaobject>
+	</figure>
+	<para>
+		From the <guilabel>Maven Profile selection</guilabel> screen you are able to <guibutton>Activate</guibutton> and <guibutton>Deactivate</guibutton> profiles for the selected project. All available proviles for the selected project, will be displayed in the <guilabel>Available profiles</guilabel> section. The profiles available to a project are inferred from those defined within the projects <filename>pom.xml</filename> file, the projects parent hierarchy and the content of maven user and global <filename>settings.xml</filename> files.
+	</para>
+	<para>
+		The <guilabel>Source</guilabel> column in the <guilabel>Available profiles</guilabel> section indicates where the profiles is defined. An undefined source means the profile is present in the Maven property page of the project, but there is no available definition. 
+	</para>
+	<para>
+		If you have selected multiple projects for <guilabel>Maven Profile selection</guilabel>, only the commonly available profiles will be displayed in the <guilabel>Available profiles</guilabel> section. Common profiles are those defined in the <filename>settings.xml</filename> files or profiles having the same ID in the <filename>pom.xml</filename> file of all selected projects. 
+	</para>
+	<note>
+		<para>
+			Changes made to common profiles, when having selected multiple projects, will not impact profiles unique to a project.
+		</para>
+	</note>
+</chapter>
