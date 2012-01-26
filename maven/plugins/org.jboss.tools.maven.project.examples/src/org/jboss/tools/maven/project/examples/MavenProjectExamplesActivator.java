@@ -19,8 +19,8 @@ import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.embedder.IMaven;
 import org.eclipse.m2e.core.project.MavenProjectInfo;
 import org.eclipse.m2e.core.project.ProjectImportConfiguration;
-import org.eclipse.m2e.core.ui.internal.UpdateConfigurationJob;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
+import org.jboss.tools.maven.project.examples.xpl.UpdateMavenProjectJob;
 import org.osgi.framework.BundleContext;
 
 /**
@@ -75,6 +75,11 @@ public class MavenProjectExamplesActivator extends AbstractUIPlugin {
 	
 	public static void log(Throwable e, String message) {
 		IStatus status = new Status(IStatus.ERROR, PLUGIN_ID, message, e);
+		getDefault().getLog().log(status);
+	}
+	
+	public static void log(String message) {
+		IStatus status = new Status(IStatus.INFO, PLUGIN_ID, message);
 		getDefault().getLog().log(status);
 	}
 	
@@ -136,7 +141,7 @@ public class MavenProjectExamplesActivator extends AbstractUIPlugin {
 					// ignore
 				}
 			}
-			Job updateJob = new UpdateConfigurationJob(selectedProjects , true, false);
+			Job updateJob = new UpdateMavenProjectJob(selectedProjects , true, false);
 			updateJob.schedule();
 			try {
 				updateJob.join();
