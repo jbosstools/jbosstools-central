@@ -24,6 +24,7 @@ import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -34,18 +35,13 @@ import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jface.preference.IPreferenceStore;
-import org.eclipse.jst.j2ee.internal.web.util.WebArtifactEditUtilities;
-import org.eclipse.jst.j2ee.project.JavaEEProjectUtilities;
+import org.eclipse.jst.j2ee.project.facet.IJ2EEFacetConstants;
 import org.eclipse.jst.j2ee.web.componentcore.util.WebArtifactEdit;
 import org.eclipse.jst.j2ee.webapplication.Servlet;
 import org.eclipse.jst.j2ee.webapplication.ServletType;
 import org.eclipse.jst.j2ee.webapplication.WebApp;
 import org.eclipse.jst.j2ee.webapplication.WebType;
-import org.eclipse.jst.jsf.core.JSFVersion;
 import org.eclipse.jst.jsf.core.internal.project.facet.IJSFFacetInstallDataModelProperties;
-import org.eclipse.jst.jsf.core.internal.project.facet.JSFUtilFactory;
-import org.eclipse.jst.jsf.core.internal.project.facet.JSFUtils;
-import org.eclipse.jst.jsf.core.jsfappconfig.JSFAppConfigUtils;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.project.MavenProjectChangedEvent;
 import org.eclipse.m2e.core.project.configurator.AbstractProjectConfigurator;
@@ -80,10 +76,6 @@ public class JSFProjectConfigurator extends AbstractProjectConfigurator {
 	
 	private static final String WAR_SOURCE_FOLDER = "/src/main/webapp";
 
-	protected static final IProjectFacet dynamicWebFacet;
-	protected static IProjectFacetVersion dynamicWebVersion;
-	protected static final IProjectFacetVersion WEB_FACET_3_0;
-	
 	public static final IProjectFacet JSF_FACET;
 	public static final IProjectFacetVersion JSF_FACET_VERSION_2_0;
 	public static final IProjectFacetVersion JSF_FACET_VERSION_1_2;
@@ -95,9 +87,6 @@ public class JSFProjectConfigurator extends AbstractProjectConfigurator {
 	public static final String JSF_VERSION_1_1 = "1.1";
 	private static final String FACES_SERVLET = "javax.faces.webapp.FacesServlet";
 	static {
-		dynamicWebFacet = ProjectFacetsManager.getProjectFacet("jst.web"); //$NON-NLS-1$
-		dynamicWebVersion = dynamicWebFacet.getVersion("2.5");  //$NON-NLS-1$
-		WEB_FACET_3_0 = dynamicWebFacet.getVersion("3.0");  //$NON-NLS-1$
 		JSF_FACET = ProjectFacetsManager.getProjectFacet("jst.jsf"); //$NON-NLS-1$
 		JSF_FACET_VERSION_2_0 = JSF_FACET.getVersion(JSF_VERSION_2_0); 
 		JSF_FACET_VERSION_1_2 = JSF_FACET.getVersion(JSF_VERSION_1_2); //$NON-NLS-1$
@@ -180,7 +169,7 @@ public class JSFProjectConfigurator extends AbstractProjectConfigurator {
 			String jsfVersion, MavenProject mavenProject,
 			IProgressMonitor monitor) throws CoreException {
 		
-		if (!fproj.hasProjectFacet(dynamicWebFacet)) {
+		if (!fproj.hasProjectFacet(IJ2EEFacetConstants.DYNAMIC_WEB_FACET)) {
 			Activator.log(Messages.JSFProjectConfigurator_The_project_does_not_contain_the_Web_Module_facet);
 		} else {
    		   installJSFFacet(fproj, jsfVersion, mavenProject, monitor);
@@ -339,11 +328,12 @@ public class JSFProjectConfigurator extends AbstractProjectConfigurator {
 		return relative.replace('\\', '/'); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 
+	/*
 	private boolean configureWebxml() {
 		IPreferenceStore store = Activator.getDefault().getPreferenceStore();
 		return store.getBoolean(Activator.CONFIGURE_WEBXML_JSF20);
 	}
-
+	*/
 
 	private String getJSFVersion(MavenProject mavenProject, IFacetedProject fproj) {
 		String version = null;
@@ -368,8 +358,8 @@ public class JSFProjectConfigurator extends AbstractProjectConfigurator {
 		if (version == null && hasFacesServletInWebXml(project)) {
 			//No dependency on JSF, no faces-config, but uses faces-servlet
 			//so we try to best guess the version depending on the installed web facet
-			IProjectFacetVersion webVersion = fproj.getInstalledVersion(dynamicWebFacet);
-			if (webVersion.compareTo(WEB_FACET_3_0) < 0) {
+			IProjectFacetVersion webVersion = fproj.getInstalledVersion(IJ2EEFacetConstants.DYNAMIC_WEB_FACET);
+			if (webVersion.compareTo(IJ2EEFacetConstants.DYNAMIC_WEB_30) < 0) {
 				version = JSF_VERSION_1_2;
 			} else {
 				version = JSF_VERSION_2_0;
@@ -387,6 +377,12 @@ public class JSFProjectConfigurator extends AbstractProjectConfigurator {
 			if (component != null) {
 				edit = WebArtifactEdit.getWebArtifactEditForRead(component);
 				if (edit !=null) {
+					IPath webXmlPath = edit.getDeploymentDescriptorPath();
+					if (!ResourcesPlugin.getWorkspace().getRoot().getFile(webXmlPath).exists()) {
+						//JBDS-1999 : If web.xml doesn't exist and we call edit.getWebApp()
+						//it will be created, so we bail.
+						return false;
+					}
 					WebApp webapp = edit.getWebApp();
 					if (webapp != null && webapp.getServlets() != null) {
 						for (Object o : webapp.getServlets()) {

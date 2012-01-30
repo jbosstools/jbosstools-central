@@ -5,6 +5,7 @@ import java.io.File;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.jst.j2ee.project.facet.IJ2EEFacetConstants;
 import org.eclipse.m2e.core.project.ResolverConfiguration;
 import org.eclipse.m2e.tests.common.WorkspaceHelpers;
 import org.eclipse.wst.common.project.facet.core.IFacetedProject;
@@ -105,6 +106,20 @@ public class JSFConfiguratorTest extends AbstractMavenConfiguratorTest {
 		assertIsJSFProject(jsfProject, JSFProjectConfigurator.JSF_FACET_VERSION_2_0);
 	}
 
+	@Test
+	public void testJBDS1999_noWebXmlCreated() throws Exception {
+		IProject project = importProject("projects/jsf/JBDS-1999/pom.xml");
+		waitForJobsToComplete();
+		
+		IFacetedProject facetedProject = ProjectFacetsManager.create(project);
+		assertNotNull(project.getName() + " is not a faceted project", facetedProject);
+		assertFalse(project.getName() + " should not have the JSF facet", facetedProject.hasProjectFacet(JSFProjectConfigurator.JSF_FACET));
+		assertTrue(project.getName() + " doesn't have the expected Web facet", facetedProject.hasProjectFacet(IJ2EEFacetConstants.DYNAMIC_WEB_25));
+		
+		IFile webXml = project.getFile("src/main/webapp/WEB-INF/web.xml");
+		assertFalse("web.xml was added to the project!", webXml.exists());
+	}	
+	
 	private void assertHasJSFConfigurationError(IProject project, String message) throws Exception {
 		WorkspaceHelpers.assertErrorMarker(MavenJSFConstants.JSF_CONFIGURATION_ERROR_MARKER_ID, message, 1, "", project);
 	}
