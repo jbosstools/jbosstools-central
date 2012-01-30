@@ -290,7 +290,7 @@
             provider="Cedric Beust"
             siteUrl="http://download.jboss.org/jbosstools/updates/indigo/extras/">
          <icon
-               image32="images/testng_16.gif">
+               image32="images/testng_32.gif">
          </icon>
          <overview
          	   summary="TestNG plug-in for Eclipse"
