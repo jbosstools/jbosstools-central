@@ -10,57 +10,45 @@
  ******************************************************************************/
 package org.jboss.tools.maven.jsf.configurators;
 
-import java.io.File;
-import java.io.InputStream;
+import static org.jboss.tools.maven.jsf.configurators.JSFUtils.JSF_VERSION_1_1;
+import static org.jboss.tools.maven.jsf.configurators.JSFUtils.JSF_VERSION_1_2;
+import static org.jboss.tools.maven.jsf.configurators.JSFUtils.JSF_VERSION_2_0;
+
 import java.util.List;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.project.MavenProject;
-import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IProject;
-import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Path;
-import org.eclipse.jdt.core.IJavaProject;
-import org.eclipse.jdt.core.IType;
-import org.eclipse.jdt.core.JavaCore;
-import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jst.j2ee.project.facet.IJ2EEFacetConstants;
-import org.eclipse.jst.j2ee.web.componentcore.util.WebArtifactEdit;
-import org.eclipse.jst.j2ee.webapplication.Servlet;
-import org.eclipse.jst.j2ee.webapplication.ServletType;
-import org.eclipse.jst.j2ee.webapplication.WebApp;
-import org.eclipse.jst.j2ee.webapplication.WebType;
 import org.eclipse.jst.jsf.core.internal.project.facet.IJSFFacetInstallDataModelProperties;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.project.MavenProjectChangedEvent;
 import org.eclipse.m2e.core.project.configurator.AbstractProjectConfigurator;
 import org.eclipse.m2e.core.project.configurator.ProjectConfigurationRequest;
-import org.eclipse.wst.common.componentcore.ComponentCore;
 import org.eclipse.wst.common.componentcore.ModuleCoreNature;
-import org.eclipse.wst.common.componentcore.resources.IVirtualComponent;
 import org.eclipse.wst.common.frameworks.datamodel.IDataModel;
 import org.eclipse.wst.common.project.facet.core.IFacetedProject;
 import org.eclipse.wst.common.project.facet.core.IProjectFacet;
 import org.eclipse.wst.common.project.facet.core.IProjectFacetVersion;
 import org.eclipse.wst.common.project.facet.core.ProjectFacetsManager;
-import org.jboss.tools.common.util.EclipseJavaUtil;
 import org.jboss.tools.maven.core.IJBossMavenConstants;
+import org.jboss.tools.maven.core.ProjectUtil;
 import org.jboss.tools.maven.core.internal.project.facet.MavenFacetInstallDataModelProvider;
 import org.jboss.tools.maven.jsf.MavenJSFActivator;
 import org.jboss.tools.maven.jsf.MavenJSFConstants;
 import org.jboss.tools.maven.jsf.Messages;
-import org.jboss.tools.maven.jsf.utils.FacesConfigQuickPeek;
 import org.jboss.tools.maven.ui.Activator;
 
 /**
@@ -82,10 +70,7 @@ public class JSFProjectConfigurator extends AbstractProjectConfigurator {
 	public static final IProjectFacetVersion JSF_FACET_VERSION_1_1;
 	protected static final IProjectFacet m2Facet;
 	protected static final IProjectFacetVersion m2Version;
-	public static final String JSF_VERSION_2_0 = "2.0";
-	public static final String JSF_VERSION_1_2 = "1.2";
-	public static final String JSF_VERSION_1_1 = "1.1";
-	private static final String FACES_SERVLET = "javax.faces.webapp.FacesServlet";
+
 	static {
 		JSF_FACET = ProjectFacetsManager.getProjectFacet("jst.jsf"); //$NON-NLS-1$
 		JSF_FACET_VERSION_2_0 = JSF_FACET.getVersion(JSF_VERSION_2_0); 
@@ -187,9 +172,9 @@ public class JSFProjectConfigurator extends AbstractProjectConfigurator {
 		markerManager.deleteMarkers(fproj.getProject(), MavenJSFConstants.JSF_CONFIGURATION_ERROR_MARKER_ID);
 		if (!fproj.hasProjectFacet(JSF_FACET)) {
 			String warSourceDir = getWarSourceDirectory(mavenProject,fproj.getProject());
-			IPath facesConfigPath = new Path("WEB-INF/faces-config.xml");
+			String facesConfigPath = "WEB-INF/faces-config.xml";
 			IFile facesConfig = fproj.getProject().getFolder(warSourceDir).getFile(facesConfigPath);
-			IFile generatedFacesConfig = getFileFromUnderlyingresources(fproj.getProject(), facesConfigPath);
+			IFile generatedFacesConfig = ProjectUtil.getGeneratedWebResourceFile(fproj.getProject(), facesConfigPath);
 
 			//faces-config.xml will not be created in the source folder and it doesn't exist yet
 			// => We'll have to fix it after setting the JSF facet
@@ -250,15 +235,6 @@ public class JSFProjectConfigurator extends AbstractProjectConfigurator {
 		
 	}
 
-	private IFile getFileFromUnderlyingresources(final IProject project, final IPath filePath) {
-			  IVirtualComponent component = ComponentCore.createComponent(project);
-			  if (component == null) {
-				  return null;
-			  }
-			  IContainer underlyingFolder = component.getRootFolder().getUnderlyingFolder();
-			  return project.getFile(underlyingFolder.getProjectRelativePath().append(filePath));
-	}
-
 	private String getWarSourceDirectory(MavenProject mavenProject,
 			IProject project) {
 		Plugin plugin = mavenProject
@@ -295,39 +271,6 @@ public class JSFProjectConfigurator extends AbstractProjectConfigurator {
 				.makeRelative().setDevice(null);
 	}
 	
-
-	public String getCustomWebXml(MavenProject mavenProject, IProject project) {
-		Plugin plugin = mavenProject
-				.getPlugin("org.apache.maven.plugins:maven-war-plugin");
-		if (plugin == null) {
-			return null;
-		}
-		Xpp3Dom config = (Xpp3Dom) plugin.getConfiguration();
-		if (config != null) {
-			Xpp3Dom webXmlDom = config.getChild("webXml");
-			if (webXmlDom != null && webXmlDom.getValue() != null) {
-				String webXmlFile = webXmlDom.getValue().trim();
-				webXmlFile = getRelativePath(project, webXmlFile);
-				return webXmlFile;
-			}
-		}
-		return null;
-	}
-
-	private static String getRelativePath(IProject project, String absolutePath) {
-		File basedir = project.getLocation().toFile();
-		String relative;
-		if (absolutePath.equals(basedir.getAbsolutePath())) {
-			relative = ".";
-		} else if (absolutePath.startsWith(basedir.getAbsolutePath())) {
-			relative = absolutePath.substring(basedir.getAbsolutePath()
-					.length() + 1);
-		} else {
-			relative = absolutePath;
-		}
-		return relative.replace('\\', '/'); //$NON-NLS-1$ //$NON-NLS-2$
-	}
-
 	/*
 	private boolean configureWebxml() {
 		IPreferenceStore store = Activator.getDefault().getPreferenceStore();
@@ -338,7 +281,7 @@ public class JSFProjectConfigurator extends AbstractProjectConfigurator {
 	private String getJSFVersion(MavenProject mavenProject, IFacetedProject fproj) {
 		String version = null;
 		IProject project = fproj.getProject();
-		version = getVersionFromFacesconfig(project);
+		version = JSFUtils.getVersionFromFacesconfig(project);
 		
 		if (version == null) {
 			version = Activator.getDefault().getDependencyVersion(mavenProject, JSF_API_GROUP_ID, JSF_API_ARTIFACT_ID);
@@ -349,13 +292,13 @@ public class JSFProjectConfigurator extends AbstractProjectConfigurator {
 		}
 		if (version == null) {
 			//JBIDE-9242 determine JSF version from classpath  
-			version = getJSFVersionFromClasspath(project);
+			version = JSFUtils.getJSFVersionFromClasspath(project);
 		}
 		if (version == null) {
 			version = inferJsfVersionFromDependencies(mavenProject, JSF_API2_GROUP_ID, JSF_API_ARTIFACT_ID, JSF_VERSION_2_0);
 		}
 		
-		if (version == null && hasFacesServletInWebXml(project)) {
+		if (version == null && hasFacesServletInWebXml(mavenProject, project)) {
 			//No dependency on JSF, no faces-config, but uses faces-servlet
 			//so we try to best guess the version depending on the installed web facet
 			IProjectFacetVersion webVersion = fproj.getInstalledVersion(IJ2EEFacetConstants.DYNAMIC_WEB_FACET);
@@ -369,112 +312,19 @@ public class JSFProjectConfigurator extends AbstractProjectConfigurator {
 	    return version;
 	}
 
-	private boolean hasFacesServletInWebXml(IProject project) {
+	private boolean hasFacesServletInWebXml(MavenProject mavenProject, IProject project) {
 		//We look for javax.faces.webapp.FacesServlet in web.xml
-		WebArtifactEdit edit = null;
-		try {
-			IVirtualComponent component = ComponentCore.createComponent(project);
-			if (component != null) {
-				edit = WebArtifactEdit.getWebArtifactEditForRead(component);
-				if (edit !=null) {
-					IPath webXmlPath = edit.getDeploymentDescriptorPath();
-					if (!ResourcesPlugin.getWorkspace().getRoot().getFile(webXmlPath).exists()) {
-						//JBDS-1999 : If web.xml doesn't exist and we call edit.getWebApp()
-						//it will be created, so we bail.
-						return false;
-					}
-					WebApp webapp = edit.getWebApp();
-					if (webapp != null && webapp.getServlets() != null) {
-						for (Object o : webapp.getServlets()) {
-							if (o instanceof Servlet) {
-								WebType webType = ((Servlet) o).getWebType();
-								if (webType != null 
-									&& webType.isServletType() 
-									&& FACES_SERVLET.equals(((ServletType)webType).getClassName())){
-									return true;
-								}
-							}
-						}
-					}
-				}
-			}
-		} finally {
-			if (edit != null)
-				edit.dispose();
-		}
-		return false;
+		//We should look for a custom web.xml at this point, but WTP would then crash on the JSF Facet installation
+		//if it's not in a standard location, so we stick with the regular file.
+		IFile webXml = getWebXml(project);
+		return webXml != null && webXml.exists() && JSFUtils.hasFacesServlet(webXml);
 	}
 
-	private String getVersionFromFacesconfig(IProject project) {
-		
-	    IVirtualComponent component = ComponentCore.createComponent(project);
-	    if (component == null) {
-		   return null;
-	    }
-	    IFile facesConfig = null;
-	    //TODO get custom faces-config.xml path from web.xml
-	    IPath facesConfigPath = new Path("WEB-INF/faces-config.xml");
-	    IContainer[] underlyingFolders = component.getRootFolder().getUnderlyingFolders();
-	    for (IContainer underlyingFolder : underlyingFolders) {
-		  IPath p = underlyingFolder.getProjectRelativePath().append(facesConfigPath);
-		  IFile f = project.getFile(p);
-		  if (f.exists()) {
-			 facesConfig = f;
-			 break;
-		  }
-	    }
-
-	    String version = null;
-		if (facesConfig != null) {
-			InputStream in = null;
-			try {
-				in = facesConfig.getContents();
-				FacesConfigQuickPeek peek = new FacesConfigQuickPeek(in);
-				version = peek.getVersion();
-			} catch (CoreException e) {
-				// ignore
-				Activator.log(e);
-			} finally {
-				IOUtil.close(in);
-			}
-		}
-		return version;
+	private IFile getWebXml(IProject project) {
+		return ProjectUtil.getWebResourceFile(project, "WEB-INF/web.xml");
 	}
 
-	/**
-	 * Determines the JSF version by searching for the methods of javax.faces.application.Application 
-	 * in the project's classpath.
-	 * @param project : the java project to analyze
-	 * @return the JSF version (1.1, 1.2, 2.0) found in the classpath, 
-	 * or null if the project doesn't depend on JSF 
-	 */
-	private String getJSFVersionFromClasspath(IProject project) {
-		String version = null;
-		IJavaProject javaProject = JavaCore.create(project);
-		if (javaProject != null) {
-			IType type = null;
-			try {
-				type = EclipseJavaUtil.findType(javaProject, 
-												"javax.faces.application.Application");//$NON-NLS-1$ 
-			} catch (JavaModelException e) {
-				e.printStackTrace();
-			}
-			if (type != null) {
-				String[] emptyParams = new String[0];
-				if (type.getMethod("getResourceHandler", emptyParams).exists() &&    
-					type.getMethod("getProjectStage", emptyParams).exists()) {      
-					return JSF_VERSION_2_0;
-			    }
-				if (type.getMethod("getELResolver", emptyParams).exists() &&        
-					type.getMethod("getExpressionFactory", emptyParams).exists()) { 
-					return JSF_VERSION_1_2;
-				} 
-				version = JSF_VERSION_1_1;
-			}
-		}
-		return version;
-	}
-	
+
 	private String inferJsfVersionFromDependencies(MavenProject mavenProject, String groupId, String artifactId, String defaultVersion) {
 		boolean hasCandidates = false;
 		String jsfVersion = null;

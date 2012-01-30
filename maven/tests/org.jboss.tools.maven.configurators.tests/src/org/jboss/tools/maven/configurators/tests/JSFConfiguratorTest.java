@@ -120,6 +120,18 @@ public class JSFConfiguratorTest extends AbstractMavenConfiguratorTest {
 		assertFalse("web.xml was added to the project!", webXml.exists());
 	}	
 	
+	@Test
+	public void testFacesServletInCustomWebXml() throws Exception {
+		//JSFFacet installation can't find custom web.xml and crashes so this case is not supported 
+		String projectLocation = "projects/jsf/jsf-customwebxml/";
+		IProject jsfProject = importProject(projectLocation+"/pom.xml");
+		waitForJobsToComplete(new NullProgressMonitor());
+		IFacetedProject facetedProject = ProjectFacetsManager.create(jsfProject);
+		assertNotNull(jsfProject.getName() + " is not a faceted project", facetedProject);
+		assertFalse(jsfProject.getName() + " should not have the JSF facet", facetedProject.hasProjectFacet(JSFProjectConfigurator.JSF_FACET));
+		assertTrue(jsfProject.getName() + " doesn't have the expected Web facet", facetedProject.hasProjectFacet(IJ2EEFacetConstants.DYNAMIC_WEB_25));
+	}	
+	
 	private void assertHasJSFConfigurationError(IProject project, String message) throws Exception {
 		WorkspaceHelpers.assertErrorMarker(MavenJSFConstants.JSF_CONFIGURATION_ERROR_MARKER_ID, message, 1, "", project);
 	}
