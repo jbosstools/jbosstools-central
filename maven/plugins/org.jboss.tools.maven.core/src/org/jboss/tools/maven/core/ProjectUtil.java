@@ -6,6 +6,8 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
+import org.eclipse.core.resources.IContainer;
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IWorkspaceRoot;
@@ -14,6 +16,10 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.jst.j2ee.componentcore.J2EEModuleVirtualComponent;
+import org.eclipse.wst.common.componentcore.ComponentCore;
+import org.eclipse.wst.common.componentcore.resources.IVirtualComponent;
+import org.eclipse.wst.common.componentcore.resources.IVirtualFolder;
 
 /**
  * A utility class for Eclipse Projects.
@@ -66,6 +72,67 @@ public class ProjectUtil {
 		} finally {
 			monitor.done();
 		}
+	}
+
+	/**
+	 * Returns the underlying file for a given path 
+	 * @param project
+	 * @param path, ex. WEB-INF/web.xml
+	 * @return the underlying file corresponding to path, or null if no file exists.
+	 */
+	public static IFile getWebResourceFile(IProject project, String path) {
+	    IVirtualComponent component = ComponentCore.createComponent(project);
+	    if (component == null) {
+		   return null;
+	    }
+	    IPath filePath = new Path(path);
+	    IContainer[] underlyingFolders = component.getRootFolder().getUnderlyingFolders();
+	    for (IContainer underlyingFolder : underlyingFolders) {
+		  IPath p = underlyingFolder.getProjectRelativePath().append(filePath);
+		  IFile f = project.getFile(p);
+		  if (f.exists()) {
+			 return f;
+		  }
+	    }
+	    return null;
+	}
+	
+	/**
+	 * Returns the first underlying IFile for a given path, not under the folder tagged as defaultRoot 
+	 * @param project
+	 * @param path, ex. WEB-INF/web.xml
+	 * @return the underlying file corresponding to path, or null if no file exists.
+	 */
+	public static IFile getGeneratedWebResourceFile(IProject project, String path) {
+	    IVirtualComponent component = ComponentCore.createComponent(project);
+	    if (component == null) {
+		   return null;
+	    }
+	    IPath filePath = new Path(path);
+	    IVirtualFolder root = component.getRootFolder();
+	    IContainer[] underlyingFolders = root.getUnderlyingFolders();
+	    IPath defaultDDFolderPath = J2EEModuleVirtualComponent.getDefaultDeploymentDescriptorFolder(root);
+	    for (IContainer underlyingFolder : underlyingFolders) {
+	      if (defaultDDFolderPath ==null || !defaultDDFolderPath.equals(underlyingFolder.getProjectRelativePath())) {
+	    	  IPath p = underlyingFolder.getProjectRelativePath().append(filePath);
+	    	  IFile f = project.getFile(p);
+	    	  return f;
+	      }
+	    }
+	    return null;
+	}
+	
+	public static String getRelativePath(IProject project, String absolutePath) {
+		File basedir = project.getLocation().toFile();
+		String relative;
+		if (absolutePath.equals(basedir.getAbsolutePath())) {
+			relative = ".";
+		} else if (absolutePath.startsWith(basedir.getAbsolutePath())) {
+			relative = absolutePath.substring(basedir.getAbsolutePath().length() + 1);
+		} else {
+			relative = absolutePath;
+		}
+		return relative.replace('\\', '/'); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 	
 }
