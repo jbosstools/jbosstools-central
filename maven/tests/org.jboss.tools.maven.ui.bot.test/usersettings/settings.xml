@@ -5,7 +5,7 @@
 			<activation>
 				<activeByDefault>true</activeByDefault>
 			</activation>
-			<id>jboss.repository</id>
+			<id>profile.from.settings.xml</id>
 		</profile>
 	</profiles>
 </settings>

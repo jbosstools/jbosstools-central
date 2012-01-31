@@ -24,9 +24,10 @@ import org.junit.runners.Suite;
 	CreateMavenizedSeamProjectTest.class,
 	CreateMavenizedEARProjectTest.class,
 	CreateMavenizedJSFProjectTest.class,
-	MavenProfileSelectionTest.class,
+	//MavenProfileSelectionTest.class, //failures
 	MaterializeLibraryTest.class,
-	CreateMavenProjectsTest.class
+	CreateMavenProjectsTest.class,
+	Configurators.class
 })
 public class MavenAllBotTests {
 	

@@ -8,23 +8,33 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.NullProgressMonitor;
 
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
+
 import org.eclipse.swtbot.swt.finder.SWTBot;
 import org.eclipse.swtbot.swt.finder.keyboard.Keystrokes;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 import org.jboss.tools.ui.bot.ext.SWTBotExt;
 import org.jboss.tools.ui.bot.ext.SWTUtilExt;
 import org.jboss.tools.ui.bot.ext.config.Annotations.Require;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 @SuppressWarnings("restriction")
 @Require(perspective="Java")
 public class CreateMavenProjectsTest extends AbstractMavenSWTBotTest{
-
+	
 	public static final String REPO_URL = "http://repo1.maven.org/maven2";
 	protected static SWTWorkbenchBot bot = new SWTWorkbenchBot();
 	
+	@BeforeClass
+	public static void setup(){
+		SWTBotExt setup = new SWTBotExt();
+		setup.menu("Window").menu("Show View").menu("Other...").click();
+		setup.tree().expandNode("Java").select("Package Explorer").click();
+		setup.button("OK").click();
+	}
+	
 	@Test
-	public void updateRepositories() throws InterruptedException {
+	public void updateRepositories() throws InterruptedException, CoreException {
 		SWTBotExt botExt = new SWTBotExt();
 		botExt.menu("Window").menu("Show View").menu("Other...").click();
 		waitForIdle();
@@ -36,6 +46,7 @@ public class CreateMavenProjectsTest extends AbstractMavenSWTBotTest{
 		botExt.button("OK").click();
 		SWTUtilExt util = new SWTUtilExt(botExt);
 		util.waitForAll();
+		util.waitForJobs(Long.MAX_VALUE,"Rebuilding Indexes");
 	}
 
 	@Test
@@ -45,7 +56,7 @@ public class CreateMavenProjectsTest extends AbstractMavenSWTBotTest{
 		IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject(projectName);
 		assertNoErrors(project);
 		assertTrue(Utils.isMavenProject(projectName));
-		buildProject(projectName,"5 Maven build...", "jar");
+		buildProject(projectName,"5 Maven build...", "jar","-0.0.1-SNAPSHOT");
 	}
 
 	
@@ -56,13 +67,13 @@ public class CreateMavenProjectsTest extends AbstractMavenSWTBotTest{
 		IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject(projectName);
 		assertNoErrors(project);
 		assertTrue(Utils.isMavenProject(projectName));
-		buildProject(projectName, "6 Maven build...", "jar");
+		buildProject(projectName, "6 Maven build...", "jar","-0.0.1-SNAPSHOT");
 	}
 	
 	
 	
 	@Test
-	public void createSimpleJarMavenizedProject() throws InterruptedException, CoreException{
+	public void createSimpleJarMavenizedProject() throws Exception{
 		String projectName = "JarMavenized";
 		SWTBotExt botExt = new SWTBotExt();
 		botExt.menu("File").menu("New").menu("Other...").click();
@@ -90,13 +101,13 @@ public class CreateMavenProjectsTest extends AbstractMavenSWTBotTest{
 	    IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject(projectName);
 	    assertNoErrors(project);
 	    assertTrue(Utils.isMavenProject(projectName));
-	    buildProject(projectName,"5 Maven build...", "jar");
+	    buildProject(projectName,"5 Maven build...", "jar","-0.0.1-SNAPSHOT");
 		
 	}
 	
 	
 	@Test
-	public void createSimpleWarMavenizedProject() throws InterruptedException, CoreException{
+	public void createSimpleWarMavenizedProject() throws Exception{
 		String projectName = "WarMavenized";
 		SWTBotExt botExt = new SWTBotExt();
 		botExt.menu("File").menu("New").menu("Other...").click();
@@ -119,7 +130,7 @@ public class CreateMavenProjectsTest extends AbstractMavenSWTBotTest{
 	    IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject(projectName);
 	    assertNoErrors(project);
 	    assertTrue(Utils.isMavenProject(projectName));
-	    buildProject(projectName,"5 Maven build...", "war");
+	    buildProject(projectName,"5 Maven build...", "war","-0.0.1-SNAPSHOT");
 		
 	}
 	
@@ -130,7 +141,7 @@ public class CreateMavenProjectsTest extends AbstractMavenSWTBotTest{
 		IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject(projectName);
 		assertNoErrors(project);
 		assertTrue(Utils.isMavenProject(projectName));
-		buildProject(projectName, "6 Maven build...", "jar");
+		buildProject(projectName, "6 Maven build...", "war",""); //version is 1.0.0
 	}
 
 	private void createSimpleMavenProjectArchetype(String projectName,String projectType, String catalog) throws InterruptedException,CoreException {
@@ -173,9 +184,10 @@ public class CreateMavenProjectsTest extends AbstractMavenSWTBotTest{
 
 	}
 
-	private void buildProject(String projectName, String mavenBuild, String packaging) throws CoreException {
+	private void buildProject(String projectName, String mavenBuild, String packaging, String version) throws Exception {
 		IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject(projectName);
 		SWTBot explorer = bot.viewByTitle("Package Explorer").bot();
+		Thread.sleep(500);
 		SWTBotTreeItem item = explorer.tree().getTreeItem(projectName).select();
 		SWTBotExt swtBot = new SWTBotExt();
 		item.contextMenu("Run As").menu(mavenBuild).click();
@@ -184,7 +196,7 @@ public class CreateMavenProjectsTest extends AbstractMavenSWTBotTest{
 		waitForIdle();
 		project = ResourcesPlugin.getWorkspace().getRoot().getProject(projectName);
 		project.getFolder("target").refreshLocal(IResource.DEPTH_INFINITE,new NullProgressMonitor());
-		IFile jarFile = project.getFile("target/" + projectName + "-0.0.1-SNAPSHOT."+packaging);
+		IFile jarFile = project.getFile("target/" + projectName + version+"."+packaging);
 		assertTrue(jarFile + " is missing ", jarFile.exists());
 	}
 

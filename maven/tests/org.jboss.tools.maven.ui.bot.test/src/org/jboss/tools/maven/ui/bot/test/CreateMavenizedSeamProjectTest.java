@@ -88,7 +88,7 @@ import org.junit.Test;
  *
  */
 @SuppressWarnings("restriction")
-@Require(perspective="Seam 2")
+@Require(perspective="Seam")
 public class CreateMavenizedSeamProjectTest{
 	
 	protected static final long IDLE_TIME = 1 * 60 * 1000L;
@@ -386,9 +386,9 @@ public class CreateMavenizedSeamProjectTest{
 	
 	public static void createNewSeamWebProjectWizard(String projectName, String deployType) throws Exception {
 		waitForIdle();
-		bot.menu("File").menu("New").menu("Seam 2 Web Project").click();
-		 
-		SWTBotShell mainShell = bot.shell("New Seam 2 Project");
+		bot.menu("File").menu("New").menu("Seam Web Project").click();
+		
+		SWTBotShell mainShell = bot.shell("New Seam Project");
 		mainShell.activate();
 
 		bot.textWithLabel("Project name:").setText(projectName);

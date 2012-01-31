@@ -9,11 +9,11 @@
 	</parent>
 	<groupId>org.jboss.tools.maven.tests</groupId>
 	<artifactId>org.jboss.tools.maven.ui.bot.test</artifactId>
-	
+
 	<packaging>eclipse-test-plugin</packaging>
 
 	<properties>
-		<systemProperties>-Djbosstools.test.jboss.home.6.0=${requirement.build.root}/jbossas-6.0.0.Final -Djbosstools.test.jboss.home.5.1=${requirement.build.root}/jboss-5.1.0.GA -Djbosstools.test.seam.2.0.1.GA.home=${requirement.build.root}/jboss-seam-2.2.0.GA</systemProperties>
+		<systemProperties>-Djbosstools.test.jboss.home.6.0=${requirement.build.root}/jboss-6.0.0.Final -Djbosstools.test.jboss.home.5.1=${requirement.build.root}/jboss-5.1.0.GA -Djbosstools.test.seam.2.0.1.GA.home=${requirement.build.root}/jboss-seam-2.2.0.GA</systemProperties>
 	</properties>
 	<build>
 		<plugins>
@@ -21,9 +21,123 @@
 				<groupId>org.eclipse.tycho</groupId>
 				<artifactId>tycho-surefire-plugin</artifactId>
 				<configuration>
+					<environmentVariables>
+						<DISPLAY>:2.0</DISPLAY>
+					</environmentVariables>
 					<useUIThread>false</useUIThread>
+					<skip>${swtbot.test.skip}</skip>
 					<testSuite>org.jboss.tools.maven.ui.bot.test</testSuite>
 					<testClass>org.jboss.tools.maven.ui.bot.test.MavenAllBotTests</testClass>
+					<dependencies>
+						<dependency combine.children="append">
+							<type>p2-installable-unit</type>
+							<artifactId>org.eclipse.jst.enterprise_ui.feature.feature.group</artifactId>
+							<version>0.0.0</version>
+						</dependency>
+						<dependency>
+							<type>p2-installable-unit</type>
+							<artifactId>org.eclipse.m2e.feature.feature.group</artifactId>
+							<version>0.0.0</version>
+						</dependency>
+						<dependency>
+							<type>p2-installable-unit</type>
+							<artifactId>org.jboss.tools.ws.feature.feature.group</artifactId>
+							<version>0.0.0</version>
+						</dependency>
+						<dependency>
+							<type>p2-installable-unit</type>
+							<artifactId>org.eclipse.wst.web_ui.feature.feature.group</artifactId>
+							<version>0.0.0</version>
+						</dependency>
+						<dependency>
+							<type>p2-installable-unit</type>
+							<artifactId>org.jboss.tools.jsf.feature.feature.group</artifactId>
+							<version>0.0.0</version>
+						</dependency>
+						<dependency>
+							<type>p2-installable-unit</type>
+							<artifactId>org.maven.ide.eclipse.wtp.feature.feature.group</artifactId>
+							<version>0.0.0</version>
+						</dependency>
+						<dependency>
+							<type>p2-installable-unit</type>
+							<artifactId>org.jboss.tools.common.jdt.feature.feature.group</artifactId>
+							<version>0.0.0</version>
+						</dependency>
+						
+						<!-- configurator test -->
+						<dependency>
+							<type>p2-installable-unit</type>
+							<artifactId>org.jboss.tools.jsf.feature.feature.group</artifactId>
+							<version>0.0.0</version>
+						</dependency>
+						<!-- seam test -->
+						<dependency>
+							<type>p2-installable-unit</type>
+							<artifactId>org.jboss.tools.seam.feature.feature.group</artifactId>
+							<version>0.0.0</version>
+						</dependency>
+						<dependency>
+							<type>p2-installable-unit</type>
+							<artifactId>org.jboss.ide.eclipse.as.feature.feature.group</artifactId>
+							<version>0.0.0</version>
+						</dependency>
+						<dependency>
+							<type>p2-installable-unit</type>
+							<artifactId>org.eclipse.datatools.enablement.feature.feature.group</artifactId>
+							<version>0.0.0</version>
+						</dependency>
+									
+						
+						
+						<!-- maven -->
+						<dependency>
+							<type>p2-installable-unit</type>
+							<artifactId>org.jboss.tools.maven.jaxrs.feature.feature.group</artifactId>
+							<version>0.0.0</version>
+						</dependency>
+						<dependency>
+							<type>p2-installable-unit</type>
+							<artifactId>org.jboss.tools.maven.jbosspackaging.feature.feature.group</artifactId>
+							<version>0.0.0</version>
+						</dependency>
+						
+						<dependency>
+							<type>p2-installable-unit</type>
+							<artifactId>org.jboss.tools.maven.feature.feature.group</artifactId>
+							<version>0.0.0</version>
+						</dependency>
+						 <dependency>
+							<type>p2-installable-unit</type>
+							<artifactId>org.jboss.tools.maven.seam.feature.feature.group</artifactId>
+							<version>0.0.0</version>
+						</dependency>
+						<dependency>
+							<type>p2-installable-unit</type>
+							<artifactId>org.jboss.tools.maven.cdi.feature.feature.group</artifactId>
+							<version>0.0.0</version>
+						</dependency>
+						<dependency>
+							<type>p2-installable-unit</type>
+							<artifactId>org.jboss.tools.maven.hibernate.feature.feature.group</artifactId>
+							<version>0.0.0</version>
+						</dependency>
+						<dependency>
+							<type>p2-installable-unit</type>
+							<artifactId>org.jboss.tools.maven.jsf.feature.feature.group</artifactId>
+							<version>0.0.0</version>
+						</dependency>
+						<dependency>
+							<type>p2-installable-unit</type>
+							<artifactId>org.jboss.tools.maven.portlet.feature.feature.group</artifactId>
+							<version>0.0.0</version>
+						</dependency>
+						<dependency>
+							<type>p2-installable-unit</type>
+							<artifactId>org.jboss.tools.maven.project.examples.feature.feature.group</artifactId>
+							<version>0.0.0</version>
+						</dependency>
+					</dependencies>
 				</configuration>
 			</plugin>
 		</plugins>

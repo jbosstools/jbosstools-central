@@ -2,6 +2,7 @@ package org.jboss.tools.maven.ui.bot.test;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.jface.bindings.keys.KeyStroke;
 
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
 import org.eclipse.swtbot.swt.finder.keyboard.Keystrokes;
@@ -9,12 +10,21 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 import org.jboss.tools.ui.bot.ext.SWTBotExt;
 import org.jboss.tools.ui.bot.ext.config.Annotations.Require;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
-@Require(perspective="Seam 2")
-public class MaterializeLibraryTest extends AbstractMavenSWTBotTest {
+@Require(perspective="Java")
+public class MaterializeLibraryTest extends AbstractMavenSWTBotTest{
 	
-	private String projectName = "exampleHTML5";
+	private String projectName = "example";
+	
+	@BeforeClass
+	public static void setup(){
+		SWTBotExt setup = new SWTBotExt();
+		setup.menu("Window").menu("Show View").menu("Other...").click();
+		setup.tree().expandNode("Java").select("Package Explorer").click();
+		setup.button("OK").click();
+	}
 	
 	@Test
 	public void testMaterializeLibrary() throws Exception{
@@ -25,8 +35,9 @@ public class MaterializeLibraryTest extends AbstractMavenSWTBotTest {
 		ext.button("Next >").click();
 		waitForIdle();
 		Thread.sleep(1000);
-		ext.tree(0).expandNode("Java EE 6 Quickstarts").select("Java EE 6 HTML5 Mobile Webapp");
+		ext.tree(0).expandNode("Java EE 6 Quickstarts").select("Spring MVC Project");
 		ext.button("Finish").click();
+		Thread.sleep(500);
 		ext.comboBoxWithLabel("Project name").setText(projectName);
 		ext.comboBoxWithLabel("Package").setText(projectName);
 		ext.button("Next >").click();
@@ -35,11 +46,15 @@ public class MaterializeLibraryTest extends AbstractMavenSWTBotTest {
 		final SWTBotView packageExplorer = bot.viewByTitle("Package Explorer");
 		IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject(projectName);
 		SWTBotTree tree = packageExplorer.bot().tree();
-		tree.expandNode(project.getName()).getNode("Maven Dependencies").contextMenu("Materialize Library...").click();
+		SWTBotTreeItem item = tree.expandNode(project.getName());
+		item = item.getNode("Maven Dependencies");
+		item.select().pressShortcut(Keystrokes.SHIFT,Keystrokes.F10);
+		KeyStroke k = KeyStroke.getInstance("M");
+		item.pressShortcut(k);
 		waitForIdle();
 		SWTBotExt botExt = new SWTBotExt();
 		botExt.button("OK").click();
-		botExt.button("OK").click();
+		botExt.activeShell().bot().button("OK").click();
 		waitForIdle();
 		assertFalse(project.getName()+" is still a maven project!",Utils.isMavenProject(project.getName()));
 		testExcludedResources(project);

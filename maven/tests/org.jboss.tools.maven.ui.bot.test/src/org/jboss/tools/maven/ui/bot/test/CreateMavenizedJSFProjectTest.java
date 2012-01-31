@@ -59,9 +59,14 @@ public class CreateMavenizedJSFProjectTest{
 	
 	protected static SWTWorkbenchBot bot;
 	
+	
 	@BeforeClass
 	public final static void beforeClass() throws Exception {
 		bot = AbstractMavenSWTBotTest.initSWTBot();
+		SWTBotExt setup = new SWTBotExt();
+		setup.menu("Window").menu("Show View").menu("Other...").click();
+		setup.tree().expandNode("Java").select("Package Explorer").click();
+		setup.button("OK").click();
 	}
 	
 	@Test
@@ -77,6 +82,8 @@ public class CreateMavenizedJSFProjectTest{
 	@Test
 	public void buildProject_AS6_v2() throws CoreException, ParserConfigurationException, SAXException, IOException, TransformerException, InterruptedException{
 		addDependencies(PROJECT_NAME6, JSF_VERSION_2);
+		IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject(PROJECT_NAME6);
+		assertNoErrors(project);
 		buildProject(PROJECT_NAME6);
 	}
 	/*
@@ -101,6 +108,8 @@ public class CreateMavenizedJSFProjectTest{
 	@Test
 	public void buildProject_AS6_v1() throws CoreException, ParserConfigurationException, SAXException, IOException, TransformerException, InterruptedException{
 		addDependencies(PROJECT_NAME6_v1, JSF_VERSION_1_2);
+		IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject(PROJECT_NAME6_v1);
+		assertNoErrors(project);
 		buildProject(PROJECT_NAME6_v1);
 	}
 	
@@ -128,8 +137,6 @@ public class CreateMavenizedJSFProjectTest{
 		waitForIdle();
 		shell.button("Finish").click();;
 		waitForIdle();
-		IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject(projectName);
-		assertNoErrors(project);
 	}
 	
 	
@@ -172,8 +179,7 @@ public class CreateMavenizedJSFProjectTest{
 	    SWTBot shellProperties = bot.shell("Properties for "+projectName).activate().bot();
 	    shellProperties.tree().select("Project Facets");
 	    Thread.sleep(500);
-	    SWTBotExt botExt = new SWTBotExt();
-	    botExt.link(0).click("Convert to faceted form...");
+	    //botExt.link(0).click("Convert to faceted form...");
 	    waitForIdle();
 	    shellProperties.tree(1).getTreeItem("JBoss Maven Integration").check();
 	    Thread.sleep(500);

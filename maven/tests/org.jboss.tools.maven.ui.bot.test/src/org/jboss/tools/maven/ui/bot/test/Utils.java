@@ -14,4 +14,13 @@ public class Utils {
 		return project.hasNature(IMavenConstants.NATURE_ID);
 	}
 	
+	public static boolean hasNature(String projectName, String natureID) throws CoreException {
+		IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject(projectName);
+		return project.hasNature(natureID);
+	}
+	
+	public static void waitForIdle() {
+		AbstractMavenSWTBotTest.waitForIdle();
+	}
+	
 }
