@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="lib" path="/home/rhopp/jbdevstudio/studio/plugins/org.eclipse.ui.forms_3.5.100.v20110425.jar"/>
+	<classpathentry kind="lib" path="/home/rhopp/jbdevstudio/studio/plugins/org.eclipse.swtbot.forms.finder_2.0.5.20111003_1754-3676ac8-dev-e36.jar"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>

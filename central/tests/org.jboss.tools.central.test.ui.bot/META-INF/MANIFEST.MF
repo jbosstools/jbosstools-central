@@ -1,0 +1,11 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: org.jboss.tools.central.test.ui.bot
+Bundle-SymbolicName: org.jboss.tools.central.test.ui.bot;singleton:=true
+Bundle-Version: 1.0.0.qualifier
+Bundle-ActivationPolicy: lazy
+Bundle-Vendor: Red Hat
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Require-Bundle: org.eclipse.swtbot.go,
+ org.jboss.tools.ui.bot.ext;bundle-version="3.2.0"
+Import-Package: org.jboss.tools.ui.bot.ext
