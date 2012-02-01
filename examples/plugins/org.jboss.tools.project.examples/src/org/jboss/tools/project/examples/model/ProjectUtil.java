@@ -80,6 +80,8 @@ public class ProjectUtil {
 	public static final String CHEATSHEETS = "cheatsheets"; //$NON-NLS-1$
 
 	public static final String PROTOCOL_FILE = "file"; //$NON-NLS-1$
+	
+	public static final String PROTOCOL_PLATFORM = "platform"; //$NON-NLS-1$
 
 	private static final String PROJECT_EXAMPLES_XML_EXTENSION_ID = "org.jboss.tools.project.examples.projectExamplesXml"; //$NON-NLS-1$
 	
@@ -519,7 +521,7 @@ public class ProjectUtil {
 	public static File getProjectExamplesFile(URL url, String prefix,
 			String suffix, IProgressMonitor monitor) {
 		File file = null;
-		if (PROTOCOL_FILE.equals(url.getProtocol())) {
+		if (PROTOCOL_FILE.equals(url.getProtocol()) || PROTOCOL_PLATFORM.equalsIgnoreCase(url.getProtocol())) {
 			try {
 				// assume all illegal characters have been properly encoded, so
 				// use URI class to unencode
