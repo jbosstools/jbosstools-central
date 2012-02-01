@@ -4,7 +4,9 @@ import java.io.File;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
+import org.jboss.tools.jst.web.kb.IKbProject;
 import org.jboss.tools.maven.jsf.configurators.JSFProjectConfigurator;
+import org.jboss.tools.seam.core.ISeamProject;
 import org.junit.Test;
 
 @SuppressWarnings("restriction")
@@ -37,4 +39,12 @@ public class SeamConfiguratorTest extends AbstractMavenConfiguratorTest {
 		return seamProject;
 	}	
 
+	@Test
+	public void testJBIDE10764_builderOrder() throws Exception {
+		IProject ejb = importProject("projects/seam/JBIDE-10764/pom.xml");
+		waitForJobsToComplete();
+		assertNoErrors(ejb);
+		assertTrue("Seam nature is missing", ejb.hasNature(ISeamProject.NATURE_ID));
+		assertTrue("KB nature is missing", ejb.hasNature(IKbProject.NATURE_ID));
+	}
 }

@@ -12,13 +12,11 @@ package org.jboss.tools.maven.seam.configurators;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
 import org.apache.maven.project.MavenProject;
-import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.ProjectScope;
@@ -28,7 +26,6 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.core.runtime.preferences.IScopeContext;
-import org.eclipse.emf.common.util.EList;
 import org.eclipse.jdt.core.IClasspathEntry;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IPackageFragment;
@@ -36,13 +33,7 @@ import org.eclipse.jdt.core.IPackageFragmentRoot;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jface.preference.IPreferenceStore;
-import org.eclipse.jst.j2ee.application.Application;
-import org.eclipse.jst.j2ee.application.Module;
-import org.eclipse.jst.j2ee.application.internal.operations.AddComponentToEnterpriseApplicationDataModelProvider;
-import org.eclipse.jst.j2ee.application.internal.operations.RemoveComponentFromEnterpriseApplicationDataModelProvider;
 import org.eclipse.jst.j2ee.application.internal.operations.RemoveComponentFromEnterpriseApplicationOperation;
-import org.eclipse.jst.j2ee.componentcore.util.EARArtifactEdit;
-import org.eclipse.jst.j2ee.internal.common.classpath.J2EEComponentClasspathUpdater;
 import org.eclipse.jst.j2ee.internal.project.J2EEProjectUtilities;
 import org.eclipse.jst.j2ee.project.JavaEEProjectUtilities;
 import org.eclipse.jst.jsf.core.internal.project.facet.IJSFFacetInstallDataModelProperties;
@@ -55,25 +46,19 @@ import org.eclipse.m2e.core.project.configurator.AbstractProjectConfigurator;
 import org.eclipse.m2e.core.project.configurator.ProjectConfigurationRequest;
 import org.eclipse.wst.common.componentcore.ComponentCore;
 import org.eclipse.wst.common.componentcore.ModuleCoreNature;
-import org.eclipse.wst.common.componentcore.datamodel.properties.ICreateReferenceComponentsDataModelProperties;
 import org.eclipse.wst.common.componentcore.resources.IVirtualComponent;
 import org.eclipse.wst.common.componentcore.resources.IVirtualFolder;
 import org.eclipse.wst.common.componentcore.resources.IVirtualReference;
-import org.eclipse.wst.common.frameworks.datamodel.DataModelFactory;
 import org.eclipse.wst.common.frameworks.datamodel.IDataModel;
-import org.eclipse.wst.common.frameworks.datamodel.IDataModelOperation;
 import org.eclipse.wst.common.project.facet.core.IFacetedProject;
 import org.eclipse.wst.common.project.facet.core.IProjectFacet;
 import org.eclipse.wst.common.project.facet.core.IProjectFacetVersion;
 import org.eclipse.wst.common.project.facet.core.ProjectFacetsManager;
-import org.jboss.tools.common.model.util.EclipseResourceUtil;
-import org.jboss.tools.jst.web.kb.IKbProject;
 import org.jboss.tools.maven.core.IJBossMavenConstants;
 import org.jboss.tools.maven.core.internal.project.facet.MavenFacetInstallDataModelProvider;
 import org.jboss.tools.maven.jsf.MavenJSFActivator;
 import org.jboss.tools.maven.seam.MavenSeamActivator;
 import org.jboss.tools.maven.ui.Activator;
-import org.jboss.tools.seam.core.ISeamProject;
 import org.jboss.tools.seam.core.SeamCorePlugin;
 import org.jboss.tools.seam.core.SeamUtil;
 import org.jboss.tools.seam.core.project.facet.SeamRuntime;
@@ -179,7 +164,6 @@ public class SeamProjectConfigurator extends AbstractProjectConfigurator {
 	    		IDataModel model = createSeamDataModel(deploying, seamVersion, project);
 	    		installWarFacets(fproj, model, seamVersion, monitor);
 	    	} else if ("ear".equals(packaging)) { //$NON-NLS-1$
-	    		configureApplicationXml(project, monitor);
 	    		installEarFacets(fproj, monitor);
 	    		installM2Facet(fproj, monitor);
 	    		IProject webProject = getReferencingSeamWebProject(project);
@@ -385,12 +369,7 @@ public class SeamProjectConfigurator extends AbstractProjectConfigurator {
 			return;
 		}
 		try {
-			if (!project.hasNature(ISeamProject.NATURE_ID)) {
-				EclipseResourceUtil.addNatureToProject(project,	ISeamProject.NATURE_ID);
-			}
-			if(!project.hasNature(IKbProject.NATURE_ID)) {
-				EclipseResourceUtil.addNatureToProject(project, IKbProject.NATURE_ID);
-			}
+			SeamUtil.enableSeamSupport(project);
 			for (int i = 0; i < earProjects.length; i++) {
 				IEclipsePreferences prefs = SeamCorePlugin
 						.getSeamPreferences(project);
@@ -634,107 +613,6 @@ public class SeamProjectConfigurator extends AbstractProjectConfigurator {
 			return defaultRuntime.getName();
 		}
 		return seamRuntime3;
-	}
-	
-	private void configureApplicationXml(IProject project, IProgressMonitor monitor) {
-		EARArtifactEdit earArtifactEdit = null;
-		try {
-			earArtifactEdit = EARArtifactEdit.getEARArtifactEditForWrite(project);
-			if(earArtifactEdit!=null) {
-				Application application = earArtifactEdit.getApplication();
-				if (application == null) {
-					return;
-				}
-				EList modules = application.getModules();
-				for (Iterator iterator = modules.iterator(); iterator.hasNext();) {
-					Object object = iterator.next();
-					if (object instanceof Module) {
-						Module module = (Module) object;
-						String uri = module.getUri();
-						if (uri != null && (uri.startsWith("mvel14") || uri.startsWith("mvel2"))) { //$NON-NLS-1$ //$NON-NLS-2$
-							iterator.remove();
-						}
-						if (uri != null && (uri.equals("jboss-seam.jar"))) { //$NON-NLS-1$ //$NON-NLS-2$
-							iterator.remove();
-						}
-					}
-				}				
-				
-			}
-		} finally {
-			if(earArtifactEdit!=null) {
-				earArtifactEdit.saveIfNecessary(monitor);
-				earArtifactEdit.dispose();
-			}
-		}
-		try {
-			final IFacetedProject fproj = ProjectFacetsManager.create(project);
-			if (fproj != null && fproj.hasProjectFacet(earFacet)) {
-				IVirtualComponent earComponent = ComponentCore.createComponent(project);
-				IVirtualReference[] refs = earComponent.getReferences();
-				IVirtualReference mvelReference = null;
-				for (IVirtualReference ref:refs) {
-					String archiveName = ref.getArchiveName();
-					if (archiveName != null && archiveName.startsWith("/lib/mvel2")) { //$NON-NLS-1$
-						mvelReference = ref;
-						break;
-					}
-				}
-				if (mvelReference != null) {
-					changeReference(earComponent, mvelReference);
-				}
-			}
-		} catch (CoreException e) {
-			MavenSeamActivator.log(e);
-		}
-		
-	}
-
-	/**
-	 * @param earComponent
-	 * @param mvelReference
-	 */
-	private void changeReference(IVirtualComponent earComponent,
-			IVirtualReference mvelReference) {
-		List<IVirtualComponent> list = new ArrayList<IVirtualComponent>();
-		list.add(mvelReference.getReferencedComponent());
-		
-		IDataModel model = DataModelFactory.createDataModel(new RemoveComponentFromEnterpriseApplicationDataModelProvider() {
-
-			@Override
-			public IDataModelOperation getDefaultOperation() {
-				return new RemoveComponentFromEnterpriseApplicationOperationEx(model);
-			}
-			
-		});
-		model.setProperty(ICreateReferenceComponentsDataModelProperties.SOURCE_COMPONENT, earComponent);
-		
-		model.setProperty(ICreateReferenceComponentsDataModelProperties.TARGET_COMPONENT_LIST, list);
-        model.setProperty(ICreateReferenceComponentsDataModelProperties.TARGET_COMPONENTS_DEPLOY_PATH, "/lib");		 //$NON-NLS-1$
-        IDataModelOperation op = model.getDefaultOperation();
-        try {
-			op.execute(null, null);
-			J2EEComponentClasspathUpdater.getInstance().queueUpdateEAR(earComponent.getProject());
-		} catch (ExecutionException e) {
-			MavenSeamActivator.log(e);
-		}	
-		
-		
-		String archiveName = mvelReference.getArchiveName();
-		archiveName = archiveName.substring(4);
-		mvelReference.setArchiveName(archiveName);
-		IDataModel dm = DataModelFactory.createDataModel(new AddComponentToEnterpriseApplicationDataModelProvider());
-		
-		dm.setProperty(ICreateReferenceComponentsDataModelProperties.SOURCE_COMPONENT, earComponent);					
-		dm.setProperty(ICreateReferenceComponentsDataModelProperties.TARGET_COMPONENT_LIST, list);
-		
-        dm.setProperty(ICreateReferenceComponentsDataModelProperties.TARGET_COMPONENTS_DEPLOY_PATH, "/lib"); //$NON-NLS-1$
-
-		try {
-			dm.getDefaultOperation().execute(null, null);
-		} catch (ExecutionException e) {
-			MavenSeamActivator.log(e);
-		}		
 	}
 	
 	private static class RemoveComponentFromEnterpriseApplicationOperationEx extends RemoveComponentFromEnterpriseApplicationOperation {
