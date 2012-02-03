@@ -299,6 +299,7 @@ public class SeamProjectConfigurator extends AbstractProjectConfigurator {
 		if (!fproj.hasProjectFacet(dynamicWebFacet)) {
 			fproj.installProjectFacet(dynamicWebVersion, null, monitor);
 		}
+		//Seam requires the JSF facet (!!!)
 		installJSFFacet(fproj, monitor);
 		installM2Facet(fproj, monitor);
 		if (!fproj.hasProjectFacet(seamFacet)) {
@@ -371,8 +372,7 @@ public class SeamProjectConfigurator extends AbstractProjectConfigurator {
 		try {
 			SeamUtil.enableSeamSupport(project);
 			for (int i = 0; i < earProjects.length; i++) {
-				IEclipsePreferences prefs = SeamCorePlugin
-						.getSeamPreferences(project);
+				IEclipsePreferences prefs = SeamCorePlugin.getSeamPreferences(project);
 				String seamParentProject = prefs.get(ISeamFacetDataModelProperties.SEAM_PARENT_PROJECT,null);
 				if (seamParentProject == null) {
 					IProject earProject = earProjects[i];
@@ -428,8 +428,7 @@ public class SeamProjectConfigurator extends AbstractProjectConfigurator {
 		if (component != null) {
 			IVirtualReference[] references = component.getReferences();
 			for (int i = 0; i < references.length; i++) {
-				IVirtualComponent refComponent = references[i]
-						.getReferencedComponent();
+				IVirtualComponent refComponent = references[i].getReferencedComponent();
 				IProject refProject = refComponent.getProject();
 				if (JavaEEProjectUtilities.isEJBProject(refProject)) {
 					if (refProject.hasNature(IMavenConstants.NATURE_ID)) {
