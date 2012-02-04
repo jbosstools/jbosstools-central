@@ -88,11 +88,9 @@ public class MavenFacetInstallDelegate implements IDelegate {
 
 				// build.setFinalName(artifactId);
 				if (fpwc.hasProjectFacet(JavaFacet.FACET)) {
-					String outputDirectory = MavenCoreActivator
-							.getOutputDirectory(javaProject);
+					String outputDirectory = MavenCoreActivator.getOutputDirectory(javaProject);
 					build.setOutputDirectory(outputDirectory);
-					String sourceDirectory = MavenCoreActivator
-							.getSourceDirectory(javaProject);
+					String sourceDirectory = MavenCoreActivator.getSourceDirectory(javaProject);
 					if (sourceDirectory != null) {
 						build.setSourceDirectory(sourceDirectory);
 					}
@@ -113,8 +111,7 @@ public class MavenFacetInstallDelegate implements IDelegate {
 					MavenCoreActivator.createMavenProject(project.getName(),
 							monitor, model, true);
 				}
-				IProjectFacet seamFacet = ProjectFacetsManager
-						.getProjectFacet(SEAM_FACET_ID);
+				IProjectFacet seamFacet = ProjectFacetsManager.getProjectFacet(SEAM_FACET_ID);
 				if (!fpwc.hasProjectFacet(seamFacet)) {
 					MavenCoreActivator.addCompilerPlugin(build, project);
 				}

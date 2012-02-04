@@ -57,6 +57,7 @@
 				<artifactId>maven-ear-plugin</artifactId>
 				<versionRange>[1.0,)</versionRange>
 				<goals>
+					<goal>generate-application-xml</goal>
 					<goal>ear</goal>
 				</goals>
 			</pluginExecutionFilter>

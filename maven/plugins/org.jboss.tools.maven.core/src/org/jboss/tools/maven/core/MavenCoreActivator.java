@@ -292,6 +292,10 @@ public class MavenCoreActivator extends Plugin {
 
 	public static void addClasspathAttribute(IJavaProject javaProject,
 			IClasspathAttribute attribute, IProgressMonitor monitor) throws JavaModelException {
+		if (javaProject == null || !javaProject.exists()) {
+			return;
+		}
+
 		IClasspathEntry[] cp = javaProject.getRawClasspath();
 		for (int i = 0; i < cp.length; i++) {
 			if (IClasspathEntry.CPE_CONTAINER == cp[i].getEntryKind()
