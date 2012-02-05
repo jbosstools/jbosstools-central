@@ -69,7 +69,7 @@ import org.eclipse.ui.views.markers.internal.MarkerMessages;
 import org.jboss.tools.project.examples.Messages;
 import org.jboss.tools.project.examples.ProjectExamplesActivator;
 import org.jboss.tools.project.examples.dialog.xpl.QuickFixWizard;
-import org.jboss.tools.project.examples.model.Project;
+import org.jboss.tools.project.examples.model.ProjectExample;
 
 /**
  * @author snjeza
@@ -79,7 +79,7 @@ public class MarkerDialog extends TitleAreaDialog {
 
 	private static final String QUICK_FIX = Messages.MarkerDialog_Quick_Fix;
 	private static final IMarkerResolution[] EMPTY_ARRAY = new IMarkerResolution[0];
-	private List<Project> projects;
+	private List<ProjectExample> projects;
 	private Image _dlgTitleImage;
 	private Button quickFixButton;
 	private Button finishButton;
@@ -100,7 +100,7 @@ public class MarkerDialog extends TitleAreaDialog {
 
 	}
 
-	public MarkerDialog(Shell parentShell, List<Project> projects) {
+	public MarkerDialog(Shell parentShell, List<ProjectExample> projects) {
 		super(parentShell);
 		this.projects = projects;
 		setShellStyle(SWT.CLOSE | SWT.MAX | SWT.TITLE | SWT.BORDER
@@ -222,7 +222,7 @@ public class MarkerDialog extends TitleAreaDialog {
 				try {
 					quickFixButton.setSelection(false);
 					openQuickFixWizard(selected);
-					for (Project project : projects) {
+					for (ProjectExample project : projects) {
 						if (project.getIncludedProjects() == null) {
 							buildProject(project.getName());
 						} else {

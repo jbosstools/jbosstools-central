@@ -21,9 +21,9 @@ import org.eclipse.ui.cheatsheets.ICheatSheetManager;
 import org.jboss.tools.project.examples.ProjectExamplesActivator;
 import org.jboss.tools.project.examples.cheatsheet.Activator;
 import org.jboss.tools.project.examples.cheatsheet.Messages;
-import org.jboss.tools.project.examples.model.Category;
-import org.jboss.tools.project.examples.model.Project;
-import org.jboss.tools.project.examples.model.ProjectUtil;
+import org.jboss.tools.project.examples.model.ProjectExampleCategory;
+import org.jboss.tools.project.examples.model.ProjectExample;
+import org.jboss.tools.project.examples.model.ProjectExampleUtil;
 
 /**
  * 
@@ -53,11 +53,11 @@ public class RunProjectExample extends Action implements ICheatSheetAction {
 			Activator.log(NLS.bind(Messages.RunProjectExample_Invalid_project_example, params[0]));
 			return;
 		}
-		List<Category> categories = ProjectUtil.getProjects(new NullProgressMonitor());
-		Project project = null;
-		for (Category category:categories) {
+		List<ProjectExampleCategory> categories = ProjectExampleUtil.getProjects(new NullProgressMonitor());
+		ProjectExample project = null;
+		for (ProjectExampleCategory category:categories) {
 			if (projectExample[0].equals(category.getName())) {
-				for (Project p:category.getProjects()) {
+				for (ProjectExample p:category.getProjects()) {
 					if (projectExample[1].equals(p.getName())) {
 						project = p;
 						break;
@@ -69,7 +69,7 @@ public class RunProjectExample extends Action implements ICheatSheetAction {
 			}
 		}
 		if (project != null) {
-			List<Project> selectedProjects = new ArrayList<Project>();
+			List<ProjectExample> selectedProjects = new ArrayList<ProjectExample>();
 			selectedProjects.add(project);
 			ProjectExamplesActivator.importProjectExamples(selectedProjects, true);
 		}

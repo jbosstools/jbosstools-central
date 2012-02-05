@@ -24,16 +24,17 @@ import org.jboss.tools.project.examples.ProjectExamplesActivator;
  * @author snjeza
  * 
  */
-public class Project implements ProjectModelElement {
+public class ProjectExample implements ProjectModelElement,
+		Comparable<ProjectExample> {
 
 	private static final String SEP = "/"; //$NON-NLS-1$
-	private static String[] PREFIXES = { "file:" , "http:", "https:" , "ftp:" }; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+	private static String[] PREFIXES = { "file:", "http:", "https:", "ftp:" }; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 	private String name;
 	private String shortDescription;
 	private String description;
 	private String url;
 	private long size;
-	private Category category;
+	private ProjectExampleCategory category;
 	private List<String> includedProjects;
 	private boolean welcome;
 	private String type;
@@ -43,22 +44,23 @@ public class Project implements ProjectModelElement {
 	private String perspectiveId;
 	private String importType;
 	private String importTypeDescription;
-	private ArchetypeModel  archetypeModel = new ArchetypeModel();
+	private ArchetypeModel archetypeModel = new ArchetypeModel();
 	private File file;
 	private IProjectExampleSite site;
-	private String defaultProfiles =""; //$NON-NLS-1$
-  private Set<String> tags;
-  private String iconPath;
-	
-	public Project() {
-		name=""; //$NON-NLS-1$
-		shortDescription=""; //$NON-NLS-1$
-		description=""; //$NON-NLS-1$
-		url=""; //$NON-NLS-1$
-		welcome=false;
+	private String defaultProfiles = ""; //$NON-NLS-1$
+	private int priority;
+	private Set<String> tags;
+	private String iconPath;
+
+	public ProjectExample() {
+		name = ""; //$NON-NLS-1$
+		shortDescription = ""; //$NON-NLS-1$
+		description = ""; //$NON-NLS-1$
+		url = ""; //$NON-NLS-1$
+		welcome = false;
 		perspectiveId = null;
 		importType = null;
-		setCategory(Category.OTHER);
+		setCategory(ProjectExampleCategory.OTHER);
 	}
 
 	public String getName() {
@@ -90,7 +92,7 @@ public class Project implements ProjectModelElement {
 			return url;
 		}
 		url = url.trim();
-		for (String prefix:PREFIXES) {
+		for (String prefix : PREFIXES) {
 			if (url.startsWith(prefix)) {
 				return url;
 			}
@@ -102,7 +104,7 @@ public class Project implements ProjectModelElement {
 		if (siteURL == null) {
 			return url;
 		}
-		String urlString = siteURL.toString(); 
+		String urlString = siteURL.toString();
 		if (urlString.endsWith(SEP)) {
 			urlString = urlString.substring(0, urlString.length() - 1);
 		} else {
@@ -129,18 +131,18 @@ public class Project implements ProjectModelElement {
 		this.size = size;
 	}
 
-	public Category getCategory() {
+	public ProjectExampleCategory getCategory() {
 		return category;
 	}
 
-	public void setCategory(Category category) {
+	public void setCategory(ProjectExampleCategory category) {
 		this.category = category;
 	}
 
 	public String getSizeAsText() {
 		String sizeString = ""; //$NON-NLS-1$
 		BigDecimal sizeDecimal = new BigDecimal(size);
-		BigDecimal MB = new BigDecimal(1024*1024);
+		BigDecimal MB = new BigDecimal(1024 * 1024);
 		BigDecimal KB = new BigDecimal(1024);
 		if (sizeDecimal.compareTo(MB) > 0) {
 			sizeString = String.format("%5.2fM", sizeDecimal.divide(MB)); //$NON-NLS-1$
@@ -185,15 +187,13 @@ public class Project implements ProjectModelElement {
 	}
 
 	public IProjectExampleSite getSite() {
-		/*if (site == null) {
-			if (getUrl().startsWith("http://anonsvn.jboss.org")) { //$NON-NLS-1$
-				site = Messages.Project_JBoss_Tools_Team_from_jboss_org;
-			} else if (getUrl().startsWith("file:")) { //$NON-NLS-1$
-				site = Messages.Project_Local;
-			} else {
-				site = Messages.Project_Unknown;
-			}
-		}*/
+		/*
+		 * if (site == null) { if
+		 * (getUrl().startsWith("http://anonsvn.jboss.org")) { //$NON-NLS-1$
+		 * site = Messages.Project_JBoss_Tools_Team_from_jboss_org; } else if
+		 * (getUrl().startsWith("file:")) { //$NON-NLS-1$ site =
+		 * Messages.Project_Local; } else { site = Messages.Project_Unknown; } }
+		 */
 		return site;
 	}
 
@@ -244,7 +244,7 @@ public class Project implements ProjectModelElement {
 	public ArchetypeModel getArchetypeModel() {
 		return archetypeModel;
 	}
-	
+
 	public boolean isURLRequired() {
 		return !ProjectExamplesActivator.MAVEN_ARCHETYPE.equals(importType);
 	}
@@ -256,7 +256,7 @@ public class Project implements ProjectModelElement {
 	public void setFile(File file) {
 		this.file = file;
 	}
-	
+
 	public String getDefaultProfiles() {
 		return defaultProfiles;
 	}
@@ -270,35 +270,68 @@ public class Project implements ProjectModelElement {
 		return getName();
 	}
 
-  public void setTags(Set<String> tags) {
-    this.tags = tags;
-  }
-  
-  public Set<String> getTags() {
-    if (tags == null) {
-      tags = new HashSet<String>();
-    }
-    return tags;
-  }
-  
-  public boolean hasTags(String ... tags) {
-    if (!getTags().isEmpty() 
-        && tags != null && tags.length > 0) {
-      for (String tag : tags) {
-        if (!getTags().contains(tag)) {
-          return false;
-        }
-      }
-      return true;
-    }
-    return false;
-  }
+	public void setTags(Set<String> tags) {
+		this.tags = tags;
+	}
 
-  public void setIconPath(String path) {
-    this.iconPath = path;
-  }  
-  
-  public String getIconPath() {
-    return iconPath;
-  }
+	public Set<String> getTags() {
+		if (tags == null) {
+			tags = new HashSet<String>();
+		}
+		return tags;
+	}
+
+	public boolean hasTags(String... tags) {
+		if (!getTags().isEmpty() && tags != null && tags.length > 0) {
+			for (String tag : tags) {
+				if (!getTags().contains(tag)) {
+					return false;
+				}
+			}
+			return true;
+		}
+		return false;
+	}
+
+	public void setIconPath(String path) {
+		this.iconPath = path;
+	}
+
+	public String getIconPath() {
+		return iconPath;
+	}
+
+	public int getPriority() {
+		return priority;
+	}
+
+	public void setPriority(int priority) {
+		this.priority = priority;
+	}
+
+	@Override
+	public int compareTo(ProjectExample o) {
+		if (o == null) {
+			return -1;
+		}
+		ProjectExampleCategory otherCategory = o.getCategory();
+		if (otherCategory == null && this.category == null) {
+			return 0;
+		}
+		if (this.category != null) {
+			if (this.category.compareTo(otherCategory) != 0) {
+				return this.category.compareTo(otherCategory);
+			}
+			int other = o.getPriority();
+			if (other < this.priority)
+				return 1;
+			else if (other > this.priority)
+				return -1;
+			if (name == null) {
+				return -1;
+			}
+			return name.compareTo(o.getName());
+		}
+		return -1;
+	}
 }

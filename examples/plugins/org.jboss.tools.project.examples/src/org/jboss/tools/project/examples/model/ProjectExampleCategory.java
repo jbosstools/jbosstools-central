@@ -19,14 +19,16 @@ import org.jboss.tools.project.examples.Messages;
  * @author snjeza
  * 
  */
-public class Category implements ProjectModelElement, Comparable<Category> {
+public class ProjectExampleCategory implements ProjectModelElement, Comparable<ProjectExampleCategory> {
 
 	private String name;
-	private List<Project> projects = new ArrayList<Project>();
+	private List<ProjectExample> projects = new ArrayList<ProjectExample>();
 	private IProjectExampleSite site;
-	public static Category OTHER = new Category(Messages.Category_Other);
+	private String description;
+	private int priority;
+	public static ProjectExampleCategory OTHER = new ProjectExampleCategory(Messages.Category_Other);
 
-	public Category(String name) {
+	public ProjectExampleCategory(String name) {
 		super();
 		this.name = name;
 	}
@@ -39,16 +41,16 @@ public class Category implements ProjectModelElement, Comparable<Category> {
 		this.name = name;
 	}
 
-	public List<Project> getProjects() {
+	public List<ProjectExample> getProjects() {
 		return projects;
 	}
 
-	public void setProjects(List<Project> projects) {
+	public void setProjects(List<ProjectExample> projects) {
 		this.projects = projects;
 	}
 
 	public String getDescription() {
-		return getName();
+		return description;
 	}
 
 	public String getShortDescription() {
@@ -62,6 +64,18 @@ public class Category implements ProjectModelElement, Comparable<Category> {
 	@Override
 	public void setSite(IProjectExampleSite site) {
 		this.site = site;
+	}
+
+	public int getPriority() {
+		return priority;
+	}
+
+	public void setPriority(int priority) {
+		this.priority = priority;
+	}
+	
+	public void setDescription(String description) {
+		this.description = description;
 	}
 
 	@Override
@@ -81,7 +95,7 @@ public class Category implements ProjectModelElement, Comparable<Category> {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		Category other = (Category) obj;
+		ProjectExampleCategory other = (ProjectExampleCategory) obj;
 		if (name == null) {
 			if (other.name != null)
 				return false;
@@ -96,26 +110,24 @@ public class Category implements ProjectModelElement, Comparable<Category> {
 	}
 
 	@Override
-	public String toString() {
-		return getName();
+	public int compareTo(ProjectExampleCategory o) {
+		if (o == null)
+			return 1;
+		int other = o.getPriority();
+		if (other < this.priority)
+			return 1;
+		else if (other > this.priority)
+			return -1;
+		if (name == null)
+			return -1;
+		return name.compareTo(o.getName());
 	}
 
-  @Override
-  public int compareTo(Category o) {
-    if (o == null) {
-      return 1;
-    }
-    //TODO use priorities
-    String otherName = o.getName();
-    if (name == otherName) {
-      return 0;
-    }
-    if (name == null) {
-      return -1;
-    }
-    if (otherName == null) {
-      return 1;
-    }
-    return name.compareTo(otherName);
-  }
+	@Override
+	public String toString() {
+		return "ProjectExampleCategory [name=" + name + ", description=" //$NON-NLS-1$ //$NON-NLS-2$
+				+ description + ", site=" + site + ", priority=" + priority  //$NON-NLS-1$//$NON-NLS-2$
+				+ "]"; //$NON-NLS-1$
+	}
+
 }

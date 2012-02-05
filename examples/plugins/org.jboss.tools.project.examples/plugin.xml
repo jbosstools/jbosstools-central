@@ -2,6 +2,7 @@
 <?eclipse version="3.2"?>
 <plugin>
    <extension-point id="projectExamplesXml" name="%ProjectExamples" schema="schema/projectExamplesXml.exsd"/>
+   <extension-point id="categories" name="%ProjectExampleCategories" schema="schema/categories.exsd"/>
    <extension-point id="importProjectExamples" name="Import Project Examples" schema="schema/importProjectExample.exsd"/>
 
   <extension point="org.eclipse.ui.newWizards">
@@ -74,6 +75,12 @@
         name="Java EE Archetypes">
         <url>http://download.jboss.org/jbosstools/examples/project-examples-shared-3.3.xml</url>
         <experimental>false</experimental>
+    </extension>
+    
+    <extension
+        point="org.jboss.tools.project.examples.categories"
+        name="Project Examples Categories">
+        <url>http://download.jboss.org/jbosstools/examples/project-examples-category-3.3.xml</url>
     </extension>
    
 </plugin>

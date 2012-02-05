@@ -33,7 +33,7 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.jboss.tools.maven.project.examples.wizard.ArchetypeExamplesWizard;
 import org.jboss.tools.project.examples.model.AbstractImportProjectExample;
-import org.jboss.tools.project.examples.model.Project;
+import org.jboss.tools.project.examples.model.ProjectExample;
 
 /**
  * @author snjeza
@@ -43,9 +43,9 @@ public class ImportMavenArchetypeProjectExample extends
 		AbstractImportProjectExample {
 
 	@Override
-	public boolean importProject(final Project projectDescription, File file,
+	public boolean importProject(final ProjectExample projectDescription, File file,
 			final IProgressMonitor monitor) throws Exception {
-		List<Project> projects = new ArrayList<Project>();
+		List<ProjectExample> projects = new ArrayList<ProjectExample>();
 		projects.add(projectDescription);
 		//IPath location = getLocation();
 		//final File destination = new File(location.toOSString());

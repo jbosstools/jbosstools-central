@@ -43,7 +43,7 @@ import org.jboss.tools.project.examples.Messages;
 import org.jboss.tools.project.examples.ProjectExamplesActivator;
 import org.jboss.tools.project.examples.model.IProjectExampleSite;
 import org.jboss.tools.project.examples.model.ProjectExampleSite;
-import org.jboss.tools.project.examples.model.ProjectUtil;
+import org.jboss.tools.project.examples.model.ProjectExampleUtil;
 import org.jboss.tools.project.examples.model.SiteCategory;
 
 /**
@@ -286,7 +286,7 @@ public class ProjectExamplesPreferencePage extends PreferencePage implements
 			store.setValue(ProjectExamplesActivator.PROJECT_EXAMPLES_OUTPUT_DIRECTORY, value);
 		}
 		try {
-			String userSites = ProjectUtil.getAsXML(sites.getUserSites());
+			String userSites = ProjectExampleUtil.getAsXML(sites.getUserSites());
 			store.setValue(ProjectExamplesActivator.USER_SITES, userSites);
 		} catch (Exception e) {
 			ProjectExamplesActivator.log(e);

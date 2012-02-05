@@ -97,9 +97,9 @@ import org.jboss.tools.project.examples.fixes.ProjectExamplesFix;
 import org.jboss.tools.project.examples.fixes.SeamRuntimeFix;
 import org.jboss.tools.project.examples.fixes.WTPRuntimeFix;
 import org.jboss.tools.project.examples.model.IImportProjectExample;
-import org.jboss.tools.project.examples.model.Project;
+import org.jboss.tools.project.examples.model.ProjectExample;
 import org.jboss.tools.project.examples.model.ProjectFix;
-import org.jboss.tools.project.examples.model.ProjectUtil;
+import org.jboss.tools.project.examples.model.ProjectExampleUtil;
 import org.jboss.tools.project.examples.wizard.ImportDefaultProjectExample;
 import org.jboss.tools.project.examples.wizard.NewProjectExamplesJob;
 import org.osgi.framework.BundleContext;
@@ -216,9 +216,9 @@ public class ProjectExamplesActivator extends AbstractUIPlugin {
 		return context;
 	}
 
-	public static List<IMarker> getMarkers(List<Project> projects) {
+	public static List<IMarker> getMarkers(List<ProjectExample> projects) {
 		List<IMarker> markers = new ArrayList<IMarker>();
-		for (Project project : projects) {
+		for (ProjectExample project : projects) {
 			try {
 				if (project.getIncludedProjects() == null) {
 					String projectName = project.getName();
@@ -255,7 +255,7 @@ public class ProjectExamplesActivator extends AbstractUIPlugin {
 		return markers;
 	}
 	
-	public static IProject[] getEclipseProject(Project project,
+	public static IProject[] getEclipseProject(ProjectExample project,
 			ProjectFix fix) {
 		String pName = fix.getProperties().get(
 				ProjectFix.ECLIPSE_PROJECTS);
@@ -288,7 +288,7 @@ public class ProjectExamplesActivator extends AbstractUIPlugin {
 		return projects.toArray(new IProject[0]);
 	}
 
-	protected static String replace(String name, Project project) {
+	protected static String replace(String name, ProjectExample project) {
 		List<String> includedProjects = project.getIncludedProjects();
 		if (includedProjects != null) {
 			int i = 0;
@@ -341,7 +341,7 @@ public class ProjectExamplesActivator extends AbstractUIPlugin {
 		}
 	}
 	
-	public static void fix(Project project, IProgressMonitor monitor) {
+	public static void fix(ProjectExample project, IProgressMonitor monitor) {
 		List<ProjectFix> fixes = project.getFixes();
 		for (ProjectFix fix:fixes) {
 			ProjectExamplesFix projectExamplesFix = ProjectExamplesFixFactory.getProjectFix(fix);
@@ -363,7 +363,7 @@ public class ProjectExamplesActivator extends AbstractUIPlugin {
 		}
 	}
 	
-	public static boolean downloadProject(Project project, IProgressMonitor monitor) {
+	public static boolean downloadProject(ProjectExample project, IProgressMonitor monitor) {
 		if (project.isURLRequired()) {
 			String urlString = project.getUrl();
 			String name = project.getName();
@@ -374,7 +374,7 @@ public class ProjectExamplesActivator extends AbstractUIPlugin {
 				ProjectExamplesActivator.log(e);
 				return false;
 			}
-			File file = ProjectUtil.getProjectExamplesFile(url, name,
+			File file = ProjectExampleUtil.getProjectExamplesFile(url, name,
 							".zip", monitor); //$NON-NLS-1$
 			if (file == null) {
 				return false;
@@ -384,11 +384,11 @@ public class ProjectExamplesActivator extends AbstractUIPlugin {
 		return true;
 	}
 	
-	public static void openWelcome(List<Project> projects) {
+	public static void openWelcome(List<ProjectExample> projects) {
 		if (projects == null) {
 			return;
 		}
-		for(final Project project:projects) {
+		for(final ProjectExample project:projects) {
 			fixWelcome(project);
 			if (project.isWelcome()) {
 				String urlString = project.getWelcomeURL();
@@ -418,7 +418,7 @@ public class ProjectExamplesActivator extends AbstractUIPlugin {
 					Display.getDefault().asyncExec(new Runnable() {
 
 						public void run() {
-							if (ProjectUtil.CHEATSHEETS.equals(project.getType())) {
+							if (ProjectExampleUtil.CHEATSHEETS.equals(project.getType())) {
 								CheatSheetView view = ViewUtilities.showCheatSheetView();
 								if (view == null) {
 									return;
@@ -478,7 +478,7 @@ public class ProjectExamplesActivator extends AbstractUIPlugin {
 		}
 	}
 
-	private static void fixWelcome(Project project) {
+	private static void fixWelcome(ProjectExample project) {
 		if (project == null || project.isWelcome()) {
 			return;
 		}
@@ -486,7 +486,7 @@ public class ProjectExamplesActivator extends AbstractUIPlugin {
 		
 	}
 
-	protected static void checkCheatsheet(Project project) {
+	protected static void checkCheatsheet(ProjectExample project) {
 		List<String> includedProjects = project.getIncludedProjects();
 		if (includedProjects == null || includedProjects.size() <= 0) {
 			return;
@@ -501,29 +501,29 @@ public class ProjectExamplesActivator extends AbstractUIPlugin {
 				continue;
 			}
 			if (checkCheatsheet(project, eclipseProject, PERIOD_CHEATSHEET_XML,
-					ProjectUtil.CHEATSHEETS)) {
+					ProjectExampleUtil.CHEATSHEETS)) {
 				return;
 			}
 			if (checkCheatsheet(project, eclipseProject, CHEATSHEET_XML,
-					ProjectUtil.CHEATSHEETS)) {
+					ProjectExampleUtil.CHEATSHEETS)) {
 				return;
 			}
 			if (checkCheatsheet(project, eclipseProject, README_HTML,
-					ProjectUtil.EDITOR)) {
+					ProjectExampleUtil.EDITOR)) {
 				return;
 			}
 			if (checkCheatsheet(project, eclipseProject, README_MD,
-					ProjectUtil.EDITOR)) {
+					ProjectExampleUtil.EDITOR)) {
 				return;
 			}
 			if (checkCheatsheet(project, eclipseProject, README_TXT,
-					ProjectUtil.EDITOR)) {
+					ProjectExampleUtil.EDITOR)) {
 				return;
 			}
 		}
 	}
 
-	private static boolean checkCheatsheet(Project project,
+	private static boolean checkCheatsheet(ProjectExample project,
 			IProject eclipseProject, String path, String type) {
 		IResource cheatsheet = eclipseProject.findMember(path);
 		if (cheatsheet != null && cheatsheet.exists() && cheatsheet.getType() == IResource.FILE) {
@@ -602,7 +602,7 @@ public class ProjectExamplesActivator extends AbstractUIPlugin {
 		}
 	}
 	
-	public static boolean canFix(Project project,ProjectFix fix) {
+	public static boolean canFix(ProjectExample project,ProjectFix fix) {
 		String type = fix.getType();
 		if (ProjectFix.PLUGIN_TYPE.equals(type)) {
 			return new PluginFix().canFix(project, fix);
@@ -619,7 +619,7 @@ public class ProjectExamplesActivator extends AbstractUIPlugin {
 		return true;
 	}
 	
-	public static void updatePerspective(List<Project> projects) {
+	public static void updatePerspective(List<ProjectExample> projects) {
 		if (projects == null || projects.size() != 1) {
 			return;
 		}
@@ -816,7 +816,7 @@ public class ProjectExamplesActivator extends AbstractUIPlugin {
 		page.setPerspective(persp);
 	}
 
-	public static void showQuickFix(final List<Project> projects) {
+	public static void showQuickFix(final List<ProjectExample> projects) {
 
 		Display.getDefault().asyncExec(new Runnable() {
 
@@ -832,7 +832,7 @@ public class ProjectExamplesActivator extends AbstractUIPlugin {
 	}
 	
 	public static void importProjectExamples(
-			final List<Project> selectedProjects, final boolean showQuickFix) {
+			final List<ProjectExample> selectedProjects, final boolean showQuickFix) {
 		final NewProjectExamplesJob workspaceJob = new NewProjectExamplesJob(
 				Messages.NewProjectExamplesWizard_Downloading, selectedProjects);
 		workspaceJob.setUser(true);
@@ -850,7 +850,7 @@ public class ProjectExamplesActivator extends AbstractUIPlugin {
 				if (!workspaceJob.getResult().isOK()) {
 					return;
 				}
-				List<Project> projects = workspaceJob.getProjects();
+				List<ProjectExample> projects = workspaceJob.getProjects();
 				try {
 					ProjectExamplesActivator.updatePerspective(projects);
 					ProjectExamplesActivator.waitForBuildAndValidation

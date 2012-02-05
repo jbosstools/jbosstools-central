@@ -36,4 +36,10 @@
         <url>http://download.jboss.org/jbosstools/examples/project-examples-maven-3.3.xml</url>
         <experimental>false</experimental>
   </extension>
+  
+  <extension
+        point="org.jboss.tools.project.examples.categories"
+        name="Project Examples Categories">
+        <url>http://download.jboss.org/jbosstools/examples/project-examples-category-jbosstools-3.3.xml</url>
+    </extension>
 </plugin>

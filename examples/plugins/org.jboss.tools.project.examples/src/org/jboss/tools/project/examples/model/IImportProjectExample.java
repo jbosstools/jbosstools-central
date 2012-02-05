@@ -22,10 +22,10 @@ import org.eclipse.core.runtime.IProgressMonitor;
  */
 public interface IImportProjectExample {
 
-	boolean importProject(Project projectDescription, File file,
+	boolean importProject(ProjectExample projectDescription, File file,
 			IProgressMonitor monitor) throws Exception;
 	
-	void fix(Project project, IProgressMonitor monitor);
+	void fix(ProjectExample project, IProgressMonitor monitor);
 	
 	void setName(String name);
 	

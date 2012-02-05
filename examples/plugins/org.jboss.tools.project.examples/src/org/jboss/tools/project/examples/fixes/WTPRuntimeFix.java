@@ -44,7 +44,7 @@ import org.jboss.ide.eclipse.as.core.util.IJBossRuntimeResourceConstants;
 import org.jboss.tools.portlet.core.internal.PortletRuntimeComponentProvider;
 import org.jboss.tools.project.examples.Messages;
 import org.jboss.tools.project.examples.ProjectExamplesActivator;
-import org.jboss.tools.project.examples.model.Project;
+import org.jboss.tools.project.examples.model.ProjectExample;
 import org.jboss.tools.project.examples.model.ProjectFix;
 
 /**
@@ -65,14 +65,14 @@ public class WTPRuntimeFix implements ProjectExamplesFix {
 	private static final String REQUIRED_COMPONENTS = "required-components"; //$NON-NLS-1$
 	private static final IPath ESB_SERVER_SUPPLIED_CONTAINER_PATH = new Path("org.jboss.esb.runtime.classpath/server.supplied"); //$NON-NLS-1$
 
-	public boolean canFix(Project project, ProjectFix fix) {
+	public boolean canFix(ProjectExample project, ProjectFix fix) {
 		if (!ProjectFix.WTP_RUNTIME.equals(fix.getType())) {
 			return false;
 		}
 		return getBestRuntime(project, fix) != null;
 	}
 
-	public boolean fix(Project project, ProjectFix fix,
+	public boolean fix(ProjectExample project, ProjectFix fix,
 			IProgressMonitor monitor) {
 		if (!canFix(project, fix)) {
 			return false;
@@ -114,7 +114,7 @@ public class WTPRuntimeFix implements ProjectExamplesFix {
 		return ret;
 	}
 
-	private void fixNonFacetedEsbProject(Project project, ProjectFix fix,
+	private void fixNonFacetedEsbProject(ProjectExample project, ProjectFix fix,
 			IProject eclipseProject) throws JavaModelException {
 		IRuntime runtime = getBestRuntime(project, fix);
 		if (runtime != null) {
@@ -176,7 +176,7 @@ public class WTPRuntimeFix implements ProjectExamplesFix {
 		}
 	}
 
-	private IRuntime getBestRuntime(Project project, ProjectFix fix) {
+	private IRuntime getBestRuntime(ProjectExample project, ProjectFix fix) {
 		String allowedTypes = fix.getProperties().get(
 				ProjectFix.ALLOWED_TYPES);
 		if (allowedTypes == null) {

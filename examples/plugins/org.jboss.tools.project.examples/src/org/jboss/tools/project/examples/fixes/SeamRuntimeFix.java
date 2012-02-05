@@ -18,7 +18,7 @@ import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.osgi.util.NLS;
 import org.jboss.tools.project.examples.Messages;
 import org.jboss.tools.project.examples.ProjectExamplesActivator;
-import org.jboss.tools.project.examples.model.Project;
+import org.jboss.tools.project.examples.model.ProjectExample;
 import org.jboss.tools.project.examples.model.ProjectFix;
 import org.jboss.tools.seam.core.SeamCorePlugin;
 import org.jboss.tools.seam.core.project.facet.SeamRuntime;
@@ -33,14 +33,14 @@ import org.osgi.service.prefs.BackingStoreException;
  */
 public class SeamRuntimeFix implements ProjectExamplesFix {
 
-	public boolean canFix(Project project, ProjectFix fix) {
+	public boolean canFix(ProjectExample project, ProjectFix fix) {
 		if (!ProjectFix.SEAM_RUNTIME.equals(fix.getType())) {
 			return false;
 		}
 		return getBestRuntime(project, fix) != null;
 	}
 
-	private SeamRuntime getBestRuntime(Project project, ProjectFix fix) {
+	private SeamRuntime getBestRuntime(ProjectExample project, ProjectFix fix) {
 		String allowedVersions = fix.getProperties().get(ProjectFix.ALLOWED_VERSIONS);
 		if (allowedVersions == null) {
 			ProjectExamplesActivator.log(NLS.bind(Messages.SeamRuntimeFix_Invalid_seam_runtime_fix, project.getName())); 
@@ -69,7 +69,7 @@ public class SeamRuntimeFix implements ProjectExamplesFix {
 		return null;
 	}
 
-	public boolean fix(Project project, ProjectFix fix,
+	public boolean fix(ProjectExample project, ProjectFix fix,
 			IProgressMonitor monitor) {
 		if (!canFix(project, fix)) {
 			return false;
@@ -88,7 +88,7 @@ public class SeamRuntimeFix implements ProjectExamplesFix {
 		return ret;
 	}
 
-	private boolean fix(Project project, ProjectFix fix,
+	private boolean fix(ProjectExample project, ProjectFix fix,
 			IProject eclipseProject) {
 		IEclipsePreferences prefs = SeamCorePlugin.getSeamPreferences(eclipseProject);
 		String seamRuntimeName = prefs.get(ISeamFacetDataModelProperties.SEAM_RUNTIME_NAME, null);

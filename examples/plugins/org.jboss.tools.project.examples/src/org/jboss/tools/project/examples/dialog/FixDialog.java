@@ -40,7 +40,7 @@ import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.Text;
 import org.jboss.tools.project.examples.Messages;
-import org.jboss.tools.project.examples.model.Project;
+import org.jboss.tools.project.examples.model.ProjectExample;
 import org.jboss.tools.project.examples.model.ProjectFix;
 import org.jboss.tools.project.examples.wizard.NewProjectExamplesWizardPage;
 
@@ -72,8 +72,8 @@ public class FixDialog extends Dialog {
 		fixes = new ArrayList<ProjectFix>();
 		while (iterator.hasNext()) {
 			Object object = iterator.next();
-			if (object instanceof Project) {
-				Project project = (Project) object;
+			if (object instanceof ProjectExample) {
+				ProjectExample project = (ProjectExample) object;
 				fixes.addAll(project.getUnsatisfiedFixes());
 			}
 			

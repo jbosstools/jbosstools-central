@@ -46,7 +46,7 @@ import org.eclipse.ui.IWorkingSet;
 import org.jboss.tools.maven.project.examples.MavenProjectExamplesActivator;
 import org.jboss.tools.maven.ui.Activator;
 import org.jboss.tools.project.examples.ProjectExamplesActivator;
-import org.jboss.tools.project.examples.model.Project;
+import org.jboss.tools.project.examples.model.ProjectExample;
 
 /**
  * 
@@ -55,7 +55,7 @@ import org.jboss.tools.project.examples.model.Project;
  */
 public class ArchetypeExamplesWizard extends Wizard implements INewWizard {
 
-	private Project projectDescription;
+	private ProjectExample projectDescription;
 	private ProjectImportConfiguration configuration;
 	private ArchetypeExamplesWizardFirstPage simplePage;
 	private ArchetypeExamplesWizardPage wizardPage;
@@ -64,7 +64,7 @@ public class ArchetypeExamplesWizard extends Wizard implements INewWizard {
 	private String artifactId;
 	private IPath locationPath;
 
-	public ArchetypeExamplesWizard(Project projectDescription) {
+	public ArchetypeExamplesWizard(ProjectExample projectDescription) {
 		super();
 		setWindowTitle("New JBoss Project");
 		setDefaultPageImageDescriptor(MavenProjectExamplesActivator.getNewWizardImageDescriptor());

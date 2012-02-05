@@ -18,7 +18,7 @@ import java.util.Set;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.jboss.tools.project.examples.model.IProjectExampleSite;
 import org.jboss.tools.project.examples.model.ProjectExampleSite;
-import org.jboss.tools.project.examples.model.ProjectUtil;
+import org.jboss.tools.project.examples.model.ProjectExampleUtil;
 import org.junit.Test;
 
 /**
@@ -31,15 +31,15 @@ public class SiteTest {
 	@Test
 	public void sitesPresent() {
 		Set<IProjectExampleSite> sites = new HashSet<IProjectExampleSite>();
-		sites.addAll(ProjectUtil.getPluginSites());
-		sites.addAll(ProjectUtil.getUserSites());
+		sites.addAll(ProjectExampleUtil.getPluginSites());
+		sites.addAll(ProjectExampleUtil.getUserSites());
 		assertTrue(sites.size() > 0);
 	}
 	
 	@Test
 	public void testInvalidSites() {
-		ProjectUtil.getProjects(new NullProgressMonitor());
-		HashSet<IProjectExampleSite> invalidSites = ProjectUtil.getInvalidSites();
+		ProjectExampleUtil.getProjects(new NullProgressMonitor());
+		HashSet<IProjectExampleSite> invalidSites = ProjectExampleUtil.getInvalidSites();
 		assertTrue(invalidSites.size() <= 0);
 	}
 	

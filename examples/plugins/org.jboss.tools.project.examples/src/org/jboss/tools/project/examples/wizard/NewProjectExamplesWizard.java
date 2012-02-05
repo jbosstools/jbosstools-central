@@ -25,11 +25,11 @@ import org.eclipse.ui.INewWizard;
 import org.eclipse.ui.IWorkbench;
 import org.jboss.tools.project.examples.Messages;
 import org.jboss.tools.project.examples.ProjectExamplesActivator;
-import org.jboss.tools.project.examples.model.Project;
+import org.jboss.tools.project.examples.model.ProjectExample;
 
 public class NewProjectExamplesWizard extends Wizard implements INewWizard {
 
-	private List<Project> projects = new ArrayList<Project>();
+	private List<ProjectExample> projects = new ArrayList<ProjectExample>();
 	
 	private NewProjectExamplesWizardPage page;
 
@@ -45,7 +45,7 @@ public class NewProjectExamplesWizard extends Wizard implements INewWizard {
 
 	@Override
 	public boolean performFinish() {
-		final List<Project> selectedProjects = new ArrayList<Project>();
+		final List<ProjectExample> selectedProjects = new ArrayList<ProjectExample>();
 		if (page.getSelection() == null || page.getSelection().size() <= 0) {
 			return false;
 		}
@@ -53,8 +53,8 @@ public class NewProjectExamplesWizard extends Wizard implements INewWizard {
 		Iterator iterator = selection.iterator();
 		while (iterator.hasNext()) {
 			Object object = iterator.next();
-			if (object instanceof Project) {
-				Project project = (Project) object;
+			if (object instanceof ProjectExample) {
+				ProjectExample project = (ProjectExample) object;
 				selectedProjects.add(project);
 			}
 		}

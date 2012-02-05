@@ -16,7 +16,7 @@ import org.eclipse.core.resources.IMarker;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.Viewer;
 import org.jboss.tools.project.examples.ProjectExamplesActivator;
-import org.jboss.tools.project.examples.model.Project;
+import org.jboss.tools.project.examples.model.ProjectExample;
 
 /**
 * @author snjeza
@@ -24,9 +24,9 @@ import org.jboss.tools.project.examples.model.Project;
 */
 public class MarkerContentProvider implements IStructuredContentProvider {
 
-	private List<Project> projects;
+	private List<ProjectExample> projects;
 
-	public MarkerContentProvider(List<Project> projects) {
+	public MarkerContentProvider(List<ProjectExample> projects) {
 		this.projects = projects;
 	}
 

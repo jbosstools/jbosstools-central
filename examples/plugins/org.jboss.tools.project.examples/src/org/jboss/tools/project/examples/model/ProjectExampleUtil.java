@@ -24,10 +24,8 @@ import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
 
@@ -57,6 +55,7 @@ import org.jboss.tools.project.examples.ProjectExamplesActivator;
 import org.jboss.tools.project.examples.filetransfer.ECFExamplesTransport;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.helpers.DefaultHandler;
@@ -65,7 +64,7 @@ import org.xml.sax.helpers.DefaultHandler;
  * @author snjeza
  * 
  */
-public class ProjectUtil {
+public class ProjectExampleUtil {
 
 	private static final String URL = "url"; //$NON-NLS-1$
 
@@ -74,26 +73,30 @@ public class ProjectUtil {
 	private static final String SITES = "sites"; //$NON-NLS-1$
 
 	private static final String SITE = "site"; //$NON-NLS-1$
-	
+
 	public static final String EDITOR = "editor"; //$NON-NLS-1$
 
 	public static final String CHEATSHEETS = "cheatsheets"; //$NON-NLS-1$
 
 	public static final String PROTOCOL_FILE = "file"; //$NON-NLS-1$
-	
+
 	public static final String PROTOCOL_PLATFORM = "platform"; //$NON-NLS-1$
 
 	private static final String PROJECT_EXAMPLES_XML_EXTENSION_ID = "org.jboss.tools.project.examples.projectExamplesXml"; //$NON-NLS-1$
-	
+
+	private static final String PROJECT_EXAMPLES_CATEGORIES_EXTENSION_ID = "org.jboss.tools.project.examples.categories"; //$NON-NLS-1$
+
 	private static String URL_EXT = URL;
-	
+
 	private static String EXPERIMENTAL_EXT = "experimental"; //$NON-NLS-1$
 
 	private static Set<IProjectExampleSite> pluginSites;
 
 	private static HashSet<IProjectExampleSite> invalidSites = new HashSet<IProjectExampleSite>();
-	
-	private ProjectUtil() {
+
+	private static HashSet<URL> categoryUrls;
+
+	private ProjectExampleUtil() {
 	}
 
 	public static Set<IProjectExampleSite> getPluginSites() {
@@ -117,7 +120,8 @@ public class ProjectUtil {
 						if (url != null) {
 							site.setUrl(url);
 						}
-					} else if (EXPERIMENTAL_EXT.equals(configurationElement.getName())) {
+					} else if (EXPERIMENTAL_EXT.equals(configurationElement
+							.getName())) {
 						String experimental = configurationElement.getValue();
 						if ("true".equals(experimental)) { //$NON-NLS-1$
 							site.setExperimental(true);
@@ -128,23 +132,26 @@ public class ProjectUtil {
 					pluginSites.add(site);
 				}
 			}
-				
+
 		}
 		return pluginSites;
 	}
-	
+
 	public static Set<IProjectExampleSite> getUserSites() {
 		Set<IProjectExampleSite> sites = new HashSet<IProjectExampleSite>();
 		ProjectExampleSite site = getSite(getProjectExamplesXml());
 		if (site != null) {
 			sites.add(site);
 		}
-		IPreferenceStore store = ProjectExamplesActivator.getDefault().getPreferenceStore();
-		String sitesAsXml = store.getString(ProjectExamplesActivator.USER_SITES);
+		IPreferenceStore store = ProjectExamplesActivator.getDefault()
+				.getPreferenceStore();
+		String sitesAsXml = store
+				.getString(ProjectExamplesActivator.USER_SITES);
 		if (sitesAsXml != null && sitesAsXml.trim().length() > 0) {
 			Element rootElement = parseDocument(sitesAsXml);
-			if (!rootElement.getNodeName().equals(SITES)) { 
-				ProjectExamplesActivator.log(Messages.ProjectUtil_Invalid_preferences);
+			if (!rootElement.getNodeName().equals(SITES)) {
+				ProjectExamplesActivator
+						.log(Messages.ProjectUtil_Invalid_preferences);
 				return sites;
 			}
 			NodeList list = rootElement.getChildNodes();
@@ -154,15 +161,18 @@ public class ProjectUtil {
 				short type = node.getNodeType();
 				if (type == Node.ELEMENT_NODE) {
 					Element entry = (Element) node;
-					if(entry.getNodeName().equals(SITE)){
+					if (entry.getNodeName().equals(SITE)) {
 						String name = entry.getAttribute(NAME);
 						String urlString = entry.getAttribute(URL);
-						if (name != null && name.trim().length() > 0 && urlString != null && urlString.trim().length() > 0) {
+						if (name != null && name.trim().length() > 0
+								&& urlString != null
+								&& urlString.trim().length() > 0) {
 							URL url = null;
 							try {
 								url = new URL(urlString);
 							} catch (MalformedURLException e) {
-								ProjectExamplesActivator.log(Messages.ProjectUtil_Invalid_preferences);
+								ProjectExamplesActivator
+										.log(Messages.ProjectUtil_Invalid_preferences);
 								continue;
 							}
 							site = new ProjectExampleSite();
@@ -178,7 +188,7 @@ public class ProjectUtil {
 		}
 		return sites;
 	}
-	
+
 	private static Set<IProjectExampleSite> getSites() {
 		Set<IProjectExampleSite> sites = new HashSet<IProjectExampleSite>();
 		sites.addAll(getPluginSites());
@@ -214,19 +224,25 @@ public class ProjectUtil {
 		}
 		return null;
 	}
-	
-	public static List<Category> getProjects(IProgressMonitor monitor) {
+
+	public static List<ProjectExampleCategory> getProjects(
+			IProgressMonitor monitor) {
 		return getProjects(getSites(), monitor);
 	}
 
-	public static List<Category> getProjects(Set<IProjectExampleSite> sites, IProgressMonitor monitor) {
+	public static List<ProjectExampleCategory> getProjects(
+			Set<IProjectExampleSite> sites, IProgressMonitor monitor) {
 		monitor.setTaskName(Messages.ProjectUtil_Parsing_project_description_files);
-		
-		List<Category> list = new ArrayList<Category>();
+
+		List<ProjectExampleCategory> list = new ArrayList<ProjectExampleCategory>();
 		invalidSites.clear();
-		Category other = Category.OTHER;
+		ProjectExampleCategory other = ProjectExampleCategory.OTHER;
 		try {
-		  boolean showExperimentalSites = ProjectExamplesActivator.getDefault().getPreferenceStore().getBoolean(ProjectExamplesActivator.SHOW_EXPERIMENTAL_SITES);
+			boolean showExperimentalSites = ProjectExamplesActivator
+					.getDefault()
+					.getPreferenceStore()
+					.getBoolean(
+							ProjectExamplesActivator.SHOW_EXPERIMENTAL_SITES);
 			for (IProjectExampleSite site : sites) {
 				if (!showExperimentalSites && site.isExperimental()) {
 					continue;
@@ -240,23 +256,26 @@ public class ProjectUtil {
 				if (monitor.isCanceled()) {
 					invalidSites.add(site);
 					continue;
-				} 
+				}
 				if (file == null || !file.exists() || !file.isFile()) {
-					ProjectExamplesActivator.log(NLS.bind(Messages.ProjectUtil_Invalid_URL,site.getUrl().toString()));
+					ProjectExamplesActivator.log(NLS.bind(
+							Messages.ProjectUtil_Invalid_URL, site.getUrl()
+									.toString()));
 					invalidSites.add(site);
 					continue;
 				}
-				
-				DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+
+				DocumentBuilderFactory dbf = DocumentBuilderFactory
+						.newInstance();
 				DocumentBuilder db = dbf.newDocumentBuilder();
 				Document doc = db.parse(file);
 				NodeList projects = doc.getElementsByTagName("project"); //$NON-NLS-1$
 				int len = projects.getLength();
 				for (int i = 0; i < len; i++) {
 					Node node = projects.item(i);
-					Project project = new Project();
+					ProjectExample project = new ProjectExample();
 					project.setSite(site);
-					Category category = other;
+					ProjectExampleCategory category = other;
 					if (node.getNodeType() == Node.ELEMENT_NODE) {
 						Element element = (Element) node;
 						NodeList children = element.getChildNodes();
@@ -269,59 +288,64 @@ public class ProjectUtil {
 								if (nodeName.equals("fixes")) { //$NON-NLS-1$
 									parseFixes(project, child);
 								}
-								
+
 								else if (nodeName.equals("category")) { //$NON-NLS-1$
 									String value = getContent(child);
 									boolean found = false;
-									for (Category cat : list) {
+									for (ProjectExampleCategory cat : list) {
 										if (cat.getSite() == null) {
 											cat.setSite(site);
 										}
-										if (cat.getName().equals(value) && site.getName().equals(cat.getSite().getName())) {
+										if (cat.getName().equals(value)
+												&& site.getName()
+														.equals(cat.getSite()
+																.getName())) {
 											category = cat;
 											found = true;
 											break;
 										}
 									}
 									if (!found) {
-										category = new Category(value);
+										category = new ProjectExampleCategory(
+												value);
 										category.setSite(site);
 										list.add(category);
 									}
 									project.setCategory(category);
 									category.getProjects().add(project);
-								}
-								else if (nodeName.equals(NAME)) { 
+								} else if (nodeName.equals(NAME)) {
 									project.setName(getContent(child));
-								}
-								else if (nodeName.equals("shortDescription")) { //$NON-NLS-1$
-									project
-											.setShortDescription(getContent(child));
-								}
-								else if (nodeName.equals("description")) { //$NON-NLS-1$
+								} else if (nodeName.equals("priority")) { //$NON-NLS-1$
+									String value = getContent(child);
+									if (value != null) {
+										try {
+											project.setPriority(new Integer(
+													value).intValue());
+										} catch (Exception e) {
+											ProjectExamplesActivator.log(e);
+										}
+									}
+								} else if (nodeName.equals("shortDescription")) { //$NON-NLS-1$
+									project.setShortDescription(getContent(child));
+								} else if (nodeName.equals("description")) { //$NON-NLS-1$
 									project.setDescription(getContent(child));
-								}
-								else if (nodeName.equals(URL)) { 
+								} else if (nodeName.equals(URL)) {
 									project.setUrl(getContent(child));
-								}
-								else if (nodeName.equals("perspectiveId")) {  //$NON-NLS-1$
+								} else if (nodeName.equals("perspectiveId")) { //$NON-NLS-1$
 									project.setPerspectiveId(getContent(child));
-								}
-								else if (nodeName.equals("importType")) {  //$NON-NLS-1$
+								} else if (nodeName.equals("importType")) { //$NON-NLS-1$
 									project.setImportType(getContent(child));
-								}
-								else if (nodeName.equals("importTypeDescription")) {  //$NON-NLS-1$
+								} else if (nodeName
+										.equals("importTypeDescription")) { //$NON-NLS-1$
 									project.setImportTypeDescription(getContent(child));
-								}
-								else if (nodeName.equals("size")) { //$NON-NLS-1$
+								} else if (nodeName.equals("size")) { //$NON-NLS-1$
 									long size = 0;
 									try {
 										size = new Long(getContent(child));
 									} catch (Exception ignored) {
 									}
 									project.setSize(size);
-								}
-								else if (nodeName.equals("included-projects")) { //$NON-NLS-1$
+								} else if (nodeName.equals("included-projects")) { //$NON-NLS-1$
 									String includedProjects = getContent(child);
 									if (includedProjects != null) {
 										includedProjects = includedProjects
@@ -330,42 +354,44 @@ public class ProjectUtil {
 												includedProjects, ","); //$NON-NLS-1$
 										List<String> projectList = new ArrayList<String>();
 										while (tokenizer.hasMoreTokens()) {
-											projectList.add(tokenizer.nextToken().trim());
+											projectList.add(tokenizer
+													.nextToken().trim());
 										}
 										project.setIncludedProjects(projectList);
 									}
-								}
-								else if (nodeName.equals("defaultMavenProfiles")) {  //$NON-NLS-1$
+								} else if (nodeName
+										.equals("defaultMavenProfiles")) { //$NON-NLS-1$
 									project.setDefaultProfiles(getContent(child));
-								}
-								else if (nodeName.equals("welcome")) { //$NON-NLS-1$
+								} else if (nodeName.equals("welcome")) { //$NON-NLS-1$
 									project.setWelcome(true);
-									String attribute = child.getAttribute("type"); //$NON-NLS-1$
-									if (attribute != null && CHEATSHEETS.equals(attribute.trim())) {
+									String attribute = child
+											.getAttribute("type"); //$NON-NLS-1$
+									if (attribute != null
+											&& CHEATSHEETS.equals(attribute
+													.trim())) {
 										project.setType(attribute.trim());
 									} else {
 										project.setType(EDITOR);
 									}
-									attribute = child.getAttribute(URL); 
-									if (attribute == null || attribute.trim().length() <= 0) {
+									attribute = child.getAttribute(URL);
+									if (attribute == null
+											|| attribute.trim().length() <= 0) {
 										project.setWelcome(false);
-										ProjectExamplesActivator.log(Messages.ProjectUtil_Invalid_welcome_element);
+										ProjectExamplesActivator
+												.log(Messages.ProjectUtil_Invalid_welcome_element);
 									} else {
 										project.setWelcomeURL(attribute.trim());
 									}
-								}
-								else if (nodeName.equals("mavenArchetype")) {  //$NON-NLS-1$
+								} else if (nodeName.equals("mavenArchetype")) { //$NON-NLS-1$
 									parseMavenArchetype(project, child);
+								} else if (nodeName.equals("tags")) { //$NON-NLS-1$
+									parseTags(project, child);
+								} else if (nodeName.equals("icon")) { //$NON-NLS-1$
+									String path = child.getAttribute("path"); //$NON-NLS-1$
+									if (path != null) {
+										project.setIconPath(path);
+									}
 								}
-                else if (nodeName.equals("tags")) {  //$NON-NLS-1$
-                  parseTags(project, child);
-                }
-                else if (nodeName.equals("icon")) {  //$NON-NLS-1$
-                  String path = child.getAttribute("path");
-                  if (path != null) {
-                    project.setIconPath(path);
-                  }
-                }								
 							}
 						}
 					}
@@ -375,25 +401,121 @@ public class ProjectUtil {
 			ProjectExamplesActivator.log(e);
 		}
 		list.add(other);
+		handleCategories(list, monitor);
 		return list;
 	}
 
-  private static void parseTags(Project project, Element tagElement) {
-    String tagsValue = tagElement.getTextContent();
-    if (tagsValue != null) {
-      StringTokenizer tokenizer = new StringTokenizer(tagsValue.trim(), ",");//$NON-NLS-1$
-      Set<String> tags = new HashSet<String>();
-      while (tokenizer.hasMoreTokens()) {
-        String tag = tokenizer.nextToken().trim();
-        if (tag.length() > 0) {
-          tags.add(tag);
-        }
-      }
-      project.setTags(tags);
-    }
-  }
+	public static Set<URL> getCategoryURLs() {
+		if (categoryUrls == null) {
+			categoryUrls = new HashSet<URL>();
+			IExtensionRegistry registry = Platform.getExtensionRegistry();
+			IExtensionPoint extensionPoint = registry
+					.getExtensionPoint(PROJECT_EXAMPLES_CATEGORIES_EXTENSION_ID);
+			IExtension[] extensions = extensionPoint.getExtensions();
+			for (int i = 0; i < extensions.length; i++) {
+				IExtension extension = extensions[i];
+				IConfigurationElement[] configurationElements = extension
+						.getConfigurationElements();
+				
+				for (int j = 0; j < configurationElements.length; j++) {
+					IConfigurationElement configurationElement = configurationElements[j];
+					if (URL_EXT.equals(configurationElement.getName())) {
+						String urlString = configurationElement.getValue();
+						URL url = getURL(urlString);
+						if (url != null) {
+							categoryUrls.add(url);
+						}
+					} 
+				}
+			}
 
-  private static void parseFixes(Project project, Element node) {
+		}
+		return categoryUrls;
+	}
+	
+	private static void handleCategories(List<ProjectExampleCategory> list, IProgressMonitor monitor) {
+		Set<URL> urls = getCategoryURLs();
+		for (URL url:urls) {
+			File file = getProjectExamplesFile(url,
+					"categories", ".xml", monitor); //$NON-NLS-1$ //$NON-NLS-2$
+			if (monitor.isCanceled()) {
+				return;
+			}
+			if (file == null || !file.exists() || !file.isFile()) {
+				ProjectExamplesActivator.log(NLS.bind(
+						Messages.ProjectUtil_Invalid_URL, url
+								.toString()));
+				continue;
+			}
+
+			DocumentBuilderFactory dbf = DocumentBuilderFactory
+					.newInstance();
+			Document doc;
+			try {
+				DocumentBuilder db = dbf.newDocumentBuilder();
+				doc = db.parse(file);
+			} catch (Exception e1) {
+				ProjectExamplesActivator.log(e1.getMessage());
+				continue;
+			} 
+			NodeList categoryNodes = doc.getElementsByTagName("category"); //$NON-NLS-1$
+			int len = categoryNodes.getLength();
+			for (int i = 0; i < len; i++) {
+				Node node = categoryNodes.item(i);
+				NamedNodeMap attributes = node.getAttributes();
+				if (attributes == null) {
+					continue;
+				}
+				String name = getAttributeValue(attributes, NAME);
+				if (name == null) {
+					continue;
+				}
+				String description = getAttributeValue(attributes, "description"); //$NON-NLS-1$
+				int priority = 0;
+				try {
+					priority = new Integer(getAttributeValue(attributes, "priority")).intValue(); //$NON-NLS-1$
+				} catch (Exception e) {
+					ProjectExamplesActivator.log(e);
+				}
+				if (description != null || priority > 0) {
+					for (ProjectExampleCategory projectExampleCategory:list) {
+						if (name.equals(projectExampleCategory.getName())) {
+							projectExampleCategory.setDescription(description);
+							projectExampleCategory.setPriority(priority);
+							continue;
+						}
+					}
+				}
+			}
+		}
+	}
+
+	private static String getAttributeValue(NamedNodeMap attributes, String name) {
+		String value = null;
+		Node node = attributes.getNamedItem(name);
+		if (node != null) {
+			value = node.getNodeValue();
+		}
+		return value;
+	}
+
+	private static void parseTags(ProjectExample project, Element tagElement) {
+		String tagsValue = tagElement.getTextContent();
+		if (tagsValue != null) {
+			StringTokenizer tokenizer = new StringTokenizer(tagsValue.trim(),
+					",");//$NON-NLS-1$
+			Set<String> tags = new HashSet<String>();
+			while (tokenizer.hasMoreTokens()) {
+				String tag = tokenizer.nextToken().trim();
+				if (tag.length() > 0) {
+					tags.add(tag);
+				}
+			}
+			project.setTags(tags);
+		}
+	}
+
+	private static void parseFixes(ProjectExample project, Element node) {
 		NodeList children = node.getChildNodes();
 		int cLen = children.getLength();
 		for (int i = 0; i < cLen; i++) {
@@ -407,8 +529,8 @@ public class ProjectUtil {
 			}
 		}
 	}
-	
-	private static void parseMavenArchetype(Project project, Element node) {
+
+	private static void parseMavenArchetype(ProjectExample project, Element node) {
 		NodeList children = node.getChildNodes();
 		int cLen = children.getLength();
 		ArchetypeModel archetypeModel = project.getArchetypeModel();
@@ -419,36 +541,28 @@ public class ProjectUtil {
 				String nodeName = child.getNodeName();
 				if (nodeName.equals("archetypeGroupId")) { //$NON-NLS-1$
 					archetypeModel.setArchetypeGroupId(getContent(child));
-				}
-				else if (nodeName.equals("archetypeArtifactId")) { //$NON-NLS-1$
+				} else if (nodeName.equals("archetypeArtifactId")) { //$NON-NLS-1$
 					archetypeModel.setArchetypeArtifactId(getContent(child));
-				}
-				else if (nodeName.equals("archetypeVersion")) { //$NON-NLS-1$
+				} else if (nodeName.equals("archetypeVersion")) { //$NON-NLS-1$
 					archetypeModel.setArchetypeVersion(getContent(child));
-				}
-				else if (nodeName.equals("archetypeRepository")) { //$NON-NLS-1$
+				} else if (nodeName.equals("archetypeRepository")) { //$NON-NLS-1$
 					archetypeModel.setArchetypeRepository(getContent(child));
-				}
-				else if (nodeName.equals("groupId")) { //$NON-NLS-1$
+				} else if (nodeName.equals("groupId")) { //$NON-NLS-1$
 					archetypeModel.setGroupId(getContent(child));
-				}
-				else if (nodeName.equals("artifactId")) { //$NON-NLS-1$
+				} else if (nodeName.equals("artifactId")) { //$NON-NLS-1$
 					archetypeModel.setArtifactId(getContent(child));
-				}
-				else if (nodeName.equals("version")) { //$NON-NLS-1$
+				} else if (nodeName.equals("version")) { //$NON-NLS-1$
 					archetypeModel.setVersion(getContent(child));
-				}
-				else if (nodeName.equals("javaPackage")) { //$NON-NLS-1$
+				} else if (nodeName.equals("javaPackage")) { //$NON-NLS-1$
 					archetypeModel.setJavaPackage(getContent(child));
-				}
-				else if (nodeName.equals("properties")) { //$NON-NLS-1$
+				} else if (nodeName.equals("properties")) { //$NON-NLS-1$
 					parseProperties(project, child);
 				}
 			}
 		}
 	}
-	
-	private static void parseProperties(Project project, Element node) {
+
+	private static void parseProperties(ProjectExample project, Element node) {
 		NodeList children = node.getChildNodes();
 		int cLen = children.getLength();
 		for (int i = 0; i < cLen; i++) {
@@ -459,12 +573,14 @@ public class ProjectUtil {
 				if (nodeName.equals("property")) { //$NON-NLS-1$
 					String key = child.getAttribute("name"); //$NON-NLS-1$
 					if (key == null || key.trim().length() <= 0) {
-						ProjectExamplesActivator.log(Messages.ProjectUtil_Invalid_property);
+						ProjectExamplesActivator
+								.log(Messages.ProjectUtil_Invalid_property);
 						return;
 					}
 					String value = child.getAttribute("value"); //$NON-NLS-1$
 					if (value == null || value.trim().length() <= 0) {
-						ProjectExamplesActivator.log(Messages.ProjectUtil_Invalid_property);
+						ProjectExamplesActivator
+								.log(Messages.ProjectUtil_Invalid_property);
 						return;
 					}
 					project.getArchetypeModel().addProperty(key, value);
@@ -473,7 +589,7 @@ public class ProjectUtil {
 		}
 	}
 
-	private static void parseFix(Project project, Element node) {
+	private static void parseFix(ProjectExample project, Element node) {
 		String type = node.getAttribute("type"); //$NON-NLS-1$
 		if (type == null || type.trim().length() <= 0) {
 			ProjectExamplesActivator.log(Messages.ProjectUtil_Invalid_fix);
@@ -491,7 +607,8 @@ public class ProjectUtil {
 				if (nodeName.equals("property")) { //$NON-NLS-1$
 					String name = child.getAttribute("name"); //$NON-NLS-1$
 					if (name == null || name.trim().length() <= 0) {
-						ProjectExamplesActivator.log(Messages.ProjectUtil_Invalid_property);
+						ProjectExamplesActivator
+								.log(Messages.ProjectUtil_Invalid_property);
 						return;
 					}
 					String value = getContent(child);
@@ -503,7 +620,8 @@ public class ProjectUtil {
 	}
 
 	private static String getProjectExamplesXml() {
-		String projectXML = System.getProperty("org.jboss.tools.project.examples.xml"); //$NON-NLS-1$
+		String projectXML = System
+				.getProperty("org.jboss.tools.project.examples.xml"); //$NON-NLS-1$
 		if (projectXML != null && projectXML.length() > 0) {
 			return projectXML;
 		}
@@ -521,7 +639,8 @@ public class ProjectUtil {
 	public static File getProjectExamplesFile(URL url, String prefix,
 			String suffix, IProgressMonitor monitor) {
 		File file = null;
-		if (PROTOCOL_FILE.equals(url.getProtocol()) || PROTOCOL_PLATFORM.equalsIgnoreCase(url.getProtocol())) {
+		if (PROTOCOL_FILE.equals(url.getProtocol())
+				|| PROTOCOL_PLATFORM.equalsIgnoreCase(url.getProtocol())) {
 			try {
 				// assume all illegal characters have been properly encoded, so
 				// use URI class to unencode
@@ -540,7 +659,8 @@ public class ProjectUtil {
 				long urlModified = -1;
 				file = getFile(url);
 				try {
-					urlModified = ECFExamplesTransport.getInstance().getLastModified(url);
+					urlModified = ECFExamplesTransport.getInstance()
+							.getLastModified(url);
 				} catch (CoreException e) {
 					if (file.exists()) {
 						return file;
@@ -557,8 +677,8 @@ public class ProjectUtil {
 						return file;
 					}
 				}
-				//file = File.createTempFile(prefix, suffix);
-				//file.deleteOnExit();
+				// file = File.createTempFile(prefix, suffix);
+				// file.deleteOnExit();
 				file.getParentFile().mkdirs();
 				if (monitor.isCanceled()) {
 					return null;
@@ -581,13 +701,14 @@ public class ProjectUtil {
 			} catch (FileNotFoundException e) {
 				ProjectExamplesActivator.log(e);
 				return null;
-			} 
+			}
 		}
 		return file;
 	}
 
 	private static File getFile(java.net.URL url2) {
-		IPath location = ProjectExamplesActivator.getDefault().getStateLocation();
+		IPath location = ProjectExamplesActivator.getDefault()
+				.getStateLocation();
 		File root = location.toFile();
 		String urlFile = url2.getFile();
 		File file = new File(root, urlFile);
@@ -597,14 +718,14 @@ public class ProjectUtil {
 	private static ECFExamplesTransport getTransport() {
 		return ECFExamplesTransport.getInstance();
 	}
-	
+
 	public static Document getDocument() throws ParserConfigurationException {
-		DocumentBuilderFactory dfactory= DocumentBuilderFactory.newInstance();
-		DocumentBuilder docBuilder= dfactory.newDocumentBuilder();
-		Document doc= docBuilder.newDocument();
+		DocumentBuilderFactory dfactory = DocumentBuilderFactory.newInstance();
+		DocumentBuilder docBuilder = dfactory.newDocumentBuilder();
+		Document doc = docBuilder.newDocument();
 		return doc;
 	}
-	
+
 	public static String getAsXML(Set<IProjectExampleSite> sites)
 			throws ParserConfigurationException, TransformerException,
 			UnsupportedEncodingException {
@@ -612,7 +733,7 @@ public class ProjectUtil {
 			return ""; //$NON-NLS-1$
 		}
 		Document doc = getDocument();
-		Element sitesElement = doc.createElement(SITES); 
+		Element sitesElement = doc.createElement(SITES);
 		doc.appendChild(sitesElement);
 		for (IProjectExampleSite site : sites) {
 			Element siteElement = doc.createElement(SITE);
@@ -630,45 +751,48 @@ public class ProjectUtil {
 		transformer.transform(source, outputTarget);
 		return s.toString("UTF8"); //$NON-NLS-1$			
 	}
-	
+
 	public static Element parseDocument(String document) {
 		Element root = null;
 		InputStream stream = null;
-		try{		
-			DocumentBuilder parser = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+		try {
+			DocumentBuilder parser = DocumentBuilderFactory.newInstance()
+					.newDocumentBuilder();
 			parser.setErrorHandler(new DefaultHandler());
 			stream = new ByteArrayInputStream(document.getBytes("UTF8")); //$NON-NLS-1$
 			root = parser.parse(stream).getDocumentElement();
 		} catch (Exception e) {
 			ProjectExamplesActivator.log(e);
-		} finally { 
-			try{
-                if (stream != null) {
-                    stream.close();
-                }
-			} catch(IOException e) {
+		} finally {
+			try {
+				if (stream != null) {
+					stream.close();
+				}
+			} catch (IOException e) {
 				ProjectExamplesActivator.log(e);
 			}
-		}		
+		}
 		return root;
 	}
 
 	public static HashSet<IProjectExampleSite> getInvalidSites() {
 		return invalidSites;
-	}	
+	}
 
-	public static List<Project> getProjectsByTags(Collection<Category> categories, String ... tags) {
-	    if (categories == null) {
-	      return null;
-	    }
-	    List<Project> selection = new ArrayList<Project>(); 
-	    for (Category c : categories) {
-	      for (Project p : c.getProjects()) {
-	        if (p.hasTags(tags) && !selection.contains(p)) {
-	          selection.add(p);
-	        }
-	      }
-	    }
-	    return selection;
-	  }
+	public static List<ProjectExample> getProjectsByTags(
+			Collection<ProjectExampleCategory> categories, String... tags) {
+		if (categories == null) {
+			return null;
+		}
+		List<ProjectExample> selection = new ArrayList<ProjectExample>();
+		for (ProjectExampleCategory c : categories) {
+			for (ProjectExample p : c.getProjects()) {
+				if (p.hasTags(tags) && !selection.contains(p)) {
+					selection.add(p);
+				}
+			}
+		}
+		return selection;
+	}
+	
 }

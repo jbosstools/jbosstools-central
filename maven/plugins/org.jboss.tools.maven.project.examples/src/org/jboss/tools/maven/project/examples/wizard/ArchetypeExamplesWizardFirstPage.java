@@ -56,7 +56,7 @@ import org.eclipse.wst.server.core.internal.facets.FacetUtil;
 import org.jboss.ide.eclipse.as.core.util.RuntimeUtils;
 import org.jboss.tools.maven.project.examples.MavenProjectExamplesActivator;
 import org.jboss.tools.maven.project.examples.Messages;
-import org.jboss.tools.project.examples.model.Project;
+import org.jboss.tools.project.examples.model.ProjectExample;
 
 /**
  * Simplified UI for the Maven Archetype Wizard, based off the original m2e MavenProjectWizardLocationPage. 
@@ -79,11 +79,11 @@ public class ArchetypeExamplesWizardFirstPage extends MavenProjectWizardLocation
 	private ModifyListener projectNameModifyListener;
 	private ModifyListener packageNameModifyListener;
 	private ModifyListener propertyModifyListener;
-	private final Project projectDescription;
+	private final ProjectExample projectDescription;
 	
 	public ArchetypeExamplesWizardFirstPage(
 			ProjectImportConfiguration configuration,
-			Project projectDescription, List<IWorkingSet> workingSet) {
+			ProjectExample projectDescription, List<IWorkingSet> workingSet) {
 		super(configuration, projectDescription.getShortDescription(),Messages.ArchetypeExamplesWizardFirstPage_Title, workingSet);
 		this.projectDescription = projectDescription;
 		setPageComplete(false);

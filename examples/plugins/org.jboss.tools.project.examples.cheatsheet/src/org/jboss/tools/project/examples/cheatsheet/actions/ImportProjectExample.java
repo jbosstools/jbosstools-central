@@ -32,8 +32,8 @@ import org.jboss.tools.project.examples.Messages;
 import org.jboss.tools.project.examples.ProjectExamplesActivator;
 import org.jboss.tools.project.examples.cheatsheet.Activator;
 import org.jboss.tools.project.examples.model.IImportProjectExample;
-import org.jboss.tools.project.examples.model.Project;
-import org.jboss.tools.project.examples.model.ProjectUtil;
+import org.jboss.tools.project.examples.model.ProjectExample;
+import org.jboss.tools.project.examples.model.ProjectExampleUtil;
 
 /**
  * 
@@ -60,7 +60,7 @@ public class ImportProjectExample extends Action implements ICheatSheetAction {
 			return;
 		}
 		
-		Project project = new Project();
+		ProjectExample project = new ProjectExample();
 		project.setName(params[0]);
 		StringTokenizer tokenizer = new StringTokenizer(params[1],","); //$NON-NLS-1$
 		List<String> includedProjects = new ArrayList<String>();
@@ -73,7 +73,7 @@ public class ImportProjectExample extends Action implements ICheatSheetAction {
 		
 	}
 
-	private void importProject(final Project project) {
+	private void importProject(final ProjectExample project) {
 		WorkspaceJob workspaceJob = new WorkspaceJob(Messages.NewProjectExamplesWizard_Downloading) {
 
 			@Override
@@ -88,7 +88,7 @@ public class ImportProjectExample extends Action implements ICheatSheetAction {
 					ProjectExamplesActivator.log(e);
 					return Status.CANCEL_STATUS;
 				}
-				final File file = ProjectUtil.getProjectExamplesFile(
+				final File file = ProjectExampleUtil.getProjectExamplesFile(
 						url, name, ".zip", monitor); //$NON-NLS-1$
 				if (file == null) {
 					return Status.CANCEL_STATUS;
@@ -130,7 +130,7 @@ public class ImportProjectExample extends Action implements ICheatSheetAction {
 				} catch (InterruptedException e) {
 					return;
 				}
-				List<Project> projects = new ArrayList<Project>();
+				List<ProjectExample> projects = new ArrayList<ProjectExample>();
 				projects.add(project);
 				List<IMarker> markers = ProjectExamplesActivator
 						.getMarkers(projects);

@@ -39,12 +39,12 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.jboss.tools.project.examples.Messages;
 import org.jboss.tools.project.examples.ProjectExamplesActivator;
-import org.jboss.tools.project.examples.model.Category;
+import org.jboss.tools.project.examples.model.ProjectExampleCategory;
 import org.jboss.tools.project.examples.model.IImportProjectExample;
 import org.jboss.tools.project.examples.model.IProjectExampleSite;
-import org.jboss.tools.project.examples.model.Project;
+import org.jboss.tools.project.examples.model.ProjectExample;
 import org.jboss.tools.project.examples.model.ProjectExampleSite;
-import org.jboss.tools.project.examples.model.ProjectUtil;
+import org.jboss.tools.project.examples.model.ProjectExampleUtil;
 import org.jboss.tools.test.util.JobUtils;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -110,10 +110,10 @@ public class ProjectTest {
 		site.setUrl(url);
 		Set<IProjectExampleSite> sites = new HashSet<IProjectExampleSite>();
 		sites.add(site);
-		List<Category> categories = ProjectUtil.getProjects(sites , new NullProgressMonitor());
-		Category category = categories.get(0);
+		List<ProjectExampleCategory> categories = ProjectExampleUtil.getProjects(sites , new NullProgressMonitor());
+		ProjectExampleCategory category = categories.get(0);
 		assertTrue("Test".equals(category.getName()));
-		Project project = category.getProjects().get(0);
+		ProjectExample project = category.getProjects().get(0);
 		String urlString = project.getUrl();
 		assertTrue(urlString.startsWith("file:"));
 		url = new URL(urlString);
@@ -143,17 +143,17 @@ public class ProjectTest {
 	}
 
 	private void importProject(IProgressMonitor monitor) throws MalformedURLException, Exception {
-		List<Category> projects = ProjectUtil.getProjects(monitor);
-		Category seamCategory = null;
-		for (Category category: projects) {
+		List<ProjectExampleCategory> projects = ProjectExampleUtil.getProjects(monitor);
+		ProjectExampleCategory seamCategory = null;
+		for (ProjectExampleCategory category: projects) {
 			if ("Seam".equals(category.getName())) {
 				seamCategory = category;
 				break;
 			}
 		}
 		assertNotNull(seamCategory);
-		Project projectExample = null;
-		for (Project project: seamCategory.getProjects()) {
+		ProjectExample projectExample = null;
+		for (ProjectExample project: seamCategory.getProjects()) {
 			if ("numberguess".equals(project.getName())) {
 				projectExample = project;
 				break;
@@ -164,7 +164,7 @@ public class ProjectTest {
 		String name = projectExample.getName();
 		URL url = null;
 		url = new URL(urlString);
-		File file = ProjectUtil.getProjectExamplesFile(
+		File file = ProjectExampleUtil.getProjectExamplesFile(
 				url, name, ".zip", monitor); //$NON-NLS-1$
 		assertNotNull(file);
 		IImportProjectExample importProjectExample = ProjectExamplesActivator.getDefault().getImportProjectExample(projectExample.getImportType());

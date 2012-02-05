@@ -32,8 +32,8 @@ import org.jboss.tools.central.jobs.RefreshBlogsJob;
 import org.jboss.tools.central.jobs.RefreshNewsJob;
 import org.jboss.tools.central.jobs.RefreshTutorialsJob;
 import org.jboss.tools.central.model.FeedsEntry;
-import org.jboss.tools.project.examples.model.Category;
-import org.jboss.tools.project.examples.model.Project;
+import org.jboss.tools.project.examples.model.ProjectExampleCategory;
+import org.jboss.tools.project.examples.model.ProjectExample;
 import org.jboss.tools.test.util.JobUtils;
 import org.jboss.tools.test.util.xpl.EditorTestHelper;
 import org.junit.AfterClass;
@@ -77,7 +77,7 @@ public class CentralTest {
 	public void testTutorials() throws Exception {
 		Job.getJobManager().join(JBossCentralActivator.JBOSS_CENTRAL_FAMILY,
 				new NullProgressMonitor());
-		Map<Category, List<Project>> categories = RefreshTutorialsJob.INSTANCE
+		Map<ProjectExampleCategory, List<ProjectExample>> categories = RefreshTutorialsJob.INSTANCE
 				.getTutorialCategories();
 		assertTrue("No one tutorial is found", categories.size() > 0);
 	}

@@ -16,14 +16,14 @@ import org.eclipse.ui.PlatformUI;
 import org.jboss.tools.project.examples.Messages;
 import org.jboss.tools.project.examples.ProjectExamplesActivator;
 import org.jboss.tools.project.examples.model.IImportProjectExample;
-import org.jboss.tools.project.examples.model.Project;
+import org.jboss.tools.project.examples.model.ProjectExample;
 
 public class NewProjectExamplesJob extends WorkspaceJob {
 
-	private List<Project> selectedProjects;
-	private List<Project> projects = new ArrayList<Project>();
+	private List<ProjectExample> selectedProjects;
+	private List<ProjectExample> projects = new ArrayList<ProjectExample>();
 
-	public NewProjectExamplesJob(String name, List<Project> selectedProjects) {
+	public NewProjectExamplesJob(String name, List<ProjectExample> selectedProjects) {
 		super(name);
 		this.selectedProjects = selectedProjects;
 	}
@@ -32,7 +32,7 @@ public class NewProjectExamplesJob extends WorkspaceJob {
 	public IStatus runInWorkspace(IProgressMonitor monitor)
 			throws CoreException {
 		projects .clear();
-		for (Project selectedProject : selectedProjects) {
+		for (ProjectExample selectedProject : selectedProjects) {
 			boolean success = ProjectExamplesActivator.downloadProject(
 					selectedProject, monitor);
 			if (success) {
@@ -43,7 +43,7 @@ public class NewProjectExamplesJob extends WorkspaceJob {
 		}
 		try {
 			setName(Messages.NewProjectExamplesWizard_Importing);
-			for (final Project project : projects) {
+			for (final ProjectExample project : projects) {
 				IImportProjectExample importProjectExample = 
 					ProjectExamplesActivator.getDefault().getImportProjectExample(project.getImportType());
 				if (importProjectExample == null) {
@@ -88,7 +88,7 @@ public class NewProjectExamplesJob extends WorkspaceJob {
 		return null;
 	}
 
-	public List<Project> getProjects() {
+	public List<ProjectExample> getProjects() {
 		return projects;
 	}
 

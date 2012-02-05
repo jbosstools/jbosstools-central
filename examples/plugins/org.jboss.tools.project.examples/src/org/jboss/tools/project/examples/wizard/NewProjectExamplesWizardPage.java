@@ -65,12 +65,12 @@ import org.eclipse.ui.part.PageBook;
 import org.jboss.tools.project.examples.Messages;
 import org.jboss.tools.project.examples.ProjectExamplesActivator;
 import org.jboss.tools.project.examples.dialog.FixDialog;
-import org.jboss.tools.project.examples.model.Category;
+import org.jboss.tools.project.examples.model.ProjectExampleCategory;
 import org.jboss.tools.project.examples.model.IImportProjectExample;
 import org.jboss.tools.project.examples.model.IProjectExampleSite;
-import org.jboss.tools.project.examples.model.Project;
+import org.jboss.tools.project.examples.model.ProjectExample;
 import org.jboss.tools.project.examples.model.ProjectFix;
-import org.jboss.tools.project.examples.model.ProjectUtil;
+import org.jboss.tools.project.examples.model.ProjectExampleUtil;
 import org.jboss.tools.project.examples.preferences.ProjectExamplesPreferencePage;
 
 /**
@@ -89,7 +89,7 @@ public class NewProjectExamplesWizardPage extends WizardPage {
 	private PageBook notesPageBook;
 	private Composite noteEmptyComposite;
 	private Composite noteComposite;
-	private List<Category> categories;
+	private List<ProjectExampleCategory> categories;
 	private Text descriptionText;
 
 	
@@ -199,8 +199,8 @@ public class NewProjectExamplesWizardPage extends WizardPage {
 			public void selectionChanged(SelectionChangedEvent event) {
 				selection = (IStructuredSelection) event.getSelection();
 				Object selected = selection.getFirstElement();
-				if (selected instanceof Project && selection.size() == 1) {
-					Project selectedProject = (Project) selected;
+				if (selected instanceof ProjectExample && selection.size() == 1) {
+					ProjectExample selectedProject = (ProjectExample) selected;
 					descriptionText.setText(selectedProject.getDescription());
 					projectName.setText(selectedProject.getName());
 					projectURL.setText(selectedProject.getUrl());
@@ -422,11 +422,11 @@ public class NewProjectExamplesWizardPage extends WizardPage {
 		siteCombo.setItems(items);		
 	}
 
-	private List<Category> getCategories(boolean show) {
+	private List<ProjectExampleCategory> getCategories(boolean show) {
 		IRunnableWithProgress op = new IRunnableWithProgress() {
 			
 			public void run(IProgressMonitor monitor) {
-				categories = ProjectUtil.getProjects(monitor);
+				categories = ProjectExampleUtil.getProjects(monitor);
 			}
 		};
 		try {
@@ -434,7 +434,7 @@ public class NewProjectExamplesWizardPage extends WizardPage {
 		} catch (Exception e) {
 			ProjectExamplesActivator.log(e);
 		}
-		HashSet<IProjectExampleSite> invalidSites = ProjectUtil.getInvalidSites();
+		HashSet<IProjectExampleSite> invalidSites = ProjectExampleUtil.getInvalidSites();
 		boolean showInvalidSites = ProjectExamplesActivator.getDefault().getPreferenceStore().getBoolean(ProjectExamplesActivator.SHOW_INVALID_SITES);
 		if (invalidSites.size() > 0 && showInvalidSites && show) {
 			String message = Messages.NewProjectExamplesWizardPage_Cannot_access_the_following_sites;
@@ -453,9 +453,9 @@ public class NewProjectExamplesWizardPage extends WizardPage {
 		//List<Category> categories = getCategories(true);
 		Set<String> sites = new TreeSet<String>();
 		sites.add(ProjectExamplesActivator.ALL_SITES);
-		for (Category category:categories) {
-			List<Project> projects = category.getProjects();
-			for (Project project:projects) {
+		for (ProjectExampleCategory category:categories) {
+			List<ProjectExample> projects = category.getProjects();
+			for (ProjectExample project:projects) {
 				String name = project.getSite() == null ? ProjectExamplesActivator.ALL_SITES : project.getSite().getName();
 				sites.add(name);
 			}
@@ -473,12 +473,12 @@ public class NewProjectExamplesWizardPage extends WizardPage {
 
 		@Override
 		public String getText(Object element) {
-			if (element instanceof Category) {
-				Category category = (Category) element;
+			if (element instanceof ProjectExampleCategory) {
+				ProjectExampleCategory category = (ProjectExampleCategory) element;
 				return category.getName();
 			}
-			if (element instanceof Project) {
-				Project project = (Project) element;
+			if (element instanceof ProjectExample) {
+				ProjectExample project = (ProjectExample) element;
 				return project.getShortDescription();
 			}
 			return super.getText(element);
@@ -494,22 +494,22 @@ public class NewProjectExamplesWizardPage extends WizardPage {
 				//return children.toArray();
 				return childCollections;
 			}
-			if (parentElement instanceof Category) {
-				Category category = (Category) parentElement;
+			if (parentElement instanceof ProjectExampleCategory) {
+				ProjectExampleCategory category = (ProjectExampleCategory) parentElement;
 				return category.getProjects().toArray();
 			}
 			return new Object[0];
 		}
 
 		public Object getParent(Object element) {
-			if (element instanceof Project) {
-				return ((Project)element).getCategory();
+			if (element instanceof ProjectExample) {
+				return ((ProjectExample)element).getCategory();
 			}
 			return null;
 		}
 
 		public boolean hasChildren(Object element) {
-			return element instanceof Category;
+			return element instanceof ProjectExampleCategory;
 		}
 
 		public Object[] getElements(Object inputElement) {
@@ -543,9 +543,9 @@ public class NewProjectExamplesWizardPage extends WizardPage {
 		Iterator iterator = selection.iterator();
 		while (iterator.hasNext()) {
 			Object object = iterator.next();
-			if (object instanceof Project) {
+			if (object instanceof ProjectExample) {
 				canFinish=true;
-				Project project = (Project) object;
+				ProjectExample project = (ProjectExample) object;
 				String importType = project.getImportType();
 				if (importType != null && importType.length() > 0) {
 					IImportProjectExample importProjectExample = ProjectExamplesActivator.getDefault().getImportProjectExample(importType);

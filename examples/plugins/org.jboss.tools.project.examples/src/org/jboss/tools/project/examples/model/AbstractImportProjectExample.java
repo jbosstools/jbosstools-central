@@ -45,7 +45,7 @@ public abstract class AbstractImportProjectExample implements
 	}
 
 	@Override
-	public void fix(Project project, IProgressMonitor monitor) {
+	public void fix(ProjectExample project, IProgressMonitor monitor) {
 		ProjectExamplesActivator.fix(project, monitor);
 	}
 	

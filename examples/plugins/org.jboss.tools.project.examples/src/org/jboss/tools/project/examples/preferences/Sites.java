@@ -16,7 +16,7 @@ import java.util.Set;
 import org.jboss.tools.project.examples.Messages;
 import org.jboss.tools.project.examples.model.IProjectExampleSite;
 import org.jboss.tools.project.examples.model.ProjectExampleSite;
-import org.jboss.tools.project.examples.model.ProjectUtil;
+import org.jboss.tools.project.examples.model.ProjectExampleUtil;
 import org.jboss.tools.project.examples.model.SiteCategory;
 
 /**
@@ -33,11 +33,11 @@ public class Sites {
 		if (siteCategories == null) {
 			siteCategories = new SiteCategory[2];
 			userSite = new SiteCategory(Messages.Sites_User_sites);
-			Set<IProjectExampleSite> userSites = ProjectUtil.getUserSites();
+			Set<IProjectExampleSite> userSites = ProjectExampleUtil.getUserSites();
 			userSite.setSites(userSites);
 			siteCategories[0]=userSite;
 			SiteCategory pluginSite = new SiteCategory(Messages.Sites_Plugin_provided_sites);
-			Set<IProjectExampleSite> pluginSites = ProjectUtil.getPluginSites();
+			Set<IProjectExampleSite> pluginSites = ProjectExampleUtil.getPluginSites();
 			pluginSite.setSites(pluginSites);
 			siteCategories[1]=pluginSite;
 			sites = new HashSet<IProjectExampleSite>();

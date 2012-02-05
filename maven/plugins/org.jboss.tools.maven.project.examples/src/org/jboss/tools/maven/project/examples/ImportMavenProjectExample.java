@@ -36,7 +36,7 @@ import org.eclipse.swt.widgets.Shell;
 import org.jboss.tools.maven.ui.Activator;
 import org.jboss.tools.project.examples.ProjectExamplesActivator;
 import org.jboss.tools.project.examples.model.AbstractImportProjectExample;
-import org.jboss.tools.project.examples.model.Project;
+import org.jboss.tools.project.examples.model.ProjectExample;
 
 /**
  * @author snjeza
@@ -49,9 +49,9 @@ public class ImportMavenProjectExample extends AbstractImportProjectExample {
 	private boolean confirm;
 
 	@Override
-	public boolean importProject(Project projectDescription, File file,
+	public boolean importProject(ProjectExample projectDescription, File file,
 			IProgressMonitor monitor) throws Exception {
-		List<Project> projects = new ArrayList<Project>();
+		List<ProjectExample> projects = new ArrayList<ProjectExample>();
 		projects.add(projectDescription);
 		IPath rootPath = getLocation();
 		IPath mavenProjectsRoot = rootPath;
@@ -154,7 +154,7 @@ public class ImportMavenProjectExample extends AbstractImportProjectExample {
 	}
 
 	private List<String> importMavenProjects(final File destination,
-			final Project projectDescription, IProgressMonitor monitor) {
+			final ProjectExample projectDescription, IProgressMonitor monitor) {
 		List<String> projectNames = new ArrayList<String>();
 		MavenPlugin plugin = MavenPlugin.getDefault();
 		try {

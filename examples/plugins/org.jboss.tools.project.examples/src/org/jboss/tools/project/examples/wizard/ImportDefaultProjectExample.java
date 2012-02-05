@@ -36,7 +36,7 @@ import org.eclipse.ui.wizards.datatransfer.ImportOperation;
 import org.jboss.tools.project.examples.Messages;
 import org.jboss.tools.project.examples.ProjectExamplesActivator;
 import org.jboss.tools.project.examples.model.AbstractImportProjectExample;
-import org.jboss.tools.project.examples.model.Project;
+import org.jboss.tools.project.examples.model.ProjectExample;
 
 public class ImportDefaultProjectExample extends
 		AbstractImportProjectExample {
@@ -48,9 +48,9 @@ public class ImportDefaultProjectExample extends
 	};
 
 	@Override
-	public boolean importProject(Project projectDescription, File file,
+	public boolean importProject(ProjectExample projectDescription, File file,
 			IProgressMonitor monitor) throws Exception {
-		List<Project> projects = new ArrayList<Project>();
+		List<ProjectExample> projects = new ArrayList<ProjectExample>();
 		if (projectDescription.getIncludedProjects() == null) {
 			boolean ret = importSingleProject(projectDescription, file, monitor);
 			projects.add(projectDescription);
@@ -130,7 +130,7 @@ public class ImportDefaultProjectExample extends
 			project.create(monitor);
 	}
 
-	private boolean importSingleProject(Project projectDescription, File file,
+	private boolean importSingleProject(ProjectExample projectDescription, File file,
 			IProgressMonitor monitor) throws CoreException, ZipException,
 			IOException, InvocationTargetException, InterruptedException {
 		final String projectName = projectDescription.getName();

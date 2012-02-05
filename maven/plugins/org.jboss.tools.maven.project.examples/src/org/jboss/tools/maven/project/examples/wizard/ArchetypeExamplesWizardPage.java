@@ -49,7 +49,7 @@ import org.eclipse.ui.PlatformUI;
 import org.jboss.tools.maven.project.examples.MavenProjectExamplesActivator;
 import org.jboss.tools.maven.project.examples.wizard.xpl.MavenProjectWizardArchetypeParametersPage;
 import org.jboss.tools.project.examples.model.ArchetypeModel;
-import org.jboss.tools.project.examples.model.Project;
+import org.jboss.tools.project.examples.model.ProjectExample;
 
 /**
  * 
@@ -59,12 +59,12 @@ import org.jboss.tools.project.examples.model.Project;
 public class ArchetypeExamplesWizardPage extends
 		MavenProjectWizardArchetypeParametersPage {
 
-	private Project projectDescription;
+	private ProjectExample projectDescription;
 	private Composite warningLink;
 	private Boolean isEnterpriseRepoAvailable;
 
 	public ArchetypeExamplesWizardPage(
-			ProjectImportConfiguration configuration, Project projectDescription) {
+			ProjectImportConfiguration configuration, ProjectExample projectDescription) {
 		super(configuration);
 		setTitle(projectDescription.getShortDescription());
 		this.projectDescription = projectDescription;
