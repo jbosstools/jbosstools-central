@@ -99,8 +99,8 @@ import org.jboss.tools.central.jobs.RefreshBlogsJob;
 import org.jboss.tools.central.jobs.RefreshNewsJob;
 import org.jboss.tools.central.jobs.RefreshTutorialsJob;
 import org.jboss.tools.central.model.FeedsEntry;
-import org.jboss.tools.project.examples.model.Category;
-import org.jboss.tools.project.examples.model.Project;
+import org.jboss.tools.project.examples.model.ProjectExampleCategory;
+import org.jboss.tools.project.examples.model.ProjectExample;
 import org.osgi.framework.Bundle;
 
 /**
@@ -141,7 +141,7 @@ public class GettingStartedPage extends AbstractJBossCentralPage {
 	private Composite projectsComposite;
 	private Composite documentationComposite;
 	
-	private Set<Category> expandedCategories = new HashSet<Category>();
+	private Set<ProjectExampleCategory> expandedCategories = new HashSet<ProjectExampleCategory>();
 	private Section newsSection;
 	private ScrolledComposite newsScrollComposite;
 	private PageBook newsPageBook;
@@ -652,8 +652,8 @@ public class GettingStartedPage extends AbstractJBossCentralPage {
 		}
 	}
 
-	private void displayTutorialLinks(final Collection<Project> tutorials, final Composite composite, boolean addTooltips) {
-		for (final Project tutorial : tutorials) {
+	private void displayTutorialLinks(final Collection<ProjectExample> tutorials, final Composite composite, boolean addTooltips) {
+		for (final ProjectExample tutorial : tutorials) {
 			FormText tutorialText = toolkit.createFormText(composite, true);
 			configureTutorialText(tutorialText, tutorial);
 			if (addTooltips) {
@@ -870,7 +870,7 @@ public class GettingStartedPage extends AbstractJBossCentralPage {
 			showException(tutorialPageBook, tutorialsExceptionText, job.getException());
 			return;
 		}
-		Map<Category, List<Project>> categories = job.getTutorialCategories();
+		Map<ProjectExampleCategory, List<ProjectExample>> categories = job.getTutorialCategories();
 		if (categories == null || categories.size() == 0) {
 			showNote(tutorialPageBook, tutorialsNoteText, tutorialScrollComposite);
 			return;
@@ -880,7 +880,7 @@ public class GettingStartedPage extends AbstractJBossCentralPage {
 
 	@Deprecated
 	//This method should be removed once the EE6 archetypes are wizardified
-	private void updateNewProjects(List<Project> wizardProjects) {
+	private void updateNewProjects(List<ProjectExample> wizardProjects) {
 		if (!newProjectsInitialized) {
 			if (wizardProjects != null) {
 				newProjectsInitialized = true;
@@ -890,11 +890,11 @@ public class GettingStartedPage extends AbstractJBossCentralPage {
 		}
 	}
 
-	private void showTutorials(Map<Category, List<Project>> categories) {
+	private void showTutorials(Map<ProjectExampleCategory, List<ProjectExample>> categories) {
 		disposeChildren(tutorialsComposite);
-		List<Category> sortedCategories = new ArrayList<Category>(categories.keySet()); 
+		List<ProjectExampleCategory> sortedCategories = new ArrayList<ProjectExampleCategory>(categories.keySet()); 
 		Collections.sort(sortedCategories);
-		for (final Category category : sortedCategories) {
+		for (final ProjectExampleCategory category : sortedCategories) {
 			int style = ExpandableComposite.TITLE_BAR|ExpandableComposite.TWISTIE;
 			if (expandedCategories.contains(category)) {
 				style|=ExpandableComposite.EXPANDED;
@@ -956,7 +956,7 @@ public class GettingStartedPage extends AbstractJBossCentralPage {
 		return categoryFont;
 	}
 
-	private void hookTooltip(FormText tutorialText, Project tutorial) {
+	private void hookTooltip(FormText tutorialText, ProjectExample tutorial) {
 		final String description = JBossCentralActivator.getDefault().getDescription(tutorial);
 		if (description != null && !description.isEmpty()) {
 			ToolTip toolTip = new DescriptionToolTip(tutorialText, description);
@@ -964,7 +964,7 @@ public class GettingStartedPage extends AbstractJBossCentralPage {
 		}
 	}
 
-	protected void configureTutorialText(FormText tutorialText, final Project tutorial) {
+	protected void configureTutorialText(FormText tutorialText, final ProjectExample tutorial) {
 		StringBuilder buffer = new StringBuilder();
 		buffer.append(JBossCentralActivator.FORM_START_TAG);
 		buffer.append("<img href=\"image\"/> ");
@@ -1160,16 +1160,15 @@ public class GettingStartedPage extends AbstractJBossCentralPage {
 		
 		Point computedSize = tutorialPageBook.computeSize(SWT.DEFAULT, SWT.DEFAULT);
 		int y = computedSize.y;
-		if (y > 200) {
-			y = 200;
+		if (y > 100) {
+			y = 100;
 		}
 		
 		tutorialScrollComposite.setMinSize(widthHint, y);
-		//newsPageBook.layout(true, true);
-		//blogsPageBook.layout(true, true);
+		
 		recomputeScrollComposite(blogsScrollComposite, blogsPageBook);
 		recomputeScrollComposite(newsScrollComposite, newsPageBook);
-		//form.redraw();
+		
 		form.layout(true, true);
 		form.reflow(true);
 		
@@ -1258,7 +1257,7 @@ public class GettingStartedPage extends AbstractJBossCentralPage {
 					//TEMPORARY HACK FOR JBIDE-10053 (Java EE6 archetypes in the project section)
 					//Should be removed once these archetype tutorials are changed to use wizards as per JBIDE-10264  
 					RefreshTutorialsJob job = RefreshTutorialsJob.INSTANCE;
-					List<Project> wizardProjects = job.getWizardProjects();
+					List<ProjectExample> wizardProjects = job.getWizardProjects();
 					if (wizardProjects != null){
 						updateNewProjects(wizardProjects);						
 					}

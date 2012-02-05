@@ -64,7 +64,7 @@ import org.jboss.tools.central.JBossCentralActivator;
 import org.jboss.tools.central.actions.JBossRuntimeDetectionPreferencesHandler;
 import org.jboss.tools.central.editors.DescriptionToolTip;
 import org.jboss.tools.project.examples.ProjectExamplesActivator;
-import org.jboss.tools.project.examples.model.Project;
+import org.jboss.tools.project.examples.model.ProjectExample;
 import org.jboss.tools.project.examples.model.ProjectFix;
 import org.jboss.tools.runtime.core.RuntimeCoreActivator;
 import org.jboss.tools.runtime.core.model.DownloadRuntime;
@@ -76,7 +76,7 @@ import org.jboss.tools.runtime.ui.actions.DownloadRuntimeAction;
  */
 public class ProjectExamplesDialog extends FormDialog implements IRunnableContext {
 	
-	private Project tutorial;
+	private ProjectExample tutorial;
 	private FormToolkit toolkit;
 	private ScrolledForm form;
 	private Composite fixesComposite;
@@ -85,7 +85,7 @@ public class ProjectExamplesDialog extends FormDialog implements IRunnableContex
 	private Control fLastControl;
 	private Set<Button> controls = new HashSet<Button>();
 	
-	public ProjectExamplesDialog(Shell parentShell, Project project) {
+	public ProjectExamplesDialog(Shell parentShell, ProjectExample project) {
 		super(parentShell);
 		setShellStyle(SWT.CLOSE | SWT.MAX | SWT.TITLE | SWT.BORDER
 				| SWT.RESIZE | getDefaultOrientation());

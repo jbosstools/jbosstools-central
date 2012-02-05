@@ -57,8 +57,8 @@ import org.jboss.tools.central.configurators.DefaultJBossCentralConfigurator;
 import org.jboss.tools.central.configurators.IJBossCentralConfigurator;
 import org.jboss.tools.central.editors.JBossCentralEditor;
 import org.jboss.tools.central.editors.JBossCentralEditorInput;
-import org.jboss.tools.project.examples.model.Category;
-import org.jboss.tools.project.examples.model.Project;
+import org.jboss.tools.project.examples.model.ProjectExampleCategory;
+import org.jboss.tools.project.examples.model.ProjectExample;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
@@ -132,7 +132,7 @@ public class JBossCentralActivator extends AbstractUIPlugin {
 
 	private BundleContext bundleContext;
 
-  private Map<Category, List<Project>> tutorialCategories;
+  private Map<ProjectExampleCategory, List<ProjectExample>> tutorialCategories;
 
 	public static final int MAX_FEEDS = 100;
 
@@ -413,7 +413,7 @@ public class JBossCentralActivator extends AbstractUIPlugin {
 		return image;
 	}
 
-	public String getDescription(Project project) {
+	public String getDescription(ProjectExample project) {
 		StringBuilder buffer = new StringBuilder();
     if (project.getDescription() != null) {
       buffer.append(project.getDescription());

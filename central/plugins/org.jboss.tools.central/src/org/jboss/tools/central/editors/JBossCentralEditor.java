@@ -162,20 +162,8 @@ public class JBossCentralEditor extends SharedHeaderFormEditor {
 		ScrolledForm form = headerForm.getForm();
 		form.setText(JBOSS_CENTRAL);
 		form.setToolTipText(JBOSS_CENTRAL);
-
 		form.setImage(getHeaderImage());
 		getToolkit().decorateFormHeading(form.getForm());
-
-		// Composite headerComposite =
-		// getToolkit().createComposite(form.getForm().getHead(), SWT.NONE);
-		// headerComposite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true,
-		// false));
-		// headerComposite.setLayout(new GridLayout(2, false));
-		// headerComposite.setBackground(null);
-		//
-		// createSearchControl(headerComposite);
-
-		// form.getForm().setHeadClient(headerComposite);
 
 		IToolBarManager toolbar = form.getToolBarManager();
 		ControlContribution searchControl = new ControlContribution("Search") {

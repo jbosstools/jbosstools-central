@@ -63,15 +63,14 @@ public class FeedsToolTip extends ToolTip {
 		GridData gd = new GridData(SWT.FILL, SWT.FILL, true, true);
 		parent.setLayoutData(gd);
 		
-		Browser browser1;
+		final Browser[] browser = new Browser[1];
 		try {
-			browser1 = new Browser(parent, SWT.NONE);
+			browser[0] = new Browser(parent, SWT.NONE);
 		} catch (Exception e1) {
-			browser1 = new Browser(parent, SWT.WEBKIT);
+			browser[0] = new Browser(parent, SWT.WEBKIT);
 		}
-		final Browser browser = browser1;
-		browser.setJavascriptEnabled(false);
-		browser.addLocationListener(new LocationAdapter() {
+		browser[0].setJavascriptEnabled(false);
+		browser[0].addLocationListener(new LocationAdapter() {
 			
 			@Override
 			public void changed(LocationEvent event) {
@@ -82,17 +81,17 @@ public class FeedsToolTip extends ToolTip {
 				}
 			}
 		});
-		browser.addOpenWindowListener(new OpenWindowListener() {
+		browser[0].addOpenWindowListener(new OpenWindowListener() {
 			public void open(WindowEvent event) {
 				event.required= true;
-				event.browser = browser;
+				event.browser = browser[0];
 			}
 		});
 		gd = new GridData(SWT.FILL, SWT.FILL, true, true);
 		gd.heightHint = 150;
 		gd.widthHint = 400;
-		browser.setLayoutData(gd);
-		browser.setText(toolText);
+		browser[0].setLayoutData(gd);
+		browser[0].setText(toolText);
         
 		return parent;
 	}
