@@ -1030,7 +1030,9 @@ public class GettingStartedPage extends AbstractJBossCentralPage {
 				// we replace the HTML entity &nbsp; with the standard xml version 
 				// TODO: should probably be done earlier on but couldn't find where.
 				text = text.replaceAll("&nbsp;", "&#160;"); 
-				
+				//Temporary fix for JBIDE-10801 
+				//FIXME find a generic way to replace entities with proper code
+				text = text.replaceAll(" & ", " &#38; "); 
 				formText.setText(text, true, true);
 			} catch(IllegalArgumentException se) {
 				formText.dispose();
