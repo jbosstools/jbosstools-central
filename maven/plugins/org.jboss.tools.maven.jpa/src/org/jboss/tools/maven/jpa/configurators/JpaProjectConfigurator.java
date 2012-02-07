@@ -81,7 +81,7 @@ public class JpaProjectConfigurator extends AbstractProjectConfigurator {
 			MavenUtil.refreshParent(request.getMavenProject());
 			
 			configureFacets(monitor, project, facetedProject, persistenceXml);
-		}
+		} 
 	}
 
 	private void configureFacets(IProgressMonitor monitor, IProject project,

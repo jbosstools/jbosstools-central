@@ -32,12 +32,12 @@ import org.eclipse.jpt.common.core.internal.resource.ModuleResourceLocator;
 import org.eclipse.jpt.common.core.internal.resource.SimpleJavaResourceLocator;
 import org.eclipse.jpt.common.core.internal.resource.WebModuleResourceLocator;
 import org.eclipse.jpt.common.core.resource.ResourceLocator;
-import org.eclipse.jst.j2ee.web.project.facet.WebFacetUtils;
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.internal.IMavenConstants;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.wst.common.componentcore.ModuleCoreNature;
 import org.eclipse.wst.common.project.facet.core.IFacetedProject;
+import org.eclipse.wst.common.project.facet.core.IProjectFacet;
 import org.eclipse.wst.common.project.facet.core.ProjectFacetsManager;
 
 /**
@@ -49,6 +49,8 @@ import org.eclipse.wst.common.project.facet.core.ProjectFacetsManager;
 public class MavenResourceLocator implements ResourceLocator {
 
 	private static IPath META_INF_PATH = new Path("META-INF");
+	
+	private static final IProjectFacet WEB_FACET = ProjectFacetsManager.getProjectFacet("jst.web");
 
 	/**
 	 * Accepts all resources not under the build output and test build output
@@ -69,6 +71,7 @@ public class MavenResourceLocator implements ResourceLocator {
 			}
 		} else {
 			// Maven project not loaded yet, fallback to default behaviour.
+			//System.err.println(project + " not loaded");
 			accept = getDelegate(project).acceptResourceLocation(project, container);
 		}
 		// Sometimes src/main/resources/META-INF is not even sent immediately to
@@ -84,7 +87,7 @@ public class MavenResourceLocator implements ResourceLocator {
 		if (ModuleCoreNature.isFlexibleProject(project)) {
 			try {
 				IFacetedProject facetedProject = ProjectFacetsManager.create(project);
-				if (facetedProject != null && facetedProject.hasProjectFacet(WebFacetUtils.WEB_FACET)) {
+				if (facetedProject != null && facetedProject.hasProjectFacet(WEB_FACET)) {
 					return new WebModuleResourceLocator();
 				}
 			} catch (CoreException e) {
@@ -131,8 +134,7 @@ public class MavenResourceLocator implements ResourceLocator {
 		// System.err.println("getResourcePath (" + project + ", " + runtimePath
 		// + ") = " + resourcePath);
 		if (resourcePath == null) {
-			resourcePath = getDelegate(project).getResourcePath(project,
-					runtimePath);
+			resourcePath = getDelegate(project).getResourcePath(project, runtimePath);
 		}
 		return resourcePath;
 	}
@@ -197,12 +199,13 @@ public class MavenResourceLocator implements ResourceLocator {
 	 * Returns the cached IMavenProjectFacade in m2e's project registry
 	 */
 	private IMavenProjectFacade getMavenProjectFacade(IProject project) {
-		return MavenPlugin.getMavenProjectRegistry().create(project.getFile(IMavenConstants.POM_FILE_NAME), true, new NullProgressMonitor());
+		return MavenPlugin.getMavenProjectRegistry().create(project.getFile(IMavenConstants.POM_FILE_NAME), 
+															true, 
+															new NullProgressMonitor());
 	}
 
 	public IPath getRuntimePath(IProject project, IPath resourcePath) {
 		IPath runtimePath = getDelegate(project).getRuntimePath(project, resourcePath);
-		System.err.println("getRuntimePath("+resourcePath+") ="+ runtimePath);
 		return runtimePath;
 	}
 }

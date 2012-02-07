@@ -9,7 +9,6 @@
             <versionRange>[2.0,)</versionRange>
             <goals>
               <goal>compile</goal>
-			  <goal>testCompile</goal> 
             </goals>
           </pluginExecutionFilter>
           <action>
