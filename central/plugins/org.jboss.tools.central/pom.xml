@@ -15,8 +15,8 @@
 		<jboss.discovery.directory.url>http://download.jboss.org/jbosstools/updates/development/indigo/jbosstools-directory.xml</jboss.discovery.directory.url>
 	</properties>
 
-	<!--  _stable_branch jobs could use this profile but the above default (last stable milestone) is probably better -->
 	<profiles>
+		<!--  _stable_branch jobs could use this profile but the above default (last stable milestone) is probably better -->
 		<profile>
 			<id>3.3.indigo</id>
 			<activation>
@@ -26,10 +26,8 @@
 				<jboss.discovery.directory.url>http://download.jboss.org/jbosstools/updates/nightly/core/3.3.indigo/jbosstools-directory.xml</jboss.discovery.directory.url>
 			</properties>
 		</profile>
-	</profiles>
 
-	<!-- _trunk jobs should use this profile -->
-	<profiles>
+		<!-- _trunk jobs should use this profile -->
 		<profile>
 			<id>trunk</id>
 			<activation>
