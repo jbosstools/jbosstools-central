@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+   <modelVersion>4.0.0</modelVersion>
+
+   <parent>
+      <artifactId>multi</artifactId>
+      <groupId>org.jboss.tools.example</groupId>
+      <version>0.0.1-SNAPSHOT</version>
+   </parent>
+
+   <artifactId>multi-ejb</artifactId>
+   <packaging>ejb</packaging>
+
+   <name>multi EJB module</name>
+
+   <dependencies>
+   	<dependency>
+   		<groupId>org.jboss.seam</groupId>
+   		<artifactId>jboss-seam</artifactId>
+   		<version>2.2.2.Final</version>
+   		<type>ejb</type>
+   	</dependency>
+   </dependencies>
+
+   <build>
+      <plugins>
+         <plugin>
+            <artifactId>maven-ejb-plugin</artifactId>
+            <version>2.3</version>
+            <configuration>
+               <!-- Tell Maven we are using EJB 3.1 -->
+               <ejbVersion>3.0</ejbVersion>
+            </configuration>
+         </plugin>
+      </plugins>
+   </build>
+    <repositories>
+        <!-- The JBoss Community public repository is a composite repository 
+           of several major repositories -->
+        <!-- see http://community.jboss.org/wiki/MavenGettingStarted-Users -->
+        <repository>
+           <id>jboss-public-repository</id>
+           <name>JBoss Repository</name>
+           <url>http://repository.jboss.org/nexus/content/groups/public</url>
+           <!-- These optional flags are designed to speed up your builds 
+              by reducing remote server calls -->
+           <releases>
+           </releases>
+           <snapshots>
+              <enabled>false</enabled>
+           </snapshots>
+        </repository>
+     </repositories>
+
+
+</project>

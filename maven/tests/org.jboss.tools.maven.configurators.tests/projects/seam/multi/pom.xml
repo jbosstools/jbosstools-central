@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>org.jboss.tools.example</groupId>
+	<artifactId>multi</artifactId>
+	<version>0.0.1-SNAPSHOT</version>
+	<packaging>pom</packaging>
+	<name>multi application</name>
+
+	<modules>
+		<module>multi-ejb</module>
+		<module>multi-web</module>
+		<module>multi-ear</module>
+	</modules>
+
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+	</properties>
+
+	<dependencyManagement>
+		<dependencies>
+
+			<!-- Define the version of the EJB jar so that we don't need to repeat 
+				ourselves in every module -->
+			<dependency>
+				<groupId>org.jboss.tools.example</groupId>
+				<artifactId>multi-ejb</artifactId>
+				<version>0.0.1-SNAPSHOT</version>
+				<type>ejb</type>
+			</dependency>
+
+			<!-- Define the version of the WAR so that we don't need to repeat ourselves 
+				in every module -->
+			<dependency>
+				<groupId>org.jboss.tools.example</groupId>
+				<artifactId>multi-web</artifactId>
+				<version>0.0.1-SNAPSHOT</version>
+				<type>war</type>
+				<scope>compile</scope>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
+</project>
