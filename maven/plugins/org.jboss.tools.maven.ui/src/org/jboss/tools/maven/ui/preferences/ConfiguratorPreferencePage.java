@@ -42,6 +42,7 @@ public class ConfiguratorPreferencePage extends PreferencePage implements
 	private static final String ORG_JBOSS_TOOLS_MAVEN_HIBERNATE = "org.jboss.tools.maven.hibernate"; //$NON-NLS-1$
 	private static final String ORG_JBOSS_TOOLS_MAVEN_SEAM = "org.jboss.tools.maven.seam"; //$NON-NLS-1$
 	private static final String ORG_JBOSS_TOOLS_MAVEN_JAXRS = "org.jboss.tools.maven.jaxrs"; //$NON-NLS-1$
+	private static final String ORG_JBOSS_TOOLS_MAVEN_JPA = "org.jboss.tools.maven.jpa"; //$NON-NLS-1$
 	
 	private Button configureSeamButton;
 	private Button configureSeamRuntimeButton;
@@ -54,7 +55,8 @@ public class ConfiguratorPreferencePage extends PreferencePage implements
 	private Button configureCDIButton;
 	private Button configureHibernateButton;
 	private Button configureJaxRsButton;
-
+	private Button configureJpaButton;
+	
 	@Override
 	protected Control createContents(Composite parent) {
 		Composite composite = new Composite(parent, SWT.NONE);
@@ -147,6 +149,13 @@ public class ConfiguratorPreferencePage extends PreferencePage implements
 			configureJaxRsButton.setSelection(configureJaxRs);
 		}
 		
+		if (bundleExists(ORG_JBOSS_TOOLS_MAVEN_JPA)) { 
+			configureJpaButton = new Button(composite,SWT.CHECK);
+			configureJpaButton.setText(Messages.ConfiguratorPreferencePage_Configure_JPA_facet);
+			boolean configureJpa = store.getBoolean(Activator.CONFIGURE_JPA);
+			configureJpaButton.setSelection(configureJpa);
+		}
+		
 		return composite;
 	}
 
@@ -219,6 +228,10 @@ public class ConfiguratorPreferencePage extends PreferencePage implements
 		if (bundleExists(ORG_JBOSS_TOOLS_MAVEN_JAXRS)) { 
 			store.setValue(Activator.CONFIGURE_JAXRS, Activator.CONFIGURE_JAXRS_VALUE);
 		}
+
+		if (bundleExists(ORG_JBOSS_TOOLS_MAVEN_JPA)) { 
+			store.setValue(Activator.CONFIGURE_JPA, Activator.CONFIGURE_JPA_VALUE);
+		}
 		
 		super.performDefaults();
 	}
@@ -255,6 +268,10 @@ public class ConfiguratorPreferencePage extends PreferencePage implements
 			store.setValue(Activator.CONFIGURE_JAXRS, configureJaxRsButton.getSelection());
 		}
 
+		if (bundleExists(ORG_JBOSS_TOOLS_MAVEN_JPA)) {
+			store.setValue(Activator.CONFIGURE_JPA, configureJpaButton.getSelection());
+		}
+		
 		return super.performOk();
 	}
 

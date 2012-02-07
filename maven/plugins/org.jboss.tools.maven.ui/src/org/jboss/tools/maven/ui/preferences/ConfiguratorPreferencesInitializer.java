@@ -60,6 +60,9 @@ public class ConfiguratorPreferencesInitializer extends
 		node.putBoolean(
 				Activator.CONFIGURE_JAXRS,
 				Activator.CONFIGURE_JAXRS_VALUE);
+		node.putBoolean(
+				Activator.CONFIGURE_JPA,
+				Activator.CONFIGURE_JPA_VALUE);		
 	}
 
 }

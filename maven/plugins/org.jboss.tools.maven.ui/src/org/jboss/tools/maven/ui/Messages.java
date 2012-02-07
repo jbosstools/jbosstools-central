@@ -48,6 +48,7 @@ public class Messages extends NLS {
 	public static String ConfiguratorPreferencePage_Configure_JBoss_JSF_Portlet_facet;
 	public static String ConfiguratorPreferencePage_Configure_JBoss_Portlet_Core_facet;
 	public static String ConfiguratorPreferencePage_Configure_JBoss_Seam_Portlet_facet;
+	public static String ConfiguratorPreferencePage_Configure_JPA_facet;	
 	public static String ConfiguratorPreferencePage_Configure_JSF_facet;
 	public static String ConfiguratorPreferencePage_Configure_CDI_facet;
 	public static String ConfiguratorPreferencePage_Configure_Hibernate;

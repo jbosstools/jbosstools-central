@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+
+	<extension
+         point="org.eclipse.m2e.core.lifecycleMappingMetadataSource">
+   </extension>
+   
+	<extension point="org.eclipse.m2e.core.projectConfigurators">
+      <configurator 
+          id="org.jboss.tools.maven.jpa.configurator"
+          class="org.jboss.tools.maven.jpa.configurators.JpaProjectConfigurator"
+          name="%jpa_project_configurator" 
+          secondaryTo="org.eclipse.m2e.jdt.javaConfigurator"/>
+    </extension>
+    
+
+   <extension
+         point="org.eclipse.jpt.common.core.resourceLocators">
+      <resourceLocator
+            class="org.jboss.tools.maven.jpa.configurators.MavenResourceLocator"
+            id="mavenResourceLocator"
+            priority="lowest"
+            >
+         <enablement>
+            <with variable="project">
+                <and>
+                <test property="org.eclipse.core.resources.projectNature" value="org.eclipse.jdt.core.javanature" forcePluginActivation="true"/>
+                <test property="org.eclipse.core.resources.projectNature" value="org.eclipse.m2e.core.maven2Nature" forcePluginActivation="true"/>
+                </and>
+            </with>
+        </enablement>
+      </resourceLocator>
+   </extension>
+
+</plugin>

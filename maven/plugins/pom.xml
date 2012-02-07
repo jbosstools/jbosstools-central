@@ -23,6 +23,7 @@
 		<module>org.jboss.tools.maven.project.examples</module>
 		<module>org.jboss.tools.maven.jaxrs</module>
 		<module>org.jboss.tools.maven.jbosspackaging</module>
+        <module>org.jboss.tools.maven.jpa</module>
 	</modules>
 </project>
 	

@@ -82,6 +82,11 @@ public class Activator extends AbstractUIPlugin {
 	public static final String CONFIGURE_JAXRS = "configureJAX-RS"; //$NON-NLS-1$
 
 	public static final boolean CONFIGURE_JAXRS_VALUE = true;
+
+	public static final String CONFIGURE_JPA = "configureJPA"; //$NON-NLS-1$
+
+	public static final boolean CONFIGURE_JPA_VALUE = true;
+
 	// The shared instance
 	private static Activator plugin;
 	
