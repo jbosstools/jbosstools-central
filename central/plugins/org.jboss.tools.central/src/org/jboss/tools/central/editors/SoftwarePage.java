@@ -33,6 +33,7 @@ import org.eclipse.swt.events.ControlAdapter;
 import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
+import org.eclipse.swt.graphics.Cursor;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -42,6 +43,8 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.Shell;
+import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.forms.IManagedForm;
 import org.eclipse.ui.forms.editor.FormEditor;
 import org.eclipse.ui.forms.widgets.ExpandableComposite;
@@ -184,7 +187,23 @@ public class SoftwarePage extends AbstractJBossCentralPage implements IRunnableC
 			
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				installAction.run();
+				Display display = Display.getCurrent();
+				Shell shell = display.getActiveShell();
+				Cursor cursor = shell == null ? null : shell.getCursor();
+				try {
+					if (shell != null) {
+						shell.setCursor(display.getSystemCursor(SWT.CURSOR_WAIT));
+					}
+					installAction.setEnabled(false);
+					installButton.setEnabled(false);
+					installAction.run();
+				} finally {
+					if (shell != null) {
+						shell.setCursor(cursor);
+					}
+					installAction.setEnabled(true);
+					installButton.setEnabled(true);
+				}
 			}
 			
 			@Override
