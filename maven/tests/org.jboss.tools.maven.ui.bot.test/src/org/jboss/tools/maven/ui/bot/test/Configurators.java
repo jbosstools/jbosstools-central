@@ -65,6 +65,7 @@ public class Configurators {
 	}
 
 	//TODO https://issues.jboss.org/browse/JBIDE-10468
+	//https://issues.jboss.org/browse/JBIDE-10831
 	@Test
 	public void testJSFConfigurator() throws Exception{
 		createMavenizedDynamicWebProject(PROJECT_NAME_JSF, false);
@@ -104,7 +105,7 @@ public class Configurators {
 		assertTrue("Project "+PROJECT_NAME_CDI_EJB+" doesn't have "+CDI_NATURE+" nature.",Utils.hasNature(PROJECT_NAME_CDI_EJB, CDI_NATURE));
 	}
 
-	//@Test
+	@Test
 	public void testJAXRSConfigurator() throws Exception {
 		createMavenizedDynamicWebProject(PROJECT_NAME_JSF, false);
 		addDependencies(PROJECT_NAME_JSF, "com.cedarsoft.rest", "jersey", "1.0.0");
@@ -128,6 +129,7 @@ public class Configurators {
 			botExt.tree().expandNode("JBoss Community").select("JBoss 6.x Runtime");
 			botExt.button("Next >").click();
 			botExt.textWithLabel("Home Directory").setText(JBOSS6_AS_HOME);
+			botExt.button("Finish").click();
 		} else {
 			botExt.comboBoxInGroup("Target runtime").setSelection("<None>");
 		}
@@ -264,7 +266,7 @@ public class Configurators {
 		
 		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 	    DocumentBuilder docBuilder = factory.newDocumentBuilder();
-	    Document docPom = docBuilder.parse(facade.getProject().getFile("pom.xml").getContents());
+	    Document docPom = docBuilder.parse(facade.getProject().getFile("web.xml").getContents());
 	    Element servletElement = docPom.createElement("servlet");
 	    Element servletNameElement = docPom.createElement("servlet-name");  
 	    Element servletClassElement = docPom.createElement("servlet-class");	    

@@ -21,12 +21,12 @@ import org.junit.runners.Suite;
  */
 @RunWith(RequirementAwareSuite.class)
 @Suite.SuiteClasses({
-	//CreateMavenizedSeamProjectTest.class,
-	//CreateMavenizedEARProjectTest.class,
-	//CreateMavenizedJSFProjectTest.class,
-	//MavenProfileSelectionTest.class, //failures
-	//MaterializeLibraryTest.class,
-	//CreateMavenProjectsTest.class,
+	CreateMavenizedSeamProjectTest.class,
+	CreateMavenizedEARProjectTest.class,
+	CreateMavenizedJSFProjectTest.class,
+	MavenProfileSelectionTest.class, //failures
+	MaterializeLibraryTest.class,
+	CreateMavenProjectsTest.class,
 	Configurators.class
 })
 public class MavenAllBotTests {
