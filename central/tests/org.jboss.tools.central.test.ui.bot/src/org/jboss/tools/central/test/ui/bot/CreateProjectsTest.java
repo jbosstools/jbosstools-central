@@ -7,13 +7,15 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
 import org.jboss.tools.ui.bot.ext.SWTBotFactory;
 import org.jboss.tools.ui.bot.ext.SWTFormsBotExt;
 import org.jboss.tools.ui.bot.ext.SWTTestExt;
+import org.jboss.tools.ui.bot.ext.config.Annotations.Require;
+import org.jboss.tools.ui.bot.ext.config.Annotations.ServerType;
 import org.jboss.tools.ui.bot.ext.parts.SWTBotTwistie;
 import org.jboss.tools.ui.bot.ext.types.IDELabel;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-//@Require(server=@org.jboss.tools.ui.bot.ext.config.Annotations.Server(type=ServerType.JbossAS))
+@Require(server=@org.jboss.tools.ui.bot.ext.config.Annotations.Server(type=ServerType.JbossAS))
 public class CreateProjectsTest extends SWTTestExt{
 	
 	private static final String JBOSS_INSTALL_PATH = "/tmp/jbossAS";
@@ -41,11 +43,11 @@ public class CreateProjectsTest extends SWTTestExt{
 		//Openshift app
 		bot.hyperlink(IDELabel.JBossCentralEditor.OPENSHIFT_APP).click();
 		bot.waitForShell(IDELabel.JBossCentralEditor.OPENSHIFT_APP_WIZARD);
-		assertTrue("New Dynamic Web Project should have appeared", bot.shell(IDELabel.JBossCentralEditor.OPENSHIFT_APP_WIZARD).isActive());
+		//assertTrue("New Dynamic Web Project should have appeared", bot.shell(IDELabel.JBossCentralEditor.OPENSHIFT_APP_WIZARD).isActive());
 		bot.activeShell().close();
 		
 		//check Project example and detection of server
-		formsBot.formTextWithText(IDELabel.JBossCentralEditor.JAVA_EE_WEB_PROJECT).click();
+		/*formsBot.formTextWithText(IDELabel.JBossCentralEditor.JAVA_EE_WEB_PROJECT).click();
 		SWTBotShell projectExampleShell = bot.waitForShell(IDELabel.JBossCentralEditor.PROJECT_EXAMPLE);
 		assertTrue("Project Example window should have appeared", bot.shell(IDELabel.JBossCentralEditor.PROJECT_EXAMPLE).isActive());
 		try{
@@ -75,14 +77,14 @@ public class CreateProjectsTest extends SWTTestExt{
 		bot.clickButton("OK");
 		bot.waitForShell("Progress Information");
 		bot.sleep(TIME_1S);
-		util.waitForAll(Long.MAX_VALUE);
+		util.waitForNonIgnoredJobs(Long.MAX_VALUE);
 		//bot.waitUntil(Conditions.shellCloses(bot.activeShell()), Long.MAX_VALUE, TIME_5S);
 		projectExampleShell.close();
-		bot.sleep(TIME_1S);
+		bot.sleep(TIME_1S);*/
 		
 		//server should be added.. check again
 		formsBot.formTextWithText(IDELabel.JBossCentralEditor.JAVA_EE_WEB_PROJECT).click();
-		projectExampleShell = bot.waitForShell(IDELabel.JBossCentralEditor.PROJECT_EXAMPLE);
+		SWTBotShell projectExampleShell = bot.waitForShell(IDELabel.JBossCentralEditor.PROJECT_EXAMPLE);
 		assertTrue("Project Example window should have appeared", bot.shell(IDELabel.JBossCentralEditor.PROJECT_EXAMPLE).isActive());
 		try{
 			bot.clickButton("Install");
