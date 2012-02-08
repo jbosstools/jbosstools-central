@@ -21,11 +21,8 @@
 				<groupId>org.eclipse.tycho</groupId>
 				<artifactId>tycho-surefire-plugin</artifactId>
 				<configuration>
-					<environmentVariables>
-						<DISPLAY>:2.0</DISPLAY>
-					</environmentVariables>
 					<useUIThread>false</useUIThread>
-					<skip>${swtbot.test.skip}</skip>
+					<skip><!--{swtbot.test.skip}  -->false</skip>
 					<testSuite>org.jboss.tools.maven.ui.bot.test</testSuite>
 					<testClass>org.jboss.tools.maven.ui.bot.test.MavenAllBotTests</testClass>
 					<dependencies>

@@ -19,6 +19,25 @@
 			<id>common-profile</id>
 		</profile>
 	</profiles>
+		<build>
+		
+	<plugins>
+	<plugin>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <configuration>
+          <source>1.6</source>
+          <target>1.6</target>
+        </configuration>
+      </plugin>
+      <plugin>
+        <artifactId>maven-war-plugin</artifactId>
+        <configuration>
+          <warSourceDirectory>${basedir}/WebContent</warSourceDirectory>
+        </configuration>
+      </plugin>
+      </plugins>
+      </build>
+     
 
 	<repositories>
 		<repository>
@@ -36,5 +55,17 @@
 			</snapshots>
 		</repository>
 	</repositories>
+	<dependencies>
+		<dependency>
+			<groupId>com.sun.faces</groupId>
+			<artifactId>mojarra-jsf-api</artifactId>
+			<version>2.0.0-b04</version>
+		</dependency>
+		<dependency>
+			<groupId>com.sun.faces</groupId>
+			<artifactId>jsf-api</artifactId>
+			<version>2.1.6</version>
+		</dependency>
+	</dependencies>
 </project>
 
