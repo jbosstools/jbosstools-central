@@ -263,11 +263,11 @@ public class Configurators {
 	}
 	
 	private void addServlet(String projectName, String servletName, String servletClass, String load) throws Exception{
-		IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject(projectName);
+		IProject facade = ResourcesPlugin.getWorkspace().getRoot().getProject(projectName);
 		
 		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 	    DocumentBuilder docBuilder = factory.newDocumentBuilder();
-	    Document docPom = docBuilder.parse(project.getProject().getFile("web.xml").getContents());
+	    Document docPom = docBuilder.parse(facade.getProject().getFile("web.xml").getContents());
 	    Element servletElement = docPom.createElement("servlet");
 	    Element servletNameElement = docPom.createElement("servlet-name");  
 	    Element servletClassElement = docPom.createElement("servlet-class");	    
@@ -288,7 +288,7 @@ public class Configurators {
 		StreamResult result = new StreamResult(xmlAsWriter);
 		DOMSource source = new DOMSource(docPom);
 		trans.transform(source, result);
-		project.getProject().getFile("web.xml").setContents(new ByteArrayInputStream(xmlAsWriter.toString().getBytes("UTF-8")), 0, null);
+		facade.getProject().getFile("web.xml").setContents(new ByteArrayInputStream(xmlAsWriter.toString().getBytes("UTF-8")), 0, null);
 		botUtil.waitForAll();
 		updateConf(projectName);	
 	}

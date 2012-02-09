@@ -29,6 +29,7 @@ import org.eclipse.swtbot.swt.finder.SWTBot;
 import org.eclipse.swtbot.swt.finder.keyboard.Keystrokes;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 import org.jboss.tools.ui.bot.ext.SWTBotExt;
+import org.jboss.tools.ui.bot.ext.SWTUtilExt;
 import org.jboss.tools.ui.bot.ext.config.Annotations.Require;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -58,6 +59,7 @@ public class CreateMavenizedJSFProjectTest{
 	public static final String JSF_VERSION_2 ="2.0";
 	
 	protected static SWTWorkbenchBot bot;
+	private SWTUtilExt botUtil = new SWTUtilExt(bot);
 	
 	
 	@BeforeClass
@@ -134,9 +136,9 @@ public class CreateMavenizedJSFProjectTest{
 		shellRuntime = bot.shell("New Server").activate().bot();
 		shellRuntime.tree().expandNode("JBoss Community").select(server);
 		shellRuntime.button("Finish").click();
-		waitForIdle();
+		botUtil.waitForAll(Long.MAX_VALUE);
 		shell.button("Finish").click();;
-		waitForIdle();
+		botUtil.waitForAll(Long.MAX_VALUE);
 	}
 	
 	
