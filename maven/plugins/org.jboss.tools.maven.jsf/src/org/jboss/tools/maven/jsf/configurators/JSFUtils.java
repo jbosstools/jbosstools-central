@@ -36,7 +36,9 @@ import org.w3c.dom.Document;
 public class JSFUtils {
 
 	public static final String FACES_SERVLET = "javax.faces.webapp.FacesServlet";
-	
+
+	private static final String FACES_SERVLET_XPATH = "//servlet[servlet-class=\"" + FACES_SERVLET + "\"]";
+
 	public static final String JSF_VERSION_2_0 = "2.0";
 	
 	public static final String JSF_VERSION_1_2 = "1.2";
@@ -108,8 +110,7 @@ public class JSFUtils {
 			Document doc = builder.parse(input);
 
 			XPath xpath = XPathFactory.newInstance().newXPath();
-			String expression = "//servlet[servlet-class=\"" + FACES_SERVLET + "\"]";
-			XPathExpression expr = xpath.compile(expression);
+			XPathExpression expr = xpath.compile(FACES_SERVLET_XPATH);
 			hasFacesServlet = null != expr.evaluate(doc, XPathConstants.NODE);
 		} catch (Exception e) {
 			Activator.log("An error occured trying to find to "+FACES_SERVLET+" :"+e.getMessage());

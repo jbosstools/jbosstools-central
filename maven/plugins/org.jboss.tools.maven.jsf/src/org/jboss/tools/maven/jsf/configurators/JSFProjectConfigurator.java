@@ -44,6 +44,7 @@ import org.eclipse.wst.common.project.facet.core.IProjectFacet;
 import org.eclipse.wst.common.project.facet.core.IProjectFacetVersion;
 import org.eclipse.wst.common.project.facet.core.ProjectFacetsManager;
 import org.jboss.tools.maven.core.IJBossMavenConstants;
+import org.jboss.tools.maven.core.MavenUtil;
 import org.jboss.tools.maven.core.ProjectUtil;
 import org.jboss.tools.maven.core.internal.project.facet.MavenFacetInstallDataModelProvider;
 import org.jboss.tools.maven.jsf.MavenJSFActivator;
@@ -171,6 +172,11 @@ public class JSFProjectConfigurator extends AbstractProjectConfigurator {
 
 		markerManager.deleteMarkers(fproj.getProject(), MavenJSFConstants.JSF_CONFIGURATION_ERROR_MARKER_ID);
 		if (!fproj.hasProjectFacet(JSF_FACET)) {
+			
+			//JBIDE-10785 : refresh parent to prevent 
+			// org.osgi.service.prefs.BackingStoreException: Resource '/parent/web/.settings' does not exist.
+			MavenUtil.refreshParent(mavenProject);
+			
 			String warSourceDir = getWarSourceDirectory(mavenProject,fproj.getProject());
 			String facesConfigPath = "WEB-INF/faces-config.xml";
 			IFile facesConfig = fproj.getProject().getFolder(warSourceDir).getFile(facesConfigPath);
