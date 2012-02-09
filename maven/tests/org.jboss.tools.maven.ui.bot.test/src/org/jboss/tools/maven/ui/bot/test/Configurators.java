@@ -153,9 +153,15 @@ public class Configurators {
 	    botUtil.waitForAll();
 		assertTrue("Web project doesn't have maven nature",Utils.isMavenProject(projectName));
 		updateConf(projectName);
-		assertFalse("Project "+projectName+" have "+JSF_NATURE+" nature.",Utils.hasNature(projectName, JSF_NATURE));
-		assertFalse("Project "+projectName+" have "+JAXRS_NATURE+" nature.",Utils.hasNature(projectName, JAXRS_NATURE));
-		assertFalse("Project "+projectName+" have "+CDI_NATURE+" nature.",Utils.hasNature(projectName, CDI_NATURE));
+		if(runtime){
+			assertTrue("Project "+projectName+" doesn't have "+JSF_NATURE+" nature.",Utils.hasNature(projectName, JSF_NATURE));
+			assertTrue("Project "+projectName+" doesn't have "+JAXRS_NATURE+" nature.",Utils.hasNature(projectName, JAXRS_NATURE));
+			assertTrue("Project "+projectName+" doesn't have "+CDI_NATURE+" nature.",Utils.hasNature(projectName, CDI_NATURE));
+		} else {
+			assertFalse("Project "+projectName+" have "+JSF_NATURE+" nature.",Utils.hasNature(projectName, JSF_NATURE));
+			assertFalse("Project "+projectName+" have "+JAXRS_NATURE+" nature.",Utils.hasNature(projectName, JAXRS_NATURE));
+			assertFalse("Project "+projectName+" have "+CDI_NATURE+" nature.",Utils.hasNature(projectName, CDI_NATURE));
+		}
 	}
 	
 	private void createMavenizedEJBProject(String projectName, boolean runtime)throws Exception{

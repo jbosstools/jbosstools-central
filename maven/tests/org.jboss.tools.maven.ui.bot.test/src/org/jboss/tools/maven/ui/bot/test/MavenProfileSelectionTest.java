@@ -60,7 +60,6 @@ public class MavenProfileSelectionTest extends AbstractMavenSWTBotTest {
 		SWTBot shell = bot.shell("Select Maven profiles").activate().bot();
 		shell.button("Select All").click();
 	    String selectedProfiles = shell.textWithLabel("Active profiles for simple-jar :").getText();
-	    System.out.println("+++++++++++++++++++++"+selectedProfiles);
 	    shell.button("OK").click();
 	   
 	    testActivatedProfiles(project.getName(), selectedProfiles, false);
