@@ -81,7 +81,7 @@ public class FeedsEntry {
 		this.date = date;
 	}
 
-	public String getFormString() {
+	public String getFormString(boolean escapeXml) {
 		StringBuffer buffer = new StringBuffer();
 		buffer.append(JBossCentralActivator.FORM_START_TAG);
 		buffer.append("<img href=\"image\"/> ");
@@ -89,10 +89,10 @@ public class FeedsEntry {
 			buffer.append("<a href=\"");
 			buffer.append(link);
 			buffer.append("\">");
-			buffer.append(StringEscapeUtils.unescapeHtml(title));
+			buffer.append(escapeXml(title, escapeXml));
 			buffer.append("</a>");
 		} else {
-			buffer.append(StringEscapeUtils.unescapeHtml(title));
+			buffer.append(escapeXml(title, escapeXml));
 		}
 		//buffer.append("<br/>");
 		boolean cr = false;
@@ -113,7 +113,7 @@ public class FeedsEntry {
 			buffer.append("</span>");
 			buffer.append(" ");
 			buffer.append("<span color=\"author\" font=\"author\">");
-			buffer.append(StringEscapeUtils.unescapeHtml(author));
+			buffer.append(escapeXml(author, escapeXml));
 			buffer.append("</span>");
 			cr = true;
 		}
@@ -125,7 +125,7 @@ public class FeedsEntry {
 		cr = false;
 		if (shortDescription != null && !shortDescription.isEmpty()) {
 			buffer.append("<span font=\"description\">");
-			buffer.append(StringEscapeUtils.unescapeHtml(shortDescription));
+			buffer.append(escapeXml(shortDescription, escapeXml));
 			buffer.append("</span>");
 			cr = true;
 		}
@@ -134,6 +134,16 @@ public class FeedsEntry {
 		}
 		buffer.append(JBossCentralActivator.FORM_END_TAG);
 		return buffer.toString();
+	}
+
+	protected String escapeXml(String text, boolean escape) {
+		text = StringEscapeUtils.unescapeHtml(text);
+		if (escape) {
+			text = StringEscapeUtils.escapeXml(text);
+		}
+		text = text.replaceAll("&nbsp;", "&#160;"); 
+		text = text.replaceAll("& ", "&#38; ");
+		return text;
 	}
 	
 	public String getShortDescription() {

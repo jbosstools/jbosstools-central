@@ -99,8 +99,8 @@ import org.jboss.tools.central.jobs.RefreshBlogsJob;
 import org.jboss.tools.central.jobs.RefreshNewsJob;
 import org.jboss.tools.central.jobs.RefreshTutorialsJob;
 import org.jboss.tools.central.model.FeedsEntry;
-import org.jboss.tools.project.examples.model.ProjectExampleCategory;
 import org.jboss.tools.project.examples.model.ProjectExample;
+import org.jboss.tools.project.examples.model.ProjectExampleCategory;
 import org.osgi.framework.Bundle;
 
 /**
@@ -1018,42 +1018,33 @@ public class GettingStartedPage extends AbstractJBossCentralPage {
 			if (i++ > JBossCentralActivator.MAX_FEEDS) {
 				return;
 			}
-			String text = entry.getFormString();
+			String text = entry.getFormString(false);
 			FormText formText = toolkit.createFormText(composite, true);
 			TableWrapData td = new TableWrapData();
 			td.indent = 2;
-			//Point size = scrollable.computeSize(SWT.DEFAULT, SWT.DEFAULT);
-			//td.maxWidth = size.x - 2;
 			formText.setLayoutData(td);
-			try {
-				// to avoid illegal argumentexception on formtext fields.
-				// we replace the HTML entity &nbsp; with the standard xml version 
-				// TODO: should probably be done earlier on but couldn't find where.
-				text = text.replaceAll("&nbsp;", "&#160;"); 
-				//Temporary fix for JBIDE-10801 
-				//FIXME find a generic way to replace entities with proper code
-				text = text.replaceAll(" & ", " &#38; "); 
+			try { 
 				formText.setText(text, true, true);
 			} catch(IllegalArgumentException se) {
-				formText.dispose();
-				formText = toolkit.createFormText(composite, false);
-				formText.setLayoutData(td);
 				try {
-					formText.setText("Problem rendering entry - " + StringEscapeUtils.unescapeHtml(se.getMessage()), false, false);
-				} catch (Exception e1) {
-					JBossCentralActivator.log(se);
+					text = entry.getFormString(true);
+					formText.setText(text, true, true);
+				} catch (IllegalArgumentException se2) {
+					formText.dispose();
+					formText = toolkit.createFormText(composite, false);
+					formText.setLayoutData(td);
+					try {
+						formText.setText("Problem rendering entry - " + StringEscapeUtils.unescapeHtml(se.getMessage()), false, false);
+					} catch (Exception e1) {
+						JBossCentralActivator.log(se);
+					}
 				}
 				continue;
 			}
-				//Display display = Display.getCurrent();
-			//formText.setFont(getLinkFont(display));
 			formText.setFont("default", JFaceResources.getDefaultFont());
 			formText.setFont("date", JFaceResources.getDefaultFont());
 			formText.setColor("date", JFaceColors.getHyperlinkText(getDisplay()));
-			//formText.setForeground(JFaceColors.getHyperlinkText(getDisplay()));
 			formText.setFont("description", JFaceResources.getDefaultFont());
-			//Font boldFont = getAuthorFont(display);
-			//formText.setFont("author", boldFont);
 			formText.setColor("author", JFaceColors.getHyperlinkText(getDisplay()));
 			formText.setImage("image", getFeedsImage());
 			if (JBossCentralActivator.isInternalWebBrowserAvailable() && entry.getDescription() != null && !entry.getDescription().isEmpty()) {
