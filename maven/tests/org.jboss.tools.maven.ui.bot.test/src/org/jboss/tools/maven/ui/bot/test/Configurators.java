@@ -72,6 +72,7 @@ public class Configurators {
 		addDependencies(PROJECT_NAME_JSF, "com.sun.faces", "mojarra-jsf-api", "2.0.0-b04");
 		assertTrue("Project "+PROJECT_NAME_JSF+" doesn't have "+JSF_NATURE+" nature",Utils.hasNature(PROJECT_NAME_JSF, JSF_NATURE));
 		clean();
+		/*
 		createMavenizedDynamicWebProject(PROJECT_NAME_JSF, false);
 		addFacesConf(PROJECT_NAME_JSF);
 		assertTrue("Project "+PROJECT_NAME_JSF+" doesn't have "+JSF_NATURE+" nature",Utils.hasNature(PROJECT_NAME_JSF, JSF_NATURE));
@@ -84,7 +85,7 @@ public class Configurators {
 		clean();
 		createMavenizedDynamicWebProject(PROJECT_NAME_JSF, true);
 		assertTrue("Project "+PROJECT_NAME_JSF+" doesn't have "+JSF_NATURE+" nature",Utils.hasNature(PROJECT_NAME_JSF, JSF_NATURE));
-		
+		*/
 		
 		
 	}
@@ -193,11 +194,11 @@ public class Configurators {
 	}
 	
 	private void addDependencies(String projectName, String groupId, String artifactId, String version) throws Exception{
-		IMavenProjectFacade facade = MavenPlugin.getMavenProjectRegistry().getMavenProject("org.jboss.tools", projectName,"0.0.1-SNAPSHOT");
+		IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject(projectName);
 		
 		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 	    DocumentBuilder docBuilder = factory.newDocumentBuilder();
-	    Document docPom = docBuilder.parse(facade.getProject().getFile("pom.xml").getContents());
+	    Document docPom = docBuilder.parse(project.getProject().getFile("pom.xml").getContents());
 	    Element dependenciesElement = docPom.createElement("dependencies");
 	    Element dependencyElement = docPom.createElement("dependency");
 	    Element groupIdElement = docPom.createElement("groupId");  
@@ -220,7 +221,7 @@ public class Configurators {
 		StreamResult result = new StreamResult(xmlAsWriter);
 		DOMSource source = new DOMSource(docPom);
 		trans.transform(source, result);
-		facade.getProject().getFile("pom.xml").setContents(new ByteArrayInputStream(xmlAsWriter.toString().getBytes("UTF-8")), 0, null);
+		project.getProject().getFile("pom.xml").setContents(new ByteArrayInputStream(xmlAsWriter.toString().getBytes("UTF-8")), 0, null);
 		botUtil.waitForAll();
 		updateConf(projectName);
 	}
@@ -262,11 +263,11 @@ public class Configurators {
 	}
 	
 	private void addServlet(String projectName, String servletName, String servletClass, String load) throws Exception{
-		IMavenProjectFacade facade = MavenPlugin.getMavenProjectRegistry().getMavenProject("org.jboss.tools", projectName,"0.0.1-SNAPSHOT");
+		IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject(projectName);
 		
 		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 	    DocumentBuilder docBuilder = factory.newDocumentBuilder();
-	    Document docPom = docBuilder.parse(facade.getProject().getFile("web.xml").getContents());
+	    Document docPom = docBuilder.parse(project.getProject().getFile("web.xml").getContents());
 	    Element servletElement = docPom.createElement("servlet");
 	    Element servletNameElement = docPom.createElement("servlet-name");  
 	    Element servletClassElement = docPom.createElement("servlet-class");	    
@@ -287,7 +288,7 @@ public class Configurators {
 		StreamResult result = new StreamResult(xmlAsWriter);
 		DOMSource source = new DOMSource(docPom);
 		trans.transform(source, result);
-		facade.getProject().getFile("pom.xml").setContents(new ByteArrayInputStream(xmlAsWriter.toString().getBytes("UTF-8")), 0, null);
+		project.getProject().getFile("web.xml").setContents(new ByteArrayInputStream(xmlAsWriter.toString().getBytes("UTF-8")), 0, null);
 		botUtil.waitForAll();
 		updateConf(projectName);	
 	}
