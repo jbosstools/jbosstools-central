@@ -2,7 +2,6 @@
 <?eclipse version="3.4"?>
 <plugin>
 
-   <extension-point id="tutorials" name="%Tutorials" schema="schema/tutorials.exsd"/>
    <extension-point id="configurators" name="JBoss Central Configurator" schema="schema/configurators.exsd"/>
    
    <extension
@@ -31,19 +30,6 @@
            name="JBoss Central"/>
    </extension>
 
-   <!--
-   <extension
-         point="org.eclipse.ui.menus">
-      <menuContribution
-            locationURI="menu:help?before=group.intro">
-            <command
-                  commandId="org.jboss.tools.central.show"
-                  icon="icons/jboss.png"
-                  id="org.jboss.tools.central.show">
-            </command>
-      </menuContribution>
-   </extension>
-   -->
    <extension point="org.eclipse.ui.actionSets">
 		<actionSet
 				id="org.jboss.tools.central"
@@ -137,13 +123,6 @@
       </command>
       
       <command
-      		defaultHandler="org.jboss.tools.central.actions.JBossSeamRuntimePreferencesHandler"
-            name="JBoss Seam Runtime Preferences"
-            id="org.jboss.tools.seam.runtime.preferences">
-      </command>
-      
-      
-      <command
       		defaultHandler="org.jboss.tools.central.actions.WTPRuntimePreferencesHandler"
             name="WTP Runtime Preferences"
             id="org.jboss.tools.wtp.runtime.preferences">
@@ -210,11 +189,6 @@
       <image
             commandId="org.jboss.tools.wtp.runtime.preferences"
             icon="icons/wtp_server.gif">
-      </image>
-      
-      <image
-            commandId="org.jboss.tools.seam.runtime.preferences"
-            icon="icons/seam16.png">
       </image>
       
       <image

@@ -493,9 +493,6 @@ public class GettingStartedPage extends AbstractJBossCentralPage {
 		item = JBossCentralActivator.createContributionItem(getSite(), "org.jboss.tools.runtime.preferences");
 		toolBarManager.add(item);
 
-		item = JBossCentralActivator.createContributionItem(getSite(), "org.jboss.tools.seam.runtime.preferences");
-		toolBarManager.add(item);
-
 		item = JBossCentralActivator.createContributionItem(getSite(), "org.jboss.tools.wtp.runtime.preferences");
 		toolBarManager.add(item);
 		
