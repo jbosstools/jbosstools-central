@@ -27,7 +27,7 @@ public class PlatformIdentifierManager {
 	
 	public PlatformIdentifierManager() {
 		platformIdentifiers.add(new ReallySimplePlatformIdentifer("hibernate"));
-		platformIdentifiers.add(new ReallySimplePlatformIdentifer("eclipse"));
+		platformIdentifiers.add(new ReallySimplePlatformIdentifer("eclipselink"));
 	} 
 	
 	public String identify(XmlPersistenceUnit xmlPersistenceUnit) {
