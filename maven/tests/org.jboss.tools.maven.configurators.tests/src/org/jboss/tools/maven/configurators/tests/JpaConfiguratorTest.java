@@ -50,6 +50,7 @@ public class JpaConfiguratorTest extends AbstractMavenConfiguratorTest {
 		assertTrue("Java Facet is missing",	facetedProject.hasProjectFacet(JavaFacet.FACET));
 	}
 	
+	/*
 	@Test
 	public void testMultiModule()  throws Exception {
 		IProject[] projects = importProjects("projects/jpa/multi", 
@@ -78,4 +79,5 @@ public class JpaConfiguratorTest extends AbstractMavenConfiguratorTest {
 		
 		assertIsJpaProject(ejb, JpaFacet.VERSION_2_0);
 	}
+	*/
 }
