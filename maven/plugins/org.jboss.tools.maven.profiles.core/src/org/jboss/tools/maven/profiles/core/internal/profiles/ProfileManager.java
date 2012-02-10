@@ -52,11 +52,13 @@ public class ProfileManager implements IProfileManager {
 		final ResolverConfiguration configuration =configurationManager.getResolverConfiguration(project);
 
 		final String profilesAsString = getAsString(profiles);
+		//TODO : replace with resolverConfiguration.getSelectedProfiles() when m2e 1.1 is the default requirement
 		if (profilesAsString.equals(configuration.getActiveProfiles())) {
 			//Nothing changed
 			return;
 		}
 		
+		//TODO : replace with resolverConfiguration.setSelectedProfiles(profilesAsString) when m2e 1.1 is the default requirement
 		configuration.setActiveProfiles(profilesAsString);
 		boolean isSet = configurationManager.setResolverConfiguration(project, configuration);
 		if (isSet) {
@@ -126,7 +128,8 @@ public class ProfileManager implements IProfileManager {
 		ResolverConfiguration resolverConfiguration = MavenPlugin.getProjectConfigurationManager()
 														.getResolverConfiguration(facade.getProject());
 
-		List<String> configuredProfiles = resolverConfiguration.getActiveProfileList();
+		//TODO : replace with resolverConfiguration.getSelectedProfiles() when m2e 1.1 is the default requirement 
+		List<String> configuredProfiles = toList(resolverConfiguration.getActiveProfiles());
 		
 		MavenProject mavenProject = facade.getMavenProject(monitor);
 		
@@ -182,6 +185,20 @@ public class ProfileManager implements IProfileManager {
 			}
 		});
 		return Collections.unmodifiableList(statuses);
+	}
+
+	private List<String> toList(String profilesAsText) {
+		List<String> profiles; 
+	    if (profilesAsText != null && profilesAsText.trim().length() > 0) {
+	      String[] profilesArray = profilesAsText.split("[,\\s\\|]"); 
+	      profiles = new ArrayList<String>(profilesArray.length);
+	      for (String profile : profilesArray) {
+	         profiles.add(profile);
+	      }
+	    } else {
+	      profiles = new ArrayList<String>(0);
+	    }
+	    return profiles;
 	}
 
 	private String findSource(Profile profile, List<Model> modelHierarchy) {
