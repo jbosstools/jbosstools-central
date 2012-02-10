@@ -27,19 +27,20 @@ public class JpaConfiguratorTest extends AbstractMavenConfiguratorTest {
 			return;
 		}
 		
-		
 		assertIsJpaProject(project, JpaFacet.VERSION_2_0);
 		assertNoErrors(project);
 		JpaProjectManager manager = JptJpaCorePlugin.getJpaProjectManager();
 		JpaProject jpa = manager.getJpaProject(project);
-		assertTrue(jpa.getJpaPlatform().getId() + " is not the expected eclipselink platform", jpa.getJpaPlatform().getId().startsWith("eclipselink"));
+		String pid = jpa.getJpaPlatform().getId(); 
+		assertTrue(pid + " is not the expected platform", pid.startsWith("eclipselink") || pid.startsWith("generic"));
 		
 		project = importProject( "projects/jpa/simple-1.0/pom.xml");
 		waitForJobsToComplete();
 		assertIsJpaProject(project, JpaFacet.VERSION_1_0);
 		assertNoErrors(project);
 		jpa = manager.getJpaProject(project);
-		assertTrue(jpa.getJpaPlatform().getId() + " is not the expected hibernate platform", jpa.getJpaPlatform().getId().startsWith("hibernate"));
+		pid = jpa.getJpaPlatform().getId(); 
+		assertTrue(pid + " is not the expected hibernate platform", pid.startsWith("hibernate"));
 	}	
 
 	protected void assertIsJpaProject(IProject project, IProjectFacetVersion expectedJpaVersion) throws Exception {
