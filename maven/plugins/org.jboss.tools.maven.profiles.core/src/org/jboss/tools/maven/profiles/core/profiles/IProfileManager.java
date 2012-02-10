@@ -1,3 +1,13 @@
+/*************************************************************************************
+ * Copyright (c) 2009-2011 Red Hat, Inc. and others.
+ * All rights reserved. This program and the accompanying materials 
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ * 
+ * Contributors:
+ *     JBoss by Red Hat - Initial implementation.
+ ************************************************************************************/
 package org.jboss.tools.maven.profiles.core.profiles;
 
 import java.util.List;
@@ -16,6 +26,13 @@ import org.eclipse.m2e.core.project.IMavenProjectFacade;
  */
 public interface IProfileManager {
 	
+	/**
+	 * Returns a List of ProfileStatus for the given mavenProjectFacade  
+	 * @param mavenProjectFacade a facade of the maven project
+	 * @param monitor a progress monitor
+	 * @return a List of ProfileStatus for the given mavenProjectFacade. 
+	 * @throws CoreException
+	 */
 	List<ProfileStatus> getProfilesStatuses(IMavenProjectFacade mavenProjectFacade, IProgressMonitor monitor) throws CoreException;
 
 	/**

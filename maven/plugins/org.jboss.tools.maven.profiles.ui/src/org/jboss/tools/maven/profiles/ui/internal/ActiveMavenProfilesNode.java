@@ -31,7 +31,6 @@ public class ActiveMavenProfilesNode implements IWorkbenchAdapter {
   
   public static ImageDescriptor icon = Activator.imageDescriptorFromPlugin(Activator.PLUGIN_ID, "icons/maven-profiles.png");
 
-  
   public ActiveMavenProfilesNode(List<Profile> profiles) {
     ids = getProfileIds(profiles);
   }
