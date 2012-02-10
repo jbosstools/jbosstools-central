@@ -22,7 +22,7 @@
 				<artifactId>tycho-surefire-plugin</artifactId>
 				<configuration>
 					<useUIThread>false</useUIThread>
-					<skip>{swtbot.test.skip}</skip>
+					<skip>${swtbot.test.skip}</skip>
 					<testSuite>org.jboss.tools.maven.ui.bot.test</testSuite>
 					<testClass>org.jboss.tools.maven.ui.bot.test.MavenAllBotTests</testClass>
 					<dependencies>
