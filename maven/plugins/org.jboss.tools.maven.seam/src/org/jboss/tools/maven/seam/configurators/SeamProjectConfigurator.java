@@ -56,6 +56,7 @@ import org.eclipse.wst.common.project.facet.core.IProjectFacet;
 import org.eclipse.wst.common.project.facet.core.IProjectFacetVersion;
 import org.eclipse.wst.common.project.facet.core.ProjectFacetsManager;
 import org.jboss.tools.maven.core.IJBossMavenConstants;
+import org.jboss.tools.maven.core.MavenUtil;
 import org.jboss.tools.maven.core.internal.project.facet.MavenFacetInstallDataModelProvider;
 import org.jboss.tools.maven.jsf.MavenJSFActivator;
 import org.jboss.tools.maven.seam.MavenSeamActivator;
@@ -163,6 +164,12 @@ public class SeamProjectConfigurator extends AbstractProjectConfigurator {
 	    	}
 	    	if ("war".equals(packaging)) { //$NON-NLS-1$
 	    		IDataModel model = createSeamDataModel(deploying, seamVersion, project);
+	    		//JBIDE-10785 : refresh parent to prevent 
+				// org.osgi.service.prefs.BackingStoreException: Resource '/parent/web/.settings' does not exist.
+				if (!fproj.hasProjectFacet(jsfFacet)) {
+	    			MavenUtil.refreshParent(mavenProject);
+	    		}
+	    		
 	    		installWarFacets(fproj, model, seamVersion, monitor);
 	    	} else if ("ear".equals(packaging)) { //$NON-NLS-1$
 	    		installEarFacets(fproj, monitor);
