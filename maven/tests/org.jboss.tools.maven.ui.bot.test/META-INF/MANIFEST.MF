@@ -23,7 +23,9 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.wst.server.core,
  org.jboss.tools.seam.core,
  org.eclipse.datatools.connectivity,
- org.eclipse.datatools.connectivity.db.generic
+ org.eclipse.datatools.connectivity.db.generic,
+ org.jboss.tools.maven.profiles.core,
+ org.jboss.tools.maven.profiles.ui
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Eclipse-RegisterBuddy: org.apache.log4j

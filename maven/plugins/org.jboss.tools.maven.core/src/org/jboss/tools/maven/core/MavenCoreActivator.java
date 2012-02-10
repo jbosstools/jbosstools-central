@@ -70,8 +70,6 @@ import org.eclipse.wst.common.componentcore.resources.IVirtualComponent;
 import org.eclipse.wst.common.componentcore.resources.IVirtualFolder;
 import org.eclipse.wst.common.frameworks.datamodel.IDataModel;
 import org.eclipse.wst.common.project.facet.core.FacetedProjectFramework;
-import org.jboss.tools.maven.core.internal.profiles.ProfileManager;
-import org.jboss.tools.maven.core.profiles.IProfileManager;
 import org.osgi.framework.BundleContext;
 
 /**
@@ -94,8 +92,6 @@ public class MavenCoreActivator extends Plugin {
 	
 	public static final List<LibraryProviderOperationConfig> libraryProviderOperationConfigs = new ArrayList<LibraryProviderOperationConfig>();
 	
-	private IProfileManager profileManager;
-	
 	// The shared instance
 	private static MavenCoreActivator plugin;
 
@@ -114,7 +110,6 @@ public class MavenCoreActivator extends Plugin {
 	public void start(BundleContext context) throws Exception {
 		super.start(context);
 		plugin = this;
-		profileManager = new ProfileManager();
 	}
 
 	/*
@@ -770,9 +765,5 @@ public class MavenCoreActivator extends Plugin {
 			throw new CoreException(new Status(IStatus.ERROR,
 					IMavenConstants.PLUGIN_ID, -1, msg, ex));
 		}
-	}
-	
-	public IProfileManager getProfileManager() {
-		return profileManager;
 	}
 }
