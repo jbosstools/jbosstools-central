@@ -172,21 +172,23 @@ public class JSFProjectConfigurator extends AbstractProjectConfigurator {
 
 		markerManager.deleteMarkers(fproj.getProject(), MavenJSFConstants.JSF_CONFIGURATION_ERROR_MARKER_ID);
 		if (!fproj.hasProjectFacet(JSF_FACET)) {
-			
+			IProject project = fproj.getProject();
 			//JBIDE-10785 : refresh parent to prevent 
 			// org.osgi.service.prefs.BackingStoreException: Resource '/parent/web/.settings' does not exist.
 			MavenUtil.refreshParent(mavenProject);
 			
-			String warSourceDir = getWarSourceDirectory(mavenProject,fproj.getProject());
+			String warSourceDir = getWarSourceDirectory(mavenProject,project);
 			String facesConfigPath = "WEB-INF/faces-config.xml";
-			IFile facesConfig = fproj.getProject().getFolder(warSourceDir).getFile(facesConfigPath);
-			IFile generatedFacesConfig = ProjectUtil.getGeneratedWebResourceFile(fproj.getProject(), facesConfigPath);
-
+			IFile defaultFacesConfig = project.getFolder(warSourceDir).getFile(facesConfigPath);
+			IFile generatedFacesConfig = ProjectUtil.getGeneratedWebResourceFile(project, facesConfigPath);
+			IFile actualFacesConfig = JSFUtils.getFacesconfig(project);
+			
 			//faces-config.xml will not be created in the source folder and it doesn't exist yet
 			// => We'll have to fix it after setting the JSF facet
 			boolean shouldFixFacesConfig = generatedFacesConfig != null 
-					                    && !generatedFacesConfig.getLocation().equals(facesConfig.getLocation()) 
+					                    && !generatedFacesConfig.getLocation().equals(defaultFacesConfig.getLocation()) 
 					                    && !generatedFacesConfig.exists();  
+			boolean defaultFacesConfigAlreadyExists = defaultFacesConfig.exists();
 			
 			IProjectFacetVersion facetVersion = null;
 			boolean configureServlet = false;//Fix for JBIDE-9454, where existing web.xml is completely overwritten.
@@ -198,7 +200,6 @@ public class JSFProjectConfigurator extends AbstractProjectConfigurator {
 			}
 			else if (jsfVersionString.startsWith(JSF_VERSION_2_0)) { 
 				facetVersion = JSF_FACET_VERSION_2_0;
-				//configureServlet = configureWebxml();
 			}
 			
 			if (facetVersion != null) {
@@ -216,20 +217,25 @@ public class JSFProjectConfigurator extends AbstractProjectConfigurator {
 			}
 			
 			if (shouldFixFacesConfig && generatedFacesConfig.exists()) {
-				if (facesConfig.exists()) { 
+				if (defaultFacesConfig.exists()) { 
 					//We have 2 config files. Delete the gen'd one
 					generatedFacesConfig.delete(true, monitor);
 				}
 				else { 
 					//move the gen'd config file to the appropriate source folder
-					IContainer destination = facesConfig.getParent();
+					IContainer destination = defaultFacesConfig.getParent();
 					if (destination != null && !destination.exists()) {
 						  destination.getLocation().toFile().mkdirs();
 					}
-					generatedFacesConfig.move(facesConfig.getFullPath(), true, monitor);
+					generatedFacesConfig.move(defaultFacesConfig.getFullPath(), true, monitor);
 				}
 			}
-			
+			if (actualFacesConfig != null 
+				&& !defaultFacesConfigAlreadyExists 
+			    && !defaultFacesConfig.getLocation().equals(actualFacesConfig.getLocation())
+			    && defaultFacesConfig.exists()/*file has just been created*/) {
+				defaultFacesConfig.delete(true, monitor);
+			}
 		}
 	}
 	

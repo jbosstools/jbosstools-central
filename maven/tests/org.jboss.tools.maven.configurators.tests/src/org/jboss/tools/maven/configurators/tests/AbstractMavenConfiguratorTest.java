@@ -27,6 +27,7 @@ import org.eclipse.wst.common.project.facet.core.IProjectFacetVersion;
 import org.eclipse.wst.common.project.facet.core.ProjectFacetsManager;
 import org.jboss.tools.common.util.FileUtil;
 import org.jboss.tools.maven.jsf.configurators.JSFProjectConfigurator;
+import org.jboss.tools.maven.jsf.configurators.JSFUtils;
 
 public abstract class AbstractMavenConfiguratorTest extends
 		AbstractMavenProjectTestCase {
@@ -45,7 +46,7 @@ public abstract class AbstractMavenConfiguratorTest extends
 		assertNotNull(project.getName() + " is not a faceted project", facetedProject);
 		assertEquals("Unexpected JSF Version", expectedJSFVersion, facetedProject.getInstalledVersion(JSFProjectConfigurator.JSF_FACET));
 		assertTrue("Java Facet is missing",	facetedProject.hasProjectFacet(JavaFacet.FACET));
-		assertTrue("faces-config.xml is missing", project.getFile("src/main/webapp/WEB-INF/faces-config.xml").exists());
+		assertTrue("faces-config.xml is missing", JSFUtils.getFacesconfig(project).exists());
 	}
 
 	/**
@@ -73,18 +74,17 @@ public abstract class AbstractMavenConfiguratorTest extends
 		if (newPomName != null) {
 			copyContent(project, newPomName, "pom.xml");
 		}
-		IProgressMonitor mon = new NullProgressMonitor();
 		IProjectConfigurationManager configurationManager = MavenPlugin.getProjectConfigurationManager();
 		ResolverConfiguration configuration = new ResolverConfiguration();
-		configurationManager.enableMavenNature(project, configuration, mon);
-		configurationManager.updateProjectConfiguration(project, mon);
-		waitForJobsToComplete(mon);
+		configurationManager.enableMavenNature(project, configuration, monitor);
+		configurationManager.updateProjectConfiguration(project, monitor);
+		waitForJobsToComplete(monitor);
 
-		project.build(IncrementalProjectBuilder.FULL_BUILD, mon);
+		project.build(IncrementalProjectBuilder.FULL_BUILD, monitor);
 		if (waitTime > 0) {
 			Thread.sleep(waitTime);
 		}
-		waitForJobsToComplete(mon);
+		waitForJobsToComplete(monitor);
 	}
 
 	protected void updateProject(IProject project) throws Exception {

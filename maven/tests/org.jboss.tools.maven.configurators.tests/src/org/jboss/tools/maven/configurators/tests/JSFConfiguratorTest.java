@@ -132,6 +132,18 @@ public class JSFConfiguratorTest extends AbstractMavenConfiguratorTest {
 		assertTrue(jsfProject.getName() + " doesn't have the expected Web facet", facetedProject.hasProjectFacet(IJ2EEFacetConstants.DYNAMIC_WEB_25));
 	}	
 	
+	@Test
+	public void testJBIDE10831_detectCustomFacesConfig() throws Exception {
+		String projectLocation = "projects/jsf/JBIDE-10831/jsf-customfacesconfig";
+		IProject jsfProject = importProject(projectLocation+"/pom.xml");
+		waitForJobsToComplete(new NullProgressMonitor());
+		assertIsJSFProject(jsfProject, JSFProjectConfigurator.JSF_FACET_VERSION_2_0);
+		
+		IFile facesConfigXml = jsfProject.getFile("src/main/webapp/WEB-INF/faces-config.xml");
+		assertFalse("A new faces-config.xml was added to the project!", facesConfigXml.exists());
+
+	}	
+	
 	private void assertHasJSFConfigurationError(IProject project, String message) throws Exception {
 		WorkspaceHelpers.assertErrorMarker(MavenJSFConstants.JSF_CONFIGURATION_ERROR_MARKER_ID, message, 1, "", project);
 	}

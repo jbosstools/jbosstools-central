@@ -11,6 +11,7 @@
 package org.jboss.tools.maven.jsf.configurators;
 
 import java.io.InputStream;
+import java.util.List;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -30,6 +31,7 @@ import org.eclipse.jdt.core.JavaModelException;
 import org.jboss.tools.common.util.EclipseJavaUtil;
 import org.jboss.tools.maven.core.ProjectUtil;
 import org.jboss.tools.maven.jsf.utils.FacesConfigQuickPeek;
+import org.jboss.tools.maven.jsf.utils.xpl.JSFAppConfigUtils;
 import org.jboss.tools.maven.ui.Activator;
 import org.w3c.dom.Document;
 
@@ -53,7 +55,17 @@ public class JSFUtils {
 	 * Return the faces-config.xml of the given project, or null if faces-config.xml doesn't exist
 	 */
 	public static IFile getFacesconfig(IProject project) {
-		IFile facesConfig = ProjectUtil.getWebResourceFile(project, "WEB-INF/faces-config.xml");
+		IFile facesConfig = null;
+		@SuppressWarnings("unchecked")
+		List<String> configFiles = JSFAppConfigUtils.getConfigFilesFromContextParam(project);
+		for (String configFile : configFiles) {
+			facesConfig = ProjectUtil.getWebResourceFile(project, configFile);
+			if (facesConfig != null && facesConfig.exists()) {
+				return facesConfig;
+			}
+		}
+		facesConfig = ProjectUtil.getWebResourceFile(project, "WEB-INF/faces-config.xml");
+		
 		return facesConfig;
 	}
 	
