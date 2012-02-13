@@ -40,7 +40,7 @@ public class JpaConfiguratorTest extends AbstractMavenConfiguratorTest {
 		assertNoErrors(project);
 		jpa = manager.getJpaProject(project);
 		pid = jpa.getJpaPlatform().getId(); 
-		assertTrue(pid + " is not the expected hibernate platform", pid.startsWith("hibernate"));
+		assertTrue(pid + " is not the expected hibernate platform", pid.startsWith("hibernate") || pid.startsWith("generic"));
 	}	
 
 	protected void assertIsJpaProject(IProject project, IProjectFacetVersion expectedJpaVersion) throws Exception {
