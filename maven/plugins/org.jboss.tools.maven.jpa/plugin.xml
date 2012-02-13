@@ -13,7 +13,13 @@
           name="%jpa_project_configurator" 
           secondaryTo="org.eclipse.m2e.jdt.javaConfigurator"/>
     </extension>
-    
+ 	<extension point="org.eclipse.m2e.core.projectConfigurators">
+      <configurator 
+          id="org.jboss.tools.maven.jpa.configurator.wtp"
+          class="org.jboss.tools.maven.jpa.configurators.JpaProjectConfigurator"
+          name="%jpa_project_configurator_wtp" 
+          secondaryTo="org.maven.ide.eclipse.configuration.wtp.configurator"/>
+    </extension>   
 
    <extension
          point="org.eclipse.jpt.common.core.resourceLocators">
