@@ -15,7 +15,6 @@
 	<modules>
 		<module>org.jboss.tools.central</module>
 		<module>org.jboss.tools.central.discovery</module>
-		<module>org.jboss.tools.community.central</module>
 	</modules>
 </project>
 	
