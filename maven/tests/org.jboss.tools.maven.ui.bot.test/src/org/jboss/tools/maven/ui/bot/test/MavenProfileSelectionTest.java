@@ -90,7 +90,7 @@ public class MavenProfileSelectionTest extends AbstractMavenSWTBotTest {
 		shell.button("Select All").click();
 		shell.button("Activate").click();
 		shell.button("OK").click();
-		//testActivatedProfiles(project.getName(), COMMON_PROFILE+", "+AUTOACTIVATED_PROFILE_IN_USER_SETTINGS, false);
+		testActivatedProfiles(project.getName(), COMMON_PROFILE+", "+AUTOACTIVATED_PROFILE_IN_USER_SETTINGS, false);
 		testActivatedProfiles(project1.getName(), COMMON_PROFILE+", "+AUTOACTIVATED_PROFILE_IN_USER_SETTINGS, false);
 		testActivatedProfiles(project2.getName(), COMMON_PROFILE+", "+AUTOACTIVATED_PROFILE_IN_USER_SETTINGS, false);
 	}

@@ -65,9 +65,10 @@
 						<!-- configurator test -->
 						<dependency>
 							<type>p2-installable-unit</type>
-							<artifactId>org.jboss.tools.jsf.feature.feature.group</artifactId>
+							<artifactId>org.jboss.tools.ws.jaxrs.feature.feature.group</artifactId>
 							<version>0.0.0</version>
 						</dependency>
+						
 						<!-- seam test -->
 						<dependency>
 							<type>p2-installable-unit</type>
@@ -98,7 +99,6 @@
 							<artifactId>org.jboss.tools.maven.jbosspackaging.feature.feature.group</artifactId>
 							<version>0.0.0</version>
 						</dependency>
-						
 						<dependency>
 							<type>p2-installable-unit</type>
 							<artifactId>org.jboss.tools.maven.feature.feature.group</artifactId>
