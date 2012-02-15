@@ -316,7 +316,8 @@ public class NewProjectExamplesRequirementsPage extends WizardPage {
 					Object object = selection.getFirstElement();
 					if (object instanceof ProjectFix) {
 						ProjectFix fix = (ProjectFix) object;
-						if (!unsatisfiedFixes.contains(fix)) {
+						if (!unsatisfiedFixes.contains(fix) && !(ProjectFix.WTP_RUNTIME.equals(fix.getType())
+								|| ProjectFix.SEAM_RUNTIME.equals(fix.getType()))) {
 							return;
 						}
 						if (ProjectFix.WTP_RUNTIME.equals(fix.getType())
