@@ -93,14 +93,15 @@ import org.eclipse.ui.menus.CommandContributionItem;
 import org.eclipse.ui.part.PageBook;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.jboss.tools.central.JBossCentralActivator;
-import org.jboss.tools.central.dialogs.ProjectExamplesDialog;
 import org.jboss.tools.central.jobs.AbstractRefreshJob;
 import org.jboss.tools.central.jobs.RefreshBlogsJob;
 import org.jboss.tools.central.jobs.RefreshNewsJob;
 import org.jboss.tools.central.jobs.RefreshTutorialsJob;
 import org.jboss.tools.central.model.FeedsEntry;
+import org.jboss.tools.project.examples.ProjectExamplesActivator;
 import org.jboss.tools.project.examples.model.ProjectExample;
 import org.jboss.tools.project.examples.model.ProjectExampleCategory;
+import org.jboss.tools.project.examples.wizard.NewProjectExamplesWizard2;
 import org.osgi.framework.Bundle;
 
 /**
@@ -552,7 +553,7 @@ public class GettingStartedPage extends AbstractJBossCentralPage {
 	    IExtensionPoint extensionPoint = extensionRegistry.getExtensionPoint("org.eclipse.ui.newWizards");
 	    IExtension[] extensions = extensionPoint.getExtensions();
 	    
-	    List<String> wizardIDs = JBossCentralActivator.getDefault().getConfigurator().getWizardIds();
+	    List<String> wizardIDs = ProjectExamplesActivator.getDefault().getConfigurator().getWizardIds();
 	    
 	    List<String> createdIDs = new ArrayList<String>();
 		for (IExtension extension : extensions) {
@@ -985,8 +986,11 @@ public class GettingStartedPage extends AbstractJBossCentralPage {
 			public void linkActivated(HyperlinkEvent e) {
 				Object object = e.data;
 				if (object instanceof String) {
-					ProjectExamplesDialog dialog = new ProjectExamplesDialog(getSite().getShell(), tutorial);
+					NewProjectExamplesWizard2 wizard = new NewProjectExamplesWizard2(tutorial);
+					WizardDialog dialog = new WizardDialog(getSite().getShell(), wizard);
 					dialog.open();
+					//ProjectExamplesDialog dialog = new ProjectExamplesDialog(getSite().getShell(), tutorial);
+					//dialog.open();
 					refreshTutorials();
 				}
 			}

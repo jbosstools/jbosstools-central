@@ -14,14 +14,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Dictionary;
 import java.util.Hashtable;
-import java.util.List;
-import java.util.Map;
 
-import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IConfigurationElement;
-import org.eclipse.core.runtime.IExtension;
-import org.eclipse.core.runtime.IExtensionPoint;
-import org.eclipse.core.runtime.IExtensionRegistry;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Platform;
@@ -53,11 +46,8 @@ import org.eclipse.ui.menus.CommandContributionItem;
 import org.eclipse.ui.menus.CommandContributionItemParameter;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.eclipse.ui.services.IServiceLocator;
-import org.jboss.tools.central.configurators.DefaultJBossCentralConfigurator;
-import org.jboss.tools.central.configurators.IJBossCentralConfigurator;
 import org.jboss.tools.central.editors.JBossCentralEditor;
 import org.jboss.tools.central.editors.JBossCentralEditorInput;
-import org.jboss.tools.project.examples.model.ProjectExampleCategory;
 import org.jboss.tools.project.examples.model.ProjectExample;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
@@ -72,21 +62,19 @@ public class JBossCentralActivator extends AbstractUIPlugin {
 
 	public static final Object JBOSS_CENTRAL_FAMILY = new Object();
 
-	public static final String JBOSS_DISCOVERY_DIRECTORY = "jboss.discovery.directory.url";
-	
-	public static final String ICON = "icon";
-
-	private static final String DESCRIPTION = "description";
-
-	private static final String TUTORIAL = "tutorial";
-
-	public static final String CATEGORY_ID = "categoryId";
-
-	public static final String REFERENCE = "reference";
-
-	public static final String TYPE = "type";
-
-	public static final String PRIORITY = "priority";
+//	public static final String ICON = "icon";
+//
+//	private static final String DESCRIPTION = "description";
+//
+//	private static final String TUTORIAL = "tutorial";
+//
+//	public static final String CATEGORY_ID = "categoryId";
+//
+//	public static final String REFERENCE = "reference";
+//
+//	public static final String TYPE = "type";
+//
+//	public static final String PRIORITY = "priority";
 
 	public static final String ID = "id";
 
@@ -118,11 +106,7 @@ public class JBossCentralActivator extends AbstractUIPlugin {
 			+ "<span color=\"header\" font=\"header\">Loading...</span>"
 			+ FORM_END_TAG;
 
-	public static final String TUTORIALS_EXTENSION_ID = "org.jboss.tools.central.tutorials";
-
-	public static final String CONFIGURATORS_EXTENSION_ID = "org.jboss.tools.central.configurators";
-
-	private IJBossCentralConfigurator configurator;
+	//public static final String TUTORIALS_EXTENSION_ID = "org.jboss.tools.central.tutorials";
 
 	// public static final String SEARCH_PROJECT_PAGES = "Search Project Pages";
 
@@ -132,11 +116,7 @@ public class JBossCentralActivator extends AbstractUIPlugin {
 
 	private BundleContext bundleContext;
 
-  private Map<ProjectExampleCategory, List<ProjectExample>> tutorialCategories;
-
 	public static final int MAX_FEEDS = 100;
-
-	private static final Object CONFIGURATOR = "configurator";
 
 	private static final String ORG_ECLIPSE_UI_INTERNAL_INTROVIEW = "org.eclipse.ui.internal.introview";
 
@@ -369,38 +349,7 @@ public class JBossCentralActivator extends AbstractUIPlugin {
 		return null;
 	}
 
-	public IJBossCentralConfigurator getConfigurator() {
-		if (configurator == null) {
-			IExtensionRegistry registry = Platform.getExtensionRegistry();
-			IExtensionPoint extensionPoint = registry
-					.getExtensionPoint(CONFIGURATORS_EXTENSION_ID);
-			IExtension[] extensions = extensionPoint.getExtensions();
-			if (extensions.length > 0) {
-				IExtension extension = extensions[0];
-				IConfigurationElement[] configurationElements = extension
-						.getConfigurationElements();
-				for (int j = 0; j < configurationElements.length; j++) {
-					IConfigurationElement configurationElement = configurationElements[j];
-					if (CONFIGURATOR.equals(configurationElement.getName())) {
-						try {
-							configurator = (IJBossCentralConfigurator) configurationElement
-									.createExecutableExtension("class");
-						} catch (CoreException e) {
-							JBossCentralActivator.log(e);
-							continue;
-						}
-						break;
-					}
-				}
-
-			}
-			if (configurator == null) {
-				configurator = new DefaultJBossCentralConfigurator();
-			}
-		}
-		return configurator;
-	}
-
+	
 	public Image getImage(String imagePath) {
 		ImageRegistry registry = getImageRegistry();
 		Image image = registry.get(imagePath);

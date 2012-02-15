@@ -14,6 +14,7 @@ import java.io.File;
 
 import org.eclipse.core.runtime.IPath;
 import org.jboss.tools.central.JBossCentralActivator;
+import org.jboss.tools.project.examples.ProjectExamplesActivator;
 
 /**
  * 
@@ -27,7 +28,7 @@ public class RefreshNewsJob extends AbstractRefreshJob {
 
 	
 	private RefreshNewsJob() {
-		super("Refreshing JBoss News...", JBossCentralActivator.getDefault().getConfigurator().getNewsUrl());
+		super("Refreshing JBoss News...", ProjectExamplesActivator.getDefault().getConfigurator().getNewsUrl());
 	}
 
 	@Override

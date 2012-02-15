@@ -11,7 +11,7 @@
 
 package org.jboss.tools.central.actions;
 
-import org.jboss.tools.central.JBossCentralActivator;
+import org.jboss.tools.project.examples.ProjectExamplesActivator;
 
 /**
  * 
@@ -22,7 +22,7 @@ public class OpenJBossToolsTwitterHandler extends OpenWithBrowserHandler {
 
 	@Override
 	public String getLocation() {
-		return JBossCentralActivator.getDefault().getConfigurator().getTwitterLink();
+		return ProjectExamplesActivator.getDefault().getConfigurator().getTwitterLink();
 	}
 
 	@Override

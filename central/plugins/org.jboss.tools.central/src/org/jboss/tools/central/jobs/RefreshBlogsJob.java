@@ -14,6 +14,7 @@ import java.io.File;
 
 import org.eclipse.core.runtime.IPath;
 import org.jboss.tools.central.JBossCentralActivator;
+import org.jboss.tools.project.examples.ProjectExamplesActivator;
 
 /**
  * 
@@ -26,7 +27,7 @@ public class RefreshBlogsJob extends AbstractRefreshJob {
 	public static RefreshBlogsJob INSTANCE = new RefreshBlogsJob();
 	
 	private RefreshBlogsJob() {
-		super("Refreshing JBoss Blogs...", JBossCentralActivator.getDefault().getConfigurator().getBlogsUrl());
+		super("Refreshing JBoss Blogs...", ProjectExamplesActivator.getDefault().getConfigurator().getBlogsUrl());
 	}
 
 	@Override

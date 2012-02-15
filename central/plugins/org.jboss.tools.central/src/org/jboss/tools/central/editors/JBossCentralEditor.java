@@ -47,6 +47,7 @@ import org.eclipse.ui.menus.CommandContributionItem;
 import org.jboss.tools.central.JBossCentralActivator;
 import org.jboss.tools.central.actions.OpenJBossBlogsHandler;
 import org.jboss.tools.central.editors.xpl.TextSearchControl;
+import org.jboss.tools.project.examples.ProjectExamplesActivator;
 
 /**
  * 
@@ -137,7 +138,7 @@ public class JBossCentralEditor extends SharedHeaderFormEditor {
 			}
 			setPageImage(index, gettingStartedImage);
 
-			if (JBossCentralActivator.getDefault().getConfigurator()
+			if (ProjectExamplesActivator.getDefault().getConfigurator()
 					.getJBossDiscoveryDirectory() != null) {
 				softwarePage = new SoftwarePage(this);
 				index = addPage(softwarePage);
@@ -174,7 +175,7 @@ public class JBossCentralEditor extends SharedHeaderFormEditor {
 		};
 		toolbar.add(searchControl);
 		toolbar.add(new GroupMarker(COMMANDS_GROUP));
-		String[] commandIds = JBossCentralActivator.getDefault()
+		String[] commandIds = ProjectExamplesActivator.getDefault()
 				.getConfigurator().getMainToolbarCommandIds();
 		for (String commandId : commandIds) {
 			CommandContributionItem item = JBossCentralActivator
@@ -323,7 +324,7 @@ public class JBossCentralEditor extends SharedHeaderFormEditor {
 	}
 
 	private Image getHeaderImage() {
-		return JBossCentralActivator.getDefault().getConfigurator()
+		return ProjectExamplesActivator.getDefault().getConfigurator()
 				.getHeaderImage();
 	}
 

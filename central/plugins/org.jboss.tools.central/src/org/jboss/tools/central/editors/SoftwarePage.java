@@ -44,7 +44,6 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Shell;
-import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.forms.IManagedForm;
 import org.eclipse.ui.forms.editor.FormEditor;
 import org.eclipse.ui.forms.widgets.ExpandableComposite;
@@ -57,6 +56,7 @@ import org.eclipse.ui.part.PageBook;
 import org.jboss.tools.central.JBossCentralActivator;
 import org.jboss.tools.central.editors.xpl.DiscoveryViewer;
 import org.jboss.tools.central.jobs.RefreshDiscoveryJob;
+import org.jboss.tools.project.examples.ProjectExamplesActivator;
 
 /**
  * 
@@ -131,7 +131,7 @@ public class SoftwarePage extends AbstractJBossCentralPage implements IRunnableC
 	    discoveryViewer = new DiscoveryViewer(getSite(), this);
 	    discoveryViewer.setShowConnectorDescriptorKindFilter(false);
 	    discoveryViewer.setShowInstalledFilterEnabled(true);
-		discoveryViewer.setDirectoryUrl(JBossCentralActivator.getDefault().getConfigurator().getJBossDiscoveryDirectory());
+		discoveryViewer.setDirectoryUrl(ProjectExamplesActivator.getDefault().getConfigurator().getJBossDiscoveryDirectory());
 		discoveryViewer.createControl(pageBook);
 		discoveryViewer.setEnvironment(getEnvironment());
 		discoveryViewer.addFilter(new ViewerFilter() {

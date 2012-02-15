@@ -2,8 +2,6 @@
 <?eclipse version="3.4"?>
 <plugin>
 
-   <extension-point id="configurators" name="JBoss Central Configurator" schema="schema/configurators.exsd"/>
-   
    <extension
          point="org.eclipse.ui.editors">
       <editor
