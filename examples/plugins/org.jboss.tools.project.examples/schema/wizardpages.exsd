@@ -3,10 +3,10 @@
 <schema targetNamespace="org.jboss.tools.project.examples" xmlns="http://www.w3.org/2001/XMLSchema">
 <annotation>
       <appInfo>
-         <meta.schema plugin="org.jboss.tools.project.examples" id="categories" name="Project Examples Categories"/>
+         <meta.schema plugin="org.jboss.tools.project.examples" id="wizardpages" name="Project Examples Wizard Pages"/>
       </appInfo>
       <documentation>
-         Adds a new Project Examples Category xml file
+         Project Examples Wizard Pages
       </documentation>
    </annotation>
 
@@ -18,7 +18,7 @@
       </annotation>
       <complexType>
          <sequence>
-            <element ref="url"/>
+            <element ref="page" minOccurs="1" maxOccurs="unbounded"/>
          </sequence>
          <attribute name="point" type="string" use="required">
             <annotation>
@@ -47,8 +47,46 @@
       </complexType>
    </element>
 
-   <element name="url">
+   <element name="page">
       <complexType>
+         <attribute name="id" type="string" use="required">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="name" type="string" use="required">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="type" type="string" use="required">
+            <annotation>
+               <documentation>
+                  Project Example type
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="priority" type="string" use="required">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="class" type="string" use="required">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+               <appInfo>
+                  <meta.attribute kind="java" basedOn=":org.jboss.tools.project.examples.wizard.IProjectExamplesWizardPage"/>
+               </appInfo>
+            </annotation>
+         </attribute>
       </complexType>
    </element>
 

@@ -3,10 +3,10 @@
 <schema targetNamespace="org.jboss.tools.project.examples" xmlns="http://www.w3.org/2001/XMLSchema">
 <annotation>
       <appInfo>
-         <meta.schema plugin="org.jboss.tools.project.examples" id="categories" name="Project Examples Categories"/>
+         <meta.schema plugin="org.jboss.tools.project.examples" id="configurators" name="JBoss Central Configurator"/>
       </appInfo>
       <documentation>
-         Adds a new Project Examples Category xml file
+         [Enter description of this extension point.]
       </documentation>
    </annotation>
 
@@ -18,7 +18,7 @@
       </annotation>
       <complexType>
          <sequence>
-            <element ref="url"/>
+            <element ref="configurator"/>
          </sequence>
          <attribute name="point" type="string" use="required">
             <annotation>
@@ -47,8 +47,25 @@
       </complexType>
    </element>
 
-   <element name="url">
+   <element name="configurator">
       <complexType>
+         <attribute name="id" type="string">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="class" type="string">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+               <appInfo>
+                  <meta.attribute kind="java" basedOn=":org.jboss.tools.central.configurators.IJBossCentralConfigurator"/>
+               </appInfo>
+            </annotation>
+         </attribute>
       </complexType>
    </element>
 
@@ -57,10 +74,18 @@
          <meta.section type="since"/>
       </appInfo>
       <documentation>
-         3.0.0
+         [Enter the first release in which this extension point appears.]
       </documentation>
    </annotation>
 
+   <annotation>
+      <appInfo>
+         <meta.section type="examples"/>
+      </appInfo>
+      <documentation>
+         [Enter extension point usage example here.]
+      </documentation>
+   </annotation>
 
    <annotation>
       <appInfo>
@@ -80,13 +105,5 @@
       </documentation>
    </annotation>
 
-   <annotation>
-      <appInfo>
-         <meta.section type="copyright"/>
-      </appInfo>
-      <documentation>
-         JBoss by Red Hat
-      </documentation>
-   </annotation>
 
 </schema>

@@ -12,6 +12,7 @@
 package org.jboss.tools.project.examples.model;
 
 import java.io.File;
+import java.util.Map;
 
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -23,7 +24,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 public interface IImportProjectExample {
 
 	boolean importProject(ProjectExample projectDescription, File file,
-			IProgressMonitor monitor) throws Exception;
+			Map<String, Object> propertiesMap, IProgressMonitor monitor) throws Exception;
 	
 	void fix(ProjectExample project, IProgressMonitor monitor);
 	

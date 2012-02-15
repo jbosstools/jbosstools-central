@@ -168,7 +168,7 @@ public class ProjectTest {
 				url, name, ".zip", monitor); //$NON-NLS-1$
 		assertNotNull(file);
 		IImportProjectExample importProjectExample = ProjectExamplesActivator.getDefault().getImportProjectExample(projectExample.getImportType());
-		if (importProjectExample.importProject(projectExample, file, monitor)) {
+		if (importProjectExample.importProject(projectExample, file, null, monitor)) {
 			importProjectExample.fix(projectExample, monitor);
 		}
 	}

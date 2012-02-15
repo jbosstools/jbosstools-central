@@ -18,5 +18,23 @@
             type="mavenArchetype">
       </importProjectExample>
    </extension>
+   <extension
+         point="org.jboss.tools.project.examples.wizardpages">
+      <page
+            class="org.jboss.tools.maven.project.examples.wizard.ArchetypeExamplesWizardFirstPage"
+            id="org.jboss.tools.maven.project.examples.wizard.ArchetypeExamplesWizardFirstPage"
+            name="Maven Archetype First Page"
+            priority="1"
+            type="mavenArchetype">
+      </page>
+      <page
+            class="org.jboss.tools.maven.project.examples.wizard.ArchetypeExamplesWizardPage"
+            id="org.jboss.tools.maven.project.examples.wizard.ArchetypeExamplesWizardPage"
+            name="Maven Archetype Second Page"
+            priority="2"
+            type="mavenArchetype">
+      </page>
+   </extension>
+   
 
 </plugin>

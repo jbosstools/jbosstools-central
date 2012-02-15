@@ -71,7 +71,7 @@ public class RunProjectExample extends Action implements ICheatSheetAction {
 		if (project != null) {
 			List<ProjectExample> selectedProjects = new ArrayList<ProjectExample>();
 			selectedProjects.add(project);
-			ProjectExamplesActivator.importProjectExamples(selectedProjects, true);
+			ProjectExamplesActivator.importProjectExamples(selectedProjects, null, null);
 		}
 	}
 	

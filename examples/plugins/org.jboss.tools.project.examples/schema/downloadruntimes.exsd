@@ -3,10 +3,10 @@
 <schema targetNamespace="org.jboss.tools.project.examples" xmlns="http://www.w3.org/2001/XMLSchema">
 <annotation>
       <appInfo>
-         <meta.schema plugin="org.jboss.tools.project.examples" id="categories" name="Project Examples Categories"/>
+         <meta.schema plugin="org.jboss.tools.project.examples" id="downloadruntimes" name="Download Runtimes"/>
       </appInfo>
       <documentation>
-         Adds a new Project Examples Category xml file
+         Downloads a new Runtime
       </documentation>
    </annotation>
 
@@ -18,7 +18,7 @@
       </annotation>
       <complexType>
          <sequence>
-            <element ref="url"/>
+            <element ref="runtime" minOccurs="1" maxOccurs="unbounded"/>
          </sequence>
          <attribute name="point" type="string" use="required">
             <annotation>
@@ -47,8 +47,43 @@
       </complexType>
    </element>
 
-   <element name="url">
+   <element name="runtime">
       <complexType>
+         <attribute name="id" type="string" use="required">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="name" type="string" use="required">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="version" type="string" use="required">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="url" type="string" use="required">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="size" type="string" use="required">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+            </annotation>
+         </attribute>
       </complexType>
    </element>
 

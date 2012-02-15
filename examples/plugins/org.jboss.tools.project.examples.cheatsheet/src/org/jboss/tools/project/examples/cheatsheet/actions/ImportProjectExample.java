@@ -14,10 +14,10 @@ import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.StringTokenizer;
 
-import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.WorkspaceJob;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -97,7 +97,7 @@ public class ImportProjectExample extends Action implements ICheatSheetAction {
 				setName(Messages.NewProjectExamplesWizard_Importing);
 				try {
 					IImportProjectExample importProjectExample = ProjectExamplesActivator.getDefault().getImportProjectExample(project.getImportType());
-					if (importProjectExample.importProject(project, file, monitor)) {
+					if (importProjectExample.importProject(project, file, new HashMap<String, Object>(), monitor)) {
 						importProjectExample.fix(project, monitor);
 					}
 				} catch (Exception e) {
@@ -132,11 +132,7 @@ public class ImportProjectExample extends Action implements ICheatSheetAction {
 				}
 				List<ProjectExample> projects = new ArrayList<ProjectExample>();
 				projects.add(project);
-				List<IMarker> markers = ProjectExamplesActivator
-						.getMarkers(projects);
-				if (markers != null && markers.size() > 0) {
-					ProjectExamplesActivator.showQuickFix(projects);
-				}
+				ProjectExamplesActivator.showReadyWizard(projects);
 				
 			}
 

@@ -19,15 +19,11 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.MessageDialogWithToggle;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.preference.IPreferenceStore;
-import org.eclipse.jface.preference.PreferenceDialog;
-import org.eclipse.jface.resource.JFaceResources;
-import org.eclipse.jface.util.Geometry;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.ITreeContentProvider;
@@ -35,6 +31,7 @@ import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
+import org.eclipse.jface.wizard.IWizard;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
@@ -42,63 +39,51 @@ import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
-import org.eclipse.swt.graphics.Point;
-import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.DirectoryDialog;
-import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Link;
-import org.eclipse.swt.widgets.Monitor;
-import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.ui.dialogs.FilteredTree;
-import org.eclipse.ui.dialogs.PreferencesUtil;
 import org.eclipse.ui.model.AdaptableList;
-import org.eclipse.ui.part.PageBook;
 import org.jboss.tools.project.examples.Messages;
 import org.jboss.tools.project.examples.ProjectExamplesActivator;
-import org.jboss.tools.project.examples.dialog.FixDialog;
-import org.jboss.tools.project.examples.model.ProjectExampleCategory;
 import org.jboss.tools.project.examples.model.IImportProjectExample;
 import org.jboss.tools.project.examples.model.IProjectExampleSite;
 import org.jboss.tools.project.examples.model.ProjectExample;
-import org.jboss.tools.project.examples.model.ProjectFix;
+import org.jboss.tools.project.examples.model.ProjectExampleCategory;
 import org.jboss.tools.project.examples.model.ProjectExampleUtil;
-import org.jboss.tools.project.examples.preferences.ProjectExamplesPreferencePage;
+import org.jboss.tools.project.examples.model.ProjectFix;
 
 /**
  * @author snjeza
  * 
  */
-public class NewProjectExamplesWizardPage extends WizardPage {
+public class NewProjectExamplesMainPage extends WizardPage {
 
-	private static final int DEFAULT_HEIGHT = 430;
+	//private static final int DEFAULT_HEIGHT = 430;
 	private static final int DEFAULT_WIDTH = 600;
 	private IStructuredSelection selection;
-	private Button showQuickFixButton;
 	private Combo siteCombo;
-	private Text noteText;
-	private Button details;
-	private PageBook notesPageBook;
-	private Composite noteEmptyComposite;
-	private Composite noteComposite;
 	private List<ProjectExampleCategory> categories;
 	private Text descriptionText;
-
+	private NewProjectExamplesRequirementsPage requirementsPage;
+	//private NewProjectExamplesReadyPage readyPage;
+	private List<IProjectExamplesWizardPage> pages;
+	private ProjectExample selectedProject;
 	
-	public NewProjectExamplesWizardPage() {
-		super("org.jboss.tools.project.examples"); //$NON-NLS-1$
+	public NewProjectExamplesMainPage(NewProjectExamplesRequirementsPage requirementsPage, List<IProjectExamplesWizardPage> pages) {
+		super("org.jboss.tools.project.examples.main"); //$NON-NLS-1$
         setTitle( Messages.NewProjectExamplesWizardPage_Project_Example );
         setDescription( Messages.NewProjectExamplesWizardPage_Import_Project_Example );
         setImageDescriptor( ProjectExamplesActivator.imageDescriptorFromPlugin(ProjectExamplesActivator.PLUGIN_ID, "icons/new_wiz.gif")); //$NON-NLS-1$
-	}
+        this.requirementsPage = requirementsPage;
+        //this.readyPage = readyPage;
+        this.pages = pages;
+    }
 
 	public void createControl(Composite parent) {
 		Composite composite = new Composite(parent,SWT.NONE);
@@ -116,23 +101,11 @@ public class NewProjectExamplesWizardPage extends WizardPage {
 		
 		final Button button = new Button(siteComposite,SWT.CHECK);
 		gd = new GridData(SWT.FILL, SWT.BEGINNING, false, false);
-		//gd.horizontalSpan = 2;
+		gd.horizontalSpan = 2;
 		button.setLayoutData(gd);
 		button.setText(Messages.ProjectExamplesPreferencePage_Show_experimental_sites);
 		final IPreferenceStore store = ProjectExamplesActivator.getDefault().getPreferenceStore();
 		button.setSelection(store.getBoolean(ProjectExamplesActivator.SHOW_EXPERIMENTAL_SITES));
-		
-		Link prefLink = new Link(siteComposite, SWT.NONE);
-		gd = new GridData(SWT.END, SWT.BEGINNING, false, false);
-		//gd.horizontalSpan = 2;
-		prefLink.setLayoutData(gd);
-		prefLink.setText(Messages.NewProjectExamplesWizardPage_Project_Examples_Preferences);
-		prefLink.addSelectionListener(new SelectionAdapter() {
-			public void widgetSelected(SelectionEvent e) {
-				PreferenceDialog dialog = PreferencesUtil.createPreferenceDialogOn(getShell(),ProjectExamplesPreferencePage.ID, null, null);
-				dialog.open();
-			}
-		});
 		
 		new Label(siteComposite,SWT.NONE).setText(Messages.NewProjectExamplesWizardPage_Site);
 		siteCombo = new Combo(siteComposite,SWT.READ_ONLY);
@@ -143,7 +116,7 @@ public class NewProjectExamplesWizardPage extends WizardPage {
 		final ProjectExamplesPatternFilter filter = new ProjectExamplesPatternFilter();
 		
 		int styleBits = SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL | SWT.BORDER | SWT.WRAP;
-		final FilteredTree filteredTree = new FilteredTree(composite, styleBits, filter,true);
+		final FilteredTree filteredTree = new FilteredTree(composite, styleBits, filter, true);
 		filteredTree.setBackground(parent.getDisplay().getSystemColor(
 				SWT.COLOR_WIDGET_BACKGROUND));
 		final TreeViewer viewer = filteredTree.getViewer();
@@ -151,7 +124,7 @@ public class NewProjectExamplesWizardPage extends WizardPage {
 		gd = new GridData(SWT.FILL, SWT.FILL, true, true);
 		GC gc = new GC(parent);
 		gd.heightHint = Dialog.convertHeightInCharsToPixels(gc
-				.getFontMetrics(), 7);
+				.getFontMetrics(), 9);
 		gc.dispose(); 
 		tree.setLayoutData(gd);
 		tree.setFont(parent.getFont());
@@ -169,7 +142,7 @@ public class NewProjectExamplesWizardPage extends WizardPage {
 		gd = new GridData(SWT.FILL, SWT.FILL, true, true);
 		gc = new GC(parent);
 		gd.heightHint = Dialog.convertHeightInCharsToPixels(gc
-				.getFontMetrics(), 8);
+				.getFontMetrics(), 6);
 		gc.dispose();
 		descriptionText.setLayoutData(gd);
 		
@@ -200,86 +173,42 @@ public class NewProjectExamplesWizardPage extends WizardPage {
 				selection = (IStructuredSelection) event.getSelection();
 				Object selected = selection.getFirstElement();
 				if (selected instanceof ProjectExample && selection.size() == 1) {
-					ProjectExample selectedProject = (ProjectExample) selected;
+					selectedProject = (ProjectExample) selected;
 					descriptionText.setText(selectedProject.getDescription());
 					projectName.setText(selectedProject.getName());
 					projectURL.setText(selectedProject.getUrl());
 					projectSize.setText(selectedProject.getSizeAsText());
+					requirementsPage.setProjectExample(selectedProject);
+					//readyPage.setProjectExample(selectedProject);
+					String projectType = selectedProject.getImportType();
+					for (IProjectExamplesWizardPage page:pages) {
+						if (projectType != null && projectType.equals(page.getProjectExampleType())) {
+							page.setProjectExample(selectedProject);
+						} else {
+							page.setProjectExample(null);
+						}
+					}
 				} else {
-					//Project selectedProject=null;
-					descriptionText.setText(""); //$NON-NLS-1$
+					selectedProject = null;
+					String description = ""; //$NON-NLS-1$
+					if (selected instanceof ProjectExampleCategory) {
+						ProjectExampleCategory category = (ProjectExampleCategory) selected;
+						if (category.getDescription() != null) {
+							description = category.getDescription();
+						}
+					}
+					descriptionText.setText(description);
 					projectName.setText(""); //$NON-NLS-1$
 					projectURL.setText(""); //$NON-NLS-1$
 					projectSize.setText(""); //$NON-NLS-1$
+					requirementsPage.setProjectExample(null);
+					//readyPage.setProjectExample(null);
 				}
 				boolean canFinish = refresh(false);
 				setPageComplete(canFinish);
 			}
 			
 		});
-		
-		notesPageBook = new PageBook( internal , SWT.NONE );
-        notesPageBook.setLayout(new GridLayout(1,false));
-        gd=new GridData(GridData.FILL, GridData.FILL, true, false);
-        gc = new GC(parent);
-		gd.heightHint = Dialog.convertHeightInCharsToPixels(gc
-				.getFontMetrics(), 6);
-		gc.dispose(); 
-		gd.horizontalSpan=2;
-		notesPageBook.setLayoutData( gd );
-        
-        noteEmptyComposite = new Composite( notesPageBook, SWT.NONE );
-        noteEmptyComposite.setLayout( new GridLayout(1, false));
-        //notesEmptyComposite.setVisible( false );
-        gd = new GridData(SWT.FILL, SWT.FILL, true, false);
-		noteEmptyComposite.setLayoutData(gd);
-		
-		noteComposite = new Composite(notesPageBook, SWT.NONE);
-		noteComposite.setLayout(new GridLayout(2,false));
-		gd = new GridData(SWT.FILL, SWT.FILL, true, false);
-		noteComposite.setLayoutData(gd);
-		noteComposite.setVisible(false);
-		
-		notesPageBook.showPage(noteEmptyComposite);
-		
-		Composite messageComposite = new Composite(noteComposite, SWT.BORDER);
-		messageComposite.setLayout(new GridLayout(2, false));
-		gd = new GridData(SWT.FILL, SWT.FILL, true, false);
-		messageComposite.setLayoutData(gd);
-		
-		Label noteLabel = new Label(messageComposite,SWT.NONE);
-		gd=new GridData(SWT.BEGINNING, SWT.BEGINNING, false, false);
-		noteLabel.setLayoutData(gd);
-		Image image = JFaceResources.getImage(Dialog.DLG_IMG_MESSAGE_WARNING);
-		image.setBackground(noteLabel.getBackground());
-		noteLabel.setImage(image);
-		
-		noteText = new Text(messageComposite, SWT.H_SCROLL | SWT.V_SCROLL | SWT.WRAP | SWT.READ_ONLY);
-		gd = new GridData(SWT.FILL, SWT.FILL, true, false);
-		gc = new GC(parent);
-		gd.heightHint = Dialog.convertHeightInCharsToPixels(gc
-				.getFontMetrics(), 3);
-		gc.dispose(); 
-		noteText.setLayoutData(gd);
-		
-		details = new Button(noteComposite, SWT.PUSH);
-		details.setText(Messages.NewProjectExamplesWizardPage_Details);
-		gd=new GridData(SWT.BEGINNING, SWT.CENTER, false, false);
-		details.setLayoutData(gd);
-		details.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				Dialog dialog = new FixDialog(getShell(), NewProjectExamplesWizardPage.this);
-				dialog.open();
-			}
-		});
-		setDefaultNote();
-		showQuickFixButton = new Button(composite,SWT.CHECK);
-		showQuickFixButton.setText(Messages.NewProjectExamplesWizardPage_Show_the_Quick_Fix_dialog);
-		showQuickFixButton.setSelection(true);
-		gd=new GridData(SWT.BEGINNING, SWT.BOTTOM, false, false);
-		gd.horizontalSpan=2;
-		showQuickFixButton.setLayoutData(gd);
 		
 		siteCombo.addSelectionListener(new SelectionAdapter() {
 
@@ -317,103 +246,10 @@ public class NewProjectExamplesWizardPage extends WizardPage {
 		
 		setControl(composite);
 		
-		configureSizeAndLocation();
 		refresh(viewer, true);
 		siteCombo.setText(ProjectExamplesActivator.ALL_SITES);
 	}
-
 	
-	private void configureSizeAndLocation() {
-		Shell shell = getContainer().getShell();
-		Point size = new Point(DEFAULT_WIDTH, getHeight());
-		shell.setSize(size);
-		Point location = getInitialLocation(size, shell);
-		shell.setBounds(getConstrainedShellBounds(new Rectangle(location.x,
-				location.y, size.x, size.y)));
-	}
-	
-	private int getHeight() {
-		GC gc = new GC(getControl());
-		int height = Dialog.convertVerticalDLUsToPixels(gc
-				.getFontMetrics(), DEFAULT_HEIGHT);
-		gc.dispose(); 
-		return height;
-	}
-
-	private Rectangle getConstrainedShellBounds(Rectangle preferredSize) {
-		Rectangle result = new Rectangle(preferredSize.x, preferredSize.y,
-				preferredSize.width, preferredSize.height);
-
-		Monitor mon = getClosestMonitor(getShell().getDisplay(), Geometry
-				.centerPoint(result));
-
-		Rectangle bounds = mon.getClientArea();
-
-		if (result.height > bounds.height) {
-			result.height = bounds.height;
-		}
-
-		if (result.width > bounds.width) {
-			result.width = bounds.width;
-		}
-
-		result.x = Math.max(bounds.x, Math.min(result.x, bounds.x
-				+ bounds.width - result.width));
-		result.y = Math.max(bounds.y, Math.min(result.y, bounds.y
-				+ bounds.height - result.height));
-
-		return result;
-	}
-
-	private static Monitor getClosestMonitor(Display toSearch, Point toFind) {
-		int closest = Integer.MAX_VALUE;
-
-		Monitor[] monitors = toSearch.getMonitors();
-		Monitor result = monitors[0];
-
-		for (int idx = 0; idx < monitors.length; idx++) {
-			Monitor current = monitors[idx];
-
-			Rectangle clientArea = current.getClientArea();
-
-			if (clientArea.contains(toFind)) {
-				return current;
-			}
-
-			int distance = Geometry.distanceSquared(Geometry
-					.centerPoint(clientArea), toFind);
-			if (distance < closest) {
-				closest = distance;
-				result = current;
-			}
-		}
-
-		return result;
-	}
-
-
-	private Point getInitialLocation(Point initialSize, Shell shell) {
-		Composite parent = shell.getParent();
-
-		Monitor monitor = shell.getDisplay().getPrimaryMonitor();
-		if (parent != null) {
-			monitor = parent.getMonitor();
-		}
-
-		Rectangle monitorBounds = monitor.getClientArea();
-		Point centerPoint;
-		if (parent != null) {
-			centerPoint = Geometry.centerPoint(parent.getBounds());
-		} else {
-			centerPoint = Geometry.centerPoint(monitorBounds);
-		}
-
-		return new Point(centerPoint.x - (initialSize.x / 2), Math.max(
-				monitorBounds.y, Math.min(centerPoint.y
-						- (initialSize.y * 2 / 3), monitorBounds.y
-						+ monitorBounds.height - initialSize.y)));
-	}
-
 	private void refresh(final TreeViewer viewer, boolean show) {
 		AdaptableList input = new AdaptableList(getCategories(show));
 		viewer.setInput(input);
@@ -527,38 +363,26 @@ public class NewProjectExamplesWizardPage extends WizardPage {
 	public IStructuredSelection getSelection() {
 		return selection;
 	}
-	
-	public boolean showQuickFix() {
-		if (showQuickFixButton != null) {
-			return showQuickFixButton.getSelection();
-		}
-		return false;
-	}
 
 	public boolean refresh(boolean force) {
 		boolean canFinish = false;
-		notesPageBook.showPage(noteEmptyComposite);
-		noteComposite.setVisible(false);
-		noteEmptyComposite.setVisible(true);
+		
 		Iterator iterator = selection.iterator();
 		while (iterator.hasNext()) {
 			Object object = iterator.next();
 			if (object instanceof ProjectExample) {
+				// FIXME
 				canFinish=true;
 				ProjectExample project = (ProjectExample) object;
 				String importType = project.getImportType();
 				if (importType != null && importType.length() > 0) {
 					IImportProjectExample importProjectExample = ProjectExamplesActivator.getDefault().getImportProjectExample(importType);
 					if (importProjectExample == null) {
-						notesPageBook.showPage(noteComposite);
-						noteComposite.setVisible(true);
-						noteEmptyComposite.setVisible(false);
-						noteText.setText(project.getImportTypeDescription());
-						details.setEnabled(false);
+						// FIXME
 						canFinish = false;
 						break;
 					} else {
-						setDefaultNote();
+						//setDefaultNote();
 					}
 				}
 				if (force || project.getUnsatisfiedFixes() == null) {
@@ -572,13 +396,9 @@ public class NewProjectExamplesWizardPage extends WizardPage {
 					}
 				}
 				if (project.getUnsatisfiedFixes().size() > 0) {
-					notesPageBook.showPage(noteComposite);
-					noteComposite.setVisible(true);
-					noteEmptyComposite.setVisible(false);
+					// FIXME
 				} else {
-					notesPageBook.showPage(noteEmptyComposite);
-					noteComposite.setVisible(false);
-					noteEmptyComposite.setVisible(true);
+					
 				}
 
 			} else {
@@ -589,9 +409,8 @@ public class NewProjectExamplesWizardPage extends WizardPage {
 		return canFinish;
 	}
 
-	private void setDefaultNote() {
-		noteText.setText(Messages.NewProjectExamplesWizardPage_Note);
-		details.setEnabled(true);
+	public ProjectExample getSelectedProject() {
+		return selectedProject;
 	}
 	
 }

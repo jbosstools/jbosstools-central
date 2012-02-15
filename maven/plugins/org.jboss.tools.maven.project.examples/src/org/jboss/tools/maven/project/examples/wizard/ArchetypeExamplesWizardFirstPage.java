@@ -12,6 +12,7 @@ package org.jboss.tools.maven.project.examples.wizard;
 
 import java.lang.reflect.Field;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -30,6 +31,8 @@ import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.resource.JFaceResources;
+import org.eclipse.jface.wizard.IWizard;
+import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.jst.j2ee.project.facet.IJ2EEFacetConstants;
 import org.eclipse.m2e.core.project.ProjectImportConfiguration;
 import org.eclipse.m2e.core.ui.internal.wizards.MavenProjectWizardLocationPage;
@@ -56,7 +59,10 @@ import org.eclipse.wst.server.core.internal.facets.FacetUtil;
 import org.jboss.ide.eclipse.as.core.util.RuntimeUtils;
 import org.jboss.tools.maven.project.examples.MavenProjectExamplesActivator;
 import org.jboss.tools.maven.project.examples.Messages;
+import org.jboss.tools.project.examples.ProjectExamplesActivator;
 import org.jboss.tools.project.examples.model.ProjectExample;
+import org.jboss.tools.project.examples.wizard.IProjectExamplesWizardPage;
+import org.jboss.tools.project.examples.wizard.NewProjectExamplesWizard2;
 
 /**
  * Simplified UI for the Maven Archetype Wizard, based off the original m2e MavenProjectWizardLocationPage. 
@@ -64,7 +70,7 @@ import org.jboss.tools.project.examples.model.ProjectExample;
  * @author Fred Bricon
  * 
  */
-public class ArchetypeExamplesWizardFirstPage extends MavenProjectWizardLocationPage {
+public class ArchetypeExamplesWizardFirstPage extends MavenProjectWizardLocationPage implements IProjectExamplesWizardPage {
 
 	private static final String TARGET_RUNTIME = "targetRuntime";
 	private Label projectNameLabel;
@@ -79,7 +85,12 @@ public class ArchetypeExamplesWizardFirstPage extends MavenProjectWizardLocation
 	private ModifyListener projectNameModifyListener;
 	private ModifyListener packageNameModifyListener;
 	private ModifyListener propertyModifyListener;
-	private final ProjectExample projectDescription;
+	private ProjectExample projectDescription;
+	private ProjectExample projectExample;
+	
+	public ArchetypeExamplesWizardFirstPage() {
+		super(new ProjectImportConfiguration(), "", "",new ArrayList<IWorkingSet>());
+	}
 	
 	public ArchetypeExamplesWizardFirstPage(
 			ProjectImportConfiguration configuration,
@@ -89,7 +100,6 @@ public class ArchetypeExamplesWizardFirstPage extends MavenProjectWizardLocation
 		setPageComplete(false);
 		
 	}
-
 	
 	@Override
 	protected void createAdditionalControls(Composite container) {
@@ -264,14 +274,16 @@ public class ArchetypeExamplesWizardFirstPage extends MavenProjectWizardLocation
 		if (visible && !initialized) {
 			//Set defaults values from history here as the history is loaded in super.visible()
 			initDefaultValues();
-			initialized = true;
-			validate();
 		}
 	}
 
 
 	private void initDefaultValues() {
 		//JBIDE-10411 : provide sensible defaults for project name and package
+		if (projectExample == null || projectNameCombo == null) {
+			return;
+		}
+		projectDescription = projectExample;
 		String projectName = projectDescription.getArchetypeModel().getArtifactId();
 		if (StringUtils.isNotBlank(projectName)) {
 			IProject p = ResourcesPlugin.getWorkspace().getRoot().getProject(projectName);
@@ -289,6 +301,8 @@ public class ArchetypeExamplesWizardFirstPage extends MavenProjectWizardLocation
 		if (packageName != null) {
 			packageCombo.setText(packageName);
 		}
+		initialized = true;
+		validate();
 	}
 
 	private void createMissingRepositoriesWarning(Composite parent,
@@ -404,5 +418,73 @@ public class ArchetypeExamplesWizardFirstPage extends MavenProjectWizardLocation
 		}
 		super.dispose();
 	}
+
+
+	@Override
+	public boolean finishPage() {
+		return true;
+	}
+
+
+	@Override
+	public String getProjectExampleType() {
+		return ProjectExamplesActivator.MAVEN_ARCHETYPE;
+	}
+
+	@Override
+	public void setProjectExample(ProjectExample projectExample) {
+		this.projectExample = projectExample;
+		if (projectExample != null) {
+			if (projectExample.getShortDescription() != null) {
+				setTitle(projectExample.getShortDescription());
+			}
+			if (projectExample.getDescription() != null) {
+				setDescription(ProjectExamplesActivator.getShortDescription(projectExample.getDescription()));
+			}
+			ProjectImportConfiguration configuration = getImportConfiguration();
+			if (configuration != null) {
+				String profiles = projectExample.getDefaultProfiles();
+			    if (profiles != null && profiles.trim().length() > 0) {
+			    	configuration.getResolverConfiguration().setActiveProfiles(profiles);
+			    }
+			}
+			initDefaultValues();
+		} 
+	}
+	
+	@Override
+	public IWizardPage getNextPage() {
+		IWizard wizard = getWizard();
+		if (wizard instanceof NewProjectExamplesWizard2) {
+			ProjectExample projectExample = ((NewProjectExamplesWizard2)wizard).getSelectedProjectExample();
+			if (projectExample != null && projectExample.getImportType() != null) {
+				List<IProjectExamplesWizardPage> pages = ((NewProjectExamplesWizard2)wizard).getContributedPages();
+				for (IProjectExamplesWizardPage page:pages) {
+					if (page == this) {
+						continue;
+					}
+					if (projectExample.getImportType().equals(page.getProjectExampleType())) {
+						return page;
+					}
+				}
+			} 
+		}
+		return super.getNextPage();
+	}
+
+	@Override
+	public IWizardPage getPreviousPage() {
+		IWizard wizard = getWizard();
+		if (wizard instanceof NewProjectExamplesWizard2) {
+			return ((NewProjectExamplesWizard2) wizard).getRequirementsPage();
+		}
+		return super.getPreviousPage();
+	}
+
+	@Override
+	public Map<String, Object> getPropertiesMap() {
+		return null;
+	}
+
 	
 }

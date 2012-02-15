@@ -6,6 +6,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
+import java.util.Map;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipException;
 import java.util.zip.ZipFile;
@@ -49,7 +50,7 @@ public class ImportDefaultProjectExample extends
 
 	@Override
 	public boolean importProject(ProjectExample projectDescription, File file,
-			IProgressMonitor monitor) throws Exception {
+			Map<String, Object> propertiesMap, IProgressMonitor monitor) throws Exception {
 		List<ProjectExample> projects = new ArrayList<ProjectExample>();
 		if (projectDescription.getIncludedProjects() == null) {
 			boolean ret = importSingleProject(projectDescription, file, monitor);

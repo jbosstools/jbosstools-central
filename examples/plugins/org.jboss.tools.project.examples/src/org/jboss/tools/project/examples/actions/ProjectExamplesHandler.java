@@ -1,5 +1,5 @@
 /*************************************************************************************
- * Copyright (c) 2008-2011 Red Hat, Inc. and others.
+ * Copyright (c) 2008-2012 Red Hat, Inc. and others.
  * All rights reserved. This program and the accompanying materials 
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -16,7 +16,7 @@ import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.ui.PlatformUI;
-import org.jboss.tools.project.examples.wizard.NewProjectExamplesWizard;
+import org.jboss.tools.project.examples.wizard.NewProjectExamplesWizard2;
 
 /**
 * @author snjeza
@@ -25,7 +25,7 @@ import org.jboss.tools.project.examples.wizard.NewProjectExamplesWizard;
 public class ProjectExamplesHandler extends AbstractHandler {
 
 	public Object execute(ExecutionEvent event) throws ExecutionException {
-		Wizard wizard = new NewProjectExamplesWizard();
+		Wizard wizard = new NewProjectExamplesWizard2();
 		WizardDialog dialog = new WizardDialog(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(), wizard);
 		dialog.open();
 		return null;

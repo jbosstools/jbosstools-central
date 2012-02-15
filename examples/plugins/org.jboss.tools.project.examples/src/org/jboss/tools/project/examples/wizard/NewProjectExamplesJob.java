@@ -2,16 +2,22 @@ package org.jboss.tools.project.examples.wizard;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
+import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.resources.WorkspaceJob;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.jdt.core.IJavaProject;
+import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jface.dialogs.MessageDialogWithToggle;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IWorkbenchWindow;
+import org.eclipse.ui.IWorkingSet;
 import org.eclipse.ui.PlatformUI;
 import org.jboss.tools.project.examples.Messages;
 import org.jboss.tools.project.examples.ProjectExamplesActivator;
@@ -22,10 +28,14 @@ public class NewProjectExamplesJob extends WorkspaceJob {
 
 	private List<ProjectExample> selectedProjects;
 	private List<ProjectExample> projects = new ArrayList<ProjectExample>();
+	private IWorkingSet[] workingSets;
+	private Map<String, Object> propertiesMap;
 
-	public NewProjectExamplesJob(String name, List<ProjectExample> selectedProjects) {
+	public NewProjectExamplesJob(String name, List<ProjectExample> selectedProjects, IWorkingSet[] workingSets, Map<String, Object> propertiesMap) {
 		super(name);
 		this.selectedProjects = selectedProjects;
+		this.workingSets = workingSets;
+		this.propertiesMap = propertiesMap;
 	}
 
 	@Override
@@ -57,10 +67,18 @@ public class NewProjectExamplesJob extends WorkspaceJob {
 					});
 					return Status.CANCEL_STATUS;
 				}
-				if (importProjectExample.importProject(project, project.getFile(), monitor)) {
+				if (importProjectExample.importProject(project, project.getFile(), propertiesMap, monitor)) {
 					importProjectExample.fix(project, monitor);						
 				} else {
 					return Status.CANCEL_STATUS;
+				}
+				if (workingSets != null && workingSets.length > 0 && project.getIncludedProjects() != null) {
+					for (String projectName:project.getIncludedProjects()) {
+						IProject eclipseProject = ResourcesPlugin.getWorkspace().getRoot().getProject(projectName);
+						if (eclipseProject != null && eclipseProject.exists()) {
+							PlatformUI.getWorkbench().getWorkingSetManager().addToWorkingSets(eclipseProject, workingSets);
+						}
+					}
 				}
 			}
 		} catch (final Exception e) {

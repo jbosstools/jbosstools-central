@@ -14,6 +14,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.maven.model.Model;
 import org.eclipse.core.resources.IProject;
@@ -50,7 +51,7 @@ public class ImportMavenProjectExample extends AbstractImportProjectExample {
 
 	@Override
 	public boolean importProject(ProjectExample projectDescription, File file,
-			IProgressMonitor monitor) throws Exception {
+			Map<String, Object> propertiesMap, IProgressMonitor monitor) throws Exception {
 		List<ProjectExample> projects = new ArrayList<ProjectExample>();
 		projects.add(projectDescription);
 		IPath rootPath = getLocation();

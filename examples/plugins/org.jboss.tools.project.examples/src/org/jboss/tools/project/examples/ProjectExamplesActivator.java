@@ -19,9 +19,12 @@ import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Dictionary;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -29,6 +32,7 @@ import java.util.StringTokenizer;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
+import org.apache.commons.lang.StringEscapeUtils;
 import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.resources.IFile;
@@ -52,12 +56,16 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.IJobChangeEvent;
 import org.eclipse.core.runtime.jobs.IJobChangeListener;
 import org.eclipse.core.runtime.jobs.Job;
-import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.MessageDialogWithToggle;
 import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.jface.resource.ImageRegistry;
+import org.eclipse.jface.wizard.IWizard;
+import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.osgi.util.NLS;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IFileEditorInput;
@@ -67,6 +75,7 @@ import org.eclipse.ui.IPluginContribution;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchPreferenceConstants;
 import org.eclipse.ui.IWorkbenchWindow;
+import org.eclipse.ui.IWorkingSet;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.WorkbenchException;
@@ -91,24 +100,36 @@ import org.eclipse.ui.internal.wizards.newresource.ResourceMessages;
 import org.eclipse.ui.part.FileEditorInput;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.eclipse.wst.validation.internal.operations.ValidationBuilder;
-import org.jboss.tools.project.examples.dialog.MarkerDialog;
+import org.jboss.tools.project.examples.configurators.DefaultJBossCentralConfigurator;
+import org.jboss.tools.project.examples.configurators.IJBossCentralConfigurator;
 import org.jboss.tools.project.examples.fixes.PluginFix;
 import org.jboss.tools.project.examples.fixes.ProjectExamplesFix;
 import org.jboss.tools.project.examples.fixes.SeamRuntimeFix;
 import org.jboss.tools.project.examples.fixes.WTPRuntimeFix;
 import org.jboss.tools.project.examples.model.IImportProjectExample;
 import org.jboss.tools.project.examples.model.ProjectExample;
-import org.jboss.tools.project.examples.model.ProjectFix;
 import org.jboss.tools.project.examples.model.ProjectExampleUtil;
+import org.jboss.tools.project.examples.model.ProjectFix;
+import org.jboss.tools.project.examples.runtimes.DownloadRuntime;
+import org.jboss.tools.project.examples.wizard.ContributedPage;
 import org.jboss.tools.project.examples.wizard.ImportDefaultProjectExample;
 import org.jboss.tools.project.examples.wizard.NewProjectExamplesJob;
+import org.jboss.tools.project.examples.wizard.ProjectReadyWizard;
+import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
+import org.osgi.framework.Version;
 
 /**
  * The activator class controls the plug-in life cycle
  */
 public class ProjectExamplesActivator extends AbstractUIPlugin {
 
+	private static final int DESCRIPTION_LENGTH = 100;
+	
+	public static final String PROPERTY_PROJECT_NAME = "projectName"; //$NON-NLS-1$
+	public static final String PROPERTY_LOCATION_PATH = "locationPath"; //$NON-NLS-1$
+	public static final String PROPERTY_ARTIFACT_ID = "artifactId"; //$NON-NLS-1$
+	
 	private static final String README_HTML = "/readme.html"; //$NON-NLS-1$
 	private static final String CHEATSHEET_XML = "/cheatsheet.xml"; //$NON-NLS-1$
 	private static final String PERIOD_CHEATSHEET_XML = "/.cheatsheet.xml"; //$NON-NLS-1$
@@ -133,6 +154,24 @@ public class ProjectExamplesActivator extends AbstractUIPlugin {
 	private static final String NAME = "name"; //$NON-NLS-1$
 	private static final String TYPE = "type"; //$NON-NLS-1$
 	
+	public static final String DOWNLOAD_RUNTIMES_EXTENSION_ID = "org.jboss.tools.project.examples.downloadruntimes"; //$NON-NLS-1$
+
+	private static final String ID = "id"; //$NON-NLS-1$
+	
+	public static final String CLASS = "class"; //$NON-NLS-1$
+	
+	private static final String PRIORITY = "priority"; //$NON-NLS-1$
+	
+	public static final String CONFIGURATORS_EXTENSION_ID = "org.jboss.tools.project.examples.configurators"; //$NON-NLS-1$
+
+	public static final String WIZARDPAGES_EXTENSION_ID = "org.jboss.tools.project.examples.wizardpages"; //$NON-NLS-1$
+
+	private IJBossCentralConfigurator configurator;
+	
+	public static final String JBOSS_DISCOVERY_DIRECTORY = "jboss.discovery.directory.url"; //$NON-NLS-1$
+	
+	private static final Object CONFIGURATOR = "configurator"; //$NON-NLS-1$
+
 	// The shared instance
 	private static ProjectExamplesActivator plugin;
 
@@ -160,6 +199,13 @@ public class ProjectExamplesActivator extends AbstractUIPlugin {
 	private Map<String, IImportProjectExample> importProjectExamplesMap;
 	private ImportDefaultProjectExample defaultImportProjectExample;
 
+	private static final String VERSION = "version"; //$NON-NLS-1$
+	private static final String URL = "url"; //$NON-NLS-1$
+	
+	private Map<String, DownloadRuntime> downloadRuntimes;
+	
+	private Map<String, List<ContributedPage>> contributedPages;
+	
 	/**
 	 * The constructor
 	 */
@@ -816,25 +862,26 @@ public class ProjectExamplesActivator extends AbstractUIPlugin {
 		page.setPerspective(persp);
 	}
 
-	public static void showQuickFix(final List<ProjectExample> projects) {
+	public static void showReadyWizard(final List<ProjectExample> projects) {
 
 		Display.getDefault().asyncExec(new Runnable() {
 
 			public void run() {
-
-				Shell shell = PlatformUI.getWorkbench()
-						.getActiveWorkbenchWindow().getShell();
-				Dialog dialog = new MarkerDialog(shell, projects);
+				Shell shell = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();
+				IWizard wizard = new ProjectReadyWizard(projects);
+				WizardDialog dialog = new WizardDialog(shell, wizard);
 				dialog.open();
+//				Dialog dialog = new MarkerDialog(shell, projects);
+//				dialog.open();
 			}
 
 		});
 	}
 	
 	public static void importProjectExamples(
-			final List<ProjectExample> selectedProjects, final boolean showQuickFix) {
+			final List<ProjectExample> selectedProjects, IWorkingSet[] workingSets, Map<String, Object> propertiesMap) {
 		final NewProjectExamplesJob workspaceJob = new NewProjectExamplesJob(
-				Messages.NewProjectExamplesWizard_Downloading, selectedProjects);
+				Messages.NewProjectExamplesWizard_Downloading, selectedProjects, workingSets, propertiesMap);
 		workspaceJob.setUser(true);
 		workspaceJob.addJobChangeListener(new IJobChangeListener() {
 
@@ -859,14 +906,10 @@ public class ProjectExamplesActivator extends AbstractUIPlugin {
 				} catch (InterruptedException e) {
 					return;
 				}
-				if (showQuickFix && projects != null && projects.size() > 0) {
-					List<IMarker> markers = ProjectExamplesActivator
-							.getMarkers(projects);
-					if (markers != null && markers.size() > 0) {
-						ProjectExamplesActivator.showQuickFix(projects);
-					}
+				if (projects != null && projects.size() > 0) {
+					ProjectExamplesActivator.showReadyWizard(projects);
 				}
-				ProjectExamplesActivator.openWelcome(projects);
+				
 			}
 
 			public void running(IJobChangeEvent event) {
@@ -886,4 +929,171 @@ public class ProjectExamplesActivator extends AbstractUIPlugin {
 		workspaceJob.schedule();
 	}
 
+	public Image getImage(ImageDescriptor imageDescriptor) {
+		ImageRegistry imageRegistry = getImageRegistry();
+		String id = getImageId(imageDescriptor);
+		Image image = imageRegistry.get(id);
+		if (image == null) {
+			image = imageDescriptor.createImage(true);
+			imageRegistry.put(id, image);
+		}
+		return image;
+	}
+
+	private String getImageId(ImageDescriptor imageDescriptor) {
+		return PLUGIN_ID + "/" + imageDescriptor.hashCode(); //$NON-NLS-1$
+	}
+	
+	public Image getImage(String imagePath) {
+		ImageRegistry registry = getImageRegistry();
+		Image image = registry.get(imagePath);
+		if (image != null) {
+			return image;
+		}
+		ImageDescriptor imageDescriptor = getImageDescriptor(imagePath);
+		image = imageDescriptor.createImage();
+		registry.put(imagePath, image);
+		return image;
+	}
+	
+	public static ImageDescriptor getImageDescriptor(String path) {
+		return imageDescriptorFromPlugin(PLUGIN_ID, path);
+	}
+	
+	public Map<String, List<ContributedPage>> getContributedPages() {
+		if (contributedPages == null) {
+			contributedPages = new HashMap<String, List<ContributedPage>>();
+			IExtensionRegistry registry = Platform.getExtensionRegistry();
+			IExtensionPoint extensionPoint = registry
+					.getExtensionPoint(WIZARDPAGES_EXTENSION_ID);
+			IExtension[] extensions = extensionPoint.getExtensions();
+			for (int i = 0; i < extensions.length; i++) {
+				IExtension extension = extensions[i];
+				IConfigurationElement[] configurationElements = extension
+						.getConfigurationElements();
+				for (int j = 0; j < configurationElements.length; j++) {
+					IConfigurationElement configurationElement = configurationElements[j];
+					String clazz = configurationElement.getAttribute(CLASS);
+					String priorityString = configurationElement.getAttribute(PRIORITY);
+					int priority = 0;
+					if (priorityString != null) {
+						try {
+							priority = new Integer(priorityString);
+						} catch (NumberFormatException e) {
+							ProjectExamplesActivator.log(e);
+						}
+					}
+					String type = configurationElement.getAttribute(TYPE);
+					ContributedPage contributedPage = new ContributedPage(configurationElement, type, priority, clazz);
+					List<ContributedPage> contributions = contributedPages.get(type);
+					if (contributions == null) {
+						contributions = new ArrayList<ContributedPage>();
+						contributedPages.put(type, contributions);
+					}
+					contributions.add(contributedPage);
+					Collections.sort(contributions);
+				}
+			}
+		}
+		return contributedPages;
+	}
+	
+	public Map<String, DownloadRuntime> getDownloadRuntimes() {
+		if (downloadRuntimes == null) {
+			downloadRuntimes = new HashMap<String, DownloadRuntime>();
+			IExtensionRegistry registry = Platform.getExtensionRegistry();
+			IExtensionPoint extensionPoint = registry
+					.getExtensionPoint(DOWNLOAD_RUNTIMES_EXTENSION_ID);
+			IExtension[] extensions = extensionPoint.getExtensions();
+			for (int i = 0; i < extensions.length; i++) {
+				IExtension extension = extensions[i];
+				IConfigurationElement[] configurationElements = extension
+						.getConfigurationElements();
+				for (int j = 0; j < configurationElements.length; j++) {
+					IConfigurationElement configurationElement = configurationElements[j];
+					String name = configurationElement.getAttribute(NAME);
+					String id = configurationElement.getAttribute(ID);
+					String version = configurationElement.getAttribute(VERSION);
+					String url = configurationElement.getAttribute(URL);
+					DownloadRuntime downloadRuntime = new DownloadRuntime(id, name, version, url);
+					downloadRuntimes.put(id, downloadRuntime);
+				}
+			}
+		}
+		return downloadRuntimes;
+	}
+	
+	public IJBossCentralConfigurator getConfigurator() {
+		if (configurator == null) {
+			IExtensionRegistry registry = Platform.getExtensionRegistry();
+			IExtensionPoint extensionPoint = registry
+					.getExtensionPoint(CONFIGURATORS_EXTENSION_ID);
+			IExtension[] extensions = extensionPoint.getExtensions();
+			if (extensions.length > 0) {
+				IExtension extension = extensions[0];
+				IConfigurationElement[] configurationElements = extension
+						.getConfigurationElements();
+				for (int j = 0; j < configurationElements.length; j++) {
+					IConfigurationElement configurationElement = configurationElements[j];
+					if (CONFIGURATOR.equals(configurationElement.getName())) {
+						try {
+							configurator = (IJBossCentralConfigurator) configurationElement
+									.createExecutableExtension("class");
+						} catch (CoreException e) {
+							ProjectExamplesActivator.log(e);
+							continue;
+						}
+						break;
+					}
+				}
+
+			}
+			if (configurator == null) {
+				configurator = new DefaultJBossCentralConfigurator();
+			}
+		}
+		return configurator;
+	}
+
+	public static Dictionary<Object, Object> getEnvironment() {
+		Dictionary<Object, Object> environment = new Hashtable<Object, Object>(
+				System.getProperties());
+		Bundle bundle = Platform.getBundle("org.jboss.tools.central"); //$NON-NLS-1$
+		Version version = bundle.getVersion();
+		environment.put("org.jboss.tools.central.version", version.toString()); //$NON-NLS-1$
+		environment.put(
+				"org.jboss.tools.central.version.major", version.getMajor()); //$NON-NLS-1$
+		environment.put(
+				"org.jboss.tools.central.version.minor", version.getMinor()); //$NON-NLS-1$
+		environment.put(
+				"org.jboss.tools.central.version.micro", version.getMicro()); //$NON-NLS-1$
+		return environment;
+	}
+	
+	public static String getShortDescription(String description) {
+		if (description.length() <= DESCRIPTION_LENGTH) {
+			return description;
+		}
+		char[] chars = StringEscapeUtils.unescapeHtml(description.trim()).toCharArray();
+		StringBuffer buffer = new StringBuffer();
+		int i = 0;
+		for (char c:chars) {
+			if (i++ < DESCRIPTION_LENGTH) {
+				buffer.append(c);
+			} else {
+				if ( (c == '_') ||
+					 (c >= 'a' && c <= 'z') ||
+					 (c >= 'a' && c <= 'Z') ||
+					 (c >= '0' && c <= '9') ) {
+					buffer.append(c);
+				} else {
+					break;
+				}
+			}
+		}
+		if (buffer.length() > 0) {
+			buffer.append("..."); //$NON-NLS-1$
+		}
+		return buffer.toString();
+	}
 }

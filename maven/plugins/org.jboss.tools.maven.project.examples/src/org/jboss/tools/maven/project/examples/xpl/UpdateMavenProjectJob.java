@@ -33,10 +33,8 @@ import org.eclipse.m2e.core.ui.internal.M2EUIPluginActivator;
 import org.eclipse.m2e.core.ui.internal.Messages;
 import org.eclipse.m2e.core.ui.internal.actions.OpenMavenConsoleAction;
 import org.eclipse.m2e.core.ui.internal.util.M2EUIUtils;
-import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.progress.IProgressConstants;
-import org.jboss.tools.maven.project.examples.MavenProjectExamplesActivator;
 
 /**
  * Class copied from org.eclipse.m2e.core.ui.internal.UpdateMavenProjectJob in m2e 1.1 
@@ -93,8 +91,8 @@ public class UpdateMavenProjectJob extends WorkspaceJob {
     setProperty(IProgressConstants.ACTION_PROPERTY, new OpenMavenConsoleAction());
     monitor.beginTask(getName(), projects.length);
 
-    long l1 = System.currentTimeMillis();
-    MavenProjectExamplesActivator.log("Update started"); //$NON-NLS-1$
+    //long l1 = System.currentTimeMillis();
+    //MavenProjectExamplesActivator.log("Update started"); //$NON-NLS-1$
 
     MultiStatus status = null;
     //project names to the errors encountered when updating them
@@ -140,8 +138,8 @@ public class UpdateMavenProjectJob extends WorkspaceJob {
     if(updateErrors.size() > 0) {
       handleErrors(updateErrors);
     }
-    long l2 = System.currentTimeMillis();
-    MavenProjectExamplesActivator.log(NLS.bind("Update completed: {0} sec", ((l2 - l1) / 1000))); //$NON-NLS-1$
+    //long l2 = System.currentTimeMillis();
+    //MavenProjectExamplesActivator.log(NLS.bind("Update completed: {0} sec", ((l2 - l1) / 1000))); //$NON-NLS-1$
 
     return status != null ? status : Status.OK_STATUS;
   }

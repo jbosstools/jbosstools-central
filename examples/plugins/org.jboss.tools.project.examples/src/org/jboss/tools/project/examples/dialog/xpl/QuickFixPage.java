@@ -163,8 +163,10 @@ public class QuickFixPage extends WizardPage {
 
 		Dialog.applyDialogFont(control);
 
-		resolutionsList.setSelection(new StructuredSelection(resolutionsList
-				.getElementAt(0)));
+		if (resolutionsList.getList().getItemCount() > 0) {
+			resolutionsList.setSelection(new StructuredSelection(
+					resolutionsList.getElementAt(0)));
+		}
 
 		markersTable.setAllChecked(true);
 	}

@@ -32,16 +32,27 @@ Require-Bundle: org.eclipse.ui,
  org.jboss.tools.portlet.core,
  org.eclipse.equinox.p2.operations,
  org.eclipse.jst.server.core,
- org.eclipse.core.filesystem;bundle-version="1.3.100"
+ org.eclipse.core.filesystem;bundle-version="1.3.100",
+ org.jboss.tools.runtime.core,
+ org.jboss.tools.runtime.ui,
+ org.eclipse.mylyn.commons.core;bundle-version="3.6.0",
+ org.eclipse.mylyn.discovery.ui;bundle-version="3.6.0",
+ org.eclipse.mylyn.discovery.core;bundle-version="3.6.0",
+ org.eclipse.mylyn.commons.ui;bundle-version="[3.6.0,3.8.0)",
+ org.apache.commons.lang;bundle-version="2.4.0",
+ org.eclipse.jdt.ui;bundle-version="3.7.1"
 Bundle-ActivationPolicy: lazy
 Bundle-Localization: plugin
 Export-Package: org.jboss.tools.project.examples,
  org.jboss.tools.project.examples.actions,
+ org.jboss.tools.project.examples.configurators,
  org.jboss.tools.project.examples.dialog,
  org.jboss.tools.project.examples.dialog.xpl,
  org.jboss.tools.project.examples.filetransfer,
  org.jboss.tools.project.examples.fixes,
  org.jboss.tools.project.examples.model,
  org.jboss.tools.project.examples.preferences,
+ org.jboss.tools.project.examples.runtimes,
  org.jboss.tools.project.examples.wizard
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Service-Component: OSGI-INF/downloadRuntime.xml

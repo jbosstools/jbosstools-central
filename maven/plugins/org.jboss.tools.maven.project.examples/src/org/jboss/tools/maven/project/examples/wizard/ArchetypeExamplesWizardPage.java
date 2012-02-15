@@ -13,7 +13,9 @@ package org.jboss.tools.maven.project.examples.wizard;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 
 import org.apache.maven.archetype.catalog.Archetype;
@@ -23,19 +25,30 @@ import org.apache.maven.archetype.metadata.ArchetypeDescriptor;
 import org.apache.maven.archetype.metadata.RequiredProperty;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.model.Model;
 import org.codehaus.plexus.util.StringUtils;
+import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IWorkspace;
+import org.eclipse.core.resources.IWorkspaceRunnable;
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jface.dialogs.Dialog;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.operation.IRunnableWithProgress;
+import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.resource.JFaceResources;
+import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.embedder.IMaven;
+import org.eclipse.m2e.core.internal.IMavenConstants;
 import org.eclipse.m2e.core.internal.MavenPluginActivator;
 import org.eclipse.m2e.core.project.ProjectImportConfiguration;
+import org.eclipse.m2e.core.ui.internal.Messages;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -48,8 +61,11 @@ import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.ui.PlatformUI;
 import org.jboss.tools.maven.project.examples.MavenProjectExamplesActivator;
 import org.jboss.tools.maven.project.examples.wizard.xpl.MavenProjectWizardArchetypeParametersPage;
+import org.jboss.tools.maven.ui.Activator;
+import org.jboss.tools.project.examples.ProjectExamplesActivator;
 import org.jboss.tools.project.examples.model.ArchetypeModel;
 import org.jboss.tools.project.examples.model.ProjectExample;
+import org.jboss.tools.project.examples.wizard.IProjectExamplesWizardPage;
 
 /**
  * 
@@ -57,12 +73,19 @@ import org.jboss.tools.project.examples.model.ProjectExample;
  *
  */
 public class ArchetypeExamplesWizardPage extends
-		MavenProjectWizardArchetypeParametersPage {
+		MavenProjectWizardArchetypeParametersPage implements IProjectExamplesWizardPage {
 
 	private ProjectExample projectDescription;
 	private Composite warningLink;
 	private Boolean isEnterpriseRepoAvailable;
+	private ProjectExample projectExample;
+	private boolean initialized = false;
+	private Map<String, Object> propertiesMap = new HashMap<String, Object>();
 
+	public ArchetypeExamplesWizardPage() {
+		super(new ProjectImportConfiguration());
+	}
+	
 	public ArchetypeExamplesWizardPage(
 			ProjectImportConfiguration configuration, ProjectExample projectDescription) {
 		super(configuration);
@@ -73,6 +96,13 @@ public class ArchetypeExamplesWizardPage extends
 	@Override
 	public void createControl(Composite parent) {
 		super.createControl(parent);
+		if (projectExample != null && !initialized) {
+			initialize();
+		}
+		
+	}
+
+	protected void initialize() {
 		Archetype archetype = new Archetype();
 		ArchetypeModel archetypeModel = projectDescription.getArchetypeModel();
 
@@ -107,8 +137,8 @@ public class ArchetypeExamplesWizardPage extends
 		// when setVisible() is called in MavenProjectWizardArchetypeParametersPage.
 		// It needs to be called AFTER setArchetype(archetype) !!! 
 		archetypeChanged = false;
-		
 		resolverConfigurationComponent.setExpanded(!resolverConfigurationComponent.getResolverConfiguration().getActiveProfileList().isEmpty());
+		initialized = true;
 	}
 
 	@Override
@@ -306,6 +336,154 @@ public class ArchetypeExamplesWizardPage extends
 		
 		isEnterpriseRepoAvailable = MavenArtifactHelper.isEnterpriseRepositoryAvailable();
 		return isEnterpriseRepoAvailable.booleanValue();
+	}
+	
+	private Throwable getRootCause(Throwable ex) {
+		if (ex == null) return null;
+		Throwable rootCause = getRootCause(ex.getCause());
+		if (rootCause == null) {
+			rootCause = ex;
+		}
+		return rootCause;
+	}
+	@Override
+	public boolean finishPage() {
+		final Model model = getModel();
+		final String groupId = model.getGroupId();
+		final String artifactId = model.getArtifactId();
+		final String version = model.getVersion();
+		final String javaPackage = getJavaPackage();
+		final Properties properties = getProperties();
+		final Archetype archetype = getArchetype();
+		ArchetypeExamplesWizardFirstPage simplePage = getSimplePage();
+		if (simplePage == null) {
+			MavenProjectExamplesActivator.log("Cannot import maven archetype");
+			return false;
+		}
+		IPath locationPath = simplePage.getLocationPath();
+		final ProjectImportConfiguration configuration = getImportConfiguration();
+		String projectName = configuration.getProjectName(model);
+		propertiesMap.put(ProjectExamplesActivator.PROPERTY_PROJECT_NAME, projectName);
+		final IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject(projectName);
+		final IPath location = simplePage.getLocationPath();
+		propertiesMap.put(ProjectExamplesActivator.PROPERTY_LOCATION_PATH, location);
+		propertiesMap.put(ProjectExamplesActivator.PROPERTY_ARTIFACT_ID, artifactId);
+		
+	    IWorkspace workspace = ResourcesPlugin.getWorkspace();
+	    
+	    boolean pomExists = location.append(projectName).append(IMavenConstants.POM_FILE_NAME).toFile().exists();
+	    if ( pomExists ) {
+	      MessageDialog.openError(getShell(), NLS.bind(Messages.wizardProjectJobFailed, projectName), Messages.wizardProjectErrorPomAlreadyExists);
+	      return false;
+	    }		
+		
+		final IWorkspaceRunnable wr = new IWorkspaceRunnable() {
+			
+			public void run(final IProgressMonitor monitor)
+					throws CoreException {
+				
+				MavenPlugin.getProjectConfigurationManager().createArchetypeProject(
+						project, location, archetype,
+						groupId, artifactId, version, javaPackage, properties,
+						configuration, monitor);
+			}
+		};
+		
+		final IRunnableWithProgress op = new IRunnableWithProgress() {
+			public void run(final IProgressMonitor monitor)
+					throws InvocationTargetException, InterruptedException {
+				try {
+					final IWorkspace ws = ResourcesPlugin.getWorkspace();
+					ws.run(wr, ws.getRoot(), IWorkspace.AVOID_UPDATE, monitor);
+				} catch (CoreException e) {
+					throw new InvocationTargetException(e);
+				}
+			}
+		};
+
+		IPreferenceStore store = Activator.getDefault().getPreferenceStore();
+		boolean configureSeam = store.getBoolean(Activator.CONFIGURE_SEAM);
+		boolean configureJSF = store.getBoolean(Activator.CONFIGURE_JSF);
+		boolean configurePortlet = store.getBoolean(Activator.CONFIGURE_PORTLET);
+		boolean configureJSFPortlet = store.getBoolean(Activator.CONFIGURE_JSFPORTLET);
+		boolean configureSeamPortlet = store.getBoolean(Activator.CONFIGURE_SEAMPORTLET);
+		boolean configureCDI = store.getBoolean(Activator.CONFIGURE_CDI);
+		boolean configureHibernate = store.getBoolean(Activator.CONFIGURE_HIBERNATE);
+		boolean configureJaxRs = store.getBoolean(Activator.CONFIGURE_JAXRS);
+		
+		try {
+			store.setValue(Activator.CONFIGURE_SEAM, false);
+			store.setValue(Activator.CONFIGURE_JSF, false);
+			store.setValue(Activator.CONFIGURE_PORTLET, false);
+			store.setValue(Activator.CONFIGURE_JSFPORTLET, false);
+			store.setValue(Activator.CONFIGURE_SEAMPORTLET, false);
+			store.setValue(Activator.CONFIGURE_CDI, false);
+			store.setValue(Activator.CONFIGURE_HIBERNATE, false);
+			store.setValue(Activator.CONFIGURE_JAXRS, false);
+			getContainer().run(true, false, op);
+		} catch (InterruptedException e) {
+			ProjectExamplesActivator.log(e);
+			return true;
+		} catch (InvocationTargetException e) {
+			ProjectExamplesActivator.log(e);
+			Throwable ex = e.getTargetException();
+			String message = ex.getMessage();
+			Throwable rootCause = getRootCause(ex);
+			if (rootCause != null) {
+				message += "\nRoot cause : " + rootCause.getMessage();
+			}
+			MessageDialog.openError(getShell(), "Error", message);
+			return true;
+		} finally {
+			store.setValue(Activator.CONFIGURE_SEAM, configureSeam);
+			store.setValue(Activator.CONFIGURE_JSF, configureJSF);
+			store.setValue(Activator.CONFIGURE_PORTLET, configurePortlet);
+			store.setValue(Activator.CONFIGURE_JSFPORTLET, configureJSFPortlet);
+			store.setValue(Activator.CONFIGURE_SEAMPORTLET, configureSeamPortlet);
+			store.setValue(Activator.CONFIGURE_CDI, configureCDI);
+			store.setValue(Activator.CONFIGURE_HIBERNATE, configureHibernate);
+			store.setValue(Activator.CONFIGURE_JAXRS, configureJaxRs);
+		}
+
+		return true;
+	}
+
+	private ArchetypeExamplesWizardFirstPage getSimplePage() {
+		IWizardPage[] pages = getWizard().getPages();
+		for (IWizardPage page:pages) {
+			if (page instanceof ArchetypeExamplesWizardFirstPage) {
+				return (ArchetypeExamplesWizardFirstPage) page;
+			}
+		}
+		return null;
+	}
+
+	@Override
+	public String getProjectExampleType() {
+		return ProjectExamplesActivator.MAVEN_ARCHETYPE;
+	}
+
+	@Override
+	public void setProjectExample(ProjectExample projectExample) {
+		this.projectExample = projectExample;
+		if (projectExample != null) {
+			if (projectExample.getShortDescription() != null) {
+				setTitle(projectExample.getShortDescription());
+			}
+			if (projectExample.getDescription() != null) {
+				setDescription(ProjectExamplesActivator
+						.getShortDescription(projectExample.getDescription()));
+			}
+			projectDescription = projectExample;
+			if (getContainer() != null) {
+				initialize();
+			}
+		}
+	}
+	
+	@Override
+	public Map<String, Object> getPropertiesMap() {
+		return propertiesMap ;
 	}
 
 }

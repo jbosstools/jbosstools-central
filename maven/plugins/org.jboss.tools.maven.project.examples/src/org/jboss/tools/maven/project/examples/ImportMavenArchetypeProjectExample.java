@@ -17,13 +17,12 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.jface.window.Window;
-import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.embedder.MavenModelManager;
 import org.eclipse.m2e.core.project.LocalProjectScanner;
@@ -31,7 +30,7 @@ import org.eclipse.m2e.core.project.MavenProjectInfo;
 import org.eclipse.m2e.core.project.ProjectImportConfiguration;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
-import org.jboss.tools.maven.project.examples.wizard.ArchetypeExamplesWizard;
+import org.jboss.tools.project.examples.ProjectExamplesActivator;
 import org.jboss.tools.project.examples.model.AbstractImportProjectExample;
 import org.jboss.tools.project.examples.model.ProjectExample;
 
@@ -43,71 +42,54 @@ public class ImportMavenArchetypeProjectExample extends
 		AbstractImportProjectExample {
 
 	@Override
-	public boolean importProject(final ProjectExample projectDescription, File file,
-			final IProgressMonitor monitor) throws Exception {
+	public boolean importProject(final ProjectExample projectDescription, File file, 
+			Map<String, Object> propertiesMap, final IProgressMonitor monitor) throws Exception {
 		List<ProjectExample> projects = new ArrayList<ProjectExample>();
 		projects.add(projectDescription);
-		//IPath location = getLocation();
-		//final File destination = new File(location.toOSString());
-
-		final boolean[] ret = new boolean[1];
-		ret[0] = true;
-		Display.getDefault().syncExec(new Runnable() {
-
-			@Override
-			public void run() {
-				ArchetypeExamplesWizard wizard = new ArchetypeExamplesWizard(projectDescription);
-				WizardDialog wizardDialog = new WizardDialog(getActiveShell(), wizard);
-				int ok = wizardDialog.open();
-				if (ok != Window.OK) {
-					ret[0] = false;
-					return;
-				}
-				List<String> includedProjects = projectDescription.getIncludedProjects();
-				if (includedProjects == null) {
-					includedProjects = new ArrayList<String>();
-					projectDescription.setIncludedProjects(includedProjects);
-				}
-				projectDescription.getIncludedProjects().clear();
-				String projectName = wizard.getProjectName();
-				includedProjects.add(projectName);
-				String artifactId = wizard.getArtifactId();
-				IPath location = wizard.getLocationPath();
-				String projectFolder = location.append(artifactId).toFile()
+//		ArchetypeExamplesWizard wizard = new ArchetypeExamplesWizard(projectDescription);
+//		WizardDialog wizardDialog = new WizardDialog(getActiveShell(), wizard);
+//		int ok = wizardDialog.open();
+//		if (ok != Window.OK) {
+//			return false;
+//		}
+		List<String> includedProjects = projectDescription.getIncludedProjects();
+		if (includedProjects == null) {
+			includedProjects = new ArrayList<String>();
+			projectDescription.setIncludedProjects(includedProjects);
+		}
+		projectDescription.getIncludedProjects().clear();
+		String projectName = (String) propertiesMap.get(ProjectExamplesActivator.PROPERTY_PROJECT_NAME);
+		includedProjects.add(projectName);
+		String artifactId = (String) propertiesMap.get(ProjectExamplesActivator.PROPERTY_ARTIFACT_ID);
+		IPath location = (IPath) propertiesMap.get(ProjectExamplesActivator.PROPERTY_LOCATION_PATH);
+		String projectFolder = location.append(artifactId).toFile()
 						.getAbsolutePath();
-				MavenModelManager mavenModelManager = MavenPlugin
+		MavenModelManager mavenModelManager = MavenPlugin
 						.getMavenModelManager();
-				LocalProjectScanner scanner = new LocalProjectScanner(
-						location.toFile(), //
+		LocalProjectScanner scanner = new LocalProjectScanner(location.toFile(),
 						projectFolder, true, mavenModelManager);
-				try {
-					scanner.run(monitor);
-				} catch (InterruptedException e1) {
-					ret[0] = false;
-					return;
-				}
+		try {
+			scanner.run(monitor);
+		} catch (InterruptedException e1) {
+			return false;
+		}
 
-				Set<MavenProjectInfo> projectSet = collectProjects(scanner
-						.getProjects());
-				ProjectImportConfiguration importConfiguration = new ProjectImportConfiguration();
+		Set<MavenProjectInfo> projectSet = collectProjects(scanner.getProjects());
+		ProjectImportConfiguration importConfiguration = new ProjectImportConfiguration();
 				
-				for (MavenProjectInfo info : projectSet) {
-					try {
-						projectName = MavenProjectExamplesActivator
-								.getProjectName(info, importConfiguration);
-						if (!includedProjects.contains(projectName)) {
-							includedProjects.add(projectName);
-						}
-					} catch (CoreException e) {
-						MavenProjectExamplesActivator.log(e);
-						ret[0] = false;
-					}
+		for (MavenProjectInfo info : projectSet) {
+			try {
+				projectName = MavenProjectExamplesActivator.getProjectName(info, importConfiguration);
+				if (!includedProjects.contains(projectName)) {
+					includedProjects.add(projectName);
 				}
-				MavenProjectExamplesActivator.updateMavenConfiguration(projectName, includedProjects, monitor);
+			} catch (CoreException e) {
+				MavenProjectExamplesActivator.log(e);
+				return false;
 			}
-			
-		});
-		return ret[0];
+		}
+		MavenProjectExamplesActivator.updateMavenConfiguration(projectName, includedProjects, monitor);
+		return true;
 	}
 
 	public Set<MavenProjectInfo> collectProjects(
@@ -129,4 +111,5 @@ public class ImportMavenArchetypeProjectExample extends
 	private static Shell getActiveShell() {
 		return Display.getDefault().getActiveShell();
 	}
+
 }
