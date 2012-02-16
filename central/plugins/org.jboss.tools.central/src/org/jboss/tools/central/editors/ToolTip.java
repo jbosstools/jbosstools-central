@@ -462,12 +462,14 @@ public abstract class ToolTip {
 		CURRENT_TOOLTIP = shell;
 
 		control.getShell().addListener(SWT.Deactivate, shellListener);
-		shell.addDisposeListener(new DisposeListener() {
+		control.getShell().addDisposeListener(new DisposeListener() {
 			
 			@Override
 			public void widgetDisposed(DisposeEvent e) {
-				control.getShell().removeListener(SWT.Deactivate, shellListener);
-				control.getShell().removeDisposeListener(this);
+				if (control != null && !control.isDisposed() && control.getShell() != null && !control.getShell().isDisposed()) {
+					control.getShell().removeListener(SWT.Deactivate, shellListener);
+					control.getShell().removeDisposeListener(this);
+				}
 			}
 		});
 		if (popupDelay > 0) {
