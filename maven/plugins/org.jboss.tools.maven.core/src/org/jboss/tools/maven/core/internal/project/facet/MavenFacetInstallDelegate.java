@@ -40,6 +40,7 @@ import org.eclipse.wst.common.project.facet.core.ProjectFacetsManager;
 import org.jboss.tools.maven.core.IJBossMavenConstants;
 import org.jboss.tools.maven.core.MavenCoreActivator;
 import org.jboss.tools.maven.core.Messages;
+import org.jboss.tools.maven.core.ProjectUtil;
 import org.jboss.tools.maven.core.libprov.MavenLibraryProviderInstallOperation;
 
 /**
@@ -70,80 +71,74 @@ public class MavenFacetInstallDelegate implements IDelegate {
 			if (!pom.exists()) {
 				Model model = new Model();
 				model.setModelVersion(IJBossMavenConstants.MAVEN_MODEL_VERSION);
-				model.setGroupId(config
-						.getStringProperty(IJBossMavenConstants.GROUP_ID));
-				String artifactId = config
-						.getStringProperty(IJBossMavenConstants.ARTIFACT_ID);
+				model.setGroupId(config.getStringProperty(IJBossMavenConstants.GROUP_ID));
+				String artifactId = config.getStringProperty(IJBossMavenConstants.ARTIFACT_ID);
 				model.setArtifactId(artifactId);
-				model.setVersion(config
-						.getStringProperty(IJBossMavenConstants.VERSION));
-				model.setName(config
-						.getStringProperty(IJBossMavenConstants.NAME));
-				model.setPackaging(config
-						.getStringProperty(IJBossMavenConstants.PACKAGING));
-				model.setDescription(config
-						.getStringProperty(IJBossMavenConstants.DESCRIPTION));
+				model.setVersion(config.getStringProperty(IJBossMavenConstants.VERSION));
+				model.setName(config.getStringProperty(IJBossMavenConstants.NAME));
+				String packaging = config.getStringProperty(IJBossMavenConstants.PACKAGING);
+				model.setPackaging(packaging);
+				String description = config.getStringProperty(IJBossMavenConstants.DESCRIPTION);
+				if (description != null && description.trim().length() > 0) {
+					model.setDescription(description);
+				}
 				Build build = new Build();
 				model.setBuild(build);
 
 				// build.setFinalName(artifactId);
 				if (fpwc.hasProjectFacet(JavaFacet.FACET)) {
-					String outputDirectory = MavenCoreActivator.getOutputDirectory(javaProject);
-					build.setOutputDirectory(outputDirectory);
+//					String outputDirectory = MavenCoreActivator.getOutputDirectory(javaProject);
+//					if (!"${basedir}/target/classes".equals(outputDirectory)) {
+//						build.setOutputDirectory(outputDirectory);
+//					}
 					String sourceDirectory = MavenCoreActivator.getSourceDirectory(javaProject);
-					if (sourceDirectory != null) {
+					if (sourceDirectory != null && !"${basedir}/src/main/java".equals(sourceDirectory)) {
 						build.setSourceDirectory(sourceDirectory);
 					}
+					MavenCoreActivator.addResource(build, project, sourceDirectory);
+					
 				}
 
-				if (fpwc.hasProjectFacet(WebFacetUtils.WEB_FACET)) {
-
-					MavenCoreActivator.addMavenWarPlugin(build, project);
+				IProjectFacetVersion webFacetVersion = fpwc.getProjectFacetVersion(IJ2EEFacetConstants.DYNAMIC_WEB_FACET); 
+				if (webFacetVersion != null && "war".equals(packaging)) {
+					MavenCoreActivator.addMavenWarPlugin(build, project, webFacetVersion);
 				}
-				if (fpwc.hasProjectFacet(IJ2EEFacetConstants.EJB_FACET)) {
-
-					MavenCoreActivator.addMavenEjbPlugin(build, project);
+				IProjectFacetVersion ejbFacetVersion = fpwc.getProjectFacetVersion(IJ2EEFacetConstants.EJB_FACET); 
+				if (ejbFacetVersion != null && "ejb".equals(packaging)) {
+					MavenCoreActivator.addMavenEjbPlugin(build, project, ejbFacetVersion);
 				}
-				if (fpwc
-						.hasProjectFacet(IJ2EEFacetConstants.ENTERPRISE_APPLICATION_FACET)) {
-					MavenCoreActivator.addMavenEarPlugin(build, project,
-							config, null, false);
-					MavenCoreActivator.createMavenProject(project.getName(),
-							monitor, model, true);
+				IProjectFacetVersion earFacetVersion = fpwc.getProjectFacetVersion(IJ2EEFacetConstants.ENTERPRISE_APPLICATION_FACET); 
+				if (earFacetVersion != null  && "ear".equals(packaging)) {
+					MavenCoreActivator.addMavenEarPlugin(build, project, config, null, earFacetVersion, false);
+					MavenCoreActivator.createMavenProject(project.getName(), monitor, model, true);
 				}
 				IProjectFacet seamFacet = ProjectFacetsManager.getProjectFacet(SEAM_FACET_ID);
-				if (!fpwc.hasProjectFacet(seamFacet)) {
+				if (!"pom".equals(packaging) && !fpwc.hasProjectFacet(seamFacet)) {
 					MavenCoreActivator.addCompilerPlugin(build, project);
 				}
 
 				if (!pom.exists()) {
-					MavenModelManager modelManager = MavenPlugin.getDefault()
-							.getMavenModelManager();
+					MavenModelManager modelManager = MavenPlugin.getMavenModelManager();
 					modelManager.createMavenModel(pom, model);
 				}
 			}
 
-			boolean hasMavenNature = MavenCoreActivator.addMavenNature(project,
-					monitor);
+			MavenCoreActivator.addMavenNature(project,	monitor);
 
 			if (fpwc.hasProjectFacet(WebFacetUtils.WEB_FACET)) {
 				IClasspathAttribute attribute = JavaCore
 						.newClasspathAttribute(
 								IClasspathDependencyConstants.CLASSPATH_COMPONENT_DEPENDENCY,
-								ClasspathDependencyUtil.getDefaultRuntimePath(
-										true).toString());
-				MavenCoreActivator.addClasspathAttribute(javaProject,
-						attribute, monitor);
+								ClasspathDependencyUtil.getDefaultRuntimePath(true).toString());
+				MavenCoreActivator.addClasspathAttribute(javaProject, attribute, monitor);
 			}
 			// FIXME
 			IClasspathAttribute attribute = JavaCore.newClasspathAttribute(
 					MavenCoreActivator.OWNER_PROJECT_FACETS_ATTR,
 					IJBossMavenConstants.M2_FACET_ID);
-			MavenCoreActivator.addClasspathAttribute(javaProject, attribute,
-					monitor);
+			MavenCoreActivator.addClasspathAttribute(javaProject, attribute, monitor);
 
-			List<LibraryProviderOperationConfig> configs = MavenCoreActivator
-					.getLibraryProviderOperationConfigs();
+			List<LibraryProviderOperationConfig> configs = MavenCoreActivator.getLibraryProviderOperationConfigs();
 			if (configs.size() > 0) {
 				MavenLibraryProviderInstallOperation operation = new MavenLibraryProviderInstallOperation();
 				for (LibraryProviderOperationConfig libraryProviderOperationConfig : configs) {
@@ -151,6 +146,8 @@ public class MavenFacetInstallDelegate implements IDelegate {
 				}
 				configs.clear();
 			}
+			
+			ProjectUtil.removeWTPContainers(config, project);
 		} finally {
 			if (fpwc != null) {
 				fpwc.dispose();

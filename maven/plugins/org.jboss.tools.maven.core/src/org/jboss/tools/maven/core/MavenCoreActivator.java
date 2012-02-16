@@ -49,17 +49,17 @@ import org.eclipse.jdt.core.IClasspathEntry;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.JavaModelException;
-import org.eclipse.jdt.launching.JavaRuntime;
 import org.eclipse.jst.common.project.facet.JavaFacetUtils;
 import org.eclipse.jst.common.project.facet.core.libprov.ILibraryProvider;
 import org.eclipse.jst.common.project.facet.core.libprov.LibraryProviderOperationConfig;
-import org.eclipse.jst.j2ee.project.facet.IJ2EEFacetConstants;
+import org.eclipse.jst.j2ee.project.JavaEEProjectUtilities;
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.embedder.MavenModelManager;
 import org.eclipse.m2e.core.internal.IMavenConstants;
 import org.eclipse.m2e.core.project.IProjectConfigurationManager;
 import org.eclipse.m2e.jdt.internal.BuildPathManager;
 import org.eclipse.m2e.model.edit.pom.Dependency;
+import org.eclipse.m2e.model.edit.pom.DependencyManagement;
 import org.eclipse.m2e.model.edit.pom.PomFactory;
 import org.eclipse.m2e.model.edit.pom.PropertyElement;
 import org.eclipse.m2e.model.edit.pom.Repository;
@@ -69,7 +69,7 @@ import org.eclipse.wst.common.componentcore.ComponentCore;
 import org.eclipse.wst.common.componentcore.resources.IVirtualComponent;
 import org.eclipse.wst.common.componentcore.resources.IVirtualFolder;
 import org.eclipse.wst.common.frameworks.datamodel.IDataModel;
-import org.eclipse.wst.common.project.facet.core.FacetedProjectFramework;
+import org.eclipse.wst.common.project.facet.core.IProjectFacetVersion;
 import org.osgi.framework.BundleContext;
 
 /**
@@ -91,6 +91,10 @@ public class MavenCoreActivator extends Plugin {
 	public static final String ENCODING = "UTF-8"; //$NON-NLS-1$
 	
 	public static final List<LibraryProviderOperationConfig> libraryProviderOperationConfigs = new ArrayList<LibraryProviderOperationConfig>();
+
+	private static final String DEFAULT_COMPILER_LEVEL = "1.5"; //$NON-NLS-1$
+
+	private static final String DEFAULT_WEBCONTENT_ROOT = "src/main/webapp"; //$NON-NLS-1$
 	
 	// The shared instance
 	private static MavenCoreActivator plugin;
@@ -165,50 +169,6 @@ public class MavenCoreActivator extends Plugin {
 			}
 			project.open(monitor);
 		}
-		IJavaProject javaProject = JavaCore.create(project);
-		IProjectDescription description = project.getDescription();
-		String[] natureIds = description.getNatureIds();
-		boolean hasJavaNature = false;
-		for (int i = 0; i < natureIds.length; i++) {
-			if (JavaCore.NATURE_ID.equals(natureIds[i])) {
-				hasJavaNature = true;
-				break;
-			}
-		}
-		if (!hasJavaNature) {
-			// EAR project
-			createFolder("target",monitor, project); //$NON-NLS-1$
-			IFolder binFolder = createFolder("target/classes",monitor, project);  //$NON-NLS-1$
-			String[] newNatureIds = new String[natureIds.length + 1];
-			for (int i = 0; i < natureIds.length; i++) {
-				newNatureIds[i]=natureIds[i];
-			}
-			newNatureIds[natureIds.length] = JavaCore.NATURE_ID;
-			description.setNatureIds(newNatureIds);
-			project.setDescription(description, monitor);
-			javaProject.setRawClasspath(new IClasspathEntry[0], monitor);
-			javaProject.setOutputLocation(binFolder.getFullPath(), monitor);
-			IClasspathEntry entry = JavaRuntime.getDefaultJREContainerEntry();
-			IClasspathEntry[] entries = javaProject.getRawClasspath();
-			IClasspathEntry[] newEntries = new IClasspathEntry[entries.length + 1];
-			System.arraycopy(entries, 0, newEntries, 0, entries.length);
-			newEntries[entries.length] = entry;
-			javaProject.setRawClasspath(newEntries, monitor);
-		}
-		if (FacetedProjectFramework.hasProjectFacet(project, IJ2EEFacetConstants.ENTERPRISE_APPLICATION)) {
-			String sourceDirectory = getSourceDirectory(javaProject);
-			if (sourceDirectory == null || sourceDirectory.trim().length() <= 0) {
-				IVirtualComponent component = ComponentCore.createComponent(project);
-				IVirtualFolder rootVFolder = component.getRootFolder();
-				IContainer rootFolder = rootVFolder.getUnderlyingFolder();
-				IPath path = rootFolder.getFullPath();
-				IClasspathEntry[] entries = javaProject.getRawClasspath();
-				IClasspathEntry[] newEntries = new IClasspathEntry[entries.length + 1];
-				System.arraycopy(entries, 0, newEntries, 0, entries.length);
-				newEntries[entries.length] = JavaCore.newSourceEntry(path);
-				javaProject.setRawClasspath(newEntries, monitor);
-			}
-		}
 		addMavenCapabilities(project, monitor, model);
 		return project;
 	}
@@ -254,8 +214,7 @@ public class MavenCoreActivator extends Plugin {
 		boolean hasJavaNature = project.hasNature(JavaCore.NATURE_ID);
 		if (hasJavaNature) {
 			IJavaProject javaProject = JavaCore.create(project);
-			IClasspathContainer mavenContainer = BuildPathManager
-					.getMaven2ClasspathContainer(javaProject);
+			IClasspathContainer mavenContainer = BuildPathManager.getMaven2ClasspathContainer(javaProject);
 			if (mavenContainer == null) {
 				IPath path = new Path(BuildPathManager.CONTAINER_ID);
 				setContainerPath(monitor, javaProject, path);
@@ -325,34 +284,46 @@ public class MavenCoreActivator extends Plugin {
 
 	public static void updateMavenProjectConfiguration(IProject project)
 			throws CoreException {
-		IProjectConfigurationManager configurationManager = MavenPlugin
-				.getDefault().getProjectConfigurationManager();
-		configurationManager.updateProjectConfiguration(project,
-				new NullProgressMonitor());
+		IProjectConfigurationManager configurationManager = MavenPlugin.getProjectConfigurationManager();
+		configurationManager.updateProjectConfiguration(project, new NullProgressMonitor());
 	}
 	
-	public static void addMavenWarPlugin(Build build, IProject project) throws JavaModelException {
-		org.apache.maven.model.Plugin plugin = new org.apache.maven.model.Plugin();
-		plugin.setGroupId("org.apache.maven.plugins"); //$NON-NLS-1$
-		plugin.setArtifactId("maven-war-plugin"); //$NON-NLS-1$
-		
-		Xpp3Dom configuration = new Xpp3Dom( "configuration" ); //$NON-NLS-1$
+	public static void addMavenWarPlugin(Build build, IProject project, IProjectFacetVersion webFacetversion) throws JavaModelException {
 		IVirtualComponent component = ComponentCore.createComponent(project);
+		if (component == null) {
+			return;
+		}
 		IVirtualFolder rootFolder = component.getRootFolder();
 		IContainer root = rootFolder.getUnderlyingFolder();
 		String webContentRoot = root.getProjectRelativePath().toString();
-		Xpp3Dom warSourceDirectory = new Xpp3Dom("warSourceDirectory"); //$NON-NLS-1$
-		if (webContentRoot.startsWith(SEPARATOR)) {
-			warSourceDirectory.setValue(MavenCoreActivator.BASEDIR + webContentRoot);
-		} else {
-			warSourceDirectory.setValue(MavenCoreActivator.BASEDIR + SEPARATOR + webContentRoot);
+		boolean isDefaultWarSource = DEFAULT_WEBCONTENT_ROOT.equals(webContentRoot);
+		boolean needsFailOnMissingWebXml = webFacetversion != null && JavaEEProjectUtilities.DYNAMIC_WEB_25.compareTo(webFacetversion) < 1;
+		if (isDefaultWarSource && !needsFailOnMissingWebXml) {
+			return;
 		}
 		
-		configuration.addChild(warSourceDirectory); 
+		org.apache.maven.model.Plugin plugin = new org.apache.maven.model.Plugin();
+		plugin.setGroupId("org.apache.maven.plugins"); //$NON-NLS-1$
+		plugin.setArtifactId("maven-war-plugin"); //$NON-NLS-1$
+		plugin.setVersion("2.2");//$NON-NLS-1$
+		Xpp3Dom configuration = new Xpp3Dom( "configuration" ); //$NON-NLS-1$
+		if (!isDefaultWarSource){
+			Xpp3Dom warSourceDirectory = new Xpp3Dom("warSourceDirectory"); //$NON-NLS-1$
+			if (webContentRoot.startsWith(SEPARATOR)) {
+				warSourceDirectory.setValue(MavenCoreActivator.BASEDIR + webContentRoot);
+			} else {
+				warSourceDirectory.setValue(MavenCoreActivator.BASEDIR + SEPARATOR + webContentRoot);
+			}
+			configuration.addChild(warSourceDirectory); 
+		}
+		if (needsFailOnMissingWebXml) {
+			Xpp3Dom failOnMissingWebXml = new Xpp3Dom("failOnMissingWebXml"); //$NON-NLS-1$
+			failOnMissingWebXml.setValue("false");//$NON-NLS-1$
+			configuration.addChild(failOnMissingWebXml); 
+		}
+		
 		plugin.setConfiguration(configuration);
 		build.getPlugins().add(plugin);
-
-		addResource(build, project, null);
 	}
 
 	public static void addResource(Build build, IProject project, String sourceDirectory)
@@ -373,34 +344,36 @@ public class MavenCoreActivator extends Plugin {
 		build.getResources().add(resource);
 	}
 	
-	public static void addMavenEarPlugin(Build build, IProject project, IDataModel m2FacetModel, String ejbArtifactId, boolean addModule) throws JavaModelException {
+	public static void addMavenEarPlugin(Build build, IProject project, IDataModel m2FacetModel, String ejbArtifactId, 
+			IProjectFacetVersion earFacetVersion, boolean addSeamModules) throws JavaModelException {
 		String sourceDirectory = getEarRoot(project);
-		build.setSourceDirectory(sourceDirectory);
 		org.apache.maven.model.Plugin plugin = new org.apache.maven.model.Plugin();
 		plugin.setGroupId("org.apache.maven.plugins"); //$NON-NLS-1$
 		plugin.setArtifactId("maven-ear-plugin"); //$NON-NLS-1$
-		
+		plugin.setVersion("2.7");//$NON-NLS-1$
 		Xpp3Dom configuration = new Xpp3Dom( "configuration" ); //$NON-NLS-1$
-		Xpp3Dom version = new Xpp3Dom("version"); //$NON-NLS-1$
-		version.setValue("5"); //$NON-NLS-1$
-		configuration.addChild(version);
-		Xpp3Dom generateApplicationXml = new Xpp3Dom("generateApplicationXml"); //$NON-NLS-1$
-		generateApplicationXml.setValue("true"); //$NON-NLS-1$
-		configuration.addChild(generateApplicationXml);
+		if (earFacetVersion != null) {
+			String earVersion = earFacetVersion.getVersionString();
+			if (earVersion.endsWith(".0")) {//$NON-NLS-1$
+				//YYiikes
+				earVersion = ""+Double.valueOf(earVersion).intValue();//$NON-NLS-1$
+			}
+			Xpp3Dom version = new Xpp3Dom("version"); //$NON-NLS-1$
+			version.setValue(earVersion); //$NON-NLS-1$
+			configuration.addChild(version);
+		}
 		Xpp3Dom defaultLibBundleDir = new Xpp3Dom("defaultLibBundleDir"); //$NON-NLS-1$
 		defaultLibBundleDir.setValue("lib"); //$NON-NLS-1$
 		configuration.addChild(defaultLibBundleDir);
-		Xpp3Dom earSourceDirectory = new Xpp3Dom("earSourceDirectory"); //$NON-NLS-1$
-		earSourceDirectory.setValue(sourceDirectory);
-		configuration.addChild(earSourceDirectory);
+		if(!"src/main/application".equals(sourceDirectory)) {//$NON-NLS-1$
+			Xpp3Dom earSourceDirectory = new Xpp3Dom("earSourceDirectory"); //$NON-NLS-1$
+			earSourceDirectory.setValue(sourceDirectory);
+			configuration.addChild(earSourceDirectory);
+		}
 		
-		if (addModule) {
+		if (addSeamModules) {
 			Xpp3Dom modules = new Xpp3Dom("modules"); //$NON-NLS-1$
 			configuration.addChild(modules);
-
-			Xpp3Dom seamModule = getEarModule("ejbModule", "org.jboss.seam", //$NON-NLS-1$ //$NON-NLS-2$
-					"jboss-seam", ROOT_DIR, null); //$NON-NLS-1$ //$NON-NLS-2$
-			modules.addChild(seamModule);
 			
 			if (ejbArtifactId != null) {
 				String ejbModuleName = ejbArtifactId + ".jar"; //$NON-NLS-1$
@@ -432,15 +405,10 @@ public class MavenCoreActivator extends Plugin {
 					"commons-digester", "commons-digester", "/lib", null); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 			modules.addChild(commonDigester);
 			
-			//Xpp3Dom mvel14 = getEarModule("jarModule", //$NON-NLS-1$
-			//		"org.mvel", "mvel14", "/", null); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-			//modules.addChild(mvel14);
 		}
 		plugin.setConfiguration(configuration);
 		
 		build.getPlugins().add(plugin);
-	
-		addResource(build, project, sourceDirectory);
 	}
 	
 	private static Xpp3Dom getEarModule(String module,
@@ -467,20 +435,22 @@ public class MavenCoreActivator extends Plugin {
 		return earModule;
 	}
 	
-	public static void addMavenEjbPlugin(Build build, IProject project) throws JavaModelException {
-		org.apache.maven.model.Plugin plugin = new org.apache.maven.model.Plugin();
-		plugin.setGroupId("org.apache.maven.plugins"); //$NON-NLS-1$
-		plugin.setArtifactId("maven-ejb-plugin"); //$NON-NLS-1$
-		plugin.setInherited("true"); //$NON-NLS-1$
-		
-		Xpp3Dom configuration = new Xpp3Dom( "configuration" ); //$NON-NLS-1$
-		Xpp3Dom ejbVersion = new Xpp3Dom("ejbVersion"); //$NON-NLS-1$
-		ejbVersion.setValue("3.0"); //$NON-NLS-1$
-		configuration.addChild(ejbVersion); 
-		plugin.setConfiguration(configuration);
-		build.getPlugins().add(plugin);
-	
-		addResource(build, project, null);
+	public static void addMavenEjbPlugin(Build build, IProject project, IProjectFacetVersion ejbFacetVersion) throws JavaModelException {
+		if (ejbFacetVersion != null) {
+			String version = ejbFacetVersion.getVersionString();
+			if (!"2.1".equals(version)) { //$NON-NLS-1$
+				org.apache.maven.model.Plugin plugin = new org.apache.maven.model.Plugin();
+				plugin.setGroupId("org.apache.maven.plugins"); //$NON-NLS-1$
+				plugin.setArtifactId("maven-ejb-plugin"); //$NON-NLS-1$
+				plugin.setVersion("2.3"); //$NON-NLS-1$
+				Xpp3Dom configuration = new Xpp3Dom( "configuration" ); //$NON-NLS-1$
+				Xpp3Dom ejbVersion = new Xpp3Dom("ejbVersion"); //$NON-NLS-1$
+				ejbVersion.setValue(version);
+				configuration.addChild(ejbVersion); 
+				plugin.setConfiguration(configuration);
+				build.getPlugins().add(plugin);
+			}
+		}
 	}
 	
 	public static String getOutputDirectory(IJavaProject javaProject) throws CoreException {
@@ -512,12 +482,21 @@ public class MavenCoreActivator extends Plugin {
 		addProperties(projectModel,libraryModel);
 		addRepositories(projectModel,libraryModel);
 		addPlugins(projectModel,libraryModel);
-		addDependencies(projectModel,libraryModel);
+		
+		DependencyManagement depMgtProject = projectModel.getDependencyManagement();
+		DependencyManagement depMgtLibrary = libraryModel.getDependencyManagement();
+		if (depMgtLibrary != null && !depMgtLibrary.getDependencies().isEmpty()) {
+			if (depMgtProject == null) {
+				depMgtProject = PomFactory.eINSTANCE.createDependencyManagement();
+				projectModel.setDependencyManagement(depMgtProject);
+			}
+			addDependencies(projectModel.getDependencyManagement().getDependencies(),libraryModel.getDependencyManagement().getDependencies());
+		}
+		//getDependencies() never returns null
+		addDependencies(projectModel.getDependencies(),libraryModel.getDependencies());
 	}
 
-	private static void addDependencies(org.eclipse.m2e.model.edit.pom.Model projectModel, org.eclipse.m2e.model.edit.pom.Model libraryModel) {
-		List<org.eclipse.m2e.model.edit.pom.Dependency> projectDependencies = projectModel.getDependencies();
-		List<org.eclipse.m2e.model.edit.pom.Dependency> libraryDependencies = libraryModel.getDependencies();
+	private static void addDependencies(List<org.eclipse.m2e.model.edit.pom.Dependency> projectDependencies , List<org.eclipse.m2e.model.edit.pom.Dependency> libraryDependencies) {
 		for (Dependency dependency:libraryDependencies) {
 			if (!dependencyExists(dependency,projectDependencies)) {
 				Dependency newDependency = (Dependency) EcoreUtil.copy(dependency);
@@ -527,8 +506,7 @@ public class MavenCoreActivator extends Plugin {
 		
 	}
 
-	private static boolean dependencyExists(Dependency dependency,
-			List<Dependency> projectDependencies) {
+	private static boolean dependencyExists(Dependency dependency, List<Dependency> projectDependencies) {
 		String groupId = dependency.getGroupId();
 		String artifactId = dependency.getArtifactId();
 		if (artifactId == null) {
@@ -733,12 +711,13 @@ public class MavenCoreActivator extends Plugin {
 
 	public static void addCompilerPlugin(Build build, IProject project) {
 		String compilerLevel = JavaFacetUtils.getCompilerLevel(project);
-		if (compilerLevel == null) {
+		if (compilerLevel == null || DEFAULT_COMPILER_LEVEL.equals(compilerLevel)) {
 			return;
 		}
 		org.apache.maven.model.Plugin plugin = new org.apache.maven.model.Plugin();
 		plugin.setGroupId("org.apache.maven.plugins"); //$NON-NLS-1$
 		plugin.setArtifactId("maven-compiler-plugin"); //$NON-NLS-1$
+		plugin.setVersion("2.3.2");
 		Xpp3Dom configuration = new Xpp3Dom( "configuration" ); //$NON-NLS-1$
 		Xpp3Dom source = new Xpp3Dom("source"); //$NON-NLS-1$
 		source.setValue(compilerLevel); //$NON-NLS-1$

@@ -98,8 +98,8 @@ public class MavenFacetInstallDataModelProvider extends
         	}
         }
         if(propertyName.equals(IJBossMavenConstants.PACKAGING)){
-        	String groupId = getStringProperty(IJBossMavenConstants.PACKAGING);
-        	if (groupId == null || groupId.trim().length() <= 0) {
+        	String packaging = getStringProperty(IJBossMavenConstants.PACKAGING);
+        	if (packaging == null || packaging.trim().length() <= 0) {
         		status = new Status(IStatus.ERROR, MavenCoreActivator.PLUGIN_ID	, Messages.MavenFacetInstallPage_The_packaging_field_is_required);
         	}
         }

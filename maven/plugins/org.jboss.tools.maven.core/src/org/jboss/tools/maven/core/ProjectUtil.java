@@ -16,10 +16,15 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.jdt.core.IClasspathEntry;
+import org.eclipse.jdt.core.IJavaProject;
+import org.eclipse.jdt.core.JavaCore;
+import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jst.j2ee.componentcore.J2EEModuleVirtualComponent;
 import org.eclipse.wst.common.componentcore.ComponentCore;
 import org.eclipse.wst.common.componentcore.resources.IVirtualComponent;
 import org.eclipse.wst.common.componentcore.resources.IVirtualFolder;
+import org.eclipse.wst.common.frameworks.datamodel.IDataModel;
 
 /**
  * A utility class for Eclipse Projects.
@@ -135,4 +140,20 @@ public class ProjectUtil {
 		return relative.replace('\\', '/'); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 	
+	public static void removeWTPContainers(IDataModel m2FacetModel, IProject project) throws JavaModelException {
+		if (m2FacetModel != null && project != null && m2FacetModel.getBooleanProperty(IJBossMavenConstants.REMOVE_WTP_CLASSPATH_CONTAINERS)) {
+		    IJavaProject javaProject = JavaCore.create(project);
+		    if(javaProject != null) {
+		      // remove classpatch container from JavaProject
+		      ArrayList<IClasspathEntry> newEntries = new ArrayList<IClasspathEntry>();
+		      for(IClasspathEntry entry : javaProject.getRawClasspath()) {
+		    	String path = entry.getPath().toString();
+		        if(path != null && !path.startsWith("org.eclipse.jst.j2ee.internal.")) {
+			          newEntries.add(entry);
+		        }
+		      }
+		      javaProject.setRawClasspath(newEntries.toArray(new IClasspathEntry[newEntries.size()]), null);
+		    }
+		}
+	}
 }

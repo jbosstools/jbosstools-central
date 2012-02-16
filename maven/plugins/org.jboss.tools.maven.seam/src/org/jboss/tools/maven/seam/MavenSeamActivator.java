@@ -43,12 +43,11 @@ import org.eclipse.jdt.core.IClasspathEntry;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.JavaModelException;
+import org.eclipse.jst.j2ee.project.JavaEEProjectUtilities;
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.embedder.MavenModelManager;
 import org.eclipse.m2e.core.internal.IMavenConstants;
-import org.eclipse.m2e.core.internal.MavenPluginActivator;
 import org.eclipse.m2e.core.internal.project.ResolverConfigurationIO;
-import org.eclipse.m2e.core.internal.project.registry.MavenProjectManager;
 import org.eclipse.m2e.core.project.ResolverConfiguration;
 import org.eclipse.m2e.model.edit.pom.Configuration;
 import org.eclipse.m2e.model.edit.pom.Plugin;
@@ -67,6 +66,7 @@ import org.eclipse.wst.common.project.facet.core.IFacetedProject;
 import org.eclipse.wst.common.project.facet.core.ProjectFacetsManager;
 import org.jboss.tools.maven.core.IJBossMavenConstants;
 import org.jboss.tools.maven.core.MavenCoreActivator;
+import org.jboss.tools.maven.core.ProjectUtil;
 import org.jboss.tools.maven.core.xpl.ProjectUpdater;
 import org.jboss.tools.seam.core.SeamUtil;
 import org.jboss.tools.seam.core.project.facet.SeamRuntime;
@@ -144,8 +144,7 @@ public class MavenSeamActivator extends AbstractUIPlugin {
 	}
 
 	
-	public void configureSeamProject(IDataModel seamFacetModel,
-			IDataModel m2FacetModel) {
+	public void configureSeamProject(IDataModel seamFacetModel, IDataModel m2FacetModel) {
 		Assert.isNotNull(seamFacetModel);
 		Assert.isNotNull(m2FacetModel);
 		webProjectName = seamFacetModel.getStringProperty(IFacetDataModelProperties.FACET_PROJECT_NAME);
@@ -162,11 +161,9 @@ public class MavenSeamActivator extends AbstractUIPlugin {
 		configureParentProject(m2FacetModel, seamFacetModel);
 		configureWarProject(m2FacetModel, seamFacetModel);
 		configureTestProject(m2FacetModel, seamFacetModel);
-		if (!SeamFacetAbstractInstallDelegate
-				.isWarConfiguration(seamFacetModel)) {
+		if (!SeamFacetAbstractInstallDelegate.isWarConfiguration(seamFacetModel)) {
 			configureEjbProject(m2FacetModel, seamFacetModel);
 			configureEarProject(m2FacetModel, seamFacetModel);
-			
 		} 
 	}
 
@@ -231,8 +228,7 @@ public class MavenSeamActivator extends AbstractUIPlugin {
 			dependency = new Dependency();
 			dependency.setGroupId("org.testng"); //$NON-NLS-1$
 			dependency.setArtifactId("testng"); //$NON-NLS-1$
-			// FIXME
-			dependency.setVersion("${testng.version}"); //$NON-NLS-1$
+			//dependency.setVersion("${testng.version}"); //$NON-NLS-1$
 			dependency.setClassifier("jdk15"); //$NON-NLS-1$
 			dependency.setScope("compile"); //$NON-NLS-1$
 			dependencies.add(dependency);
@@ -257,7 +253,6 @@ public class MavenSeamActivator extends AbstractUIPlugin {
 			dependency.setGroupId(groupId);
 			dependency.setArtifactId(artifactId);
 			dependency.setType("war"); //$NON-NLS-1$
-			dependency.setVersion(m2FacetModel.getStringProperty(IJBossMavenConstants.VERSION));
 			dependency.setScope("test"); //$NON-NLS-1$
 			dependencies.add(dependency);
 			
@@ -267,7 +262,6 @@ public class MavenSeamActivator extends AbstractUIPlugin {
 				dependency.setGroupId(groupId);
 				dependency.setArtifactId(ejbArtifactId);
 				dependency.setType("ejb"); //$NON-NLS-1$
-				dependency.setVersion(m2FacetModel.getStringProperty(IJBossMavenConstants.VERSION));
 				dependency.setScope("test"); //$NON-NLS-1$
 				dependencies.add(dependency);
 			}
@@ -297,9 +291,9 @@ public class MavenSeamActivator extends AbstractUIPlugin {
 				if (sourceDirectory != null) {
 					build.setTestSourceDirectory(sourceDirectory);
 				}		
-				String outputDirectory = MavenCoreActivator.getOutputDirectory(javaProject);	
-				build.setOutputDirectory(outputDirectory);
-				build.setTestOutputDirectory(outputDirectory);
+				//String outputDirectory = MavenCoreActivator.getOutputDirectory(javaProject);	
+				//build.setOutputDirectory(outputDirectory);
+				//build.setTestOutputDirectory(outputDirectory);
 				MavenCoreActivator.addResource(build, project, sourceDirectory);
 				Resource resource = new Resource();
 				
@@ -361,21 +355,17 @@ public class MavenSeamActivator extends AbstractUIPlugin {
 			Dependency dependency = new Dependency();
 			dependency.setGroupId(m2FacetModel.getStringProperty(IJBossMavenConstants.GROUP_ID));
 			dependency.setArtifactId(ejbProjectName);
-			dependency.setVersion(m2FacetModel.getStringProperty(IJBossMavenConstants.VERSION));
 			dependency.setType("ejb"); //$NON-NLS-1$
-			dependency.setScope("runtime"); //$NON-NLS-1$
 			dependencies.add(dependency);
 			
 			dependency = new Dependency();
 			dependency.setGroupId(m2FacetModel.getStringProperty(IJBossMavenConstants.GROUP_ID));
 			dependency.setArtifactId(webProjectName);
-			dependency.setVersion(m2FacetModel.getStringProperty(IJBossMavenConstants.VERSION));
 			dependency.setType("war"); //$NON-NLS-1$
-			dependency.setScope("runtime"); //$NON-NLS-1$
 			dependencies.add(dependency);
 			
 			dependency = getSeamDependency();
-			dependency.setVersion("${seam.version}"); //$NON-NLS-1$
+			//dependency.setVersion("${seam.version}"); //$NON-NLS-1$
 			dependency.setType("ejb"); //$NON-NLS-1$
 			dependency.setScope("compile"); //$NON-NLS-1$
 			List<Exclusion> exclusions = dependency.getExclusions();
@@ -466,16 +456,9 @@ public class MavenSeamActivator extends AbstractUIPlugin {
 			Build build = new Build();
 			try {
 				build.setFinalName(earProjectName);
-				
-				String sourceDirectory = MavenCoreActivator.getEarRoot(project);
-				if (sourceDirectory != null) {
-					build.setSourceDirectory(sourceDirectory);
-				}
-				build.setOutputDirectory("target/classes"); //$NON-NLS-1$
-				MavenCoreActivator.addMavenEarPlugin(build, project, m2FacetModel, ejbArtifactId, true);
+				MavenCoreActivator.addMavenEarPlugin(build, project, m2FacetModel, ejbArtifactId, JavaEEProjectUtilities.ENTERPRISE_APPLICATION_50, true);
 				model.setBuild(build);
 				MavenCoreActivator.createMavenProject(earProjectName, null, model, true);
-				removeWTPContainers(m2FacetModel, project);
 			} catch (Exception e) {
 				MavenSeamActivator.log(e);
 			}
@@ -545,16 +528,17 @@ public class MavenSeamActivator extends AbstractUIPlugin {
 			try {
 				// FIXME
 				//build.setFinalName(ejbArtifactId);
-				String outputDirectory = MavenCoreActivator.getOutputDirectory(javaProject);	
-				build.setOutputDirectory(outputDirectory);
+				//String outputDirectory = MavenCoreActivator.getOutputDirectory(javaProject);	
+				//build.setOutputDirectory(outputDirectory);
 				String sourceDirectory = MavenCoreActivator.getSourceDirectory(javaProject);
 				if (sourceDirectory != null) {
 					build.setSourceDirectory(sourceDirectory);
 				}
-				MavenCoreActivator.addMavenEjbPlugin(build, project);
+				MavenCoreActivator.addMavenEjbPlugin(build, project, JavaEEProjectUtilities.EJB_30);
 				model.setBuild(build);
 				MavenCoreActivator.createMavenProject(ejbProjectName, null, model, true);
-				removeWTPContainers(m2FacetModel, project);
+				
+				ProjectUtil.removeWTPContainers(m2FacetModel, project);
 			} catch (Exception e) {
 				MavenSeamActivator.log(e);
 			}
@@ -642,7 +626,7 @@ public class MavenSeamActivator extends AbstractUIPlugin {
 			dependency.setGroupId("org.jboss.seam"); //$NON-NLS-1$
 			dependency.setArtifactId("jboss-seam-debug"); //$NON-NLS-1$
 			// FIXME
-			dependency.setVersion("${seam.version}"); //$NON-NLS-1$
+			//dependency.setVersion("${seam.version}"); //$NON-NLS-1$
 			
 			addDependency(pomFile,dependency);
 			
@@ -737,14 +721,14 @@ public class MavenSeamActivator extends AbstractUIPlugin {
 				dependency = new Dependency();
 				dependency.setGroupId(m2FacetModel.getStringProperty(IJBossMavenConstants.GROUP_ID));
 				dependency.setArtifactId(ejbProjectName);
-				dependency.setVersion(m2FacetModel.getStringProperty(IJBossMavenConstants.VERSION));
 				dependency.setType("ejb"); //$NON-NLS-1$
 				dependency.setScope("provided"); //$NON-NLS-1$
 				addDependency(pomFile,dependency);
 			}
 			
 			updateProject(pomFile, new WarProjectUpdater(webProject));
-			removeWTPContainers(m2FacetModel, webProject);
+			
+			ProjectUtil.removeWTPContainers(m2FacetModel, webProject);
 		} catch (Exception e) {
 			MavenSeamActivator.log(e);
 		}
@@ -778,33 +762,6 @@ public class MavenSeamActivator extends AbstractUIPlugin {
 		newPlugin.setArtifactId(artifactId);
 		build.getPlugins().add(newPlugin);
 		return newPlugin;
-	}
-
-	private void removeWTPContainers(IDataModel m2FacetModel,
-			IProject webProject) throws JavaModelException {
-		if (m2FacetModel.getBooleanProperty(IJBossMavenConstants.REMOVE_WTP_CLASSPATH_CONTAINERS)) {
-			IJavaProject javaProject = JavaCore.create(webProject);
-			IClasspathEntry[] entries = javaProject.getRawClasspath();
-			List<IClasspathEntry> newEntries = new ArrayList<IClasspathEntry>();
-			for (int i = 0; i < entries.length; i++) {
-				IClasspathEntry entry = entries[i];
-				boolean add = true;
-				if (entry.getEntryKind() == IClasspathEntry.CPE_CONTAINER) {
-					// FIXME
-					IPath path = entry.getPath();
-					if (path != null) {
-						String value = path.toString();
-						if (value.startsWith("org.eclipse.jst")) { //$NON-NLS-1$
-							add = false;
-						}
-					}
-				}
-				if (add) {
-					newEntries.add(entry);
-				}
-			}
-			javaProject.setRawClasspath(newEntries.toArray(new IClasspathEntry[0]), null);
-		}
 	}
 
 	private Dependency getHibernateValidator() {
@@ -851,6 +808,7 @@ public class MavenSeamActivator extends AbstractUIPlugin {
 		dependency = new Dependency();
 		dependency.setGroupId("org.jboss.seam"); //$NON-NLS-1$
 		dependency.setArtifactId("jboss-seam"); //$NON-NLS-1$
+		dependency.setType("ejb");
 		return dependency;
 	}
 
@@ -860,7 +818,7 @@ public class MavenSeamActivator extends AbstractUIPlugin {
 		InputStream inputStream = null;
 		try {
 			URL resolvedURL = FileLocator.resolve(parentPomEntryURL);
-			MavenModelManager modelManager = MavenPlugin.getDefault().getMavenModelManager();
+			MavenModelManager modelManager = MavenPlugin.getMavenModelManager();
 			inputStream = resolvedURL.openStream();
 			Model model = modelManager.readMavenModel(inputStream);
 			model.setArtifactId(parentArtifactId);
@@ -899,6 +857,7 @@ public class MavenSeamActivator extends AbstractUIPlugin {
 					try {
 						Model rootPomModel = modelManager.readMavenModel(rootPom);
 						List<Dependency> seamDependencies = rootPomModel.getDependencyManagement().getDependencies();
+
 						setArtifactVersion("jsf.version", properties, "javax.faces", "jsf-api", seamDependencies); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 						String richfacesVersion = setArtifactVersion("richfaces.version", properties, "org.richfaces.framework", "richfaces-impl", seamDependencies); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 						if (richfacesVersion == null) {
@@ -950,11 +909,26 @@ public class MavenSeamActivator extends AbstractUIPlugin {
 			}
 			
 			List<String> modules = model.getModules();
+			
 			modules.add("../" + artifactId); //$NON-NLS-1$
 			if (!SeamFacetAbstractInstallDelegate
 					.isWarConfiguration(seamFacetModel)) {
 				modules.add("../" + ejbArtifactId); //$NON-NLS-1$
 				modules.add("../" + earArtifactId); //$NON-NLS-1$
+			
+				Dependency dependency = new Dependency();
+				dependency.setGroupId(model.getGroupId());
+				dependency.setArtifactId(ejbProjectName);
+				dependency.setType("ejb"); //$NON-NLS-1$
+				dependency.setVersion(projectVersion);
+				model.getDependencyManagement().getDependencies().add(0, dependency);
+				
+				dependency = new Dependency();
+				dependency.setGroupId(model.getGroupId());
+				dependency.setArtifactId(webProjectName);
+				dependency.setType("war"); //$NON-NLS-1$
+				dependency.setVersion(projectVersion);
+				model.getDependencyManagement().getDependencies().add(1, dependency);
 			}
 			webProjectName = seamFacetModel.getStringProperty(IFacetDataModelProperties.FACET_PROJECT_NAME);
 			
@@ -963,7 +937,6 @@ public class MavenSeamActivator extends AbstractUIPlugin {
 			location = location.append(parentProjectName);
 			MavenCoreActivator.createMavenProject(parentProjectName, null, model, false, location);
 			// disable workspace resolution
-			MavenProjectManager projectManager = MavenPluginActivator.getDefault().getMavenProjectManager();
 		    IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject(parentProjectName);
 		    ResolverConfiguration configuration = ResolverConfigurationIO.readResolverConfiguration(project);
 		    configuration.setResolveWorkspaceProjects(false);
@@ -1117,7 +1090,7 @@ public class MavenSeamActivator extends AbstractUIPlugin {
 					}
 					configuration.setStringValue(WAR_SOURCE_DIRECTORY, value);
 				}
-				StringBuffer buffer = new StringBuffer();
+				StringBuilder buffer = new StringBuilder();
 				boolean first = true;
 				for (IPath output:outputs) {
 					if (first) {

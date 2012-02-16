@@ -10,10 +10,8 @@ import org.eclipse.wst.common.project.facet.core.events.IFacetedProjectEvent;
 import org.eclipse.wst.common.project.facet.core.events.IFacetedProjectListener;
 import org.eclipse.wst.common.project.facet.core.events.IProjectFacetActionEvent;
 import org.jboss.tools.maven.core.IJBossMavenConstants;
-import org.jboss.tools.maven.core.internal.project.facet.MavenFacetInstallDataModelProvider;
 import org.jboss.tools.maven.seam.MavenSeamActivator;
 import org.jboss.tools.seam.internal.core.project.facet.ISeamFacetDataModelProperties;
-import org.jboss.tools.seam.internal.core.project.facet.SeamFacetInstallDataModelProvider;
 
 public class MavenPostInstallListener implements IFacetedProjectListener {
 
@@ -31,11 +29,10 @@ public class MavenPostInstallListener implements IFacetedProjectListener {
 		boolean isM2Project = false;
 		for (IProjectFacetVersion projectFacetVersion : projectFacets) {
 			IProjectFacet projectFacet = projectFacetVersion.getProjectFacet();
-			if (ISeamFacetDataModelProperties.SEAM_FACET_ID.equals(projectFacet
-					.getId())) {
+			if (ISeamFacetDataModelProperties.SEAM_FACET_ID.equals(projectFacet.getId())) {
 				isSeamProject = true;
 			}
-			if (IJBossMavenConstants.M2_FACET_ID.equals(projectFacet.getId())) {
+			else if (IJBossMavenConstants.M2_FACET_ID.equals(projectFacet.getId())) {
 				isM2Project = true;
 			}
 		}
@@ -46,9 +43,8 @@ public class MavenPostInstallListener implements IFacetedProjectListener {
 			IDataModel dataModel = (IDataModel) object;
 			if ( SEAM_FACET_MODEL_PROVIDER.equals(dataModel.getID())) {
 				seamFacetModel = dataModel;
-			}
-
-			if ( M2_FACET_MODEL_PROVIDER.equals(dataModel.getID()) ) {
+			} 
+			else if ( M2_FACET_MODEL_PROVIDER.equals(dataModel.getID()) ) {
 				m2FacetModel = dataModel;
 			}
 		}

@@ -39,6 +39,10 @@
 		          facet="jst.connector"
 		          soft="true"
 		          version="[1.0"/>
+		         <requires
+		          facet="jst.webfragment"
+		          soft="true"
+		          version="[3.0"/>
          	</or>
          </constraint>
       </project-facet-version>
@@ -116,7 +120,23 @@
       		</enablement>
     	</provider>
   	</extension>
-  	
+   
+  	<extension point="org.eclipse.jst.common.project.facet.core.libraryProviders">
+    	<provider id="jsf20-maven-library-provider" extends="maven-library-provider">
+    		<label>%Maven_JSF_2_0_Libraries</label>
+      		<param name="template" value="platform:/plugin/org.jboss.tools.maven.core/poms/jsf-template20.xml"/>
+      		<enablement>
+      		  <and>
+        		<with variable="projectFacets">
+          			<test property="org.jboss.tools.maven.core.projectFacets" value="jst.jsf,jboss.m2" forcePluginActivation="true"/>
+        		</with>
+        		<with variable="requestingProjectFacet">
+                    <test property="org.eclipse.wst.common.project.facet.core.projectFacet" value="jst.jsf:2.0" forcePluginActivation="true"/>
+                </with>
+        	  </and>
+      		</enablement>
+    	</provider>
+  	</extension>  	
   	<extension point="org.eclipse.jst.common.project.facet.core.libraryProviders">
     	<provider id="hibernate332-maven-library-provider" extends="maven-library-provider">
       		<label>%Hibernate_3_3_2_Libraries</label>
@@ -170,6 +190,7 @@
       		</enablement>
     	</provider>
   	</extension>
+
   	
   	<extension point="org.eclipse.jst.common.project.facet.core.libraryProviders">
     	<provider id="portletbridge200alpha-maven-library-provider" extends="maven-library-provider">

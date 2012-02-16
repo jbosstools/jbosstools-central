@@ -15,6 +15,7 @@ import java.util.List;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
+import org.apache.maven.artifact.resolver.filter.ScopeArtifactFilter;
 import org.apache.maven.project.MavenProject;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.ProjectScope;
@@ -86,7 +87,7 @@ public class HibernateProjectConfigurator extends AbstractProjectConfigurator {
 
 	private boolean isHibernateProject(MavenProject mavenProject) {
 		List<Artifact> artifacts = new ArrayList<Artifact>();
-		ArtifactFilter filter = new org.apache.maven.artifact.resolver.filter.ScopeArtifactFilter(
+		ArtifactFilter filter = new ScopeArtifactFilter(
 				Artifact.SCOPE_TEST);
 		for (Artifact artifact : mavenProject.getArtifacts()) {
 			if (filter.include(artifact)) {

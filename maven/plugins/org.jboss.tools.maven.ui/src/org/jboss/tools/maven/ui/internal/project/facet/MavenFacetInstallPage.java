@@ -128,6 +128,7 @@ IFacetWizardPage {
 		packaging.setLayoutData(gd);
 		String[] items = { "war","ear", "ejb", "jar" }; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 		packaging.setItems(items);
+		synchHelper.synchCombo(packaging, IJBossMavenConstants.PACKAGING, null);
 		
 		IFacetedProjectWorkingCopy fpwc = null;
 		try {
@@ -135,8 +136,7 @@ IFacetWizardPage {
 			if (!mavenProjectExists) {
 				if (fpwc.hasProjectFacet(WebFacetUtils.WEB_FACET)) {
 					packaging.select(0);
-				} else if (fpwc
-						.hasProjectFacet(IJ2EEFacetConstants.ENTERPRISE_APPLICATION_FACET)) {
+				} else if (fpwc.hasProjectFacet(IJ2EEFacetConstants.ENTERPRISE_APPLICATION_FACET)) {
 					packaging.select(1);
 				} else if (fpwc.hasProjectFacet(IJ2EEFacetConstants.EJB_FACET)) {
 					packaging.select(2);
@@ -147,7 +147,6 @@ IFacetWizardPage {
 				String mavenPackaging = getDataModel().getStringProperty(IJBossMavenConstants.PACKAGING);
 				packaging.setText(mavenPackaging);
 			}
-			synchHelper.synchCombo(packaging, IJBossMavenConstants.PACKAGING, null);
 			
 			name = createField(composite, Messages.MavenFacetInstallPage_Name, IJBossMavenConstants.NAME);
 			name.setText(projectName);
@@ -162,6 +161,8 @@ IFacetWizardPage {
 					seamVersion.setText("2.1.1.GA"); //$NON-NLS-1$
 				} else if ("2.2".equals(seamFacetVersion.getVersionString())) { //$NON-NLS-1$
 					seamVersion.setText("2.2.1.Final"); //$NON-NLS-1$
+				} else if ("2.3".equals(seamFacetVersion.getVersionString())) { //$NON-NLS-1$
+					seamVersion.setText("2.3.0.ALPHA"); //$NON-NLS-1$
 				}
 				Button removeWTPContainers = new Button(composite,SWT.CHECK);
 				removeWTPContainers.setText(Messages.MavenFacetInstallPage_Remove_WTP_Classpath_containers);
