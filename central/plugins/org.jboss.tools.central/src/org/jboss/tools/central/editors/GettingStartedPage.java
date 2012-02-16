@@ -929,7 +929,7 @@ public class GettingStartedPage extends AbstractJBossCentralPage {
 			categoryComposite.setClient(composite);
 			String description = category.getDescription();
 			if (description != null && !description.isEmpty() && categoryComposite.getControl() != null) {
-				final ToolTip toolTip = new DescriptionToolTip(categoryComposite.getControl(), description);
+				final DescriptionToolTip toolTip = new DescriptionToolTip(categoryComposite.getControl(), description);
 				toolTip.activate();	
 			}
 		}
@@ -957,7 +957,7 @@ public class GettingStartedPage extends AbstractJBossCentralPage {
 	private void hookTooltip(FormText tutorialText, ProjectExample tutorial) {
 		final String description = JBossCentralActivator.getDefault().getDescription(tutorial);
 		if (description != null && !description.isEmpty()) {
-			ToolTip toolTip = new DescriptionToolTip(tutorialText, description);
+			DescriptionToolTip toolTip = new DescriptionToolTip(tutorialText, description);
 			toolTip.activate();
 		}
 	}
