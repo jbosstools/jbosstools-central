@@ -106,6 +106,10 @@ public class NewProjectExamplesWizard2 extends Wizard implements INewWizard {
 			// FIXME
 			}
 			for (IProjectExamplesWizardPage contributedPage:contributedPages) {
+				String type = projectExample.getImportType();
+				if (type == null || !type.equals(contributedPage.getProjectExampleType())) {
+					continue;
+				}
 				if (!contributedPage.finishPage()) {
 					return false;
 				}
