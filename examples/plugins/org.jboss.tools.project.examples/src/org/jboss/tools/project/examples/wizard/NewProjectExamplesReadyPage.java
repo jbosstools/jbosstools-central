@@ -3,7 +3,6 @@ package org.jboss.tools.project.examples.wizard;
 import java.util.List;
 
 import org.eclipse.core.resources.IMarker;
-import org.eclipse.jdt.internal.ui.typehierarchy.ShowQualifiedTypeNamesAction;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.wizard.IWizard;
 import org.eclipse.jface.wizard.IWizardPage;

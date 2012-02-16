@@ -10,10 +10,8 @@
  ************************************************************************************/
 package org.jboss.tools.project.examples.wizard;
 
-import java.util.ArrayList;
 import java.util.List;
 
-import org.eclipse.jdt.internal.ui.typehierarchy.ShowQualifiedTypeNamesAction;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.ui.internal.ide.IDEInternalWorkbenchImages;

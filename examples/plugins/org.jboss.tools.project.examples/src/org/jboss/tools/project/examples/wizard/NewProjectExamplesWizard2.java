@@ -17,7 +17,6 @@ package org.jboss.tools.project.examples.wizard;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -38,7 +37,6 @@ import org.eclipse.ui.IWorkingSet;
 import org.eclipse.ui.PlatformUI;
 import org.jboss.tools.project.examples.Messages;
 import org.jboss.tools.project.examples.ProjectExamplesActivator;
-import org.jboss.tools.project.examples.dialog.xpl.QuickFixPage;
 import org.jboss.tools.project.examples.model.ProjectExample;
 
 public class NewProjectExamplesWizard2 extends Wizard implements INewWizard {
