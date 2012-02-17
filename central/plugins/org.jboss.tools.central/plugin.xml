@@ -194,4 +194,78 @@
             icon="icons/examples_wiz.gif">
       </image>
    </extension>   
+   
+   <!-- new wizards -->
+   <extension
+         point="org.eclipse.ui.newWizards">
+      <category
+            id="org.jboss.tools.central.ui.wizard.category"
+            name="JBoss Central">
+      </category>
+      <wizard
+            category="org.jboss.tools.central.ui.wizard.category"
+            id="org.jboss.tools.central.wizards.NewJavaeeWarProjectWizard"
+            class="org.jboss.tools.central.wizards.NewJavaeeWarProjectWizard"
+            icon="icons/newwebprj_wiz.gif"
+            name="Java EE Web Project"
+            project="true">
+      </wizard>
+      <wizard
+            category="org.jboss.tools.central.ui.wizard.category"
+            id="org.jboss.tools.central.wizards.NewJavaeeEarProjectWizard"
+            class="org.jboss.tools.central.wizards.NewJavaeeEarProjectWizard"
+            icon="icons/ear-wiz-icon.gif"
+            name="Java EE Project"
+            project="true">
+      </wizard>
+      <wizard
+            category="org.jboss.tools.central.ui.wizard.category"
+            id="org.jboss.tools.central.wizards.NewHtml5ProjectWizard"
+            class="org.jboss.tools.central.wizards.NewHtml5ProjectWizard"
+            icon="icons/html5.png"
+            name="HTML5 Project"
+            project="true">
+      </wizard>
+      <wizard
+            category="org.jboss.tools.central.ui.wizard.category"
+            id="org.jboss.tools.central.wizards.NewRichfacesProjectWizard"
+            class="org.jboss.tools.central.wizards.NewRichfacesProjectWizard"
+            icon="icons/rf_logo.png"
+            name="RichFaces Project"
+            project="true">
+      </wizard>
+      <wizard
+            category="org.jboss.tools.central.ui.wizard.category"
+            id="org.jboss.tools.central.wizards.NewSpringMvcProjectWizard"
+            class="org.jboss.tools.central.wizards.NewSpringMvcProjectWizard"
+            icon="icons/spring_wiz.gif"
+            name="Spring MVC Project"
+            project="true">
+      </wizard>
+      <wizard
+            category="org.jboss.tools.central.ui.wizard.category"
+            id="org.jboss.tools.central.wizards.NewGwtProjectWizard"
+            class="org.jboss.tools.central.wizards.NewGwtProjectWizard"
+            icon="icons/new-gdt-project.png"
+            name="GWT Web Project"
+            project="true">
+      </wizard>            
+   </extension>
+   
+   <extension
+		point="org.eclipse.ui.perspectiveExtensions">
+		<perspectiveExtension
+			targetID="org.jboss.tools.common.ui.JBossPerspective">
+			<newWizardShortcut id="org.jboss.tools.central.wizards.NewJavaeeWarProjectWizard" />
+			<newWizardShortcut id="org.jboss.tools.central.wizards.NewJavaeeEarProjectWizard"/>
+			<newWizardShortcut id="org.jboss.tools.central.wizards.NewHtml5ProjectWizard"/>
+			<newWizardShortcut id="org.jboss.tools.central.wizards.NewRichfacesProjectWizard"/>
+			<newWizardShortcut id="org.jboss.tools.central.wizards.NewSpringMvcProjectWizard"/>
+			<newWizardShortcut id="org.jboss.tools.central.wizards.NewGwtProjectWizard"/>
+		</perspectiveExtension>
+   </extension>
+   
+   
+   
+   
 </plugin>

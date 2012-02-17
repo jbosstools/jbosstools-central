@@ -99,9 +99,9 @@ public class RefreshTutorialsJob extends Job {
 		return tutorialCategories;
 	}
 
-  public List<ProjectExample> getWizardProjects() {
-    return wizardProjects;
-  }
+    public List<ProjectExample> getWizardProjects() {
+        return wizardProjects;
+    }
 
 	@Override
 	public boolean belongsTo(Object family) {

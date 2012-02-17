@@ -48,6 +48,7 @@ public class NewProjectExamplesWizard2 extends Wizard implements INewWizard {
 	//private NewProjectExamplesReadyPage readyPage;
 	List<IProjectExamplesWizardPage> contributedPages = new LinkedList<IProjectExamplesWizardPage>();
 	private ProjectExample projectExample;
+
 	private boolean isCentral = false;
 	//private QuickFixPage quickFixPage;
 
@@ -59,16 +60,19 @@ public class NewProjectExamplesWizard2 extends Wizard implements INewWizard {
 	
 	public NewProjectExamplesWizard2(ProjectExample projectExample) {
 		super();
+		initializeProjectExample(projectExample);
+	}
+
+	protected void initializeProjectExample(ProjectExample projectExample) {
 		this.projectExample = projectExample;
 		this.isCentral = true;
 		setWindowTitle(Messages.NewProjectExamplesWizard_New_Project_Example);
 		setNeedsProgressMonitor(true);
 	}
-
+	
 	/**
 	 * Creates an empty wizard for creating a new resource in the workspace.
 	 */
-
 	@Override
 	public boolean performFinish() {
 		final List<ProjectExample> selectedProjects = new ArrayList<ProjectExample>();
@@ -251,4 +255,9 @@ public class NewProjectExamplesWizard2 extends Wizard implements INewWizard {
         }
         return true;
 	}
+
+	public ProjectExample getProjectExample() {
+		return projectExample;
+	}
+	
 }
