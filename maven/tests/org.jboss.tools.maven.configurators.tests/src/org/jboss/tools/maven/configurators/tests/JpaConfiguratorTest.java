@@ -7,7 +7,6 @@ import org.eclipse.jpt.jpa.core.JpaProject;
 import org.eclipse.jpt.jpa.core.JpaProjectManager;
 import org.eclipse.jpt.jpa.core.JptJpaCorePlugin;
 import org.eclipse.jst.common.project.facet.core.JavaFacet;
-import org.eclipse.m2e.core.project.ResolverConfiguration;
 import org.eclipse.wst.common.project.facet.core.IFacetedProject;
 import org.eclipse.wst.common.project.facet.core.IProjectFacetVersion;
 import org.eclipse.wst.common.project.facet.core.ProjectFacetsManager;

@@ -15,8 +15,6 @@ import java.io.File;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IncrementalProjectBuilder;
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jst.common.project.facet.core.JavaFacet;
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.project.IProjectConfigurationManager;
