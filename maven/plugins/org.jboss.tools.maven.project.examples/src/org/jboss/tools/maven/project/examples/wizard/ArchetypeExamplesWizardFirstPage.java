@@ -63,6 +63,7 @@ import org.jboss.tools.project.examples.ProjectExamplesActivator;
 import org.jboss.tools.project.examples.model.ProjectExample;
 import org.jboss.tools.project.examples.wizard.IProjectExamplesWizardPage;
 import org.jboss.tools.project.examples.wizard.NewProjectExamplesWizard2;
+import org.jboss.tools.project.examples.wizard.WizardContext;
 
 /**
  * Simplified UI for the Maven Archetype Wizard, based off the original m2e MavenProjectWizardLocationPage. 
@@ -82,11 +83,9 @@ public class ArchetypeExamplesWizardFirstPage extends MavenProjectWizardLocation
 	private Composite warningLink;
 	private boolean initialized;
 	private Boolean isEnterpriseRepoAvailable;
-	private ModifyListener projectNameModifyListener;
-	private ModifyListener packageNameModifyListener;
-	private ModifyListener propertyModifyListener;
 	private ProjectExample projectDescription;
 	private ProjectExample projectExample;
+	private WizardContext context;
 	
 	public ArchetypeExamplesWizardFirstPage() {
 		super(new ProjectImportConfiguration(), "", "",new ArrayList<IWorkingSet>());
@@ -98,7 +97,6 @@ public class ArchetypeExamplesWizardFirstPage extends MavenProjectWizardLocation
 		super(configuration, projectDescription.getShortDescription(),Messages.ArchetypeExamplesWizardFirstPage_Title, workingSet);
 		this.projectDescription = projectDescription;
 		setPageComplete(false);
-		
 	}
 	
 	@Override
@@ -113,12 +111,12 @@ public class ArchetypeExamplesWizardFirstPage extends MavenProjectWizardLocation
 		projectNameCombo.addModifyListener(new ModifyListener() {
 			@Override
 			public void modifyText(ModifyEvent e) {
+				if (isCurrentPage()) {
+					context.setProperty(MavenProjectConstants.PROJECT_NAME, getProjectName());
+				}
 				validate();
 			}
 		});
-		if (projectNameModifyListener != null) {
-			projectNameCombo.addModifyListener(projectNameModifyListener);
-		}
 
 		packageLabel = new Label(container, SWT.NONE);
 		packageLabel.setText(Messages.ArchetypeExamplesWizardFirstPage_Package_Label);
@@ -129,12 +127,12 @@ public class ArchetypeExamplesWizardFirstPage extends MavenProjectWizardLocation
 		packageCombo.addModifyListener(new ModifyListener() {
 			@Override
 			public void modifyText(ModifyEvent e) {
+				if (isCurrentPage()) {
+					context.setProperty(MavenProjectConstants.PACKAGE, packageCombo.getText());
+				}
 				validate();
 			}
 		});
-		if (packageNameModifyListener != null) {
-			packageCombo.addModifyListener(packageNameModifyListener);
-		}
 
 		//TODO read facet version from project example metadata
 		IProjectFacetVersion facetVersion;
@@ -145,10 +143,6 @@ public class ArchetypeExamplesWizardFirstPage extends MavenProjectWizardLocation
 		} catch (CoreException e) {
 			e.printStackTrace();
 		}
-		if (propertyModifyListener != null) {
-			serverTargetCombo.addModifyListener(propertyModifyListener);
-		}
-
 		
 		Label emptyLabel = new Label(container, SWT.NONE);
 		emptyLabel.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false,
@@ -188,15 +182,19 @@ public class ArchetypeExamplesWizardFirstPage extends MavenProjectWizardLocation
 			}
 		}
 				
-		serverTargetCombo.select(selectedRuntimeIdx);
-		
 		serverTargetCombo.addModifyListener(new ModifyListener() {
 
 			@Override
 			public void modifyText(ModifyEvent e) {
+				if (isCurrentPage()) {
+					context.setProperty(MavenProjectConstants.ENTERPRISE_TARGET, isEnterpriseTargetRuntime());
+				}
 				validateEnterpriseRepo();
 			}
 		});
+		if (selectedRuntimeIdx > 0) {
+			serverTargetCombo.select(selectedRuntimeIdx);
+		}
 
 	}
 
@@ -254,8 +252,11 @@ public class ArchetypeExamplesWizardFirstPage extends MavenProjectWizardLocation
 	}
 
 	protected void validateEnterpriseRepo() {
+		
 		boolean isWarningLinkVisible = (isEnterpriseTargetRuntime() && !assertEnterpriseRepoAccessible());
-		warningLink.setVisible(isWarningLinkVisible);
+		if (warningLink != null) {
+			warningLink.setVisible(isWarningLinkVisible);
+		}
 	}
 
 	
@@ -301,6 +302,10 @@ public class ArchetypeExamplesWizardFirstPage extends MavenProjectWizardLocation
 		if (packageName != null) {
 			packageCombo.setText(packageName);
 		}
+		
+		//Force setting of enterprise value
+		context.setProperty(MavenProjectConstants.ENTERPRISE_TARGET, isEnterpriseTargetRuntime());
+
 		initialized = true;
 		validate();
 	}
@@ -341,11 +346,9 @@ public class ArchetypeExamplesWizardFirstPage extends MavenProjectWizardLocation
 
 
 	private boolean assertEnterpriseRepoAccessible() {
-		if (isEnterpriseRepoAvailable != null) {
-			return isEnterpriseRepoAvailable.booleanValue();
+		if (isEnterpriseRepoAvailable == null) {
+			isEnterpriseRepoAvailable = MavenArtifactHelper.isEnterpriseRepositoryAvailable();
 		}
-		
-		isEnterpriseRepoAvailable = MavenArtifactHelper.isEnterpriseRepositoryAvailable();
 		return isEnterpriseRepoAvailable.booleanValue();
 	}
 
@@ -368,29 +371,6 @@ public class ArchetypeExamplesWizardFirstPage extends MavenProjectWizardLocation
 		return runtimesMap;
 	}
 
-	public ModifyListener getProjectNameModifyListener() {
-		return projectNameModifyListener;
-	}
-
-	public void setProjectNameModifyListener(ModifyListener projectNameModifyListener) {
-		this.projectNameModifyListener = projectNameModifyListener;
-	}
-
-	public ModifyListener getPackageNameModifyListener() {
-		return packageNameModifyListener;
-	}
-
-	public void setPackageNameModifyListener(ModifyListener packageNameModifyListener) {
-		this.packageNameModifyListener = packageNameModifyListener;
-	}
-
-	public ModifyListener getPropertyModifyListener() {
-		return propertyModifyListener;
-	}
-
-	public void setPropertyModifyListener(ModifyListener propertyModifyListener) {
-		this.propertyModifyListener = propertyModifyListener;
-	}
 
 	public void setUseDefaultWorkspaceLocation(boolean value) {
 		Class clazz = MavenProjectWizardLocationPage.class;
@@ -484,6 +464,38 @@ public class ArchetypeExamplesWizardFirstPage extends MavenProjectWizardLocation
 	@Override
 	public Map<String, Object> getPropertiesMap() {
 		return null;
+	}
+
+	@Override
+	public void onWizardContextChange(String key, Object value) {
+		if (MavenProjectConstants.PROJECT_NAME.equals(key)) {
+			String artifactId = value == null?"":value.toString();
+			setProjectName(artifactId);
+		} else if (MavenProjectConstants.PACKAGE.equals(key)){
+			String packageName = value == null?"":value.toString();
+			setPackageName(packageName);
+		}
+	}
+
+	
+	public void setProjectName(String projectName) {
+		if (projectNameCombo != null && !projectNameCombo.getText().equals(projectName)) {
+			projectNameCombo.setText(projectName);
+		}
+	}
+
+	public void setPackageName(String packageName) {
+		if (packageCombo != null) {
+			if (!packageCombo.getText().equals(packageName)){ 
+				packageCombo.setText(packageName);
+			}
+		}
+	}	
+	
+	
+	@Override
+	public void setWizardContext(WizardContext context) {
+		this.context = context;
 	}
 
 	

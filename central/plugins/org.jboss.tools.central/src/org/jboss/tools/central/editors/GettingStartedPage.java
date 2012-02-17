@@ -876,18 +876,6 @@ public class GettingStartedPage extends AbstractJBossCentralPage {
 		showTutorials(categories);
 	}
 
-	@Deprecated
-	//This method should be removed once the EE6 archetypes are wizardified
-	private void updateNewProjects(List<ProjectExample> wizardProjects) {
-		if (!newProjectsInitialized) {
-			if (wizardProjects != null) {
-				newProjectsInitialized = true;
-				displayTutorialLinks(wizardProjects, projectsComposite, false);
-				resize(true);
-			}
-		}
-	}
-
 	private void showTutorials(Map<ProjectExampleCategory, List<ProjectExample>> categories) {
 		disposeChildren(tutorialsComposite);
 		List<ProjectExampleCategory> sortedCategories = new ArrayList<ProjectExampleCategory>(categories.keySet()); 
@@ -1250,11 +1238,11 @@ public class GettingStartedPage extends AbstractJBossCentralPage {
 					
 					//TEMPORARY HACK FOR JBIDE-10053 (Java EE6 archetypes in the project section)
 					//Should be removed once these archetype tutorials are changed to use wizards as per JBIDE-10264  
-					RefreshTutorialsJob job = RefreshTutorialsJob.INSTANCE;
-					List<ProjectExample> wizardProjects = job.getWizardProjects();
-					if (wizardProjects != null){
-						updateNewProjects(wizardProjects);						
-					}
+//					RefreshTutorialsJob job = RefreshTutorialsJob.INSTANCE;
+//					List<ProjectExample> wizardProjects = job.getWizardProjects();
+//					if (wizardProjects != null){
+//						updateNewProjects(wizardProjects);						
+//					}
 				}
 			});
 			

@@ -51,6 +51,8 @@ import org.eclipse.m2e.core.project.ProjectImportConfiguration;
 import org.eclipse.m2e.core.ui.internal.Messages;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.ModifyEvent;
+import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
@@ -66,6 +68,7 @@ import org.jboss.tools.project.examples.ProjectExamplesActivator;
 import org.jboss.tools.project.examples.model.ArchetypeModel;
 import org.jboss.tools.project.examples.model.ProjectExample;
 import org.jboss.tools.project.examples.wizard.IProjectExamplesWizardPage;
+import org.jboss.tools.project.examples.wizard.WizardContext;
 
 /**
  * 
@@ -81,6 +84,7 @@ public class ArchetypeExamplesWizardPage extends
 	private ProjectExample projectExample;
 	private boolean initialized = false;
 	private Map<String, Object> propertiesMap = new HashMap<String, Object>();
+	private WizardContext context;
 
 	public ArchetypeExamplesWizardPage() {
 		super(new ProjectImportConfiguration());
@@ -96,6 +100,24 @@ public class ArchetypeExamplesWizardPage extends
 	@Override
 	public void createControl(Composite parent) {
 		super.createControl(parent);
+		packageCombo.addModifyListener(new ModifyListener() {
+			@Override
+			public void modifyText(ModifyEvent e) {
+				if (isCurrentPage()) {
+					context.setProperty(MavenProjectConstants.PACKAGE, packageCombo.getText());
+				}
+			}
+		});
+		artifactIdCombo.addModifyListener(new ModifyListener() {
+			@Override
+			public void modifyText(ModifyEvent e) {
+				if (isCurrentPage()) {
+					context.setProperty(MavenProjectConstants.PROJECT_NAME, artifactIdCombo.getText());
+				}
+				validate();
+			}
+		});
+		
 		if (projectExample != null && !initialized) {
 			initialize();
 		}
@@ -105,8 +127,6 @@ public class ArchetypeExamplesWizardPage extends
 	protected void initialize() {
 		Archetype archetype = new Archetype();
 		ArchetypeModel archetypeModel = projectDescription.getArchetypeModel();
-
-		final String version = archetypeModel.getVersion();
 
 		archetype.setGroupId(archetypeModel.getArchetypeGroupId());
 		archetype.setArtifactId(archetypeModel.getArchetypeArtifactId());
@@ -284,9 +304,10 @@ public class ArchetypeExamplesWizardPage extends
 	      }
 		}
 	}
-
+	
+	
 	public void setArtifactId(String projectName) {
-		if (artifactIdCombo != null) {
+		if (artifactIdCombo != null && !artifactIdCombo.getText().equals(projectName)) {
 			artifactIdCombo.setText(projectName);
 		}
 	}
@@ -296,8 +317,10 @@ public class ArchetypeExamplesWizardPage extends
 			if (!packageCombo.getText().equals(packageName)){ 
 				packageCombo.setText(packageName);
 			}
-			if (!groupIdCombo.getText().equals(packageName)){
-				groupIdCombo.setText(packageName);
+			if (!isCurrentPage()) {
+				if (!groupIdCombo.getText().equals(packageName)){
+					groupIdCombo.setText(packageName);
+				}
 			}
 		}
 	}
@@ -484,6 +507,26 @@ public class ArchetypeExamplesWizardPage extends
 	@Override
 	public Map<String, Object> getPropertiesMap() {
 		return propertiesMap ;
+	}
+
+	@Override
+	public void onWizardContextChange(String key, Object value) {
+		if (MavenProjectConstants.PROJECT_NAME.equals(key)) {
+			String artifactId = value == null?"":value.toString();
+			setArtifactId(artifactId);
+		} else if (MavenProjectConstants.PACKAGE.equals(key)){
+			String packageName = value == null?"":value.toString();
+			setPackageName(packageName);
+		} else if (MavenProjectConstants.ENTERPRISE_TARGET.equals(key)) {
+			//Make sure it's a boolean :
+			Boolean enterprise = Boolean.parseBoolean(value.toString());
+			updateArchetypeProperty("enterprise", enterprise.toString());
+		}
+	}
+
+	@Override
+	public void setWizardContext(WizardContext context) {
+		this.context = context;
 	}
 
 }

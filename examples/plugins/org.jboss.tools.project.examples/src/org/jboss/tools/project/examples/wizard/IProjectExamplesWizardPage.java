@@ -5,7 +5,7 @@ import java.util.Map;
 import org.eclipse.jface.wizard.IWizardPage;
 import org.jboss.tools.project.examples.model.ProjectExample;
 
-public interface IProjectExamplesWizardPage extends IWizardPage {
+public interface IProjectExamplesWizardPage extends IWizardPage, IWizardContextChangeListener {
 
 	boolean finishPage();
 	
@@ -14,4 +14,6 @@ public interface IProjectExamplesWizardPage extends IWizardPage {
 	void setProjectExample(ProjectExample projectExample);
 
 	Map<String, Object> getPropertiesMap();
+	
+	void setWizardContext(WizardContext context);
 }

@@ -76,7 +76,13 @@ public class DefaultJBossCentralConfigurator implements
 		List<String> wizardIds = new ArrayList<String>();
 	    wizardIds.add("org.eclipse.jst.servlet.ui.project.facet.WebProjectWizard"); //$NON-NLS-1$
 	    wizardIds.add("org.jboss.ide.eclipse.as.openshift.express.ui.wizard.createNewApplicationWizard"); //$NON-NLS-1$
-		return wizardIds;
+	    wizardIds.add("org.jboss.tools.central.wizards.NewJavaeeWarProjectWizard"); //$NON-NLS-1$
+	    wizardIds.add("org.jboss.tools.central.wizards.NewJavaeeEarProjectWizard"); //$NON-NLS-1$
+	    wizardIds.add("org.jboss.tools.central.wizards.NewHtml5ProjectWizard"); //$NON-NLS-1$
+	    wizardIds.add("org.jboss.tools.central.wizards.NewRichfacesProjectWizard"); //$NON-NLS-1$
+	    wizardIds.add("org.jboss.tools.central.wizards.NewSpringMvcProjectWizard"); //$NON-NLS-1$
+	    wizardIds.add("org.jboss.tools.central.wizards.NewGwtProjectWizard"); //$NON-NLS-1$
+	    return wizardIds;
 	}
 
 	@Override

@@ -21,10 +21,10 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.jboss.tools.central.JBossCentralActivator;
 import org.jboss.tools.project.examples.ProjectExamplesActivator;
-import org.jboss.tools.project.examples.model.ProjectExampleCategory;
 import org.jboss.tools.project.examples.model.ProjectExample;
-import org.jboss.tools.project.examples.model.ProjectFix;
+import org.jboss.tools.project.examples.model.ProjectExampleCategory;
 import org.jboss.tools.project.examples.model.ProjectExampleUtil;
+import org.jboss.tools.project.examples.model.ProjectFix;
 
 /**
  * 

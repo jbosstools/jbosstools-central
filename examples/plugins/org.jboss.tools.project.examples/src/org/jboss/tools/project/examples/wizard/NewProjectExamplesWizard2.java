@@ -49,6 +49,8 @@ public class NewProjectExamplesWizard2 extends Wizard implements INewWizard {
 	List<IProjectExamplesWizardPage> contributedPages = new LinkedList<IProjectExamplesWizardPage>();
 	private ProjectExample projectExample;
 
+	private WizardContext wizardContext = new WizardContext();
+	
 	private boolean isCentral = false;
 	//private QuickFixPage quickFixPage;
 
@@ -214,7 +216,7 @@ public class NewProjectExamplesWizard2 extends Wizard implements INewWizard {
 		if (projectExample != null) {
 			return projectExample;
 		}
-		return mainPage.getSelectedProject();
+		return (mainPage == null)?null:mainPage.getSelectedProject();
 	}
 
 //	public IWizardPage getReadyPage() {
@@ -259,5 +261,14 @@ public class NewProjectExamplesWizard2 extends Wizard implements INewWizard {
 	public ProjectExample getProjectExample() {
 		return projectExample;
 	}
-	
+
+	@Override
+	public void addPage(IWizardPage page) {
+		if (page instanceof IProjectExamplesWizardPage) {
+			IProjectExamplesWizardPage ewp = (IProjectExamplesWizardPage)page;
+			ewp.setWizardContext(wizardContext);
+			wizardContext.addListener(ewp);
+		}
+		super.addPage(page);
+	}
 }

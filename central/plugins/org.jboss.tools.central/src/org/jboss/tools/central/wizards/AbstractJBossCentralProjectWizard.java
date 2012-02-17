@@ -13,6 +13,11 @@ package org.jboss.tools.central.wizards;
 import java.util.List;
 
 import org.eclipse.core.runtime.Assert;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.jface.dialogs.ProgressMonitorDialog;
+import org.eclipse.jface.operation.IRunnableWithProgress;
+import org.jboss.tools.central.JBossCentralActivator;
 import org.jboss.tools.central.jobs.RefreshTutorialsJob;
 import org.jboss.tools.project.examples.model.ProjectExample;
 import org.jboss.tools.project.examples.wizard.NewProjectExamplesWizard2;
@@ -34,10 +39,18 @@ public abstract class AbstractJBossCentralProjectWizard extends NewProjectExampl
 		ProjectExample example = null;
 		RefreshTutorialsJob refreshTutorialsJob = RefreshTutorialsJob.INSTANCE;
 		List<ProjectExample> wizardProjects = refreshTutorialsJob.getWizardProjects();
+		
 		if (wizardProjects == null || wizardProjects.isEmpty()) {
-			//FIXME needs to execute refreshTutorialsJob and wait, gracefully
-			//wizardProjects = refreshTutorialsJob.getWizardProjects();
-		}
+			RunnableLookup lookup = new RunnableLookup();
+			try {
+				new ProgressMonitorDialog(getShell()).run(true, true, lookup);
+			} catch (Exception e) {
+				JBossCentralActivator.log(e);
+			}
+			wizardProjects = refreshTutorialsJob.getWizardProjects();
+		}		
+		
+		
 		if (wizardProjects != null) {
 			for (ProjectExample expl : wizardProjects) {
 				if (matches(expl)) {
@@ -61,33 +74,29 @@ public abstract class AbstractJBossCentralProjectWizard extends NewProjectExampl
 	@Override
 	public void addPages() {
 		if (getProjectExample() == null) {
-			//TODO add error page
+			//MessageDialog.openError(getShell(), "Wizard Error", "Wizard metadata could not be loaded");
+			addPage(new ErrorPage("Failed to load Wizard", "Wizard metadata could not be loaded"));
 		} else {
 			super.addPages();
 		}
 	}
 	
-	/*
-		RunnableLookup lookup = new RunnableLookup(exampleName);
-		try {
-			new ProgressMonitorDialog(getShell()).run(true, true, lookup);
-		} catch (Exception e) {
-			JBossCentralActivator.log(e);
-		}
-
 	class RunnableLookup implements IRunnableWithProgress {
 		
-		ProjectExample example;
-
 		public void run(IProgressMonitor monitor) {
-			List<ProjectExampleCategory> categories = ProjectExampleUtil.getProjects(monitor);
-			for (ProjectExample expl : ProjectExampleUtil.getProjectsByTags(categories, "wizard")) {
-				if (matches(expl)) {
-					example = expl;
-					break;
+			monitor.setTaskName("Refreshing project examples");
+			RefreshTutorialsJob refreshTutorialsJob = RefreshTutorialsJob.INSTANCE;	
+			int jobState = refreshTutorialsJob.getState();
+			try {
+				if (jobState == Job.NONE) {
+					refreshTutorialsJob.schedule();
 				}
+				refreshTutorialsJob.join();
+			} catch (Exception e) {
+				e.printStackTrace();
 			}
 		}
 	}
-	 */
+	
+	
 }
