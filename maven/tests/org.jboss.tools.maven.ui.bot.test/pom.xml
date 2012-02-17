@@ -136,7 +136,7 @@
 						</dependency>
 						<dependency>
 							<type>p2-installable-unit</type>
-							<artifactId>org.jboss.tools.maven.project.profiles.feature.feature.group</artifactId>
+							<artifactId>org.jboss.tools.maven.profiles.feature.feature.group</artifactId>
 							<version>0.0.0</version>
 						</dependency>
 					</dependencies>
