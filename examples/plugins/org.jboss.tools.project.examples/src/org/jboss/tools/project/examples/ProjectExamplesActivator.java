@@ -201,6 +201,8 @@ public class ProjectExamplesActivator extends AbstractUIPlugin {
 
 	private static final String VERSION = "version"; //$NON-NLS-1$
 	private static final String URL = "url"; //$NON-NLS-1$
+
+	private static final String DISCLAIMER = "disclaimer"; //$NON-NLS-1$
 	
 	private Map<String, DownloadRuntime> downloadRuntimes;
 	
@@ -1015,7 +1017,11 @@ public class ProjectExamplesActivator extends AbstractUIPlugin {
 					String id = configurationElement.getAttribute(ID);
 					String version = configurationElement.getAttribute(VERSION);
 					String url = configurationElement.getAttribute(URL);
+					String disclaimer = configurationElement.getAttribute(DISCLAIMER);
 					DownloadRuntime downloadRuntime = new DownloadRuntime(id, name, version, url);
+					if (Boolean.FALSE.toString().equals(disclaimer)) {
+						downloadRuntime.setDisclaimer(false);
+					}
 					downloadRuntimes.put(id, downloadRuntime);
 				}
 			}

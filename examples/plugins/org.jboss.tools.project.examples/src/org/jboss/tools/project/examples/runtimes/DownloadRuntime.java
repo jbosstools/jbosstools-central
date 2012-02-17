@@ -20,6 +20,7 @@ public class DownloadRuntime {
 	private String id;
 	private String version;
 	private String url;
+	private boolean disclaimer = true;
 	
 	public DownloadRuntime(String id, String name, String version, String url) {
 		super();
@@ -83,6 +84,14 @@ public class DownloadRuntime {
 	public String toString() {
 		return "DownloadRuntime [name=" + name + ", id=" + id + ", version="
 				+ version + ", url=" + url + "]";
+	}
+
+	public boolean isDisclaimer() {
+		return disclaimer;
+	}
+
+	public void setDisclaimer(boolean disclaimer) {
+		this.disclaimer = disclaimer;
 	}
 
 }

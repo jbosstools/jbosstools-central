@@ -84,6 +84,13 @@
                </documentation>
             </annotation>
          </attribute>
+         <attribute name="disclaimer" type="boolean">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+            </annotation>
+         </attribute>
       </complexType>
    </element>
 

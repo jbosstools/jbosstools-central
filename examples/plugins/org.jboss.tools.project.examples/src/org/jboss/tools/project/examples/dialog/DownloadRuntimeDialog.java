@@ -44,9 +44,13 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.DirectoryDialog;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Link;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
+import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.browser.IWorkbenchBrowserSupport;
 import org.jboss.tools.project.examples.ProjectExamplesActivator;
 import org.jboss.tools.project.examples.filetransfer.ECFExamplesTransport;
 import org.jboss.tools.project.examples.runtimes.DownloadRuntime;
@@ -96,7 +100,7 @@ public class DownloadRuntimeDialog extends Dialog {
 		Composite contents = new Composite(area, SWT.NONE);
 		GridData gd = new GridData(GridData.FILL_BOTH);
 		//gd.heightHint = 200;
-		gd.widthHint = 600;
+		gd.widthHint = 700;
 		contents.setLayoutData(gd);
 		contents.setLayout(new GridLayout(1, false));
 		applyDialogFont(contents);
@@ -107,7 +111,63 @@ public class DownloadRuntimeDialog extends Dialog {
 		pathComposite.setLayoutData(gd);
 		pathComposite.setLayout(new GridLayout(3, false));
 		
-		
+		if (downloadRuntime.isDisclaimer()) {
+			Group disclaimerComposite = new Group(pathComposite, SWT.NONE);
+			gd = new GridData(SWT.FILL, SWT.FILL, true, false);
+			gd.horizontalSpan = 3;
+			disclaimerComposite.setLayoutData(gd);
+			disclaimerComposite.setLayout(new GridLayout(1, false));
+			disclaimerComposite.setText("Warning");
+			new Label(disclaimerComposite, SWT.NONE).setText("This is a community project and, as such is not supported with an SLA.");
+			Link link = new Link(disclaimerComposite, SWT.NONE);
+			link.setText("Any questions or problems can be raised through the <a>JBoss AS 7 User Forum</a> where the community will provide their best efforts to assist.");
+			Link link1 = new Link(disclaimerComposite, SWT.NONE);
+			link1.setText("This project is included in the JBoss Enterprise Application Platform for which a <a>support subscription</a> is available.");
+					
+			link.addSelectionListener( new SelectionAdapter( ) {
+
+				public void widgetSelected( SelectionEvent e )
+				{
+					String text = e.text;
+					if ("JBoss AS 7 User Forum".equals(text)) {
+						IWorkbenchBrowserSupport support = PlatformUI.getWorkbench()
+								.getBrowserSupport();
+						try {
+							URL url = new URL("http://community.jboss.org/en/jbossas/as7_users?view=discussions"); //$NON-NLS-1$
+							support.getExternalBrowser().openURL(url);
+						} catch (Exception e1) {
+							ProjectExamplesActivator.log(e1);
+						}
+					}
+					
+				}
+			} );
+			link1.addSelectionListener( new SelectionAdapter( ) {
+
+				public void widgetSelected( SelectionEvent e )
+				{
+					String text = e.text;
+					if ("support subscription".equals(text)) {
+						IWorkbenchBrowserSupport support = PlatformUI.getWorkbench()
+								.getBrowserSupport();
+						try {
+							URL url = new URL("http://www.redhat.com/jboss/"); //$NON-NLS-1$
+							support.getExternalBrowser().openURL(url);
+						} catch (Exception e1) {
+							ProjectExamplesActivator.log(e1);
+						}
+					}
+					
+				}
+			} );
+		}
+		Label urlLabel = new Label(pathComposite, SWT.NONE);
+		urlLabel.setText("URL:");
+		Text urlText = new Text(pathComposite, SWT.READ_ONLY|SWT.BORDER);
+		gd = new GridData(SWT.FILL, SWT.FILL, true, false);
+		gd.horizontalSpan=2;
+		urlText.setLayoutData(gd);
+		urlText.setText(downloadRuntime.getUrl());
 		Label pathLabel = new Label(pathComposite, SWT.NONE);
 		pathLabel.setText("Install folder:");
 		
@@ -185,6 +245,9 @@ public class DownloadRuntimeDialog extends Dialog {
 		});
 		
 		deleteOnExit = new Button(pathComposite, SWT.CHECK);
+		gd = new GridData(SWT.FILL, SWT.FILL, true, false);
+		gd.horizontalSpan=3;
+		deleteOnExit.setLayoutData(gd);
 		deleteOnExit.setText("Delete archive after installing");
 		
 		delete = dialogSettings.get(DELETE_ON_EXIT);
