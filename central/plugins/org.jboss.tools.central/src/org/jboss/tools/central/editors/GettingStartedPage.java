@@ -567,7 +567,20 @@ public class GettingStartedPage extends AbstractJBossCentralPage {
 				}
 			}
 		}
+		
 		projectsSection.setClient(projectsComposite);
+	}
+
+	private void addProjectExamples(FormToolkit toolkit,
+			Composite projectsComposite) {
+		List<ProjectExample> wizards = RefreshTutorialsJob.INSTANCE.getWizardProjects();
+		Collections.sort(wizards);
+		for (final ProjectExample wizard :  wizards) {
+			FormText text = toolkit.createFormText(projectsComposite, true);
+			configureTutorialText(text, wizard);
+			
+		}
+		
 	}
 
 	private void createProjectLink(FormToolkit toolkit, Composite composite,
@@ -1234,15 +1247,8 @@ public class GettingStartedPage extends AbstractJBossCentralPage {
 						return;
 					}
 					setBusyIndicator(tutorialsLoadingComposite, false);
+					addProjectExamples(toolkit, projectsComposite);
 					refreshTutorials();
-					
-					//TEMPORARY HACK FOR JBIDE-10053 (Java EE6 archetypes in the project section)
-					//Should be removed once these archetype tutorials are changed to use wizards as per JBIDE-10264  
-//					RefreshTutorialsJob job = RefreshTutorialsJob.INSTANCE;
-//					List<ProjectExample> wizardProjects = job.getWizardProjects();
-//					if (wizardProjects != null){
-//						updateNewProjects(wizardProjects);						
-//					}
 				}
 			});
 			
