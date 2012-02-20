@@ -266,6 +266,27 @@
       </connectorDescriptor>
       <connectorDescriptor
             categoryId="org.jboss.tools.central.discovery.testing"
+            description="Tool support for JSLint"
+            id="com.rockstarapps.workbench.branding.feature"
+            kind="task"
+            license="Free, ASL"
+            name="JSLint"
+            provider="Rockstarapps.com"
+            siteUrl="http://download.jboss.org/jbosstools/updates/indigo/extras/">
+            <iu id="com.rockstarapps.aws.feature"/>
+			<iu id="com.rockstarapps.html.core.feature"/>
+			<iu id="com.rockstarapps.jsLex"/>
+			<iu id="com.rockstarapps.jsLint"/>
+			<iu id="com.rockstarapps.workbench.branding.feature"/>
+         <icon
+               image32="images/jslint_32.png">
+         </icon>
+         <overview
+               url="http://www.jslint.com/">
+         </overview>
+      </connectorDescriptor>
+      <connectorDescriptor
+            categoryId="org.jboss.tools.central.discovery.testing"
             description="Tool support for PMD"
             id="net.sourceforge.pmd.eclipse"
             kind="task"
