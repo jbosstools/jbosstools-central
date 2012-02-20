@@ -345,6 +345,7 @@
          <icon
                image32="images/google_32.png">
          </icon>
+	<!-- TODO: https://issues.jboss.org/browse/JBIDE-10967 move this to Extras and point at that copy instead -->
          <overview
                url="http://code.google.com/p/google-plugin-for-eclipse/">
          </overview>
