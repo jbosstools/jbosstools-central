@@ -7,15 +7,19 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
 import org.jboss.tools.ui.bot.ext.SWTBotFactory;
 import org.jboss.tools.ui.bot.ext.SWTFormsBotExt;
 import org.jboss.tools.ui.bot.ext.SWTTestExt;
+import org.jboss.tools.ui.bot.ext.condition.BrowserIsLoaded;
+import org.jboss.tools.ui.bot.ext.condition.NonSystemJobRunsCondition;
+import org.jboss.tools.ui.bot.ext.condition.TaskDuration;
 import org.jboss.tools.ui.bot.ext.config.Annotations.Require;
 import org.jboss.tools.ui.bot.ext.config.Annotations.ServerType;
+import org.jboss.tools.ui.bot.ext.parts.SWTBotBrowserExt;
 import org.jboss.tools.ui.bot.ext.parts.SWTBotTwistie;
 import org.jboss.tools.ui.bot.ext.types.IDELabel;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-@Require(server=@org.jboss.tools.ui.bot.ext.config.Annotations.Server(type=ServerType.JbossAS))
+//@Require(server=@org.jboss.tools.ui.bot.ext.config.Annotations.Server(type=ServerType.JbossAS))
 public class CreateProjectsTest extends SWTTestExt{
 	
 	private static final String JBOSS_INSTALL_PATH = "/tmp/jbossAS";
@@ -31,7 +35,7 @@ public class CreateProjectsTest extends SWTTestExt{
 		deleteDirectory(new File(JBOSS_INSTALL_PATH));
 	}
 	
-	@Test
+	//@Test
 	public void createProjectsSectionTest(){
 		//waitForAWhile();
 		SWTFormsBotExt formsBot = SWTBotFactory.getFormsBot();
@@ -113,9 +117,8 @@ public class CreateProjectsTest extends SWTTestExt{
 		bot.activeShell().close();
 	}
 	
-	@Test
+	//@Test
 	public void projectExamplesSectionTest(){
-		//SWTBotSection section = bot.section("Project Examples");
 		SWTBotTwistie twistieBot = bot.twistieByLabel("JBoss Quickstarts");
 		if (!twistieBot.isExpanded()){
 			twistieBot.toggle();
@@ -123,27 +126,45 @@ public class CreateProjectsTest extends SWTTestExt{
 		SWTFormsBotExt formsBot = SWTBotFactory.getFormsBot();
 		formsBot.formTextWithText("Helloworld").click();
 		bot.clickButton("Start");
-		waitForAllMultipleTimes(3);
+		bot.waitWhile(new NonSystemJobRunsCondition(), TaskDuration.NORMAL.getTimeout());
 		formsBot.formTextWithText("Numberguess").click();
 		bot.clickButton("Start");
-		waitForAllMultipleTimes(3);
+		bot.waitWhile(new NonSystemJobRunsCondition(), TaskDuration.NORMAL.getTimeout());
 		log.info(bot.activeEditor().getTitle());
 		formsBot.formTextWithText("Login").click();
 		bot.clickButton("Start");
-		waitForAllMultipleTimes(3);
+		bot.waitWhile(new NonSystemJobRunsCondition(),TaskDuration.NORMAL.getTimeout());
 		formsBot.formTextWithText("Kitchensink").click();
 		bot.clickButton("Start");
-		waitForAllMultipleTimes(3);
+		bot.waitWhile(new NonSystemJobRunsCondition(), TaskDuration.NORMAL.getTimeout());
 	}
 	
-	/**
-	 * calls method waitForAll x times
-	 * @param value how many times waitForAll should be called
-	 */
-	private void waitForAllMultipleTimes(int value){
-		for (int i=0; i<value; i++){
-			util.waitForAll();
-		}
+	@Test
+	public void documentationSectionTest(){
+		/*bot.hyperlink("New and Noteworthy").click();
+		bot.waitUntil(new BrowserIsLoaded(bot.browserExt()), TaskDuration.LONG.getTimeout());
+		assertFalse("JBoss Central sould not be active editor right now", bot.activeEditor().getTitle().equals("JBoss Central"));
+		bot.activeEditor().close();
+		bot.hyperlink("User Forum").click();
+		bot.waitUntil(new BrowserIsLoaded(bot.browserExt()), TaskDuration.LONG.getTimeout());
+		assertFalse("JBoss Central sould not be active editor right now", bot.activeEditor().getTitle().equals("JBoss Central"));
+		bot.activeEditor().close();*/
+		testHyperlinkToBrowser("New and Noteworthy");
+		testHyperlinkToBrowser("User Forum");
+		testHyperlinkToBrowser("Reference");
+		testHyperlinkToBrowser("Developer Forum");
+		testHyperlinkToBrowser("FAQ");
+		testHyperlinkToBrowser("Wiki");
+		testHyperlinkToBrowser("Screencasts");
+		testHyperlinkToBrowser("Issue Tracker");
+		bot.sleep(TIME_10S);
+	}
+	
+	private void testHyperlinkToBrowser(String hyperlinkText){
+		bot.hyperlink(hyperlinkText).click();
+		bot.waitUntil(new BrowserIsLoaded(bot.browserExt()), TaskDuration.LONG.getTimeout());
+		assertFalse("JBoss Central sould not be active editor right now", bot.activeEditor().getTitle().equals("JBoss Central"));
+		bot.activeEditor().close();
 	}
 	
 	private void waitForAWhile(){
