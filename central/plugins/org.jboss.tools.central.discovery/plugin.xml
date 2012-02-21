@@ -331,21 +331,21 @@
  			<group id="extra" />
       </connectorCategory>
 
+      <!-- TODO: change URL to http://download.jboss.org/jbosstools/updates/indigo/ for/after Beta1 -->
       <connectorDescriptor
             categoryId="org.jboss.tools.central.discovery.web"
-            description="Google Plugin for Eclipse (GPE) + Google Web Toolkit 2.4.0 SDK (GWT)"
+            description="Google Plugin for Eclipse (GPE) + Google Web Toolkit SDK (GWT)"
             id="com.google.gwt.eclipse.sdkbundle.e37.feature"
             kind="task"
             license="EPL, Other"
             name="Google Plugin + Web Toolkit"
             provider="Google, Inc."
-            siteUrl="http://dl.google.com/eclipse/plugin/3.7/">
+            siteUrl="http://download.jboss.org/jbosstools/updates/requirements/gwt/2.5.0.v201201120043-rel-r37/">
             <iu id="com.google.gwt.eclipse.sdkbundle.e37.feature"/>
             <iu id="com.google.gdt.eclipse.suite.e37.feature"/>
          <icon
                image32="images/google_32.png">
          </icon>
-	<!-- TODO: https://issues.jboss.org/browse/JBIDE-10967 move this to Extras and point at that copy instead -->
          <overview
                url="http://code.google.com/p/google-plugin-for-eclipse/">
          </overview>
