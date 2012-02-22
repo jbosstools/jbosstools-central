@@ -19,7 +19,6 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.jdt.core.IClasspathEntry;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.JavaCore;
-import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jst.j2ee.componentcore.J2EEModuleVirtualComponent;
 import org.eclipse.wst.common.componentcore.ComponentCore;
 import org.eclipse.wst.common.componentcore.resources.IVirtualComponent;
@@ -140,8 +139,9 @@ public class ProjectUtil {
 		return relative.replace('\\', '/'); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 	
-	public static void removeWTPContainers(IDataModel m2FacetModel, IProject project) throws JavaModelException {
-		if (m2FacetModel != null && project != null && m2FacetModel.getBooleanProperty(IJBossMavenConstants.REMOVE_WTP_CLASSPATH_CONTAINERS)) {
+	public static void removeWTPContainers(IDataModel m2FacetModel, IProject project) throws CoreException {
+		if (m2FacetModel != null && project != null && project.hasNature(JavaCore.NATURE_ID) 
+		 && m2FacetModel.getBooleanProperty(IJBossMavenConstants.REMOVE_WTP_CLASSPATH_CONTAINERS) ) {
 		    IJavaProject javaProject = JavaCore.create(project);
 		    if(javaProject != null) {
 		      // remove classpatch container from JavaProject
