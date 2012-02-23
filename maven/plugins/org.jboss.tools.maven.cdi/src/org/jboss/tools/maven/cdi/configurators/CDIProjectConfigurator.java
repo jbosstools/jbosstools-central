@@ -24,7 +24,6 @@ import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.project.MavenProjectChangedEvent;
 import org.eclipse.m2e.core.project.configurator.AbstractProjectConfigurator;
 import org.eclipse.m2e.core.project.configurator.ProjectConfigurationRequest;
-import org.eclipse.osgi.util.NLS;
 import org.eclipse.wst.common.componentcore.ModuleCoreNature;
 import org.eclipse.wst.common.frameworks.datamodel.IDataModel;
 import org.eclipse.wst.common.project.facet.core.IFacetedProject;
@@ -34,7 +33,6 @@ import org.eclipse.wst.common.project.facet.core.ProjectFacetsManager;
 import org.jboss.tools.cdi.core.CDICoreNature;
 import org.jboss.tools.cdi.core.CDIUtil;
 import org.jboss.tools.maven.cdi.MavenCDIActivator;
-import org.jboss.tools.maven.cdi.Messages;
 import org.jboss.tools.maven.core.IJBossMavenConstants;
 import org.jboss.tools.maven.core.internal.project.facet.MavenFacetInstallDataModelProvider;
 import org.jboss.tools.maven.ui.Activator;
@@ -139,15 +137,8 @@ public class CDIProjectConfigurator extends AbstractProjectConfigurator {
 		if ((currentWebVersion != null && currentWebVersion.compareTo(dynamicWebVersion)> -1)
 				|| (currentEjbVersion != null && currentEjbVersion.compareTo(ejbVersion)> -1)) {
 			installCDIFacet(fproj, cdiVersion, monitor);
-		} else {
-			String name = "";
-			if (fproj.getProject() != null) {
-				name = fproj.getProject().getName();
-			}
-			MavenCDIActivator.log(NLS.bind(Messages.CDIProjectConfigurator_The_project_does_not_contain_required_facets, name));
 		}
 		installM2Facet(fproj, monitor);
-		
 	}
 
 
