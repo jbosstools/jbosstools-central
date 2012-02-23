@@ -262,8 +262,6 @@
 			<newWizardShortcut id="org.jboss.tools.central.wizards.NewRichfacesProjectWizard"/>
 			<newWizardShortcut id="org.jboss.tools.central.wizards.NewSpringMvcProjectWizard"/>
 			<newWizardShortcut id="org.jboss.tools.central.wizards.NewGwtProjectWizard"/>
-			<!-- Hibernate Run Code Generation Toolbar -->
-         	<actionSet id="org.hibernate.eclipse.launch.actionset"/>
 		</perspectiveExtension>
    </extension>
    
