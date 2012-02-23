@@ -16,10 +16,14 @@ import java.util.Set;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.jpt.common.core.resource.ResourceLocator;
 import org.eclipse.jpt.jpa.core.JpaFacet;
 import org.eclipse.jpt.jpa.core.JptJpaCorePlugin;
 import org.eclipse.jpt.jpa.core.internal.facet.JpaFacetDataModelProperties;
@@ -69,7 +73,7 @@ public class JpaProjectConfigurator extends AbstractProjectConfigurator {
 			return;
 		}
 
-		IFile persistenceXml = JptUtils.getPersistenceXml(project);
+		IFile persistenceXml = getPersistenceXml(project);
 		if (persistenceXml == null || !persistenceXml.exists()) {
 			//No persistence.xml => not a JPA project 
 			return;
@@ -82,6 +86,16 @@ public class JpaProjectConfigurator extends AbstractProjectConfigurator {
 			
 			configureFacets(monitor, project, facetedProject, persistenceXml);
 		} 
+	}
+
+	private IFile getPersistenceXml(IProject project) {
+		ResourceLocator resourceLocator = new MavenResourceLocator();
+		IPath path = resourceLocator.getResourcePath(project, new Path("META-INF/persistence.xml"));
+		IFile persistenceXml = null;
+		if (path != null) {
+			persistenceXml = ResourcesPlugin.getWorkspace().getRoot().getFile(path);		
+		}
+		return persistenceXml;
 	}
 
 	private void configureFacets(IProgressMonitor monitor, IProject project,
