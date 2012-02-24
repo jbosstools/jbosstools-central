@@ -908,28 +908,28 @@ public class MavenSeamActivator extends AbstractUIPlugin {
 				MavenSeamActivator.log(NLS.bind(Messages.MavenSeamActivator_The_folder_does_not_exist, seamHomePath));
 			}
 			
-			List<String> modules = model.getModules();
 			
+			Dependency dependency = new Dependency();
+			dependency.setGroupId(model.getGroupId());
+			dependency.setArtifactId(webProjectName);
+			dependency.setType("war"); //$NON-NLS-1$
+			dependency.setVersion(projectVersion);
+			model.getDependencyManagement().getDependencies().add(0, dependency);
+
+			List<String> modules = model.getModules();
 			modules.add("../" + artifactId); //$NON-NLS-1$
-			if (!SeamFacetAbstractInstallDelegate
-					.isWarConfiguration(seamFacetModel)) {
+			if (!SeamFacetAbstractInstallDelegate.isWarConfiguration(seamFacetModel)) {
 				modules.add("../" + ejbArtifactId); //$NON-NLS-1$
 				modules.add("../" + earArtifactId); //$NON-NLS-1$
 			
-				Dependency dependency = new Dependency();
+				dependency = new Dependency();
 				dependency.setGroupId(model.getGroupId());
 				dependency.setArtifactId(ejbProjectName);
 				dependency.setType("ejb"); //$NON-NLS-1$
 				dependency.setVersion(projectVersion);
 				model.getDependencyManagement().getDependencies().add(0, dependency);
-				
-				dependency = new Dependency();
-				dependency.setGroupId(model.getGroupId());
-				dependency.setArtifactId(webProjectName);
-				dependency.setType("war"); //$NON-NLS-1$
-				dependency.setVersion(projectVersion);
-				model.getDependencyManagement().getDependencies().add(1, dependency);
 			}
+
 			webProjectName = seamFacetModel.getStringProperty(IFacetDataModelProperties.FACET_PROJECT_NAME);
 			
 			IProject seamWebProject = ResourcesPlugin.getWorkspace().getRoot().getProject(webProjectName);
@@ -1119,7 +1119,7 @@ public class MavenSeamActivator extends AbstractUIPlugin {
 			if (sources.size() > 0) {
 				
 				Plugin plugin = getPlugin(build, ORG_CODEHAUS_MOJO , "build-helper-maven-plugin"); //$NON-NLS-1$
-				plugin.setVersion("1.5"); //$NON-NLS-1$
+				plugin.setVersion("1.7"); //$NON-NLS-1$
 				plugin.getExecutions().clear();
 				
 				PluginExecution execution = PomFactory.eINSTANCE.createPluginExecution();
