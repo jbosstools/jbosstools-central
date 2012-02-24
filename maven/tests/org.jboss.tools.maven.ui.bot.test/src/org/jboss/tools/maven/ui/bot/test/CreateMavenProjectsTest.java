@@ -58,17 +58,6 @@ public class CreateMavenProjectsTest extends AbstractMavenSWTBotTest{
 		assertTrue(Utils.isMavenProject(projectName));
 		buildProject(projectName,"5 Maven build...", "jar","-0.0.1-SNAPSHOT");
 	}
-
-	
-	@Test
-	public void createSimpleJarProjectArchetype() throws Exception {
-		String projectName = "ArchetypeQuickstart";
-		createSimpleMavenProjectArchetype(projectName,"maven-archetype-quickstart", "Nexus Indexer");
-		IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject(projectName);
-		assertNoErrors(project);
-		assertTrue(Utils.isMavenProject(projectName));
-		buildProject(projectName, "6 Maven build...", "jar","-0.0.1-SNAPSHOT");
-	}
 	
 	
 	
@@ -143,6 +132,16 @@ public class CreateMavenProjectsTest extends AbstractMavenSWTBotTest{
 		assertTrue(Utils.isMavenProject(projectName));
 		buildProject(projectName, "6 Maven build...", "war",""); //version is 1.0.0
 	}
+	
+	@Test
+	public void createSimpleJarProjectArchetype() throws Exception {
+		String projectName = "ArchetypeQuickstart";
+		createSimpleMavenProjectArchetype(projectName,"maven-archetype-quickstart", "Nexus Indexer");
+		IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject(projectName);
+		assertNoErrors(project);
+		assertTrue(Utils.isMavenProject(projectName));
+		buildProject(projectName, "6 Maven build...", "jar","-0.0.1-SNAPSHOT");
+	}
 
 	private void createSimpleMavenProjectArchetype(String projectName,String projectType, String catalog) throws InterruptedException,CoreException {
 		SWTBotExt botExt = new SWTBotExt();
@@ -155,7 +154,8 @@ public class CreateMavenProjectsTest extends AbstractMavenSWTBotTest{
 		shell.button("Next >").click();
 		Thread.sleep(2000);
 		shell.comboBox().setSelection(catalog);
-		Thread.sleep(2000);
+		SWTUtilExt botUtil = new SWTUtilExt(botExt);
+		botUtil.waitForAll();
 		int index = botExt.table(0).indexOf(projectType, "Artifact Id");
 		if (index == -1) {
 			fail(projectType + " not found");

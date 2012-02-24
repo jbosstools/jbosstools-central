@@ -11,6 +11,7 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 import org.jboss.tools.ui.bot.ext.SWTBotExt;
 import org.jboss.tools.ui.bot.ext.SWTUtilExt;
 import org.jboss.tools.ui.bot.ext.config.Annotations.Require;
+import org.jboss.tools.ui.bot.ext.helper.ContextMenuHelper;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -40,7 +41,17 @@ public class MaterializeLibraryTest extends AbstractMavenSWTBotTest{
 		while(!botUtil.isShellActive("New Project Example")){
 			Thread.sleep(500);
 		}
-		botExt.tree().expandNode("Java EE 6 Quickstarts").select("Spring MVC Project");
+		botExt.tree().expandNode("JBoss Maven Archetypes").select("Spring MVC Project");
+		botExt.button("Next >").click();
+		botExt.button("Next >").click();
+		botExt.button("Next >").click();
+		botExt.comboBoxWithLabel("Group Id:").setText(projectName);
+		botExt.comboBoxWithLabel("Artifact Id:").setText(projectName);
+		botExt.button("Finish").click();
+		
+		
+		
+		/* old wizard
 		botExt.button("Finish").click();
 		while(!botUtil.isShellActive("New JBoss Project")){
 			Thread.sleep(500);
@@ -49,7 +60,10 @@ public class MaterializeLibraryTest extends AbstractMavenSWTBotTest{
 		botExt.comboBoxWithLabel("Package").setText(projectName);
 		botExt.button("Next >").click();
 		botExt.button("Finish").click();
-		botUtil.waitForAll(Long.MAX_VALUE);
+		*/
+		botUtil.waitForNonIgnoredJobs();
+		Thread.sleep(5000);
+		botExt.activeShell().bot().button("Finish").click();
 		final SWTBotView packageExplorer = bot.viewByTitle("Package Explorer");
 		IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject(projectName);
 		SWTBotTree tree = packageExplorer.bot().tree();
