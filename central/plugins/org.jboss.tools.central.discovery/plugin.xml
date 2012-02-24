@@ -133,6 +133,40 @@
                url="http://www.jboss.org/tools">
          </overview>
       </connectorDescriptor>
+      <connectorDescriptor
+            categoryId="org.jboss.tools.central.discovery.maven"
+            groupId="org.jboss.tools.central.discovery.maven.configurators"
+            description="JBoss Maven JPA Configurator"
+            id="org.jboss.tools.maven.jpa.feature"
+            kind="task"
+            license="Free, EPL"
+            name="JBoss Maven JPA Configurator"
+            provider="JBoss by Red Hat"
+            siteUrl="http://download.jboss.org/jbosstools/updates/development/indigo">
+         <icon
+               image32="images/jbosstools_icon32.png">
+         </icon>
+         <overview
+               url="http://www.jboss.org/tools">
+         </overview>
+      </connectorDescriptor>
+      <connectorDescriptor
+            categoryId="org.jboss.tools.central.discovery.maven"
+            groupId="org.jboss.tools.central.discovery.maven.configurators"
+            description="Maven Profile Management UI"
+            id="org.jboss.tools.maven.profiles.feature"
+            kind="task"
+            license="Free, EPL"
+            name="Maven Profile Management UI"
+            provider="JBoss by Red Hat"
+            siteUrl="http://download.jboss.org/jbosstools/updates/development/indigo">
+         <icon
+               image32="images/jbosstools_icon32.png">
+         </icon>
+         <overview
+               url="http://www.jboss.org/tools">
+         </overview>
+      </connectorDescriptor>
       
       <connectorDescriptor
             categoryId="org.jboss.tools.central.discovery.maven"
