@@ -9,14 +9,15 @@
 	</parent>
 	<groupId>org.jboss.tools.examples.plugins</groupId>
 	<artifactId>org.jboss.tools.project.examples</artifactId>
-	
-		<properties>
+
+	<properties>
 		<!-- TODO: for GA, change this from /development/indigo/ to /stable/indigo/ -->
 		<jboss.discovery.directory.url>http://download.jboss.org/jbosstools/updates/development/indigo/jbosstools-directory.xml</jboss.discovery.directory.url>
 	</properties>
 
 	<profiles>
-		<!--  _stable_branch jobs could use this profile but the above default (last stable milestone) is probably better -->
+		<!-- _stable_branch jobs could use this profile but the above default (last 
+			stable milestone) is probably better -->
 		<profile>
 			<id>3.3.indigo</id>
 			<activation>
@@ -40,59 +41,32 @@
 	</profiles>
 	<packaging>eclipse-plugin</packaging>
 	<build>
+		<resources>
+			<resource>
+				<directory>src</directory>
+				<includes>
+					<include>**/discovery.properties</include>
+				</includes>
+				<filtering>true</filtering>
+			</resource>
+		</resources>
 		<plugins>
-			<!-- This will copy from the source folder to the template folder. Use only if no filtering/replacement has already been done in source folder 
 			<plugin>
 				<artifactId>maven-resources-plugin</artifactId>
 				<version>2.5</version>
 				<executions>
 					<execution>
-						<id>copy-resources</id>
-						<phase>validate</phase>
+						<id>resource-filtering</id>
+						<!-- Need to execute resource filtering AFTER tycho-compiler-plugin 
+							is executed -->
+						<phase>process-classes</phase>
 						<goals>
-							<goal>copy-resources</goal>
+							<goal>resources</goal>
 						</goals>
-						<configuration>
-							<outputDirectory>${basedir}/template/</outputDirectory>
-							<resources>
-								<resource>
-									<directory>src/org/jboss/tools/project/examples/configurators/</directory>
-									<includes>
-										<include>**/DefaultJBossCentralConfigurator.java</include>
-									</includes>
-									<filtering>true</filtering>
-								</resource>
-							</resources>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin> -->
-			<plugin>
-				<artifactId>maven-resources-plugin</artifactId>
-				<version>2.5</version>
-				<executions>
-					<execution>
-						<id>copy-resources</id>
-						<phase>validate</phase>
-						<goals>
-							<goal>copy-resources</goal>
-						</goals>
-						<configuration>
-							<outputDirectory>${basedir}/src/org/jboss/tools/project/examples/configurators/</outputDirectory>
-							<resources>
-								<resource>
-									<directory>template/</directory>
-									<includes>
-										<include>**/DefaultJBossCentralConfigurator.java</include>
-									</includes>
-									<filtering>true</filtering>
-								</resource>
-							</resources>
-						</configuration>
 					</execution>
 				</executions>
 			</plugin>
 		</plugins>
 	</build>
-	
+
 </project>

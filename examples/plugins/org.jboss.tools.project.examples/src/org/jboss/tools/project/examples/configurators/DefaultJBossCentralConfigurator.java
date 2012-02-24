@@ -13,6 +13,7 @@ package org.jboss.tools.project.examples.configurators;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.ResourceBundle;
 
 import org.eclipse.swt.graphics.Image;
 import org.jboss.tools.project.examples.ProjectExamplesActivator;
@@ -44,7 +45,18 @@ public class DefaultJBossCentralConfigurator implements
 	private static final String JBOSS_DIRECTORY_URL_DEFAULT = "http://download.jboss.org/jbosstools/updates/development/indigo/jbosstools-directory.xml"; //$NON-NLS-1$
 	
 	// see pom.xml for actual value -- this is passed it at build-time via Maven
-	private static final String JBOSS_DIRECTORY_URL = "http://download.jboss.org/jbosstools/updates/development/indigo/jbosstools-directory.xml";   //$NON-NLS-1$
+	private static final String JBOSS_DIRECTORY_URL;
+	
+	static {
+		ResourceBundle rb = ResourceBundle.getBundle("org.jboss.tools.project.examples.configurators.discovery"); //$NON-NLS-1$
+		String url = rb.getString("discovery.url").trim(); //$NON-NLS-1$
+		if ("".equals(url) || "${jboss.discovery.directory.url}".equals(url)){  //$NON-NLS-1$//$NON-NLS-2$
+			//was not filtered, fallback to default value
+			JBOSS_DIRECTORY_URL = JBOSS_DIRECTORY_URL_DEFAULT;
+		} else {
+			JBOSS_DIRECTORY_URL = url;
+		}
+	}
 
 	private static final String TWITTER_LINK ="http://twitter.com/#!/jbosstools"; //$NON-NLS-1$
 	
@@ -66,8 +78,8 @@ public class DefaultJBossCentralConfigurator implements
 		// use commandline override -Djboss.discovery.directory.url
 		String directory = System.getProperty(ProjectExamplesActivator.JBOSS_DISCOVERY_DIRECTORY, null);
 		if (directory == null) {
-			// else use Maven-generated value; fall back to default
-			return JBOSS_DIRECTORY_URL.equals("${" + "jboss.discovery.directory.url" + "}") ? JBOSS_DIRECTORY_URL_DEFAULT : JBOSS_DIRECTORY_URL; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+			// else use Maven-generated value (or fall back to default)
+			return JBOSS_DIRECTORY_URL;
 		}
 		return directory;
 	}
