@@ -11,6 +11,7 @@
 package org.jboss.tools.project.examples.configurators;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.eclipse.swt.graphics.Image;
@@ -24,6 +25,21 @@ import org.jboss.tools.project.examples.ProjectExamplesActivator;
 public class DefaultJBossCentralConfigurator implements
 		IJBossCentralConfigurator {
 
+	private static final List<String> WIZARD_IDS;
+	
+	static {
+		List<String> wizardIds = new ArrayList<String>();
+	    wizardIds.add("org.eclipse.jst.servlet.ui.project.facet.WebProjectWizard"); //$NON-NLS-1$
+	    wizardIds.add("org.jboss.ide.eclipse.as.openshift.express.ui.wizard.createNewApplicationWizard"); //$NON-NLS-1$
+	    wizardIds.add("org.jboss.tools.central.wizards.NewJavaeeWarProjectWizard"); //$NON-NLS-1$
+	    wizardIds.add("org.jboss.tools.central.wizards.NewJavaeeEarProjectWizard"); //$NON-NLS-1$
+	    wizardIds.add("org.jboss.tools.central.wizards.NewHtml5ProjectWizard"); //$NON-NLS-1$
+	    wizardIds.add("org.jboss.tools.central.wizards.NewRichfacesProjectWizard"); //$NON-NLS-1$
+	    wizardIds.add("org.jboss.tools.central.wizards.NewSpringMvcProjectWizard"); //$NON-NLS-1$
+	    wizardIds.add("org.jboss.tools.central.wizards.NewGwtProjectWizard"); //$NON-NLS-1$
+	    WIZARD_IDS = Collections.unmodifiableList(wizardIds);
+	}
+	
 	// TODO: for GA, change this from /development/indigo/ to /stable/indigo/
 	private static final String JBOSS_DIRECTORY_URL_DEFAULT = "http://download.jboss.org/jbosstools/updates/development/indigo/jbosstools-directory.xml"; //$NON-NLS-1$
 	
@@ -73,10 +89,7 @@ public class DefaultJBossCentralConfigurator implements
 
 	@Override
 	public List<String> getWizardIds() {
-		List<String> wizardIds = new ArrayList<String>();
-	    wizardIds.add("org.eclipse.jst.servlet.ui.project.facet.WebProjectWizard"); //$NON-NLS-1$
-	    wizardIds.add("org.jboss.ide.eclipse.as.openshift.express.ui.wizard.createNewApplicationWizard"); //$NON-NLS-1$
-	    return wizardIds;
+		return WIZARD_IDS;
 	}
 
 	@Override
