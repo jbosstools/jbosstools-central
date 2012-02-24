@@ -7,7 +7,9 @@ import org.junit.runners.Suite.SuiteClasses;
 @RunWith(RequirementAwareSuite.class)
 @SuiteClasses({
 	//BaseFunctionalityTest.class,
-	CreateProjectsTest.class
+	//CreateProjectsTest.class
+	//DocumentationSectionTest.class
+	EmptyTestForHudson.class
 	})
 public class CentralAllBotTests {
 

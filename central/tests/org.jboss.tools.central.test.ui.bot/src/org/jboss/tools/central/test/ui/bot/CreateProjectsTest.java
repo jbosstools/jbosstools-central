@@ -120,9 +120,12 @@ public class CreateProjectsTest extends SWTTestExt{
 	//@Test
 	public void projectExamplesSectionTest(){
 		SWTBotTwistie twistieBot = bot.twistieByLabel("JBoss Quickstarts");
-		if (!twistieBot.isExpanded()){
+		while (!twistieBot.isExpanded()){
 			twistieBot.toggle();
 		}
+		/*if (!twistieBot.isExpanded()){
+			twistieBot.toggle();
+		}*/
 		SWTFormsBotExt formsBot = SWTBotFactory.getFormsBot();
 		formsBot.formTextWithText("Helloworld").click();
 		bot.clickButton("Start");
@@ -137,34 +140,6 @@ public class CreateProjectsTest extends SWTTestExt{
 		formsBot.formTextWithText("Kitchensink").click();
 		bot.clickButton("Start");
 		bot.waitWhile(new NonSystemJobRunsCondition(), TaskDuration.NORMAL.getTimeout());
-	}
-	
-	@Test
-	public void documentationSectionTest(){
-		/*bot.hyperlink("New and Noteworthy").click();
-		bot.waitUntil(new BrowserIsLoaded(bot.browserExt()), TaskDuration.LONG.getTimeout());
-		assertFalse("JBoss Central sould not be active editor right now", bot.activeEditor().getTitle().equals("JBoss Central"));
-		bot.activeEditor().close();
-		bot.hyperlink("User Forum").click();
-		bot.waitUntil(new BrowserIsLoaded(bot.browserExt()), TaskDuration.LONG.getTimeout());
-		assertFalse("JBoss Central sould not be active editor right now", bot.activeEditor().getTitle().equals("JBoss Central"));
-		bot.activeEditor().close();*/
-		testHyperlinkToBrowser("New and Noteworthy");
-		testHyperlinkToBrowser("User Forum");
-		testHyperlinkToBrowser("Reference");
-		testHyperlinkToBrowser("Developer Forum");
-		testHyperlinkToBrowser("FAQ");
-		testHyperlinkToBrowser("Wiki");
-		testHyperlinkToBrowser("Screencasts");
-		testHyperlinkToBrowser("Issue Tracker");
-		bot.sleep(TIME_10S);
-	}
-	
-	private void testHyperlinkToBrowser(String hyperlinkText){
-		bot.hyperlink(hyperlinkText).click();
-		bot.waitUntil(new BrowserIsLoaded(bot.browserExt()), TaskDuration.LONG.getTimeout());
-		assertFalse("JBoss Central sould not be active editor right now", bot.activeEditor().getTitle().equals("JBoss Central"));
-		bot.activeEditor().close();
 	}
 	
 	private void waitForAWhile(){

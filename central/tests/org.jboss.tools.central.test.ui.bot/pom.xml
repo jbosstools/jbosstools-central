@@ -13,8 +13,9 @@
 	
 	<packaging>eclipse-test-plugin</packaging>
 	<properties>
-		<!-- for debugging ucomment and comment next line <systemProperties>-Xdebug -Xrunjdwp:transport=dt_socket,address=8001,server=y,suspend=y -Dswtbot.test.properties.file=${swtbot.properties}</systemProperties> -->
-		<systemProperties>-Dswtbot.test.properties.file=${swtbot.properties}</systemProperties>
+		<jbosstools.test.jbossas.home>${requirement.build.root}/jboss-as-web-7.0.2.Final</jbosstools.test.jbossas.home>
+		<!-- for debugging ucomment and comment next line <systemProperties>-Xdebug -Xrunjdwp:transport=dt_socket,address=8001,server=y,suspend=y -Djbosstools.test.jbossas.home=${jbosstools.test.jbossas.home}  -Dswtbot.test.properties.file=${swtbot.properties}</systemProperties> -->
+		<systemProperties>-Djbosstools.test.jbossas.home=${jbosstools.test.jbossas.home} -Dswtbot.test.properties.file=${swtbot.properties}</systemProperties>
 	</properties>
 	
 	<build>
@@ -23,6 +24,10 @@
 				<groupId>org.eclipse.tycho</groupId>
 				<artifactId>tycho-surefire-plugin</artifactId>
 				<configuration>
+					<!-- <systemPropertyVariables>
+						<MOZILLA_FIVE_HOME>/home/rhopp/jbdevstudio/studio/plugins/org.mozilla.xulrunner.gtk.linux.x86_64_1.9.2.19pre/xulrunner</MOZILLA_FIVE_HOME>
+						<LD_LIBRARY_PATH>${env.MOZILLA_FIVE_HOME}</LD_LIBRARY_PATH>
+					</systemPropertyVariables> -->
 					<testSuite>org.jboss.tools.central.test.ui.bot</testSuite>
 					<testClass>org.jboss.tools.central.test.ui.bot.CentralAllBotTests</testClass>
 					<useUIThread>false</useUIThread>
@@ -51,6 +56,11 @@
 						<dependency>
 							<type>p2-installable-unit</type>
 							<artifactId>org.jboss.tools.openshift.express.feature.feature.group</artifactId>
+							<version>0.0.0</version>
+						</dependency>
+						<dependency>
+							<type>p2-installable-unit</type>
+							<artifactId>org.jboss.tools.xulrunner.feature.feature.group</artifactId>
 							<version>0.0.0</version>
 						</dependency>
 					</dependencies>
