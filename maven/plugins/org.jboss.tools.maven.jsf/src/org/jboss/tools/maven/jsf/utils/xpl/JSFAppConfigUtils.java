@@ -74,14 +74,15 @@ public class JSFAppConfigUtils {
 		List<String> filesList = Collections.emptyList();
 		if (ModuleCoreNature.isFlexibleProject(project)) {
 			IModelProvider provider = ModelProviderManager.getModelProvider(project);
-			Object webAppObj = provider.getModelObject();
-			if (webAppObj != null){
-				if (webAppObj instanceof WebApp)
-					filesList = getConfigFilesForJ2EEApp(project);
-				else if (webAppObj instanceof org.eclipse.jst.javaee.web.WebApp)
-					filesList = getConfigFilesForJEEApp((org.eclipse.jst.javaee.web.WebApp)webAppObj);
+			if (provider != null) {
+				Object webAppObj = provider.getModelObject();
+				if (webAppObj != null){
+					if (webAppObj instanceof WebApp)
+						filesList = getConfigFilesForJ2EEApp(project);
+					else if (webAppObj instanceof org.eclipse.jst.javaee.web.WebApp)
+						filesList = getConfigFilesForJEEApp((org.eclipse.jst.javaee.web.WebApp)webAppObj);
+				}
 			}
-			
 		}
 		return filesList;
 	}
