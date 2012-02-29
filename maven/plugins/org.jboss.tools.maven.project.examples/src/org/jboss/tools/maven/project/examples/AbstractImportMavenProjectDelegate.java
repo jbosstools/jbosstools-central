@@ -8,18 +8,28 @@
  * Contributors:
  *     JBoss by Red Hat - Initial implementation.
  ************************************************************************************/
-
 package org.jboss.tools.maven.project.examples;
 
+import java.io.File;
+import java.util.Map;
 
+import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.jboss.tools.project.examples.model.ProjectExample;
 
-/**
- * @author Fred Bricon
- * 
- */
-public class ImportMavenArchetypeProjectExample extends	AbstractImportMavenExample {
+abstract class AbstractImportMavenProjectDelegate {
 
-	protected AbstractImportMavenProjectDelegate getDelegate() {
-		return new ImportMavenArchetypeProjectExampleDelegate();
+	private IPath location; 
+
+	protected abstract boolean importProject(ProjectExample projectDescription, File file,
+			Map<String, Object> propertiesMap, IProgressMonitor monitor) throws Exception;
+	
+	protected void setLocation(IPath location) {
+		this.location = location;
 	}
+	
+	protected IPath getLocation() {
+		return location;
+	}
+	
 }
