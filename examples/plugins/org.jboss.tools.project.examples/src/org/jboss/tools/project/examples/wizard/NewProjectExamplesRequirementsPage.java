@@ -321,8 +321,8 @@ public class NewProjectExamplesRequirementsPage extends WizardPage {
 						if (ProjectFix.WTP_RUNTIME.equals(fixType)
 								|| ProjectFix.SEAM_RUNTIME.equals(fixType)) {
 							DownloadRuntime downloadRuntime = getDownloadRuntime(fix);
+							downloadAndInstall.setEnabled(downloadRuntime != null);
 							if (downloadRuntime != null) {
-								downloadAndInstall.setEnabled(true);
 								downloadAndInstall.setToolTipText("Download and install " + downloadRuntime.getName());
 							}
 							install.setEnabled(true);
