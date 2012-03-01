@@ -47,5 +47,12 @@ public class ParentAdder extends ProjectUpdater {
         }
         model.setParent(parent);
       }
+      //Since we add the parent, we remove the version / groupId
+      if (groupId != null && groupId.equals(model.getGroupId())) {
+    	  model.setGroupId(null);
+      }
+      if (version != null && version.equals(model.getVersion())) { 
+    	  model.setVersion(null);
+      }
     }
   }

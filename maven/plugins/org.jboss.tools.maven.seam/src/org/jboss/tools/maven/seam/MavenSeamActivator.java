@@ -32,7 +32,6 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.Assert;
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IStatus;
@@ -62,8 +61,6 @@ import org.eclipse.wst.common.componentcore.resources.IVirtualComponent;
 import org.eclipse.wst.common.componentcore.resources.IVirtualFolder;
 import org.eclipse.wst.common.frameworks.datamodel.IDataModel;
 import org.eclipse.wst.common.project.facet.core.FacetedProjectFramework;
-import org.eclipse.wst.common.project.facet.core.IFacetedProject;
-import org.eclipse.wst.common.project.facet.core.ProjectFacetsManager;
 import org.jboss.tools.maven.core.IJBossMavenConstants;
 import org.jboss.tools.maven.core.MavenCoreActivator;
 import org.jboss.tools.maven.core.ProjectUtil;
@@ -178,11 +175,7 @@ public class MavenSeamActivator extends AbstractUIPlugin {
 		if (!pom.exists()) {
 			Model model = new Model();
 			model.setModelVersion(IJBossMavenConstants.MAVEN_MODEL_VERSION);
-			model.setGroupId(m2FacetModel
-					.getStringProperty(IJBossMavenConstants.GROUP_ID));
 			model.setArtifactId(testArtifactId);
-			model.setVersion(m2FacetModel
-					.getStringProperty(IJBossMavenConstants.VERSION));
 			model.setName(m2FacetModel.getStringProperty(IJBossMavenConstants.NAME) + " - test"); //$NON-NLS-1$
 			model.setPackaging("jar"); //$NON-NLS-1$
 			model.setDescription(m2FacetModel
@@ -333,11 +326,7 @@ public class MavenSeamActivator extends AbstractUIPlugin {
 		if (!pom.exists()) {
 			Model model = new Model();
 			model.setModelVersion(IJBossMavenConstants.MAVEN_MODEL_VERSION);
-			model.setGroupId(m2FacetModel
-					.getStringProperty(IJBossMavenConstants.GROUP_ID));
 			model.setArtifactId(earArtifactId);
-			model.setVersion(m2FacetModel
-					.getStringProperty(IJBossMavenConstants.VERSION));
 			model.setName(m2FacetModel.getStringProperty(IJBossMavenConstants.NAME) + " - EAR"); //$NON-NLS-1$
 			model.setPackaging("ear"); //$NON-NLS-1$
 			model.setDescription(m2FacetModel
@@ -466,12 +455,6 @@ public class MavenSeamActivator extends AbstractUIPlugin {
 		}
 	}
 	
-	private void removeRuntime(IProject project) throws CoreException {
-		IFacetedProject facetedProject = ProjectFacetsManager.create( project );
-		facetedProject.setRuntime(null, null);
-	
-	}
-
 	private void configureEjbProject(IDataModel m2FacetModel,
 			IDataModel seamFacetModel) {
 		IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject(ejbProjectName);
@@ -480,11 +463,7 @@ public class MavenSeamActivator extends AbstractUIPlugin {
 		if (!pom.exists()) {
 			Model model = new Model();
 			model.setModelVersion(IJBossMavenConstants.MAVEN_MODEL_VERSION);
-			model.setGroupId(m2FacetModel
-					.getStringProperty(IJBossMavenConstants.GROUP_ID));
 			model.setArtifactId(ejbArtifactId);
-			model.setVersion(m2FacetModel
-					.getStringProperty(IJBossMavenConstants.VERSION));
 			model.setName(m2FacetModel.getStringProperty(IJBossMavenConstants.NAME) + " - EJB"); //$NON-NLS-1$
 			model.setPackaging("ejb"); //$NON-NLS-1$
 			model.setDescription(m2FacetModel
