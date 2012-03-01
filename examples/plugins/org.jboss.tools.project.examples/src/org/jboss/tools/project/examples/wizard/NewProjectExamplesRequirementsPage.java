@@ -313,18 +313,21 @@ public class NewProjectExamplesRequirementsPage extends WizardPage {
 					Object object = selection.getFirstElement();
 					if (object instanceof ProjectFix) {
 						ProjectFix fix = (ProjectFix) object;
-						if (!unsatisfiedFixes.contains(fix) && !(ProjectFix.WTP_RUNTIME.equals(fix.getType())
-								|| ProjectFix.SEAM_RUNTIME.equals(fix.getType()))) {
+						String fixType = fix.getType();
+						if (!unsatisfiedFixes.contains(fix) && !(ProjectFix.WTP_RUNTIME.equals(fixType)
+								|| ProjectFix.SEAM_RUNTIME.equals(fixType))) {
 							return;
 						}
-						if (ProjectFix.WTP_RUNTIME.equals(fix.getType())
-								|| ProjectFix.SEAM_RUNTIME.equals(fix.getType())) {
+						if (ProjectFix.WTP_RUNTIME.equals(fixType)
+								|| ProjectFix.SEAM_RUNTIME.equals(fixType)) {
 							DownloadRuntime downloadRuntime = getDownloadRuntime(fix);
-							downloadAndInstall.setEnabled(downloadRuntime != null);
-							downloadAndInstall.setToolTipText("Download and install " + downloadRuntime.getName());
+							if (downloadRuntime != null) {
+								downloadAndInstall.setEnabled(true);
+								downloadAndInstall.setToolTipText("Download and install " + downloadRuntime.getName());
+							}
 							install.setEnabled(true);
 							install.setToolTipText("JBoss Runtime Detection");
-						} else if (ProjectFix.PLUGIN_TYPE.equals(fix.getType())) {
+						} else if (ProjectFix.PLUGIN_TYPE.equals(fixType)) {
 							install.setEnabled(fix.getProperties().get(ProjectFix.CONNECTOR_ID) != null);
 							install.setToolTipText("Install required feature(s)");
 						}
