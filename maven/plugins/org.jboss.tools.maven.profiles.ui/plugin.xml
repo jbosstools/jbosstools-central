@@ -33,7 +33,7 @@
                           objectClass="org.eclipse.core.resources.IProject"
                           adaptable="true">
          <action id="org.jboss.tools.maven.ui.commands.selectMavenProfileAction"
-                 class="org.jboss.tools.maven.ui.generic.GenericCommandActionDelegate:org.jboss.tools.maven.ui.commands.selectMavenProfileCommand"
+                 class="org.jboss.tools.maven.profiles.ui.internal.GenericCommandActionDelegate:org.jboss.tools.maven.ui.commands.selectMavenProfileCommand"
                  label="%Select_Maven_Profiles_Menu"
                  style="push"
                  definitionId="org.jboss.tools.maven.ui.commands.selectMavenProfileCommand"
@@ -51,7 +51,7 @@
                           objectClass="org.eclipse.core.resources.IFile"
                           adaptable="true">
          <action id="org.jboss.tools.maven.ui.commands.selectMavenProfileAction"
-                 class="org.jboss.tools.maven.ui.generic.GenericCommandActionDelegate:org.jboss.tools.maven.ui.commands.selectMavenProfileCommand"
+                 class="org.jboss.tools.maven.profiles.ui.internal.GenericCommandActionDelegate:org.jboss.tools.maven.ui.commands.selectMavenProfileCommand"
                  label="%Select_Maven_Profiles_Menu"
                  style="push"
                  definitionId="org.jboss.tools.maven.ui.commands.selectMavenProfileCommand"
@@ -66,7 +66,7 @@
       	     adaptable="true"
              objectClass="org.eclipse.ui.IWorkingSet">
          <action id="org.jboss.tools.maven.ui.commands.selectMavenProfileAction"
-                 class="org.jboss.tools.maven.ui.generic.GenericCommandActionDelegate:org.jboss.tools.maven.ui.commands.selectMavenProfileCommand"
+                 class="org.jboss.tools.maven.profiles.ui.internal.GenericCommandActionDelegate:org.jboss.tools.maven.ui.commands.selectMavenProfileCommand"
                  label="%Select_Maven_Profiles_Menu"
                  style="push"
                  definitionId="org.jboss.tools.maven.ui.commands.selectMavenProfileCommand"
