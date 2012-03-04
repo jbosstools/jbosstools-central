@@ -222,7 +222,7 @@
             license="Free, EPL"
             name="Eclipse EGit"
             provider="eclipse.org"
-            siteUrl="http://download.jboss.org/jbosstools/updates/indigo/">
+            siteUrl="http://download.jboss.org/jbosstools/updates/indigo/SR2">
          <icon
                image32="images/egit_32.png">
          </icon>
