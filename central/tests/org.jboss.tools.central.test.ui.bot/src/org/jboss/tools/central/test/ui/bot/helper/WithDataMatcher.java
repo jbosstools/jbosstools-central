@@ -1,4 +1,4 @@
-package org.jboss.tools.central.test.ui.bot.helper;
+/*package org.jboss.tools.central.test.ui.bot.helper;
 
 import org.eclipse.swt.widgets.Widget;
 import org.eclipse.swtbot.swt.finder.matchers.AbstractMatcher;
@@ -9,7 +9,7 @@ public class WithDataMatcher<T extends Widget> extends AbstractMatcher<T> {
 	/*public WithDataMatcher(String key, String value, ) {
 		
 	}*/
-	
+	/*
 	//@Override
 	public void describeTo(Description description) {
 		description.appendText("testDescription");
@@ -23,3 +23,4 @@ public class WithDataMatcher<T extends Widget> extends AbstractMatcher<T> {
 	}
 
 }
+*/

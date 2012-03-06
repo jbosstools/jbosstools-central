@@ -1,5 +1,8 @@
 package org.jboss.tools.central.test.ui.bot;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import org.jboss.tools.ui.bot.ext.SWTTestExt;
 import org.jboss.tools.ui.bot.ext.condition.BrowserIsLoaded;
 import org.jboss.tools.ui.bot.ext.condition.TaskDuration;
@@ -26,7 +29,6 @@ public class DocumentationSectionTest extends SWTTestExt {
 		testHyperlinkToBrowser("Wiki");
 		testHyperlinkToBrowser("Screencasts");
 		testHyperlinkToBrowser("Issue Tracker");
-		bot.sleep(TIME_10S);
 	}
 	
 	private void testHyperlinkToBrowser(String hyperlinkText){
@@ -34,7 +36,11 @@ public class DocumentationSectionTest extends SWTTestExt {
 		SWTBotBrowserExt browser = bot.browserExt();
 		bot.waitUntil(new BrowserIsLoaded(browser), TaskDuration.LONG.getTimeout());
 		assertFalse("JBoss Central sould not be active editor right now", bot.activeEditor().getTitle().equals("JBoss Central"));
+		//And also can't be empty page
 		System.out.println(browser.getText());
+		Pattern pattern = Pattern.compile(".*<body></body>.*", Pattern.DOTALL);
+		Matcher matcher = pattern.matcher(browser.getText());
+		assertFalse("Page cannot be empty", matcher.matches());
 		bot.activeEditor().close();
 	}
 	
