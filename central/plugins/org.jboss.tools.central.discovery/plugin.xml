@@ -24,6 +24,7 @@
             name="JBoss Maven Integration"
             provider="JBoss by Red Hat"
             siteUrl="http://download.jboss.org/jbosstools/updates/development/indigo/">
+            <iu id="org.jboss.tools.maven.feature"/>
          <icon
                image32="images/jbosstools_icon32.png">
          </icon>
@@ -41,6 +42,7 @@
             name="JBoss Maven CDI Configurator"
             provider="JBoss by Red Hat"
             siteUrl="http://download.jboss.org/jbosstools/updates/development/indigo/">
+            <iu id="org.jboss.tools.maven.cdi.feature"/>
          <icon
                image32="images/jbosstools_icon32.png">
          </icon>
@@ -58,6 +60,7 @@
             name="JBoss Maven Hibernate Configurator"
             provider="JBoss by Red Hat"
             siteUrl="http://download.jboss.org/jbosstools/updates/development/indigo/">
+            <iu id="org.jboss.tools.maven.hibernate.feature"/>
          <icon
                image32="images/jbosstools_icon32.png">
          </icon>
@@ -75,6 +78,7 @@
             name="JBoss Maven JAX-RS Configurator"
             provider="JBoss by Red Hat"
             siteUrl="http://download.jboss.org/jbosstools/updates/development/indigo/">
+            <iu id="org.jboss.tools.maven.jaxrs.feature"/>
          <icon
                image32="images/jbosstools_icon32.png">
          </icon>
@@ -92,6 +96,7 @@
             name="JBoss Maven JSF Configurator"
             provider="JBoss by Red Hat"
             siteUrl="http://download.jboss.org/jbosstools/updates/development/indigo/">
+            <iu id="org.jboss.tools.maven.jsf.feature"/>
          <icon
                image32="images/jbosstools_icon32.png">
          </icon>
@@ -109,6 +114,7 @@
             name="JBoss Maven Portlet Configurator"
             provider="JBoss by Red Hat"
             siteUrl="http://download.jboss.org/jbosstools/updates/development/indigo/">
+            <iu id="org.jboss.tools.maven.portlet.feature"/>
          <icon
                image32="images/jbosstools_icon32.png">
          </icon>
@@ -126,6 +132,7 @@
             name="JBoss Maven Seam Configurator"
             provider="JBoss by Red Hat"
             siteUrl="http://download.jboss.org/jbosstools/updates/development/indigo/">
+            <iu id="org.jboss.tools.maven.seam.feature"/>
          <icon
                image32="images/jbosstools_icon32.png">
          </icon>
@@ -143,6 +150,7 @@
             name="JBoss Maven JPA Configurator"
             provider="JBoss by Red Hat"
             siteUrl="http://download.jboss.org/jbosstools/updates/development/indigo/">
+            <iu id="org.jboss.tools.maven.jpa.feature"/>
          <icon
                image32="images/jbosstools_icon32.png">
          </icon>
@@ -160,6 +168,7 @@
             name="Maven Profile Management UI"
             provider="JBoss by Red Hat"
             siteUrl="http://download.jboss.org/jbosstools/updates/development/indigo/">
+            <iu id="org.jboss.tools.maven.profiles.feature"/>
          <icon
                image32="images/jbosstools_icon32.png">
          </icon>
@@ -178,6 +187,7 @@
             name="Maven Integration for Eclipse (m2e)"
             provider="eclipse.org"
             siteUrl="http://download.jboss.org/jbosstools/updates/indigo/">
+	    <iu id="org.eclipse.m2e.feature"/>
          <icon
                image32="images/m2e_32.gif">
          </icon>
@@ -195,6 +205,7 @@
             name="Maven Integration for Web Tools (m2e-wtp)"
             provider="eclipse.org"
             siteUrl="http://download.jboss.org/jbosstools/updates/indigo/">
+	    <iu id="org.maven.ide.eclipse.wtp.feature"/>
          <icon
                image32="images/m2e_32.gif">
          </icon>
@@ -223,6 +234,7 @@
             name="Eclipse EGit"
             provider="eclipse.org"
             siteUrl="http://download.jboss.org/jbosstools/updates/indigo/SR2/">
+	    <iu id="org.eclipse.egit"/>
          <icon
                image32="images/egit_32.png">
          </icon>
@@ -271,6 +283,7 @@
             name="FindBugs"
             provider="FindBugs Project"
             siteUrl="http://download.jboss.org/jbosstools/updates/indigo/extras/">
+	    <iu id="edu.umd.cs.findbugs.plugin.eclipse"/>
          <icon
                image32="images/findbugs_32.png">
          </icon>
@@ -289,10 +302,10 @@
             provider="Rockstarapps.com"
             siteUrl="http://download.jboss.org/jbosstools/updates/indigo/extras/">
             <iu id="com.rockstarapps.aws.feature"/>
-			<iu id="com.rockstarapps.html.core.feature"/>
-			<iu id="com.rockstarapps.jsLex"/>
-			<iu id="com.rockstarapps.jsLint"/>
-			<iu id="com.rockstarapps.workbench.branding.feature"/>
+	    <iu id="com.rockstarapps.html.core.feature"/>
+	    <iu id="com.rockstarapps.jsLex"/>
+	    <iu id="com.rockstarapps.jsLint"/>
+	    <iu id="com.rockstarapps.workbench.branding.feature"/>
          <icon
                image32="images/jslint_32.png">
          </icon>
@@ -310,6 +323,7 @@
             name="PMD"
             provider="PMD Developers"
             siteUrl="http://download.jboss.org/jbosstools/updates/indigo/extras/">
+	    <iu id="net.sourceforge.pmd.eclipse"/>
          <icon
                image32="images/pmd_32.png">
          </icon>
@@ -327,6 +341,7 @@
             name="TestNG"
             provider="Cedric Beust"
             siteUrl="http://download.jboss.org/jbosstools/updates/indigo/extras/">
+	    <iu id="org.testng.eclipse"/>
          <icon
                image32="images/testng_32.gif">
          </icon>
