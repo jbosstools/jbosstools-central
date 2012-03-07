@@ -388,14 +388,14 @@
       <connectorDescriptor
             categoryId="org.jboss.tools.central.discovery.web"
             groupId="org.jboss.tools.central.discovery.web.core"
-            description="JST Server Core, UI, Adapters, Extensions, User Doc"
+            description="JST Server Core, UI, Adapters, User Doc"
             id="org.eclipse.jst.server_core.feature"
             kind="task"
             license="Free, EPL, Other"
             name="JST Server"
             provider="Eclipse.org"
             siteUrl="http://download.jboss.org/jbosstools/updates/indigo/SR2/">
-            <iu id="org.eclipse.jst.server_adapters.ext.feature"/>
+            <!-- <iu id="org.eclipse.jst.server_adapters.ext.feature"/> -->
             <iu id="org.eclipse.jst.server_adapters.feature"/>
             <iu id="org.eclipse.jst.server_core.feature"/>
             <iu id="org.eclipse.jst.server_ui.feature"/>
