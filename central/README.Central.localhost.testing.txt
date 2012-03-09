@@ -6,17 +6,18 @@ To build/test locally:
 	cd /tmp; wget -nc http://elonen.iki.fi/code/nanohttpd/NanoHTTPD.java
 	javac NanoHTTPD.java; java NanoHTTPD -d /path/to/parent/folder/for/central/
 
-1. If you need to iterate through changes to the product/plugins/com.jboss.jbds.central plugin, you can do so, rebuild it, and reinstall it into a running JBDS instance.
+1. If you need to iterate through changes to the product/plugins/com.jboss.jbds.central plugin, you can do so, rebuild it, and reinstall it into a running Eclipse instance.
 
    	Help > Install new > file:///path/to/product/site/target/site/
 
-For example, you might want to edit central/plugins/org.jboss.tools.central/src/org/jboss/tools/central/configurators/DefaultJBossCentralConfigurator.java to set a new path for JBOSS_DISCOVERY_DIRECTORY_3_3_0_XML:
+You may also want to rebuild this plugin to set a different default URL (jboss.discovery.directory.url) for the directory.xml file:
 
-	private static final String JBOSS_DISCOVERY_DIRECTORY_3_3_0_XML = "http://localhost/central/site/target/site/jbosstools-directory.xml"; // for testing on localhost
+	examples/plugins/org.jboss.tools.project.examples/pom.xml
 
 2. Rebuild:
 
-	cd /path/to/central; mvn clean install
+	cd /path/to/examples; mvn install -DskipTests -Dmaven.test.skip
+	cd /path/to/central; mvn install -DskipTests -Dmaven.test.skip
 
 3. Verify the directory.xml file is generated, and http-accessible:
 
@@ -29,11 +30,13 @@ For example, you might want to edit central/plugins/org.jboss.tools.central/src/
 	instead of 
 		1.0.0.v20120120-1459-H123-Beta1
 
-5. Launch JBDS like this:
+5. Launch Eclipse like this:
 
 	./eclipse  -vmargs -Djboss.discovery.directory.url=file:///path/to/central/site/target/site/jbosstools-directory.xml
 		or	
 	./eclipse -vmargs  -Djboss.discovery.directory.url=http://localhost/central/site/target/site/jbosstools-directory.xml
+		or
+	add the -Djboss.discovery.directory.url flag to your eclipse.ini file after the -vmargs line
 
 6. Select 'Help > Jboss Central' (if not already loaded). Check the 'Software/Updates' tab to review contents of the discovery site (as per org.jboss.tools.central.discovery/plugin.xml). Hit the refresh icon if necessary to see changes.
 

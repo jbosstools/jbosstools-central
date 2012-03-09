@@ -18,3 +18,5 @@ Thus, when running Eclipse, simply pass in an alternate URL like this:
 
 	./eclipse -vmargs -Djboss.discovery.directory.url=http://download.jboss.org/jbosstools/updates/nightly/core/3.3.indigo/jbosstools-directory.xml
 
+Or, you can add the -Djboss.discovery.directory.url flag to your eclipse.ini file after the -vmargs line.
+
