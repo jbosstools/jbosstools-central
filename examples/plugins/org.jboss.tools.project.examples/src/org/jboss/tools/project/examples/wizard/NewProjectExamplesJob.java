@@ -66,7 +66,8 @@ public class NewProjectExamplesJob extends WorkspaceJob {
 					return Status.CANCEL_STATUS;
 				}
 				if (importProjectExample.importProject(project, project.getFile(), propertiesMap, monitor)) {
-					importProjectExample.fix(project, monitor);						
+					importProjectExample.fix(project, monitor);			
+					ProjectExamplesActivator.fixWelcome(project);
 				} else {
 					return Status.CANCEL_STATUS;
 				}

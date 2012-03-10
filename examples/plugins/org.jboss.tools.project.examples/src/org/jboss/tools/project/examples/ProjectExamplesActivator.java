@@ -526,7 +526,7 @@ public class ProjectExamplesActivator extends AbstractUIPlugin {
 		}
 	}
 
-	private static void fixWelcome(ProjectExample project) {
+	public static void fixWelcome(ProjectExample project) {
 		if (project == null || project.isWelcome()) {
 			return;
 		}
