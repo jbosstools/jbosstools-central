@@ -480,7 +480,7 @@ public class ProjectExamplesActivator extends AbstractUIPlugin {
 								view.getCheatSheetViewer().setInput(id, id, finalURL, new DefaultStateManager(), false);
 							} else {
 								try {
-									if (finalURL.toString().endsWith(README_MD) || finalURL.toString().endsWith(README_TXT)) {
+									if (finalURL.toString().endsWith(README_MD) || finalURL.toString().endsWith(README_TXT) || finalURL.toString().endsWith(README_MDU)) {
 										IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
 										IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
 										IFile[] files = null;
