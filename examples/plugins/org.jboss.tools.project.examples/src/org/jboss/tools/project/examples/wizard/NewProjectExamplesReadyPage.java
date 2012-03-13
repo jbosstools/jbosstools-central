@@ -67,7 +67,9 @@ public class NewProjectExamplesReadyPage extends WizardPage {
 				if (projectExample.isWelcome()) {
 					showReadme.setEnabled(true);
 					showReadme.setSelection(true);
-					showReadme.setText("Show '" + projectExample.getWelcomeURL() + "' for further instructions");
+					String urlString = projectExample.getWelcomeURL();
+					String welcomeURL = ProjectExamplesActivator.replace(urlString, projectExample);
+					showReadme.setText("Show '" + welcomeURL + "' for further instructions");
 				} else {
 					showReadme.setEnabled(false);
 					showReadme.setSelection(false);

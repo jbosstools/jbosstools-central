@@ -135,6 +135,7 @@ public class ProjectExamplesActivator extends AbstractUIPlugin {
 	private static final String PERIOD_CHEATSHEET_XML = "/.cheatsheet.xml"; //$NON-NLS-1$
 	private static final String README_MD = "/readme.md"; //$NON-NLS-1$
 	private static final String README_TXT = "/readme.txt"; //$NON-NLS-1$
+	private static final String README_MDU = "/README.md"; //$NON-NLS-1$
 	
 	// The plug-in ID
 	public static final String PLUGIN_ID = "org.jboss.tools.project.examples"; //$NON-NLS-1$
@@ -336,7 +337,7 @@ public class ProjectExamplesActivator extends AbstractUIPlugin {
 		return projects.toArray(new IProject[0]);
 	}
 
-	protected static String replace(String name, ProjectExample project) {
+	public static String replace(String name, ProjectExample project) {
 		List<String> includedProjects = project.getIncludedProjects();
 		if (includedProjects != null) {
 			int i = 0;
@@ -561,6 +562,10 @@ public class ProjectExamplesActivator extends AbstractUIPlugin {
 				return;
 			}
 			if (checkCheatsheet(project, eclipseProject, README_MD,
+					ProjectExampleUtil.EDITOR)) {
+				return;
+			}
+			if (checkCheatsheet(project, eclipseProject, README_MDU,
 					ProjectExampleUtil.EDITOR)) {
 				return;
 			}
