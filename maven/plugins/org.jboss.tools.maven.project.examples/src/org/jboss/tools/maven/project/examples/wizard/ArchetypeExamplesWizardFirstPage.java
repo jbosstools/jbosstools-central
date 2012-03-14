@@ -46,6 +46,7 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Link;
@@ -55,6 +56,8 @@ import org.eclipse.wst.common.project.facet.core.IProjectFacetVersion;
 import org.eclipse.wst.common.project.facet.core.ProjectFacetsManager;
 import org.eclipse.wst.common.project.facet.core.runtime.RuntimeManager;
 import org.eclipse.wst.server.core.IRuntime;
+import org.eclipse.wst.server.core.IRuntimeLifecycleListener;
+import org.eclipse.wst.server.core.ServerCore;
 import org.eclipse.wst.server.core.internal.facets.FacetUtil;
 import org.jboss.ide.eclipse.as.core.util.RuntimeUtils;
 import org.jboss.tools.maven.project.examples.MavenProjectExamplesActivator;
@@ -87,6 +90,8 @@ public class ArchetypeExamplesWizardFirstPage extends MavenProjectWizardLocation
 	private ProjectExample projectExample;
 	private WizardContext context;
 	
+	private IRuntimeLifecycleListener listener;
+	
 	public ArchetypeExamplesWizardFirstPage() {
 		super(new ProjectImportConfiguration(), "", "",new ArrayList<IWorkingSet>());
 	}
@@ -102,6 +107,35 @@ public class ArchetypeExamplesWizardFirstPage extends MavenProjectWizardLocation
 	@Override
 	protected void createAdditionalControls(Composite container) {
 
+		listener = new IRuntimeLifecycleListener() {
+			
+			@Override
+			public void runtimeRemoved(IRuntime runtime) {
+				runInUIThread();
+			}
+			
+			@Override
+			public void runtimeChanged(IRuntime runtime) {
+				runInUIThread();
+			}
+			
+			@Override
+			public void runtimeAdded(IRuntime runtime) {
+				runInUIThread();
+			}
+			
+			private void runInUIThread() {
+				Display.getDefault().asyncExec(new Runnable() {
+					
+					@Override
+					public void run() {
+						configureRuntimeCombo();
+					}
+				});
+			}
+			
+		};
+		ServerCore.addRuntimeLifecycleListener(listener);
 		GridData gridData = new GridData(SWT.FILL, SWT.TOP, true, false, 2, 1);
 		projectNameLabel = new Label(container, SWT.NONE);
 		projectNameLabel.setText(Messages.ArchetypeExamplesWizardFirstPage_ProjectName_Label);
@@ -134,15 +168,7 @@ public class ArchetypeExamplesWizardFirstPage extends MavenProjectWizardLocation
 			}
 		});
 
-		//TODO read facet version from project example metadata
-		IProjectFacetVersion facetVersion;
-		try {
-			facetVersion = ProjectFacetsManager.getProjectFacet(
-					IJ2EEFacetConstants.DYNAMIC_WEB).getLatestVersion();
-			createServerTargetComposite(container, facetVersion);
-		} catch (CoreException e) {
-			e.printStackTrace();
-		}
+		createServerTargetComposite(container);
 		
 		Label emptyLabel = new Label(container, SWT.NONE);
 		emptyLabel.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false,
@@ -160,28 +186,14 @@ public class ArchetypeExamplesWizardFirstPage extends MavenProjectWizardLocation
 		createMissingRepositoriesWarning(composite, gridData);
 	}
 
-	protected void createServerTargetComposite(Composite parent,
-			IProjectFacetVersion facetVersion) {
+	protected void createServerTargetComposite(Composite parent) {
 		Label serverTargetLabel = new Label(parent, SWT.NONE);
 		serverTargetLabel.setText(Messages.ArchetypeExamplesWizardFirstPage_Target_Runtime_Label);
 
 		GridData gridData = new GridData(SWT.FILL, SWT.TOP, true, false, 2, 1);
 		serverTargetCombo = new Combo(parent, SWT.BORDER | SWT.READ_ONLY);
 		serverTargetCombo.setLayoutData(gridData);
-		serverRuntimes = getServerRuntimes(facetVersion);
 		serverTargetCombo.add(Messages.ArchetypeExamplesWizardFirstPage_No_TargetRuntime);
-		int i =0, selectedRuntimeIdx = 0;
-		String lastUsedRuntime = dialogSettings.get(TARGET_RUNTIME);
-
-		for (Map.Entry<String, IRuntime> entry : serverRuntimes.entrySet()) {
-			serverTargetCombo.add(entry.getKey());
-			++i;
-			IRuntime runtime = entry.getValue();
-			if (lastUsedRuntime != null && lastUsedRuntime.equals(runtime.getId())) {
-				selectedRuntimeIdx = i;
-			}
-		}
-				
 		serverTargetCombo.addModifyListener(new ModifyListener() {
 
 			@Override
@@ -192,10 +204,43 @@ public class ArchetypeExamplesWizardFirstPage extends MavenProjectWizardLocation
 				validateEnterpriseRepo();
 			}
 		});
+		
+		configureRuntimeCombo();
+
+	}
+
+	protected void configureRuntimeCombo() {
+		if (serverTargetCombo == null || serverTargetCombo.isDisposed()) {
+			return;
+		}
+		//TODO read facet version from project example metadata
+		IProjectFacetVersion facetVersion;
+		try {
+			facetVersion = ProjectFacetsManager.getProjectFacet(
+					IJ2EEFacetConstants.DYNAMIC_WEB).getLatestVersion();
+		} catch (CoreException e) {
+			MavenProjectExamplesActivator.log(e);
+			return;
+		}
+			
+		int i =0, selectedRuntimeIdx = 0;
+		String lastUsedRuntime = dialogSettings.get(TARGET_RUNTIME);
+
+		serverRuntimes = getServerRuntimes(facetVersion);
+		serverTargetCombo.removeAll();
+		serverTargetCombo.add(Messages.ArchetypeExamplesWizardFirstPage_No_TargetRuntime);
+		for (Map.Entry<String, IRuntime> entry : serverRuntimes.entrySet()) {
+			serverTargetCombo.add(entry.getKey());
+			++i;
+			IRuntime runtime = entry.getValue();
+			if (lastUsedRuntime != null && lastUsedRuntime.equals(runtime.getId())) {
+				selectedRuntimeIdx = i;
+			}
+		}
+				
 		if (selectedRuntimeIdx > 0) {
 			serverTargetCombo.select(selectedRuntimeIdx);
 		}
-
 	}
 
 	protected void validate() {
@@ -395,6 +440,10 @@ public class ArchetypeExamplesWizardFirstPage extends MavenProjectWizardLocation
 			if (lastUsedRuntime != null) {
 				dialogSettings.put(TARGET_RUNTIME, lastUsedRuntime.getId());
 			}
+		}
+		if (listener != null) {
+			ServerCore.removeRuntimeLifecycleListener(listener);
+			listener = null;
 		}
 		super.dispose();
 	}
