@@ -11,5 +11,5 @@
 	<artifactId>examples.site</artifactId>
 	<name>examples.site</name>
 	
-	<packaging>eclipse-update-site</packaging>
+	<packaging>eclipse-repository</packaging>
 </project>

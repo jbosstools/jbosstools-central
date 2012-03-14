@@ -26,5 +26,22 @@
 		<module>org.jboss.tools.maven.jpa.feature</module>
 		<module>org.jboss.tools.maven.profiles.feature</module>        
      </modules>
+
+	<repositories>
+		<repository>
+			<id>indigo</id>
+			<layout>p2</layout>
+			<url>http://download.eclipse.org/releases/indigo</url>
+		</repository>
+		<repository>
+			<id>wtp</id>
+			<layout>p2</layout>
+			<url>http://download.jboss.org/jbosstools/updates/m2eclipse-wtp/</url>
+		</repository>
+		<repository>
+			<id>swtbot</id>
+			<layout>p2</layout>
+			<url>http://download.eclipse.org/technology/swtbot/helios/dev-build/update-site/</url>
+		</repository>
+	</repositories>
 </project>
-	
