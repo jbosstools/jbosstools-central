@@ -53,6 +53,7 @@ import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.content.IContentType;
 import org.eclipse.core.runtime.jobs.IJobChangeEvent;
 import org.eclipse.core.runtime.jobs.IJobChangeListener;
 import org.eclipse.core.runtime.jobs.Job;
@@ -68,6 +69,8 @@ import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
+import org.eclipse.ui.IEditorDescriptor;
+import org.eclipse.ui.IEditorRegistry;
 import org.eclipse.ui.IFileEditorInput;
 import org.eclipse.ui.IPerspectiveDescriptor;
 import org.eclipse.ui.IPerspectiveRegistry;
@@ -94,6 +97,7 @@ import org.eclipse.ui.internal.cheatsheets.state.DefaultStateManager;
 import org.eclipse.ui.internal.cheatsheets.views.CheatSheetView;
 import org.eclipse.ui.internal.cheatsheets.views.ViewUtilities;
 import org.eclipse.ui.internal.ide.IDEInternalPreferences;
+import org.eclipse.ui.internal.ide.IDEWorkbenchMessages;
 import org.eclipse.ui.internal.ide.IDEWorkbenchPlugin;
 import org.eclipse.ui.internal.util.PrefUtil;
 import org.eclipse.ui.internal.wizards.newresource.ResourceMessages;
@@ -480,7 +484,13 @@ public class ProjectExamplesActivator extends AbstractUIPlugin {
 								view.getCheatSheetViewer().setInput(id, id, finalURL, new DefaultStateManager(), false);
 							} else {
 								try {
-									if (finalURL.toString().endsWith(README_MD) || finalURL.toString().endsWith(README_TXT) || finalURL.toString().endsWith(README_MDU)) {
+									if (finalURL.toString().endsWith(".htm") || finalURL.toString().endsWith(".html")) {
+										IWorkbenchBrowserSupport browserSupport = ProjectExamplesActivator.getDefault().getWorkbench().getBrowserSupport();
+										IWebBrowser browser = browserSupport.createBrowser(IWorkbenchBrowserSupport.LOCATION_BAR | IWorkbenchBrowserSupport.NAVIGATION_BAR, 
+												null, null, null);
+										browser.openURL(finalURL);
+									} else {
+										boolean txtFile = finalURL.toString().endsWith(".md") || finalURL.toString().endsWith(".txt");
 										IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
 										IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
 										IFile[] files = null;
@@ -492,8 +502,12 @@ public class ProjectExamplesActivator extends AbstractUIPlugin {
 										}
 										if (files.length > 0) {
 											try {
-												IFileEditorInput input = new FileEditorInput(files[0]);
-												IDE.openEditor(page, input, EditorsUI.DEFAULT_TEXT_EDITOR_ID);
+												if (txtFile) {
+													IFileEditorInput input = new FileEditorInput(files[0]);
+													IDE.openEditor(page, input, EditorsUI.DEFAULT_TEXT_EDITOR_ID);
+												} else {
+													IDE.openEditor(page, files[0]);
+												}
 											} catch (PartInitException e) {
 												ProjectExamplesActivator.log(e);
 											}
@@ -501,21 +515,22 @@ public class ProjectExamplesActivator extends AbstractUIPlugin {
 											IFileStore store = EFS.getLocalFileSystem().getStore(
 													new Path(finalURL.getPath()));
 											try {
-												IDE.openEditor(page, new FileStoreEditorInput(store),
+												FileStoreEditorInput input = new FileStoreEditorInput(store);
+												if (txtFile) {
+													IDE.openEditor(page, input,
 														EditorsUI.DEFAULT_TEXT_EDITOR_ID);
+												} else {
+													IDE.openEditor(page, input,
+															getEditorId(store));
+												}
 											} catch (PartInitException e) {
 												ProjectExamplesActivator.log(e);
 											}
 										}
 										
-									} else {
-										IWorkbenchBrowserSupport browserSupport = ProjectExamplesActivator.getDefault().getWorkbench().getBrowserSupport();
-										IWebBrowser browser = browserSupport.createBrowser(IWorkbenchBrowserSupport.LOCATION_BAR | IWorkbenchBrowserSupport.NAVIGATION_BAR, 
-												null, null, null);
-										browser.openURL(finalURL);
-									}
-								} catch (PartInitException e) {
-									ProjectExamplesActivator.log(e);
+									} 
+									} catch (PartInitException e) {
+										ProjectExamplesActivator.log(e);
 								}
 							}
 						}
@@ -527,6 +542,71 @@ public class ProjectExamplesActivator extends AbstractUIPlugin {
 		}
 	}
 
+	private static String getEditorId(IFileStore fileStore) throws PartInitException {
+		String name = fileStore.fetchInfo().getName();
+		if (name == null) {
+			throw new IllegalArgumentException();
+		}
+
+		IContentType contentType= null;
+		try {
+			InputStream is = null;
+			try {
+				is = fileStore.openInputStream(EFS.NONE, null);
+				contentType= Platform.getContentTypeManager().findContentTypeFor(is, name);
+			} finally {
+				if (is != null) {
+					is.close();
+				}
+			}
+		} catch (CoreException ex) {
+			// continue without content type
+		} catch (IOException ex) {
+			// continue without content type
+		}
+
+		IEditorRegistry editorReg= PlatformUI.getWorkbench().getEditorRegistry();
+
+		return getEditorDescriptor(name, editorReg, editorReg.getDefaultEditor(name, contentType)).getId();
+	}
+	
+	private static IEditorDescriptor getEditorDescriptor(String name,
+			IEditorRegistry editorReg, IEditorDescriptor defaultDescriptor)
+			throws PartInitException {
+
+		if (defaultDescriptor != null) {
+			return defaultDescriptor;
+		}
+
+		IEditorDescriptor editorDesc = defaultDescriptor;
+
+		// next check the OS for in-place editor (OLE on Win32)
+		if (editorReg.isSystemInPlaceEditorAvailable(name)) {
+			editorDesc = editorReg
+					.findEditor(IEditorRegistry.SYSTEM_INPLACE_EDITOR_ID);
+		}
+
+		// next check with the OS for an external editor
+		if (editorDesc == null
+				&& editorReg.isSystemExternalEditorAvailable(name)) {
+			editorDesc = editorReg
+					.findEditor(IEditorRegistry.SYSTEM_EXTERNAL_EDITOR_ID);
+		}
+
+		// next lookup the default text editor
+		if (editorDesc == null) {
+			editorDesc = editorReg
+					.findEditor(IDEWorkbenchPlugin.DEFAULT_TEXT_EDITOR_ID);
+		}
+
+		// if no valid editor found, bail out
+		if (editorDesc == null) {
+			throw new PartInitException(
+					IDEWorkbenchMessages.IDE_noFileEditorFound);
+		}
+
+		return editorDesc;
+	}
 	public static void fixWelcome(ProjectExample project) {
 		if (project == null || project.isWelcome()) {
 			return;
