@@ -279,7 +279,11 @@ public class ECFExamplesTransport {
 					IIncomingFileTransfer source = ((IIncomingFileTransferReceiveDataEvent) event).getSource();
 					if (monitor != null) {
 						if (monitor.isCanceled()) {
-							source.cancel();
+							try {
+								source.cancel();
+							} catch (Throwable e) {
+								ProjectExamplesActivator.log("Operation canceled");
+							}
 							return;
 						}
 						long fileLength = source.getFileLength();

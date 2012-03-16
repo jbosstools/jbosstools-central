@@ -23,6 +23,7 @@ import java.util.Set;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.IDialogSettings;
@@ -31,7 +32,6 @@ import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.jface.fieldassist.ControlDecoration;
 import org.eclipse.jface.fieldassist.FieldDecoration;
 import org.eclipse.jface.fieldassist.FieldDecorationRegistry;
-import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
@@ -51,6 +51,7 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.browser.IWorkbenchBrowserSupport;
+import org.eclipse.ui.progress.IProgressService;
 import org.jboss.tools.project.examples.ProjectExamplesActivator;
 import org.jboss.tools.project.examples.filetransfer.ECFExamplesTransport;
 import org.jboss.tools.project.examples.runtimes.DownloadRuntime;
@@ -353,26 +354,22 @@ public class DownloadRuntimeDialog extends Dialog {
 	}
 
 	private void downloadRuntime(final String selectedDirectory,
-			final String destinationDirectory, final boolean deleteOnExit) {
-		final ProgressMonitorDialog dialog = new ProgressMonitorDialog(getShell());
-		dialog.setBlockOnOpen(false);
-		dialog.setCancelable(true);
-		dialog.open();
-		final IProgressMonitor monitor = dialog.getProgressMonitor();
-		monitor.beginTask("Download '" + downloadRuntime.getName() + "' ...", 100);
-		
-		IRunnableWithProgress runnable = new IRunnableWithProgress() {
-			public void run(IProgressMonitor monitor) {
+			final String destinationDirectory, final boolean deleteOnExit) {		
+		Job downloadJob = new Job("Download '" + downloadRuntime.getName()) {
+
+			@Override
+			public IStatus run(IProgressMonitor monitor) {
+				monitor.beginTask("Download '" + downloadRuntime.getName() + "' ...", 100);
 				downloadAndInstall(selectedDirectory,
 						destinationDirectory, deleteOnExit, monitor);
+				return Status.OK_STATUS;
 			}
+			
 		};
-		try {
-			dialog.run(true, true, runnable);
-		} catch (Exception e) {
-			ProjectExamplesActivator.log(e);
-			MessageDialog.openError(getActiveShell(), "Error", e.getMessage());
-		}
+		downloadJob.setUser(false);
+		downloadJob.schedule();
+		IProgressService progressService= PlatformUI.getWorkbench().getProgressService();
+		progressService.showInDialog(getActiveShell(), downloadJob);
 	}
 	
 	private IStatus downloadAndInstall(String selectedDirectory, String destinationDirectory, boolean deleteOnExit, IProgressMonitor monitor) {
