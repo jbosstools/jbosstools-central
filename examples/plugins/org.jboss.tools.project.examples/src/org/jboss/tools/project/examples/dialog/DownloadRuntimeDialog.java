@@ -17,6 +17,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URL;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -61,6 +62,7 @@ import org.jboss.tools.runtime.core.model.IRuntimeDetector;
 import org.jboss.tools.runtime.core.model.RuntimeDefinition;
 import org.jboss.tools.runtime.core.model.RuntimePath;
 import org.jboss.tools.runtime.ui.RuntimeUIActivator;
+import org.jboss.tools.runtime.ui.preferences.RuntimePreferencePage;
 
 /**
  * @author snjeza
@@ -462,31 +464,36 @@ public class DownloadRuntimeDialog extends Dialog {
 		return null;
 	}
 
-	private static void createRuntimes(String directory, IProgressMonitor monitor) {
+	private static void createRuntimes(String directory,
+			IProgressMonitor monitor) {
 		JBossRuntimeLocator locator = new JBossRuntimeLocator();
-		Set<RuntimePath> runtimePaths = RuntimeUIActivator.getDefault()
-				.getRuntimePaths();
-		RuntimePath newPath = new RuntimePath(directory);
-		runtimePaths.add(newPath);
-		for (RuntimePath runtimePath : runtimePaths) {
-			List<RuntimeDefinition> serverDefinitions = locator
-					.searchForRuntimes(runtimePath.getPath(),
-							monitor);
-			runtimePath.getServerDefinitions().clear();
-			for (RuntimeDefinition serverDefinition : serverDefinitions) {
-				serverDefinition.setRuntimePath(runtimePath);
-			}
-			runtimePath.getServerDefinitions().addAll(serverDefinitions);
-			RuntimeUIActivator.getDefault().getRuntimePaths().add(runtimePath);
-			RuntimeUIActivator.getDefault().saveRuntimePaths();
+		final RuntimePath runtimePath = new RuntimePath(directory);
+		List<RuntimeDefinition> serverDefinitions = locator.searchForRuntimes(
+				runtimePath.getPath(), monitor);
+		runtimePath.getServerDefinitions().clear();
+		for (RuntimeDefinition serverDefinition : serverDefinitions) {
+			serverDefinition.setRuntimePath(runtimePath);
 		}
-		List<RuntimeDefinition> serverDefinitions = RuntimeUIActivator
-				.getDefault().getServerDefinitions();
-		Set<IRuntimeDetector> detectors = RuntimeCoreActivator
-				.getRuntimeDetectors();
-		for (IRuntimeDetector detector : detectors) {
-			if (detector.isEnabled()) {
-				detector.initializeRuntimes(serverDefinitions);
+		runtimePath.getServerDefinitions().addAll(serverDefinitions);
+		RuntimeUIActivator.getDefault().getRuntimePaths().add(runtimePath);
+		RuntimeUIActivator.getDefault().saveRuntimePaths();
+		if (serverDefinitions.size() > 1) {
+			Display.getDefault().asyncExec(new Runnable() {
+				
+				@Override
+				public void run() {
+					RuntimeUIActivator.refreshRuntimes(Display.getDefault()
+							.getActiveShell(), RuntimeUIActivator.getDefault().getRuntimePaths(), null, false, 7);
+				}
+			});
+			
+		} else {
+			Set<IRuntimeDetector> detectors = RuntimeCoreActivator
+					.getRuntimeDetectors();
+			for (IRuntimeDetector detector : detectors) {
+				if (detector.isEnabled()) {
+					detector.initializeRuntimes(serverDefinitions);
+				}
 			}
 		}
 	}
