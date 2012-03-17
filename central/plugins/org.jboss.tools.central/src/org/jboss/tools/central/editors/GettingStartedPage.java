@@ -21,6 +21,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.lang.StringEscapeUtils;
+import org.eclipse.core.resources.WorkspaceJob;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IContributor;
@@ -160,7 +161,6 @@ public class GettingStartedPage extends AbstractJBossCentralPage {
 	private ToolBarManager newsToolBarManager;
 	private ToolBarManager blogsToolBarManager;
 	private Action blogsWarning;
-	private boolean newProjectsInitialized;
 	
 	public GettingStartedPage(FormEditor editor) {
 		super(editor, ID, "Getting Started");
@@ -782,7 +782,9 @@ public class GettingStartedPage extends AbstractJBossCentralPage {
 				setBusyIndicator(composite, true);
 				form.reflow(true);
 				form.redraw();
-				recomputeScrollComposite(scrolledComposite, pageBook);
+				if (pageBook != tutorialPageBook) {
+					recomputeScrollComposite(scrolledComposite, pageBook);
+				}
 			}
 		});
 		return true;
