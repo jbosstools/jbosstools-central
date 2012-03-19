@@ -7,12 +7,8 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
 import org.jboss.tools.ui.bot.ext.SWTBotFactory;
 import org.jboss.tools.ui.bot.ext.SWTFormsBotExt;
 import org.jboss.tools.ui.bot.ext.SWTTestExt;
-import org.jboss.tools.ui.bot.ext.condition.BrowserIsLoaded;
-import org.jboss.tools.ui.bot.ext.condition.NonSystemJobRunsCondition;
-import org.jboss.tools.ui.bot.ext.condition.TaskDuration;
 import org.jboss.tools.ui.bot.ext.config.Annotations.Require;
 import org.jboss.tools.ui.bot.ext.config.Annotations.ServerType;
-import org.jboss.tools.ui.bot.ext.parts.SWTBotBrowserExt;
 import org.jboss.tools.ui.bot.ext.parts.SWTBotTwistie;
 import org.jboss.tools.ui.bot.ext.types.IDELabel;
 import org.jboss.tools.ui.bot.ext.wizards.SWTBotWizard;
@@ -126,35 +122,15 @@ public class CreateProjectsTest extends SWTTestExt{
 			twistieBot.toggle();
 		}*/
 		SWTFormsBotExt formsBot = SWTBotFactory.getFormsBot();
-		checkExample(formsBot, "Helloworld");
-		checkExample(formsBot, "Numberguess");
-		checkExample(formsBot, "Login");
-		checkExample(formsBot, "Kitchensink");
-		checkExample(formsBot, "HTML5");
-		/*formsBot.formTextWithText("Helloworld").click();
-		bot.clickButton("Start");
-		bot.waitWhile(new NonSystemJobRunsCondition(), TaskDuration.NORMAL.getTimeout());
-		formsBot.formTextWithText("Numberguess").click();
-		bot.clickButton("Start");
-		bot.waitWhile(new NonSystemJobRunsCondition(), TaskDuration.NORMAL.getTimeout());
-		log.info(bot.activeEditor().getTitle());
-		formsBot.formTextWithText("Login").click();
-		bot.clickButton("Start");
-		bot.waitWhile(new NonSystemJobRunsCondition(),TaskDuration.NORMAL.getTimeout());
-		formsBot.formTextWithText("Kitchensink").click();
-		bot.clickButton("Start");
-		bot.waitWhile(new NonSystemJobRunsCondition(), TaskDuration.NORMAL.getTimeout());*/
+		checkExample(formsBot, "Helloworld", true);
+		checkExample(formsBot, "Numberguess", true);
+		//checkExample(formsBot, "Login", false); //Login example ma nejaky divny login.xml cheatsheet
+		//checkExample(formsBot, "Kitchensink", true); //zatim nejaka chyba v JBDS https://issues.jboss.org/browse/JBDS-2072
+		checkExample(formsBot, "HTML5", true);
 	}
 	
 	private void waitForAWhile(){
 		bot.sleep(Long.MAX_VALUE);
-	}
-	
-	private boolean createDirectory(String path){
-		if (new File(path).mkdir()){
-			return true;
-		}
-		return false;
 	}
 	
 	private static boolean deleteDirectory(File path) {
@@ -172,13 +148,30 @@ public class CreateProjectsTest extends SWTTestExt{
 	    return( path.delete() );
 	  }
 	
-	private void checkExample(SWTFormsBotExt formsBot, String formText){
+	private void checkExample(SWTFormsBotExt formsBot, String formText, boolean readme){
 		formsBot.formTextWithText(formText).click();
 		bot.waitForShell(IDELabel.JBossCentralEditor.PROJECT_EXAMPLE);
 		SWTBotWizard wizard = new SWTBotWizard(bot.shell(IDELabel.JBossCentralEditor.PROJECT_EXAMPLE).widget);
 		wizard.next();
 		wizard.finishWithWait();
-		bot.activeShell().close();
+		String readmeText = bot.checkBox(1).getText();
+		assertFalse("Quick fix should not be enabled (Everything should be fine)", bot.checkBox(0).isEnabled());
+		if (readme){
+			assertTrue("Show readme checkbox should be enabled", bot.checkBox(1).isEnabled());
+			assertTrue("Show readme checkbox should be checked by default", bot.checkBox(1).isChecked());
+			if (readmeText.contains("cheatsheet.xml")){
+				bot.clickButton("Finish");
+				assertTrue("Cheat Sheets view should be open right now", bot.activeView().getTitle().equals("Cheat Sheets"));
+				bot.activeView().close();
+			}else if (readmeText.toLowerCase().contains("readme.md")){
+				bot.clickButton("Finish");
+				assertTrue("Readme should have opened in Text Editor", bot.activeEditor().getReference().getEditor(false).getClass().getName().contains("org.eclipse.ui.editors.text.TextEditor"));
+				bot.activeEditor().close();
+			}else if (readmeText.toLowerCase().contains("readme.htm")){
+				bot.clickButton("Finish");
+				assertTrue("Readme should have opened in Internal Browser", bot.activeEditor().getReference().getEditor(false).getClass().getName().contains("org.eclipse.ui.internal.browser.WebBrowserEditor"));
+			}
+		}
 	}
 	
 	private void checkCreateProject(String formText){
