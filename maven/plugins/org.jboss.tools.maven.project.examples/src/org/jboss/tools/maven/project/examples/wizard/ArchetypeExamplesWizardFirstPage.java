@@ -338,11 +338,9 @@ public class ArchetypeExamplesWizardFirstPage extends MavenProjectWizardLocation
 			}
 		}
 		
-		String packageName = null;
-		if (packageCombo.getItemCount() > 0) {
+		String packageName = projectDescription.getArchetypeModel().getJavaPackage();
+		if (StringUtils.isBlank(packageName) && packageCombo.getItemCount() > 0) {
 			packageName = packageCombo.getItem(0);
-		} else {
-			packageName = projectDescription.getArchetypeModel().getJavaPackage();
 		}
 		if (packageName != null) {
 			packageCombo.setText(packageName);
