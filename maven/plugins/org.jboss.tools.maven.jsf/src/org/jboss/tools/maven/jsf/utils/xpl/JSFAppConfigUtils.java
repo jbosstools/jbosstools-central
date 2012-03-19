@@ -73,15 +73,22 @@ public class JSFAppConfigUtils {
 	public static List<String> getConfigFilesFromContextParam(IProject project) {
 		List<String> filesList = Collections.emptyList();
 		if (ModuleCoreNature.isFlexibleProject(project)) {
-			IModelProvider provider = ModelProviderManager.getModelProvider(project);
-			if (provider != null) {
-				Object webAppObj = provider.getModelObject();
-				if (webAppObj != null){
-					if (webAppObj instanceof WebApp)
-						filesList = getConfigFilesForJ2EEApp(project);
-					else if (webAppObj instanceof org.eclipse.jst.javaee.web.WebApp)
-						filesList = getConfigFilesForJEEApp((org.eclipse.jst.javaee.web.WebApp)webAppObj);
+			try {
+				IModelProvider provider = ModelProviderManager.getModelProvider(project);
+				if (provider != null) {
+					Object webAppObj = provider.getModelObject();
+					if (webAppObj != null){
+						if (webAppObj instanceof WebApp)
+							filesList = getConfigFilesForJ2EEApp(project);
+						else if (webAppObj instanceof org.eclipse.jst.javaee.web.WebApp)
+							filesList = getConfigFilesForJEEApp((org.eclipse.jst.javaee.web.WebApp)webAppObj);
+					}
 				}
+			} catch (Exception e) {
+				//Fix for JBIDE-11078 : in extremely rare cases, 
+				//a NPE can be thrown if no IModelProvider is found for project
+				//At this point that error shouldn't block the user so we just log it
+				MavenJSFActivator.log("Could not read web.xml", e); //$NON-NLS-1$
 			}
 		}
 		return filesList;

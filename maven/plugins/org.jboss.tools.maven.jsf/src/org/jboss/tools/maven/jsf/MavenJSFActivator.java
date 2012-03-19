@@ -67,8 +67,7 @@ public class MavenJSFActivator extends AbstractUIPlugin {
 	}
 	
 	public static void log(Throwable e) {
-		IStatus status = new Status(IStatus.ERROR, PLUGIN_ID, e.getLocalizedMessage(), e);
-		getDefault().getLog().log(status);
+		log(e.getLocalizedMessage(), e);
 	}
 
 	public static void log(String message) {
@@ -76,6 +75,11 @@ public class MavenJSFActivator extends AbstractUIPlugin {
 		getDefault().getLog().log(status);
 	}
 
+	public static void log(String message, Throwable e) {
+		IStatus status = new Status(IStatus.ERROR, PLUGIN_ID, message, e);
+		getDefault().getLog().log(status);
+	}
+	
 	public IDataModel createJSFDataModel(IFacetedProject fproj, IProjectFacetVersion facetVersion) {
 		IDataModel config = (IDataModel) new JSFFacetInstallDataModelProvider().create();
 		LibraryInstallDelegate libraryDelegate = new LibraryInstallDelegate(fproj, facetVersion);
