@@ -46,7 +46,6 @@ import org.eclipse.jface.resource.JFaceColors;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.jface.window.ToolTip;
 import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.BusyIndicator;
@@ -925,7 +924,7 @@ public class GettingStartedPage extends AbstractJBossCentralPage {
 			displayTutorialLinks(categories.get(category), composite, true);
 			categoryComposite.setClient(composite);
 			String description = category.getDescription();
-			if (description != null && !description.isEmpty() && categoryComposite.getControl() != null) {
+			if (description != null && !description.isEmpty() && categoryComposite.getControl() != null && !categoryComposite.getControl().isDisposed()) {
 				final DescriptionToolTip toolTip = new DescriptionToolTip(categoryComposite.getControl(), description);
 				toolTip.activate();	
 			}

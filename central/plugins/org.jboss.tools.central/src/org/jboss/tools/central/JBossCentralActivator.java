@@ -195,7 +195,7 @@ public class JBossCentralActivator extends AbstractUIPlugin {
 		}
 	}
 
-	public static void log(Exception e, String message) {
+	public static void log(Throwable e, String message) {
 		IStatus status = new Status(IStatus.ERROR, PLUGIN_ID, message, e);
 		plugin.getLog().log(status);
 	}

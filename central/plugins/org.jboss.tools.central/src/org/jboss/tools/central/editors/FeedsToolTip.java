@@ -11,7 +11,6 @@
 
 package org.jboss.tools.central.editors;
 
-import org.eclipse.jface.window.ToolTip;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.browser.Browser;
 import org.eclipse.swt.browser.LocationAdapter;

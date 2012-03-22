@@ -16,6 +16,7 @@ import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Monitor;
 import org.eclipse.swt.widgets.Shell;
+import org.jboss.tools.central.JBossCentralActivator;
 
 /**
  * This class gives implementors to provide customized tooltips for any control.
@@ -434,8 +435,13 @@ public abstract class ToolTip {
 
 	private void toolTipHide(Shell tip, Event event) {
 		if (tip != null && !tip.isDisposed() && shouldHideToolTip(event)) {
-			if (!control.getShell().isDisposed()) {
-				control.getShell().removeListener(SWT.Deactivate, shellListener);
+			try {
+				if (control != null && !control.isDisposed() && !control.getShell().isDisposed()) {
+					control.getShell().removeListener(SWT.Deactivate, shellListener);
+				}
+			} catch (Throwable t) {
+				// workaround for https://issues.jboss.org/browse/JBIDE-10938/https://issues.jboss.org/browse/JBIDE-11257
+				JBossCentralActivator.log(t, "https://issues.jboss.org/browse/JBIDE-10938");
 			}
 			currentArea = null;
 			passOnEvent(tip, event);
