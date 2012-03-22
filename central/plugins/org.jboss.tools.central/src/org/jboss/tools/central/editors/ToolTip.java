@@ -440,7 +440,6 @@ public abstract class ToolTip {
 					control.getShell().removeListener(SWT.Deactivate, shellListener);
 				}
 			} catch (Throwable t) {
-				// workaround for https://issues.jboss.org/browse/JBIDE-10938/https://issues.jboss.org/browse/JBIDE-11257
 				JBossCentralActivator.log(t, "https://issues.jboss.org/browse/JBIDE-10938");
 			}
 			currentArea = null;
