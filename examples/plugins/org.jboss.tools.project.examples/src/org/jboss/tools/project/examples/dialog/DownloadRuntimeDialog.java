@@ -17,9 +17,12 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URL;
+import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -70,6 +73,7 @@ import org.jboss.tools.runtime.ui.preferences.RuntimePreferencePage;
  */
 public class DownloadRuntimeDialog extends Dialog {
 
+	private static final String SEPARATOR = "/";
 	private static final String FOLDER_IS_REQUIRED = "This folder is required";
 	private static final String FOLDER_IS_NOT_WRITABLE = "This folder does not exist or is not writable";
 	private static final String DELETE_ON_EXIT = "deleteOnExit";
@@ -429,6 +433,16 @@ public class DownloadRuntimeDialog extends Dialog {
 				file.delete();
 				return Status.CANCEL_STATUS;
 			}
+			String root = getRoot(file, monitor);
+			if (monitor.isCanceled()) {
+				return Status.CANCEL_STATUS;
+			}
+			if (root != null) {
+				File rootFile = new File(selectedDirectory, root);
+				if (rootFile != null && rootFile.exists()) {
+					selectedDirectory = rootFile.getAbsolutePath();
+				}
+			}
 			createRuntimes(selectedDirectory, monitor);
 		} catch (IOException e) {
 			ProjectExamplesActivator.log(e);
@@ -456,6 +470,46 @@ public class DownloadRuntimeDialog extends Dialog {
 		return Status.OK_STATUS;
 	}
 	
+	private String getRoot(File file, IProgressMonitor monitor) {
+		ZipFile zipFile = null;
+		String root = null;
+		try {
+			zipFile = new ZipFile(file);
+			Enumeration<? extends ZipEntry> entries = zipFile.entries();
+			while (entries.hasMoreElements()) {
+				if (monitor.isCanceled()) {
+					return null;
+				}
+				ZipEntry entry = (ZipEntry) entries.nextElement();
+				String entryName = entry.getName();
+				if (entryName == null || entryName.isEmpty() 
+						|| entryName.startsWith(SEPARATOR) || entryName.indexOf(SEPARATOR) == -1) {
+					return null;
+				}
+				String directory = entryName.substring(0, entryName.indexOf(SEPARATOR));
+				if (root == null) {
+					root = directory;
+					continue;
+				}
+				if (!directory.equals(root)) {
+					return null;
+				}
+			}
+		} catch (IOException e) {
+			ProjectExamplesActivator.log(e);
+			return null;
+		} finally {
+			if (zipFile != null) {
+				try {
+					zipFile.close();
+				} catch (IOException e) {
+					// ignore
+				}
+			}
+		}
+		return root;
+	}
+
 	private Shell getActiveShell() {
 		Display display = Display.getDefault();
 		if (display != null) {
