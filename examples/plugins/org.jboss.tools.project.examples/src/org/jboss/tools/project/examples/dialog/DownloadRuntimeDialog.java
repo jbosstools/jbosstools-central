@@ -531,6 +531,16 @@ public class DownloadRuntimeDialog extends Dialog {
 		runtimePath.getServerDefinitions().addAll(serverDefinitions);
 		RuntimeUIActivator.getDefault().getRuntimePaths().add(runtimePath);
 		RuntimeUIActivator.getDefault().saveRuntimePaths();
+		if (serverDefinitions.size() == 0) {
+			Display.getDefault().asyncExec(new Runnable() {
+
+				@Override
+				public void run() {
+					MessageDialog.openError(Display.getDefault()
+							.getActiveShell(), "Error", "No runtime/server found...");
+				}
+			});
+		}
 		if (serverDefinitions.size() > 1) {
 			Display.getDefault().asyncExec(new Runnable() {
 				
