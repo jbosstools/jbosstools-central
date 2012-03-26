@@ -8,6 +8,11 @@
    </feature>
    <feature url="features/org.jboss.tools.central.discovery.feature_0.0.0.jar" id="org.jboss.tools.central.discovery.feature" version="0.0.0">
    </feature>
+
+   <feature url="features/org.jboss.tools.central.test.feature_0.0.0.jar" id="org.jboss.tools.central.test.feature" version="0.0.0">
+      <category name="JBoss Central Nightly Build Update Site"/>
+   </feature>
+
    <category-def name="JBoss Central Nightly Build Update Site" label="JBoss Central Nightly Build Update Site">
       <description>
          JBoss Central Nightly Build Update Site: contains all features in this build.
