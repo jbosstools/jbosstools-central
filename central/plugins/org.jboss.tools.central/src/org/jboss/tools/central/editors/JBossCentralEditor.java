@@ -25,11 +25,14 @@ import org.eclipse.jface.action.GroupMarker;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.mylyn.internal.provisional.commons.ui.CommonImages;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.ControlAdapter;
+import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
@@ -160,12 +163,35 @@ public class JBossCentralEditor extends SharedHeaderFormEditor {
 
 	@Override
 	protected void createHeaderContents(IManagedForm headerForm) {
-		ScrolledForm form = headerForm.getForm();
+		final ScrolledForm form = headerForm.getForm();
 		form.setText(JBOSS_CENTRAL);
 		form.setToolTipText(JBOSS_CENTRAL);
 		form.setImage(getHeaderImage());
 		getToolkit().decorateFormHeading(form.getForm());
 
+		form.addControlListener(new ControlAdapter() {
+
+			boolean resize;
+
+			@Override
+			public void controlResized(ControlEvent e) {
+				if (resize) {
+					return;
+				}
+				resize = true;
+				try {
+					Point size = form.getSize();
+					if (size.x < 500) {
+						form.setSize(500, size.y);
+						form.layout(true, true);
+					}
+				} finally {
+					resize = false;
+				}
+			}
+
+		});
+		
 		IToolBarManager toolbar = form.getToolBarManager();
 		ControlContribution searchControl = new ControlContribution("Search") {
 			@Override
