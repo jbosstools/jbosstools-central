@@ -78,6 +78,8 @@ public class SoftwarePage extends AbstractJBossCentralPage implements IRunnableC
 	private DiscoveryViewer discoveryViewer;
 	private RefreshJobChangeListener refreshJobChangeListener;
 	private InstallAction installAction;
+
+	private Button installButton;
 	
 	public SoftwarePage(FormEditor editor) {
 		super(editor, ID, "Software/Update");
@@ -180,30 +182,14 @@ public class SoftwarePage extends AbstractJBossCentralPage implements IRunnableC
 			}
 	    });
 
-	    final Button installButton = toolkit.createButton(featureComposite, "Install", SWT.PUSH);
+	    installButton = toolkit.createButton(featureComposite, "Install", SWT.PUSH);
 	    installButton.setEnabled(false);
 	    installButton.setImage(JBossCentralActivator.getDefault().getImage(ICON_INSTALL));
 	    installButton.addSelectionListener(new SelectionListener() {
 			
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				Display display = Display.getCurrent();
-				Shell shell = display.getActiveShell();
-				Cursor cursor = shell == null ? null : shell.getCursor();
-				try {
-					if (shell != null) {
-						shell.setCursor(display.getSystemCursor(SWT.CURSOR_WAIT));
-					}
-					installAction.setEnabled(false);
-					installButton.setEnabled(false);
-					installAction.run();
-				} finally {
-					if (shell != null) {
-						shell.setCursor(cursor);
-					}
-					installAction.setEnabled(true);
-					installButton.setEnabled(true);
-				}
+				installAction.run();
 			}
 			
 			@Override
@@ -379,7 +365,27 @@ public class SoftwarePage extends AbstractJBossCentralPage implements IRunnableC
 
 		@Override
 		public void run() {
-			DiscoveryUi.install(discoveryViewer.getInstallableConnectors(), SoftwarePage.this);
+			Display display = Display.getCurrent();
+			Shell shell = display.getActiveShell();
+			Cursor cursor = shell == null ? null : shell.getCursor();
+			try {
+				if (shell != null) {
+					shell.setCursor(display.getSystemCursor(SWT.CURSOR_WAIT));
+				}
+				setEnabled(false);
+				if (installButton != null) {
+					installButton.setEnabled(false);
+				}
+				DiscoveryUi.install(discoveryViewer.getInstallableConnectors(), SoftwarePage.this);
+			} finally {
+				if (shell != null) {
+					shell.setCursor(cursor);
+				}
+				setEnabled(true);
+				if (installButton != null) {
+					installButton.setEnabled(true);
+				}
+			}
 		}
 		
 	}
@@ -394,10 +400,13 @@ public class SoftwarePage extends AbstractJBossCentralPage implements IRunnableC
 		public void run() {
 			IHandlerService handlerService = (IHandlerService) getSite().getService(IHandlerService.class);
 	        try {
-	          handlerService.executeCommand("org.eclipse.equinox.p2.ui.sdk.update", new Event());
+	        	setEnabled(false);
+	        	handlerService.executeCommand("org.eclipse.equinox.p2.ui.sdk.update", new Event());
 	        }
 	        catch (Exception e) {
 	        	JBossCentralActivator.log(e);
+	        } finally {
+	        	setEnabled(true);
 	        }
 		}
 		
