@@ -3,6 +3,7 @@ package org.jboss.tools.maven.configurators.tests;
 import java.io.File;
 
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jst.j2ee.project.facet.IJ2EEFacetConstants;
@@ -142,6 +143,23 @@ public class JSFConfiguratorTest extends AbstractMavenConfiguratorTest {
 		IFile facesConfigXml = jsfProject.getFile("src/main/webapp/WEB-INF/faces-config.xml");
 		assertFalse("A new faces-config.xml was added to the project!", facesConfigXml.exists());
 
+	}	
+	
+	
+
+	@Test
+	public void testJBIDE11413_WebInfLib() throws Exception {
+		IProject[] projects = importProjects("projects/jsf/JBIDE-11413", new String[]{ "jsf-nolib/pom.xml","jsf-lib/pom.xml"}, new ResolverConfiguration());
+		waitForJobsToComplete();
+		
+		IProject jsfnolib = projects[0];
+		IProject jsflib = projects[1];
+		
+		IFolder lib = jsfnolib.getFolder("src/main/webapp/WEB-INF/lib");
+		assertFalse("WEB-INF/lib was added to the project!", lib.exists());
+		
+		lib = jsflib.getFolder("src/main/webapp/WEB-INF/lib");
+		assertTrue("WEB-INF/lib was removed from the project!", lib.exists());
 	}	
 	
 	private void assertHasJSFConfigurationError(IProject project, String message) throws Exception {

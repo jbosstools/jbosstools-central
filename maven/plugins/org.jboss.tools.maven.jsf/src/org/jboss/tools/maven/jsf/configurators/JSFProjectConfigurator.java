@@ -23,6 +23,7 @@ import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
@@ -182,6 +183,7 @@ public class JSFProjectConfigurator extends AbstractProjectConfigurator {
 			IFile defaultFacesConfig = project.getFolder(warSourceDir).getFile(facesConfigPath);
 			IFile generatedFacesConfig = ProjectUtil.getGeneratedWebResourceFile(project, facesConfigPath);
 			IFile actualFacesConfig = JSFUtils.getFacesconfig(project);
+			IFolder libFolder = project.getFolder(warSourceDir).getFolder("WEB-INF/lib");
 			
 			//faces-config.xml will not be created in the source folder and it doesn't exist yet
 			// => We'll have to fix it after setting the JSF facet
@@ -189,6 +191,7 @@ public class JSFProjectConfigurator extends AbstractProjectConfigurator {
 					                    && !generatedFacesConfig.getLocation().equals(defaultFacesConfig.getLocation()) 
 					                    && !generatedFacesConfig.exists();  
 			boolean defaultFacesConfigAlreadyExists = defaultFacesConfig.exists();
+			boolean libFolderAlreadyExists = libFolder.exists(); 
 			
 			IProjectFacetVersion facetVersion = null;
 			boolean configureServlet = false;//Fix for JBIDE-9454, where existing web.xml is completely overwritten.
@@ -235,6 +238,12 @@ public class JSFProjectConfigurator extends AbstractProjectConfigurator {
 			    && !defaultFacesConfig.getLocation().equals(actualFacesConfig.getLocation())
 			    && defaultFacesConfig.exists()/*file has just been created*/) {
 				defaultFacesConfig.delete(true, monitor);
+			}
+			//JBIDE-11413 : don't create an unnecessary lib folder
+			if (!libFolderAlreadyExists 
+				&& libFolder.exists() 
+				&& libFolder.members().length == 0){
+				libFolder.delete(true, monitor);
 			}
 		}
 	}
