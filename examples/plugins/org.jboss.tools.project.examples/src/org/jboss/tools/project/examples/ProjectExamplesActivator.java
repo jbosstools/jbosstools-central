@@ -57,6 +57,7 @@ import org.eclipse.core.runtime.content.IContentType;
 import org.eclipse.core.runtime.jobs.IJobChangeEvent;
 import org.eclipse.core.runtime.jobs.IJobChangeListener;
 import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.MessageDialogWithToggle;
@@ -106,6 +107,7 @@ import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.eclipse.wst.validation.internal.operations.ValidationBuilder;
 import org.jboss.tools.project.examples.configurators.DefaultJBossCentralConfigurator;
 import org.jboss.tools.project.examples.configurators.IJBossCentralConfigurator;
+import org.jboss.tools.project.examples.dialog.MarkerDialog;
 import org.jboss.tools.project.examples.fixes.PluginFix;
 import org.jboss.tools.project.examples.fixes.ProjectExamplesFix;
 import org.jboss.tools.project.examples.fixes.SeamRuntimeFix;
@@ -154,6 +156,15 @@ public class ProjectExamplesActivator extends AbstractUIPlugin {
 	public static final String PROJECT_EXAMPLES_OUTPUT_DIRECTORY = "projectExamplesOutputDirectory"; //$NON-NLS-1$
 	public static final String PROJECT_EXAMPLES_DEFAULT = "projectExamplesDefaultLocation"; //$NON-NLS-1$
 	public static final boolean PROJECT_EXAMPLES_DEFAULT_VALUE = true;
+
+	public static final String SHOW_PROJECT_READY_WIZARD = "showProjectRadyWizard"; //$NON-NLS-1$
+	public static final boolean SHOW_PROJECT_READY_WIZARD_VALUE = true;
+	
+	public static final String SHOW_README = "showReadme"; //$NON-NLS-1$
+	public static final boolean SHOW_README_VALUE = true;
+	
+	public static final String SHOW_QUICK_FIX = "showQuickFix"; //$NON-NLS-1$
+	public static final boolean SHOW_QUICK_FIX_VALUE = true;
 	
 	private static final String IMPORT_PROJECT_EXAMPLES_EXTENSION_ID = "org.jboss.tools.project.examples.importProjectExamples"; //$NON-NLS-1$
 	private static final String NAME = "name"; //$NON-NLS-1$
@@ -951,6 +962,31 @@ public class ProjectExamplesActivator extends AbstractUIPlugin {
 
 	public static void showReadyWizard(final List<ProjectExample> projects) {
 
+		IPreferenceStore store = ProjectExamplesActivator.getDefault().getPreferenceStore();
+		
+		boolean showProjectReadyWizard = store.getBoolean(SHOW_PROJECT_READY_WIZARD);
+		if (!showProjectReadyWizard) {
+			boolean openWelcome = store.getBoolean(SHOW_README);
+			if (openWelcome) {
+				ProjectExamplesActivator.openWelcome(projects);
+			}
+			boolean showQuickFix = store.getBoolean(SHOW_QUICK_FIX);
+			if (showQuickFix) {
+				List<IMarker> markers = getMarkers(projects);
+				if (markers != null && markers.size() > 0) {
+				
+					Display.getCurrent().asyncExec(new Runnable() {
+					
+						@Override
+						public void run() {
+							Dialog dialog = new MarkerDialog(Display.getCurrent().getActiveShell(), projects);
+							dialog.open();
+						}
+					});
+				}
+			}
+			return;
+		}
 		Display.getDefault().asyncExec(new Runnable() {
 
 			public void run() {

@@ -62,6 +62,9 @@ public class ProjectExamplesPreferencePage extends PreferencePage implements
 	private Button showInvalidSites;
 	private Text outputDirectoryText;
 	private Button isWorkspace;
+	private Button showProjectReadyWizard;
+	private Button showReadme;
+	private Button showQuickFix;
 	
 	@Override
 	protected Control createContents(Composite parent) {
@@ -125,6 +128,18 @@ public class ProjectExamplesPreferencePage extends PreferencePage implements
 			}
 			
 		});
+		
+		showProjectReadyWizard = new Button(composite,SWT.CHECK);
+		showProjectReadyWizard.setText("Show Project Ready wizard");
+		showProjectReadyWizard.setSelection(store.getBoolean(ProjectExamplesActivator.SHOW_PROJECT_READY_WIZARD));
+		
+		showReadme = new Button(composite,SWT.CHECK);
+		showReadme.setText("Show readme/cheatsheet file");
+		showReadme.setSelection(store.getBoolean(ProjectExamplesActivator.SHOW_README));
+		
+		showQuickFix = new Button(composite,SWT.CHECK);
+		showQuickFix.setText("Show Quick Fix dialog");
+		showQuickFix.setSelection(store.getBoolean(ProjectExamplesActivator.SHOW_QUICK_FIX));
 		
 		showExperimentalSites = new Button(composite,SWT.CHECK);
 		showExperimentalSites.setText(Messages.ProjectExamplesPreferencePage_Show_experimental_sites);
@@ -261,6 +276,10 @@ public class ProjectExamplesPreferencePage extends PreferencePage implements
 
 	@Override
 	protected void performDefaults() {
+		showProjectReadyWizard.setSelection(ProjectExamplesActivator.SHOW_PROJECT_READY_WIZARD_VALUE);
+		showReadme.setSelection(ProjectExamplesActivator.SHOW_README_VALUE);
+		showQuickFix.setSelection(ProjectExamplesActivator.SHOW_QUICK_FIX_VALUE);
+		
 		showExperimentalSites.setSelection(ProjectExamplesActivator.SHOW_EXPERIMENTAL_SITES_VALUE);
 		showInvalidSites.setSelection(ProjectExamplesActivator.SHOW_INVALID_SITES_VALUE);
 		isWorkspace.setSelection(ProjectExamplesActivator.PROJECT_EXAMPLES_DEFAULT_VALUE);
@@ -278,6 +297,10 @@ public class ProjectExamplesPreferencePage extends PreferencePage implements
 
 	private void storePreferences() {
 		IPreferenceStore store = ProjectExamplesActivator.getDefault().getPreferenceStore();
+		store.setValue(ProjectExamplesActivator.SHOW_PROJECT_READY_WIZARD, showProjectReadyWizard.getSelection());
+		store.setValue(ProjectExamplesActivator.SHOW_README, showReadme.getSelection());
+		store.setValue(ProjectExamplesActivator.SHOW_QUICK_FIX, showQuickFix.getSelection());
+		
 		store.setValue(ProjectExamplesActivator.SHOW_EXPERIMENTAL_SITES, showExperimentalSites.getSelection());
 		store.setValue(ProjectExamplesActivator.SHOW_INVALID_SITES, showInvalidSites.getSelection());
 		store.setValue(ProjectExamplesActivator.PROJECT_EXAMPLES_DEFAULT, isWorkspace.getSelection());
