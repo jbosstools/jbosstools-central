@@ -91,6 +91,13 @@
     <extension
          point="org.jboss.tools.project.examples.downloadruntimes">
       <runtime
+            id="org.jboss.tools.runtime.core.as.711" 
+            name="JBoss AS 7.1.1 Certified Java EE 6 Full Profile"
+            version="7.1.1.Final"
+            size="127MB"
+            url="http://download.jboss.org/jbossas/7.1/jboss-as-7.1.1.Final/jboss-as-7.1.1.Final.zip?use_mirror=autoselect"
+            disclaimer="true"/>
+      <runtime
             id="org.jboss.tools.runtime.core.as.710" 
             name="JBoss AS 7.1.0 Certified Java EE 6 Full Profile"
             version="7.1.0.Final"
