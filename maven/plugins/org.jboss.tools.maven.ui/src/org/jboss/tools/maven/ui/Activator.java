@@ -87,6 +87,10 @@ public class Activator extends AbstractUIPlugin {
 
 	public static final boolean CONFIGURE_JPA_VALUE = true;
 
+	public static final String CONFIGURE_GWT = "configureGWT"; //$NON-NLS-1$
+
+	public static final boolean CONFIGURE_GWT_VALUE = true;
+	
 	// The shared instance
 	private static Activator plugin;
 	

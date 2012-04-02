@@ -62,7 +62,10 @@ public class ConfiguratorPreferencesInitializer extends
 				Activator.CONFIGURE_JAXRS_VALUE);
 		node.putBoolean(
 				Activator.CONFIGURE_JPA,
-				Activator.CONFIGURE_JPA_VALUE);		
+				Activator.CONFIGURE_JPA_VALUE);
+		node.putBoolean(
+				Activator.CONFIGURE_GWT,
+				Activator.CONFIGURE_GWT_VALUE);
 	}
 
 }

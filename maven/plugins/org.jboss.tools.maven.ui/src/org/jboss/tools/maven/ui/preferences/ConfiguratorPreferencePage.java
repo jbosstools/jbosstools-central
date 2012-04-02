@@ -43,6 +43,7 @@ public class ConfiguratorPreferencePage extends PreferencePage implements
 	private static final String ORG_JBOSS_TOOLS_MAVEN_SEAM = "org.jboss.tools.maven.seam"; //$NON-NLS-1$
 	private static final String ORG_JBOSS_TOOLS_MAVEN_JAXRS = "org.jboss.tools.maven.jaxrs"; //$NON-NLS-1$
 	private static final String ORG_JBOSS_TOOLS_MAVEN_JPA = "org.jboss.tools.maven.jpa"; //$NON-NLS-1$
+	private static final String ORG_JBOSS_TOOLS_MAVEN_GWT = "org.jboss.tools.maven.gwt"; //$NON-NLS-1$
 	
 	private Button configureSeamButton;
 	private Button configureSeamRuntimeButton;
@@ -56,6 +57,7 @@ public class ConfiguratorPreferencePage extends PreferencePage implements
 	private Button configureHibernateButton;
 	private Button configureJaxRsButton;
 	private Button configureJpaButton;
+	private Button configureGwtButton;
 	
 	@Override
 	protected Control createContents(Composite parent) {
@@ -156,6 +158,14 @@ public class ConfiguratorPreferencePage extends PreferencePage implements
 			configureJpaButton.setSelection(configureJpa);
 		}
 		
+		if (bundleExists(ORG_JBOSS_TOOLS_MAVEN_GWT)) { 
+			configureGwtButton = new Button(composite,SWT.CHECK);
+			configureGwtButton.setText(Messages.ConfiguratorPreferencePage_Configure_GWT);
+			boolean configureJpa = store.getBoolean(Activator.CONFIGURE_GWT);
+			configureGwtButton.setSelection(configureJpa);
+		}
+
+		
 		return composite;
 	}
 
@@ -233,6 +243,10 @@ public class ConfiguratorPreferencePage extends PreferencePage implements
 			store.setValue(Activator.CONFIGURE_JPA, Activator.CONFIGURE_JPA_VALUE);
 		}
 		
+		if (bundleExists(ORG_JBOSS_TOOLS_MAVEN_GWT)) { 
+			store.setValue(Activator.CONFIGURE_GWT, Activator.CONFIGURE_GWT_VALUE);
+		}
+		
 		super.performDefaults();
 	}
 
@@ -270,6 +284,10 @@ public class ConfiguratorPreferencePage extends PreferencePage implements
 
 		if (bundleExists(ORG_JBOSS_TOOLS_MAVEN_JPA)) {
 			store.setValue(Activator.CONFIGURE_JPA, configureJpaButton.getSelection());
+		}
+		
+		if (bundleExists(ORG_JBOSS_TOOLS_MAVEN_GWT)) { 
+			store.setValue(Activator.CONFIGURE_GWT, configureGwtButton.getSelection());
 		}
 		
 		return super.performOk();
