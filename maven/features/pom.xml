@@ -24,7 +24,8 @@
 		<module>org.jboss.tools.maven.jaxrs.feature</module>
 		<module>org.jboss.tools.maven.jbosspackaging.feature</module>	
 		<module>org.jboss.tools.maven.jpa.feature</module>
-		<module>org.jboss.tools.maven.profiles.feature</module>        
+		<module>org.jboss.tools.maven.profiles.feature</module>
+		<module>org.jboss.tools.maven.gwt.feature</module>
      </modules>
 
 	<repositories>

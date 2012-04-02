@@ -25,7 +25,8 @@
 		<module>org.jboss.tools.maven.jbosspackaging</module>
         <module>org.jboss.tools.maven.jpa</module>
 		<module>org.jboss.tools.maven.profiles.core</module>        
-		<module>org.jboss.tools.maven.profiles.ui</module>        
+		<module>org.jboss.tools.maven.profiles.ui</module>
+		<module>org.jboss.tools.maven.gwt</module>
 	</modules>
 </project>
 	
