@@ -25,33 +25,26 @@ public class GWTProjectConfigurator extends AbstractProjectConfigurator {
 	
 	private static final Logger log = LoggerFactory.getLogger(AbstractProjectConfigurator.class);
 
-	public static final String CODEHAUS_GROUP_ID = "org.codehaus.mojo";
-	public static final String GWT_MAVEN_PLUGIN_ARTIFACT_ID = "gwt-maven-plugin";
+	public static final String GWT_WAR_MAVEN_PLUGIN_KEY = "org.apache.maven.plugins:maven-war-plugin";
 	
 	@Override
-	public void configure(ProjectConfigurationRequest arg0, IProgressMonitor arg1) throws CoreException {
+	public void configure(ProjectConfigurationRequest projectConfig, IProgressMonitor monitor) throws CoreException {
 		
 		IPreferenceStore store = Activator.getDefault().getPreferenceStore();
 		boolean configureGWT = store.getBoolean(Activator.CONFIGURE_GWT);
 		log.debug("GWT Entry Point Modules configuration is {}",configureGWT ? "enabled" : "disabled");
-		if(configureGWT) {
-			List<Plugin> plugins = arg0.getMavenProjectFacade().getMavenProject().getBuildPlugins();
-			for (Plugin plugin : plugins) {
-				if(CODEHAUS_GROUP_ID.equals(plugin.getGroupId()) && GWT_MAVEN_PLUGIN_ARTIFACT_ID.equals(plugin.getArtifactId())) {
-					log.debug("Configure Entry Point Modules for GWT Project {}", arg0.getProject().getName());
-					IModule[] modules = ModuleUtils.findAllModules(JavaCore.create(arg0.getProject()),false);
-					List<String> modNames = new ArrayList<String>();
-					for (IModule iModule : modules) {
-						modNames.add(iModule.getQualifiedName());
-						log.debug("\t {}",iModule.getQualifiedName());
-					}
-					try {
-						GWTProjectProperties.setEntryPointModules(arg0.getProject(), modNames);
-					} catch (BackingStoreException e) {
-						log.error("Ecseption in Maven GWT Configurator", e);
-					}
-					break;
-				}
+		if(configureGWT && projectConfig.getMavenProject().getPlugin(GWT_WAR_MAVEN_PLUGIN_KEY)!=null) {
+			log.debug("Configure Entry Point Modules for GWT Project {}", projectConfig.getProject().getName());
+			IModule[] modules = ModuleUtils.findAllModules(JavaCore.create(projectConfig.getProject()),false);
+			List<String> modNames = new ArrayList<String>();
+			for (IModule iModule : modules) {
+				modNames.add(iModule.getQualifiedName());
+				log.debug("\t {}",iModule.getQualifiedName());
+			}
+			try {
+				GWTProjectProperties.setEntryPointModules(projectConfig.getProject(), modNames);
+			} catch (BackingStoreException e) {
+				log.error("Ecseption in Maven GWT Configurator", e);
 			}
 		}
 	}
