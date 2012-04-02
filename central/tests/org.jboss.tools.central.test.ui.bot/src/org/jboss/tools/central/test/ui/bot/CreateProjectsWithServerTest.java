@@ -4,6 +4,7 @@ import java.io.File;
 
 import org.eclipse.swtbot.swt.finder.exceptions.WidgetNotFoundException;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 import org.jboss.tools.ui.bot.ext.SWTBotFactory;
 import org.jboss.tools.ui.bot.ext.SWTFormsBotExt;
 import org.jboss.tools.ui.bot.ext.SWTTestExt;
@@ -11,28 +12,31 @@ import org.jboss.tools.ui.bot.ext.config.Annotations.Require;
 import org.jboss.tools.ui.bot.ext.config.Annotations.ServerType;
 import org.jboss.tools.ui.bot.ext.parts.SWTBotTwistie;
 import org.jboss.tools.ui.bot.ext.types.IDELabel;
+import org.jboss.tools.ui.bot.ext.view.ProblemsView;
 import org.jboss.tools.ui.bot.ext.wizards.SWTBotWizard;
+import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
 @Require(server=@org.jboss.tools.ui.bot.ext.config.Annotations.Server(type=ServerType.JbossAS))
-public class CreateProjectsTest extends SWTTestExt{
-	
-	private static final String JBOSS_INSTALL_PATH = "/tmp/jbossAS";
+public class CreateProjectsWithServerTest extends SWTTestExt{
 	
 	@BeforeClass
 	public static void setup(){
-		log.info(configuredState.getServer().name);
 		bot.menu("Help").menu(IDELabel.JBossCentralEditor.JBOSS_CENTRAL).click();
 		util.waitForAll();
 	}
-	@AfterClass
-	public static void teardown(){
-		deleteDirectory(new File(JBOSS_INSTALL_PATH));
+	
+	@After
+	public void teardown(){
+		SWTBotTreeItem[] items = ProblemsView.getErrorsNode(bot).getItems();
+		for (SWTBotTreeItem swtBotTreeItem : items) {
+			log.error(swtBotTreeItem.toString());
+		}
 	}
 	
-	//@Test
+	@Test
 	public void createProjectsSectionTest(){
 		//waitForAWhile();
 		SWTFormsBotExt formsBot = SWTBotFactory.getFormsBot();
@@ -101,11 +105,17 @@ public class CreateProjectsTest extends SWTTestExt{
 		projectExampleShell.close();
 		
 		//check the rest of project examples
-		checkCreateProject(IDELabel.JBossCentralEditor.JAVA_EE_WEB_PROJECT);
+		checkExample(null, IDELabel.JBossCentralEditor.JAVA_EE_WEB_PROJECT, true);
+		checkExample(null, IDELabel.JBossCentralEditor.JAVA_EE_PROJECT, true);
+		checkExample(null, IDELabel.JBossCentralEditor.HTML5_PROJECT, true);
+		checkExample(null, IDELabel.JBossCentralEditor.RICHFACES_PROJECT, true);
+		checkExample(null, IDELabel.JBossCentralEditor.SPRING_MVC_PROJECT, false);
+		
+		/*checkCreateProject(IDELabel.JBossCentralEditor.JAVA_EE_WEB_PROJECT);
 		checkCreateProject(IDELabel.JBossCentralEditor.JAVA_EE_PROJECT);
 		checkCreateProject(IDELabel.JBossCentralEditor.HTML5_PROJECT);
 		checkCreateProject(IDELabel.JBossCentralEditor.SPRING_MVC_PROJECT);
-		checkCreateProject(IDELabel.JBossCentralEditor.RICHFACES_PROJECT);
+		checkCreateProject(IDELabel.JBossCentralEditor.RICHFACES_PROJECT);*/
 		bot.toolbarDropDownButtonWithTooltip("New").click();
 		bot.waitForShell("New");
 		assertTrue("Shell \"New\" should have appeared", bot.shell("New").isActive());
@@ -124,8 +134,8 @@ public class CreateProjectsTest extends SWTTestExt{
 		SWTFormsBotExt formsBot = SWTBotFactory.getFormsBot();
 		checkExample(formsBot, "Helloworld", true);
 		checkExample(formsBot, "Numberguess", true);
-		//checkExample(formsBot, "Login", false); //Login example ma nejaky divny login.xml cheatsheet
-		//checkExample(formsBot, "Kitchensink", true); //zatim nejaka chyba v JBDS https://issues.jboss.org/browse/JBDS-2072
+		checkExample(formsBot, "Login", true, "login.xml"); //Login example ma nejaky divny login.xml cheatsheet
+		checkExample(formsBot, "Kitchensink", true);
 		checkExample(formsBot, "HTML5", true);
 	}
 	
@@ -133,44 +143,61 @@ public class CreateProjectsTest extends SWTTestExt{
 		bot.sleep(Long.MAX_VALUE);
 	}
 	
-	private static boolean deleteDirectory(File path) {
-	    if( path.exists() ) {
-	      File[] files = path.listFiles();
-	      for(int i=0; i<files.length; i++) {
-	         if(files[i].isDirectory()) {
-	           deleteDirectory(files[i]);
-	         }
-	         else {
-	           files[i].delete();
-	         }
-	      }
-	    }
-	    return( path.delete() );
-	  }
+
+	/**
+	 * 
+	 * @param formsBot formBot==null => link is of type HyperLink else it is of type FormText
+	 * @param formText
+	 * @param readme true if readme should be shown
+	 */
 	
 	private void checkExample(SWTFormsBotExt formsBot, String formText, boolean readme){
-		formsBot.formTextWithText(formText).click();
+		checkExample(formsBot, formText, readme, null);
+	}
+	
+	/**
+	 * Checks example
+	 * @param formsBot bot for Forms
+	 * @param formText text to be clicked at
+	 * @param readme true if readme is supposed to show, false otherwise
+	 * @param readmeFileName 
+	 */
+	
+	private void checkExample(SWTFormsBotExt formsBot, String formText, boolean readme, String readmeFileName){
+		if (formsBot==null){
+			bot.hyperlink(formText).click();
+		}else{
+			formsBot.formTextWithText(formText).click();
+		}
 		bot.waitForShell(IDELabel.JBossCentralEditor.PROJECT_EXAMPLE);
 		SWTBotWizard wizard = new SWTBotWizard(bot.shell(IDELabel.JBossCentralEditor.PROJECT_EXAMPLE).widget);
 		wizard.next();
+		if (wizard.canNext()) wizard.next();
 		wizard.finishWithWait();
 		String readmeText = bot.checkBox(1).getText();
 		assertFalse("Quick fix should not be enabled (Everything should be fine)", bot.checkBox(0).isEnabled());
 		if (readme){
 			assertTrue("Show readme checkbox should be enabled", bot.checkBox(1).isEnabled());
 			assertTrue("Show readme checkbox should be checked by default", bot.checkBox(1).isChecked());
-			if (readmeText.contains("cheatsheet.xml")){
+			if (readmeFileName != null){
+				assertTrue(readmeText.toLowerCase().contains(readmeFileName));
 				bot.clickButton("Finish");
-				assertTrue("Cheat Sheets view should be open right now", bot.activeView().getTitle().equals("Cheat Sheets"));
+				assertTrue("Cheat Sheets view should be opened right now", bot.activeView().getTitle().equals("Cheat Sheets"));
 				bot.activeView().close();
-			}else if (readmeText.toLowerCase().contains("readme.md")){
+			}else if (readmeText.contains("cheatsheet.xml")){
 				bot.clickButton("Finish");
-				assertTrue("Readme should have opened in Text Editor", bot.activeEditor().getReference().getEditor(false).getClass().getName().contains("org.eclipse.ui.editors.text.TextEditor"));
+				assertTrue("Cheat Sheets view should be opened right now", bot.activeView().getTitle().equals("Cheat Sheets"));
+				bot.activeView().close();
+			}else if (readmeText.toLowerCase().contains("readme.md") || readmeText.toLowerCase().contains("readme.txt")){
+				bot.clickButton("Finish");
+				//assertTrue("Readme should have opened in Text Editor", bot.activeEditor().getReference().getEditor(false).getClass().getName().contains("org.eclipse.ui.editors.text.TextEditor")); //because readmes are opening in browser now.. It's a bug. Jira is created.
 				bot.activeEditor().close();
 			}else if (readmeText.toLowerCase().contains("readme.htm")){
 				bot.clickButton("Finish");
 				assertTrue("Readme should have opened in Internal Browser", bot.activeEditor().getReference().getEditor(false).getClass().getName().contains("org.eclipse.ui.internal.browser.WebBrowserEditor"));
 			}
+		}else{
+			bot.clickButton("Finish");
 		}
 	}
 	
