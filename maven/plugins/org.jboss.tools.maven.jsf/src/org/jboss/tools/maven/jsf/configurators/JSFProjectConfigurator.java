@@ -12,7 +12,7 @@ package org.jboss.tools.maven.jsf.configurators;
 
 import static org.jboss.tools.maven.jsf.configurators.JSFUtils.JSF_VERSION_1_1;
 import static org.jboss.tools.maven.jsf.configurators.JSFUtils.JSF_VERSION_1_2;
-import static org.jboss.tools.maven.jsf.configurators.JSFUtils.JSF_VERSION_2_0;
+import static org.jboss.tools.maven.jsf.configurators.JSFUtils.*;
 
 import java.util.List;
 
@@ -26,6 +26,7 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -67,6 +68,7 @@ public class JSFProjectConfigurator extends AbstractProjectConfigurator {
 	private static final String WAR_SOURCE_FOLDER = "/src/main/webapp";
 
 	public static final IProjectFacet JSF_FACET;
+	public static final IProjectFacetVersion JSF_FACET_VERSION_2_1;
 	public static final IProjectFacetVersion JSF_FACET_VERSION_2_0;
 	public static final IProjectFacetVersion JSF_FACET_VERSION_1_2;
 	public static final IProjectFacetVersion JSF_FACET_VERSION_1_1;
@@ -78,6 +80,16 @@ public class JSFProjectConfigurator extends AbstractProjectConfigurator {
 		JSF_FACET_VERSION_2_0 = JSF_FACET.getVersion(JSF_VERSION_2_0); 
 		JSF_FACET_VERSION_1_2 = JSF_FACET.getVersion(JSF_VERSION_1_2); //$NON-NLS-1$
 		JSF_FACET_VERSION_1_1 = JSF_FACET.getVersion(JSF_VERSION_1_1); //$NON-NLS-1$
+		
+		IProjectFacetVersion jsf21Version = null;
+		try {
+			jsf21Version = JSF_FACET.getVersion(JSF_VERSION_2_1); 
+		} catch (Exception e) {
+			Activator.log("JSF 2.1 Facet is unavailable, fall back to 2.0");
+			jsf21Version = JSF_FACET_VERSION_2_0; 
+		}
+		JSF_FACET_VERSION_2_1 = jsf21Version;
+		
 		m2Facet = ProjectFacetsManager.getProjectFacet("jboss.m2"); //$NON-NLS-1$
 		m2Version = m2Facet.getVersion("1.0"); //$NON-NLS-1$
 	}
@@ -204,7 +216,10 @@ public class JSFProjectConfigurator extends AbstractProjectConfigurator {
 			else if (jsfVersionString.startsWith(JSF_VERSION_2_0)) { 
 				facetVersion = JSF_FACET_VERSION_2_0;
 			}
-			
+			else if (jsfVersionString.startsWith(JSF_VERSION_2_1)) { 
+				facetVersion = JSF_FACET_VERSION_2_1;
+			}
+
 			if (facetVersion != null) {
 				IStatus status = facetVersion.getConstraint().check(fproj.getProjectFacets());
 				if (status.isOK()) {
@@ -240,6 +255,7 @@ public class JSFProjectConfigurator extends AbstractProjectConfigurator {
 				defaultFacesConfig.delete(true, monitor);
 			}
 			//JBIDE-11413 : don't create an unnecessary lib folder
+			libFolder.refreshLocal(IResource.DEPTH_ZERO, monitor);
 			if (!libFolderAlreadyExists 
 				&& libFolder.exists() 
 				&& libFolder.members().length == 0){
@@ -308,7 +324,7 @@ public class JSFProjectConfigurator extends AbstractProjectConfigurator {
 			version = Activator.getDefault().getDependencyVersion(mavenProject, JSF_API_GROUP_ID, JSF_API_ARTIFACT_ID);
 		}
 		if (version == null) {
-			//Check if there's a JSF 2 dependency 
+			//Check if there's a JSF 2.x dependency 
 			version = Activator.getDefault().getDependencyVersion(mavenProject, JSF_API2_GROUP_ID, JSF_API_ARTIFACT_ID);
 		}
 		if (version == null) {

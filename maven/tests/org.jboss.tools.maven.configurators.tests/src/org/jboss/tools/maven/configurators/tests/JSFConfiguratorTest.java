@@ -1,5 +1,7 @@
 package org.jboss.tools.maven.configurators.tests;
 
+import static org.jboss.tools.maven.jsf.configurators.JSFUtils.JSF_VERSION_2_1;
+
 import java.io.File;
 
 import org.eclipse.core.resources.IFile;
@@ -10,6 +12,7 @@ import org.eclipse.jst.j2ee.project.facet.IJ2EEFacetConstants;
 import org.eclipse.m2e.core.project.ResolverConfiguration;
 import org.eclipse.m2e.tests.common.WorkspaceHelpers;
 import org.eclipse.wst.common.project.facet.core.IFacetedProject;
+import org.eclipse.wst.common.project.facet.core.IProjectFacetVersion;
 import org.eclipse.wst.common.project.facet.core.ProjectFacetsManager;
 import org.jboss.tools.maven.jsf.MavenJSFConstants;
 import org.jboss.tools.maven.jsf.configurators.JSFProjectConfigurator;
@@ -145,8 +148,6 @@ public class JSFConfiguratorTest extends AbstractMavenConfiguratorTest {
 
 	}	
 	
-	
-
 	@Test
 	public void testJBIDE11413_WebInfLib() throws Exception {
 		IProject[] projects = importProjects("projects/jsf/JBIDE-11413", new String[]{ "jsf-nolib/pom.xml","jsf-lib/pom.xml"}, new ResolverConfiguration());
@@ -160,6 +161,24 @@ public class JSFConfiguratorTest extends AbstractMavenConfiguratorTest {
 		
 		lib = jsflib.getFolder("src/main/webapp/WEB-INF/lib");
 		assertTrue("WEB-INF/lib was removed from the project!", lib.exists());
+	}	
+	
+	@Test
+	public void testJBIDE11416_supportJSF21Dependencies() throws Exception {
+		IProject project = importProject("projects/jsf/jsf-jsfapi-21/pom.xml");
+		waitForJobsToComplete(new NullProgressMonitor());
+		assertNoErrors(project);
+		
+		boolean isJsf21available = false;
+		try {
+			isJsf21available = null != ProjectFacetsManager.getProjectFacet("jst.jsf").getVersion(JSF_VERSION_2_1); 
+		} catch (Exception e) {
+			//ignore
+		}
+		
+		IProjectFacetVersion expectedJsfVersion = isJsf21available?  JSFProjectConfigurator.JSF_FACET_VERSION_2_1
+																	:JSFProjectConfigurator.JSF_FACET_VERSION_2_0;
+		assertIsJSFProject(project,expectedJsfVersion);
 	}	
 	
 	private void assertHasJSFConfigurationError(IProject project, String message) throws Exception {

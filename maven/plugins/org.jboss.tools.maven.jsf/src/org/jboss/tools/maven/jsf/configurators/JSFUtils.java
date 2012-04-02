@@ -23,7 +23,9 @@ import javax.xml.xpath.XPathFactory;
 import org.codehaus.plexus.util.IOUtil;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaCore;
@@ -40,6 +42,8 @@ public class JSFUtils {
 	public static final String FACES_SERVLET = "javax.faces.webapp.FacesServlet";
 
 	private static final String FACES_SERVLET_XPATH = "//servlet[servlet-class=\"" + FACES_SERVLET + "\"]";
+
+	public static final String JSF_VERSION_2_1 = "2.1";
 
 	public static final String JSF_VERSION_2_0 = "2.0";
 	
@@ -78,6 +82,7 @@ public class JSFUtils {
 		if (facesConfig != null) {
 			InputStream in = null;
 			try {
+				facesConfig.refreshLocal(IResource.DEPTH_ZERO, new NullProgressMonitor());
 				in = facesConfig.getContents();
 				FacesConfigQuickPeek peek = new FacesConfigQuickPeek(in);
 				version = peek.getVersion();
@@ -134,7 +139,7 @@ public class JSFUtils {
 	 * Determines the JSF version by searching for the methods of javax.faces.application.Application 
 	 * in the project's classpath.
 	 * @param project : the java project to analyze
-	 * @return the JSF version (1.1, 1.2, 2.0) found in the classpath, 
+	 * @return the JSF version (1.1, 1.2, 2.0, 2.1) found in the classpath, 
 	 * or null if the project doesn't depend on JSF 
 	 */
 	public static String getJSFVersionFromClasspath(IProject project) {
@@ -143,19 +148,20 @@ public class JSFUtils {
 		if (javaProject != null) {
 			IType type = null;
 			try {
-				type = EclipseJavaUtil.findType(javaProject, 
-												"javax.faces.application.Application");//$NON-NLS-1$ 
+				type = EclipseJavaUtil.findType(javaProject, "javax.faces.context.FacesContext");//$NON-NLS-1$ 
 			} catch (JavaModelException e) {
 				e.printStackTrace();
 			}
 			if (type != null) {
 				String[] emptyParams = new String[0];
-				if (type.getMethod("getResourceHandler", emptyParams).exists() &&    
-					type.getMethod("getProjectStage", emptyParams).exists()) {      
+				if (type.getMethod("isReleased", emptyParams).exists()) {
+					return JSF_VERSION_2_1;					
+				}
+				if (type.getMethod("getAttributes", emptyParams).exists() &&    
+					type.getMethod("getPartialViewContext", emptyParams).exists()) {      
 					return JSF_VERSION_2_0;
 			    }
-				if (type.getMethod("getELResolver", emptyParams).exists() &&        
-					type.getMethod("getExpressionFactory", emptyParams).exists()) { 
+				if (type.getMethod("getELContext", emptyParams).exists()) { 
 					return JSF_VERSION_1_2;
 				} 
 				version = JSF_VERSION_1_1;
