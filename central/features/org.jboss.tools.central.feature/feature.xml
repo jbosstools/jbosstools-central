@@ -14,9 +14,4 @@
 
    <plugin id="org.jboss.tools.central" download-size="0" install-size="0" version="0.0.0" unpack="false"/> 
 
-   <!-- JBIDE-11299 - include Examples features when installing Central -->
-   <includes id="org.jboss.tools.project.examples.feature" version="0.0.0" />
-   <includes id="org.jboss.tools.community.project.examples.feature" version="0.0.0" />
-   <includes id="org.jboss.tools.maven.project.examples.feature" version="0.0.0" />
-
 </feature>

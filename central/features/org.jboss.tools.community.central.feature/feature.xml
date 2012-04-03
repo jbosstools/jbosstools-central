@@ -1,11 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<feature
-      id="org.jboss.tools.community.central.feature"
-      label="%featureName"
-      version="1.0.0.qualifier"
-      provider-name="%providerName"
-      plugin="org.jboss.tools.community.central">
-
+<feature id="org.jboss.tools.community.central.feature" label="%featureName" version="1.0.0.qualifier" provider-name="%providerName" plugin="org.jboss.tools.community.central">
    <description>
       %description
    </description>
@@ -18,14 +12,14 @@
       %license
    </license>
 
+   <!-- JBIDE-11299 - include Examples features when installing Central -->
    <requires>
+      <import feature="org.jboss.tools.central.feature" version="1.0.0.qualifier" match="greaterOrEqual"/>
+      <import feature="org.jboss.tools.project.examples.feature" version="1.2.1.qualifier" match="greaterOrEqual"/>
       <import feature="org.jboss.tools.community.project.examples.feature" version="1.2.1.qualifier" match="greaterOrEqual"/>
+      <import feature="org.jboss.tools.maven.project.examples.feature" version="1.3.0.qualifier" match="greaterOrEqual"/>
    </requires>
 
-   <plugin
-         id="org.jboss.tools.community.central"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"/>
+   <plugin id="org.jboss.tools.community.central" download-size="0" install-size="0" version="0.0.0"/>
 
 </feature>
