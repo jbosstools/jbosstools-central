@@ -33,9 +33,9 @@ import com.google.gwt.eclipse.core.properties.GWTProjectProperties;
 
 public class GWTProjectConfigurator extends AbstractProjectConfigurator {
 	
-	private static final Logger log = LoggerFactory.getLogger(AbstractProjectConfigurator.class);
+	private static final Logger log = LoggerFactory.getLogger(GWTProjectConfigurator.class);
 
-	public static final String GWT_WAR_MAVEN_PLUGIN_KEY = "org.apache.maven.plugins:maven-war-plugin";
+	public static final String GWT_WAR_MAVEN_PLUGIN_KEY = "org.codehaus.mojo:gwt-maven-plugin";
 	
 	@Override
 	public void configure(ProjectConfigurationRequest projectConfig, IProgressMonitor monitor) throws CoreException {
@@ -54,7 +54,7 @@ public class GWTProjectConfigurator extends AbstractProjectConfigurator {
 			try {
 				GWTProjectProperties.setEntryPointModules(projectConfig.getProject(), modNames);
 			} catch (BackingStoreException e) {
-				log.error("Ecseption in Maven GWT Configurator", e);
+				log.error("Exception in Maven GWT Configurator", e);
 			}
 		}
 	}
