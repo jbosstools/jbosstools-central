@@ -49,7 +49,7 @@ import org.eclipse.jdt.core.IClasspathEntry;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.JavaModelException;
-import org.eclipse.jst.common.project.facet.JavaFacetUtils;
+import org.eclipse.jst.common.project.facet.core.internal.JavaFacetUtil;
 import org.eclipse.jst.common.project.facet.core.libprov.ILibraryProvider;
 import org.eclipse.jst.common.project.facet.core.libprov.LibraryProviderOperationConfig;
 import org.eclipse.jst.j2ee.project.JavaEEProjectUtilities;
@@ -176,7 +176,7 @@ public class MavenCoreActivator extends Plugin {
 	public static void addMavenCapabilities(IProject project, IProgressMonitor monitor, Model model) throws CoreException {
 		IFile pom = project.getFile(IMavenConstants.POM_FILE_NAME);
 		if (!pom.exists() && model != null) {
-			MavenModelManager modelManager = MavenPlugin.getDefault().getMavenModelManager();
+			MavenModelManager modelManager = MavenPlugin.getMavenModelManager();
 			modelManager.createMavenModel(pom, model);	
 		}
 		
@@ -359,7 +359,7 @@ public class MavenCoreActivator extends Plugin {
 				earVersion = ""+Double.valueOf(earVersion).intValue();//$NON-NLS-1$
 			}
 			Xpp3Dom version = new Xpp3Dom("version"); //$NON-NLS-1$
-			version.setValue(earVersion); //$NON-NLS-1$
+			version.setValue(earVersion); 
 			configuration.addChild(version);
 		}
 		Xpp3Dom defaultLibBundleDir = new Xpp3Dom("defaultLibBundleDir"); //$NON-NLS-1$
@@ -380,7 +380,7 @@ public class MavenCoreActivator extends Plugin {
 				Xpp3Dom ejbProject = getEarModule(
 						"ejbModule", //$NON-NLS-1$
 						m2FacetModel.getStringProperty(IJBossMavenConstants.GROUP_ID),
-						ejbArtifactId, ROOT_DIR, ejbModuleName); //$NON-NLS-1$ 
+						ejbArtifactId, ROOT_DIR, ejbModuleName); 
 				modules.addChild(ejbProject);
 			}
 
@@ -390,7 +390,7 @@ public class MavenCoreActivator extends Plugin {
 					"webModule", //$NON-NLS-1$
 					m2FacetModel.getStringProperty(IJBossMavenConstants.GROUP_ID),
 					m2FacetModel.getStringProperty(IJBossMavenConstants.ARTIFACT_ID),
-					ROOT_DIR, webModuleName); //$NON-NLS-1$
+					ROOT_DIR, webModuleName); 
 			Xpp3Dom contextRoot = new Xpp3Dom("contextRoot"); //$NON-NLS-1$
 			contextRoot.setValue(m2FacetModel
 					.getStringProperty(IJBossMavenConstants.ARTIFACT_ID));
@@ -710,7 +710,7 @@ public class MavenCoreActivator extends Plugin {
 	}
 
 	public static void addCompilerPlugin(Build build, IProject project) {
-		String compilerLevel = JavaFacetUtils.getCompilerLevel(project);
+		String compilerLevel = JavaFacetUtil.getCompilerLevel(project);
 		if (compilerLevel == null || DEFAULT_COMPILER_LEVEL.equals(compilerLevel)) {
 			return;
 		}

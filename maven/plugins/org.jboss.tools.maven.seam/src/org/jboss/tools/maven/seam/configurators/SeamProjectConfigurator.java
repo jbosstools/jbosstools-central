@@ -503,6 +503,7 @@ public class SeamProjectConfigurator extends AbstractProjectConfigurator {
 		config.setStringProperty(ISeamFacetDataModelProperties.JBOSS_AS_DEPLOY_AS, deployType);
 		config.setBooleanProperty(ISeamFacetDataModelProperties.CONFIGURE_DEFAULT_SEAM_RUNTIME, false);
 		config.setBooleanProperty(ISeamFacetDataModelProperties.CONFIGURE_WAR_PROJECT, false);
+		config.setBooleanProperty(ISeamFacetDataModelProperties.PROJECT_ALREADY_EXISTS, true);
 		IPreferenceStore store = MavenSeamActivator.getDefault().getPreferenceStore();
 		boolean configureSeamArtifacts = store.getBoolean(Activator.CONFIGURE_SEAM_ARTIFACTS);
 		if (!configureSeamArtifacts) {

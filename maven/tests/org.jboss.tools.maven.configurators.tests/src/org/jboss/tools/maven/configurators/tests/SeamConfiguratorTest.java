@@ -2,14 +2,18 @@ package org.jboss.tools.maven.configurators.tests;
 
 import java.io.File;
 
+import org.apache.maven.model.Model;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IncrementalProjectBuilder;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
+import org.eclipse.m2e.core.embedder.MavenModelManager;
 import org.eclipse.m2e.core.project.ResolverConfiguration;
 import org.eclipse.wst.common.project.facet.core.IFacetedProject;
 import org.eclipse.wst.common.project.facet.core.IProjectFacet;
 import org.eclipse.wst.common.project.facet.core.ProjectFacetsManager;
 import org.jboss.tools.jst.web.kb.IKbProject;
+import org.jboss.tools.maven.core.MavenUtil;
 import org.jboss.tools.maven.jsf.configurators.JSFProjectConfigurator;
 import org.jboss.tools.seam.core.ISeamProject;
 import org.jboss.tools.seam.core.SeamCorePlugin;
@@ -85,4 +89,24 @@ public class SeamConfiguratorTest extends AbstractMavenConfiguratorTest {
 		IEclipsePreferences prefs = SeamCorePlugin.getSeamPreferences(web);
 		assertEquals(ISeamFacetDataModelProperties.DEPLOY_AS_EAR, prefs.get(ISeamFacetDataModelProperties.JBOSS_AS_DEPLOY_AS, null));
 	}
+	
+	
+	@Test
+	public void testJBIDE11176_addSeamDependencyToExistingMavenizedProject()  throws Exception {
+		IProject project = createExisting("dynamic-web", "projects/conversion/dynamic-web");
+		project.build(IncrementalProjectBuilder.FULL_BUILD, monitor);
+		waitForJobsToComplete();
+		updateProject(project, "seam-dependency.pom");
+		assertNoErrors(project);
+		
+		Model model = MavenUtil.getModel(project);
+		assertNotNull("Model is null", model);
+		
+		assertEquals("Unexpected dependencies found :"+ model.getDependencies(), 1, model.getDependencies().size());
+		assertNull("Found unxepected parent "+ model.getParent(),  model.getParent());
+		
+	}
+	
+	
+	
 }
