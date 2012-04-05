@@ -24,10 +24,6 @@
 				<groupId>org.eclipse.tycho</groupId>
 				<artifactId>tycho-surefire-plugin</artifactId>
 				<configuration>
-					<!-- <systemPropertyVariables>
-						<MOZILLA_FIVE_HOME>/home/rhopp/jbdevstudio/studio/plugins/org.mozilla.xulrunner.gtk.linux.x86_64_1.9.2.19pre/xulrunner</MOZILLA_FIVE_HOME>
-						<LD_LIBRARY_PATH>${env.MOZILLA_FIVE_HOME}</LD_LIBRARY_PATH>
-					</systemPropertyVariables> -->
 					<testSuite>org.jboss.tools.central.test.ui.bot</testSuite>
 					<testClass>org.jboss.tools.central.test.ui.bot.CentralAllBotTests</testClass>
 					<useUIThread>false</useUIThread>
@@ -60,7 +56,7 @@
 						</dependency>
 						<dependency>
 							<type>p2-installable-unit</type>
-							<artifactId>org.jboss.tools.xulrunner.feature.feature.group</artifactId>
+							<artifactId>org.jboss.ide.eclipse.as.feature.feature.group</artifactId>
 							<version>0.0.0</version>
 						</dependency>
 					</dependencies>

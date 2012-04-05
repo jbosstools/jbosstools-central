@@ -1,20 +1,12 @@
 package org.jboss.tools.central.test.ui.bot;
 
 import java.io.File;
-import java.io.IOException;
-import java.io.StringWriter;
-import java.io.Writer;
-import java.sql.Date;
-import java.util.Calendar;
 
 import org.eclipse.swtbot.swt.finder.exceptions.WidgetNotFoundException;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
-import org.eclipse.ui.IMemento;
-import org.eclipse.ui.XMLMemento;
 import org.jboss.tools.ui.bot.ext.SWTBotFactory;
 import org.jboss.tools.ui.bot.ext.SWTFormsBotExt;
 import org.jboss.tools.ui.bot.ext.SWTTestExt;
-import org.jboss.tools.ui.bot.ext.condition.NonSystemJobRunsCondition;
 import org.jboss.tools.ui.bot.ext.condition.ShellIsActiveCondition;
 import org.jboss.tools.ui.bot.ext.condition.TaskDuration;
 import org.jboss.tools.ui.bot.ext.types.IDELabel;
@@ -41,7 +33,7 @@ public class CreateProjectsWithoutServerTest extends SWTTestExt {
 	
 	@Test
 	public void createProjectsSectionTest(){
-		SWTFormsBotExt formsBot = SWTBotFactory.getFormsBot();
+//		SWTFormsBotExt formsBot = SWTBotFactory.getFormsBot();
 		//Dynamic web project
 		bot.hyperlink(IDELabel.JBossCentralEditor.DYNAMIC_WEB_PROJECT).click();
 		bot.waitForShell(IDELabel.JBossCentralEditor.NEW_DYNAMIC_WEB_PROJECT);

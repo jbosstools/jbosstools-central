@@ -1,10 +1,7 @@
 package org.jboss.tools.central.test.ui.bot;
 
-import java.io.File;
-
 import org.eclipse.swtbot.swt.finder.exceptions.WidgetNotFoundException;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
-import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 import org.jboss.tools.ui.bot.ext.SWTBotFactory;
 import org.jboss.tools.ui.bot.ext.SWTFormsBotExt;
 import org.jboss.tools.ui.bot.ext.SWTTestExt;
@@ -12,10 +9,8 @@ import org.jboss.tools.ui.bot.ext.config.Annotations.Require;
 import org.jboss.tools.ui.bot.ext.config.Annotations.ServerType;
 import org.jboss.tools.ui.bot.ext.parts.SWTBotTwistie;
 import org.jboss.tools.ui.bot.ext.types.IDELabel;
-import org.jboss.tools.ui.bot.ext.view.ProblemsView;
 import org.jboss.tools.ui.bot.ext.wizards.SWTBotWizard;
 import org.junit.After;
-import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -30,16 +25,16 @@ public class CreateProjectsWithServerTest extends SWTTestExt{
 	
 	@After
 	public void teardown(){
-		SWTBotTreeItem[] items = ProblemsView.getErrorsNode(bot).getItems();
+		/*SWTBotTreeItem[] items = ProblemsView.getErrorsNode(bot).getItems();
 		for (SWTBotTreeItem swtBotTreeItem : items) {
 			log.error(swtBotTreeItem.toString());
-		}
+		}*/
 	}
 	
 	@Test
 	public void createProjectsSectionTest(){
 		//waitForAWhile();
-		SWTFormsBotExt formsBot = SWTBotFactory.getFormsBot();
+//		SWTFormsBotExt formsBot = SWTBotFactory.getFormsBot();
 		//Dynamic web project
 		bot.hyperlink(IDELabel.JBossCentralEditor.DYNAMIC_WEB_PROJECT).click();
 		bot.waitForShell(IDELabel.JBossCentralEditor.NEW_DYNAMIC_WEB_PROJECT);
@@ -201,21 +196,21 @@ public class CreateProjectsWithServerTest extends SWTTestExt{
 		}
 	}
 	
-	private void checkCreateProject(String formText){
-		//formsBot.formTextWithText(formText).click();
-		bot.hyperlink(formText).click();
-		bot.waitForShell(IDELabel.JBossCentralEditor.PROJECT_EXAMPLE);
-		SWTBotWizard wizard = new SWTBotWizard(bot.shell(IDELabel.JBossCentralEditor.PROJECT_EXAMPLE).widget);
-		wizard.next();
-		wizard.finishWithWait();
-		bot.activeShell().close();
-		if (bot.activeEditor().getTitle().equalsIgnoreCase("cheat sheets")){
-			bot.activeEditor().close();
-		}
-//		assertTrue("Project Example window should have appeared", bot.shell(IDELabel.JBossCentralEditor.PROJECT_EXAMPLE).isActive());
-//		bot.button("Start").click();
-//		bot.waitForShell(wizzardShellText);
-//		assertTrue(wizzardShellText+"  should have appeared", bot.shell(wizzardShellText).isActive());
+//	private void checkCreateProject(String formText){
+//		//formsBot.formTextWithText(formText).click();
+//		bot.hyperlink(formText).click();
+//		bot.waitForShell(IDELabel.JBossCentralEditor.PROJECT_EXAMPLE);
+//		SWTBotWizard wizard = new SWTBotWizard(bot.shell(IDELabel.JBossCentralEditor.PROJECT_EXAMPLE).widget);
+//		wizard.next();
+//		wizard.finishWithWait();
 //		bot.activeShell().close();
-	}
+//		if (bot.activeEditor().getTitle().equalsIgnoreCase("cheat sheets")){
+//			bot.activeEditor().close();
+//		}
+////		assertTrue("Project Example window should have appeared", bot.shell(IDELabel.JBossCentralEditor.PROJECT_EXAMPLE).isActive());
+////		bot.button("Start").click();
+////		bot.waitForShell(wizzardShellText);
+////		assertTrue(wizzardShellText+"  should have appeared", bot.shell(wizzardShellText).isActive());
+////		bot.activeShell().close();
+//	}
 }
