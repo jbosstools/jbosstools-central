@@ -683,7 +683,7 @@ public class MavenCoreActivator extends Plugin {
 		}
 	}
 
-	private static void copy(InputStream is, OutputStream os)
+	public static void copy(InputStream is, OutputStream os)
 			throws IOException {
 		byte[] buffer = new byte[1024];
 		int count;
@@ -745,4 +745,5 @@ public class MavenCoreActivator extends Plugin {
 					IMavenConstants.PLUGIN_ID, -1, msg, ex));
 		}
 	}
+        
 }
