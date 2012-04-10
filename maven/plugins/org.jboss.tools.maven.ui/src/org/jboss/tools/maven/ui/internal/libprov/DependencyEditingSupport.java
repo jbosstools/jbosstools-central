@@ -131,13 +131,13 @@ public class DependencyEditingSupport extends EditingSupport {
 			dependency.setVersion(valueString);
 			break;
 		case 3:
-			if (intValue > scopes.length) {
+			if (intValue < 0 || intValue > scopes.length) {
 				intValue = 0;
 			}
 			dependency.setScope(scopes[intValue]);
 			break;
 		case 4:
-			if (intValue > types.length) {
+			if (intValue < 0 || intValue > types.length) {
 				intValue = 0;
 			}
 			dependency.setType(types[intValue]);

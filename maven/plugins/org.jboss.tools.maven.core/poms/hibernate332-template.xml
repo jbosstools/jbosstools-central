@@ -6,35 +6,6 @@
 	<artifactId>template</artifactId>
 	<packaging>pom</packaging>
 	<version>0.0.1-SNAPSHOT</version>
-	
-	<repositories>
-	    <repository>
-          <id>jboss-public-repository-group</id>
-          <name>JBoss Community Public Maven Repository</name>
-          <url>https://repository.jboss.org/nexus/content/groups/public/</url>
-          <layout>default</layout>
-          <releases>
-            <enabled>true</enabled>
-            <updatePolicy>never</updatePolicy>
-          </releases>
-          <snapshots>
-            <enabled>true</enabled>
-            <updatePolicy>never</updatePolicy>
-          </snapshots>
-        </repository>
-    	<repository>
-      		<id>repository.jboss.org</id>
-      		<name>JBoss Repository</name>
-      		<url>http://repository.jboss.org/maven2</url>
-    	</repository>
-    	<repository>
-      		<snapshots />
-      		<id>snapshots.jboss.org</id>
-      		<name>JBoss Snapshot Repository</name>
-      		<url>http://snapshots.jboss.org/maven2</url>
-    	</repository> 
-  	</repositories>
-	
     <dependencies>
    		<dependency>
         <groupId>org.hibernate</groupId>
@@ -115,13 +86,16 @@
           </exclusion>
         </exclusions>
       </dependency>
-
    	  <dependency>
         <groupId>org.hibernate</groupId>
         <artifactId>hibernate-search</artifactId>
         <version>3.1.1.GA</version>
+        <exclusions>
+          <exclusion>
+            <groupId>hsqldb</groupId>
+            <artifactId>hsqldb</artifactId>
+          </exclusion>
+        </exclusions>
       </dependency>
-   	  		
 	</dependencies>
-   
 </project>

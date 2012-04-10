@@ -692,8 +692,7 @@ public class MavenCoreActivator extends Plugin {
 		}
 	}
 
-	public static void addLibraryProviderOperationConfig(
-			LibraryProviderOperationConfig config) {
+	public static void addLibraryProviderOperationConfig(LibraryProviderOperationConfig config) {
 		libraryProviderOperationConfigs.add(config);
 	}
 

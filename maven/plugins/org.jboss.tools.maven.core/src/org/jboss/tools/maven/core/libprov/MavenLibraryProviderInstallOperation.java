@@ -17,6 +17,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -29,6 +30,7 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
+import org.apache.maven.model.DependencyManagement;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
@@ -82,8 +84,8 @@ public class MavenLibraryProviderInstallOperation extends
 			PomResourceImpl resource = loadResource(pom);
 			Model projectModel = resource.getModel();
 			Model libraryModel = mavenConfig.getModel();
-			MavenCoreActivator.mergeModel(projectModel, libraryModel);
 			try {
+				MavenCoreActivator.mergeModel(projectModel, libraryModel);
 				Map<String,String> options = new HashMap<String,String>();
 				options.put(XMIResource.OPTION_ENCODING, MavenCoreActivator.ENCODING);
 				resource.save(options);
@@ -115,9 +117,34 @@ public class MavenLibraryProviderInstallOperation extends
 	    if(pomModel.getDescription() != null && pomModel.getDescription().length() > 0) {
 	      model.setDescription(pomModel.getDescription());
 	    }
-	    EList<Dependency> pomDependencies = pomModel.getDependencies();
-	    List<org.apache.maven.model.Dependency> dependencies = model.getDependencies();
-	    for (Dependency pomDependency:pomDependencies) {
+	    
+	    if (pomModel.getDependencyManagement() != null && pomModel.getDependencyManagement().isSetDependencies()) {
+	    	model.setDependencyManagement(new DependencyManagement());
+	    	model.getDependencyManagement().setDependencies(convertDependencies(pomModel.getDependencyManagement().getDependencies()));
+	    }
+	    model.setDependencies(convertDependencies(pomModel.getDependencies()));
+	    
+	    EList<Repository> pomRepositories = pomModel.getRepositories();
+	    List<org.apache.maven.model.Repository> repositories = model.getRepositories();
+	    for (Repository pomRepository:pomRepositories) {
+	    	org.apache.maven.model.Repository repository = new org.apache.maven.model.Repository();
+	    	repository.setId(pomRepository.getId());
+	    	repository.setLayout(pomRepository.getLayout());
+	    	repository.setName(pomRepository.getName());
+	    	RepositoryPolicy pomReleases = pomRepository.getReleases();
+	    	repository.setReleases(getRepositoryPolicy(pomReleases));
+	    	RepositoryPolicy pomSnapshots = pomRepository.getSnapshots();
+	    	repository.setSnapshots(getRepositoryPolicy(pomSnapshots));
+	    	repository.setLayout(pomRepository.getLayout());
+	    	repository.setUrl(pomRepository.getUrl());
+	    	repositories.add(repository);
+	    }
+	    createMavenModel(file, model);
+	}
+
+	private List<org.apache.maven.model.Dependency> convertDependencies(EList<Dependency> pomDependencies) {
+		List<org.apache.maven.model.Dependency> dependencies = new ArrayList<org.apache.maven.model.Dependency>(pomDependencies.size());
+		for (Dependency pomDependency:pomDependencies) {
 	    	org.apache.maven.model.Dependency dependency = new org.apache.maven.model.Dependency();
 	    	dependency.setArtifactId(pomDependency.getArtifactId());
 	    	dependency.setGroupId(pomDependency.getGroupId());
@@ -137,22 +164,7 @@ public class MavenLibraryProviderInstallOperation extends
 	    	}
 	    	dependencies.add(dependency);
 	    }
-	    EList<Repository> pomRepositories = pomModel.getRepositories();
-	    List<org.apache.maven.model.Repository> repositories = model.getRepositories();
-	    for (Repository pomRepository:pomRepositories) {
-	    	org.apache.maven.model.Repository repository = new org.apache.maven.model.Repository();
-	    	repository.setId(pomRepository.getId());
-	    	repository.setLayout(pomRepository.getLayout());
-	    	repository.setName(pomRepository.getName());
-	    	RepositoryPolicy pomReleases = pomRepository.getReleases();
-	    	repository.setReleases(getRepositoryPolicy(pomReleases));
-	    	RepositoryPolicy pomSnapshots = pomRepository.getSnapshots();
-	    	repository.setSnapshots(getRepositoryPolicy(pomSnapshots));
-	    	repository.setLayout(pomRepository.getLayout());
-	    	repository.setUrl(pomRepository.getUrl());
-	    	repositories.add(repository);
-	    }
-	    createMavenModel(file, model);
+		return dependencies;
 	}
 
 	public void createMavenModel(File file, org.apache.maven.model.Model model) throws CoreException {

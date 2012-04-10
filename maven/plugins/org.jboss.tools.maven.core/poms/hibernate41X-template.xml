@@ -1,0 +1,90 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>template</groupId>
+	<artifactId>template</artifactId>
+	<packaging>pom</packaging>
+	<version>0.0.1-SNAPSHOT</version>
+
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>org.jboss.bom</groupId>
+				<artifactId>jboss-javaee-6.0-with-hibernate</artifactId>
+				<version>1.0.0.M7</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
+
+<dependencies>
+	<!-- Hibernate ORM sub-modules -->
+	<dependency>
+		<groupId>org.hibernate</groupId>
+		<artifactId>hibernate-core</artifactId>
+		<!-- this already part of JDK6 -->
+		<exclusions>
+			<exclusion>
+				<groupId>xml-apis</groupId>
+				<artifactId>xml-apis</artifactId>
+			</exclusion>
+		</exclusions>
+		<scope>provided</scope>
+	</dependency>
+	<dependency>
+		<groupId>org.hibernate</groupId>
+		<artifactId>hibernate-entitymanager</artifactId>
+		<scope>provided</scope>
+	</dependency>
+	<!-- 
+	<dependency>
+		<groupId>org.hibernate</groupId>
+		<artifactId>hibernate-envers</artifactId>
+	</dependency>
+	<dependency>
+		<groupId>org.hibernate</groupId>
+		<artifactId>hibernate-c3p0</artifactId>
+	</dependency>
+	<dependency>
+		<groupId>org.hibernate</groupId>
+		<artifactId>hibernate-ehcache</artifactId>
+	</dependency>
+	-->
+	<dependency>
+		<groupId>org.hibernate</groupId>
+		<artifactId>hibernate-validator</artifactId>
+	    <scope>provided</scope>
+	</dependency>
+	<dependency>
+		<groupId>org.hibernate</groupId>
+		<artifactId>hibernate-search</artifactId>
+		<version>4.1.0.Final</version>
+	</dependency>
+	<!--
+	<dependency>
+		<groupId>org.hibernate</groupId>
+		<artifactId>hibernate-search-analyzers</artifactId>
+	</dependency>
+	<dependency>
+		<groupId>org.hibernate</groupId>
+		<artifactId>hibernate-search-engine</artifactId>
+	</dependency>
+	<dependency>
+		<groupId>org.hibernate</groupId>
+		<artifactId>hibernate-search-orm</artifactId>
+	</dependency>
+	-->
+	<!-- Tools 
+	<dependency>
+		<groupId>org.hibernate</groupId>
+		<artifactId>hibernate-validator-annotation-processor</artifactId>
+	</dependency>
+	<dependency>
+		<groupId>org.hibernate</groupId>
+		<artifactId>hibernate-jpamodelgen</artifactId>
+	</dependency>
+	-->
+</dependencies>
+</project>
