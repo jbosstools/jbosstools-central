@@ -130,9 +130,8 @@ IFacetWizardPage {
 		packaging.setItems(items);
 		synchHelper.synchCombo(packaging, IJBossMavenConstants.PACKAGING, null);
 		
-		IFacetedProjectWorkingCopy fpwc = null;
 		try {
-			fpwc = (IFacetedProjectWorkingCopy) getDataModel().getProperty(IFacetDataModelProperties.FACETED_PROJECT_WORKING_COPY);
+			IFacetedProjectWorkingCopy fpwc = (IFacetedProjectWorkingCopy) getDataModel().getProperty(IFacetDataModelProperties.FACETED_PROJECT_WORKING_COPY);
 			if (!mavenProjectExists) {
 				if (fpwc.hasProjectFacet(WebFacetUtils.WEB_FACET)) {
 					packaging.select(0);
@@ -171,10 +170,6 @@ IFacetWizardPage {
 			}
 		} catch (Exception e) {
 			Activator.log(e);
-		} finally {
-			if (fpwc != null) {
-				fpwc.dispose();
-			}
 		}
 		
 		if (mavenProjectExists) {
