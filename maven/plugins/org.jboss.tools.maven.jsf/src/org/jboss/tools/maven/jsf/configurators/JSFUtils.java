@@ -31,6 +31,7 @@ import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.JavaModelException;
 import org.jboss.tools.common.util.EclipseJavaUtil;
+import org.jboss.tools.common.xml.DtdResolver;
 import org.jboss.tools.maven.core.ProjectUtil;
 import org.jboss.tools.maven.jsf.utils.FacesConfigQuickPeek;
 import org.jboss.tools.maven.jsf.utils.xpl.JSFAppConfigUtils;
@@ -124,6 +125,7 @@ public class JSFUtils {
 			domFactory.setNamespaceAware(false); // never forget this!
 			domFactory.setValidating(false);
 			DocumentBuilder builder = domFactory.newDocumentBuilder();
+			builder.setEntityResolver(new DtdResolver());
 			Document doc = builder.parse(input);
 
 			XPath xpath = XPathFactory.newInstance().newXPath();
