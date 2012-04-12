@@ -60,10 +60,9 @@ public class ImportMavenArchetypeProjectExampleDelegate extends AbstractImportMa
 		includedProjects.add(projectName);
 		String artifactId = (String) propertiesMap.get(ProjectExamplesActivator.PROPERTY_ARTIFACT_ID);
 		IPath location = (IPath) propertiesMap.get(ProjectExamplesActivator.PROPERTY_LOCATION_PATH);
-		String projectFolder = location.append(artifactId).toFile()
-						.getAbsolutePath();
-		MavenModelManager mavenModelManager = MavenPlugin
-						.getMavenModelManager();
+		String projectFolder = location.append(artifactId).toFile().getAbsolutePath();
+		MavenModelManager mavenModelManager = MavenPlugin.getMavenModelManager();
+		
 		LocalProjectScanner scanner = new LocalProjectScanner(location.toFile(),
 						projectFolder, true, mavenModelManager);
 		try {

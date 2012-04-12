@@ -19,38 +19,31 @@ import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Link;
 import org.eclipse.ui.PlatformUI;
 
 public class MissingRepositoryWarningComponent extends Composite {
 
-	private Composite warningLink;
+	private Link warninglink;
 
-	public MissingRepositoryWarningComponent(Composite parent) {
+	public MissingRepositoryWarningComponent(Composite parent, boolean visibleInitially) {
 		super(parent, SWT.NORMAL);
 		
-		warningLink = new Composite(parent, SWT.NONE);
+		GridDataFactory.fillDefaults().align(SWT.FILL, SWT.FILL).grab(true, false).span(3, 1)
+		.applyTo(this);
+		GridLayoutFactory.fillDefaults().numColumns(2).applyTo(this);
 		
-		Display display = Display.getCurrent();
-		Color color = display.getSystemColor(SWT.COLOR_BLUE);
-		
-		warningLink.setBackground(color);
-		GridDataFactory.fillDefaults().align(SWT.LEFT, SWT.CENTER).span(3, 1)
-				.applyTo(warningLink);
-		GridLayoutFactory.fillDefaults().numColumns(2).applyTo(warningLink);
+		Label warningImg = new Label(this, SWT.CENTER | SWT.TOP);
+		Image warningIcon = JFaceResources.getImage(Dialog.DLG_IMG_MESSAGE_WARNING);
+		GridDataFactory.fillDefaults().align(SWT.FILL, SWT.TOP).applyTo(warningImg);
+		warningImg.setImage(warningIcon);
 
-		Label warningImg = new Label(warningLink, SWT.CENTER | SWT.TOP);
-		warningImg.setImage(JFaceResources.getImage(Dialog.DLG_IMG_MESSAGE_WARNING));
-
-		Link link = new Link(warningLink, SWT.NONE);
-		String message = "Artifacts needed from JBoss Enterprise Maven repository do not seem to be available.\nThis might cause build problems. "
-				+ "Follow this <a href=\"http://community.jboss.org/wiki/SettingUpTheJBossEnterpriseRepositories\">link</a> for more details.";
-		link.setText(message);
-		link.addSelectionListener(new SelectionAdapter() {
+		warninglink = new Link(this, SWT.NONE |  SWT.FILL);
+		GridDataFactory.fillDefaults().align(SWT.FILL, SWT.FILL).grab(true, false).applyTo(warninglink);
+		warninglink.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				try {
@@ -62,19 +55,19 @@ public class MissingRepositoryWarningComponent extends Composite {
 				}
 			}
 		});
-		link.setBackground(display.getSystemColor(SWT.COLOR_RED));
-	}
-	
-	@Override
-	public void setVisible(boolean visible) {
-		warningLink.setVisible(visible);
-		super.setVisible(visible);
+		
+		setVisible(visibleInitially);
 	}
 	
 	@Override
 	public void dispose() {
-		warningLink.dispose();
 		super.dispose();
 	}
 	
+	public void setLinkText(String text) {
+		if (warninglink != null) {
+			warninglink.setText(text);
+			getParent().layout(true, true);
+		}
+	}
 }

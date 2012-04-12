@@ -8,6 +8,10 @@ public final class MavenProjectConstants {
 
 	public final static String ENTERPRISE_TARGET = "enterprise";
 
+	public final static String IMPORT_PROJECT_CONFIGURATION = "importProjectConfiguration";
+
+	public static final String MAVEN_MODEL = "mavenModel";
+	
 	private MavenProjectConstants(){
 	}
 }

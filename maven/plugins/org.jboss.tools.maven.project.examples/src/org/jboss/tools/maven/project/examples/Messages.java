@@ -12,6 +12,7 @@ public class Messages extends NLS {
 	public static String ArchetypeExamplesWizardFirstPage_Target_Runtime_Label;
 	public static String ArchetypeExamplesWizardFirstPage_Title;
 	public static String ArchetypeExamplesWizardFirstPage_Unresolved_Enterprise_Repo;
+	public static String ArchetypeExamplesWizardFirstPage_Unresolved_WFK_Repo;
 	public static String ArchetypeExamplesWizardFirstPage_Error_Package;
 	static {
 		// initialize resource bundle

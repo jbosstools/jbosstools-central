@@ -391,6 +391,8 @@ public class ProjectExampleUtil {
 									if (path != null) {
 										project.setIconPath(path);
 									}
+								} else if (nodeName.equals("essentialEnterpriseDependencies")) {
+									parseEssentialEnterpriseDependencies(project, child);
 								}
 							}
 						}
@@ -403,6 +405,24 @@ public class ProjectExampleUtil {
 		list.add(other);
 		handleCategories(list, monitor);
 		return list;
+	}
+
+	private static void parseEssentialEnterpriseDependencies(
+			ProjectExample project, Element enterpriseDependenciesElement) {
+
+		String tagsValue = enterpriseDependenciesElement.getTextContent();
+		if (tagsValue != null) {
+			StringTokenizer tokenizer = new StringTokenizer(tagsValue.trim(),",");//$NON-NLS-1$
+			Set<String> gavs = new HashSet<String>();
+			while (tokenizer.hasMoreTokens()) {
+				String gav = tokenizer.nextToken().trim();
+				if (gav.length() > 0) {
+					gavs.add(gav);
+				}
+			}
+			project.setEssentialEnterpriseDependencyGavs(gavs);
+		}
+
 	}
 
 	public static Set<URL> getCategoryURLs() {

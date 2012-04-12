@@ -43,8 +43,8 @@ public class WizardContext {
 		}
 	}
 
-	public void getProperty(String key) {
-		context.get(key);
+	public Object getProperty(String key) {
+		return context.get(key);
 	}
 	
 	private void fireChangeEvent(String key, Object value) {

@@ -109,8 +109,8 @@ public class NewProjectExamplesWizard2 extends Wizard implements INewWizard {
 			} else {
 			// FIXME
 			}
+			String type = projectExample.getImportType();
 			for (IProjectExamplesWizardPage contributedPage:contributedPages) {
-				String type = projectExample.getImportType();
 				if (type == null || !type.equals(contributedPage.getProjectExampleType())) {
 					continue;
 				}
@@ -171,18 +171,14 @@ public class NewProjectExamplesWizard2 extends Wizard implements INewWizard {
 		Set<String> keySet = extensionPages.keySet();
 		for (String key:keySet) {
 			List<ContributedPage> contributions = extensionPages.get(key);
+			boolean canSetProjectExample = isCentral && projectExample != null && key.equals(projectExample.getImportType());
 			for(ContributedPage page:contributions) {
 				try {
-					if (!isCentral) {
-						IProjectExamplesWizardPage contributedPage = (IProjectExamplesWizardPage) page.getConfigurationElement().createExecutableExtension(ProjectExamplesActivator.CLASS);
-						contributedPages.add(contributedPage);
-					} else {
-						if (projectExample != null && key.equals(projectExample.getImportType())) {
-							IProjectExamplesWizardPage contributedPage = (IProjectExamplesWizardPage) page.getConfigurationElement().createExecutableExtension(ProjectExamplesActivator.CLASS);
-							contributedPage.setProjectExample(projectExample);
-							contributedPages.add(contributedPage);
-						}
+					IProjectExamplesWizardPage contributedPage = (IProjectExamplesWizardPage) page.getConfigurationElement().createExecutableExtension(ProjectExamplesActivator.CLASS);
+					if (canSetProjectExample) {
+						contributedPage.setProjectExample(projectExample);
 					}
+					contributedPages.add(contributedPage);
 				} catch (CoreException e) {
 					ProjectExamplesActivator.log(e);
 				}

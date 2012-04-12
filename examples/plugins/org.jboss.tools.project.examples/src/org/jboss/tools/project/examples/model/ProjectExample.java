@@ -50,6 +50,7 @@ public class ProjectExample implements ProjectModelElement,
 	private String defaultProfiles = ""; //$NON-NLS-1$
 	private int priority;
 	private Set<String> tags;
+	private Set<String> essentialEnterpriseDependencies;
 	private String iconPath;
 
 	public ProjectExample() {
@@ -333,5 +334,14 @@ public class ProjectExample implements ProjectModelElement,
 			return name.compareTo(o.getName());
 		}
 		return -1;
+	}
+
+	public void setEssentialEnterpriseDependencyGavs(Set<String> gavs) {
+	  essentialEnterpriseDependencies = gavs;
+	}
+	
+
+	public Set<String> getEssentialEnterpriseDependencyGavs() {
+	  return essentialEnterpriseDependencies;
 	}
 }

@@ -11,7 +11,6 @@
 package org.jboss.tools.maven.project.examples.wizard;
 
 import java.lang.reflect.InvocationTargetException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -34,14 +33,11 @@ import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
-import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.MessageDialog;
-import org.eclipse.jface.layout.GridDataFactory;
-import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.preference.IPreferenceStore;
-import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.embedder.IMaven;
@@ -50,18 +46,13 @@ import org.eclipse.m2e.core.internal.MavenPluginActivator;
 import org.eclipse.m2e.core.project.ProjectImportConfiguration;
 import org.eclipse.m2e.core.ui.internal.Messages;
 import org.eclipse.osgi.util.NLS;
-import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Link;
 import org.eclipse.swt.widgets.TableItem;
-import org.eclipse.ui.PlatformUI;
 import org.jboss.tools.maven.project.examples.MavenProjectExamplesActivator;
+import org.jboss.tools.maven.project.examples.utils.MavenArtifactHelper;
 import org.jboss.tools.maven.project.examples.wizard.xpl.MavenProjectWizardArchetypeParametersPage;
 import org.jboss.tools.maven.ui.Activator;
 import org.jboss.tools.project.examples.ProjectExamplesActivator;
@@ -79,24 +70,17 @@ public class ArchetypeExamplesWizardPage extends
 		MavenProjectWizardArchetypeParametersPage implements IProjectExamplesWizardPage {
 
 	private ProjectExample projectDescription;
-	private Composite warningLink;
-	private Boolean isEnterpriseRepoAvailable;
 	private ProjectExample projectExample;
 	private boolean initialized = false;
 	private Map<String, Object> propertiesMap = new HashMap<String, Object>();
 	private WizardContext context;
+	private MissingRepositoryWarningComponent warningComponent;
+	private IStatus enterpriseRepoStatus;
 
 	public ArchetypeExamplesWizardPage() {
 		super(new ProjectImportConfiguration());
 	}
 	
-	public ArchetypeExamplesWizardPage(
-			ProjectImportConfiguration configuration, ProjectExample projectDescription) {
-		super(configuration);
-		setTitle(projectDescription.getShortDescription());
-		this.projectDescription = projectDescription;
-	}
-
 	@Override
 	public void createControl(Composite parent) {
 		super.createControl(parent);
@@ -165,46 +149,9 @@ public class ArchetypeExamplesWizardPage extends
 	protected void createAdvancedSettings(Composite composite, GridData gridData) {
 		// TODO Auto-generated method stub
 		super.createAdvancedSettings(composite, gridData);
-		createMissingRepositoriesWarning(composite, gridData);
+		warningComponent = new MissingRepositoryWarningComponent(composite, false);
 	}
 
-	private void createMissingRepositoriesWarning(Composite parent,
-			GridData gridData) {
-		//TODO make that damn component align correctly
-		//warningLink = new MissingRepositoryWarningComponent(parent);
-		
-		//TODO delete that code
-		warningLink = new Composite(parent, SWT.NONE);
-		
-		GridDataFactory.fillDefaults().align(SWT.LEFT, SWT.CENTER).span(3, 1)
-				.applyTo(warningLink);
-		GridLayoutFactory.fillDefaults().numColumns(2).applyTo(warningLink);
-
-		Label warningImg = new Label(warningLink, SWT.CENTER | SWT.TOP);
-		warningImg.setImage(JFaceResources.getImage(Dialog.DLG_IMG_MESSAGE_WARNING));
-
-		Link link = new Link(warningLink, SWT.NONE);
-		String message = "Artifacts needed from JBoss Enterprise Maven repository do not seem to be available.\nThis might cause build problems. "
-				+ "Follow this <a href=\"http://community.jboss.org/wiki/SettingUpTheJBossEnterpriseRepositories\">link</a> for more details.";
-		link.setText(message);
-		link.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				try {
-					// Open default external browser
-					PlatformUI.getWorkbench().getBrowserSupport()
-							.getExternalBrowser().openURL(new URL(e.text));
-				} catch (Exception ex) {
-					ex.printStackTrace();
-				}
-			}
-		});
-		
-		warningLink.setVisible(false);
-	}
-
-
-	
 	public Archetype getArchetype() {
 		return archetype;
 	}
@@ -332,7 +279,7 @@ public class ArchetypeExamplesWizardPage extends
 	}
 
 	private void checkEnterpriseProperty() {
-		if (warningLink == null) {
+		if (warningComponent == null) {
 			//Not initialized yet
 			return;
 		}
@@ -340,25 +287,25 @@ public class ArchetypeExamplesWizardPage extends
 		for(int i = 0; i < propertiesTable.getItemCount(); i++ ) {
 		      TableItem item = propertiesTable.getItem(i);
 		      String value = item.getText(VALUE_INDEX);
-		      if (item.getText(KEY_INDEX).equals("enterprise") 
+		      if (item.getText(KEY_INDEX).equals("enterprise")  //$NON-NLS-1$
 		    		  && (Boolean.TRUE.toString().equalsIgnoreCase(value)
 		    		  || "y".equalsIgnoreCase(value)
 		    		  || "yes".equalsIgnoreCase(value))
-		    		  && !assertEnterpriseRepoAccessible()) {
-		    	  warningLink.setVisible(true);
-		    	  return;
+		    		  ) {
+		    	  
+		    	boolean isWarningLinkVisible = false;
+				if (enterpriseRepoStatus == null) {
+					enterpriseRepoStatus = MavenArtifactHelper.checkEnterpriseRequirementsAvailable(projectExample); 
+				}
+				isWarningLinkVisible = !enterpriseRepoStatus.isOK();
+				if (isWarningLinkVisible) {
+					warningComponent.setLinkText(enterpriseRepoStatus.getMessage());
+				}
+				warningComponent.setVisible(isWarningLinkVisible);
+		    	return;
 		      }
 		}
-  	  warningLink.setVisible(false);
-	}
-	
-	private boolean assertEnterpriseRepoAccessible() {
-		if (isEnterpriseRepoAvailable != null) {
-			return isEnterpriseRepoAvailable.booleanValue();
-		}
-		
-		isEnterpriseRepoAvailable = MavenArtifactHelper.isEnterpriseRepositoryAvailable();
-		return isEnterpriseRepoAvailable.booleanValue();
+		warningComponent.setVisible(false);
 	}
 	
 	private Throwable getRootCause(Throwable ex) {
@@ -497,6 +444,13 @@ public class ArchetypeExamplesWizardPage extends
 				setDescription(ProjectExamplesActivator
 						.getShortDescription(projectExample.getDescription()));
 			}
+			ProjectImportConfiguration configuration = getImportConfiguration();
+			if (configuration != null) {
+				String profiles = projectExample.getDefaultProfiles();
+			    if (profiles != null && profiles.trim().length() > 0) {
+			    	configuration.getResolverConfiguration().setActiveProfiles(profiles);
+			    }
+			}
 			projectDescription = projectExample;
 			if (getContainer() != null) {
 				initialize();
@@ -527,6 +481,31 @@ public class ArchetypeExamplesWizardPage extends
 	@Override
 	public void setWizardContext(WizardContext context) {
 		this.context = context;
+		context.setProperty(MavenProjectConstants.IMPORT_PROJECT_CONFIGURATION, getImportConfiguration());
+		context.setProperty(MavenProjectConstants.MAVEN_MODEL, getDynamicModel());
 	}
+	
 
+	/** Returns a dynamic Model that can be shared across wizard pages. */
+	private Model getDynamicModel() {
+		Model model = new Model() {
+	    	public String getModelVersion() {
+	    		return "4.0.0"; //$NON-NLS-1$
+	    	}
+
+	    	public String getGroupId() {
+	    		return groupIdCombo.getText();
+	    	}
+	    	
+	    	public String getArtifactId(){
+	    		return artifactIdCombo.getText();
+	    	}
+	    	
+	    	public String getVersion(){
+	    		return versionCombo.getText();
+	    	}
+	    };
+	    return model;
+	  }
+	
 }

@@ -11,7 +11,6 @@
 package org.jboss.tools.maven.project.examples.wizard;
 
 import java.lang.reflect.Field;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashMap;
@@ -20,6 +19,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.regex.Pattern;
 
+import org.apache.maven.model.Model;
 import org.codehaus.plexus.util.StringUtils;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
@@ -27,10 +27,6 @@ import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.jface.dialogs.Dialog;
-import org.eclipse.jface.layout.GridDataFactory;
-import org.eclipse.jface.layout.GridLayoutFactory;
-import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.wizard.IWizard;
 import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.jst.j2ee.project.facet.IJ2EEFacetConstants;
@@ -40,8 +36,6 @@ import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
@@ -51,7 +45,6 @@ import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Link;
 import org.eclipse.ui.IWorkingSet;
-import org.eclipse.ui.PlatformUI;
 import org.eclipse.wst.common.project.facet.core.IProjectFacetVersion;
 import org.eclipse.wst.common.project.facet.core.ProjectFacetsManager;
 import org.eclipse.wst.common.project.facet.core.runtime.RuntimeManager;
@@ -62,6 +55,7 @@ import org.eclipse.wst.server.core.internal.facets.FacetUtil;
 import org.jboss.ide.eclipse.as.core.util.RuntimeUtils;
 import org.jboss.tools.maven.project.examples.MavenProjectExamplesActivator;
 import org.jboss.tools.maven.project.examples.Messages;
+import org.jboss.tools.maven.project.examples.utils.MavenArtifactHelper;
 import org.jboss.tools.project.examples.ProjectExamplesActivator;
 import org.jboss.tools.project.examples.model.ProjectExample;
 import org.jboss.tools.project.examples.wizard.IProjectExamplesWizardPage;
@@ -76,21 +70,22 @@ import org.jboss.tools.project.examples.wizard.WizardContext;
  */
 public class ArchetypeExamplesWizardFirstPage extends MavenProjectWizardLocationPage implements IProjectExamplesWizardPage {
 
-	private static final String TARGET_RUNTIME = "targetRuntime";
+	private static final String TARGET_RUNTIME = "targetRuntime"; //$NON-NLS-1$
 	private Label projectNameLabel;
 	private Combo projectNameCombo;
 	private Label packageLabel;
 	private Combo packageCombo;
 	private Combo serverTargetCombo;
 	private Map<String, IRuntime> serverRuntimes;
-	private Composite warningLink;
+	private MissingRepositoryWarningComponent warningComponent;
 	private boolean initialized;
-	private Boolean isEnterpriseRepoAvailable;
+	private IStatus enterpriseRepoStatus;
 	private ProjectExample projectDescription;
 	private ProjectExample projectExample;
 	private WizardContext context;
 	
 	private IRuntimeLifecycleListener listener;
+	private Link warninglink;
 	
 	public ArchetypeExamplesWizardFirstPage() {
 		super(new ProjectImportConfiguration(), "", "",new ArrayList<IWorkingSet>());
@@ -183,7 +178,7 @@ public class ArchetypeExamplesWizardFirstPage extends MavenProjectWizardLocation
 	
 	@Override
 	protected void createAdvancedSettings(Composite composite, GridData gridData) {
-		createMissingRepositoriesWarning(composite, gridData);
+		warningComponent = new MissingRepositoryWarningComponent(composite, false);
 	}
 
 	protected void createServerTargetComposite(Composite parent) {
@@ -249,7 +244,7 @@ public class ArchetypeExamplesWizardFirstPage extends MavenProjectWizardLocation
 		}
 		//Need to be called first, or error message would be overwritten
 		super.validate();
-
+		
 		String errorMessage = validateInputs();
 		setErrorMessage(errorMessage);
 		setMessage(null);
@@ -269,16 +264,18 @@ public class ArchetypeExamplesWizardFirstPage extends MavenProjectWizardLocation
 	      return Messages.ArchetypeExamplesWizardFirstPage_ProjectName_Cant_Be_Empty;
 	    }
 	    
+	    final String resolvedName = getImportConfiguration().getProjectName(getModel());
+	    
 	    // check whether the project name is valid
-	    final IStatus nameStatus = workspace.validateName(name, IResource.PROJECT);
+	    final IStatus nameStatus = workspace.validateName(resolvedName, IResource.PROJECT);
 	    if(!nameStatus.isOK()) {
 	      return nameStatus.getMessage();
 	    }
 		
 	    // check whether project already exists
-	    final IProject handle = workspace.getRoot().getProject(name);
+	    final IProject handle = workspace.getRoot().getProject(resolvedName);
 	    if(handle.exists()) {
-	      return Messages.ArchetypeExamplesWizardFirstPage_Existing_Project;
+	      return NLS.bind(Messages.ArchetypeExamplesWizardFirstPage_Existing_Project, resolvedName);
 	    }
 	    
 	    //check if the package is valid
@@ -297,10 +294,20 @@ public class ArchetypeExamplesWizardFirstPage extends MavenProjectWizardLocation
 	}
 
 	protected void validateEnterpriseRepo() {
-		
-		boolean isWarningLinkVisible = (isEnterpriseTargetRuntime() && !assertEnterpriseRepoAccessible());
-		if (warningLink != null) {
-			warningLink.setVisible(isWarningLinkVisible);
+		if (warningComponent != null) {
+			boolean isWarningLinkVisible = false;
+			if (isEnterpriseTargetRuntime()) {
+				if (enterpriseRepoStatus == null) {
+					enterpriseRepoStatus = MavenArtifactHelper.checkEnterpriseRequirementsAvailable(projectExample); 
+				}
+				isWarningLinkVisible = !enterpriseRepoStatus.isOK();
+				if (isWarningLinkVisible) {
+					warningComponent.setLinkText(enterpriseRepoStatus.getMessage());
+					//warninglink.setText(enterpriseRepoStatus.getMessage());
+					//warningComponent.getParent().layout(true, true);
+				}
+			}
+			warningComponent.setVisible(isWarningLinkVisible);
 		}
 	}
 
@@ -351,48 +358,6 @@ public class ArchetypeExamplesWizardFirstPage extends MavenProjectWizardLocation
 
 		initialized = true;
 		validate();
-	}
-
-	private void createMissingRepositoriesWarning(Composite parent,
-			GridData gridData) {
-		//TODO make that damn component align correctly
-		//warningLink = new MissingRepositoryWarningComponent(parent);
-		
-		//TODO delete that code
-		warningLink = new Composite(parent, SWT.NONE);
-		
-		GridDataFactory.fillDefaults().align(SWT.LEFT, SWT.CENTER).span(3, 1)
-				.applyTo(warningLink);
-		GridLayoutFactory.fillDefaults().numColumns(2).applyTo(warningLink);
-
-		Label warningImg = new Label(warningLink, SWT.CENTER | SWT.TOP);
-		warningImg.setImage(JFaceResources.getImage(Dialog.DLG_IMG_MESSAGE_WARNING));
-
-		Link link = new Link(warningLink, SWT.NONE);
-		link.setText(NLS.bind(Messages.ArchetypeExamplesWizardFirstPage_Unresolved_Enterprise_Repo, MavenArtifactHelper.ENTERPRISE_JBOSS_SPEC));
-		link.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				try {
-					// Open default external browser
-					PlatformUI.getWorkbench().getBrowserSupport()
-							.getExternalBrowser().openURL(new URL(e.text));
-				} catch (Exception ex) {
-					ex.printStackTrace();
-				}
-			}
-		});
-		
-		warningLink.setVisible(false);
-	}
-
-
-
-	private boolean assertEnterpriseRepoAccessible() {
-		if (isEnterpriseRepoAvailable == null) {
-			isEnterpriseRepoAvailable = MavenArtifactHelper.isEnterpriseRepositoryAvailable();
-		}
-		return isEnterpriseRepoAvailable.booleanValue();
 	}
 
 	protected Map<String, IRuntime> getServerRuntimes(
@@ -468,13 +433,6 @@ public class ArchetypeExamplesWizardFirstPage extends MavenProjectWizardLocation
 			if (projectExample.getDescription() != null) {
 				setDescription(ProjectExamplesActivator.getShortDescription(projectExample.getDescription()));
 			}
-			ProjectImportConfiguration configuration = getImportConfiguration();
-			if (configuration != null) {
-				String profiles = projectExample.getDefaultProfiles();
-			    if (profiles != null && profiles.trim().length() > 0) {
-			    	configuration.getResolverConfiguration().setActiveProfiles(profiles);
-			    }
-			}
 			initDefaultValues();
 		} 
 	}
@@ -545,5 +503,14 @@ public class ArchetypeExamplesWizardFirstPage extends MavenProjectWizardLocation
 		this.context = context;
 	}
 
+	@Override
+	public ProjectImportConfiguration getImportConfiguration() {
+		ProjectImportConfiguration importConfiguration = (ProjectImportConfiguration) context.getProperty(MavenProjectConstants.IMPORT_PROJECT_CONFIGURATION);
+		return importConfiguration;
+	}
+	
+	private Model getModel() {
+		return (Model) context.getProperty(MavenProjectConstants.MAVEN_MODEL);
+	}
 	
 }
