@@ -11,6 +11,7 @@
 package org.jboss.tools.central.editors;
 
 import java.io.UnsupportedEncodingException;
+import java.lang.reflect.Field;
 import java.net.URLEncoder;
 
 import org.eclipse.core.commands.AbstractHandler;
@@ -23,20 +24,28 @@ import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.action.ControlContribution;
 import org.eclipse.jface.action.GroupMarker;
 import org.eclipse.jface.action.IToolBarManager;
-import org.eclipse.mylyn.internal.provisional.commons.ui.CommonImages;
+import org.eclipse.jface.text.Document;
+import org.eclipse.jface.text.TextViewer;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.events.ControlAdapter;
 import org.eclipse.swt.events.ControlEvent;
+import org.eclipse.swt.events.DisposeEvent;
+import org.eclipse.swt.events.DisposeListener;
+import org.eclipse.swt.events.FocusAdapter;
+import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.ui.IEditorInput;
@@ -46,6 +55,9 @@ import org.eclipse.ui.forms.IManagedForm;
 import org.eclipse.ui.forms.editor.SharedHeaderFormEditor;
 import org.eclipse.ui.forms.widgets.ImageHyperlink;
 import org.eclipse.ui.forms.widgets.ScrolledForm;
+import org.eclipse.ui.internal.forms.widgets.BusyIndicator;
+import org.eclipse.ui.internal.forms.widgets.FormHeading;
+import org.eclipse.ui.internal.forms.widgets.TitleRegion;
 import org.eclipse.ui.menus.CommandContributionItem;
 import org.jboss.tools.central.JBossCentralActivator;
 import org.jboss.tools.central.actions.OpenJBossBlogsHandler;
@@ -63,7 +75,7 @@ public class JBossCentralEditor extends SharedHeaderFormEditor {
 
 	private static final String UTF_8_ENCODING = "UTF-8";
 
-	private static final String JBOSS_CENTRAL = "JBoss Central";
+	public static final String JBOSS_CENTRAL = "JBoss Central";
 
 	public static final String ID = "org.jboss.tools.central.editors.JBossCentralEditor";
 
@@ -74,6 +86,10 @@ public class JBossCentralEditor extends SharedHeaderFormEditor {
 	private Image headerImage;
 	private Image gettingStartedImage;
 	private Image softwareImage;
+
+	private Composite toolbarComposite;
+
+	private Composite searchComposite;
 
 	public JBossCentralEditor() {
 		super();
@@ -164,33 +180,11 @@ public class JBossCentralEditor extends SharedHeaderFormEditor {
 	@Override
 	protected void createHeaderContents(IManagedForm headerForm) {
 		final ScrolledForm form = headerForm.getForm();
-		form.setText(JBOSS_CENTRAL);
+		//form.setText(JBOSS_CENTRAL);
+		new HeaderText(form);
 		form.setToolTipText(JBOSS_CENTRAL);
 		form.setImage(getHeaderImage());
 		getToolkit().decorateFormHeading(form.getForm());
-
-		form.addControlListener(new ControlAdapter() {
-
-			boolean resize;
-
-			@Override
-			public void controlResized(ControlEvent e) {
-				if (resize) {
-					return;
-				}
-				resize = true;
-				try {
-					Point size = form.getSize();
-					if (size.x < 500) {
-						form.setSize(500, size.y);
-						form.layout(true, true);
-					}
-				} finally {
-					resize = false;
-				}
-			}
-
-		});
 		
 		IToolBarManager toolbar = form.getToolBarManager();
 		ControlContribution searchControl = new ControlContribution("Search") {
@@ -214,8 +208,10 @@ public class JBossCentralEditor extends SharedHeaderFormEditor {
 	}
 
 	protected Control createSearchControl(Composite parent) {
+		
+		toolbarComposite = parent;
 
-		Composite searchComposite = getToolkit().createComposite(parent);
+		searchComposite = getToolkit().createComposite(parent);
 		GridData gd = new GridData(SWT.BEGINNING, SWT.FILL, true, true);
 		gd.widthHint = 200;
 		searchComposite.setLayoutData(gd);
@@ -235,8 +231,7 @@ public class JBossCentralEditor extends SharedHeaderFormEditor {
 		gd = new GridData(SWT.FILL, SWT.TOP, false, false);
 		menuLink.setLayoutData(gd);
 		menuLink.setBackground(null);
-		menuLink.setImage(CommonImages
-				.getImage(CommonImages.TOOLBAR_ARROW_DOWN));
+		menuLink.setImage(JBossCentralActivator.getDefault().getImage("/icons/toolbar-arrow-down.gif"));
 		menuLink.setToolTipText("Search Menu");
 		final TextSearchControl searchControl = new TextSearchControl(
 				searchComposite, false);
@@ -360,6 +355,102 @@ public class JBossCentralEditor extends SharedHeaderFormEditor {
 
 	public SoftwarePage getSoftwarePage() {
 		return softwarePage;
+	}
+
+	private class HeaderText {
+
+		private StyledText titleLabel;
+
+		private BusyIndicator busyLabel;
+
+		private TitleRegion titleRegion;
+
+		private ScrolledForm form;
+
+		public HeaderText(ScrolledForm form) {
+			this.form = form;
+			try {
+				FormHeading heading = (FormHeading) form.getForm().getHead();
+				heading.setBusy(true);
+				heading.setBusy(false);
+
+				Field field = FormHeading.class.getDeclaredField("titleRegion"); //$NON-NLS-1$
+				field.setAccessible(true);
+				titleRegion = (TitleRegion) field.get(heading);
+
+				for (Control child : titleRegion.getChildren())
+					if (child instanceof BusyIndicator) {
+						busyLabel = (BusyIndicator) child;
+						break;
+					}
+				if (busyLabel == null)
+					throw new IllegalArgumentException();
+
+				final TextViewer titleViewer = new TextViewer(titleRegion, SWT.READ_ONLY);
+				titleViewer.setDocument(new Document());
+
+				titleLabel = titleViewer.getTextWidget();
+				titleLabel.setText(JBossCentralEditor.JBOSS_CENTRAL);
+				titleLabel.setForeground(heading.getForeground());
+				titleLabel.setFont(heading.getFont());
+				titleLabel.addFocusListener(new FocusAdapter() {
+					public void focusLost(FocusEvent e) {
+						titleLabel.setSelection(0);
+						Event selectionEvent= new Event();
+						selectionEvent.x = 0;
+						selectionEvent.y = 0;
+						titleLabel.notifyListeners(SWT.Selection, selectionEvent);
+					}
+				});
+				
+				Point size = titleLabel.computeSize(SWT.DEFAULT, SWT.DEFAULT);
+				
+				final Image emptyImage = new Image(heading.getDisplay(), size.x, size.y);
+				busyLabel.setImage(emptyImage);
+				titleLabel.addDisposeListener(new DisposeListener() {
+					
+					@Override
+					public void widgetDisposed(DisposeEvent e) {
+						emptyImage.dispose();
+					}
+				});
+
+				busyLabel.addControlListener(new ControlAdapter() {
+					public void controlMoved(ControlEvent e) {
+						updateSizeAndLocations();
+					}
+				});
+				titleLabel.moveAbove(busyLabel);
+				titleRegion.addControlListener(new ControlAdapter() {
+					public void controlResized(ControlEvent e) {
+						updateSizeAndLocations();
+					}
+				});
+				updateSizeAndLocations();
+			} catch (Exception e) {
+				JBossCentralActivator.log(e);
+			} 
+		}
+
+		private void updateSizeAndLocations() {
+			if (busyLabel == null || busyLabel.isDisposed())
+				return;
+			if (titleLabel == null || titleLabel.isDisposed())
+				return;
+			Point size = titleLabel.computeSize(SWT.DEFAULT, SWT.DEFAULT, true);
+			int y = (titleLabel.getParent().getSize().y - size.y) / 2;
+			titleLabel.setBounds(busyLabel.getLocation().x + 20, y, size.x, size.y);
+			titleRegion.setBounds(5, 0, size.x + 40, size.y + 8 );
+			if (toolbarComposite != null && !toolbarComposite.isDisposed()) {
+				int formWidth = form.getSize().x;
+				int width = size.x + 40 + toolbarComposite.getSize().x;
+				if (width > formWidth) {
+					searchComposite.setVisible(false);
+				} else{
+					searchComposite.setVisible(true);
+				}
+			}
+		}
 	}
 
 }
