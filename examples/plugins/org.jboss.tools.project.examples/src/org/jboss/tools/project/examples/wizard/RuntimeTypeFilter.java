@@ -1,5 +1,5 @@
 /*************************************************************************************
- * Copyright (c) 2008-2011 Red Hat, Inc. and others.
+ * Copyright (c) 2008-2012 Red Hat, Inc. and others.
  * All rights reserved. This program and the accompanying materials 
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -11,27 +11,30 @@
 package org.jboss.tools.project.examples.wizard;
 
 import java.util.List;
+import java.util.Set;
 
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerFilter;
+import org.eclipse.wst.server.core.IRuntimeType;
+import org.jboss.tools.project.examples.Messages;
 import org.jboss.tools.project.examples.ProjectExamplesActivator;
-import org.jboss.tools.project.examples.model.ProjectExampleCategory;
-import org.jboss.tools.project.examples.model.IProjectExampleSite;
+import org.jboss.tools.project.examples.fixes.WTPRuntimeFix;
 import org.jboss.tools.project.examples.model.ProjectExample;
+import org.jboss.tools.project.examples.model.ProjectExampleCategory;
 import org.jboss.tools.project.examples.model.ProjectModelElement;
 
 /**
  * 
- * @author snjeza
+ * @author Fred Bricon
  *
  */
-public class SiteFilter extends ViewerFilter {
+public class RuntimeTypeFilter extends ViewerFilter {
 
-	private String site;
+	private String runtimeType;
 	
-	public SiteFilter() {
+	public RuntimeTypeFilter() {
 		super();
-		site = ProjectExamplesActivator.ALL_SITES;
+		runtimeType = Messages.ProjectExamplesActivator_All;
 	}
 	
 	@Override
@@ -39,35 +42,39 @@ public class SiteFilter extends ViewerFilter {
 		if (! (element instanceof ProjectModelElement) ) {
 			return false;
 		}
-		
-		if (site.equals(ProjectExamplesActivator.ALL_SITES)) {
+		if (runtimeType.equals(ProjectExamplesActivator.ALL_RUNTIMES)) {
 			return true;
-		}
+		} 
 		
 		if (element instanceof ProjectExampleCategory) {
 			ProjectExampleCategory category = (ProjectExampleCategory) element;
-			IProjectExampleSite categorySite = category.getSite();
-			if (categorySite == null || !site.equals(categorySite.getName())) {
-				return false;
-			}
 			List<ProjectExample> projects = category.getProjects();
 			for (ProjectExample project:projects) {
-				IProjectExampleSite projectSite = project.getSite();
-				if (projectSite != null && site.equals(projectSite.getName())) {
-					return true;
+				if (hasServer(project)) {
+						return true;
 				}
 			}
 			return false;
 		}
-		ProjectModelElement model = (ProjectModelElement) element;
-		if (model.getSite() != null && site.equals(model.getSite().getName())) {
-			return true;
+		boolean select = false;
+		if (element instanceof ProjectExample) {
+			select = hasServer((ProjectExample) element);
+		}
+		return select;
+	}
+
+	private boolean hasServer(ProjectExample project) {
+		Set<IRuntimeType> runtimes = WTPRuntimeFix.getTargetedServerRuntimes(project);
+		for (IRuntimeType r : runtimes) {
+			if (runtimeType.equals(r.getName())) {
+				return true;
+			}
 		}
 		return false;
 	}
 
-	public void setSite(String site) {
-		this.site = site;
+	public void setRuntimeType(String runtimeType) {
+		this.runtimeType = runtimeType;
 	}
 
 }

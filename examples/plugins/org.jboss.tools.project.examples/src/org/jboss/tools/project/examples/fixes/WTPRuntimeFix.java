@@ -12,7 +12,9 @@ package org.jboss.tools.project.examples.fixes;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.StringTokenizer;
 
 import org.eclipse.core.resources.IProject;
@@ -177,8 +179,7 @@ public class WTPRuntimeFix implements ProjectExamplesFix {
 	}
 
 	private IRuntime getBestRuntime(ProjectExample project, ProjectFix fix) {
-		String allowedTypes = fix.getProperties().get(
-				ProjectFix.ALLOWED_TYPES);
+		String allowedTypes = fix.getProperties().get(ProjectFix.ALLOWED_TYPES);
 		if (allowedTypes == null) {
 			ProjectExamplesActivator.log(NLS.bind(Messages.WTPRuntimeFix_Invalid_WTP_runtime_fix, project.getName()));
 			return null;
@@ -365,4 +366,41 @@ public class WTPRuntimeFix implements ProjectExamplesFix {
 
 		return null;
 	}
+	
+
+	public static Set<IRuntimeType> getTargetedServerRuntimes(ProjectExample example) {
+		Set<IRuntimeType> targetedRuntimes = new HashSet<IRuntimeType>();
+		List<ProjectFix> fixes = example.getFixes();
+		if (fixes != null && !fixes.isEmpty()) {
+			IRuntime[] runtimes = ServerCore.getRuntimes();
+			if (runtimes.length > 0) {
+				for (ProjectFix fix : fixes) {
+					if (ProjectFix.WTP_RUNTIME.equals(fix.getType())) {
+						
+						String allowedTypes = fix.getProperties().get(ProjectFix.ALLOWED_TYPES);
+						if (allowedTypes == null) {
+							continue;
+						}
+						
+						StringTokenizer tokenizer = new StringTokenizer(allowedTypes, ","); //$NON-NLS-1$
+						while (tokenizer.hasMoreTokens()) {
+							String allowedType = tokenizer.nextToken().trim();
+							if (allowedType.length() <= 0) {
+								continue;
+							}
+							for (IRuntime runtime:runtimes) {
+								IRuntimeType runtimeType = runtime.getRuntimeType();
+								if (runtimeType != null && (ProjectFix.ANY.equals(allowedType) || runtimeType.getId().equals(allowedType))) {
+									targetedRuntimes.add(runtimeType);
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+		return targetedRuntimes;
+	}
+	
+	
 }

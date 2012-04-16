@@ -31,6 +31,7 @@ import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
+import org.eclipse.jface.viewers.ViewerFilter;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
@@ -48,14 +49,17 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.ui.dialogs.FilteredTree;
 import org.eclipse.ui.model.AdaptableList;
+import org.eclipse.wst.server.core.IRuntimeType;
 import org.jboss.tools.project.examples.Messages;
 import org.jboss.tools.project.examples.ProjectExamplesActivator;
+import org.jboss.tools.project.examples.fixes.WTPRuntimeFix;
 import org.jboss.tools.project.examples.model.IImportProjectExample;
 import org.jboss.tools.project.examples.model.IProjectExampleSite;
 import org.jboss.tools.project.examples.model.ProjectExample;
 import org.jboss.tools.project.examples.model.ProjectExampleCategory;
 import org.jboss.tools.project.examples.model.ProjectExampleUtil;
 import org.jboss.tools.project.examples.model.ProjectFix;
+import org.jboss.tools.project.examples.runtimes.RuntimeUtils;
 
 /**
  * @author snjeza
@@ -73,6 +77,7 @@ public class NewProjectExamplesMainPage extends WizardPage {
 	//private NewProjectExamplesReadyPage readyPage;
 	private List<IProjectExamplesWizardPage> pages;
 	private ProjectExample selectedProject;
+	private Combo targetRuntimeTypesCombo;
 	
 	public NewProjectExamplesMainPage(NewProjectExamplesRequirementsPage requirementsPage, List<IProjectExamplesWizardPage> pages) {
 		super("org.jboss.tools.project.examples.main"); //$NON-NLS-1$
@@ -109,6 +114,10 @@ public class NewProjectExamplesMainPage extends WizardPage {
 		new Label(siteComposite,SWT.NONE).setText(Messages.NewProjectExamplesWizardPage_Site);
 		siteCombo = new Combo(siteComposite,SWT.READ_ONLY);
 		siteCombo.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
+
+		new Label(siteComposite,SWT.NONE).setText(Messages.NewProjectExamplesMainPage_TargetedRuntime);
+		targetRuntimeTypesCombo = new Combo(siteComposite, SWT.READ_ONLY);
+		targetRuntimeTypesCombo .setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
 		
 		new Label(composite,SWT.NONE).setText(Messages.NewProjectExamplesWizardPage_Projects);
 		
@@ -132,7 +141,8 @@ public class NewProjectExamplesMainPage extends WizardPage {
 		viewer.setContentProvider(new ProjectContentProvider());
 		
 		final SiteFilter siteFilter = new SiteFilter();
-		viewer.addFilter(siteFilter);
+		final RuntimeTypeFilter serverFilter = new RuntimeTypeFilter();
+		viewer.setFilters(new ViewerFilter[]{siteFilter, serverFilter});
 		
 		Label descriptionLabel = new Label(composite,SWT.NONE);
 		descriptionLabel.setText(Messages.NewProjectExamplesWizardPage_Description);
@@ -225,28 +235,75 @@ public class NewProjectExamplesMainPage extends WizardPage {
 			public void widgetSelected(SelectionEvent e) {
 				IPreferenceStore store = ProjectExamplesActivator.getDefault().getPreferenceStore();
 				store.setValue(ProjectExamplesActivator.SHOW_EXPERIMENTAL_SITES, button.getSelection());
+				
+				//Store current combo selections
+				String selectedRuntime = targetRuntimeTypesCombo.getText();
+				String selectedSite = siteCombo.getText();
+
+				//Rebuild the combo lists
 				refresh(viewer, true);
-				if (siteCombo != null) {
-					String[] items = getItems();
-					int index = siteCombo.getSelectionIndex();
-					siteCombo.setItems(items);
-					if (items.length > 0 && (index < 0 || index > items.length) ) {
-						siteCombo.select(0);
-					} else {
-						siteCombo.select(index);
-					}
-				}
+
+				//Restore the combo selections with initial values if possible
+				restoreCombo(targetRuntimeTypesCombo, selectedRuntime);
+				restoreCombo(siteCombo, selectedSite);
+				
 				siteFilter.setSite(siteCombo.getText());
 				viewer.refresh();
 			}
 			
 		});
+
+		
+		targetRuntimeTypesCombo.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				serverFilter.setRuntimeType(targetRuntimeTypesCombo.getText());
+				viewer.refresh();
+			}
+		});
+
+		
 		setPageComplete(false);
 		
 		setControl(composite);
-		
+
 		refresh(viewer, true);
 		siteCombo.setText(ProjectExamplesActivator.ALL_SITES);
+		
+		targetRuntimeTypesCombo.setText(ProjectExamplesActivator.ALL_RUNTIMES);
+		
+		
+
+	}
+
+	private void loadRuntimeTypes() {
+		if (targetRuntimeTypesCombo == null) {
+			return;
+		}
+		targetRuntimeTypesCombo.removeAll();
+		targetRuntimeTypesCombo.add(ProjectExamplesActivator.ALL_RUNTIMES);
+		
+		Set<IRuntimeType> installedRuntimeTypes = RuntimeUtils.getInstalledRuntimeTypes();
+		List<IRuntimeType> sortedTypes = new ArrayList<IRuntimeType>();
+		
+		for (ProjectExampleCategory category : categories) {
+			for (ProjectExample project : category.getProjects()) {
+				for (IRuntimeType type : WTPRuntimeFix.getTargetedServerRuntimes(project)) {
+					if (!sortedTypes.contains(type)) {
+						//If runtime types have a server instance, display them first
+						if (installedRuntimeTypes.contains(type)) {
+							sortedTypes.add(0, type);
+						} else {
+							sortedTypes.add(type);
+						}
+					}
+				}
+			}
+		}
+		
+		for (IRuntimeType type : sortedTypes) {
+			targetRuntimeTypesCombo.add(type.getName());
+		}
 	}
 	
 	private void refresh(final TreeViewer viewer, boolean show) {
@@ -255,6 +312,7 @@ public class NewProjectExamplesMainPage extends WizardPage {
 		viewer.refresh();
 		String[] items = getItems();
 		siteCombo.setItems(items);		
+		loadRuntimeTypes();
 	}
 
 	private List<ProjectExampleCategory> getCategories(boolean show) {
@@ -411,5 +469,16 @@ public class NewProjectExamplesMainPage extends WizardPage {
 	public ProjectExample getSelectedProject() {
 		return selectedProject;
 	}
+
 	
+	private static void restoreCombo(Combo combo, String initialValue) {
+		//Look position of initial value
+		int selectedIdx = combo.indexOf(initialValue);
+		if (selectedIdx  < 0) {
+			//If initial value not found, reset to first item
+			selectedIdx = 0;
+		}
+		//Reset position of combo to the appropriate item index
+		combo.select(selectedIdx); 
+	}
 }

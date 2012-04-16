@@ -14,6 +14,7 @@ import org.eclipse.osgi.util.NLS;
 
 public class Messages extends NLS {
 	private static final String BUNDLE_NAME = "org.jboss.tools.project.examples.messages"; //$NON-NLS-1$
+	public static String NewProjectExamplesMainPage_TargetedRuntime;
 	public static String NewProjectExamplesWizardPage_Cannot_access_the_following_sites;
 	public static String NewProjectExamplesWizardPage_Site;
 	public static String Category_Other;
