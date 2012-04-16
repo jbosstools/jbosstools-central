@@ -26,10 +26,12 @@ public class FacesConfigQuickPeek {
 	private String FACES_CONFIG_SYSTEM_ID_1_1 = "http://java.sun.com/dtd/web-facesconfig_1_1.dtd";
 	private String FACES_CONFIG_SCHEMA_ID_1_2 = "http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-facesconfig_1_2.xsd";
 	private String FACES_CONFIG_SCHEMA_ID_2_0 = "http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-facesconfig_2_0.xsd";
+	private String FACES_CONFIG_SCHEMA_ID_2_1 = "http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-facesconfig_2_1.xsd";
 	private String FACES_CONFIG_ID_1_0 = "1.0";
 	private String FACES_CONFIG_ID_1_1 = "1.1";
 	private String FACES_CONFIG_ID_1_2 = "1.2";
 	private String FACES_CONFIG_ID_2_0 = "2.0";
+	private String FACES_CONFIG_ID_2_1 = "2.1";
 	
 	private XMLRootHandler handler;
 
@@ -101,6 +103,8 @@ public class FacesConfigQuickPeek {
 				version = FACES_CONFIG_ID_1_2;
 			} else if (schemaName.equals(FACES_CONFIG_SCHEMA_ID_2_0)) {
 				version = FACES_CONFIG_ID_2_0;
+			} else if (schemaName.equals(FACES_CONFIG_SCHEMA_ID_2_1)) {
+				version = FACES_CONFIG_ID_2_1;
 			} 
 		}
 		return version;
