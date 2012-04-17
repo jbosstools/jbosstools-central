@@ -1,10 +1,15 @@
 package org.jboss.tools.central.test.ui.bot;
 
+import org.eclipse.swtbot.eclipse.finder.waits.Conditions;
 import org.eclipse.swtbot.swt.finder.exceptions.WidgetNotFoundException;
+import org.eclipse.swtbot.swt.finder.utils.Traverse;
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotMenu;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 import org.jboss.tools.ui.bot.ext.SWTBotFactory;
 import org.jboss.tools.ui.bot.ext.SWTFormsBotExt;
 import org.jboss.tools.ui.bot.ext.SWTTestExt;
+import org.jboss.tools.ui.bot.ext.condition.NonSystemJobRunsCondition;
 import org.jboss.tools.ui.bot.ext.config.Annotations.Require;
 import org.jboss.tools.ui.bot.ext.config.Annotations.ServerType;
 import org.jboss.tools.ui.bot.ext.parts.SWTBotTwistie;
@@ -25,6 +30,7 @@ public class CreateProjectsWithServerTest extends SWTTestExt{
 	
 	@After
 	public void teardown(){
+		servers.removeAllProjectsFromServer("AS-7.0");
 		/*SWTBotTreeItem[] items = ProblemsView.getErrorsNode(bot).getItems();
 		for (SWTBotTreeItem swtBotTreeItem : items) {
 			log.error(swtBotTreeItem.toString());
@@ -44,7 +50,7 @@ public class CreateProjectsWithServerTest extends SWTTestExt{
 		log.info(bot.activeShell().getText());
 		bot.hyperlink(IDELabel.JBossCentralEditor.OPENSHIFT_APP).click();
 		bot.waitForShell(IDELabel.JBossCentralEditor.OPENSHIFT_APP_WIZARD);
-		//assertTrue("New Dynamic Web Project should have appeared", bot.shell(IDELabel.JBossCentralEditor.OPENSHIFT_APP_WIZARD).isActive());
+		assertTrue("New OpenShift Express Application window should have appeared", bot.shell(IDELabel.JBossCentralEditor.OPENSHIFT_APP_WIZARD).isActive());
 		bot.activeShell().close();
 		
 		//check Project example and detection of server
@@ -80,7 +86,7 @@ public class CreateProjectsWithServerTest extends SWTTestExt{
 //		bot.waitForShell("Progress Information");
 //		util.waitForNonIgnoredJobs(Long.MAX_VALUE);
 //		//bot.waitUntil(Conditions.shellCloses(bot.activeShell()), Long.MAX_VALUE, TIME_5S);
-//		projectExampleShell.close();
+//		projectExampleShell.close();j
 		
 		//server should be added.. check again
 		//formsBot.formTextWithText(IDELabel.JBossCentralEditor.JAVA_EE_WEB_PROJECT).click();
@@ -117,7 +123,7 @@ public class CreateProjectsWithServerTest extends SWTTestExt{
 		bot.activeShell().close();
 	}
 	
-	@Test
+	//@Test
 	public void projectExamplesSectionTest(){
 		SWTBotTwistie twistieBot = bot.twistieByLabel("JBoss Quickstarts");
 		while (!twistieBot.isExpanded()){
@@ -132,6 +138,32 @@ public class CreateProjectsWithServerTest extends SWTTestExt{
 		checkExample(formsBot, "Login", true, "login.xml"); //Login example ma nejaky divny login.xml cheatsheet
 		checkExample(formsBot, "Kitchensink", true);
 		checkExample(formsBot, "HTML5", true);
+	}
+	
+	/**
+	 * Tries to deploy all projects
+	 */
+	
+	@Test
+	public void canBeDeployedTest(){
+		servers.show();
+		servers.findServerByName(servers.bot().tree(), "AS-7.0").contextMenu("Add and Remove...").click();
+		for (SWTBotTreeItem treeItem : bot.tree().getAllItems()) {
+			treeItem.select();
+			bot.clickButton("Add >");
+		}
+		
+		bot.clickButton("Finish");
+		bot.waitWhile(new NonSystemJobRunsCondition());
+		assertNull("Errors node should be null", problems.getErrorsNode(bot));
+		SWTBotTreeItem serverTreeItem = servers.findServerByName(servers.bot().tree(), "AS-7.0").expand();
+		for (SWTBotTreeItem projectName : projectExplorer.show().bot().tree().getAllItems()) {
+			try{
+				serverTreeItem.getNode(projectName.getText()+"  [Started, Synchronized]");
+			}catch (WidgetNotFoundException wnfe){
+				fail("Project <"+projectName.getText()+"> is not deployed on server correctly");
+			}
+		}
 	}
 	
 	private void waitForAWhile(){
