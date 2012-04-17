@@ -123,7 +123,7 @@ public class CreateProjectsWithServerTest extends SWTTestExt{
 		bot.activeShell().close();
 	}
 	
-	//@Test
+	@Test
 	public void projectExamplesSectionTest(){
 		SWTBotTwistie twistieBot = bot.twistieByLabel("JBoss Quickstarts");
 		while (!twistieBot.isExpanded()){
