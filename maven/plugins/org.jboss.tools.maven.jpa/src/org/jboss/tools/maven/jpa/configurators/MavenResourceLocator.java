@@ -11,6 +11,7 @@
 package org.jboss.tools.maven.jpa.configurators;
 
 import java.io.File;
+import java.lang.reflect.Method;
 import java.util.List;
 
 import org.apache.maven.model.Resource;
@@ -56,7 +57,7 @@ public class MavenResourceLocator implements ResourceLocator {
 	 * Accepts all resources not under the build output and test build output
 	 * folders
 	 */
-	public boolean acceptResourceLocation(IProject project, IContainer container) {
+	public boolean resourceLocationIsValid(IProject project, IContainer container) {
 		IMavenProjectFacade mavenProjectFacade = getMavenProjectFacade(project);
 		boolean accept = true;
 		if (mavenProjectFacade != null
@@ -72,7 +73,7 @@ public class MavenResourceLocator implements ResourceLocator {
 		} else {
 			// Maven project not loaded yet, fallback to default behaviour.
 			//System.err.println(project + " not loaded");
-			accept = getDelegate(project).acceptResourceLocation(project, container);
+			accept = isResourceLocationValid(getDelegate(project), project, container);
 		}
 		// Sometimes src/main/resources/META-INF is not even sent immediately to
 		// this method, resulting in persistence.xml not being added to the jpaFiles 
@@ -208,4 +209,34 @@ public class MavenResourceLocator implements ResourceLocator {
 		IPath runtimePath = getDelegate(project).getRuntimePath(project, resourcePath);
 		return runtimePath;
 	}
+
+	/**
+	 * @deprecated use {@link #acceptResourceLocation(IProject, IContainer)} instead
+	 */
+	@Deprecated
+	public boolean acceptResourceLocation(IProject project, IContainer container) {
+		return resourceLocationIsValid(project, container);
+	}
+	
+	
+	//Ugly workaround to deal with Dali API changes in Juno and keep backward compatibility with Indigo
+	private static boolean isResourceLocationValid(ResourceLocator resourceLocator, IProject project, IContainer container) {
+		Method isResourceLocationIsValid = null;
+		for (Method m : resourceLocator.getClass().getMethods()) {
+			if ("isResourceLocationIsValid".equals(m.getName()) || "acceptResourceLocation".equals(m.getName())) {
+				isResourceLocationIsValid = m;
+				break;
+			}
+		}
+		boolean result = false;
+		if (isResourceLocationIsValid != null) {
+			try {
+				result = (Boolean)isResourceLocationIsValid.invoke(resourceLocator, project, container);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+		return result;
+	}
+	
 }

@@ -10,6 +10,7 @@
  ************************************************************************************/
 package org.jboss.tools.maven.jpa.configurators;
 
+import java.lang.reflect.Method;
 import java.util.List;
 
 import org.eclipse.core.resources.IFile;
@@ -36,7 +37,7 @@ public class JptUtils {
 	 * @return the IFile persitence.xml handle. Can be null. 
 	 */
 	public static  IFile getPersistenceXml(IProject project) {
-		ResourceLocator resourceLocator = JptCommonCorePlugin.getResourceLocator(project);
+		ResourceLocator resourceLocator = getResourceLocator(project);
 		if (resourceLocator == null) {
 			return null;
 		}
@@ -74,6 +75,31 @@ public class JptUtils {
 			return JpaFacet.FACET.getDefaultVersion();
 		}
 		return JpaFacet.FACET.getVersion(version);
+	}
+
+	
+	public static ResourceLocator getResourceLocator(IProject project) {
+	  Method getResourceLocator;
+	  try {
+		getResourceLocator = JptCommonCorePlugin.class.getMethod("getResourceLocator", IProject.class);
+		if(getResourceLocator!=null) {
+			return (ResourceLocator)getResourceLocator.invoke(null, project);
+		}
+      } catch (NoSuchMethodException e) {
+		try {
+			Class<?> resourceLocatorManagerClass = Class.forName("org.eclipse.jpt.common.core.internal.resource.ResourceLocatorManager");
+			Object instance = resourceLocatorManagerClass.getMethod("getInstance", null).invoke(null, null);
+			getResourceLocator = resourceLocatorManagerClass.getMethod("getResourceLocator", IProject.class);
+			if(getResourceLocator!=null) {
+				return (ResourceLocator)getResourceLocator.invoke(instance, project);
+			} ;
+		} catch (Exception e1) {
+		  e1.printStackTrace();
+		}
+	  } catch (Exception e) {
+		e.printStackTrace();
+	  }
+	  return null;  
 	}
 	
 }
