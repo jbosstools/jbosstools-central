@@ -30,12 +30,9 @@ import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.browser.Browser;
 import org.eclipse.swt.graphics.Image;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
-import org.eclipse.ui.IPerspectiveDescriptor;
-import org.eclipse.ui.IPerspectiveListener;
 import org.eclipse.ui.IViewReference;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PartInitException;
@@ -62,8 +59,6 @@ import org.osgi.service.prefs.BackingStoreException;
  * The activator class controls the plug-in life cycle
  */
 public class JBossCentralActivator extends AbstractUIPlugin {
-
-	private static final String JBOSS_PERSPECTIVE_ID = "org.jboss.tools.common.ui.JBossPerspective";
 
 	public static final Object JBOSS_CENTRAL_FAMILY = new Object();
 
@@ -111,23 +106,6 @@ public class JBossCentralActivator extends AbstractUIPlugin {
 	private static JBossCentralActivator plugin;
 
 	private static Boolean isInternalWebBrowserAvailable;
-	
-	private IPerspectiveListener perspectiveListener = new IPerspectiveListener() {
-		
-		@Override
-		public void perspectiveChanged(IWorkbenchPage page,
-				IPerspectiveDescriptor perspective, String changeId) {
-		}
-		
-		@Override
-		public void perspectiveActivated(IWorkbenchPage page,
-				IPerspectiveDescriptor perspective) {
-			String id = perspective.getId();
-			if (JBOSS_PERSPECTIVE_ID.equals(id) && showJBossCentralOnStartup()) {
-				getJBossCentralEditor();
-			}
-		}
-	};
 
 	/**
 	 * The constructor
@@ -146,13 +124,6 @@ public class JBossCentralActivator extends AbstractUIPlugin {
 		super.start(context);
 		this.bundleContext = context;
 		plugin = this;
-		Display.getDefault().asyncExec(new Runnable() {
-			
-			@Override
-			public void run() {
-				PlatformUI.getWorkbench().getActiveWorkbenchWindow().addPerspectiveListener(perspectiveListener);
-			}
-		});
 	}
 
 	/*
@@ -163,17 +134,6 @@ public class JBossCentralActivator extends AbstractUIPlugin {
 	 * )
 	 */
 	public void stop(BundleContext context) throws Exception {
-		Display.getDefault().syncExec(new Runnable() {
-			
-			@Override
-			public void run() {
-				try {
-					PlatformUI.getWorkbench().getActiveWorkbenchWindow().removePerspectiveListener(perspectiveListener);
-				} catch (Throwable e) {
-					// ignore
-				}
-			}
-		});
 		Job.getJobManager().cancel(JBOSS_CENTRAL_FAMILY); 
 		Job.getJobManager().join(JBOSS_CENTRAL_FAMILY, new NullProgressMonitor());
 		
