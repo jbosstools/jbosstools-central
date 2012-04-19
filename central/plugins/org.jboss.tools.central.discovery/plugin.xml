@@ -233,7 +233,7 @@
             license="Free, EPL"
             name="Eclipse EGit"
             provider="eclipse.org"
-            siteUrl="http://download.jboss.org/jbosstools/updates/indigo/SR2/">
+            siteUrl="http://download.jboss.org/jbosstools/updates/indigo/">
 	    <iu id="org.eclipse.egit"/>
          <icon
                image32="images/egit_32.png">
@@ -269,8 +269,8 @@
             id="org.jboss.tools.central.discovery.testing"
             name="Testing"
             relevance="60">
- 			<group id="org.jboss.tools.central.discovery.testing.local" />
- 			<group id="org.jboss.tools.central.discovery.testing.remote" />
+	<group id="org.jboss.tools.central.discovery.testing.local" />
+ 	<group id="org.jboss.tools.central.discovery.testing.remote" />
       </connectorCategory>
       
       <connectorDescriptor
@@ -394,7 +394,7 @@
             license="Free, EPL, Other"
             name="JST Server"
             provider="Eclipse.org"
-            siteUrl="http://download.jboss.org/jbosstools/updates/indigo/SR2/">
+            siteUrl="http://download.jboss.org/jbosstools/updates/indigo/">
             <!-- <iu id="org.eclipse.jst.server_adapters.ext.feature"/> -->
             <iu id="org.eclipse.jst.server_adapters.feature"/>
             <iu id="org.eclipse.jst.server_core.feature"/>
@@ -417,7 +417,7 @@
             license="EPL, Other"
             name="Google Plugin + Web Toolkit"
             provider="Google, Inc."
-            siteUrl="http://download.jboss.org/jbosstools/updates/indigo/SR2/">
+            siteUrl="http://download.jboss.org/jbosstools/updates/indigo/">
             <iu id="com.google.gwt.eclipse.sdkbundle.e37.feature"/>
             <iu id="com.google.gdt.eclipse.suite.e37.feature"/>
          <icon
@@ -451,8 +451,6 @@
                url="http://www.springsource.com/developer">
          </overview>
       </connectorDescriptor>
-      
-      <!-- TODO: change URLs from http://download.jboss.org/jbosstools/updates/indigo/SR2/ to http://download.jboss.org/jbosstools/updates/indigo/ after Beta1 -->
       
 	</extension>
 </plugin>
