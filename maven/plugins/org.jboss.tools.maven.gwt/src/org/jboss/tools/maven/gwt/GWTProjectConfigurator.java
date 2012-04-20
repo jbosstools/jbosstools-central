@@ -10,30 +10,34 @@
  ******************************************************************************/
 package org.jboss.tools.maven.gwt;
 
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.maven.model.Plugin;
-import org.apache.maven.plugin.MojoExecution;
+import org.eclipse.core.resources.IFolder;
+import org.eclipse.core.resources.IProject;
+import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jface.preference.IPreferenceStore;
-import org.eclipse.m2e.core.project.MavenProjectChangedEvent;
 import org.eclipse.m2e.core.project.configurator.AbstractProjectConfigurator;
 import org.eclipse.m2e.core.project.configurator.ProjectConfigurationRequest;
+import org.jboss.tools.common.model.project.ProjectHome;
 import org.jboss.tools.maven.ui.Activator;
 import org.osgi.service.prefs.BackingStoreException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.gdt.eclipse.core.properties.WebAppProjectProperties;
 import com.google.gwt.eclipse.core.modules.IModule;
 import com.google.gwt.eclipse.core.modules.ModuleUtils;
 import com.google.gwt.eclipse.core.properties.GWTProjectProperties;
 
 public class GWTProjectConfigurator extends AbstractProjectConfigurator {
-	
 	private static final Logger log = LoggerFactory.getLogger(GWTProjectConfigurator.class);
 
 	public static final String GWT_WAR_MAVEN_PLUGIN_KEY = "org.codehaus.mojo:gwt-maven-plugin";
@@ -58,11 +62,38 @@ public class GWTProjectConfigurator extends AbstractProjectConfigurator {
 				try {
 					GWTProjectProperties.setEntryPointModules(projectConfig.getProject(), modNames);
 				} catch (BackingStoreException e) {
-					log.error("Exception in Maven GWT Configurator", e);
+					logError("Exception in Maven GWT Configurator, cannot set entry point modules", e);
 				}
+				
+				try {
+					IPath webContentPath = getWebContentFolder(projectConfig.getProject(), monitor);
+					IFolder outputWorkspaceFolder = projectConfig.getProject().getWorkspace().getRoot().getFolder(webContentPath);
+					WebAppProjectProperties.setLastUsedWarOutLocation(projectConfig.getProject(), outputWorkspaceFolder.getFullPath());
+				} catch (BackingStoreException e) {
+					logError("Exception in Maven GWT Configurator, cannot set war output location", e);
+				}
+
 			} else {
 				log.debug("Skip configurator for non Java project {}",projectName);
 			}
 		}
+	}
+
+	/**
+	 * Report error in logger and eclipse user interface
+	 * @param message - exception context description 
+	 * @param e - exception to report
+	 */
+	private void logError(final String message, BackingStoreException e) {
+		log.error(message, e);
+		MavenGWTPlugin.log(message,e);
+	}
+	
+	private IPath getWebContentFolder(IProject project, IProgressMonitor monitor) throws CoreException {
+		IPath webContentPath = ProjectHome.getFirstWebContentPath(project);
+		Assert.isTrue(webContentPath != null && !webContentPath.isEmpty(),
+				MessageFormat
+						.format("No web content folder was found in project {0}", project.getName()));
+		return webContentPath;
 	}
 }

@@ -10,8 +10,12 @@
  ******************************************************************************/
 package org.jboss.tools.maven.gwt;
 
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Platform;
+import org.eclipse.core.runtime.Status;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
+import org.osgi.service.prefs.BackingStoreException;
 
 public class MavenGWTPlugin implements BundleActivator {
 
@@ -37,4 +41,8 @@ public class MavenGWTPlugin implements BundleActivator {
 		MavenGWTPlugin.context = null;
 	}
 
+	public static void log(String message, BackingStoreException e) {
+		Platform.getLog(MavenGWTPlugin.getContext().getBundle()).log(new Status(IStatus.ERROR,context.getBundle().getSymbolicName(),message));
+	}
+	
 }
