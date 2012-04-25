@@ -36,6 +36,8 @@ import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
@@ -99,6 +101,11 @@ public class ArchetypeExamplesWizardFirstPage extends MavenProjectWizardLocation
 		setPageComplete(false);
 	}
 	
+	public void createControl(Composite parent) {
+		super.createControl(parent);
+		setUseDefaultWorkspaceLocation(ProjectExamplesActivator.getDefault().getPreferenceStore().getBoolean(ProjectExamplesActivator.PROJECT_EXAMPLES_DEFAULT));
+		setLocationCombo(ProjectExamplesActivator.getDefault().getPreferenceStore().getString(ProjectExamplesActivator.PROJECT_EXAMPLES_OUTPUT_DIRECTORY));
+	}
 	@Override
 	protected void createAdditionalControls(Composite container) {
 
@@ -381,15 +388,45 @@ public class ArchetypeExamplesWizardFirstPage extends MavenProjectWizardLocation
 
 
 	public void setUseDefaultWorkspaceLocation(boolean value) {
-		Class clazz = MavenProjectWizardLocationPage.class;
 		try {
-			Field field = clazz.getDeclaredField("useDefaultWorkspaceLocationButton"); //$NON-NLS-1$
+			Field field = this.getClass().getSuperclass().getDeclaredField("useDefaultWorkspaceLocationButton"); //$NON-NLS-1$
 			field.setAccessible(true);
 			Object useDefaultWorkspaceLocation = field.get(this);
 			if (useDefaultWorkspaceLocation instanceof Button) {
-				Button useDefaultWorkspaceLocationButton = (Button) useDefaultWorkspaceLocation;
+				final Button useDefaultWorkspaceLocationButton = (Button) useDefaultWorkspaceLocation;
 				useDefaultWorkspaceLocationButton.setSelection(value);
 				useDefaultWorkspaceLocationButton.notifyListeners(SWT.Selection, new Event());
+				useDefaultWorkspaceLocationButton.addSelectionListener(new SelectionAdapter() {
+					
+					@Override
+					public void widgetSelected(SelectionEvent e) {
+						ProjectExamplesActivator.getDefault().getPreferenceStore().setValue(ProjectExamplesActivator.PROJECT_EXAMPLES_DEFAULT, useDefaultWorkspaceLocationButton.getSelection());
+					}
+				
+				});
+			}
+		} catch (Exception e) {
+			MavenProjectExamplesActivator.log(e);
+		} 
+	}
+	
+	public void setLocationCombo(String defaultLocation) {
+		try {
+			Field field = this.getClass().getSuperclass().getDeclaredField("locationCombo"); //$NON-NLS-1$
+			field.setAccessible(true);
+			Object locationComboField = field.get(this);
+			if (locationComboField instanceof Combo) {
+				final Combo locationCombo = (Combo) locationComboField;
+				locationCombo.setText(defaultLocation);
+				locationCombo.notifyListeners(SWT.Selection, new Event());
+				locationCombo.addModifyListener(new ModifyListener() {
+					
+					@Override
+					public void modifyText(ModifyEvent e) {
+						ProjectExamplesActivator.getDefault().getPreferenceStore().setValue(ProjectExamplesActivator.PROJECT_EXAMPLES_OUTPUT_DIRECTORY, locationCombo.getText());
+					}
+				
+				});
 			}
 		} catch (Exception e) {
 			MavenProjectExamplesActivator.log(e);
