@@ -63,6 +63,8 @@ public abstract class AbstractRefreshJob extends Job {
 	}
 
 	public abstract File getCacheFile();
+	
+	public abstract File getValidCacheFile();
 
 	protected void getEntries(File file) throws IOException,
 			IllegalArgumentException, FeedException {
@@ -185,36 +187,14 @@ public abstract class AbstractRefreshJob extends Job {
 						cacheFile.getName(), urlString, destination, monitor);
 				URL url = getURL();
 				if (monitor.isCanceled()) {
-					return Status.CANCEL_STATUS;
+					return getValidEntries(monitor);
 				}
 				if (status.isOK() && url != null) {
-					cacheModified = ECFExamplesTransport.getInstance()
-							.getLastModified(url);
-					InputStream in = null;
-					OutputStream out = null;
-					try {
-						in = new FileInputStream(tempFile);
-						out = new FileOutputStream(cacheFile);
-						ProjectExamplesActivator.copy(in, out);
-					} finally {
-						if (in != null) {
-							try {
-								in.close();
-							} catch (Exception e) {
-								// ignore
-							}
-						}
-						if (out != null) {
-							try {
-								out.close();
-							} catch (Exception e) {
-								// ignore
-							}
-						}
-					}
+					cacheModified = ECFExamplesTransport.getInstance().getLastModified(url);
+					ProjectExamplesActivator.copyFile(tempFile, cacheFile);
 					tempFile.delete();
 					if (monitor.isCanceled()) {
-						return Status.CANCEL_STATUS;
+						return getValidEntries(monitor);
 					}
 					cacheFile.setLastModified(cacheModified);
 					getEntries(cacheFile);
@@ -222,12 +202,46 @@ public abstract class AbstractRefreshJob extends Job {
 					setException(status.getException());
 				}
 			} catch (Exception e) {
+				return getValidEntries(monitor);
+			}
+		}
+		if (monitor.isCanceled()) {
+			return getValidEntries(monitor);
+		}
+		if (getEntries().size() > 0) {
+			try {
+				File validCacheFile = getValidCacheFile();
+				if (!validCacheFile.isFile() || cacheFile.lastModified() != validCacheFile.lastModified()) {
+					ProjectExamplesActivator.copyFile(cacheFile, getValidCacheFile());
+					validCacheFile.setLastModified(cacheFile.lastModified());
+				}
+			} catch (Exception e) {
+				exception = e;
+				return getValidEntries(monitor);
+			}
+		} else {
+			return getValidEntries(monitor);
+		}
+		return Status.OK_STATUS;
+	}
+
+	protected IStatus getValidEntries(IProgressMonitor monitor) {
+		File file = getValidCacheFile();
+		if (file.isFile()) {
+			try {
+				getEntries(file);
+			} catch (Exception e) {
 				exception = e;
 				return Status.CANCEL_STATUS;
 			}
 		}
+		if (monitor.isCanceled()) {
+			return Status.CANCEL_STATUS;
+		}
 		return Status.OK_STATUS;
 	}
+
+	
 
 	private long getUrlModified() {
 		URL url = getURL();

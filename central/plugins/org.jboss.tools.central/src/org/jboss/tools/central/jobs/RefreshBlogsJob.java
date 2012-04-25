@@ -24,6 +24,7 @@ import org.jboss.tools.project.examples.ProjectExamplesActivator;
 public class RefreshBlogsJob extends AbstractRefreshJob {
 
 	private static final String CACHE_FILE = "blogs.xml";
+	private static final String VALID_CACHE_FILE = "valid_blogs.xml";
 	public static RefreshBlogsJob INSTANCE = new RefreshBlogsJob();
 	
 	private RefreshBlogsJob() {
@@ -32,8 +33,17 @@ public class RefreshBlogsJob extends AbstractRefreshJob {
 
 	@Override
 	public File getCacheFile() {
+		return getFile(CACHE_FILE);
+	}
+
+	protected File getFile(String name) {
 		IPath location = JBossCentralActivator.getDefault().getStateLocation();
-		File file = new File(location.toFile(), CACHE_FILE);
+		File file = new File(location.toFile(), name);
 		return file;
+	}
+	
+	@Override
+	public File getValidCacheFile() {
+		return getFile(VALID_CACHE_FILE);
 	}
 }

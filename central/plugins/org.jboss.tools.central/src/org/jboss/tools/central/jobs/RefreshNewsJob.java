@@ -24,6 +24,8 @@ import org.jboss.tools.project.examples.ProjectExamplesActivator;
 public class RefreshNewsJob extends AbstractRefreshJob {
 
 	private static final String CACHE_FILE = "news.xml";
+	private static final String VALID_CACHE_FILE = "valid_news.xml";
+	
 	public static RefreshNewsJob INSTANCE = new RefreshNewsJob();
 
 	
@@ -33,8 +35,17 @@ public class RefreshNewsJob extends AbstractRefreshJob {
 
 	@Override
 	public File getCacheFile() {
+		return getFile(CACHE_FILE);
+	}
+
+	protected File getFile(String name) {
 		IPath location = JBossCentralActivator.getDefault().getStateLocation();
-		File file = new File(location.toFile(), CACHE_FILE);
+		File file = new File(location.toFile(), name);
 		return file;
+	}
+	
+	@Override
+	public File getValidCacheFile() {
+		return getFile(VALID_CACHE_FILE);
 	}
 }
