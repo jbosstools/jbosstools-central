@@ -16,6 +16,8 @@ import org.eclipse.jface.wizard.IWizard;
 import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.ModifyEvent;
+import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
@@ -130,10 +132,18 @@ public class NewProjectExamplesLocationPage extends WizardPage {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				enableControls(outputDirectoryBrowse);
+				ProjectExamplesActivator.getDefault().getPreferenceStore().setValue(ProjectExamplesActivator.PROJECT_EXAMPLES_DEFAULT, isWorkspace.getSelection());
 			}
 			
 		});
 		
+		outputDirectoryText.addModifyListener(new ModifyListener() {
+			
+			@Override
+			public void modifyText(ModifyEvent e) {
+				ProjectExamplesActivator.getDefault().getPreferenceStore().setValue(ProjectExamplesActivator.PROJECT_EXAMPLES_OUTPUT_DIRECTORY, outputDirectoryText.getText());
+			}
+		});
 		Control workingSetControl= createWorkingSetControl(composite);
 		workingSetControl.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
