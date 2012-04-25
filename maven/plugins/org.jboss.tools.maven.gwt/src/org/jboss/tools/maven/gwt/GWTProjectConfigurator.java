@@ -15,7 +15,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.maven.model.Plugin;
-import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
@@ -23,10 +22,10 @@ import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.Platform;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.m2e.core.project.MavenProjectChangedEvent;
 import org.eclipse.m2e.core.project.configurator.AbstractProjectConfigurator;
 import org.eclipse.m2e.core.project.configurator.ProjectConfigurationRequest;
 import org.jboss.tools.common.model.project.ProjectHome;
@@ -57,42 +56,9 @@ public class GWTProjectConfigurator extends AbstractProjectConfigurator {
 			if(javaProject!=null) {
 				log.debug("Configure Entry Point Modules for GWT Project {}", projectName);
 				
-				List<String> modNames = new ArrayList<String>();
-				
 				Plugin pluginConfig = projectConfig.getMavenProject().getPlugin(GWT_WAR_MAVEN_PLUGIN_KEY);
 				
-				Xpp3Dom gwtConfig = (Xpp3Dom)pluginConfig.getConfiguration();
-                
-                if (gwtConfig!=null) {
-                    Xpp3Dom[] moduleNodes = gwtConfig.getChildren("module");
-                    if (moduleNodes.length > 0) {
-                    	String moduleQNameTrimmed = null;
-                    	for (Xpp3Dom mNode : moduleNodes) {
-                        	moduleQNameTrimmed = mNode.getValue().trim();
-                        }
-                    	if(moduleQNameTrimmed != null){
-                    		modNames.add(moduleQNameTrimmed);
-                    	}
-                    } else { 
-                        Xpp3Dom modulesNode = gwtConfig.getChild("modules");
-                        if (modulesNode != null) {
-                            moduleNodes = modulesNode.getChildren("module");
-                            for (Xpp3Dom mNode : moduleNodes) {
-                            	String moduleQNameTrimmed = mNode.getValue().trim();
-                                modNames.add(moduleQNameTrimmed);
-                            }
-                        }
-                    }
-                }
-				
-				if(modNames.size() == 0){
-					IModule[] modules = ModuleUtils.findAllModules(javaProject,false);
-					modNames = new ArrayList<String>();
-					for (IModule iModule : modules) {
-						modNames.add(iModule.getQualifiedName());
-						log.debug("\t{}",iModule.getQualifiedName());
-					}
-				}
+				List<String> modNames = findModules(pluginConfig, javaProject);
 
 				try {
 					GWTProjectProperties.setEntryPointModules(projectConfig.getProject(), modNames);
@@ -113,6 +79,57 @@ public class GWTProjectConfigurator extends AbstractProjectConfigurator {
 				log.debug("Skip configurator for non Java project {}",projectName);
 			}
 		}
+	}
+	
+	@Override
+	public void mavenProjectChanged(MavenProjectChangedEvent event, IProgressMonitor monitor) throws CoreException {
+		Plugin newConfig = event.getMavenProject().getMavenProject().getPlugin(GWT_WAR_MAVEN_PLUGIN_KEY);
+		IJavaProject javaProject = JavaCore.create(event.getMavenProject().getProject());
+		
+		List<String> modNames = findModules(newConfig, javaProject);
+		
+		try {
+			GWTProjectProperties.setEntryPointModules(event.getMavenProject().getProject(), modNames);
+		} catch (BackingStoreException e) {
+			logError("Exception in Maven GWT Configurator, cannot set entry point modules", e);
+		}
+		
+	}
+	
+	private List<String> findModules(Plugin pluginConfig, IJavaProject javaProject){
+		List<String> modNames = new ArrayList<String>();
+		Xpp3Dom gwtConfig = (Xpp3Dom)pluginConfig.getConfiguration();
+        
+        if (gwtConfig!=null) {
+            Xpp3Dom[] moduleNodes = gwtConfig.getChildren("module");
+            if (moduleNodes.length > 0) {
+            	String moduleQNameTrimmed = null;
+            	for (Xpp3Dom mNode : moduleNodes) {
+                	moduleQNameTrimmed = mNode.getValue().trim();
+                }
+            	if(moduleQNameTrimmed != null){
+            		modNames.add(moduleQNameTrimmed);
+            	}
+            } else { 
+                Xpp3Dom modulesNode = gwtConfig.getChild("modules");
+                if (modulesNode != null) {
+                    moduleNodes = modulesNode.getChildren("module");
+                    for (Xpp3Dom mNode : moduleNodes) {
+                    	String moduleQNameTrimmed = mNode.getValue().trim();
+                        modNames.add(moduleQNameTrimmed);
+                    }
+                }
+            }
+        }
+        if(modNames.size() == 0){
+			IModule[] modules = ModuleUtils.findAllModules(javaProject,false);
+			modNames = new ArrayList<String>();
+			for (IModule iModule : modules) {
+				modNames.add(iModule.getQualifiedName());
+				log.debug("\t{}",iModule.getQualifiedName());
+			}
+		}
+        return modNames;
 	}
 
 	/**
