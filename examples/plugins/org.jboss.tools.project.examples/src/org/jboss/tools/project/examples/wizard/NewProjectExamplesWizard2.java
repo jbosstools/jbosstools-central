@@ -26,6 +26,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.ui.INewWizard;
@@ -199,6 +200,10 @@ public class NewProjectExamplesWizard2 extends Wizard implements INewWizard {
 	
 	private IStructuredSelection getSelection() {
 		if (fSelection == null) {
+			if (getActivePart() == null || getActivePart().getSite() == null 
+					|| getActivePart().getSite().getSelectionProvider() == null) {
+				return new StructuredSelection();
+			}
 			ISelection sel = getActivePart().getSite().getSelectionProvider()
 					.getSelection();
 			if (sel instanceof IStructuredSelection) {

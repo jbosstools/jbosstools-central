@@ -298,7 +298,8 @@ public class ImportMavenProjectExampleDelegate extends AbstractImportMavenProjec
 		for (IProject project:projects) {
 			if (project != null && project.exists()) {
 				File projectFile = project.getLocation().toFile();
-				if (projectFile.getAbsolutePath().startsWith(destination.getAbsolutePath())) {
+				File projectParent = projectFile.getParentFile();
+				if (projectParent.equals(destination)) {
 					existingProjects.add(project);
 				}
 			}

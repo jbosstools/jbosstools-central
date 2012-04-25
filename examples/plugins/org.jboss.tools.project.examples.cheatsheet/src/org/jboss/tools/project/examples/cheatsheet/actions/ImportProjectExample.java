@@ -79,25 +79,12 @@ public class ImportProjectExample extends Action implements ICheatSheetAction {
 			@Override
 			public IStatus runInWorkspace(IProgressMonitor monitor)
 					throws CoreException {
-				String urlString = project.getUrl();
-				String name = project.getName();
-				URL url = null;
-				try {
-					url = new URL(urlString);
-				} catch (MalformedURLException e) {
-					ProjectExamplesActivator.log(e);
-					return Status.CANCEL_STATUS;
-				}
-				final File file = ProjectExampleUtil.getProjectExamplesFile(
-						url, name, ".zip", monitor); //$NON-NLS-1$
-				if (file == null) {
-					return Status.CANCEL_STATUS;
-				}
+				ProjectExamplesActivator.downloadProject(project, monitor);
 				
 				setName(Messages.NewProjectExamplesWizard_Importing);
 				try {
 					IImportProjectExample importProjectExample = ProjectExamplesActivator.getDefault().getImportProjectExample(project.getImportType());
-					if (importProjectExample.importProject(project, file, new HashMap<String, Object>(), monitor)) {
+					if (importProjectExample.importProject(project, project.getFile(), new HashMap<String, Object>(), monitor)) {
 						importProjectExample.fix(project, monitor);
 					}
 				} catch (Exception e) {

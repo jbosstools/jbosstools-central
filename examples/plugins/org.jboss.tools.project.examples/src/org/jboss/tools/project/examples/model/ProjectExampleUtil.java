@@ -726,11 +726,11 @@ public class ProjectExampleUtil {
 		return file;
 	}
 
-	private static File getFile(java.net.URL url2) {
+	private static File getFile(URL url) {
 		IPath location = ProjectExamplesActivator.getDefault()
 				.getStateLocation();
 		File root = location.toFile();
-		String urlFile = url2.getFile();
+		String urlFile = url.getFile();
 		File file = new File(root, urlFile);
 		return file;
 	}

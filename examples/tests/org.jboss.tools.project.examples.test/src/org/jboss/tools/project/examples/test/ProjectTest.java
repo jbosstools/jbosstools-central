@@ -160,15 +160,10 @@ public class ProjectTest {
 			}
 		}
 		assertNotNull(projectExample);
-		String urlString = projectExample.getUrl();
-		String name = projectExample.getName();
-		URL url = null;
-		url = new URL(urlString);
-		File file = ProjectExampleUtil.getProjectExamplesFile(
-				url, name, ".zip", monitor); //$NON-NLS-1$
-		assertNotNull(file);
+		ProjectExamplesActivator.downloadProject(projectExample, new NullProgressMonitor());
+		assertNotNull(projectExample.getFile());
 		IImportProjectExample importProjectExample = ProjectExamplesActivator.getDefault().getImportProjectExample(projectExample.getImportType());
-		if (importProjectExample.importProject(projectExample, file, null, monitor)) {
+		if (importProjectExample.importProject(projectExample, projectExample.getFile(), null, monitor)) {
 			importProjectExample.fix(projectExample, monitor);
 		}
 	}

@@ -11,6 +11,8 @@
 package org.jboss.tools.project.examples;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -108,6 +110,7 @@ import org.eclipse.wst.validation.internal.operations.ValidationBuilder;
 import org.jboss.tools.project.examples.configurators.DefaultJBossCentralConfigurator;
 import org.jboss.tools.project.examples.configurators.IJBossCentralConfigurator;
 import org.jboss.tools.project.examples.dialog.MarkerDialog;
+import org.jboss.tools.project.examples.filetransfer.ECFExamplesTransport;
 import org.jboss.tools.project.examples.fixes.PluginFix;
 import org.jboss.tools.project.examples.fixes.ProjectExamplesFix;
 import org.jboss.tools.project.examples.fixes.SeamRuntimeFix;
@@ -129,6 +132,8 @@ import org.osgi.framework.Version;
  * The activator class controls the plug-in life cycle
  */
 public class ProjectExamplesActivator extends AbstractUIPlugin {
+
+	private static final String SEPARATOR = "/";
 
 	private static final int DESCRIPTION_LENGTH = 100;
 	
@@ -441,7 +446,7 @@ public class ProjectExamplesActivator extends AbstractUIPlugin {
 				return false;
 			}
 			File file = ProjectExampleUtil.getProjectExamplesFile(url, name,
-							".zip", monitor); //$NON-NLS-1$
+					".zip", monitor); //$NON-NLS-1$
 			if (file == null) {
 				return false;
 			}
@@ -450,6 +455,31 @@ public class ProjectExamplesActivator extends AbstractUIPlugin {
 		return true;
 	}
 	
+	public static void copyFile(File inputFile, File outputFile)
+			throws FileNotFoundException, IOException {
+		InputStream in = null;
+		OutputStream out = null;
+		try {
+			in = new FileInputStream(inputFile);
+			out = new FileOutputStream(outputFile);
+			copy(in, out);
+		} finally {
+			if (in != null) {
+				try {
+					in.close();
+				} catch (Exception e) {
+					// ignore
+				}
+			}
+			if (out != null) {
+				try {
+					out.close();
+				} catch (Exception e) {
+					// ignore
+				}
+			}
+		}
+	}
 	public static void openWelcome(List<ProjectExample> projects) {
 		if (projects == null) {
 			return;
@@ -460,7 +490,7 @@ public class ProjectExamplesActivator extends AbstractUIPlugin {
 				String urlString = project.getWelcomeURL();
 				urlString = replace(urlString, project);
 				URL url = null;
-				if (urlString.startsWith("/")) { //$NON-NLS-1$
+				if (urlString.startsWith(SEPARATOR)) { //$NON-NLS-1$
 					IPath path = new Path(urlString);
 					IResource resource = ResourcesPlugin.getWorkspace().getRoot().findMember(path);
 					if (resource instanceof IFile && resource.isAccessible()) {
@@ -977,7 +1007,7 @@ public class ProjectExamplesActivator extends AbstractUIPlugin {
 				List<IMarker> markers = getMarkers(projects);
 				if (markers != null && markers.size() > 0) {
 				
-					Display.getCurrent().asyncExec(new Runnable() {
+					Display.getDefault().asyncExec(new Runnable() {
 					
 						@Override
 						public void run() {
@@ -1066,7 +1096,7 @@ public class ProjectExamplesActivator extends AbstractUIPlugin {
 	}
 
 	private String getImageId(ImageDescriptor imageDescriptor) {
-		return PLUGIN_ID + "/" + imageDescriptor.hashCode(); //$NON-NLS-1$
+		return PLUGIN_ID + SEPARATOR + imageDescriptor.hashCode(); //$NON-NLS-1$
 	}
 	
 	public Image getImage(String imagePath) {
