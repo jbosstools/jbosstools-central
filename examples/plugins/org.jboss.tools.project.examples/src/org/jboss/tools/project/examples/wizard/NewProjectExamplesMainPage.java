@@ -31,7 +31,6 @@ import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
-import org.eclipse.jface.viewers.ViewerFilter;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
@@ -140,9 +139,12 @@ public class NewProjectExamplesMainPage extends WizardPage {
 		viewer.setLabelProvider(new ProjectLabelProvider());
 		viewer.setContentProvider(new ProjectContentProvider());
 		
+		
 		final SiteFilter siteFilter = new SiteFilter();
 		final RuntimeTypeFilter serverFilter = new RuntimeTypeFilter();
-		viewer.setFilters(new ViewerFilter[]{siteFilter, serverFilter});
+		
+		viewer.addFilter(siteFilter);
+		viewer.addFilter(serverFilter);
 		
 		Label descriptionLabel = new Label(composite,SWT.NONE);
 		descriptionLabel.setText(Messages.NewProjectExamplesWizardPage_Description);
