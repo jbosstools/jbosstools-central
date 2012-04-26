@@ -51,8 +51,8 @@ public class CreateProjectsWithServerTest extends SWTTestExt{
 		bot.hyperlink(IDELabel.JBossCentralEditor.OPENSHIFT_APP).click();
 		bot.waitForShell(IDELabel.JBossCentralEditor.OPENSHIFT_APP_WIZARD);
 		bot.waitWhile(new NonSystemJobRunsCondition());
-		assertTrue("New OpenShift Express Application window should have appeared", bot.activeShell().getText().equals(IDELabel.JBossCentralEditor.OPENSHIFT_APP_WIZARD));
-		//assertTrue("New OpenShift Express Application window should have appeared", bot.shell(IDELabel.JBossCentralEditor.OPENSHIFT_APP_WIZARD).isActive());
+		assertTrue("New OpenShift Application window should have appeared", bot.activeShell().getText().equals(IDELabel.JBossCentralEditor.OPENSHIFT_APP_WIZARD));
+		//assertTrue("New OpenShift Application window should have appeared", bot.shell(IDELabel.JBossCentralEditor.OPENSHIFT_APP_WIZARD).isActive());
 		bot.activeShell().close();
 		
 		//check Project example and detection of server
