@@ -83,17 +83,20 @@ public class GWTProjectConfigurator extends AbstractProjectConfigurator {
 	
 	@Override
 	public void mavenProjectChanged(MavenProjectChangedEvent event, IProgressMonitor monitor) throws CoreException {
-		Plugin newConfig = event.getMavenProject().getMavenProject().getPlugin(GWT_WAR_MAVEN_PLUGIN_KEY);
-		IJavaProject javaProject = JavaCore.create(event.getMavenProject().getProject());
-		
-		List<String> modNames = findModules(newConfig, javaProject);
-		
-		try {
-			GWTProjectProperties.setEntryPointModules(event.getMavenProject().getProject(), modNames);
-		} catch (BackingStoreException e) {
-			logError("Exception in Maven GWT Configurator, cannot set entry point modules", e);
+		IPreferenceStore store = Activator.getDefault().getPreferenceStore();
+		boolean configureGWT = store.getBoolean(Activator.CONFIGURE_GWT);
+		if(configureGWT){
+			Plugin newConfig = event.getMavenProject().getMavenProject().getPlugin(GWT_WAR_MAVEN_PLUGIN_KEY);
+			IJavaProject javaProject = JavaCore.create(event.getMavenProject().getProject());
+			
+			List<String> modNames = findModules(newConfig, javaProject);
+			
+			try {
+				GWTProjectProperties.setEntryPointModules(event.getMavenProject().getProject(), modNames);
+			} catch (BackingStoreException e) {
+				logError("Exception in Maven GWT Configurator, cannot set entry point modules", e);
+			}
 		}
-		
 	}
 	
 	private List<String> findModules(Plugin pluginConfig, IJavaProject javaProject){
