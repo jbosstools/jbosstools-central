@@ -49,7 +49,6 @@ public class NewProjectExamplesLocationPage extends WizardPage {
 		super("org.jboss.tools.project.examples.location"); //$NON-NLS-1$
         setTitle( "Location" );
         setDescription( "Project Example Location and Workspace" );
-        setImageDescriptor( ProjectExamplesActivator.imageDescriptorFromPlugin(ProjectExamplesActivator.PLUGIN_ID, "icons/new_wiz.gif")); //$NON-NLS-1$
         fWorkingSetGroup= new WorkingSetGroup();
         setWorkingSets(new IWorkingSet[0]);
 	}

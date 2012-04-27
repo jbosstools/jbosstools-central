@@ -82,7 +82,6 @@ public class NewProjectExamplesMainPage extends WizardPage {
 		super("org.jboss.tools.project.examples.main"); //$NON-NLS-1$
         setTitle( Messages.NewProjectExamplesWizardPage_Project_Example );
         setDescription( Messages.NewProjectExamplesWizardPage_Import_Project_Example );
-        setImageDescriptor( ProjectExamplesActivator.imageDescriptorFromPlugin(ProjectExamplesActivator.PLUGIN_ID, "icons/new_wiz.gif")); //$NON-NLS-1$
         this.requirementsPage = requirementsPage;
         //this.readyPage = readyPage;
         this.pages = pages;

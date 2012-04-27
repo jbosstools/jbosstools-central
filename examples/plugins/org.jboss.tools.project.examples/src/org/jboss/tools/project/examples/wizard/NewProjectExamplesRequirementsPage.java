@@ -107,7 +107,6 @@ public class NewProjectExamplesRequirementsPage extends WizardPage {
 	protected NewProjectExamplesRequirementsPage() {
 		super(PAGE_NAME);
         setTitleAndDescription(null);
-        setImageDescriptor( ProjectExamplesActivator.imageDescriptorFromPlugin(ProjectExamplesActivator.PLUGIN_ID, "icons/new_wiz.gif")); //$NON-NLS-1$
         checkboxOn = RuntimeUIActivator.imageDescriptorFromPlugin(RuntimeUIActivator.PLUGIN_ID, "/icons/xpl/complete_tsk.gif").createImage();
 		checkboxOff = RuntimeUIActivator.imageDescriptorFromPlugin(RuntimeUIActivator.PLUGIN_ID, "/icons/xpl/incomplete_tsk.gif").createImage();
 	}

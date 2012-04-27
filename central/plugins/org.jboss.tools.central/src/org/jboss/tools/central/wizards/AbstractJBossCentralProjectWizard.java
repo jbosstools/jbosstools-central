@@ -17,8 +17,13 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
+import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.ui.IWorkbench;
+import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.jboss.tools.central.JBossCentralActivator;
 import org.jboss.tools.central.jobs.RefreshTutorialsJob;
+import org.jboss.tools.project.examples.ProjectExamplesActivator;
 import org.jboss.tools.project.examples.model.ProjectExample;
 import org.jboss.tools.project.examples.wizard.NewProjectExamplesWizard2;
 
@@ -98,5 +103,15 @@ public abstract class AbstractJBossCentralProjectWizard extends NewProjectExampl
 		}
 	}
 	
+	protected void initializeDefaultPageImageDescriptor() {
+		String imagePath = getWizardBackgroundImagePath();
+		ImageDescriptor desc = AbstractUIPlugin.imageDescriptorFromPlugin(JBossCentralActivator.PLUGIN_ID, 
+																		  imagePath);
+		setDefaultPageImageDescriptor(desc);
+	}
+	
+	protected String getWizardBackgroundImagePath() {
+		return "icons/new_wiz.gif";
+	}
 	
 }

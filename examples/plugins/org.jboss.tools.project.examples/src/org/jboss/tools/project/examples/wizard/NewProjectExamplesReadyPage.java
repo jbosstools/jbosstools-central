@@ -28,7 +28,6 @@ public class NewProjectExamplesReadyPage extends WizardPage {
 
 	public NewProjectExamplesReadyPage(List<ProjectExample> projectExamples) {
 		super("org.jboss.tools.project.examples.ready"); //$NON-NLS-1$
-        setImageDescriptor( ProjectExamplesActivator.imageDescriptorFromPlugin(ProjectExamplesActivator.PLUGIN_ID, "icons/new_wiz.gif")); //$NON-NLS-1$
         this.projectExamples = projectExamples;
 	}
 
