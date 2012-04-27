@@ -27,6 +27,8 @@
 		<module>org.jboss.tools.maven.profiles.core</module>        
 		<module>org.jboss.tools.maven.profiles.ui</module>
 		<module>org.jboss.tools.maven.gwt</module>
+		<module>org.jboss.tools.maven.sourcelookup.core</module>
+		<module>org.jboss.tools.maven.sourcelookup.ui</module> 
 	</modules>
 </project>
 	
