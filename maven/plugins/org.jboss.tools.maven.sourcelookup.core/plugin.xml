@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+
+	<extension point="org.eclipse.debug.core.sourcePathComputers">
+   		<sourcePathComputer
+   			id="org.jboss.tools.maven.sourcelookup.SourcePathComputer"
+   			class="org.jboss.tools.maven.sourcelookup.containers.JBossASSourcePathComputer">
+   		</sourcePathComputer>
+    </extension>
+    
+    <extension
+         point="org.eclipse.debug.core.sourceContainerTypes">
+      <sourceContainerType
+            name="JBoss Maven Source Container"
+            class="org.jboss.tools.maven.sourcelookup.containers.JBossSourceContainerType"
+            id="org.jboss.tools.maven.sourcelookup.containerType"
+            description="JBoss Maven Source Container">
+      </sourceContainerType>
+    </extension>
+    
+</plugin>

@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+	<extension
+         point="org.eclipse.debug.ui.sourceContainerPresentations">
+      <sourceContainerPresentation
+            browserClass="org.jboss.tools.maven.sourcelookup.ui.browsers.JBossSourceContainerBrowser"
+            containerTypeID="org.jboss.tools.maven.sourcelookup.containerType"
+            icon="$nl$/icons/jboss.gif"
+            id="org.jboss.tools.maven.sourcelookup.containerPresentation">
+      </sourceContainerPresentation>
+   </extension>
+   <extension
+        point="org.eclipse.ui.preferencePages">
+     <page
+           category="org.jboss.tools.common.model.ui.MainPreferencePage"
+           class="org.jboss.tools.maven.sourcelookup.ui.preferences.SourceLookupPreferencePage"
+           id="org.jboss.tools.maven.sourcelookup.ui.preferences.SourceLookupPreferencePage"
+           name="Source Lookup"/>
+   </extension>
+   
+   <extension point="org.eclipse.ui.editorActions">
+      <editorContribution id="org.jboss.tools.maven.sourcelookup.ui.attachSourcesContribution"
+                          targetID="org.eclipse.jdt.ui.ClassFileEditor">
+         <action id="org.jboss.tools.maven.sourcelookup.ui.attachSourcesAction"
+              class="org.jboss.tools.maven.sourcelookup.ui.actions.AttachSourcesActionDelegate"
+              label="Attach Sources" style="push"/>
+      </editorContribution>
+   </extension>
+   
+   <extension
+         point="org.eclipse.ui.startup">
+      <startup
+            class="org.jboss.tools.maven.sourcelookup.ui.Startup"></startup>
+   </extension>
+   
+</plugin>
