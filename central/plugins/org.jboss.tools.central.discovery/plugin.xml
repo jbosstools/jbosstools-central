@@ -198,6 +198,24 @@
       <connectorDescriptor
             categoryId="org.jboss.tools.central.discovery.maven"
             groupId="org.jboss.tools.central.discovery.maven.upstream"
+            description="Maven Integration for Eclipse JDT APT (m2e-apt)"
+            id="org.jboss.tools.maven.apt.feature"
+            kind="task"
+            license="Free, EPL"
+            name="Maven Integration for Eclipse JDT APT (m2e-apt)"
+            provider="JBoss by Red Hat"
+            siteUrl="http://download.jboss.org/jbosstools/updates/indigo/">
+       <iu id="org.jboss.tools.maven.apt.feature"/>
+         <icon
+               image32="images/m2e_32.gif">
+         </icon>
+         <overview
+               url="http://www.eclipse.org/m2e/">
+         </overview>
+      </connectorDescriptor>
+      <connectorDescriptor
+            categoryId="org.jboss.tools.central.discovery.maven"
+            groupId="org.jboss.tools.central.discovery.maven.upstream"
             description="Maven Integration for Web Tools (m2e-wtp)"
             id="org.maven.ide.eclipse.wtp.feature"
             kind="task"
