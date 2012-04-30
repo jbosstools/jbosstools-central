@@ -15,6 +15,7 @@ import org.jboss.tools.ui.bot.ext.config.Annotations.ServerType;
 import org.jboss.tools.ui.bot.ext.gen.ActionItem.Preference;
 import org.jboss.tools.ui.bot.ext.parts.SWTBotTwistie;
 import org.jboss.tools.ui.bot.ext.types.IDELabel;
+import org.jboss.tools.ui.bot.ext.view.ProblemsView;
 import org.jboss.tools.ui.bot.ext.wizards.SWTBotWizard;
 import org.junit.After;
 import org.junit.BeforeClass;
@@ -167,21 +168,21 @@ public class CreateProjectsWithServerTest extends SWTTestExt{
 		bot.shell("Add and Remove...").activate();
 		for (SWTBotTreeItem treeItem : bot.tree().getAllItems()) {
 			treeItem.select();
+			log.info("Adding "+treeItem.getText()+" to server");
 			bot.clickButton("Add >");
+				log.info("Succesfully added");
 		}
 		bot.clickButton("Finish");
 		servers.show();
-		log.info("========================================");
-		log.info(bot.tree().getAllItems().toString());
 		bot.waitWhile(new NonSystemJobRunsCondition());
-		log.info("Pred getErrorsNode");
-		assertNull("Errors node should be null", problems.getErrorsNode(bot));
-		log.info("Za getErrorsNode");
+		assertNull("Errors node should be null", ProblemsView.getErrorsNode(bot));
 		servers.show();
 		bot.waitWhile(new NonSystemJobRunsCondition());
 		SWTBotTreeItem serverTreeItem = servers.findServerByName(servers.bot().tree(), serverName).expand();
+		bot.sleep(TIME_1S);
 		for (SWTBotTreeItem projectName : projectExplorer.show().bot().tree().getAllItems()) {
 			try{
+				log.info("Testing project "+projectName.getText());
 				serverTreeItem.getNode(projectName.getText()+"  [Started, Synchronized]");
 				log.info("Project: "+projectName.getText()+" is properly deployed.");
 			}catch (WidgetNotFoundException wnfe){
@@ -191,6 +192,7 @@ public class CreateProjectsWithServerTest extends SWTTestExt{
 				}
 			}
 		}
+		servers.removeProjectFromServers(serverName);
 	}
 	
 	private void waitForAWhile(){
