@@ -24,6 +24,7 @@ import java.util.Set;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
@@ -391,20 +392,36 @@ public class DownloadRuntimeDialog extends Dialog {
 			destination.mkdirs();
 			file = new File (destination, name);
 			int i = 1;
-			while (file.exists()) {
-				file = new File(destination, name + "(" + i++ + ")");
+			boolean download = true;
+			long urlModified = 0;
+			if (deleteOnExit) {
+				while (file.exists()) {
+					file = new File(destination, name + "(" + i++ + ")"); //$NON-NLS-1$ //$NON-NLS-2$
+				}
+			} else {
+				long cacheModified = file.lastModified();
+				try {
+					urlModified = ECFExamplesTransport.getInstance()
+							.getLastModified(url);
+					download = cacheModified <= 0 || cacheModified != urlModified;
+				} catch (CoreException e) {
+					// ignore
+				}
 			}
-			
 			if (deleteOnExit) {
 				file.deleteOnExit();
 			}
-			out = new BufferedOutputStream(
-					new FileOutputStream(file));
-			
-			IStatus result = ECFExamplesTransport.getInstance().download(file.getName(),
-					url.toExternalForm(), out, monitor);
-			out.flush();
-			out.close();
+			IStatus result = null;
+			if (download) {
+				out = new BufferedOutputStream(new FileOutputStream(file));
+				result = ECFExamplesTransport.getInstance().download(
+						file.getName(), url.toExternalForm(), out, monitor);
+				out.flush();
+				out.close();
+				if (urlModified > 0) {
+					file.setLastModified(urlModified);
+				}
+			}
 			if (monitor.isCanceled()) {
 				file.deleteOnExit();
 				file.delete();
@@ -413,14 +430,19 @@ public class DownloadRuntimeDialog extends Dialog {
 			File directory = new File(selectedDirectory);
 			directory.mkdirs();
 			if (!directory.isDirectory()) {
-				ProjectExamplesActivator.getDefault().getLog().log(result);
-				MessageDialog.openError(getActiveShell(), "Error", "The '" + directory + "' is not a directory.");
+				String message = "The '" + directory + "' is not a directory.";
+				if (result != null) {
+					ProjectExamplesActivator.getDefault().getLog().log(result);
+				} else {
+					ProjectExamplesActivator.getDefault().getLog().log(result);
+				}
+				MessageDialog.openError(getActiveShell(), "Error", message);
 				file.deleteOnExit();
 				file.delete();
 				return Status.CANCEL_STATUS;
 			}
 			ProjectExamplesActivator.extractZipFile(file, directory, monitor);
-			if (!result.isOK()) {
+			if (result != null && !result.isOK()) {
 				ProjectExamplesActivator.getDefault().getLog().log(result);
 				String message;
 				if (result.getException() != null) {

@@ -26,6 +26,7 @@ public interface IJBossCentralConfigurator {
 	String getTwitterLink();
 	String getBlogsUrl();
 	String getNewsUrl();
+	String getDownloadRuntimesURL();
 	List<String> getWizardIds();
 	Image getHeaderImage();
 

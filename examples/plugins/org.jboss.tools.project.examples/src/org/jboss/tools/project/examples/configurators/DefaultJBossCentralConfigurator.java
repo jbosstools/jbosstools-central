@@ -64,6 +64,7 @@ public class DefaultJBossCentralConfigurator implements
 
 	private static final String NEWS_URL = "http://planet.jboss.org/feeds/news"; //$NON-NLS-1$
 
+	private static final String DOWNLOAD_RUNTIMES_URL = "http://download.jboss.org/examples/download_runtimes.xml"; //$NON-NLS-1$
 	private Image headerImage;
 
 	@Override
@@ -110,5 +111,10 @@ public class DefaultJBossCentralConfigurator implements
 			headerImage = ProjectExamplesActivator.getDefault().getImage("/icons/jboss.png"); //$NON-NLS-1$
 		}
 		return headerImage;
+	}
+
+	@Override
+	public String getDownloadRuntimesURL() {
+		return DOWNLOAD_RUNTIMES_URL;
 	}
 }
