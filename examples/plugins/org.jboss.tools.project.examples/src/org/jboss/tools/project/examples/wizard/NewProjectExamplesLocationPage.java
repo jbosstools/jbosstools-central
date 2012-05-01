@@ -1,10 +1,12 @@
 package org.jboss.tools.project.examples.wizard;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.jdt.internal.ui.packageview.PackageExplorerPart;
 import org.eclipse.jface.dialogs.Dialog;
@@ -131,6 +133,15 @@ public class NewProjectExamplesLocationPage extends WizardPage {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				enableControls(outputDirectoryBrowse);
+				if (!isWorkspace.getSelection()) {
+					String location = outputDirectoryText.getText().trim();
+					if (!validateLocation(location)) {
+						return;
+					}
+				}
+				setPageComplete(true);
+				setErrorMessage(null);
+				setMessage(null);
 				ProjectExamplesActivator.getDefault().getPreferenceStore().setValue(ProjectExamplesActivator.PROJECT_EXAMPLES_DEFAULT, isWorkspace.getSelection());
 			}
 			
@@ -140,13 +151,31 @@ public class NewProjectExamplesLocationPage extends WizardPage {
 			
 			@Override
 			public void modifyText(ModifyEvent e) {
+				if (!isWorkspace.getSelection()) {
+					String location = outputDirectoryText.getText().trim();
+					if (!validateLocation(location)) {
+						return;
+					}
+				}
 				ProjectExamplesActivator.getDefault().getPreferenceStore().setValue(ProjectExamplesActivator.PROJECT_EXAMPLES_OUTPUT_DIRECTORY, outputDirectoryText.getText());
+				setPageComplete(true);
+				setErrorMessage(null);
+				setMessage(null);
 			}
 		});
 		Control workingSetControl= createWorkingSetControl(composite);
 		workingSetControl.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
 		setPageComplete(true);
+	}
+	
+	private boolean canCreate(File file) {
+		while (!file.exists()) {
+			file= file.getParentFile();
+			if (file == null)
+				return false;
+		}
+		return file.canWrite();
 	}
 
 	public void init(IStructuredSelection selection, IWorkbenchPart activePart) {
@@ -297,6 +326,31 @@ public class NewProjectExamplesLocationPage extends WizardPage {
 			//return ((NewProjectExamplesWizard2)wizard).getReadyPage();
 		}
 		return null;
+	}
+
+	private boolean validateLocation(String location) {
+		if (location.length() == 0) {
+			setErrorMessage(null);
+			setMessage("Enter a location for the project");
+			setPageComplete(false);
+			return false;
+		}
+		// check whether the location is a syntactically correct path
+		if (!Path.EMPTY.isValidPath(location)) {
+			setErrorMessage("Invalid project contents directory");
+			setPageComplete(false);
+			return false;
+		}
+		IPath projectPath = Path.fromOSString(location);
+		if (!projectPath.toFile().exists()) {
+			// check non-existing external location
+			if (!canCreate(projectPath.toFile())) {
+				setErrorMessage("Cannot create project content at the given external location.");
+				setPageComplete(false);
+				return false;
+			}
+		}
+		return true;
 	}
 
 }

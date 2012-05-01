@@ -10,6 +10,7 @@
  ************************************************************************************/
 package org.jboss.tools.maven.project.examples.wizard;
 
+import java.io.File;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -26,7 +27,9 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.wizard.IWizard;
 import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.jst.j2ee.project.facet.IJ2EEFacetConstants;
@@ -45,7 +48,6 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Link;
 import org.eclipse.ui.IWorkingSet;
 import org.eclipse.wst.common.project.facet.core.IProjectFacetVersion;
 import org.eclipse.wst.common.project.facet.core.ProjectFacetsManager;
@@ -87,7 +89,8 @@ public class ArchetypeExamplesWizardFirstPage extends MavenProjectWizardLocation
 	private WizardContext context;
 	
 	private IRuntimeLifecycleListener listener;
-	private Link warninglink;
+	private Button isWorkspace;
+	private Combo outputDirectoryCombo;
 	
 	public ArchetypeExamplesWizardFirstPage() {
 		super(new ProjectImportConfiguration(), "", "",new ArrayList<IWorkingSet>());
@@ -252,12 +255,24 @@ public class ArchetypeExamplesWizardFirstPage extends MavenProjectWizardLocation
 		//Need to be called first, or error message would be overwritten
 		super.validate();
 		
+		if (!isPageComplete()) {
+			return;
+		}
+		if (outputDirectoryCombo != null && isWorkspace != null) {
+			if (!isWorkspace.getSelection()) {
+				String location = outputDirectoryCombo.getText();
+				if (!validateLocation(location)) {
+					return;
+				}
+			}
+		}
 		String errorMessage = validateInputs();
 		setErrorMessage(errorMessage);
 		setMessage(null);
 		setPageComplete(errorMessage == null);
 
 		validateEnterpriseRepo();
+		
 	}
 
 	private String validateInputs() {
@@ -393,14 +408,17 @@ public class ArchetypeExamplesWizardFirstPage extends MavenProjectWizardLocation
 			field.setAccessible(true);
 			Object useDefaultWorkspaceLocation = field.get(this);
 			if (useDefaultWorkspaceLocation instanceof Button) {
-				final Button useDefaultWorkspaceLocationButton = (Button) useDefaultWorkspaceLocation;
-				useDefaultWorkspaceLocationButton.setSelection(value);
-				useDefaultWorkspaceLocationButton.notifyListeners(SWT.Selection, new Event());
-				useDefaultWorkspaceLocationButton.addSelectionListener(new SelectionAdapter() {
+				isWorkspace = (Button) useDefaultWorkspaceLocation;
+				isWorkspace.setSelection(value);
+				isWorkspace.notifyListeners(SWT.Selection, new Event());
+				isWorkspace.addSelectionListener(new SelectionAdapter() {
 					
 					@Override
 					public void widgetSelected(SelectionEvent e) {
-						ProjectExamplesActivator.getDefault().getPreferenceStore().setValue(ProjectExamplesActivator.PROJECT_EXAMPLES_DEFAULT, useDefaultWorkspaceLocationButton.getSelection());
+						validate();
+						if (isPageComplete()) {
+							ProjectExamplesActivator.getDefault().getPreferenceStore().setValue(ProjectExamplesActivator.PROJECT_EXAMPLES_DEFAULT, isWorkspace.getSelection());
+						}
 					}
 				
 				});
@@ -416,14 +434,17 @@ public class ArchetypeExamplesWizardFirstPage extends MavenProjectWizardLocation
 			field.setAccessible(true);
 			Object locationComboField = field.get(this);
 			if (locationComboField instanceof Combo) {
-				final Combo locationCombo = (Combo) locationComboField;
-				locationCombo.setText(defaultLocation);
-				locationCombo.notifyListeners(SWT.Selection, new Event());
-				locationCombo.addModifyListener(new ModifyListener() {
+				outputDirectoryCombo = (Combo) locationComboField;
+				outputDirectoryCombo.setText(defaultLocation);
+				outputDirectoryCombo.notifyListeners(SWT.Selection, new Event());
+				outputDirectoryCombo.addModifyListener(new ModifyListener() {
 					
 					@Override
 					public void modifyText(ModifyEvent e) {
-						ProjectExamplesActivator.getDefault().getPreferenceStore().setValue(ProjectExamplesActivator.PROJECT_EXAMPLES_OUTPUT_DIRECTORY, locationCombo.getText());
+						validate();
+						if (isPageComplete()) {
+							ProjectExamplesActivator.getDefault().getPreferenceStore().setValue(ProjectExamplesActivator.PROJECT_EXAMPLES_OUTPUT_DIRECTORY, outputDirectoryCombo.getText());
+						}
 					}
 				
 				});
@@ -433,6 +454,26 @@ public class ArchetypeExamplesWizardFirstPage extends MavenProjectWizardLocation
 		} 
 	}
 	
+	private boolean validateLocation(String location) {
+		IPath projectPath = Path.fromOSString(location);
+		if (!projectPath.toFile().exists()) {
+			if (!canCreate(projectPath.toFile())) {
+				setErrorMessage("Cannot create project content at the given external location.");
+				setPageComplete(false);
+				return false;
+			}
+		}
+		return true;
+	}
+	
+	private boolean canCreate(File file) {
+		while (!file.exists()) {
+			file= file.getParentFile();
+			if (file == null)
+				return false;
+		}
+		return file.canWrite();
+	}
 	@Override
 	public void dispose() {
 		if (dialogSettings != null && serverRuntimes != null && serverTargetCombo != null) {
