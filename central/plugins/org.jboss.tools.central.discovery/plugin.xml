@@ -334,6 +334,33 @@
       <connectorDescriptor
             categoryId="org.jboss.tools.central.discovery.testing"
             groupId="org.jboss.tools.central.discovery.testing.local"
+            description="Mylyn support for reporting JBoss JIRAs and Red Hat Bugzillas"
+            id="org.jboss.tools.common.mylyn.feature"
+            kind="task"
+            license="Free, EPL"
+            name="Mylyn Issue Tracker Connectors"
+            provider="JBoss by Red Hat"
+            siteUrl="http://download.jboss.org/jbosstools/updates/development/indigo/">
+         <iu id="org.jboss.tools.common.mylyn.feature"/>
+         <iu id="org.eclipse.mylyn_feature"/>
+         <iu id="org.eclipse.mylyn.ide_feature"/>
+         <iu id="org.eclipse.mylyn.commons"/>
+         <iu id="org.eclipse.mylyn.context_feature"/>
+         <iu id="org.eclipse.mylyn.bugzilla_feature"/>
+         <iu id="org.eclipse.mylyn.java_feature"/>
+         <iu id="org.eclipse.mylyn.pde_feature"/>
+         <iu id="org.eclipse.mylyn.team_feature"/>
+         <iu id="org.eclipse.mylyn.versions"/>
+         <icon
+               image32="images/jbosstools_icon32.png">
+         </icon>
+         <overview
+               url="http://www.jboss.org/tools">
+         </overview>
+      </connectorDescriptor>
+      <connectorDescriptor
+            categoryId="org.jboss.tools.central.discovery.testing"
+            groupId="org.jboss.tools.central.discovery.testing.local"
             description="Tool support for PMD"
             id="net.sourceforge.pmd.eclipse"
             kind="task"
@@ -341,7 +368,7 @@
             name="PMD"
             provider="PMD Developers"
             siteUrl="http://download.jboss.org/jbosstools/updates/indigo/extras/">
-	    <iu id="net.sourceforge.pmd.eclipse"/>
+       <iu id="net.sourceforge.pmd.eclipse"/>
          <icon
                image32="images/pmd_32.png">
          </icon>
