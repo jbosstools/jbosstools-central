@@ -26,6 +26,7 @@
       <import feature="org.jboss.tools.runtime.seam.detector.feature" version="1.3.0.qualifier" match="greaterOrEqual"/>
    </requires>
 
-   <plugin id="org.jboss.tools.community.central" download-size="0" install-size="0" version="0.0.0"/>
+   <!-- JBIDE-11299 remove unneeded plugin, but keep this feature around for ease-of-use when installing Central into Eclipse 
+   <plugin id="org.jboss.tools.community.central" download-size="0" install-size="0" version="0.0.0"/> -->
 
 </feature>
