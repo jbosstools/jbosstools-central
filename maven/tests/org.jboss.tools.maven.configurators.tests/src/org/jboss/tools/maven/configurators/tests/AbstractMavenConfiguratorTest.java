@@ -13,8 +13,10 @@ package org.jboss.tools.maven.configurators.tests;
 import java.io.File;
 
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IncrementalProjectBuilder;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jst.common.project.facet.core.JavaFacet;
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.project.IProjectConfigurationManager;
@@ -87,5 +89,19 @@ public abstract class AbstractMavenConfiguratorTest extends
 
 	protected void updateProject(IProject project) throws Exception {
 		updateProject(project, null, -1);
+	}
+	
+	protected void assertHasError(IProject project, String errorMessage) {
+		try {
+			for (IMarker m : findErrorMarkers(project)) {
+				String message = (String)m.getAttribute(IMarker.MESSAGE);
+				if (errorMessage.equals(message)){
+					return;
+				}
+			}
+		} catch (CoreException e) {
+			fail(e.getMessage());
+		}
+		fail("Error Message '"+ errorMessage +"' was not found on "+project.getName());
 	}
 }

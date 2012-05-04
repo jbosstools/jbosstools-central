@@ -19,11 +19,13 @@ import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
 import org.apache.maven.artifact.resolver.filter.ScopeArtifactFilter;
 import org.apache.maven.project.MavenProject;
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.ProjectScope;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.core.runtime.preferences.IScopeContext;
@@ -35,7 +37,7 @@ import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jst.j2ee.application.internal.operations.RemoveComponentFromEnterpriseApplicationOperation;
-import org.eclipse.jst.j2ee.internal.project.J2EEProjectUtilities;
+import org.eclipse.jst.j2ee.project.EarUtilities;
 import org.eclipse.jst.j2ee.project.JavaEEProjectUtilities;
 import org.eclipse.jst.jsf.core.internal.project.facet.IJSFFacetInstallDataModelProperties;
 import org.eclipse.m2e.core.internal.IMavenConstants;
@@ -83,15 +85,10 @@ public class SeamProjectConfigurator extends AbstractProjectConfigurator {
 	private static final String JBOSS_SEAM_ARTIFACT_ID = "jboss-seam"; //$NON-NLS-1$
 
 	protected static final IProjectFacet dynamicWebFacet;
-	protected static final IProjectFacetVersion dynamicWebVersion;
 	protected static final IProjectFacet javaFacet;
-	protected static final IProjectFacetVersion javaVersion;
 	protected static final IProjectFacet jsfFacet;
-	protected static final IProjectFacetVersion jsfVersion;
 	protected static final IProjectFacet earFacet;
-	protected static final IProjectFacetVersion earVersion;
 	protected static final IProjectFacet ejbFacet;
-	protected static final IProjectFacetVersion ejbVersion;
 	protected static final IProjectFacet m2Facet;
 	protected static final IProjectFacetVersion m2Version;
 	private static final IProjectFacet seamFacet;
@@ -103,17 +100,12 @@ public class SeamProjectConfigurator extends AbstractProjectConfigurator {
 	static {
 		seamFacet = ProjectFacetsManager.getProjectFacet("jst.seam"); //$NON-NLS-1$
 		javaFacet = ProjectFacetsManager.getProjectFacet("jst.java"); //$NON-NLS-1$
-		javaVersion = javaFacet.getVersion("5.0"); //$NON-NLS-1$
 		dynamicWebFacet = ProjectFacetsManager.getProjectFacet("jst.web"); //$NON-NLS-1$
-		dynamicWebVersion = dynamicWebFacet.getVersion("2.5");  //$NON-NLS-1$
 		jsfFacet = ProjectFacetsManager.getProjectFacet("jst.jsf"); //$NON-NLS-1$
-		jsfVersion = jsfFacet.getVersion("1.2"); //$NON-NLS-1$
 		earFacet = ProjectFacetsManager.getProjectFacet("jst.ear"); //$NON-NLS-1$
-		earVersion = earFacet.getVersion("5.0"); //$NON-NLS-1$
 		m2Facet = ProjectFacetsManager.getProjectFacet("jboss.m2"); //$NON-NLS-1$
 		m2Version = m2Facet.getVersion("1.0"); //$NON-NLS-1$
 		ejbFacet = ProjectFacetsManager.getProjectFacet("jst.ejb"); //$NON-NLS-1$
-		ejbVersion = ejbFacet.getVersion("3.0"); //$NON-NLS-1$
 		portletFacet = ProjectFacetsManager.getProjectFacet("jboss.portlet"); //$NON-NLS-1$
 		jsfportletFacet = ProjectFacetsManager.getProjectFacet("jboss.jsfportlet"); //$NON-NLS-1$
 		seamPortletFacet = ProjectFacetsManager.getProjectFacet("jboss.seamportlet"); //$NON-NLS-1$
@@ -150,10 +142,11 @@ public class SeamProjectConfigurator extends AbstractProjectConfigurator {
 		if (rootSeamProject != null && isSeamSettingChangedByUser(rootSeamProject)) {
 			return;
 		}
+		clearMarkers(project);
 		String packaging = mavenProject.getPackaging();
 	    String seamVersion = getSeamVersion(mavenProject);
 	    if (seamVersion != null) {
-	    	IProject[] earProjects = J2EEProjectUtilities.getReferencingEARProjects(project);
+	    	IProject[] earProjects = EarUtilities.getReferencingEARProjects(project);
 	    	String deploying = packaging;
 	    	if (earProjects.length > 0) {
 	    		deploying = "ear"; //$NON-NLS-1$
@@ -162,6 +155,7 @@ public class SeamProjectConfigurator extends AbstractProjectConfigurator {
 	    	if (fproj == null) {
 	    		return;
 	    	}
+	    	IProjectFacetVersion seamFacetVersion = getSeamFacetVersion(seamVersion);
 	    	if ("war".equals(packaging)) { //$NON-NLS-1$
 	    		IDataModel model = createSeamDataModel(deploying, seamVersion, project);
 	    		//JBIDE-10785 : refresh parent to prevent 
@@ -170,9 +164,9 @@ public class SeamProjectConfigurator extends AbstractProjectConfigurator {
 	    			MavenUtil.refreshParent(mavenProject);
 	    		}
 	    		
-	    		installWarFacets(fproj, model, seamVersion, monitor);
+	    		installWarFacets(fproj, model, seamFacetVersion, monitor);
 	    	} else if ("ear".equals(packaging)) { //$NON-NLS-1$
-	    		installEarFacets(fproj, monitor);
+	    		installEarFacets(fproj, seamFacetVersion, monitor);
 	    		installM2Facet(fproj, monitor);
 	    		IProject webProject = getReferencingSeamWebProject(project);
 	    		if (webProject != null) {
@@ -223,7 +217,7 @@ public class SeamProjectConfigurator extends AbstractProjectConfigurator {
 	    		
 	    	} else if ("ejb".equals(packaging)) { //$NON-NLS-1$
 	    		installM2Facet(fproj,monitor);
-	    		installEjbFacets(fproj, monitor);
+	    		installEjbFacets(fproj, seamFacetVersion, monitor);
 	    		addSeamSupport(project, earProjects);
 	    		storeSettings(project);
 	    		
@@ -284,34 +278,52 @@ public class SeamProjectConfigurator extends AbstractProjectConfigurator {
 		return facetVersion;
 	}
 
-	private void installEarFacets(IFacetedProject fproj,IProgressMonitor monitor) throws CoreException {
+	private void installEarFacets(IFacetedProject fproj, IProjectFacetVersion seamFv, IProgressMonitor monitor) throws CoreException {
 		if (!fproj.hasProjectFacet(earFacet)) {
-			fproj.installProjectFacet(earVersion, null, monitor);
+			IProjectFacetVersion earVersion = findTargetFacetVersion(seamFv, earFacet);
+			fproj.installProjectFacet(earVersion , null, monitor);
 		}
 		
 	}
 	
-	private void installEjbFacets(IFacetedProject fproj,IProgressMonitor monitor) throws CoreException {
+	private void installEjbFacets(IFacetedProject fproj, IProjectFacetVersion seamFv, IProgressMonitor monitor) throws CoreException {
 		if (!fproj.hasProjectFacet(javaFacet)) {
-			fproj.installProjectFacet(javaVersion, null, monitor);
+			IProjectFacetVersion javaVersion = findTargetFacetVersion(seamFv, javaFacet);
+			fproj.installProjectFacet(javaVersion , null, monitor);
 		}
 		if (!fproj.hasProjectFacet(ejbFacet)) {
+			IProjectFacetVersion ejbVersion = findTargetFacetVersion(seamFv, ejbFacet);
 			fproj.installProjectFacet(ejbVersion, null, monitor);
 		}
 	}
 
-	private void installWarFacets(IFacetedProject fproj,IDataModel model, String seamVersion,IProgressMonitor monitor) throws CoreException {
+	private void installWarFacets(IFacetedProject fproj,IDataModel model, IProjectFacetVersion seamFacetVersion, IProgressMonitor monitor) throws CoreException {
+		//Seam requires the JSF facet (!!!)
+		boolean hasConflicts = false;
+		for (IProjectFacetVersion fv : fproj.getProjectFacets()) {
+			if (seamFacetVersion.conflictsWith(fv)) {
+				addErrorMarker(fproj.getProject(), seamFacetVersion + " can not be installed as it conflicts with "+ fv);
+				hasConflicts = true;
+			}
+		}
+		
+		if (hasConflicts) {
+			return;
+		}
+		
 		if (!fproj.hasProjectFacet(javaFacet)) {
+			IProjectFacetVersion javaVersion = findTargetFacetVersion(seamFacetVersion, javaFacet);
 			fproj.installProjectFacet(javaVersion, null, monitor);
 		}
 		if (!fproj.hasProjectFacet(dynamicWebFacet)) {
+			IProjectFacetVersion dynamicWebVersion = findTargetFacetVersion(seamFacetVersion, dynamicWebFacet);
 			fproj.installProjectFacet(dynamicWebVersion, null, monitor);
 		}
-		//Seam requires the JSF facet (!!!)
-		installJSFFacet(fproj, monitor);
+		IProjectFacetVersion jsfVersion = findTargetFacetVersion(seamFacetVersion, jsfFacet);
+		installJSFFacet(fproj, jsfVersion, monitor);
 		installM2Facet(fproj, monitor);
+		
 		if (!fproj.hasProjectFacet(seamFacet)) {
-			IProjectFacetVersion seamFacetVersion = getSeamFacetVersion(seamVersion);
 			fproj.installProjectFacet(seamFacetVersion, model, monitor);
 		} else {
 			String deploying = model.getStringProperty(ISeamFacetDataModelProperties.JBOSS_AS_DEPLOY_AS);
@@ -341,6 +353,23 @@ public class SeamProjectConfigurator extends AbstractProjectConfigurator {
 		}
 	}
 
+	private void clearMarkers(IProject project) throws CoreException {
+		markerManager.deleteMarkers(project, MavenSeamConstants.SEAM_CONFIGURATION_ERROR_MARKER_ID);	
+	}
+
+	private IProjectFacetVersion findTargetFacetVersion(IProjectFacetVersion seamFv, IProjectFacet targetFacet) throws CoreException {
+		// Super simplified way to find the target Facet version : 
+		// we take the first one that doesn't conflict with the target Seam Facet Version
+		if (seamFv != null) {
+			for (IProjectFacetVersion jsfFv : targetFacet.getSortedVersions(true)) {
+				if (!seamFv.conflictsWith(jsfFv)) {
+					return jsfFv;
+				}
+			}
+		}
+		return null;
+	}
+
 	private void setModelProperty(IDataModel model, IEclipsePreferences prefs, String property) {
 		String value = model.getStringProperty(property);
 		if (value != null && value.trim().length() > 0) {
@@ -348,10 +377,10 @@ public class SeamProjectConfigurator extends AbstractProjectConfigurator {
 		}
 	}
 
-	private void installJSFFacet(IFacetedProject fproj, IProgressMonitor monitor)
+	private void installJSFFacet(IFacetedProject fproj, IProjectFacetVersion jsfVersion, IProgressMonitor monitor)
 			throws CoreException {
-		if (!fproj.hasProjectFacet(jsfFacet)) {
-			IDataModel model = MavenJSFActivator.getDefault().createJSFDataModel(fproj,jsfVersion);
+		if (jsfFacet != null && !fproj.hasProjectFacet(jsfFacet)) {
+			IDataModel model = MavenJSFActivator.getDefault().createJSFDataModel(fproj,jsfVersion );
 			//Fix for JBIDE-9454, to prevent complete overwrite of web.xml 
 			model.setBooleanProperty(IJSFFacetInstallDataModelProperties.CONFIGURE_SERVLET,false);
 			fproj.installProjectFacet(jsfVersion, model, monitor);
@@ -398,7 +427,25 @@ public class SeamProjectConfigurator extends AbstractProjectConfigurator {
 		
 	}
 
-	private IProject getReferencingSeamWebProject(IProject earProject)
+	private IProject getReferencingSeamWebProject(IProject earProject)	throws CoreException {
+		Criteria criteria = new Criteria() {
+			public boolean applies(IProject project) {
+				return project != null && JavaEEProjectUtilities.isDynamicWebProject(project);
+			}
+		};
+		return getReferencingSeamProject(earProject, criteria);
+	}
+	
+	private IProject getReferencingSeamEJBProject(IProject earProject)	throws CoreException {
+		Criteria criteria = new Criteria() {
+			public boolean applies(IProject project) {
+				return project != null && JavaEEProjectUtilities.isEJBProject(project);
+			}
+		};
+		return getReferencingSeamProject(earProject, criteria);
+	}
+		
+	private IProject getReferencingSeamProject(IProject earProject, Criteria criteria)
 			throws CoreException {
 		IVirtualComponent component = ComponentCore.createComponent(earProject);
 		if (component != null) {
@@ -406,7 +453,7 @@ public class SeamProjectConfigurator extends AbstractProjectConfigurator {
 			for (int i = 0; i < references.length; i++) {
 				IVirtualComponent refComponent = references[i].getReferencedComponent();
 				IProject refProject = refComponent.getProject();
-				if (JavaEEProjectUtilities.isDynamicWebProject(refProject)) {
+				if (criteria.applies(refProject)) {
 					if (refProject.hasNature(IMavenConstants.NATURE_ID)) {
 						IFile pom = refProject.getFile(IMavenConstants.POM_FILE_NAME);
 						if (pom.exists()) {
@@ -429,48 +476,13 @@ public class SeamProjectConfigurator extends AbstractProjectConfigurator {
 		}
 		return null;
 	}
-	
-	private IProject getReferencingSeamEJBProject(IProject earProject)
-			throws CoreException {
-		IVirtualComponent component = ComponentCore.createComponent(earProject);
-		if (component != null) {
-			IVirtualReference[] references = component.getReferences();
-			for (int i = 0; i < references.length; i++) {
-				IVirtualComponent refComponent = references[i].getReferencedComponent();
-				IProject refProject = refComponent.getProject();
-				if (JavaEEProjectUtilities.isEJBProject(refProject)) {
-					if (refProject.hasNature(IMavenConstants.NATURE_ID)) {
-						IFile pom = refProject
-								.getFile(IMavenConstants.POM_FILE_NAME);
-						if (pom.exists()) {
-							MavenProjectManager projectManager = MavenPluginActivator
-									.getDefault().getMavenProjectManager();
-							IMavenProjectFacade facade = projectManager.create(
-									pom, true, null);
-							if (facade != null) {
-								MavenProject mavenProject = facade
-										.getMavenProject(null);
-								if (mavenProject != null) {
-									String version = getSeamVersion(mavenProject);
-									if (version != null) {
-										return refProject;
-									}
-								}
-							}
-						}
 
-					}
-				}
-			}
-		}
-		return null;
-	}
 
 	private String getSeamVersion(MavenProject mavenProject) {
 		List<Artifact> artifacts = new ArrayList<Artifact>();
 		ArtifactFilter filter = new ScopeArtifactFilter(Artifact.SCOPE_TEST);
 		for (Artifact artifact : mavenProject.getArtifacts()) {
-			if (filter.include(artifact)) {
+			if (filter.include(artifact) && artifact.isResolved()) {
 				artifacts.add(artifact);
 			}
 		}
@@ -633,7 +645,18 @@ public class SeamProjectConfigurator extends AbstractProjectConfigurator {
 		protected void updateEARDD(IProgressMonitor monitor) {
 			//super.updateEARDD(monitor);
 		}
+	}
+	
+	private static interface Criteria {
+		boolean applies(IProject project);
+	}
 
+	@SuppressWarnings("restriction")
+	private void addErrorMarker(IProject project, String message) {
+	    markerManager.addMarker(project, 
+	    		MavenSeamConstants.SEAM_CONFIGURATION_ERROR_MARKER_ID, 
+	    		message
+	    		,-1,  IMarker.SEVERITY_ERROR);
 		
 	}
 }

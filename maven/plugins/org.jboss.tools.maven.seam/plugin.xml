@@ -36,6 +36,21 @@
           secondaryTo="org.eclipse.m2e.jdt.javaConfigurator"/>
     </extension>
     
+    <extension
+         point="org.eclipse.ui.ide.markerSupport">
+      <markerTypeCategory
+            name="%Maven_Configuration_Problems">
+         <markerTypeReference
+               id="org.jbosstools.maven.configuration.seam">
+         </markerTypeReference>
+      </markerTypeCategory>
+   </extension>    
     
-    
+     <extension point="org.eclipse.core.resources.markers"
+         id="org.jbosstools.maven.configuration.seam"
+         name="%Maven_Configuration_Problem">
+      <super type="org.eclipse.m2e.core.maven2Problem.configuration"/>
+      <persistent value="true"/>
+    </extension>
+
 </plugin>
