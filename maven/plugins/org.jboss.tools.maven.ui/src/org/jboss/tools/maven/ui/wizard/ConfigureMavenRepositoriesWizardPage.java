@@ -483,7 +483,7 @@ public class ConfigureMavenRepositoriesWizardPage extends WizardPage {
 			boolean found = false;
 			for (Repository repository:allRepositories) {
 				if (id.equals(repository.getId())) {
-					id = startId + "." + i;
+					id = startId + "." + i++;
 					found = true;
 					break;
 				}
