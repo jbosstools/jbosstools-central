@@ -145,4 +145,18 @@
             markerType="org.eclipse.m2e.core.maven2Problem.pomloading">
         </markerResolutionGenerator>
     </extension>
+    
+    <extension point="org.eclipse.ui.newWizards">
+    <category
+            name="%JBossTools_Category"
+            id="org.jboss.ide.eclipse.ui.wizards">
+    </category>
+    <wizard
+          category="org.jboss.ide.eclipse.ui.wizards"
+          class="org.jboss.tools.maven.ui.wizard.ConfigureMavenRepositoriesWizard"
+          icon="icons/repo_wiz.gif"
+          id="org.jboss.tools.maven.ui.wizard.ConfigureMavenRepositoriesWizard"
+          name="%Configure_Maven_Repositories">
+    </wizard>
+  </extension>
 </plugin>

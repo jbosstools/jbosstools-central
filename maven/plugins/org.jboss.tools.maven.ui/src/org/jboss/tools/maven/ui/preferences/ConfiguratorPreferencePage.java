@@ -13,18 +13,24 @@ package org.jboss.tools.maven.ui.preferences;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.PreferencePage;
+import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 import org.jboss.tools.maven.ui.Activator;
 import org.jboss.tools.maven.ui.Messages;
+import org.jboss.tools.maven.ui.wizard.ConfigureMavenRepositoriesWizard;
 import org.osgi.framework.Bundle;
 
 /**
@@ -58,6 +64,7 @@ public class ConfiguratorPreferencePage extends PreferencePage implements
 	private Button configureJaxRsButton;
 	private Button configureJpaButton;
 	private Button configureGwtButton;
+	private Image jbossImage;
 	
 	@Override
 	protected Control createContents(Composite parent) {
@@ -165,8 +172,32 @@ public class ConfiguratorPreferencePage extends PreferencePage implements
 			configureGwtButton.setSelection(configureJpa);
 		}
 
+		Button configureMavenButton = new Button(composite, SWT.PUSH);
+		configureMavenButton.setLayoutData(new GridData(SWT.BEGINNING, SWT.FILL, true, false));
+		configureMavenButton.setText("Configure Maven Repositories...");
+		configureMavenButton.setImage(getJBossImage());
+		
+		configureMavenButton.addSelectionListener(new SelectionAdapter() {
+			
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				ConfigureMavenRepositoriesWizard wizard = new ConfigureMavenRepositoriesWizard();
+				WizardDialog dialog = new WizardDialog(Display.getDefault().getActiveShell(), wizard);
+				dialog.create();
+				dialog.open(); 
+			}
+		});
 		
 		return composite;
+	}
+	
+	private Image getJBossImage() {
+		if (jbossImage == null) {
+			ImageDescriptor desc = Activator.imageDescriptorFromPlugin(Activator.PLUGIN_ID,
+					"icons/jboss.png"); //$NON-NLS-1$
+			jbossImage = desc.createImage();
+		}
+		return jbossImage;
 	}
 
 	private boolean bundleExists(String bundleId) {
@@ -291,6 +322,14 @@ public class ConfiguratorPreferencePage extends PreferencePage implements
 		}
 		
 		return super.performOk();
+	}
+
+	@Override
+	public void dispose() {
+		if (jbossImage != null) {
+			jbossImage.dispose();
+		}
+		super.dispose();
 	}
 
 		

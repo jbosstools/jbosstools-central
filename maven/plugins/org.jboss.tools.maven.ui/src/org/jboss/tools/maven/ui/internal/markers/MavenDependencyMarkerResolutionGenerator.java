@@ -47,11 +47,13 @@ public class MavenDependencyMarkerResolutionGenerator implements
 		switch (type) {
 		case JBOSS_REPO:
 			return new IMarkerResolution[] {
+					new ConfigureMavenRepositoriesMarkerResolution(),
 					new OpenPageInBrowserMarkerResolution(Messages.Quickfix_setupCommunityRepo, 
 							JBOSS_COMMUNITY_REPO_SETUP_GUIDE_URL)
 					};
 		case EAP_REPO:
 			return new IMarkerResolution[] { 
+					new ConfigureMavenRepositoriesMarkerResolution(),
 					new OpenPageInBrowserMarkerResolution(Messages.Quickfix_setupEnterpriseRepo, 
 							JBOSS_ENTERPRISE_REPO_SETUP_GUIDE_URL)
 					};

@@ -21,6 +21,7 @@ import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.browser.IWebBrowser;
 import org.eclipse.ui.browser.IWorkbenchBrowserSupport;
+import org.jboss.tools.maven.ui.Activator;
 
 public class OpenPageInBrowserMarkerResolution implements IMarkerResolution,
 		IMarkerResolution2 {
@@ -58,11 +59,9 @@ public class OpenPageInBrowserMarkerResolution implements IMarkerResolution,
 			}
 			browser.openURL(new URL(url));
 		} catch (PartInitException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			Activator.log(e);
 		} catch (MalformedURLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			Activator.log(e);
 		}
 	}
 	
