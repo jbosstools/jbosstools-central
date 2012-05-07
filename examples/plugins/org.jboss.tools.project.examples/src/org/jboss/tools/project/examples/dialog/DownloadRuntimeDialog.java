@@ -126,34 +126,14 @@ public class DownloadRuntimeDialog extends Dialog {
 			disclaimerComposite.setText("Warning");
 			new Label(disclaimerComposite, SWT.NONE).setText("This is a community project and, as such is not supported with an SLA.");
 			Link link = new Link(disclaimerComposite, SWT.NONE);
-			link.setText("Any questions or problems can be raised through the <a>JBoss AS 7 User Forum</a> where the community will provide their best efforts to assist.");
-			Link link1 = new Link(disclaimerComposite, SWT.NONE);
-			link1.setText("This project is included in the JBoss Enterprise Application Platform for which a <a>support subscription</a> is available.");
-					
+			link.setText("If you're looking for fully supported, certified, enterprise middleware try JBoss Enterprise Middleware products. <a>Show Details</a>");
+
 			link.addSelectionListener( new SelectionAdapter( ) {
 
 				public void widgetSelected( SelectionEvent e )
 				{
 					String text = e.text;
-					if ("JBoss AS 7 User Forum".equals(text)) {
-						IWorkbenchBrowserSupport support = PlatformUI.getWorkbench()
-								.getBrowserSupport();
-						try {
-							URL url = new URL("http://community.jboss.org/en/jbossas/as7_users?view=discussions"); //$NON-NLS-1$
-							support.getExternalBrowser().openURL(url);
-						} catch (Exception e1) {
-							ProjectExamplesActivator.log(e1);
-						}
-					}
-					
-				}
-			} );
-			link1.addSelectionListener( new SelectionAdapter( ) {
-
-				public void widgetSelected( SelectionEvent e )
-				{
-					String text = e.text;
-					if ("support subscription".equals(text)) {
+					if ("Show Details".equals(text)) {
 						IWorkbenchBrowserSupport support = PlatformUI.getWorkbench()
 								.getBrowserSupport();
 						try {
