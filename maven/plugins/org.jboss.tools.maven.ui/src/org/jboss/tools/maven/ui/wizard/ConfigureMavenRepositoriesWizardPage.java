@@ -10,6 +10,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.apache.maven.cli.MavenCli;
+import org.apache.maven.repository.RepositorySystem;
 import org.apache.maven.settings.Activation;
 import org.apache.maven.settings.Profile;
 import org.apache.maven.settings.Repository;
@@ -76,6 +77,8 @@ public class ConfigureMavenRepositoriesWizardPage extends WizardPage {
 	private List<Repository> selectedIncludedRepositories = new ArrayList<Repository>();
 	private List<Repository> selectedAvailableRepositories = new ArrayList<Repository>();
 	private ListViewer availableRepositoriesViewer;
+
+	private String localRepository;
 	
 	public ConfigureMavenRepositoriesWizardPage() {
 		super(PAGE_NAME);
@@ -89,6 +92,26 @@ public class ConfigureMavenRepositoriesWizardPage extends WizardPage {
 		}
 	}
 
+	private String getLocalRepository() {
+		if (localRepository == null) {
+			String userSettings = getUserSettings();
+			String globalSettings = MavenPlugin.getMavenRuntimeManager()
+					.getGlobalSettingsFile();
+			try {
+				Settings settings = maven.buildSettings(globalSettings,
+						userSettings);
+				localRepository = settings.getLocalRepository();
+				if (localRepository == null) {
+					localRepository = RepositorySystem.defaultUserLocalRepository
+							.getAbsolutePath();
+				}
+			} catch (CoreException e) {
+				Activator.log(e);
+			} 
+		}
+		return localRepository;
+	}
+	
 	public void createControl(Composite parent) {
 		Composite composite = new Composite(parent, SWT.NONE);
 		composite.setLayout(new GridLayout(1, false));
@@ -398,6 +421,10 @@ public class ConfigureMavenRepositoriesWizardPage extends WizardPage {
 	private void searchDir(List<Repository> list, File directory, int depth,
 			IProgressMonitor monitor) {
 		
+		String localRepository = getLocalRepository();
+		if (localRepository != null && localRepository.trim().equals(directory.getAbsolutePath())) {
+			return;
+		}
 		monitor.setTaskName("Searching " + directory.getAbsolutePath());
 		File comFile = new File(directory, "com");
 		if (comFile.isDirectory()) { //$NON-NLS-1$
