@@ -42,7 +42,7 @@ import org.sonatype.aether.version.Version;
 
 public class MavenArtifactHelper {
 
-	private static final DependencyKey ENTERPRISE_JBOSS_SPEC = DependencyKey.fromPortableString("org.jboss.spec:jboss-javaee-web-6.0:pom:3.0.0.Beta1-redhat-1::"); //$NON-NLS-1$
+	//private static final DependencyKey ENTERPRISE_JBOSS_SPEC = DependencyKey.fromPortableString("org.jboss.spec:jboss-javaee-web-6.0:pom:3.0.0.Beta1-redhat-1::"); //$NON-NLS-1$
 	
 	private static final String COORDS = "org.jboss.spec:jboss-javaee-web-6.0:[0,)"; //$NON-NLS-1$
 	/**
@@ -87,7 +87,7 @@ public class MavenArtifactHelper {
 		if (!isEnterpriseRepositoryAvailable()) {
 			return new Status(IStatus.ERROR, 
 					   MavenProjectExamplesActivator.PLUGIN_ID, 
-					   NLS.bind(Messages.ArchetypeExamplesWizardFirstPage_Unresolved_Enterprise_Repo, ENTERPRISE_JBOSS_SPEC));
+					   NLS.bind(Messages.ArchetypeExamplesWizardFirstPage_Unresolved_Enterprise_Repo, COORDS));
 		}
 		if (project != null) {
 			Set<String> requirements = project.getEssentialEnterpriseDependencyGavs();
