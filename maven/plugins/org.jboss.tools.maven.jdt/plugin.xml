@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+
+	<extension
+         point="org.eclipse.m2e.core.lifecycleMappingMetadataSource">
+    </extension>
+   
+   <extension point="org.eclipse.jdt.core.classpathContainerInitializer"
+              id="endorsedLibrariesClasspathContainer"
+              name="Endorsed Libraries">
+      <classpathContainerInitializer
+            id="org.jboss.tools.maven.jdt.ENDORSED_LIB_CLASSPATH_CONTAINER"
+            class="org.jboss.tools.maven.jdt.configurators.EndorsedLibrariesContainerInitializer"/>
+   </extension>
+      
+ 	<extension point="org.eclipse.m2e.core.projectConfigurators">
+      <configurator 
+          id="org.jboss.tools.maven.jdt.configurator.endorsedlib"
+          class="org.jboss.tools.maven.jdt.configurators.EndorsedLibProjectConfigurator"
+          name="%Endorsed_Lib_Configurator_label" 
+          secondaryTo="org.eclipse.m2e.jdt.javaConfigurator"/>
+    </extension>
+    
+</plugin>

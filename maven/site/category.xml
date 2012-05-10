@@ -47,6 +47,9 @@
 	<feature url="features/org.jboss.tools.maven.sourcelookup.feature_0.0.0.jar" id="org.jboss.tools.maven.sourcelookup.feature" version="0.0.0">
 		<category name="JBoss Tools maven Nightly Build Update Site"/>
 	</feature>
+	<feature url="features/org.jboss.tools.maven.jdt.feature_0.0.0.jar" id="org.jboss.tools.maven.jdt.feature" version="0.0.0">
+		<category name="JBoss Tools maven Nightly Build Update Site"/>
+	</feature>    
 	<!-- Sources --> 
 	<feature url="features/org.jboss.tools.maven.feature.source_0.0.0.jar" id="org.jboss.tools.maven.feature.source" version="0.0.0">
 		<category name="JBoss Tools maven Nightly Build Update Site"/>
@@ -90,4 +93,8 @@
 	<feature url="features/org.jboss.tools.maven.sourcelookup.feature.source_0.0.0.jar" id="org.jboss.tools.maven.sourcelookup.feature.source" version="0.0.0">
 		<category name="JBoss Tools maven Nightly Build Update Site"/>
 	</feature>
+	<feature url="features/org.jboss.tools.maven.jdt.feature.source_0.0.0.jar" id="org.jboss.tools.maven.jdt.feature.source" version="0.0.0">
+		<category name="JBoss Tools maven Nightly Build Update Site"/>
+	</feature>
+    
 </site>
