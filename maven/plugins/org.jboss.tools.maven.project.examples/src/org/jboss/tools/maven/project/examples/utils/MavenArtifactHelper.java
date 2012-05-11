@@ -42,16 +42,16 @@ import org.sonatype.aether.version.Version;
 
 public class MavenArtifactHelper {
 
-	//private static final DependencyKey ENTERPRISE_JBOSS_SPEC = DependencyKey.fromPortableString("org.jboss.spec:jboss-javaee-web-6.0:pom:3.0.0.Beta1-redhat-1::"); //$NON-NLS-1$
+	private static final String JBOSS_SPEC = "org.jboss.spec:jboss-javaee-web-6.0"; //$NON-NLS-1$
 	
-	private static final String COORDS = "org.jboss.spec:jboss-javaee-web-6.0:[0,)"; //$NON-NLS-1$
+	private static final String COORDS = JBOSS_SPEC+":[0,)"; //$NON-NLS-1$
 	/**
 	 * Checks if the EAP repository is available
 	 * 
 	 * @return true if org.jboss.spec:jboss-javaee-web-6.0:pom:*redhat* can be resolved
 	 */
 	public static boolean isEnterpriseRepositoryAvailable() {
-		boolean isRepoAvailable = artifactExists(COORDS);
+		boolean isRepoAvailable = redHatArtifactExists(COORDS);
 		return isRepoAvailable;
 	}
 
@@ -87,7 +87,7 @@ public class MavenArtifactHelper {
 		if (!isEnterpriseRepositoryAvailable()) {
 			return new Status(IStatus.ERROR, 
 					   MavenProjectExamplesActivator.PLUGIN_ID, 
-					   NLS.bind(Messages.ArchetypeExamplesWizardFirstPage_Unresolved_Enterprise_Repo, COORDS));
+					   NLS.bind(Messages.ArchetypeExamplesWizardFirstPage_Unresolved_Enterprise_Repo, JBOSS_SPEC));
 		}
 		if (project != null) {
 			Set<String> requirements = project.getEssentialEnterpriseDependencyGavs();
@@ -105,7 +105,7 @@ public class MavenArtifactHelper {
 		return Status.OK_STATUS;
 	}
 	
-	private static boolean artifactExists(String coords) {
+	private static boolean redHatArtifactExists(String coords) {
 		RepositorySystem system;
 		try {
 			system = new DefaultPlexusContainer()
@@ -115,15 +115,15 @@ public class MavenArtifactHelper {
 			return false;
 		}
 		MavenRepositorySystemSession session = new MavenRepositorySystemSession();
-		String localRepoHome = System.getProperty("user.home") //$NON-NLS-1$
-				+ Path.SEPARATOR + ".m2" + Path.SEPARATOR + "repository"; //$NON-NLS-1$ //$NON-NLS-2$
+		IMaven maven = MavenPlugin.getMaven();
+		String localRepoHome = maven.getLocalRepositoryPath();
 		LocalRepository localRepo = new LocalRepository(localRepoHome);
 		session.setLocalRepositoryManager(system.newLocalRepositoryManager(localRepo));
-		org.sonatype.aether.artifact.Artifact artifact = new DefaultArtifact(coords);
+		
 		VersionRangeRequest rangeRequest = new VersionRangeRequest();
-		rangeRequest.setArtifact(artifact);
+		rangeRequest.setArtifact( new DefaultArtifact(coords));
+		
 		List<ArtifactRepository> repos = new ArrayList<ArtifactRepository>();
-		IMaven maven = MavenPlugin.getMaven();
 	    try {
 			repos.addAll(maven.getArtifactRepositories(false));
 		} catch (CoreException e) {
@@ -135,8 +135,7 @@ public class MavenArtifactHelper {
 			rangeRequest.addRepository(remoteRepo);
 		}
 		try {
-			VersionRangeResult result = system.resolveVersionRange(
-					session, rangeRequest);
+			VersionRangeResult result = system.resolveVersionRange(	session, rangeRequest);
 			List<Version> versions = result.getVersions();
 			for (Version version:versions) {
 				if (version != null && version.toString().contains("redhat")) { //$NON-NLS-1$
