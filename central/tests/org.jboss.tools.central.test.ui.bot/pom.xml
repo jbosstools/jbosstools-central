@@ -14,7 +14,7 @@
 	<packaging>eclipse-test-plugin</packaging>
 	<properties>
 		<additionalSystemProperties></additionalSystemProperties>
-		<jbosstools.test.jbossas.home>${requirement.build.root}/jboss-as-7.1.1.Final</jbosstools.test.jbossas.home>
+		<jbosstools.test.jbossas.home>${project.build.directory}/requirements/jboss-as-7.1.1.Final</jbosstools.test.jbossas.home>
 		<!-- for debugging ucomment and comment next line <systemProperties>-Xdebug -Xrunjdwp:transport=dt_socket,address=8001,server=y,suspend=y -Djbosstools.test.jbossas.home=${jbosstools.test.jbossas.home}  -Dswtbot.test.properties.file=${swtbot.properties}</systemProperties> -->
 		<systemProperties>${additionalSystemProperties} -Djbosstools.test.jbossas.home=${jbosstools.test.jbossas.home} -Dswtbot.test.properties.file=${swtbot.properties}</systemProperties>
 	</properties>
@@ -30,6 +30,31 @@
 	
 	<build>
 		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-dependency-plugin</artifactId>
+				<version>2.4</version>
+				<executions>
+					<execution>
+						<id>unpack</id>
+						<phase>pre-integration-test</phase>
+						<goals>
+							<goal>unpack</goal>
+						</goals>
+						<configuration>
+							<artifactItems>
+								<artifactItem>
+									<groupId>org.jboss.as</groupId>
+									<artifactId>jboss-as-dist</artifactId>
+									<version>7.1.1.Final</version>
+									<type>zip</type>
+								</artifactItem>
+							</artifactItems>
+							<outputDirectory>${project.build.directory}/requirements</outputDirectory>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
 			<plugin>
 				<groupId>org.eclipse.tycho</groupId>
 				<artifactId>tycho-surefire-plugin</artifactId>
