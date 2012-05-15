@@ -515,7 +515,7 @@ public class DownloadRuntimeDialog extends Dialog {
 	private Shell getActiveShell() {
 		Display display = Display.getDefault();
 		if (display != null) {
-			return display.getActiveShell();
+			return PlatformUI.getWorkbench().getModalDialogShellProvider().getShell();
 		}
 		return null;
 	}
