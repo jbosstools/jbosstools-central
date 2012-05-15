@@ -182,8 +182,11 @@ public class CDIProjectConfigurator extends AbstractProjectConfigurator {
 	}
 
 	private boolean isKnownCdiExtension(Artifact artifact) {
-		return artifact.getGroupId().startsWith("org.jboss.seam.") 
-			&& artifact.getVersion().startsWith("3.");
+		return (artifact.getGroupId().startsWith("org.jboss.seam.") 
+			&& artifact.getVersion().startsWith("3."))
+			|| artifact.getGroupId().startsWith("org.apache.deltaspike.");
+		
+		
 	}
 
 }
