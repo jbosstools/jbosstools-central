@@ -119,6 +119,7 @@ public class NewProjectExamplesReadyPage extends WizardPage {
 			setTitle(projectExample.getShortDescription());
 			setDescription("'" + projectExample.getShortDescription() + "' Project is now ready");
 			if (showReadme != null) {
+				ProjectExamplesActivator.fixWelcome(projectExample);
 				if (projectExample.isWelcome()) {
 					showReadme.setEnabled(true);
 					showReadme.setSelection(store.getBoolean(ProjectExamplesActivator.SHOW_README));

@@ -36,7 +36,6 @@ import java.util.zip.ZipFile;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.commons.lang.StringEscapeUtils;
 import org.eclipse.core.filesystem.EFS;
@@ -136,7 +135,6 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-import org.xml.sax.SAXException;
 
 /**
  * The activator class controls the plug-in life cycle
@@ -662,12 +660,15 @@ public class ProjectExamplesActivator extends AbstractUIPlugin {
 
 		return editorDesc;
 	}
+	
 	public static void fixWelcome(ProjectExample project) {
-		if (project == null || project.isWelcome()) {
+		if (project == null) {
+			return;
+		}
+		if (!project.isWelcomeFixRequired()) {
 			return;
 		}
 		checkCheatsheet(project);
-		
 	}
 
 	protected static void checkCheatsheet(ProjectExample project) {

@@ -381,6 +381,7 @@ public class ProjectExampleUtil {
 												.log(Messages.ProjectUtil_Invalid_welcome_element);
 									} else {
 										project.setWelcomeURL(attribute.trim());
+										project.setWelcomeFixRequired(false);
 									}
 								} else if (nodeName.equals("mavenArchetype")) { //$NON-NLS-1$
 									parseMavenArchetype(project, child);

@@ -39,6 +39,7 @@ public class ProjectExample implements ProjectModelElement,
 	private boolean welcome;
 	private String type;
 	private String welcomeURL;
+	private boolean welcomeFixRequired = true;
 	private List<ProjectFix> fixes = new ArrayList<ProjectFix>();
 	private List<ProjectFix> unsatisfiedFixes;
 	private String perspectiveId;
@@ -343,5 +344,13 @@ public class ProjectExample implements ProjectModelElement,
 
 	public Set<String> getEssentialEnterpriseDependencyGavs() {
 	  return essentialEnterpriseDependencies;
+	}
+
+	public boolean isWelcomeFixRequired() {
+		return welcomeFixRequired;
+	}
+
+	public void setWelcomeFixRequired(boolean welcomeFixRequired) {
+		this.welcomeFixRequired = welcomeFixRequired;
 	}
 }
