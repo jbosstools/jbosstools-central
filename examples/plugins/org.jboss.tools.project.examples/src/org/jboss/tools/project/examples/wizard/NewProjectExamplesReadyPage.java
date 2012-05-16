@@ -127,7 +127,7 @@ public class NewProjectExamplesReadyPage extends WizardPage {
 					showReadme.setText("Show '" + welcomeURL + "' for further instructions");
 				} else {
 					showReadme.setEnabled(false);
-					showReadme.setSelection(store.getBoolean(ProjectExamplesActivator.SHOW_README));
+					showReadme.setSelection(false);
 					showReadme.setText(SHOW_README_FILE_FOR_FURTHER_INSTRUCTIONS);
 				}
 			}
