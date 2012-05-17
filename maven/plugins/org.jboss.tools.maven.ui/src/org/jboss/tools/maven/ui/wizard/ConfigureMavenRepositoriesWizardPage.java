@@ -142,6 +142,8 @@ public class ConfigureMavenRepositoriesWizardPage extends WizardPage {
 
 	private static final String PLUGIN_REPOSITORIES_ELEMENT = "pluginRepositories"; //$NON-NLS-1$
 
+	private static final String PLUGIN_REPOSITORY_ELEMENT = "pluginRepository"; //$NON-NLS-1$
+
 	private static final String REPOSITORIES_ELEMENT = "repositories"; //$NON-NLS-1$
 
 	private static final String ACTIVE_BY_DEFAULT_ELEMENT = "activeByDefault"; //$NON-NLS-1$
@@ -618,13 +620,18 @@ public class ConfigureMavenRepositoriesWizardPage extends WizardPage {
 	}
 
 	protected void addRepository(RepositoryWrapper wrapper) {
-		addRepository(wrapper, repositoriesElement);
-		addRepository(wrapper, pluginRepositoriesElement);
+		addRepository(wrapper, repositoriesElement, false);
+		addRepository(wrapper, pluginRepositoriesElement, true);
 		
 	}
 
-	private void addRepository(RepositoryWrapper wrapper, Element repos) {
-		Element repository = document.createElement(REPOSITORY_ELEMENT);
+	private void addRepository(RepositoryWrapper wrapper, Element repos, boolean isPluginRepository) {
+		Element repository;
+		if (isPluginRepository) {
+			repository = document.createElement(PLUGIN_REPOSITORY_ELEMENT);
+		} else {
+			repository = document.createElement(REPOSITORY_ELEMENT);
+		}
 		repos.appendChild(repository);
 		addElement(repository, ID_ELEMENT, wrapper.getRepository().getId());
 		addElement(repository, NAME_ELEMENT, wrapper.getRepository().getName());
@@ -658,17 +665,23 @@ public class ConfigureMavenRepositoriesWizardPage extends WizardPage {
 
 	protected void removeRepository(RepositoryWrapper wrapper) {
 		String url = wrapper.getRepository().getUrl();
-		removeRepository(url, repositoriesElement);
-		removeRepository(url, pluginRepositoriesElement);
+		removeRepository(url, repositoriesElement, false);
+		removeRepository(url, pluginRepositoriesElement, true);
 	}
 
-	protected void removeRepository(String url, Element repos) {
+	protected void removeRepository(String url, Element repos, boolean isPluginRepository) {
 		NodeList repositoryNodeList = repos.getChildNodes();
 		int len = repositoryNodeList.getLength();
+		String name;
+		if (isPluginRepository) {
+			name = PLUGIN_REPOSITORY_ELEMENT;
+		} else {
+			name = REPOSITORY_ELEMENT;
+		}
 		Node repository = null;
 		for (int i = 0; i < len; i++) {
 			Node node = repositoryNodeList.item(i);
-			if (node.getNodeType() == Node.ELEMENT_NODE && REPOSITORY_ELEMENT.equals(node.getNodeName())) {
+			if (node.getNodeType() == Node.ELEMENT_NODE && name.equals(node.getNodeName())) {
 				String urlNode = getRepositoryUrl(node);
 				if (urlNode != null && urlNode.equals(url)) {
 					repository = node;
