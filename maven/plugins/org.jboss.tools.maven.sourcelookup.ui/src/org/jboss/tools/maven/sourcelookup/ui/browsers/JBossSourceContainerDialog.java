@@ -160,7 +160,7 @@ public class JBossSourceContainerDialog extends TitleAreaDialog {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				DirectoryDialog dialog = new DirectoryDialog(getShell());
-				dialog.setMessage("Choose JBoss AS Home:");
+				dialog.setMessage("Choose Home:");
 				String path = dialog.open();
 				if (path != null) {
 					setHomePath(path);
