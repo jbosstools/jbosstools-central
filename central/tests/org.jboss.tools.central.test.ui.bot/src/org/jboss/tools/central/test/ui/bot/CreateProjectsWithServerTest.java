@@ -1,5 +1,11 @@
 package org.jboss.tools.central.test.ui.bot;
 
+import static org.eclipse.swtbot.swt.finder.matchers.WidgetMatcherFactory.widgetOfType;
+
+import java.io.File;
+import java.io.FileNotFoundException;
+
+import org.eclipse.swt.widgets.Link;
 import org.eclipse.swtbot.eclipse.finder.waits.Conditions;
 import org.eclipse.swtbot.swt.finder.exceptions.WidgetNotFoundException;
 import org.eclipse.swtbot.swt.finder.utils.Traverse;
@@ -21,11 +27,11 @@ import org.junit.After;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-@Require(server=@org.jboss.tools.ui.bot.ext.config.Annotations.Server(type=ServerType.JbossAS))
+@Require(server=@org.jboss.tools.ui.bot.ext.config.Annotations.Server(type=ServerType.EAP))
 public class CreateProjectsWithServerTest extends SWTTestExt{
 	
 	@BeforeClass
-	public static void setup(){
+	public static void setup() throws FileNotFoundException{
 		bot.menu("Window").menu("Preferences").click();
 		bot.waitForShell("Preferences");
 		bot.tree().getTreeItem("Maven").select();
@@ -33,7 +39,57 @@ public class CreateProjectsWithServerTest extends SWTTestExt{
 		bot.clickButton("OK");
 		bot.menu("Help").menu(IDELabel.JBossCentralEditor.JBOSS_CENTRAL).click();
 		util.waitForAll();
+		if (configuredState.getServer().type.equalsIgnoreCase("EAP")){
+			setupEAP();
+		}
+		
 	}
+	/**
+	 * Sets up maven configuration file with configured EAP and WFK repository and clears ~/.m2/clean-repository 
+	 * Clears ~/.m2/clean-repository if exists
+	 * @throws FileNotFoundException 
+	 */
+	private static void setupEAP() throws FileNotFoundException{
+		log.info("A mame tady EAPcko !!!!!!");
+		String mvnConfigFileName = System.getProperty("eap.maven.config.file");
+		File mvnConfigFile;
+		try {
+			mvnConfigFile = new File(mvnConfigFileName);
+		} catch (NullPointerException e) {
+			throw new NullPointerException("eap.maven.config.file wasn't set");
+		}
+		if (!mvnConfigFile.exists()) throw new FileNotFoundException("File configured in eap.maven.config.file " +
+				"property does not exist");
+		File mvnLocalRepo = new File(System.getProperty("user.home")+"/.m2/clean-repository");
+		if (mvnLocalRepo.exists()){
+			deleteDirectory(mvnLocalRepo);
+		}
+		//Now is ~/.m2/clean-repository deleted and settings.xml exists. Next step is to tell eclipse to use our settings.xml
+		bot.menu("Window").menu("Preferences").click();
+		bot.waitForShell("Preferences");
+		bot.tree().expandNode("Maven").select("User Settings");
+		bot.text(1).setText(mvnConfigFileName);
+		bot.clickButton("Update Settings");
+		util.waitForNonIgnoredJobs();
+		bot.clickButton("Apply");
+		bot.clickButton("OK");
+		util.waitForNonIgnoredJobs();
+	}
+	
+	private static boolean deleteDirectory(File path) {
+	    if( path.exists() ) {
+	      File[] files = path.listFiles();
+	      for(int i=0; i<files.length; i++) {
+	         if(files[i].isDirectory()) {
+	           deleteDirectory(files[i]);
+	         }
+	         else {
+	           files[i].delete();
+	         }
+	      }
+	    }
+	    return( path.delete() );
+	  }
 	
 	@After
 	public void teardown(){
@@ -42,6 +98,11 @@ public class CreateProjectsWithServerTest extends SWTTestExt{
 		for (SWTBotTreeItem swtBotTreeItem : items) {
 			log.error(swtBotTreeItem.toString());
 		}*/
+	}
+	
+	@Test
+	public void dummyTest(){
+		
 	}
 	
 	@Test
@@ -118,11 +179,11 @@ public class CreateProjectsWithServerTest extends SWTTestExt{
 		projectExampleShell.close();
 		
 		//check the rest of project examples
-		checkExample(null, IDELabel.JBossCentralEditor.JAVA_EE_WEB_PROJECT, true);
-		checkExample(null, IDELabel.JBossCentralEditor.JAVA_EE_PROJECT, true);
-		checkExample(null, IDELabel.JBossCentralEditor.HTML5_PROJECT, true);
-		checkExample(null, IDELabel.JBossCentralEditor.RICHFACES_PROJECT, true);
-		checkExample(null, IDELabel.JBossCentralEditor.SPRING_MVC_PROJECT, false);
+		checkExample(null, IDELabel.JBossCentralEditor.JAVA_EE_WEB_PROJECT, false);
+//		checkExample(null, IDELabel.JBossCentralEditor.JAVA_EE_PROJECT, true);
+//		checkExample(null, IDELabel.JBossCentralEditor.HTML5_PROJECT, true);
+//		checkExample(null, IDELabel.JBossCentralEditor.RICHFACES_PROJECT, true);
+//		checkExample(null, IDELabel.JBossCentralEditor.SPRING_MVC_PROJECT, false);
 		
 		/*checkCreateProject(IDELabel.JBossCentralEditor.JAVA_EE_WEB_PROJECT);
 		checkCreateProject(IDELabel.JBossCentralEditor.JAVA_EE_PROJECT);
@@ -137,7 +198,7 @@ public class CreateProjectsWithServerTest extends SWTTestExt{
 		projectExplorer.deleteAllProjects();
 	}
 	
-	@Test
+//	@Test
 	public void projectExamplesSectionTest(){
 		SWTBotTwistie twistieBot = bot.twistieByLabel("JBoss Quickstarts");
 		while (!twistieBot.isExpanded()){
@@ -159,8 +220,6 @@ public class CreateProjectsWithServerTest extends SWTTestExt{
 	/**
 	 * Tries to deploy all projects
 	 */
-	
-	//@Test
 	public void canBeDeployedTest(){
 		servers.show();
 		String serverName = bot.tree().getAllItems()[0].getText().substring(0, bot.tree().getAllItems()[0].getText().indexOf(' '));
@@ -228,7 +287,16 @@ public class CreateProjectsWithServerTest extends SWTTestExt{
 		bot.waitForShell(IDELabel.JBossCentralEditor.PROJECT_EXAMPLE);
 		SWTBotWizard wizard = new SWTBotWizard(bot.shell(IDELabel.JBossCentralEditor.PROJECT_EXAMPLE).widget);
 		wizard.next();
-		if (wizard.canNext()) wizard.next();
+		if (wizard.canNext()){
+			bot.comboBox(2).setSelection(1);
+			try{
+				bot.link();
+				fail("There is something wrong with maven repo. Message: \n"+bot.link().getText());
+			}catch (WidgetNotFoundException ex){
+				//everything fine
+			}
+			wizard.next();
+		}
 		wizard.finishWithWait();
 		String readmeText = bot.checkBox(1).getText();
 		assertFalse("Quick fix should not be enabled (Everything should be fine)", bot.checkBox(0).isEnabled());

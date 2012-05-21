@@ -1,0 +1,2 @@
+First import Launch configuration (RunTest for running locally via Eclipse. MavenTest for running with maven(not working right now because of EAP))
+Specify  arguments test.configurations.dir and eap.maven.config.file (should be in /resources/server_properties and /resources/settings.xml)
