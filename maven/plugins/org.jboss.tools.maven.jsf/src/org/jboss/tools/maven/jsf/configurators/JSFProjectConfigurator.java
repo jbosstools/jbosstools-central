@@ -12,7 +12,8 @@ package org.jboss.tools.maven.jsf.configurators;
 
 import static org.jboss.tools.maven.jsf.configurators.JSFUtils.JSF_VERSION_1_1;
 import static org.jboss.tools.maven.jsf.configurators.JSFUtils.JSF_VERSION_1_2;
-import static org.jboss.tools.maven.jsf.configurators.JSFUtils.*;
+import static org.jboss.tools.maven.jsf.configurators.JSFUtils.JSF_VERSION_2_0;
+import static org.jboss.tools.maven.jsf.configurators.JSFUtils.JSF_VERSION_2_1;
 
 import java.util.List;
 
@@ -85,7 +86,7 @@ public class JSFProjectConfigurator extends AbstractProjectConfigurator {
 		try {
 			jsf21Version = JSF_FACET.getVersion(JSF_VERSION_2_1); 
 		} catch (Exception e) {
-			Activator.log("JSF 2.1 Facet is unavailable, fall back to 2.0");
+			MavenJSFActivator.warn("JSF 2.1 Facet is unavailable, fall back to 2.0");
 			jsf21Version = JSF_FACET_VERSION_2_0; 
 		}
 		JSF_FACET_VERSION_2_1 = jsf21Version;

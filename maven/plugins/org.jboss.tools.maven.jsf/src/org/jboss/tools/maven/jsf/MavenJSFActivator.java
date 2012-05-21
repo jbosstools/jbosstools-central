@@ -80,6 +80,11 @@ public class MavenJSFActivator extends AbstractUIPlugin {
 		getDefault().getLog().log(status);
 	}
 	
+	public static void warn(String message) {
+		IStatus status = new Status(IStatus.WARNING, PLUGIN_ID, message);
+		getDefault().getLog().log(status);
+	}	
+		
 	public IDataModel createJSFDataModel(IFacetedProject fproj, IProjectFacetVersion facetVersion) {
 		IDataModel config = (IDataModel) new JSFFacetInstallDataModelProvider().create();
 		LibraryInstallDelegate libraryDelegate = new LibraryInstallDelegate(fproj, facetVersion);
