@@ -17,12 +17,17 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.maven.model.Model;
+import org.eclipse.core.filesystem.EFS;
+import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.Path;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.m2e.core.MavenPlugin;
@@ -34,6 +39,7 @@ import org.eclipse.m2e.core.project.ProjectImportConfiguration;
 import org.eclipse.m2e.core.ui.internal.actions.OpenMavenConsoleAction;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
+import org.eclipse.ui.PlatformUI;
 import org.jboss.tools.maven.ui.Activator;
 import org.jboss.tools.project.examples.ProjectExamplesActivator;
 import org.jboss.tools.project.examples.model.ProjectExample;
@@ -98,7 +104,21 @@ public class ImportMavenProjectExampleDelegate extends AbstractImportMavenProjec
 				return false;
 			}
 		}
-		boolean ok = ProjectExamplesActivator.extractZipFile(file, destination, monitor);
+		boolean ok = false;
+		if (file.isFile()) {
+			ok = ProjectExamplesActivator.extractZipFile(file, destination, monitor);
+		}
+		if (file.isDirectory()) {
+			destination.mkdirs();
+			IFileStore descStore = EFS.getLocalFileSystem().fromLocalFile(destination);
+			IFileStore srcStore = EFS.getLocalFileSystem().fromLocalFile(file);
+			try {
+				srcStore.copy(descStore, EFS.OVERWRITE, monitor);
+				ok = true;
+			} catch (Exception e) {
+				MavenProjectExamplesActivator.log(e);
+			}
+		}
 		monitor.setTaskName("");
 		if (monitor.isCanceled()) {
 			return false;
@@ -110,7 +130,7 @@ public class ImportMavenProjectExampleDelegate extends AbstractImportMavenProjec
 				public void run() {
 					MessageDialog.openError(getActiveShell(), 
 							"Error", 
-							"Cannot extract the archive.");
+							"Cannot extract/copy the archive.");
 				}
 			});
 			return false;
@@ -156,7 +176,6 @@ public class ImportMavenProjectExampleDelegate extends AbstractImportMavenProjec
 	private List<String> importMavenProjects(final File destination,
 			final ProjectExample projectDescription, IProgressMonitor monitor) {
 		List<String> projectNames = new ArrayList<String>();
-		MavenPlugin plugin = MavenPlugin.getDefault();
 		try {
 			AbstractProjectScanner<MavenProjectInfo> projectScanner = getProjectScanner(destination);
 			projectScanner.run(monitor);
@@ -299,7 +318,7 @@ public class ImportMavenProjectExampleDelegate extends AbstractImportMavenProjec
 			if (project != null && project.exists()) {
 				File projectFile = project.getLocation().toFile();
 				File projectParent = projectFile.getParentFile();
-				if (projectParent.equals(destination)) {
+				if (projectParent.equals(destination) || projectFile.equals(destination)) {
 					existingProjects.add(project);
 				}
 			}

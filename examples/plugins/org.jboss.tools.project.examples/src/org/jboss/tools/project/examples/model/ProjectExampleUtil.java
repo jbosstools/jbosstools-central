@@ -14,6 +14,7 @@ import java.io.BufferedOutputStream;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileFilter;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -47,9 +48,14 @@ import org.eclipse.core.runtime.IExtensionRegistry;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.osgi.util.NLS;
+import org.eclipse.wst.server.core.IRuntime;
+import org.eclipse.wst.server.core.IServer;
+import org.eclipse.wst.server.core.ServerCore;
+import org.jboss.ide.eclipse.as.core.server.IJBossServerRuntime;
 import org.jboss.tools.project.examples.Messages;
 import org.jboss.tools.project.examples.ProjectExamplesActivator;
 import org.jboss.tools.project.examples.filetransfer.ECFExamplesTransport;
@@ -65,6 +71,8 @@ import org.xml.sax.helpers.DefaultHandler;
  * 
  */
 public class ProjectExampleUtil {
+
+	private static final String SERVER_PROJECT_EXAMPLE_XML = ".project_example.xml";
 
 	private static final String URL = "url"; //$NON-NLS-1$
 
@@ -137,6 +145,66 @@ public class ProjectExampleUtil {
 		return pluginSites;
 	}
 
+	public static Set<IProjectExampleSite> getServerSites() {
+		Set<IProjectExampleSite> sites = new HashSet<IProjectExampleSite>();
+		IPreferenceStore store = ProjectExamplesActivator.getDefault()
+				.getPreferenceStore();
+		if (!store.getBoolean(ProjectExamplesActivator.SHOW_SERVER_SITES)) {
+			return sites;
+		}
+		IServer[] servers = ServerCore.getServers();
+		for (IServer server:servers) {
+			IRuntime runtime = server.getRuntime();
+			if (runtime == null) {
+				continue;
+			}
+			IJBossServerRuntime jbossRuntime = (IJBossServerRuntime)runtime.loadAdapter(IJBossServerRuntime.class, new NullProgressMonitor());
+			if (jbossRuntime == null) {
+				continue;
+			}
+			IPath jbossLocation = runtime.getLocation();
+			if (jbossRuntime.getRuntime() == null) {
+				continue;
+			}
+			String name = jbossRuntime.getRuntime().getName() + " Project Examples";
+			File serverHome = jbossLocation.toFile();
+			File file = getFile(serverHome, true);
+			if (file != null) {
+				ProjectExampleSite site = new ProjectExampleSite();
+				site.setExperimental(false);
+				site.setName(name);
+				try {
+					site.setUrl(file.toURI().toURL());
+					sites.add(site);
+				} catch (MalformedURLException e) {
+					ProjectExamplesActivator.log(e.getMessage());
+				}
+			}
+		}
+		return sites;
+	}
+	private static File getFile(File serverHome, boolean b) {
+		if (!serverHome.isDirectory()) {
+			return null;
+		}
+		File[] directories = serverHome.listFiles(new FileFilter() {
+			
+			@Override
+			public boolean accept(File pathname) {
+				return pathname.isDirectory();
+			}
+		});
+		if (directories != null && directories.length > 0) {
+			for (File directory:directories) {
+				File projectExampleFile = new File(directory, SERVER_PROJECT_EXAMPLE_XML);
+				if (projectExampleFile.isFile()) {
+					return projectExampleFile;
+				}
+			}
+		}
+		return null;
+	}
+
 	public static Set<IProjectExampleSite> getUserSites() {
 		Set<IProjectExampleSite> sites = new HashSet<IProjectExampleSite>();
 		ProjectExampleSite site = getSite(getProjectExamplesXml());
@@ -193,6 +261,7 @@ public class ProjectExampleUtil {
 		Set<IProjectExampleSite> sites = new HashSet<IProjectExampleSite>();
 		sites.addAll(getPluginSites());
 		sites.addAll(getUserSites());
+		sites.addAll(getServerSites());
 		return sites;
 	}
 
@@ -265,10 +334,17 @@ public class ProjectExampleUtil {
 					continue;
 				}
 
-				DocumentBuilderFactory dbf = DocumentBuilderFactory
-						.newInstance();
-				DocumentBuilder db = dbf.newDocumentBuilder();
-				Document doc = db.parse(file);
+				Document doc;
+				try {
+					DocumentBuilderFactory dbf = DocumentBuilderFactory
+							.newInstance();
+					DocumentBuilder db = dbf.newDocumentBuilder();
+					doc = db.parse(file);
+				} catch (Exception e) {
+					ProjectExamplesActivator.log(e);
+					invalidSites.add(site);
+					continue;
+				}
 				NodeList projects = doc.getElementsByTagName("project"); //$NON-NLS-1$
 				int len = projects.getLength();
 				for (int i = 0; i < len; i++) {

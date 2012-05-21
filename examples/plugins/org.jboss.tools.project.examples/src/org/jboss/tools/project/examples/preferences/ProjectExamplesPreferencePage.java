@@ -56,6 +56,7 @@ public class ProjectExamplesPreferencePage extends PreferencePage implements
 
 	public static final String ID = "org.jboss.tools.project.examples.preferences.projectExamplesPreferencePage"; //$NON-NLS-1$
 	private Button showExperimentalSites;
+	private Button showServerSites;
 	private Sites sites;
 	private TreeViewer viewer;
 	private ProjectExampleSite selectedSite;
@@ -144,6 +145,10 @@ public class ProjectExamplesPreferencePage extends PreferencePage implements
 		showExperimentalSites = new Button(composite,SWT.CHECK);
 		showExperimentalSites.setText(Messages.ProjectExamplesPreferencePage_Show_experimental_sites);
 		showExperimentalSites.setSelection(store.getBoolean(ProjectExamplesActivator.SHOW_EXPERIMENTAL_SITES));
+		
+		showServerSites = new Button(composite,SWT.CHECK);
+		showServerSites.setText(Messages.ProjectExamplesPreferencePage_Show_server_sites);
+		showServerSites.setSelection(store.getBoolean(ProjectExamplesActivator.SHOW_SERVER_SITES));
 		
 		showInvalidSites = new Button(composite,SWT.CHECK);
 		showInvalidSites.setText(Messages.ProjectExamplesPreferencePage_Show_invalid_sites);
@@ -281,10 +286,12 @@ public class ProjectExamplesPreferencePage extends PreferencePage implements
 		showQuickFix.setSelection(ProjectExamplesActivator.SHOW_QUICK_FIX_VALUE);
 		
 		showExperimentalSites.setSelection(ProjectExamplesActivator.SHOW_EXPERIMENTAL_SITES_VALUE);
+		showServerSites.setSelection(ProjectExamplesActivator.SHOW_SERVER_SITES_VALUE);
 		showInvalidSites.setSelection(ProjectExamplesActivator.SHOW_INVALID_SITES_VALUE);
 		isWorkspace.setSelection(ProjectExamplesActivator.PROJECT_EXAMPLES_DEFAULT_VALUE);
 		outputDirectoryText.setText(""); //$NON-NLS-1$
 		sites.getUserSites().clear();
+		sites.getServerSites().clear();
 		storePreferences();
 		super.performDefaults();
 	}
@@ -302,6 +309,8 @@ public class ProjectExamplesPreferencePage extends PreferencePage implements
 		store.setValue(ProjectExamplesActivator.SHOW_QUICK_FIX, showQuickFix.getSelection());
 		
 		store.setValue(ProjectExamplesActivator.SHOW_EXPERIMENTAL_SITES, showExperimentalSites.getSelection());
+		store.setValue(ProjectExamplesActivator.SHOW_SERVER_SITES, showServerSites.getSelection());
+	
 		store.setValue(ProjectExamplesActivator.SHOW_INVALID_SITES, showInvalidSites.getSelection());
 		store.setValue(ProjectExamplesActivator.PROJECT_EXAMPLES_DEFAULT, isWorkspace.getSelection());
 		String value = outputDirectoryText.getText();

@@ -17,7 +17,6 @@ import java.util.Set;
 
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.jboss.tools.project.examples.model.IProjectExampleSite;
-import org.jboss.tools.project.examples.model.ProjectExampleSite;
 import org.jboss.tools.project.examples.model.ProjectExampleUtil;
 import org.junit.Test;
 
@@ -33,6 +32,7 @@ public class SiteTest {
 		Set<IProjectExampleSite> sites = new HashSet<IProjectExampleSite>();
 		sites.addAll(ProjectExampleUtil.getPluginSites());
 		sites.addAll(ProjectExampleUtil.getUserSites());
+		sites.addAll(ProjectExampleUtil.getServerSites());
 		assertTrue(sites.size() > 0);
 	}
 	

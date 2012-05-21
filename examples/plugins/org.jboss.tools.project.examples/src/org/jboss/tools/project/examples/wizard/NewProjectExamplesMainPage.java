@@ -109,6 +109,13 @@ public class NewProjectExamplesMainPage extends WizardPage {
 		final IPreferenceStore store = ProjectExamplesActivator.getDefault().getPreferenceStore();
 		button.setSelection(store.getBoolean(ProjectExamplesActivator.SHOW_EXPERIMENTAL_SITES));
 		
+		final Button serverButton = new Button(siteComposite,SWT.CHECK);
+		gd = new GridData(SWT.FILL, SWT.BEGINNING, false, false);
+		gd.horizontalSpan = 2;
+		serverButton.setLayoutData(gd);
+		serverButton.setText(Messages.ProjectExamplesPreferencePage_Show_server_sites);
+		serverButton.setSelection(store.getBoolean(ProjectExamplesActivator.SHOW_SERVER_SITES));
+		
 		new Label(siteComposite,SWT.NONE).setText(Messages.NewProjectExamplesWizardPage_Site);
 		siteCombo = new Combo(siteComposite,SWT.READ_ONLY);
 		siteCombo.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
@@ -254,7 +261,30 @@ public class NewProjectExamplesMainPage extends WizardPage {
 			
 		});
 
-		
+		serverButton.addSelectionListener(new SelectionAdapter() {
+
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				IPreferenceStore store = ProjectExamplesActivator.getDefault().getPreferenceStore();
+				store.setValue(ProjectExamplesActivator.SHOW_SERVER_SITES, serverButton.getSelection());
+				
+				//Store current combo selections
+				String selectedRuntime = targetRuntimeTypesCombo.getText();
+				String selectedSite = siteCombo.getText();
+
+				//Rebuild the combo lists
+				refresh(viewer, true);
+
+				//Restore the combo selections with initial values if possible
+				restoreCombo(targetRuntimeTypesCombo, selectedRuntime);
+				restoreCombo(siteCombo, selectedSite);
+				
+				siteFilter.setSite(siteCombo.getText());
+				viewer.refresh();
+			}
+			
+		});
+
 		targetRuntimeTypesCombo.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {

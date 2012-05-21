@@ -47,6 +47,10 @@ public class ProjectExamplesPreferencesInitializer extends
 		node.putBoolean(
 				ProjectExamplesActivator.SHOW_QUICK_FIX,
 				ProjectExamplesActivator.SHOW_QUICK_FIX_VALUE);
+		
+		node.putBoolean(
+				ProjectExamplesActivator.SHOW_SERVER_SITES,
+				ProjectExamplesActivator.SHOW_SERVER_SITES_VALUE);
 	}
 
 }
