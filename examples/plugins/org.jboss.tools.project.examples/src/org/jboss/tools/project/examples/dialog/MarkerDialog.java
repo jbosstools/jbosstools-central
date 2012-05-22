@@ -24,6 +24,7 @@ import org.eclipse.core.resources.IResourceChangeEvent;
 import org.eclipse.core.resources.IResourceChangeListener;
 import org.eclipse.core.resources.IncrementalProjectBuilder;
 import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.resources.WorkspaceJob;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -222,19 +223,41 @@ public class MarkerDialog extends TitleAreaDialog {
 				try {
 					quickFixButton.setSelection(false);
 					openQuickFixWizard(selected);
-					for (ProjectExample project : projects) {
-						if (project.getIncludedProjects() == null) {
-							buildProject(project.getName());
-						} else {
-							List<String> includedProjects = project.getIncludedProjects();
-							for (String projectName:includedProjects) {
-								buildProject(projectName);
+					WorkspaceJob job = new WorkspaceJob("Building workspace") {
+						
+						@Override
+						public IStatus runInWorkspace(IProgressMonitor monitor)
+								throws CoreException {
+							for (ProjectExample project : projects) {
+								if (project.getIncludedProjects() == null) {
+									buildProject(project.getName(), monitor);
+								} else {
+									List<String> includedProjects = project.getIncludedProjects();
+									for (String projectName:includedProjects) {
+										buildProject(projectName, monitor);
+										if (monitor.isCanceled()) {
+											return Status.CANCEL_STATUS;
+										}
+									}
+								}
 							}
+							if (monitor.isCanceled()) {
+								return Status.CANCEL_STATUS;
+							}
+							ProjectExamplesActivator.waitForBuildAndValidation.schedule();
+							try {
+								ProjectExamplesActivator.waitForBuildAndValidation.join();
+							} catch (InterruptedException e) {
+								return Status.CANCEL_STATUS;
+							}
+							if (monitor.isCanceled()) {
+								return Status.CANCEL_STATUS;
+							}
+							return Status.OK_STATUS;
 						}
-					}
-					ProjectExamplesActivator.waitForBuildAndValidation
-							.schedule();
-					ProjectExamplesActivator.waitForBuildAndValidation.join();
+					};
+					job.setUser(true);
+					job.schedule();
 				} catch (Exception e) {
 					ProjectExamplesActivator.log(e);
 				} finally {
@@ -244,14 +267,10 @@ public class MarkerDialog extends TitleAreaDialog {
 		}
 	}
 
-	private void buildProject(String projectName) throws CoreException {
-		IProject eclipseProject = ResourcesPlugin
-				.getWorkspace().getRoot().getProject(projectName);
-		if (eclipseProject != null
-				&& eclipseProject.isOpen()) {
-			eclipseProject.build(
-					IncrementalProjectBuilder.FULL_BUILD,
-					null);
+	private void buildProject(String projectName, IProgressMonitor monitor) throws CoreException {
+		IProject eclipseProject = ResourcesPlugin.getWorkspace().getRoot().getProject(projectName);
+		if (eclipseProject != null && eclipseProject.isOpen()) {
+			eclipseProject.build(IncrementalProjectBuilder.FULL_BUILD, monitor);
 		}
 	}
 
@@ -272,10 +291,7 @@ public class MarkerDialog extends TitleAreaDialog {
 
 		IRunnableWithProgress resolutionsRunnable = new IRunnableWithProgress() {
 			public void run(IProgressMonitor monitor) {
-				monitor
-						.beginTask(
-								MarkerMessages.resolveMarkerAction_computationManyAction,
-								100);
+				monitor.beginTask(MarkerMessages.resolveMarkerAction_computationManyAction, 100);
 
 				IMarker[] allMarkers = (IMarker[]) ProjectExamplesActivator
 						.getMarkers(projects).toArray(new IMarker[0]);
@@ -353,7 +369,7 @@ public class MarkerDialog extends TitleAreaDialog {
 			wizard
 					.setWindowTitle(MarkerMessages.resolveMarkerAction_dialogTitle);
 			WizardDialog dialog = new QuickFixWizardDialog(PlatformUI
-					.getWorkbench().getActiveWorkbenchWindow().getShell(),
+					.getWorkbench().getModalDialogShellProvider().getShell(),
 					wizard);
 			dialog.open();
 		}

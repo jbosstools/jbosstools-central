@@ -15,6 +15,7 @@ import java.util.List;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.internal.ide.IDEInternalWorkbenchImages;
 import org.jboss.tools.project.examples.Messages;
 import org.jboss.tools.project.examples.ProjectExamplesActivator;
@@ -66,7 +67,7 @@ public class ProjectReadyWizard extends Wizard {
 				
 				@Override
 				public void run() {
-					Dialog dialog = new MarkerDialog(getShell(), projectExamples);
+					Dialog dialog = new MarkerDialog(PlatformUI.getWorkbench().getModalDialogShellProvider().getShell(), projectExamples);
 					dialog.open();
 				}
 			});
