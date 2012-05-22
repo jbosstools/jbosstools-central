@@ -407,6 +407,8 @@ public class ProjectExampleUtil {
 									project.setDescription(getContent(child));
 								} else if (nodeName.equals(URL)) {
 									project.setUrl(getContent(child));
+								} else if (nodeName.equals("source-location")) { //$NON-NLS-1$
+									project.setSourceLocation(getContent(child));
 								} else if (nodeName.equals("perspectiveId")) { //$NON-NLS-1$
 									project.setPerspectiveId(getContent(child));
 								} else if (nodeName.equals("importType")) { //$NON-NLS-1$

@@ -1,6 +1,7 @@
 package org.jboss.tools.project.examples.wizard;
 
 import java.lang.reflect.InvocationTargetException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -33,6 +34,7 @@ import org.eclipse.mylyn.internal.discovery.core.model.DiscoveryConnector;
 import org.eclipse.mylyn.internal.discovery.core.model.RemoteBundleDiscoveryStrategy;
 import org.eclipse.mylyn.internal.discovery.ui.DiscoveryUi;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.GC;
@@ -43,9 +45,12 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Link;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.Text;
+import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.browser.IWorkbenchBrowserSupport;
 import org.eclipse.ui.dialogs.PreferencesUtil;
 import org.jboss.tools.project.examples.Messages;
 import org.jboss.tools.project.examples.ProjectExamplesActivator;
@@ -69,6 +74,7 @@ public class NewProjectExamplesRequirementsPage extends WizardPage {
 	private ArrayList<ProjectFix> unsatisfiedFixes = new ArrayList<ProjectFix>();
 	private Image checkboxOn;
 	private Image checkboxOff;
+	private Link link;
 	
 	public NewProjectExamplesRequirementsPage(ProjectExample projectExample) {
 		super(PAGE_NAME);
@@ -144,13 +150,7 @@ public class NewProjectExamplesRequirementsPage extends WizardPage {
 		gd = new GridData(SWT.FILL, SWT.FILL, true, false);
 		gd.horizontalSpan = 2;
 		label.setLayoutData(gd);
-		
-//		label = new Label(composite, SWT.NONE);
-//		gd = new GridData(SWT.FILL, SWT.FILL, true, false);
-//		gd.horizontalSpan = 2;
-//		label.setLayoutData(gd);
-		
-		
+				
 		Group fixesGroup = new Group(composite, SWT.NONE);
 		gd = new GridData(SWT.FILL, SWT.FILL, true, false);
 		gd.horizontalSpan = 2;
@@ -181,6 +181,12 @@ public class NewProjectExamplesRequirementsPage extends WizardPage {
 		tableViewer.setContentProvider(new FixContentProvider(fixes));
 		
 		createButtons(fixesGroup, tableViewer);
+		
+		link = new Link(composite, SWT.NONE);
+		gd = new GridData(SWT.FILL, SWT.FILL, true, false);
+		gd.horizontalSpan=2;
+		link.setLayoutData(gd);
+		
 		setPageComplete(true);
 		setControl(composite);
 		if (projectExample != null) {
@@ -373,10 +379,40 @@ public class NewProjectExamplesRequirementsPage extends WizardPage {
 		return projectExample;
 	}
 
-	public void setProjectExample(ProjectExample projectExample) {
+	public void setProjectExample(final ProjectExample projectExample) {
 		this.projectExample = projectExample;
 		setTitleAndDescription(projectExample);
 		refreshFixes();
+		
+		if (link == null) {
+			return;
+		}
+		if (projectExample != null && projectExample.getSourceLocation() != null && !projectExample.getSourceLocation().isEmpty()) {
+			link.setVisible(true);
+			link.setText("Found a bug? Or have improvements to this example? Help us develop it, source can be found at <a>Project Example Source</a>");
+			link.getParent().pack(true);
+			link.addSelectionListener( new SelectionAdapter( ) {
+
+				public void widgetSelected( SelectionEvent e )
+				{
+					String text = e.text;
+					if ("Project Example Source".equals(text)) {
+						IWorkbenchBrowserSupport support = PlatformUI.getWorkbench()
+								.getBrowserSupport();
+						try {
+							URL url = new URL(projectExample.getSourceLocation());
+							support.getExternalBrowser().openURL(url);
+						} catch (Exception e1) {
+							ProjectExamplesActivator.log(e1);
+						}
+					}
+				}
+			} );
+		} else {
+			link.setVisible(false);
+			link.setText(""); //$NON-NLS-1$
+			link.getParent().pack(true);
+		}
 	}
 	
 	protected void refreshFixes() {

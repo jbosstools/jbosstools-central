@@ -53,6 +53,7 @@ public class ProjectExample implements ProjectModelElement,
 	private Set<String> tags;
 	private Set<String> essentialEnterpriseDependencies;
 	private String iconPath;
+	private String sourceLocation;
 
 	public ProjectExample() {
 		name = ""; //$NON-NLS-1$
@@ -352,5 +353,13 @@ public class ProjectExample implements ProjectModelElement,
 
 	public void setWelcomeFixRequired(boolean welcomeFixRequired) {
 		this.welcomeFixRequired = welcomeFixRequired;
+	}
+
+	public String getSourceLocation() {
+		return sourceLocation;
+	}
+
+	public void setSourceLocation(String sourceLocation) {
+		this.sourceLocation = sourceLocation;
 	}
 }
