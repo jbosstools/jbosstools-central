@@ -10,6 +10,12 @@
  ************************************************************************************/
 package org.jboss.tools.project.examples.dialog;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 import java.util.Map;
 
 import org.eclipse.jface.dialogs.Dialog;
@@ -125,7 +131,35 @@ public class DownloadRuntimeViewerDialog extends Dialog {
 
 		@Override
 		public Object[] getElements(Object inputElement) {
-			return downloadRuntimes.values().toArray(new DownloadRuntime[0]);
+			DownloadRuntime[] runtimes = downloadRuntimes.values().toArray(new DownloadRuntime[0]);
+			Arrays.sort(runtimes, new Comparator<DownloadRuntime>() {
+				
+				@Override
+				public int compare(DownloadRuntime o1, DownloadRuntime o2) {
+					if (o1 == null && o2 == null) {
+						return 0;
+					}
+					if (o1 == null) {
+						return 1;
+					}
+					if (o2 == null) {
+						return -1;
+					}
+					String s1 = o1.getName();
+					String s2 = o2.getName();
+					if (s1 == null && s2 == null) {
+						return 0;
+					}
+					if (s1 == null) {
+						return 1;
+					}
+					if (s2 == null) {
+						return -1;
+					}
+					return s1.compareTo(s2);
+				}
+			});
+			return runtimes;
 		}
 		
 		@Override
