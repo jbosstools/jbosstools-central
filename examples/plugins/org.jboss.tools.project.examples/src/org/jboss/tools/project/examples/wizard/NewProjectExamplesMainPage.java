@@ -113,8 +113,8 @@ public class NewProjectExamplesMainPage extends WizardPage {
 		gd = new GridData(SWT.FILL, SWT.BEGINNING, false, false);
 		gd.horizontalSpan = 2;
 		serverButton.setLayoutData(gd);
-		serverButton.setText(Messages.ProjectExamplesPreferencePage_Show_server_sites);
-		serverButton.setSelection(store.getBoolean(ProjectExamplesActivator.SHOW_SERVER_SITES));
+		serverButton.setText(Messages.ProjectExamplesPreferencePage_Show_runtime_sites);
+		serverButton.setSelection(store.getBoolean(ProjectExamplesActivator.SHOW_RUNTIME_SITES));
 		
 		new Label(siteComposite,SWT.NONE).setText(Messages.NewProjectExamplesWizardPage_Site);
 		siteCombo = new Combo(siteComposite,SWT.READ_ONLY);
@@ -266,7 +266,7 @@ public class NewProjectExamplesMainPage extends WizardPage {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				IPreferenceStore store = ProjectExamplesActivator.getDefault().getPreferenceStore();
-				store.setValue(ProjectExamplesActivator.SHOW_SERVER_SITES, serverButton.getSelection());
+				store.setValue(ProjectExamplesActivator.SHOW_RUNTIME_SITES, serverButton.getSelection());
 				
 				//Store current combo selections
 				String selectedRuntime = targetRuntimeTypesCombo.getText();

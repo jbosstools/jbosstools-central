@@ -69,7 +69,7 @@ public class Messages extends NLS {
 	public static String ProjectExamplesPreferencePage_Output_directory;
 	public static String ProjectExamplesPreferencePage_Remove;
 	public static String ProjectExamplesPreferencePage_Show_experimental_sites;
-	public static String ProjectExamplesPreferencePage_Show_server_sites;
+	public static String ProjectExamplesPreferencePage_Show_runtime_sites;
 	public static String ProjectExamplesPreferencePage_Show_invalid_sites;
 	public static String ProjectExamplesPreferencePage_Sites;
 	public static String ProjectExamplesPreferencePage_Use_default_workspace_location;
@@ -96,7 +96,7 @@ public class Messages extends NLS {
 	public static String SiteDialog_URL;
 	public static String Sites_Plugin_provided_sites;
 	public static String Sites_User_sites;
-	public static String Sites_Server_sites;
+	public static String Sites_Runtime_sites;
 	public static String InvalideSite;
 	public static String WTPRuntimeFix_Invalid_WTP_runtime_fix;
 	static {

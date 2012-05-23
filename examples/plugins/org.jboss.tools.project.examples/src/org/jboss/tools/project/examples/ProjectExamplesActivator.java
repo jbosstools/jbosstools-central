@@ -163,10 +163,10 @@ public class ProjectExamplesActivator extends AbstractUIPlugin {
 	public static final String ALL_RUNTIMES = Messages.ProjectExamplesActivator_All;
 	
 	public static final String SHOW_EXPERIMENTAL_SITES = "showExperimentalSites"; //$NON-NLS-1$
-	public static final String SHOW_SERVER_SITES = "showServerSites"; //$NON-NLS-1$
+	public static final String SHOW_RUNTIME_SITES = "showRuntimeSites"; //$NON-NLS-1$
 	public static final String USER_SITES = "userSites"; //$NON-NLS-1$
 	public static final boolean SHOW_EXPERIMENTAL_SITES_VALUE = false;
-	public static final boolean SHOW_SERVER_SITES_VALUE = false;
+	public static final boolean SHOW_RUNTIME_SITES_VALUE = false;
 	public static final String SHOW_INVALID_SITES = "invalidSites"; //$NON-NLS-1$
 	public static final boolean SHOW_INVALID_SITES_VALUE = true;
 	public static final String MAVEN_ARCHETYPE = "mavenArchetype"; //$NON-NLS-1$

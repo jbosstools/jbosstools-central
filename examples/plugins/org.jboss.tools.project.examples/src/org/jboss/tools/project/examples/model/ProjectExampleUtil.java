@@ -145,11 +145,11 @@ public class ProjectExampleUtil {
 		return pluginSites;
 	}
 
-	public static Set<IProjectExampleSite> getServerSites() {
+	public static Set<IProjectExampleSite> getRuntimeSites() {
 		Set<IProjectExampleSite> sites = new HashSet<IProjectExampleSite>();
 		IPreferenceStore store = ProjectExamplesActivator.getDefault()
 				.getPreferenceStore();
-		if (!store.getBoolean(ProjectExamplesActivator.SHOW_SERVER_SITES)) {
+		if (!store.getBoolean(ProjectExamplesActivator.SHOW_RUNTIME_SITES)) {
 			return sites;
 		}
 		IServer[] servers = ServerCore.getServers();
@@ -261,7 +261,7 @@ public class ProjectExampleUtil {
 		Set<IProjectExampleSite> sites = new HashSet<IProjectExampleSite>();
 		sites.addAll(getPluginSites());
 		sites.addAll(getUserSites());
-		sites.addAll(getServerSites());
+		sites.addAll(getRuntimeSites());
 		return sites;
 	}
 
