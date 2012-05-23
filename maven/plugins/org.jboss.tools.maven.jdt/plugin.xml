@@ -11,7 +11,7 @@
               name="Endorsed Libraries">
       <classpathContainerInitializer
             id="org.jboss.tools.maven.jdt.ENDORSED_LIB_CLASSPATH_CONTAINER"
-            class="org.jboss.tools.maven.jdt.configurators.EndorsedLibrariesContainerInitializer"/>
+            class="org.jboss.tools.maven.jdt.internal.endorsedlib.EndorsedLibrariesContainerInitializer"/>
    </extension>
       
  	<extension point="org.eclipse.m2e.core.projectConfigurators">
