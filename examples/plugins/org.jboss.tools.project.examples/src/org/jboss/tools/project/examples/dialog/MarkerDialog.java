@@ -19,13 +19,9 @@ import java.util.Map;
 
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.resources.IMarker;
-import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResourceChangeEvent;
 import org.eclipse.core.resources.IResourceChangeListener;
-import org.eclipse.core.resources.IncrementalProjectBuilder;
 import org.eclipse.core.resources.ResourcesPlugin;
-import org.eclipse.core.resources.WorkspaceJob;
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
@@ -223,41 +219,6 @@ public class MarkerDialog extends TitleAreaDialog {
 				try {
 					quickFixButton.setSelection(false);
 					openQuickFixWizard(selected);
-					WorkspaceJob job = new WorkspaceJob("Building workspace") {
-						
-						@Override
-						public IStatus runInWorkspace(IProgressMonitor monitor)
-								throws CoreException {
-							for (ProjectExample project : projects) {
-								if (project.getIncludedProjects() == null) {
-									buildProject(project.getName(), monitor);
-								} else {
-									List<String> includedProjects = project.getIncludedProjects();
-									for (String projectName:includedProjects) {
-										buildProject(projectName, monitor);
-										if (monitor.isCanceled()) {
-											return Status.CANCEL_STATUS;
-										}
-									}
-								}
-							}
-							if (monitor.isCanceled()) {
-								return Status.CANCEL_STATUS;
-							}
-							ProjectExamplesActivator.waitForBuildAndValidation.schedule();
-							try {
-								ProjectExamplesActivator.waitForBuildAndValidation.join();
-							} catch (InterruptedException e) {
-								return Status.CANCEL_STATUS;
-							}
-							if (monitor.isCanceled()) {
-								return Status.CANCEL_STATUS;
-							}
-							return Status.OK_STATUS;
-						}
-					};
-					job.setUser(true);
-					job.schedule();
 				} catch (Exception e) {
 					ProjectExamplesActivator.log(e);
 				} finally {
@@ -266,14 +227,7 @@ public class MarkerDialog extends TitleAreaDialog {
 			}
 		}
 	}
-
-	private void buildProject(String projectName, IProgressMonitor monitor) throws CoreException {
-		IProject eclipseProject = ResourcesPlugin.getWorkspace().getRoot().getProject(projectName);
-		if (eclipseProject != null && eclipseProject.isOpen()) {
-			eclipseProject.build(IncrementalProjectBuilder.FULL_BUILD, monitor);
-		}
-	}
-
+	
 	private void refreshTableViewer() {
 		tableViewer.setInput(projects);
 		ISelection source = tableViewer.getSelection();

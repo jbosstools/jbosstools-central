@@ -45,6 +45,7 @@ import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IWorkspaceRoot;
+import org.eclipse.core.resources.IncrementalProjectBuilder;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
@@ -215,6 +216,11 @@ public class ProjectExamplesActivator extends AbstractUIPlugin {
 		@Override
 		protected IStatus run(IProgressMonitor monitor) {
 			try {
+				try {
+					ResourcesPlugin.getWorkspace().build(IncrementalProjectBuilder.INCREMENTAL_BUILD, monitor);
+				} catch (CoreException e) {
+					log(e);
+				}
 				Job.getJobManager().join(PROJECT_EXAMPLES_FAMILY, monitor);
 				Job.getJobManager().join(ResourcesPlugin.FAMILY_AUTO_BUILD,
 						monitor);
