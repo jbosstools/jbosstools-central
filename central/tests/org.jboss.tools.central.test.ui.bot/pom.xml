@@ -42,6 +42,7 @@
 							<goal>unpack</goal>
 						</goals>
 						<configuration>
+							<skip>${swtbot.test.skip}</skip>
 							<artifactItems>
 								<artifactItem>
 									<groupId>org.jboss.as</groupId>
