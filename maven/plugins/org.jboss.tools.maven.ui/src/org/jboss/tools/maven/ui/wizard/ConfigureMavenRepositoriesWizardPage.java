@@ -169,6 +169,9 @@ public class ConfigureMavenRepositoriesWizardPage extends WizardPage {
 	private static final String REMOVE_ALL = " <<Remove All ";
 	private static final String REMOVE = " <Remove ";
 
+	private static final String JBOSS_EAP_MAVEN_REPOSITORY_ID = "jboss-eap-maven-repository";; //$NON-NLS-1$
+	private static final String JBOSS_WFK_MAVEN_REPOSITORY_ID = "jboss-wfk-maven-repository";; //$NON-NLS-1$
+
 	private Button removeButton;
 	private Button removeAllButton;
 	private Button addButton;
@@ -892,12 +895,11 @@ public class ConfigureMavenRepositoriesWizardPage extends WizardPage {
 			if (list != null && list.length >= 1) {
 				// JBoss EAP Maven Repository
 				Repository repository = getDefaultRepository();
-				String id = JBOSSTOOLS_MAVEN_PROFILE_ID;
 				Set<RepositoryWrapper> allRepositories = new HashSet<RepositoryWrapper>();
 				allRepositories.addAll(repos);
 				allRepositories.addAll(includedRepositories);
 				allRepositories.addAll(availableRepositories);
-				repository.setId(getUniqueId(id, allRepositories));
+				repository.setId(getUniqueId(JBOSS_EAP_MAVEN_REPOSITORY_ID, allRepositories));
 				repository.setName(JBOSS_EAP_MAVEN_REPOSITORY);
 				try {
 					repository.setUrl(directory.toURI().toURL().toString());
@@ -912,7 +914,11 @@ public class ConfigureMavenRepositoriesWizardPage extends WizardPage {
 		if (file.isDirectory()) {
 			// JBoss WFK Maven Repository
 			Repository repository = getDefaultRepository();
-			repository.setId("jboss-wfk-maven-repository");
+			Set<RepositoryWrapper> allRepositories = new HashSet<RepositoryWrapper>();
+			allRepositories.addAll(repos);
+			allRepositories.addAll(includedRepositories);
+			allRepositories.addAll(availableRepositories);
+			repository.setId(getUniqueId(JBOSS_WFK_MAVEN_REPOSITORY_ID, allRepositories));
 			repository.setName("JBoss WFK Maven Repository");
 			try {
 				repository.setUrl(directory.toURI().toURL().toString());
@@ -932,7 +938,7 @@ public class ConfigureMavenRepositoriesWizardPage extends WizardPage {
 			boolean found = false;
 			for (RepositoryWrapper wrapper:allRepositories) {
 				if (id.equals(wrapper.getRepository().getId())) {
-					id = startId + "." + i++;
+					id = startId + "." + i++; //$NON-NLS-1$
 					found = true;
 					break;
 				}
@@ -1230,9 +1236,13 @@ public class ConfigureMavenRepositoriesWizardPage extends WizardPage {
 		return bytes;
 	}
 	
-	public void finishPage() {
+	public boolean finishPage() {
 		String userSettings = getUserSettings();
 		File file = new File(userSettings);
+		boolean ok = MessageDialog.openQuestion(getShell(), "Confirm File Update", "Are you sure you want to update the file '" + userSettings + "'?");
+		if (!ok) {
+			return false;
+		}
 		String outputString = getNewSettings();
 		FileOutputStream out = null;
 
@@ -1241,9 +1251,11 @@ public class ConfigureMavenRepositoriesWizardPage extends WizardPage {
 			byte[] bytes = outputString.getBytes(UTF_8);
 			out.write(bytes);
 			out.flush();
+			maven.reloadSettings();
 		} catch (Exception e) {
 			MessageDialog.openError(getShell(), ERROR_TITLE, e.getMessage());
 			Activator.log(e);
+			return false;
 		} finally {
 			if (out != null) {
 				try {
@@ -1253,6 +1265,7 @@ public class ConfigureMavenRepositoriesWizardPage extends WizardPage {
 				}
 			}
 		}
+		return true;
 	}
 
 }

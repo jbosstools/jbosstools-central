@@ -44,8 +44,7 @@ public class ConfigureMavenRepositoriesWizard extends Wizard implements
 	
 	@Override
 	public boolean performFinish() {
-		page.finishPage();
-		return true;
+		return page.finishPage();
 	}
 
 	@Override
