@@ -21,5 +21,31 @@
           name="%Endorsed_Lib_Configurator_label" 
           secondaryTo="org.eclipse.m2e.jdt.javaConfigurator"/>
     </extension>
+
+    
+     <extension point="org.eclipse.core.resources.markers"
+         id="org.jbosstools.maven.configuration.jdt.endorsedlib"
+         name="%Maven_Configuration_Problem">
+      <super type="org.eclipse.m2e.core.maven2Problem.configuration"/>
+      <persistent value="true"/>
+    </extension>
+   
+    <extension
+         point="org.eclipse.ui.ide.markerSupport">
+      <markerTypeCategory
+            name="%Maven_Configuration_Problems">
+         <markerTypeReference
+               id="org.jbosstools.maven.configuration.jdt.endorsedlib">
+         </markerTypeReference>
+      </markerTypeCategory>
+   </extension>
+   
+	<extension 
+        point="org.eclipse.ui.ide.markerResolution">
+        <markerResolutionGenerator
+            class="org.jboss.tools.maven.jdt.internal.markers.MissingEndorsedLibMarkerResolutionGenerator"
+            markerType="org.jbosstools.maven.configuration.jdt.endorsedlib">
+        </markerResolutionGenerator>
+    </extension>
     
 </plugin>

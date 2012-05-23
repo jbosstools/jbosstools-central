@@ -8,7 +8,7 @@
  * Contributors:
  *      Sonatype, Inc. - initial API and implementation
  *******************************************************************************/
-package org.jboss.tools.maven.jdt.configurators.xpl;
+package org.jboss.tools.maven.jdt.internal.endorsedlib.xpl;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;

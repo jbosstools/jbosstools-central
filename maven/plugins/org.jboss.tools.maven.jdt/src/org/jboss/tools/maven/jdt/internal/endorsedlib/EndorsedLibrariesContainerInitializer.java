@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008-2010 Sonatype, Inc. and others
+ * Copyright (c) 2008-2012 Sonatype, Inc. and others
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,7 +10,7 @@
  *      Red Hat, Inc.  - Changed behaviour to support Endorsed Libraries
  *******************************************************************************/
 
-package org.jboss.tools.maven.jdt.configurators;
+package org.jboss.tools.maven.jdt.internal.endorsedlib;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
@@ -24,6 +24,8 @@ import org.eclipse.m2e.core.embedder.IMavenConfiguration;
 import org.eclipse.m2e.core.project.IMavenProjectRegistry;
 import org.eclipse.m2e.core.project.MavenUpdateRequest;
 import org.jboss.tools.maven.jdt.MavenJdtActivator;
+import org.jboss.tools.maven.jdt.endorsedlib.IEndorsedLibrariesManager;
+import org.jboss.tools.maven.jdt.utils.ClasspathHelpers;
 
 
 /**
@@ -55,7 +57,7 @@ public class EndorsedLibrariesContainerInitializer extends ClasspathContainerIni
   }
 
 
-  private EndorsedLibrariesManager getBuildPathManager() {
+  private IEndorsedLibrariesManager getBuildPathManager() {
     return MavenJdtActivator.getDefault().getEndorsedLibrariesManager();
   }
 

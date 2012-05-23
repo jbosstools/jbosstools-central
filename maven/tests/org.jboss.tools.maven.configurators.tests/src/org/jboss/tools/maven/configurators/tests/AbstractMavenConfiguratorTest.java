@@ -104,4 +104,8 @@ public abstract class AbstractMavenConfiguratorTest extends
 		}
 		fail("Error Message '"+ errorMessage +"' was not found on "+project.getName());
 	}
+	
+	protected String getMessage(IMarker marker) throws CoreException {
+		return (String)marker.getAttribute(IMarker.MESSAGE);
+	}
 }

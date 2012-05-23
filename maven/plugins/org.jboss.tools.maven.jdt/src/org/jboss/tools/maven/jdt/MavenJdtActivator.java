@@ -15,7 +15,8 @@ import java.io.File;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
-import org.jboss.tools.maven.jdt.configurators.EndorsedLibrariesManager;
+import org.jboss.tools.maven.jdt.endorsedlib.IEndorsedLibrariesManager;
+import org.jboss.tools.maven.jdt.internal.endorsedlib.EndorsedLibrariesManager;
 import org.osgi.framework.BundleContext;
 
 /**
@@ -29,7 +30,7 @@ public class MavenJdtActivator extends AbstractUIPlugin {
 	// The shared instance
 	private static MavenJdtActivator plugin;
 
-	private EndorsedLibrariesManager endorsedLibrariesManager;
+	private IEndorsedLibrariesManager endorsedLibrariesManager;
 	
 	/**
 	 * The constructor
@@ -81,7 +82,7 @@ public class MavenJdtActivator extends AbstractUIPlugin {
 		getDefault().getLog().log(status);
 	}
 
-	public EndorsedLibrariesManager getEndorsedLibrariesManager() {
+	public IEndorsedLibrariesManager getEndorsedLibrariesManager() {
 		return endorsedLibrariesManager;
 	}	
 }

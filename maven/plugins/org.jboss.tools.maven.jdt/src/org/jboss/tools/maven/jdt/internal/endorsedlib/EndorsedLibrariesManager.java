@@ -10,7 +10,7 @@
  *      Red Hat, Inc.  - Changed behaviour to support Endorsed Libraries
  *******************************************************************************/
 
-package org.jboss.tools.maven.jdt.configurators;
+package org.jboss.tools.maven.jdt.internal.endorsedlib;
 
 import java.io.Closeable;
 import java.io.File;
@@ -33,9 +33,11 @@ import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.m2e.jdt.IClasspathDescriptor;
 import org.jboss.tools.maven.jdt.MavenJdtActivator;
-import org.jboss.tools.maven.jdt.configurators.xpl.MavenClasspathContainerSaveHelper;
+import org.jboss.tools.maven.jdt.endorsedlib.IEndorsedLibrariesManager;
+import org.jboss.tools.maven.jdt.internal.endorsedlib.xpl.MavenClasspathContainerSaveHelper;
+import org.jboss.tools.maven.jdt.utils.ClasspathHelpers;
 
-public class EndorsedLibrariesManager {
+public class EndorsedLibrariesManager implements IEndorsedLibrariesManager {
 
 	private File stateLocationDir;
 
@@ -43,13 +45,8 @@ public class EndorsedLibrariesManager {
 		stateLocationDir = containerLocationDir;
 	}
 	
-	/**
-	 * Adds the Endorsed Libraries classpath library to a project's classpath. It's added beore any other classpath build path.
-	 * @param javaProject
-	 * @param classpath
-	 * @param endorsedDirs
-	 * @param monitor
-	 * @throws CoreException
+	/* (non-Javadoc)
+	 * @see org.jboss.tools.maven.jdt.endorsedlib.IEndorsedLibrariesManager#configureEndorsedLibs(org.eclipse.jdt.core.IJavaProject, org.eclipse.m2e.jdt.IClasspathDescriptor, java.io.File[], org.eclipse.core.runtime.IProgressMonitor)
 	 */
 	public void configureEndorsedLibs(IJavaProject javaProject, IClasspathDescriptor classpath, File[] endorsedDirs,
 			IProgressMonitor monitor) throws CoreException {
@@ -117,6 +114,9 @@ public class EndorsedLibrariesManager {
 		}
 	}
 
+	/* (non-Javadoc)
+	 * @see org.jboss.tools.maven.jdt.endorsedlib.IEndorsedLibrariesManager#getSavedContainer(org.eclipse.core.resources.IProject)
+	 */
 	public IClasspathContainer getSavedContainer(IProject project)
 			throws CoreException {
 		File containerStateFile = getContainerStateFile(project);

@@ -1,5 +1,5 @@
 /*************************************************************************************
- * Copyright (c) 2008-2011 Red Hat, Inc. and others.
+ * Copyright (c) 2012 Red Hat, Inc. and others.
  * All rights reserved. This program and the accompanying materials 
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -14,8 +14,10 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -24,6 +26,7 @@ import org.apache.maven.execution.MavenSession;
 import org.apache.maven.lifecycle.MavenExecutionPlan;
 import org.apache.maven.plugin.MojoExecution;
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
@@ -31,12 +34,17 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.JavaCore;
+import org.eclipse.m2e.core.internal.markers.SourceLocation;
+import org.eclipse.m2e.core.internal.markers.SourceLocationHelper;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.project.configurator.AbstractProjectConfigurator;
+import org.eclipse.m2e.core.project.configurator.MojoExecutionKey;
 import org.eclipse.m2e.core.project.configurator.ProjectConfigurationRequest;
 import org.eclipse.m2e.jdt.IClasspathDescriptor;
 import org.eclipse.m2e.jdt.IJavaProjectConfigurator;
 import org.jboss.tools.maven.jdt.MavenJdtActivator;
+import org.jboss.tools.maven.jdt.endorsedlib.IEndorsedLibrariesManager;
+import org.jboss.tools.maven.jdt.utils.ClasspathHelpers;
 
 
 /**
@@ -48,38 +56,50 @@ import org.jboss.tools.maven.jdt.MavenJdtActivator;
 public class EndorsedLibProjectConfigurator extends AbstractProjectConfigurator implements IJavaProjectConfigurator {
 
 	private static final Pattern jAVA_ENDORSED_DIRS_PATTERN = Pattern.compile("-Djava.endorsed.dirs=([^ \\t]+)");
+	
+	private static final String MISSING_ENDORSED_DIRS_MARKER = "org.jbosstools.maven.configuration.jdt.endorsedlib";
 
+	@SuppressWarnings("restriction")
 	@Override
 	public void configure(ProjectConfigurationRequest request, IProgressMonitor monitor) throws CoreException {
 
-		File[] endorsedDirs = getEndorsedDirs(request.getMavenProjectFacade(), monitor);
+		markerManager.deleteMarkers(request.getProject(), MISSING_ENDORSED_DIRS_MARKER);
+		
+		IMavenProjectFacade mavenProjectFacade = request.getMavenProjectFacade();
+		File[] endorsedDirs = getEndorsedDirs(mavenProjectFacade, monitor);
 		if (endorsedDirs == null || endorsedDirs.length == 0) {
 			return;
 		}
 		
-		boolean missingEndorsedDir = checkMissingDirs(endorsedDirs);
-		if (missingEndorsedDir && canExecuteDependencyCopy()) {
-			//TODO trigger dependency:copy
-			missingEndorsedDir = checkMissingDirs(endorsedDirs);
-		}
-		if (missingEndorsedDir) {
-			//TODO add marker
-			System.err.println("Some Endorsed directories are missing for "+request.getProject().getName());
+		Set<File> missingEndorsedDir = checkMissingDirs(endorsedDirs);
+		if (!missingEndorsedDir.isEmpty()) {
+			MojoExecutionKey key = new MojoExecutionKey("org.apache.maven.plugins","maven-compiler-plugin",null,null,null,null); 
+			SourceLocation sourceLocation = SourceLocationHelper.findLocation(mavenProjectFacade.getMavenProject(), key);
+			for (File dir : missingEndorsedDir) {
+				addMissingDirWarning(request.getProject(), sourceLocation, dir);
+			}
 		}
     }
 
-	private boolean canExecuteDependencyCopy() {
-		//TODO check preferences?
-		return true;
+	@SuppressWarnings("restriction")
+	private void addMissingDirWarning(IProject project, SourceLocation sourceLocation, File dir) throws CoreException {
+		
+		IMarker marker = markerManager.addMarker(project.getFile("pom.xml"), 
+	    		MISSING_ENDORSED_DIRS_MARKER, 
+	    		"Endorsed directory '" + dir.getAbsolutePath() + "' is missing. " +
+	    				"You may need to a perform a Maven command line build in order to create it."
+	    		,sourceLocation.getLineNumber(),  IMarker.SEVERITY_ERROR);
+		marker.setAttribute("outputDirectory", dir.getAbsolutePath());
 	}
-	
-	private boolean checkMissingDirs(File[] endorsedDirs) {
+
+	private Set<File> checkMissingDirs(File[] endorsedDirs) {
+		Set<File> missingDirs = new HashSet<File>(endorsedDirs.length);
 		for (File dir : endorsedDirs) {
 			if (!dir.exists()) {
-				return true;
+				missingDirs.add(dir);
 			}
 		}
-		return false;
+		return missingDirs;
 	}
 	
 	public void configureClasspath(IMavenProjectFacade facade,
@@ -211,7 +231,7 @@ public class EndorsedLibProjectConfigurator extends AbstractProjectConfigurator 
 	  return result;
 	}
 	
-	private EndorsedLibrariesManager getEndorsedLibrariesManager() {
+	private IEndorsedLibrariesManager getEndorsedLibrariesManager() {
 		return MavenJdtActivator.getDefault().getEndorsedLibrariesManager();
 	}
 	

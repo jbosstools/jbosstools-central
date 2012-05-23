@@ -107,6 +107,30 @@ public class SeamConfiguratorTest extends AbstractMavenConfiguratorTest {
 		
 	}
 	
+	@Test
+	public void testJBIDE11570_constraintViolations() throws Exception {
+		IProject project = importProject("projects/seam/violation/pom.xml");
+		waitForJobsToComplete();
+		assertNoErrors(project);
+		assertIsJSFProject(project, JSFProjectConfigurator.JSF_FACET_VERSION_1_2);
+		
+		updateProject(project, "add-seam.pom");
+		IFacetedProject fp = ProjectFacetsManager.create(project);
+		assertFalse("Seam facet was installed", fp.hasProjectFacet(SEAM_FACET));
+		assertIsJSFProject(project, JSFProjectConfigurator.JSF_FACET_VERSION_1_2);
+		assertHasError(project, "Seam 2.3 can not be installed as it conflicts with JavaServer Faces 1.2");
+	}
+	
+	
+	@Test
+	public void testJBIDE11570_unresolvedSeamDependency() throws Exception {
+		IProject project = importProject("projects/seam/missing-seam/pom.xml");
+		waitForJobsToComplete();
+		IFacetedProject fp = ProjectFacetsManager.create(project);
+		assertFalse("Seam facet was installed", fp.hasProjectFacet(SEAM_FACET));
+		assertFalse("JSF facet was installed", fp.hasProjectFacet(JSFProjectConfigurator.JSF_FACET));
+		assertHasError(project, "Missing artifact org.jboss.seam:jboss-seam:jar:missing");
+	}
 	
 	
 }

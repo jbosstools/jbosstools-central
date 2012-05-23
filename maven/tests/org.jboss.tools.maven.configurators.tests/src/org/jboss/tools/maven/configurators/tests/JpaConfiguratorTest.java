@@ -1,12 +1,12 @@
 package org.jboss.tools.maven.configurators.tests;
 
 import org.eclipse.core.resources.IProject;
-import org.eclipse.jpt.common.core.internal.resource.ResourceLocatorManager;
 import org.eclipse.jpt.jpa.core.JpaFacet;
 import org.eclipse.jpt.jpa.core.JpaProject;
 import org.eclipse.jpt.jpa.core.JpaProjectManager;
 import org.eclipse.jpt.jpa.core.JptJpaCorePlugin;
 import org.eclipse.jst.common.project.facet.core.JavaFacet;
+import org.eclipse.m2e.core.project.ResolverConfiguration;
 import org.eclipse.wst.common.project.facet.core.IFacetedProject;
 import org.eclipse.wst.common.project.facet.core.IProjectFacetVersion;
 import org.eclipse.wst.common.project.facet.core.ProjectFacetsManager;
@@ -19,12 +19,6 @@ public class JpaConfiguratorTest extends AbstractMavenConfiguratorTest {
 	public void testSimpleJavaProjects() throws Exception {
 		IProject project = importProject( "projects/jpa/simple-2.0/pom.xml");
 		waitForJobsToComplete();
-		
-		if (ResourceLocatorManager.instance().getResourceLocator(project) == null) {
-			//FIXME : JPT randomly decides to not pick up the 
-			//MavenResourceLocator from our jpa plugin, leading to test failures 
-			return;
-		}
 		
 		assertIsJpaProject(project, JpaFacet.VERSION_2_0);
 		assertNoErrors(project);
@@ -49,7 +43,6 @@ public class JpaConfiguratorTest extends AbstractMavenConfiguratorTest {
 		assertTrue("Java Facet is missing",	facetedProject.hasProjectFacet(JavaFacet.FACET));
 	}
 	
-	/*
 	@Test
 	public void testMultiModule()  throws Exception {
 		IProject[] projects = importProjects("projects/jpa/multi", 
@@ -65,12 +58,6 @@ public class JpaConfiguratorTest extends AbstractMavenConfiguratorTest {
 		IProject ejb = projects[2];
 		IProject web = projects[3];
 
-		if (ResourceLocatorManager.instance().getResourceLocator(ejb) == null) {
-			//FIXME : JPT randomly decides to not pick up the 
-			//MavenResourceLocator from our jpa plugin, leading to test failures 
-			return;
-		}
-
 		assertNoErrors(pom);
 		assertNoErrors(ejb);
 		assertNoErrors(ear);
@@ -78,5 +65,4 @@ public class JpaConfiguratorTest extends AbstractMavenConfiguratorTest {
 		
 		assertIsJpaProject(ejb, JpaFacet.VERSION_2_0);
 	}
-	*/
 }
