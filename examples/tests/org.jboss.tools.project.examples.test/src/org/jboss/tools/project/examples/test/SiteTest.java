@@ -32,7 +32,7 @@ public class SiteTest {
 		Set<IProjectExampleSite> sites = new HashSet<IProjectExampleSite>();
 		sites.addAll(ProjectExampleUtil.getPluginSites());
 		sites.addAll(ProjectExampleUtil.getUserSites());
-		sites.addAll(ProjectExampleUtil.getServerSites());
+		sites.addAll(ProjectExampleUtil.getRuntimeSites());
 		assertTrue(sites.size() > 0);
 	}
 	
