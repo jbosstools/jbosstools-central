@@ -17,8 +17,7 @@ import org.eclipse.m2e.model.edit.pom.Model;
  * @author snjeza
  * 
  */
-public class MavenLibraryProviderInstallOperationConfig extends
-		LibraryProviderInstallOperationConfig {
+public class MavenLibraryProviderInstallOperationConfig extends LibraryProviderInstallOperationConfig {
 
 	private Model model;
 
