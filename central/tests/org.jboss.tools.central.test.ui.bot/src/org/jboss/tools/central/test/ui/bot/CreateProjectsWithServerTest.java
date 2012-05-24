@@ -27,7 +27,9 @@ import org.junit.After;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-@Require(server=@org.jboss.tools.ui.bot.ext.config.Annotations.Server(type=ServerType.EAP))
+
+//TODO When testing new build try it with type=ServerType.EAP !!!!
+@Require(server=@org.jboss.tools.ui.bot.ext.config.Annotations.Server(type=ServerType.JbossAS))
 public class CreateProjectsWithServerTest extends SWTTestExt{
 	
 	@BeforeClass
@@ -180,10 +182,10 @@ public class CreateProjectsWithServerTest extends SWTTestExt{
 		
 		//check the rest of project examples
 		checkExample(null, IDELabel.JBossCentralEditor.JAVA_EE_WEB_PROJECT, false);
-//		checkExample(null, IDELabel.JBossCentralEditor.JAVA_EE_PROJECT, true);
-//		checkExample(null, IDELabel.JBossCentralEditor.HTML5_PROJECT, true);
-//		checkExample(null, IDELabel.JBossCentralEditor.RICHFACES_PROJECT, true);
-//		checkExample(null, IDELabel.JBossCentralEditor.SPRING_MVC_PROJECT, false);
+		checkExample(null, IDELabel.JBossCentralEditor.JAVA_EE_PROJECT, true);
+		checkExample(null, IDELabel.JBossCentralEditor.HTML5_PROJECT, true);
+		checkExample(null, IDELabel.JBossCentralEditor.RICHFACES_PROJECT, true);
+		checkExample(null, IDELabel.JBossCentralEditor.SPRING_MVC_PROJECT, false);
 		
 		/*checkCreateProject(IDELabel.JBossCentralEditor.JAVA_EE_WEB_PROJECT);
 		checkCreateProject(IDELabel.JBossCentralEditor.JAVA_EE_PROJECT);
@@ -198,7 +200,7 @@ public class CreateProjectsWithServerTest extends SWTTestExt{
 		projectExplorer.deleteAllProjects();
 	}
 	
-//	@Test
+	@Test
 	public void projectExamplesSectionTest(){
 		SWTBotTwistie twistieBot = bot.twistieByLabel("JBoss Quickstarts");
 		while (!twistieBot.isExpanded()){
@@ -279,6 +281,7 @@ public class CreateProjectsWithServerTest extends SWTTestExt{
 	 */
 	
 	private void checkExample(SWTFormsBotExt formsBot, String formText, boolean readme, String readmeFileName){
+		problems.show();
 		if (formsBot==null){
 			bot.hyperlink(formText).click();
 		}else{
