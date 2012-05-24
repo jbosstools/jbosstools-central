@@ -109,8 +109,6 @@ public class CreateProjectsWithServerTest extends SWTTestExt{
 	
 	@Test
 	public void createProjectsSectionTest(){
-		//waitForAWhile();
-//		SWTFormsBotExt formsBot = SWTBotFactory.getFormsBot();
 		//Dynamic web project
 		bot.hyperlink(IDELabel.JBossCentralEditor.DYNAMIC_WEB_PROJECT).click();
 		bot.waitForShell(IDELabel.JBossCentralEditor.NEW_DYNAMIC_WEB_PROJECT);
@@ -120,51 +118,13 @@ public class CreateProjectsWithServerTest extends SWTTestExt{
 		log.info(bot.activeShell().getText());
 		
 		//TODO will put back when IDELabel.JBossCentralEditor.OPENSHIFT_APP_WIZARD will be correct
-		/*bot.hyperlink(IDELabel.JBossCentralEditor.OPENSHIFT_APP).click();
+		bot.hyperlink(IDELabel.JBossCentralEditor.OPENSHIFT_APP).click();
 		bot.waitForShell(IDELabel.JBossCentralEditor.OPENSHIFT_APP_WIZARD);
 		bot.waitWhile(new NonSystemJobRunsCondition());
 		assertTrue("New OpenShift Express Application window should have appeared", bot.activeShell().getText().equals(IDELabel.JBossCentralEditor.OPENSHIFT_APP_WIZARD));
 		//assertTrue("New OpenShift Express Application window should have appeared", bot.shell(IDELabel.JBossCentralEditor.OPENSHIFT_APP_WIZARD).isActive());
-		bot.activeShell().close();*/
+		bot.activeShell().close();
 		
-		
-		//check Project example and detection of server
-//		formsBot.formTextWithText(IDELabel.JBossCentralEditor.JAVA_EE_WEB_PROJECT).click();
-//		//bot.hyperlink(IDELabel.JBossCentralEditor.JAVA_EE_WEB_PROJECT).click();
-//		SWTBotShell projectExampleShell = bot.waitForShell(IDELabel.JBossCentralEditor.PROJECT_EXAMPLE);
-//		assertTrue("Project Example window should have appeared", bot.shell(IDELabel.JBossCentralEditor.PROJECT_EXAMPLE).isActive());
-//		try{
-//			bot.clickButton("Install");
-//			SWTBotShell shell = bot.waitForShell(IDELabel.Menu.PREFERENCES);
-//			if (shell == null){
-//				fail("Preferences shell should have appeared");
-//			}
-//			bot.activeShell().close();
-//		}catch(WidgetNotFoundException wnfex){
-//			fail("Missing Install button");
-//		}
-//		try{
-//			projectExampleShell.activate();
-//			bot.clickButton("Download and Install...");
-//		}catch(WidgetNotFoundException wnfex){
-//			fail("Missing \"Download and Install\" button");
-//		}
-//		
-//		//create direcotry where will be JBossAS downloaded
-//		if(!createDirectory(JBOSS_INSTALL_PATH)){
-//			fail("Unable to create direcory for JBoss - \""+JBOSS_INSTALL_PATH+"\"");
-//		}
-//		
-//		bot.textWithLabel("Install folder:").setText(JBOSS_INSTALL_PATH);
-//		bot.textWithLabel("Download folder:").setText("/tmp");
-//		bot.clickButton("OK");
-//		bot.waitForShell("Progress Information");
-//		util.waitForNonIgnoredJobs(Long.MAX_VALUE);
-//		//bot.waitUntil(Conditions.shellCloses(bot.activeShell()), Long.MAX_VALUE, TIME_5S);
-//		projectExampleShell.close();j
-		
-		//server should be added.. check again
-		//formsBot.formTextWithText(IDELabel.JBossCentralEditor.JAVA_EE_WEB_PROJECT).click();
 		bot.hyperlink(IDELabel.JBossCentralEditor.JAVA_EE_WEB_PROJECT).click();
 		SWTBotShell projectExampleShell = bot.waitForShell(IDELabel.JBossCentralEditor.PROJECT_EXAMPLE);
 		assertTrue("Project Example window should have appeared", bot.shell(IDELabel.JBossCentralEditor.PROJECT_EXAMPLE).isActive());
@@ -176,8 +136,6 @@ public class CreateProjectsWithServerTest extends SWTTestExt{
 		}
 		projectExampleShell.activate();
 		assertFalse("Button \"Download and Install...\" should not be enabled, because all requirements should have been met, condition", bot.button("Download and Install...").isEnabled());
-//		bot.clickButton("Download and Install...");
-//		fail("Button \"Download and Install...\" should not be enabled, because all requirements should have been met");
 		projectExampleShell.close();
 		
 		//check the rest of project examples
@@ -187,11 +145,6 @@ public class CreateProjectsWithServerTest extends SWTTestExt{
 		checkExample(null, IDELabel.JBossCentralEditor.RICHFACES_PROJECT, true);
 		checkExample(null, IDELabel.JBossCentralEditor.SPRING_MVC_PROJECT, false);
 		
-		/*checkCreateProject(IDELabel.JBossCentralEditor.JAVA_EE_WEB_PROJECT);
-		checkCreateProject(IDELabel.JBossCentralEditor.JAVA_EE_PROJECT);
-		checkCreateProject(IDELabel.JBossCentralEditor.HTML5_PROJECT);
-		checkCreateProject(IDELabel.JBossCentralEditor.SPRING_MVC_PROJECT);
-		checkCreateProject(IDELabel.JBossCentralEditor.RICHFACES_PROJECT);*/
 		bot.toolbarDropDownButtonWithTooltip("New").click();
 		bot.waitForShell("New");
 		assertTrue("Shell \"New\" should have appeared", bot.shell("New").isActive());
