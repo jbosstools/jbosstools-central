@@ -53,6 +53,25 @@
       <connectorDescriptor
             categoryId="org.jboss.tools.central.discovery.maven"
             groupId="org.jboss.tools.central.discovery.maven.configurators"
+            description="JBoss Maven GWT Configurator"
+            id="org.jboss.tools.maven.gwt.feature"
+            kind="task"
+            license="Free, EPL"
+            name="JBoss Maven GWT Configurator"
+            provider="JBoss by Red Hat"
+            siteUrl="http://download.jboss.org/jbosstools/updates/development/indigo/central/core/">
+            <iu id="org.jboss.tools.maven.gwt.feature"/>
+            <iu id="com.google.gdt.eclipse.suite.e37.feature"/>
+         <icon
+               image32="images/jbosstools_icon32.png">
+         </icon>
+         <overview
+               url="http://www.jboss.org/tools">
+         </overview>
+      </connectorDescriptor>
+      <connectorDescriptor
+            categoryId="org.jboss.tools.central.discovery.maven"
+            groupId="org.jboss.tools.central.discovery.maven.configurators"
             description="JBoss Maven Hibernate Configurator"
             id="org.jboss.tools.maven.hibernate.feature"
             kind="task"

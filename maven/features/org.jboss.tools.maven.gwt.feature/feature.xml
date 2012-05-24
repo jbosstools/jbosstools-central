@@ -21,6 +21,7 @@
    <requires>
       <import feature="org.eclipse.m2e.feature" version="0.13.0" match="greaterOrEqual"/>
       <import feature="org.maven.ide.eclipse.wtp.feature" version="0.13.0" match="greaterOrEqual"/>
+      <import feature="com.google.gdt.eclipse.suite.e37.feature" version="2.5.0" match="greaterOrEqual"/>
    </requires>
 
    <plugin
