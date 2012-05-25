@@ -16,9 +16,9 @@ import org.eclipse.core.runtime.Assert;
 /**
  * 
  * @author snjeza
- *
+ * 
  */
-public class RepositoryWrapper implements Comparable<RepositoryWrapper>{
+public class RepositoryWrapper implements Comparable<RepositoryWrapper> {
 	public static final String SEPARATOR = "/"; //$NON-NLS-1$
 	private Repository repository;
 	private String profileId;
@@ -26,7 +26,7 @@ public class RepositoryWrapper implements Comparable<RepositoryWrapper>{
 
 	public RepositoryWrapper(Repository repository, String profileId) {
 		Assert.isNotNull(repository);
-		Assert.isNotNull(profileId);
+		// Assert.isNotNull(profileId);
 		this.repository = repository;
 		this.profileId = profileId;
 		url = repository.getUrl();
@@ -36,6 +36,10 @@ public class RepositoryWrapper implements Comparable<RepositoryWrapper>{
 				url = url + SEPARATOR;
 			}
 		}
+	}
+
+	public RepositoryWrapper(Repository repository) {
+		this(repository, null);
 	}
 
 	public Repository getRepository() {
@@ -53,16 +57,12 @@ public class RepositoryWrapper implements Comparable<RepositoryWrapper>{
 	public void setProfileId(String profileId) {
 		this.profileId = profileId;
 	}
-	
-	public boolean isJBossRepository() {
-		return ConfigureMavenRepositoriesWizardPage.JBOSSTOOLS_MAVEN_PROFILE_ID.equals(profileId);
-	}
 
 	public String getDisplayName() {
 		String name = repository.getName() == null ? "<no-name>" : repository.getName(); //$NON-NLS-1$
 		return name + "-" + repository.getUrl(); //$NON-NLS-1$
 	}
-	
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;

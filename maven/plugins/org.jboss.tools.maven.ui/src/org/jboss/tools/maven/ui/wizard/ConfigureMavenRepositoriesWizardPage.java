@@ -13,7 +13,6 @@ package org.jboss.tools.maven.ui.wizard;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileFilter;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -22,7 +21,6 @@ import java.io.InputStream;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
-import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -41,7 +39,6 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
 import org.apache.maven.cli.MavenCli;
-import org.apache.maven.repository.RepositorySystem;
 import org.apache.maven.settings.Profile;
 import org.apache.maven.settings.Repository;
 import org.apache.maven.settings.RepositoryPolicy;
@@ -53,15 +50,8 @@ import org.eclipse.compare.contentmergeviewer.TextMergeViewer;
 import org.eclipse.compare.structuremergeviewer.DiffNode;
 import org.eclipse.compare.structuremergeviewer.Differencer;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IPath;
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.dialogs.Dialog;
-import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.dialogs.MessageDialog;
-import org.eclipse.jface.dialogs.ProgressMonitorDialog;
-import org.eclipse.jface.operation.IRunnableWithProgress;
-import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.CellLabelProvider;
 import org.eclipse.jface.viewers.ColumnLayoutData;
@@ -77,16 +67,15 @@ import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TableViewerColumn;
 import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.jface.window.ToolTip;
+import org.eclipse.jface.window.Window;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.embedder.IMaven;
-import org.eclipse.m2e.core.embedder.IMavenConfiguration;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
@@ -94,7 +83,6 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.DirectoryDialog;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.jboss.tools.maven.ui.Activator;
@@ -111,6 +99,30 @@ import org.xml.sax.InputSource;
  *
  */
 public class ConfigureMavenRepositoriesWizardPage extends WizardPage {
+
+	private static final String ACTIVE_PROFILE = "activeProfile"; //$NON-NLS-1$
+
+	private static final String ACTIVE_PROFILES = "activeProfiles"; //$NON-NLS-1$
+
+	private static final String REPOSITORY_APACHE_ORG_ID = "repository-apache-org"; //$NON-NLS-1$
+	
+	private static final String REPOSITORY_APACHE_ORG_PROFILE_ID = REPOSITORY_APACHE_ORG_ID;
+
+	private static final String COM_SPRINGSOURCE_REPOSITORY_BUNDLES_EXTERNAL_ID = "com-springsource-repository-bundles-external"; //$NON-NLS-1$
+
+	private static final String COM_SPRINGSOURCE_REPOSITORY_BUNDLES_EXTERNAL_PROFILE_ID = COM_SPRINGSOURCE_REPOSITORY_BUNDLES_EXTERNAL_ID;
+	
+	private static final String COM_SPRINGSOURCE_REPOSITORY_BUNDLES_RELEASE_ID = "com-springsource-repository-bundles-release"; //$NON-NLS-1$
+
+	private static final String COM_SPRINGSOURCE_REPOSITORY_BUNDLES_RELEASE_PROFILE_ID = COM_SPRINGSOURCE_REPOSITORY_BUNDLES_RELEASE_ID;
+	
+	private static final String JAVA_NET_PUBLIC_ID = "java-net-public"; //$NON-NLS-1$
+	
+	private static final String JAVA_NET_PUBLIC_PROFILE_ID = JAVA_NET_PUBLIC_ID;
+
+	private static final String JBOSS_PUBLIC_REPOSITORY_ID = "jboss-public-repository"; //$NON-NLS-1$
+	
+	private static final String JBOSS_PUBLIC_REPOSITORY_PROFILE_ID = JBOSS_PUBLIC_REPOSITORY_ID;
 
 	private static final String ERROR_TITLE = "Error";
 
@@ -134,21 +146,12 @@ public class ConfigureMavenRepositoriesWizardPage extends WizardPage {
 
 	private static final String REPOSITORY_ELEMENT = "repository"; //$NON-NLS-1$
 
-	private static final String LASTPATH = "lastPath"; //$NON-NLS-1$
-
-	private static final String CONFIGURE_MAVEN_REPOSITORIES = "ConfigureMavenRepositories"; //$NON-NLS-1$
-
-	private static final String JBOSS_EAP_MAVEN_REPOSITORY = "JBoss EAP Maven Repository"; //$NON-NLS-1$
-
 	private static final String PLUGIN_REPOSITORIES_ELEMENT = "pluginRepositories"; //$NON-NLS-1$
 
 	private static final String PLUGIN_REPOSITORY_ELEMENT = "pluginRepository"; //$NON-NLS-1$
 
 	private static final String REPOSITORIES_ELEMENT = "repositories"; //$NON-NLS-1$
 
-	private static final String ACTIVE_BY_DEFAULT_ELEMENT = "activeByDefault"; //$NON-NLS-1$
-
-	private static final String ACTIVATION_ELEMENT = "activation"; //$NON-NLS-1$
 
 	private static final String ID_ELEMENT = "id"; //$NON-NLS-1$
 
@@ -158,35 +161,19 @@ public class ConfigureMavenRepositoriesWizardPage extends WizardPage {
 
 	private static final String UTF_8 = "UTF-8"; //$NON-NLS-1$
 	
-	public static final String JBOSSTOOLS_MAVEN_PROFILE_ID = "jbosstools-maven-profile"; //$NON-NLS-1$
-
-	private static final String JSF_IMPL = "com" + File.separator + "sun" + File.separator + "faces" + File.separator + "jsf-impl";  //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
-	private static final String WFK_BOMS = "com" + File.separator + "redhat" + File.separator + "jboss" + File.separator + "wfk" + File.separator + "boms";  //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
-	
 	private static final String PAGE_NAME = "org.jboss.tools.maven.ui.wizard.page"; //$NON-NLS-1$
-	private static final String ADD_ALL = " Add All>> ";
-	private static final String ADD = " Add>> ";
-	private static final String REMOVE_ALL = " <<Remove All ";
-	private static final String REMOVE = " <Remove ";
-
-	private static final String JBOSS_EAP_MAVEN_REPOSITORY_ID = "jboss-eap-maven-repository";; //$NON-NLS-1$
-	private static final String JBOSS_WFK_MAVEN_REPOSITORY_ID = "jboss-wfk-maven-repository";; //$NON-NLS-1$
+	private static final String ADD_REPOSITORY = " Add Repository ";
+	private static final String REMOVE_ALL = " Remove All ";
+	private static final String REMOVE = " Remove ";
 
 	private Button removeButton;
 	private Button removeAllButton;
-	private Button addButton;
-	private Button addAllButton;
-	private IMavenConfiguration mavenConfiguration;
+	private Button addRepositoryButton;
 	private IMaven maven;
-	private Image jbossImage;
 	private TableViewer includedRepositoriesViewer;
 	private Set<RepositoryWrapper> includedRepositories;
 	private Set<RepositoryWrapper> availableRepositories;
 	private Set<RepositoryWrapper> selectedIncludedRepositories = new HashSet<RepositoryWrapper>();
-	private Set<RepositoryWrapper> selectedAvailableRepositories = new HashSet<RepositoryWrapper>();
-	private TableViewer availableRepositoriesViewer;
-
-	private String localRepository;
 
 	private Document document;
 
@@ -197,45 +184,16 @@ public class ConfigureMavenRepositoriesWizardPage extends WizardPage {
 	private String newSettings;
 
 	private String oldSettings;
-
-	private Element jbossMavenProfile;
-
-	private Element repositoriesElement;
-
-	private Element pluginRepositoriesElement;
-	
-	private IDialogSettings dialogSettings;
 	
 	public ConfigureMavenRepositoriesWizardPage() {
 		super(PAGE_NAME);
 		setTitle("Configure Maven Repositories");
-		mavenConfiguration = MavenPlugin.getMavenConfiguration();
 		maven = MavenPlugin.getMaven();
-		try {
-			maven.reloadSettings();
-		} catch (CoreException e) {
-			Activator.log(e);
-		}
-	}
-
-	private String getLocalRepository() {
-		if (localRepository == null) {
-			String userSettings = getUserSettings();
-			String globalSettings = MavenPlugin.getMavenRuntimeManager()
-					.getGlobalSettingsFile();
-			try {
-				Settings settings = maven.buildSettings(globalSettings,
-						userSettings);
-				localRepository = settings.getLocalRepository();
-				if (localRepository == null) {
-					localRepository = RepositorySystem.defaultUserLocalRepository
-							.getAbsolutePath();
-				}
-			} catch (CoreException e) {
-				Activator.log(e);
-			} 
-		}
-		return localRepository;
+//		try {
+//			maven.reloadSettings();
+//		} catch (CoreException e) {
+//			Activator.log(e);
+//		}
 	}
 	
 	public void createControl(Composite parent) {
@@ -270,8 +228,7 @@ public class ConfigureMavenRepositoriesWizardPage extends WizardPage {
 		}
 		DocumentBuilder builder;
 		try {
-			DocumentBuilderFactory factory = DocumentBuilderFactory
-					.newInstance();
+			DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 			builder = factory.newDocumentBuilder();
 		} catch (ParserConfigurationException e) {
 			Activator.log(e);
@@ -299,119 +256,22 @@ public class ConfigureMavenRepositoriesWizardPage extends WizardPage {
 				throw new RuntimeException(e1);
 			}
 		}
-		NodeList profilesList = document.getElementsByTagName(PROFILES_ELEMENT);
-		Node profiles;
-		if (profilesList.getLength() > 0) {
-			profiles = profilesList.item(0);
-			NodeList profileNodes = profiles.getChildNodes();
-			int length = profileNodes.getLength();
-
-			for (int i = 0; i < length; i++) {
-				Node profile = profileNodes.item(i);
-				if (profile.getNodeType() == Node.ELEMENT_NODE
-						&& PROFILE_ELEMENT.equals(profile.getNodeName())) {
-					NodeList profileElements = profile.getChildNodes();
-					for (int j = 0; j < profileElements.getLength(); j++) {
-						Node node = profileElements.item(j);
-						if (node.getNodeType() == Node.ELEMENT_NODE
-								&& ID_ELEMENT.equals(node.getNodeName())) {
-							String id = node.getTextContent();
-							if (id != null) {
-								id = id.trim();
-							}
-							if (JBOSSTOOLS_MAVEN_PROFILE_ID.equals(id)) {
-								jbossMavenProfile = (Element) profile;
-								break;
-							}
-						}
-					}
-				}
-				if (jbossMavenProfile != null) {
-					break;
-				}
-			}
-		} else {
-			profiles = document.createElement(PROFILES_ELEMENT);
-			document.getDocumentElement().appendChild(profiles);
-		}
-
-		if (jbossMavenProfile == null) {
-			createJBossMavenProfile(profiles);
-		} else {
-			configureJBossMavenProfile();
-		}
-        
+		
 	    Group repositoriesGroup = new Group(composite, SWT.NONE);
         gd = new GridData(SWT.FILL, SWT.FILL, true, false);
         GridLayout layout = new GridLayout(3, false);
         repositoriesGroup.setLayout(layout);
         repositoriesGroup.setLayoutData(gd);
         repositoriesGroup.setText("Repositories");
-	
-        Composite availableRepositoriesComposite = new Composite(repositoriesGroup, SWT.NONE);
-        gd = new GridData(SWT.FILL, SWT.FILL, true, false);
-        availableRepositoriesComposite.setLayoutData(gd);
-        availableRepositoriesComposite.setLayout(new GridLayout());
-        
-        Label availableRepositoriesLabel = new Label(availableRepositoriesComposite, SWT.NONE);
-        gd = new GridData(SWT.FILL, SWT.FILL, true, false);
-        availableRepositoriesLabel.setLayoutData(gd);
-        availableRepositoriesLabel.setText("Available Repositories:");
-        
-        availableRepositoriesViewer = new TableViewer(availableRepositoriesComposite, SWT.BORDER | SWT.MULTI |SWT.H_SCROLL|SWT.V_SCROLL);
-        gd = new GridData(SWT.FILL, SWT.FILL, true, false);
-        gd.heightHint = 150;
-        gd.widthHint = 350;
-        availableRepositoriesViewer.getTable().setLayoutData(gd);
-        availableRepositoriesViewer.getTable().setLinesVisible(false);
-        availableRepositoriesViewer.getTable().setHeaderVisible(false);
-        TableViewerColumn column = new TableViewerColumn(availableRepositoriesViewer, SWT.NONE);
-        column.getColumn().setText("Repository");
-        //column.getColumn().setWidth(350);
-        column.getColumn().setResizable(true);
-        ColumnLayoutData columnLayoutData = new ColumnWeightData(350,350);
-        TableLayout availableLayout = new AutoResizeTableLayout(availableRepositoriesViewer.getTable());
-        availableLayout.addColumnData(columnLayoutData);
-        availableRepositoriesViewer.setContentProvider(new ArrayContentProvider());
-        availableRepositoriesViewer.setLabelProvider(new RepositoryLabelProvider());
-        ColumnViewerToolTipSupport.enableFor(availableRepositoriesViewer,ToolTip.NO_RECREATE);
-        
-        Composite buttonsComposite = new Composite(repositoriesGroup, SWT.NONE);
-        gd = new GridData(SWT.FILL, SWT.FILL, false, false);
-        buttonsComposite.setLayoutData(gd);
-        buttonsComposite.setLayout(new GridLayout(1, false));
-        
-        Label buttonsLabel = new Label(buttonsComposite, SWT.NONE);
-        gd = new GridData(SWT.FILL, SWT.FILL, false, false);
-        buttonsLabel.setLayoutData(gd);
-        
-        GC gc = new GC(buttonsComposite);
-        int maxAddRemoveButtonsWidth = computeMaxAddRemoveButtonsWidth(gc);
-        gc.dispose();
-        
-        Composite buttonsComp = new Composite(buttonsComposite, SWT.NONE);
-        gd = new GridData(SWT.FILL, SWT.FILL, false, false);
-        buttonsComp.setLayoutData(gd);
-        buttonsComp.setLayout(new GridLayout());
-        
-        removeButton = createButton(buttonsComp, maxAddRemoveButtonsWidth, REMOVE);
-        removeAllButton = createButton(buttonsComp, maxAddRemoveButtonsWidth, REMOVE_ALL);
-        addButton = createButton(buttonsComp, maxAddRemoveButtonsWidth, ADD);
-        addAllButton = createButton(buttonsComp, maxAddRemoveButtonsWidth, ADD_ALL);
-   
+	        
         Composite includedRepositoriesComposite = new Composite(repositoriesGroup, SWT.NONE);
         gd = new GridData(SWT.FILL, SWT.FILL, true, false);
         includedRepositoriesComposite.setLayoutData(gd);
         includedRepositoriesComposite.setLayout(new GridLayout(1, false));
-        
-        Label includedRepositoriesLabel = new Label(includedRepositoriesComposite, SWT.NONE);
-        gd = new GridData(SWT.FILL, SWT.FILL, true, false);
-        includedRepositoriesLabel.setLayoutData(gd);
-        includedRepositoriesLabel.setText("Included Repositories:");
-	    
+            
 	    includedRepositoriesViewer = new TableViewer(includedRepositoriesComposite, SWT.BORDER | SWT.MULTI | SWT.H_SCROLL|SWT.V_SCROLL);
         gd = new GridData(SWT.FILL, SWT.FILL, true, false);
-        gd.widthHint = 350;
+        gd.widthHint = 500;
         gd.heightHint = 150;
         includedRepositoriesViewer.getTable().setLayoutData(gd);
         includedRepositoriesViewer.getTable().setLinesVisible(false);
@@ -420,71 +280,15 @@ public class ConfigureMavenRepositoriesWizardPage extends WizardPage {
         c.getColumn().setText("Repository");
         c.getColumn().setResizable(true);
         TableLayout includedLayout = new AutoResizeTableLayout(includedRepositoriesViewer.getTable());
+        ColumnLayoutData columnLayoutData = new ColumnWeightData(350,350);
         includedLayout.addColumnData(columnLayoutData);
         
         includedRepositoriesViewer.setContentProvider(new ArrayContentProvider());
         includedRepositoriesViewer.setLabelProvider(new RepositoryLabelProvider());
-        ColumnViewerToolTipSupport.enableFor(availableRepositoriesViewer, ToolTip.NO_RECREATE);
+        ColumnViewerToolTipSupport.enableFor(includedRepositoriesViewer, ToolTip.NO_RECREATE);
         
-        Button recognizeButton = new Button(composite, SWT.PUSH);
-		recognizeButton.setLayoutData(new GridData(SWT.BEGINNING, SWT.FILL, true, false));
-		recognizeButton.setText("Recognize JBoss Maven Enterprise Repositories...");
-		recognizeButton.setImage(getJBossImage());
-		
-		recognizeButton.addSelectionListener(new SelectionAdapter() {
-			
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				DirectoryDialog directoryDialog = new DirectoryDialog(getShell());
-				directoryDialog.setMessage("Select the directory in which to search for JBoss Maven Enterprise Repositories:");
-				directoryDialog.setText("Search for JBoss Maven Enterprise Repositories");
-
-				dialogSettings = Activator.getDefault().getDialogSettings();
-				IDialogSettings configureMavenRepositories = dialogSettings.getSection(CONFIGURE_MAVEN_REPOSITORIES);
-				if (configureMavenRepositories == null) {
-					configureMavenRepositories = dialogSettings.addNewSection(CONFIGURE_MAVEN_REPOSITORIES);
-				}
-				String filterPath = configureMavenRepositories.get(LASTPATH);
-				if (filterPath != null) {
-					directoryDialog.setFilterPath(filterPath);
-				}
-				String pathStr = directoryDialog.open();
-				if (pathStr == null)
-					return;
-				
-				configureMavenRepositories.put(LASTPATH, pathStr);
-				final IPath path = new Path(pathStr);
-				
-				final ProgressMonitorDialog dialog = new ProgressMonitorDialog(getShell());
-				dialog.setBlockOnOpen(false);
-				dialog.setCancelable(true);
-				dialog.open();
-				final IProgressMonitor monitor = dialog.getProgressMonitor();
-				monitor.beginTask("Searching...", 110);
-				final Set<RepositoryWrapper> repos = new HashSet<RepositoryWrapper>();
-				
-				IRunnableWithProgress runnable = new IRunnableWithProgress() {
-					public void run(IProgressMonitor monitor2) {
-						searchForRepositories(path, repos, monitor2);
-					}
-				};
-				try {
-					dialog.run(true, true, runnable);
-				} catch (Exception e1) {
-					Activator.log(e1);
-				} 
-				
-				if (monitor.isCanceled()) {
-					return;
-				}
-				for (RepositoryWrapper wrapper:repos) {
-					if (!includedRepositories.contains(wrapper)) {
-						availableRepositories.add(wrapper);
-					}
-				}
-				refreshRepositories();
-			}
-		});
+        createButtons(repositoriesGroup);
+        
 		
 		includedRepositories = getIncludedRepositories();
 		availableRepositories = getAvailableRepositories();
@@ -498,24 +302,6 @@ public class ConfigureMavenRepositoriesWizardPage extends WizardPage {
 			availableRepositories.remove(repository);
 		}
 		
-		availableRepositoriesViewer.addSelectionChangedListener(new ISelectionChangedListener() {
-			
-			public void selectionChanged(SelectionChangedEvent event) {
-				ISelection sel = event.getSelection();
-				selectedAvailableRepositories.clear();
-				if (sel instanceof IStructuredSelection) {
-					IStructuredSelection selection = (IStructuredSelection) sel;
-					Iterator iterator = selection.iterator();
-					while (iterator.hasNext()) {
-						Object object = iterator.next();
-						if (object instanceof RepositoryWrapper) {
-							selectedAvailableRepositories.add((RepositoryWrapper) object);
-						}
-					}
-				}
-				configureButtons();
-			}
-		});
 		includedRepositoriesViewer.addSelectionChangedListener(new ISelectionChangedListener() {
 			
 			public void selectionChanged(SelectionChangedEvent event) {
@@ -538,15 +324,16 @@ public class ConfigureMavenRepositoriesWizardPage extends WizardPage {
 
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				for (RepositoryWrapper wrapper:selectedIncludedRepositories) {
-					if (wrapper.isJBossRepository()) {
+				boolean ok = getMessageDialog(selectedIncludedRepositories);
+				if (ok) {
+					for (RepositoryWrapper wrapper : selectedIncludedRepositories) {
 						includedRepositories.remove(wrapper);
 						availableRepositories.add(wrapper);
 						removeRepository(wrapper);
 					}
+					setPageComplete(true);
+					refreshRepositories();
 				}
-				setPageComplete(true);
-				refreshRepositories();
 			}
 		
         });
@@ -554,12 +341,14 @@ public class ConfigureMavenRepositoriesWizardPage extends WizardPage {
 
 			@Override
 			public void widgetSelected(SelectionEvent e) {
+				boolean ok = getMessageDialog(includedRepositories);
+				if (!ok) {
+					return;
+				}
 				List<RepositoryWrapper> list = new ArrayList<RepositoryWrapper>();
-				for (RepositoryWrapper wrapper:includedRepositories) {
-					if (wrapper.isJBossRepository()) {
-						list.add(wrapper);
-						removeRepository(wrapper);
-					}
+				for (RepositoryWrapper wrapper : includedRepositories) {
+					list.add(wrapper);
+					removeRepository(wrapper);
 				}
 				includedRepositories.removeAll(list);
 				availableRepositories.addAll(list);
@@ -568,37 +357,20 @@ public class ConfigureMavenRepositoriesWizardPage extends WizardPage {
 			}
 		
         });
-		addButton.addSelectionListener(new SelectionAdapter() {
+		addRepositoryButton.addSelectionListener(new SelectionAdapter() {
 
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				for (RepositoryWrapper wrapper:selectedAvailableRepositories) {
-					if (wrapper.isJBossRepository()) {
-						includedRepositories.add(wrapper);
-						availableRepositories.remove(wrapper);
-						addRepository(wrapper);
-					}
+				AddRepositoryDialog dialog = new AddRepositoryDialog(getShell(), availableRepositories, includedRepositories, maven);
+				int ok = dialog.open();
+				if (ok == Window.OK) {
+					RepositoryWrapper wrapper = dialog.getRepositoryWrapper();
+					includedRepositories.add(wrapper);
+					availableRepositories.remove(wrapper);
+					addRepository(wrapper, dialog.isActiveByDefault());
+					setPageComplete(true);
+					refreshRepositories();
 				}
-				setPageComplete(true);
-				refreshRepositories();
-			}
-		
-        });
-		addAllButton.addSelectionListener(new SelectionAdapter() {
-
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				List<RepositoryWrapper> list = new ArrayList<RepositoryWrapper>();
-				for (RepositoryWrapper wrapper:availableRepositories) {
-					if (wrapper.isJBossRepository()) {
-						list.add(wrapper);
-						addRepository(wrapper);
-					}
-				}
-				includedRepositories.addAll(list);
-				availableRepositories.removeAll(list);
-				setPageComplete(true);
-				refreshRepositories();
 			}
 		
         });
@@ -615,17 +387,166 @@ public class ConfigureMavenRepositoriesWizardPage extends WizardPage {
 		setPageComplete(false);
 	}
 
-	protected void createDefaultSettings() throws CoreException,
+	protected void createButtons(Composite parent) {
+		GridData gd;
+		Composite buttonsComposite = new Composite(parent, SWT.NONE);
+        gd = new GridData(SWT.FILL, SWT.TOP, false, false);
+        buttonsComposite.setLayoutData(gd);
+        buttonsComposite.setLayout(new GridLayout(1, false));
+        
+        removeButton = createButton(buttonsComposite, REMOVE);
+        removeAllButton = createButton(buttonsComposite, REMOVE_ALL);
+        addRepositoryButton = createButton(buttonsComposite, ADD_REPOSITORY);
+	}
+
+	private void createDefaultSettings() throws CoreException,
 			UnsupportedEncodingException {
 		ByteArrayOutputStream out = new ByteArrayOutputStream();
 		maven.writeSettings(new Settings(), out);
 		newSettings = new String(out.toByteArray(), UTF_8);
 	}
 
-	protected void addRepository(RepositoryWrapper wrapper) {
-		addRepository(wrapper, repositoriesElement, false);
-		addRepository(wrapper, pluginRepositoriesElement, true);
+	private void addRepository(RepositoryWrapper wrapper, boolean activeByDefault) {
+		if (wrapper == null || wrapper.getProfileId() == null || wrapper.getRepository() == null) {
+			return;
+		}
+		String profileId = wrapper.getProfileId();
+		Element profile = getProfile(profileId);
+		Element repositoriesElement = getElement(profile, REPOSITORIES_ELEMENT);
+		if (repositoriesElement != null) {
+			addRepository(wrapper, repositoriesElement, false);
+		}
+		Element pluginRepositoriesElement = getElement(profile, PLUGIN_REPOSITORIES_ELEMENT);
+		if (pluginRepositoriesElement != null) {
+			addRepository(wrapper, pluginRepositoriesElement, true);
+		}
 		
+		if (activeByDefault) {
+
+			NodeList activeProfilesList = document
+					.getElementsByTagName(ACTIVE_PROFILES);
+			Element activeProfiles = null;
+			if (activeProfilesList.getLength() > 0) {
+				activeProfiles = (Element) activeProfilesList.item(0);
+			}
+			if (activeProfiles == null) {
+				activeProfiles = document.createElement(ACTIVE_PROFILES);
+				document.getDocumentElement().appendChild(activeProfiles);
+			}
+			NodeList activeProfileList = activeProfiles.getChildNodes();
+			boolean activated = false;
+			for (int i = 0; i < activeProfileList.getLength(); i++) {
+				Node node = activeProfileList.item(i);
+				if (node.getNodeType() == Node.ELEMENT_NODE
+						&& ACTIVE_PROFILE.equals(node.getNodeName())) {
+					String id = node.getTextContent();
+					if (id != null) {
+						id = id.trim();
+					}
+					if (profileId.equals(id)) {
+						activated = true;
+						break;
+					}
+				}
+			}
+			if (!activated) {
+				addElement(activeProfiles, ACTIVE_PROFILE, profileId);
+			}
+		}
+	}
+
+	private Element getElement(Element element, String name) {
+		NodeList elements = element.getChildNodes();
+		int len = elements.getLength();
+		for (int i = 0; i < len; i++) {
+			Node node = elements.item(i);
+			if (node.getNodeType() == Node.ELEMENT_NODE && name.equals(node.getNodeName())) {
+				return (Element) node;
+			}
+		}
+		return null;
+	}
+
+	private Element getProfile(String profileId) {
+		NodeList profilesList = document.getElementsByTagName(PROFILES_ELEMENT);
+		Node profiles;
+		Element profileElement = null;
+		if (profilesList.getLength() > 0) {
+			profiles = profilesList.item(0);
+			NodeList profileNodes = profiles.getChildNodes();
+			int length = profileNodes.getLength();
+
+			for (int i = 0; i < length; i++) {
+				Node profile = profileNodes.item(i);
+				if (profile.getNodeType() == Node.ELEMENT_NODE
+						&& PROFILE_ELEMENT.equals(profile.getNodeName())) {
+					NodeList profileElements = profile.getChildNodes();
+					for (int j = 0; j < profileElements.getLength(); j++) {
+						Node node = profileElements.item(j);
+						if (node.getNodeType() == Node.ELEMENT_NODE
+								&& ID_ELEMENT.equals(node.getNodeName())) {
+							String id = node.getTextContent();
+							if (id != null) {
+								id = id.trim();
+							}
+							if (profileId.equals(id)) {
+								profileElement = (Element) profile;
+								break;
+							}
+						}
+					}
+				}
+				if (profileElement != null) {
+					break;
+				}
+			}
+		} else {
+			profiles = document.createElement(PROFILES_ELEMENT);
+			document.getDocumentElement().appendChild(profiles);
+		}
+
+		if (profileElement == null) {
+			profileElement = createProfile(profiles, profileId);
+		}
+		configureProfile(profileElement);
+		return profileElement;
+
+	}
+
+	private Element createProfile(Node profiles, String profileId) {
+		Element profile = document.createElement(PROFILE_ELEMENT); 
+		profiles.appendChild(profile);
+		Element id = document.createElement(ID_ELEMENT);
+		id.setTextContent(profileId);
+		profile.appendChild(id);
+		return profile;
+	}
+
+	private void configureProfile(Element profileElement) {
+		NodeList nodeList = profileElement.getChildNodes();
+		int len = nodeList.getLength();
+		Element repositoriesElement = null;
+		Element pluginRepositoriesElement = null;
+		for (int i = 0; i < len; i++) {
+			Node node = nodeList.item(i);
+			if (node.getNodeType() == Node.ELEMENT_NODE && REPOSITORIES_ELEMENT.equals(node.getNodeName())) {
+				repositoriesElement = (Element) node;
+			}
+			if (node.getNodeType() == Node.ELEMENT_NODE && PLUGIN_REPOSITORIES_ELEMENT.equals(node.getNodeName())) {
+				pluginRepositoriesElement = (Element) node;
+			}
+			if (repositoriesElement != null && pluginRepositoriesElement != null) {
+				return;
+			}
+		}
+		if (repositoriesElement == null) {
+			repositoriesElement = document.createElement(REPOSITORIES_ELEMENT); 
+			profileElement.appendChild(repositoriesElement);
+		}
+		if (pluginRepositoriesElement == null) {
+			pluginRepositoriesElement = document.createElement(PLUGIN_REPOSITORIES_ELEMENT);
+			profileElement.appendChild(pluginRepositoriesElement);
+		}
 	}
 
 	private void addRepository(RepositoryWrapper wrapper, Element repos, boolean isPluginRepository) {
@@ -667,9 +588,78 @@ public class ConfigureMavenRepositoriesWizardPage extends WizardPage {
 	}
 
 	protected void removeRepository(RepositoryWrapper wrapper) {
+		if (wrapper == null || wrapper.getProfileId() == null || wrapper.getRepository() == null || wrapper.getRepository().getUrl() == null) {
+			return;
+		}
 		String url = wrapper.getRepository().getUrl();
-		removeRepository(url, repositoriesElement, false);
-		removeRepository(url, pluginRepositoriesElement, true);
+		String profileId = wrapper.getProfileId();
+		Element profile = getProfile(profileId);
+		if (profile == null) {
+			return;
+		}
+		Element repositoriesElement = getElement(profile, REPOSITORIES_ELEMENT);
+		if (repositoriesElement != null) {
+			removeRepository(url, repositoriesElement, false);
+		}
+		Element pluginRepositoriesElement = getElement(profile, PLUGIN_REPOSITORIES_ELEMENT);
+		if (pluginRepositoriesElement != null) {
+			removeRepository(url, pluginRepositoriesElement, true);
+		}
+		
+		// remove profile ?
+		if (repositoriesElement != null) {
+			NodeList nodeList = repositoriesElement.getChildNodes();
+			int len = nodeList.getLength();
+			for (int i = 0; i < len; i++) {
+				Node node = nodeList.item(i);
+				if (node.getNodeType() == Node.ELEMENT_NODE
+						&& REPOSITORY_ELEMENT.equals(node.getNodeName())) {
+					return;
+				}
+			}
+		}
+		if (pluginRepositoriesElement != null) {
+			NodeList nodeList = pluginRepositoriesElement.getChildNodes();
+			int len = nodeList.getLength();
+			for (int i = 0; i < len; i++) {
+				Node node = nodeList.item(i);
+				if (node.getNodeType() == Node.ELEMENT_NODE
+						&& PLUGIN_REPOSITORY_ELEMENT.equals(node.getNodeName())) {
+					return;
+				}
+			}
+		}
+		NodeList profilesList = document.getElementsByTagName(PROFILES_ELEMENT);
+		Element profiles = (Element) profilesList.item(0);
+		profiles.removeChild(profile);
+		
+		NodeList activeProfilesList = document
+				.getElementsByTagName(ACTIVE_PROFILES);
+		Element activeProfiles = null;
+		if (activeProfilesList.getLength() > 0) {
+			activeProfiles = (Element) activeProfilesList.item(0);
+		}
+		if (activeProfiles != null) {
+			NodeList activeProfileList = activeProfiles.getChildNodes();
+			Node profileNode = null;
+			for (int i = 0; i < activeProfileList.getLength(); i++) {
+				Node node = activeProfileList.item(i);
+				if (node.getNodeType() == Node.ELEMENT_NODE
+						&& ACTIVE_PROFILE.equals(node.getNodeName())) {
+					String id = node.getTextContent();
+					if (id != null) {
+						id = id.trim();
+					}
+					if (profileId.equals(id)) {
+						profileNode = node;
+						break;
+					}
+				}
+			}
+			if (profileNode != null) {
+				activeProfiles.removeChild(profileNode);
+			}
+		}
 	}
 
 	protected void removeRepository(String url, Element repos, boolean isPluginRepository) {
@@ -714,49 +704,6 @@ public class ConfigureMavenRepositoriesWizardPage extends WizardPage {
 			}
 		}
 		return null;
-	}
-
-	private void configureJBossMavenProfile() {
-		NodeList nodeList = jbossMavenProfile.getChildNodes();
-		int len = nodeList.getLength();
-		for (int i = 0; i < len; i++) {
-			Node node = nodeList.item(i);
-			if (node.getNodeType() == Node.ELEMENT_NODE && REPOSITORIES_ELEMENT.equals(node.getNodeName())) {
-				repositoriesElement = (Element) node;
-			}
-			if (node.getNodeType() == Node.ELEMENT_NODE && PLUGIN_REPOSITORIES_ELEMENT.equals(node.getNodeName())) {
-				pluginRepositoriesElement = (Element) node;
-			}
-			if (repositoriesElement != null && pluginRepositoriesElement != null) {
-				return;
-			}
-		}
-		if (repositoriesElement == null) {
-			repositoriesElement = document.createElement(REPOSITORIES_ELEMENT); 
-			jbossMavenProfile.appendChild(repositoriesElement);
-		}
-		if (pluginRepositoriesElement == null) {
-			pluginRepositoriesElement = document.createElement(PLUGIN_REPOSITORIES_ELEMENT);
-			jbossMavenProfile.appendChild(pluginRepositoriesElement);
-		}
-	}
-	
-	private Element createJBossMavenProfile(Node profiles) {
-		jbossMavenProfile = document.createElement(PROFILE_ELEMENT); 
-		profiles.appendChild(jbossMavenProfile);
-		Element id = document.createElement(ID_ELEMENT);
-		id.setTextContent(JBOSSTOOLS_MAVEN_PROFILE_ID);
-		jbossMavenProfile.appendChild(id);
-		Element activation = document.createElement(ACTIVATION_ELEMENT);
-		jbossMavenProfile.appendChild(activation);
-		Element activeByDefault = document.createElement(ACTIVE_BY_DEFAULT_ELEMENT); 
-		activeByDefault.setTextContent("true"); //$NON-NLS-1$
-		activation.appendChild(activeByDefault);
-		repositoriesElement = document.createElement(REPOSITORIES_ELEMENT); 
-		jbossMavenProfile.appendChild(repositoriesElement);
-		pluginRepositoriesElement = document.createElement(PLUGIN_REPOSITORIES_ELEMENT);
-		jbossMavenProfile.appendChild(pluginRepositoriesElement);
-		return jbossMavenProfile;
 	}
 
 	private void createPreviewer(Composite composite) {
@@ -810,144 +757,6 @@ public class ConfigureMavenRepositoriesWizardPage extends WizardPage {
 		return null;
 	}
 
-	private void searchForRepositories(IPath path,
-			Set<RepositoryWrapper> repos, IProgressMonitor monitor) {
-		File[] files = null;
-		if (path != null) {
-			File f = path.toFile();
-			if (f.isDirectory()) {
-				files = new File[1];
-				files[0] = f;
-			}
-			else
-				return;
-		} else
-			files = File.listRoots();
-
-		if (files != null) {
-			int size = files.length;
-			int work = 100 / size;
-			int workLeft = 100 - (work * size);
-			for (int i = 0; i < size; i++) {
-				if (monitor.isCanceled())
-					return;
-				if (files[i] != null && files[i].isDirectory()) {
-					searchDir(repos, files[i], 4, monitor);
-				}
-				monitor.worked(work);
-			}
-			monitor.worked(workLeft);
-		} else
-			monitor.worked(100);
-	}
-	
-	private void searchDir(Set<RepositoryWrapper> repos, File directory, int depth,
-			IProgressMonitor monitor) {
-		
-		String localRepository = getLocalRepository();
-		if (localRepository != null && localRepository.trim().equals(directory.getAbsolutePath())) {
-			return;
-		}
-		monitor.setTaskName("Searching " + directory.getAbsolutePath());
-		File comFile = new File(directory, "com"); //$NON-NLS-1$
-		if (comFile.isDirectory()) {
-			RepositoryWrapper repository = getRepositoryFromDir(directory, repos, monitor);
-			if (repository != null) {
-				repos.add(repository);
-				return;
-			}
-		}
-		
-		if (depth == 0)
-			return;
-		
-		File[] files = directory.listFiles(new FileFilter() {
-			public boolean accept(File file) {
-				return file.isDirectory();
-			}
-		});
-		if (files != null) {
-			int size = files.length;
-			for (int i = 0; i < size; i++) {
-				if (monitor.isCanceled())
-					return;
-				searchDir(repos, files[i], depth - 1, monitor);
-			}
-		}
-	}
-
-	private RepositoryWrapper getRepositoryFromDir(File directory, Set<RepositoryWrapper> repos, IProgressMonitor monitor) {
-		if (monitor.isCanceled()) {
-			return null;
-		}
-		
-		File file = new File(directory, JSF_IMPL);
-		if (file.isDirectory()) {
-			File[] list = file.listFiles(new FileFilter() {
-				
-				public boolean accept(File pathname) {
-					if (pathname != null && pathname.getName() != null && pathname.getName().contains("redhat")) {
-						return true;
-					}
-					return false;
-				}
-			});
-			if (list != null && list.length >= 1) {
-				// JBoss EAP Maven Repository
-				Repository repository = getDefaultRepository();
-				Set<RepositoryWrapper> allRepositories = new HashSet<RepositoryWrapper>();
-				allRepositories.addAll(repos);
-				allRepositories.addAll(includedRepositories);
-				allRepositories.addAll(availableRepositories);
-				repository.setId(getUniqueId(JBOSS_EAP_MAVEN_REPOSITORY_ID, allRepositories));
-				repository.setName(JBOSS_EAP_MAVEN_REPOSITORY);
-				try {
-					repository.setUrl(directory.toURI().toURL().toString());
-				} catch (MalformedURLException e) {
-					Activator.log(e);
-				}
-				RepositoryWrapper wrapper = new RepositoryWrapper(repository, JBOSSTOOLS_MAVEN_PROFILE_ID);
-				return wrapper;
-			}
-		}
-		file = new File(directory, WFK_BOMS);
-		if (file.isDirectory()) {
-			// JBoss WFK Maven Repository
-			Repository repository = getDefaultRepository();
-			Set<RepositoryWrapper> allRepositories = new HashSet<RepositoryWrapper>();
-			allRepositories.addAll(repos);
-			allRepositories.addAll(includedRepositories);
-			allRepositories.addAll(availableRepositories);
-			repository.setId(getUniqueId(JBOSS_WFK_MAVEN_REPOSITORY_ID, allRepositories));
-			repository.setName("JBoss WFK Maven Repository");
-			try {
-				repository.setUrl(directory.toURI().toURL().toString());
-			} catch (MalformedURLException e) {
-				Activator.log(e);
-			}
-			RepositoryWrapper wrapper = new RepositoryWrapper(repository, JBOSSTOOLS_MAVEN_PROFILE_ID);
-			return wrapper;
-		}
-		return null;
-	}
-
-	private String getUniqueId(String id, Set<RepositoryWrapper> allRepositories) {
-		int i = 0;
-		String startId = id;
-		while (true) {
-			boolean found = false;
-			for (RepositoryWrapper wrapper:allRepositories) {
-				if (id.equals(wrapper.getRepository().getId())) {
-					id = startId + "." + i++; //$NON-NLS-1$
-					found = true;
-					break;
-				}
-			}
-			if (!found) {
-				return id;
-			}
-		}
-	}
 
 	private String readFile(File file) throws FileNotFoundException {
 	    StringBuilder text = new StringBuilder();
@@ -964,8 +773,8 @@ public class ConfigureMavenRepositoriesWizardPage extends WizardPage {
 	    return text.toString();
 	  }
 	
-	private String getUserSettings() {
-		String userSettings = mavenConfiguration.getUserSettingsFile();
+	public static String getUserSettings() {
+		String userSettings = MavenPlugin.getMavenConfiguration().getUserSettingsFile();
 	    if(userSettings == null || userSettings.length() == 0) {
 	    	userSettings = MavenCli.DEFAULT_USER_SETTINGS_FILE.getAbsolutePath();
 	    }
@@ -973,32 +782,15 @@ public class ConfigureMavenRepositoriesWizardPage extends WizardPage {
 	}
 	
 	private void configureButtons() {
-		removeAllButton.setEnabled(false);
-		removeButton.setEnabled(false);
-		for (RepositoryWrapper wrapper:selectedIncludedRepositories) {
-			if (JBOSSTOOLS_MAVEN_PROFILE_ID.equals(wrapper.getProfileId())) {
-				removeButton.setEnabled(true);
-				break;
-			}
-		}
-		for (RepositoryWrapper wrapper:includedRepositories) {
-			if (JBOSSTOOLS_MAVEN_PROFILE_ID.equals(wrapper.getProfileId())) {
-				removeAllButton.setEnabled(true);
-				break;
-			}
-		}
-		addButton.setEnabled(selectedAvailableRepositories.size() > 0);
-		addAllButton.setEnabled(availableRepositories.size() > 0);
+		removeAllButton.setEnabled(includedRepositories.size() > 0);
+		removeButton.setEnabled(selectedIncludedRepositories.size() > 0);
 	}
 
 	private void refreshRepositories() {
 		includedRepositoriesViewer.setInput(includedRepositories.toArray(new RepositoryWrapper[0]));
-        availableRepositoriesViewer.setInput(availableRepositories.toArray(new RepositoryWrapper[0]));
 		previewViewer.refresh();
         selectedIncludedRepositories.clear();
-        selectedAvailableRepositories.clear();
         includedRepositoriesViewer.setSelection(new StructuredSelection(selectedIncludedRepositories.toArray(new RepositoryWrapper[0])));
-        availableRepositoriesViewer.setSelection(new StructuredSelection(selectedAvailableRepositories.toArray(new RepositoryWrapper[0])));
 		configureButtons();
 	}
 
@@ -1023,39 +815,39 @@ public class ConfigureMavenRepositoriesWizardPage extends WizardPage {
 		Set<RepositoryWrapper> repositories = new TreeSet<RepositoryWrapper>();
         
 		Repository repository = getDefaultRepository();
-		repository.setId("jboss-public-repository"); //$NON-NLS-1$
+		repository.setId(JBOSS_PUBLIC_REPOSITORY_ID);
 		repository.setName("JBoss Public"); //$NON-NLS-1$
 		repository.setUrl("https://repository.jboss.org/nexus/content/groups/public-jboss/"); //$NON-NLS-1$
-		repositories.add(new RepositoryWrapper(repository, JBOSSTOOLS_MAVEN_PROFILE_ID));
+		repositories.add(new RepositoryWrapper(repository, JBOSS_PUBLIC_REPOSITORY_PROFILE_ID));
 		
 		repository = getDefaultRepository();
-        repository.setId("java-net-public"); //$NON-NLS-1$
+        repository.setId(JAVA_NET_PUBLIC_ID);
 		repository.setName("Java Net Public"); //$NON-NLS-1$
 		repository.setUrl("https://maven.java.net/content/groups/public/"); //$NON-NLS-1$
-		repositories.add(new RepositoryWrapper(repository, JBOSSTOOLS_MAVEN_PROFILE_ID));
+		repositories.add(new RepositoryWrapper(repository, JAVA_NET_PUBLIC_PROFILE_ID));
 		
 		repository = getDefaultRepository();
-        repository.setId("com.springsource.repository.bundles.release"); //$NON-NLS-1$
+        repository.setId(COM_SPRINGSOURCE_REPOSITORY_BUNDLES_RELEASE_ID);
 		repository.setName("EBR Spring Release"); //$NON-NLS-1$
 		repository.setUrl("http://repository.springsource.com/maven/bundles/release/"); //$NON-NLS-1$
-		repositories.add(new RepositoryWrapper(repository, JBOSSTOOLS_MAVEN_PROFILE_ID));
+		repositories.add(new RepositoryWrapper(repository, COM_SPRINGSOURCE_REPOSITORY_BUNDLES_RELEASE_PROFILE_ID));
 		
 		repository = getDefaultRepository();
-        repository.setId("com.springsource.repository.bundles.external"); //$NON-NLS-1$
+        repository.setId(COM_SPRINGSOURCE_REPOSITORY_BUNDLES_EXTERNAL_ID);
 		repository.setName("EBR External Release"); //$NON-NLS-1$
 		repository.setUrl("http://repository.springsource.com/maven/bundles/external/"); //$NON-NLS-1$
-		repositories.add(new RepositoryWrapper(repository, JBOSSTOOLS_MAVEN_PROFILE_ID));
+		repositories.add(new RepositoryWrapper(repository, COM_SPRINGSOURCE_REPOSITORY_BUNDLES_EXTERNAL_PROFILE_ID));
 
 		repository = getDefaultRepository();
-        repository.setId("repository.apache.org"); //$NON-NLS-1$
+        repository.setId(REPOSITORY_APACHE_ORG_ID);
 		repository.setName("Apache Repository"); //$NON-NLS-1$
 		repository.setUrl("https://repository.apache.org/content/groups/public/"); //$NON-NLS-1$
-		repositories.add(new RepositoryWrapper(repository, JBOSSTOOLS_MAVEN_PROFILE_ID));
+		repositories.add(new RepositoryWrapper(repository, REPOSITORY_APACHE_ORG_PROFILE_ID));
 		
 		return repositories;
 	}
 	
-	private Repository getDefaultRepository() {
+	public static Repository getDefaultRepository() {
 		Repository repository = new Repository();
 		repository.setLayout(LAYOUT_DEFAULT);
 		RepositoryPolicy releases = new RepositoryPolicy();
@@ -1067,15 +859,6 @@ public class ConfigureMavenRepositoriesWizardPage extends WizardPage {
 		snapshots.setUpdatePolicy(POLICY_NEVER); //$NON-NLS-1$
 		repository.setSnapshots(snapshots);
 		return repository;
-	}
-	
-	private Image getJBossImage() {
-		if (jbossImage == null) {
-			ImageDescriptor desc = Activator.imageDescriptorFromPlugin(Activator.PLUGIN_ID,
-					"icons/jboss.png"); //$NON-NLS-1$
-			jbossImage = desc.createImage();
-		}
-		return jbossImage;
 	}
 
 	private List<Profile> getActiveProfiles() throws CoreException {
@@ -1091,47 +874,13 @@ public class ConfigureMavenRepositoriesWizardPage extends WizardPage {
 		return activeProfiles;
 	}
 	
-	private Button createButton(Composite buttonsComp,
-			int maxAddRemoveButtonsWidth, String text) {
+	private Button createButton(Composite parent, String text) {
 		GridData gd;
-		Button button = new Button(buttonsComp, SWT.NONE | SWT.LEFT);
-        gd = new GridData();
-        gd.verticalAlignment = GridData.VERTICAL_ALIGN_CENTER;
-        gd.widthHint = maxAddRemoveButtonsWidth;
+		Button button = new Button(parent, SWT.NONE | SWT.LEFT);
+        gd = new GridData(GridData.FILL, GridData.FILL, false, false);
         button.setLayoutData(gd);
         button.setText(text);
         return button;
-	}
-	
-	private int computeMaxAddRemoveButtonsWidth(GC gc) {
-		int maxWidth = 0;
-
-		maxWidth = getGreaterWidth(gc,REMOVE, maxWidth);
-		maxWidth = getGreaterWidth(gc,REMOVE_ALL, maxWidth);
-		maxWidth = getGreaterWidth(gc,ADD, maxWidth);
-		maxWidth = getGreaterWidth(gc,ADD_ALL, maxWidth);
-		
-		return maxWidth;
-	}
-	
-	private int getGreaterWidth(GC gc, String str, int compareWidth) {
-		int greaterWidth = compareWidth;
-
-		Point strExtentPoint = gc.stringExtent(str);
-		int strWidth = strExtentPoint.x;
-		if (strWidth > compareWidth) {
-			greaterWidth = strWidth;
-		}
-
-		return greaterWidth + 5;
-	}
-	
-	@Override
-	public void dispose() {
-		if (jbossImage != null) {
-			jbossImage.dispose();
-		}
-		super.dispose();
 	}
 
 	class RepositoryLabelProvider extends CellLabelProvider {
@@ -1266,6 +1015,26 @@ public class ConfigureMavenRepositoriesWizardPage extends WizardPage {
 			}
 		}
 		return true;
+	}
+
+	protected boolean getMessageDialog(Set<RepositoryWrapper> repos) {
+		if (repos.size() == 0) {
+			return false;
+		}
+		StringBuilder builder = new StringBuilder();
+		if (repos.size() == 1) {
+			builder.append("Are you sure you want to delete the '");
+			builder.append(repos.iterator().next().getRepository().getUrl());
+			builder.append("' repository?");
+		} else {
+			builder.append("Are you sure you want to delete the following repositories:\n\n");
+			for (RepositoryWrapper wrapper:repos) {
+				builder.append(wrapper.getRepository().getUrl());
+				builder.append("\n");
+			}
+			builder.append("\n");
+		}
+		return MessageDialog.openQuestion(getShell(), "Question?", builder.toString());
 	}
 
 }
