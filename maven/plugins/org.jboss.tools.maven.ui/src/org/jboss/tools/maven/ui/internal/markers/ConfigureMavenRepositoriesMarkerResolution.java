@@ -12,6 +12,7 @@ package org.jboss.tools.maven.ui.internal.markers;
 
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.jface.wizard.WizardDialog;
+import org.eclipse.m2e.core.embedder.ArtifactKey;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IMarkerResolution;
@@ -22,9 +23,15 @@ public class ConfigureMavenRepositoriesMarkerResolution implements IMarkerResolu
 		IMarkerResolution2 {
 
 	
+	private ArtifactKey artifactKey;
+
 	public ConfigureMavenRepositoriesMarkerResolution() {
 	}
 	
+	public ConfigureMavenRepositoriesMarkerResolution(ArtifactKey artifactKey) {
+		this.artifactKey = artifactKey;
+	}
+
 	public String getDescription() {
 		return getLabel();
 	}
@@ -37,9 +44,9 @@ public class ConfigureMavenRepositoriesMarkerResolution implements IMarkerResolu
 		return "Configure Maven Repositories";
 	}
 
-	public void run(IMarker arg0) {
+	public void run(IMarker marker) {
 
-		ConfigureMavenRepositoriesWizard wizard = new ConfigureMavenRepositoriesWizard();
+		ConfigureMavenRepositoriesWizard wizard = new ConfigureMavenRepositoriesWizard(artifactKey);
 		WizardDialog dialog = new WizardDialog(Display.getDefault().getActiveShell(), wizard);
 		dialog.create();
 		dialog.open(); 

@@ -16,6 +16,7 @@ import org.eclipse.m2e.core.embedder.ArtifactKey;
 import org.eclipse.m2e.core.internal.IMavenConstants;
 import org.eclipse.ui.IMarkerResolution;
 import org.eclipse.ui.IMarkerResolutionGenerator2;
+import org.jboss.tools.maven.ui.Activator;
 import org.jboss.tools.maven.ui.Messages;
 
 @SuppressWarnings("nls")
@@ -34,6 +35,8 @@ public class MavenDependencyMarkerResolutionGenerator implements
 
 	private static final String FAILURE_TO_FIND_STRING = "Failure to find "; //$NON-NLS-1$
 
+	private static final String COULD_NOT_FIND_STRING = "Could not find artifact "; //$NON-NLS-1$
+
 	enum ResolutionType {
 		JBOSS_REPO, EAP_REPO, UNSUPPORTED
 	}
@@ -44,16 +47,17 @@ public class MavenDependencyMarkerResolutionGenerator implements
 	
 	public IMarkerResolution[] getResolutions(IMarker marker) {
 		ResolutionType type = getResolutionType(marker);
+		ArtifactKey key = getArtifactKey(marker);
 		switch (type) {
 		case JBOSS_REPO:
 			return new IMarkerResolution[] {
-					new ConfigureMavenRepositoriesMarkerResolution(),
+					new ConfigureMavenRepositoriesMarkerResolution(key),
 					new OpenPageInBrowserMarkerResolution(Messages.Quickfix_setupCommunityRepo, 
 							JBOSS_COMMUNITY_REPO_SETUP_GUIDE_URL)
 					};
 		case EAP_REPO:
 			return new IMarkerResolution[] { 
-					new ConfigureMavenRepositoriesMarkerResolution(),
+					new ConfigureMavenRepositoriesMarkerResolution(key),
 					new OpenPageInBrowserMarkerResolution(Messages.Quickfix_setupEnterpriseRepo, 
 							JBOSS_ENTERPRISE_REPO_SETUP_GUIDE_URL)
 					};
@@ -93,7 +97,7 @@ public class MavenDependencyMarkerResolutionGenerator implements
 				}
 			}
 		} catch (CoreException e) {
-			e.printStackTrace();
+			Activator.log(e);
 		}
 		return key;
 	}
@@ -108,10 +112,18 @@ public class MavenDependencyMarkerResolutionGenerator implements
 	}
 
 	private ArtifactKey parsePomLoadingErrorMessage(String message) {
+		ArtifactKey key = parseMessage(message, FAILURE_TO_FIND_STRING);
+		if (key == null) {
+			key = parseMessage(message, COULD_NOT_FIND_STRING);
+		}
+		return key;
+	}
+
+	protected ArtifactKey parseMessage(String message, String text) {
+		int start = message.indexOf(text);
 		ArtifactKey key = null;
-		int start = message.indexOf(FAILURE_TO_FIND_STRING);
 		if (start > -1) {
-			int from = FAILURE_TO_FIND_STRING.length()+start;
+			int from = text.length()+start;
 			String keyString = message.substring(from, message.indexOf(" ", from));
 			key = extractKey(key, keyString);
 		}
@@ -120,16 +132,16 @@ public class MavenDependencyMarkerResolutionGenerator implements
 
 	private ArtifactKey extractKey(ArtifactKey key, String keyString) {
 		String[] keyAsArray = keyString.trim().split(":"); //$NON-NLS-1$
-		if (keyAsArray.length > 3) {
+		if (keyAsArray.length >= 3) {
 			String groupId 	  = keyAsArray[0];
 			String artifactId = keyAsArray[1];
 			String classifier = null;
 			String version;
-			if (keyAsArray.length > 4) {
-				classifier = keyAsArray[3];
-				version = keyAsArray[4];
-			} else {
+			if (keyAsArray.length > 3) {
+				classifier = keyAsArray[2];
 				version = keyAsArray[3];
+			} else {
+				version = keyAsArray[2];
 			}
 			key = new ArtifactKey(groupId, artifactId, version, classifier);
 		}

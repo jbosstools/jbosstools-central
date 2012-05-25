@@ -49,7 +49,14 @@ import org.eclipse.compare.ITypedElement;
 import org.eclipse.compare.contentmergeviewer.TextMergeViewer;
 import org.eclipse.compare.structuremergeviewer.DiffNode;
 import org.eclipse.compare.structuremergeviewer.Differencer;
+import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.SubProgressMonitor;
+import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.ArrayContentProvider;
@@ -70,7 +77,13 @@ import org.eclipse.jface.window.ToolTip;
 import org.eclipse.jface.window.Window;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.m2e.core.MavenPlugin;
+import org.eclipse.m2e.core.embedder.ArtifactKey;
 import org.eclipse.m2e.core.embedder.IMaven;
+import org.eclipse.m2e.core.embedder.IMavenConfiguration;
+import org.eclipse.m2e.core.internal.IMavenConstants;
+import org.eclipse.m2e.core.internal.index.IndexManager;
+import org.eclipse.m2e.core.project.IMavenProjectFacade;
+import org.eclipse.m2e.core.project.MavenUpdateRequest;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
@@ -184,16 +197,14 @@ public class ConfigureMavenRepositoriesWizardPage extends WizardPage {
 	private String newSettings;
 
 	private String oldSettings;
+
+	private ArtifactKey artifactKey;
 	
-	public ConfigureMavenRepositoriesWizardPage() {
+	public ConfigureMavenRepositoriesWizardPage(ArtifactKey artifactKey) {
 		super(PAGE_NAME);
 		setTitle("Configure Maven Repositories");
 		maven = MavenPlugin.getMaven();
-//		try {
-//			maven.reloadSettings();
-//		} catch (CoreException e) {
-//			Activator.log(e);
-//		}
+		this.artifactKey = artifactKey;
 	}
 	
 	public void createControl(Composite parent) {
@@ -361,7 +372,7 @@ public class ConfigureMavenRepositoriesWizardPage extends WizardPage {
 
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				AddRepositoryDialog dialog = new AddRepositoryDialog(getShell(), availableRepositories, includedRepositories, maven);
+				AddRepositoryDialog dialog = new AddRepositoryDialog(getShell(), availableRepositories, includedRepositories, maven, artifactKey);
 				int ok = dialog.open();
 				if (ok == Window.OK) {
 					RepositoryWrapper wrapper = dialog.getRepositoryWrapper();
@@ -1000,7 +1011,7 @@ public class ConfigureMavenRepositoriesWizardPage extends WizardPage {
 			byte[] bytes = outputString.getBytes(UTF_8);
 			out.write(bytes);
 			out.flush();
-			maven.reloadSettings();
+			updateSettings();
 		} catch (Exception e) {
 			MessageDialog.openError(getShell(), ERROR_TITLE, e.getMessage());
 			Activator.log(e);
@@ -1017,7 +1028,50 @@ public class ConfigureMavenRepositoriesWizardPage extends WizardPage {
 		return true;
 	}
 
-	protected boolean getMessageDialog(Set<RepositoryWrapper> repos) {
+	protected void updateSettings() {
+		final String userSettings = getUserSettings();
+
+		Job job = new Job("Updating Maven settings...") {
+			protected IStatus run(IProgressMonitor monitor) {
+				try {
+					MavenPlugin.getMaven().reloadSettings();
+					final File localRepositoryDir = new File(maven
+							.getLocalRepository().getBasedir());
+
+					IMavenConfiguration mavenConfiguration = MavenPlugin
+							.getMavenConfiguration();
+					if (userSettings.length() > 0) {
+						mavenConfiguration.setUserSettingsFile(userSettings);
+					} else {
+						mavenConfiguration.setUserSettingsFile(null);
+					}
+
+					File newRepositoryDir = new File(maven.getLocalRepository()
+							.getBasedir());
+					if (!newRepositoryDir.equals(localRepositoryDir)) {
+						IndexManager indexManager = MavenPlugin
+								.getIndexManager();
+						indexManager.getWorkspaceIndex().updateIndex(true, monitor);
+					}
+
+					List<IMavenProjectFacade> facades = new ArrayList<IMavenProjectFacade>();
+					IProject[] projects = ResourcesPlugin.getWorkspace().getRoot().getProjects();
+					
+					if (projects != null && projects.length > 0) {
+						MavenUpdateRequest updateRequest = new MavenUpdateRequest(projects, mavenConfiguration.isOffline(),true);
+						MavenPlugin.getMavenProjectRegistry().refresh(updateRequest);
+					}
+					return Status.OK_STATUS;
+				} catch (CoreException e) {
+					Activator.log(e);
+					return e.getStatus();
+				}
+			}
+		};
+		job.schedule();
+	}
+	
+	private boolean getMessageDialog(Set<RepositoryWrapper> repos) {
 		if (repos.size() == 0) {
 			return false;
 		}

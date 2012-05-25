@@ -10,13 +10,18 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import org.apache.maven.repository.RepositorySystem;
+import org.apache.maven.repository.internal.MavenRepositorySystemSession;
 import org.apache.maven.settings.Profile;
 import org.apache.maven.settings.Repository;
 import org.apache.maven.settings.Settings;
+import org.codehaus.plexus.DefaultPlexusContainer;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.dialogs.IMessageProvider;
@@ -29,6 +34,7 @@ import org.eclipse.jface.fieldassist.FieldDecorationRegistry;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.m2e.core.MavenPlugin;
+import org.eclipse.m2e.core.embedder.ArtifactKey;
 import org.eclipse.m2e.core.embedder.IMaven;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
@@ -43,11 +49,19 @@ import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.DirectoryDialog;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 import org.jboss.tools.maven.ui.Activator;
+import org.sonatype.aether.artifact.Artifact;
+import org.sonatype.aether.repository.LocalRepository;
+import org.sonatype.aether.repository.RemoteRepository;
+import org.sonatype.aether.resolution.ArtifactRequest;
+import org.sonatype.aether.resolution.ArtifactResolutionException;
+import org.sonatype.aether.resolution.ArtifactResult;
+import org.sonatype.aether.util.artifact.DefaultArtifact;
 
 public class AddRepositoryDialog extends TitleAreaDialog {
 
@@ -76,7 +90,7 @@ public class AddRepositoryDialog extends TitleAreaDialog {
 	private Text idText;
 	private Text urlText;
 	private Text nameText;
-	private Image jbossImage;
+	private Image jbossImage, resolvedImage, unresolvedImage;
 	private IDialogSettings dialogSettings;
 	private String localRepository;
 	private ControlDecoration profileComboDecoration;
@@ -87,16 +101,21 @@ public class AddRepositoryDialog extends TitleAreaDialog {
 	private ControlDecoration urlExistsTextDecoration;
 	
 	private RepositoryWrapper repositoryWrapper;
+	private ArtifactKey artifactKey;
+	private Label artifactLabel;
+	private String coords;
+	private Label artifactImageLabel;
 
 	public AddRepositoryDialog(Shell parentShell,
 			Set<RepositoryWrapper> availableRepositories,
-			Set<RepositoryWrapper> includedRepositories, IMaven maven) {
+			Set<RepositoryWrapper> includedRepositories, IMaven maven, ArtifactKey artifactKey) {
 		super(parentShell);
 		setShellStyle(SWT.CLOSE | SWT.MAX | SWT.TITLE | SWT.BORDER | SWT.RESIZE
 				| getDefaultOrientation());
 		this.availableRepositories = availableRepositories;
 		this.includedRepositories = includedRepositories;
 		this.maven = maven;
+		this.artifactKey = artifactKey;
 	}
 
 	@Override
@@ -202,7 +221,6 @@ public class AddRepositoryDialog extends TitleAreaDialog {
 		urlTextDecoration = addDecoration(urlText, FieldDecorationRegistry.DEC_REQUIRED, REPOSITORY_URL_IS_REQUIRED);
 		urlValidTextDecoration = addDecoration(urlText, FieldDecorationRegistry.DEC_ERROR, URL_IS_NOT_VALID);
 		urlExistsTextDecoration = addDecoration(urlText, FieldDecorationRegistry.DEC_ERROR, URL_ALREADY_EXISTS);
-		
 		Button recognizeButton = new Button(contents, SWT.PUSH);
 		recognizeButton.setLayoutData(new GridData(SWT.BEGINNING, SWT.FILL, true, false));
 		recognizeButton.setText("Recognize JBoss Maven Enterprise Repositories...");
@@ -303,7 +321,118 @@ public class AddRepositoryDialog extends TitleAreaDialog {
 			}
 		});
 		
+		if (artifactKey != null) {
+			String message = "The '" + getCoords() + "' artifact";
+			final String unresolvedMessage = message + " is not resolved.";
+			final String resolvedMessage = message + " is resolved.";
+			Composite labelComposite = new Composite(contents, SWT.NONE);
+			labelComposite.setLayout(new GridLayout(2, false));
+			labelComposite.setLayoutData(new GridData(GridData.FILL, GridData.FILL, true, false));
+			artifactImageLabel = createLabel(labelComposite, ""); //$NON-NLS-1$
+			artifactLabel = createLabel(labelComposite, unresolvedMessage );
+			artifactImageLabel.setImage(getUnresolvedImage());
+			urlText.addModifyListener(new ModifyListener() {
+				
+				public void modifyText(ModifyEvent e) {
+					if (getErrorMessage() != null) {
+						return;
+					}
+					final String id = idText.getText().trim();
+					final String url = urlText.getText().trim();
+					Job job = new Job("Resolving artifact ...") {
+
+						@Override
+						protected IStatus run(IProgressMonitor monitor) {
+							final boolean resolved = resolveArtifact(id, url);
+							Display.getDefault().asyncExec(new Runnable() {
+								
+								public void run() {
+									if (resolved) {
+										artifactImageLabel.setImage(getResolvedImage());
+										artifactLabel.setText(resolvedMessage);
+									} else {
+										artifactImageLabel.setImage(getUnresolvedImage());
+										artifactLabel.setText(unresolvedMessage);
+									}
+								}
+							});
+							
+							return Status.OK_STATUS;
+						}
+						
+					};
+					job.setUser(true);
+					job.schedule();
+				}
+			});
+		}
+		
 		return area;
+	}
+
+	private String getCoords() {
+		if (coords == null && artifactKey != null) {
+			StringBuilder builder = new StringBuilder();
+			builder.append(artifactKey.getGroupId());
+			builder.append(":");
+			builder.append(artifactKey.getArtifactId());
+			builder.append(":");
+			if (artifactKey.getClassifier() != null) {
+				builder.append(artifactKey.getClassifier());
+				builder.append(":");
+			}
+			builder.append(artifactKey.getVersion());
+			coords = builder.toString();
+		}
+		return coords;
+	}
+
+	private boolean resolveArtifact(String id, String url) {
+		
+		org.sonatype.aether.RepositorySystem system;
+		try {
+			system = new DefaultPlexusContainer()
+					.lookup(org.sonatype.aether.RepositorySystem.class);
+		} catch (Exception e) {
+			Activator.log(e);
+			return false;
+		}
+		MavenRepositorySystemSession session = new MavenRepositorySystemSession();
+		IMaven maven = MavenPlugin.getMaven();
+		String localRepoHome = maven.getLocalRepositoryPath();
+		LocalRepository localRepo = new LocalRepository(localRepoHome);
+		session.setLocalRepositoryManager(system.newLocalRepositoryManager(localRepo));
+
+		ArtifactRequest artifactRequest = new ArtifactRequest();
+		artifactRequest.setArtifact(new DefaultArtifact(getCoords()));
+
+		RemoteRepository centralRepo = new RemoteRepository( "central", "default", "http://repo1.maven.org/maven2/" );  //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$
+		artifactRequest.addRepository(centralRepo);
+		RemoteRepository remoteRepo = new RemoteRepository(id,
+				"default", url); //$NON-NLS-1$
+		artifactRequest.addRepository(remoteRepo);
+		for (RepositoryWrapper wrapper : includedRepositories) {
+			Repository repo = wrapper.getRepository();
+			if (repo == null) {
+				continue;
+			}
+			remoteRepo = new RemoteRepository(repo.getId(),
+					"default", repo.getUrl()); //$NON-NLS-1$
+			artifactRequest.addRepository(remoteRepo);
+		}
+
+		try {
+			ArtifactResult artifactResult = system.resolveArtifact(session,
+					artifactRequest);
+			Artifact artifact = artifactResult.getArtifact();
+			return artifact != null;
+		} catch (ArtifactResolutionException e) {
+			if (Activator.getDefault().isDebugging()) {
+				Activator.log(e);
+			}
+		}
+		
+		return false;
 	}
 
 	private Text createText(Composite parent) {
@@ -402,8 +531,8 @@ public class AddRepositoryDialog extends TitleAreaDialog {
 		}
 	}
 
-	private Label createLabel(Composite repositoryComposite, String text) {
-		Label label = new Label(repositoryComposite, SWT.NONE);
+	private Label createLabel(Composite parent, String text) {
+		Label label = new Label(parent, SWT.NONE);
 		label.setLayoutData(new GridData(GridData.FILL, GridData.FILL, false,
 				false));
 		label.setText(text);
@@ -450,6 +579,24 @@ public class AddRepositoryDialog extends TitleAreaDialog {
 			jbossImage = desc.createImage();
 		}
 		return jbossImage;
+	}
+	
+	private Image getResolvedImage() {
+		if (resolvedImage == null) {
+			ImageDescriptor desc = Activator.imageDescriptorFromPlugin(Activator.PLUGIN_ID,
+					"icons/resolved.gif"); //$NON-NLS-1$
+			resolvedImage = desc.createImage();
+		}
+		return resolvedImage;
+	}
+	
+	private Image getUnresolvedImage() {
+		if (unresolvedImage == null) {
+			ImageDescriptor desc = Activator.imageDescriptorFromPlugin(Activator.PLUGIN_ID,
+					"icons/unresolved.gif"); //$NON-NLS-1$
+			unresolvedImage = desc.createImage();
+		}
+		return unresolvedImage;
 	}
 	
 	private void searchForRepositories(IPath path,
@@ -651,6 +798,12 @@ public class AddRepositoryDialog extends TitleAreaDialog {
 	public boolean close() {
 		if (jbossImage != null) {
 			jbossImage.dispose();
+		}
+		if (resolvedImage != null) {
+			resolvedImage.dispose();
+		}
+		if (unresolvedImage != null) {
+			unresolvedImage.dispose();
 		}
 		return super.close();
 	}

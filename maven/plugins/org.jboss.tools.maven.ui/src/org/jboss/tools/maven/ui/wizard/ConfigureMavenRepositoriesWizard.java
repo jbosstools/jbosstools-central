@@ -13,6 +13,7 @@ package org.jboss.tools.maven.ui.wizard;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.wizard.Wizard;
+import org.eclipse.m2e.core.embedder.ArtifactKey;
 import org.eclipse.ui.INewWizard;
 import org.eclipse.ui.IWorkbench;
 import org.jboss.tools.maven.ui.Activator;
@@ -26,10 +27,16 @@ public class ConfigureMavenRepositoriesWizard extends Wizard implements
 		INewWizard {
 
 	private ConfigureMavenRepositoriesWizardPage page;
+	private ArtifactKey artifactKey;
 
 	public ConfigureMavenRepositoriesWizard() {
 		super();
 		setWindowTitle("Maven Repositories");
+	}
+	
+	public ConfigureMavenRepositoriesWizard(ArtifactKey artifactKey) {
+		this();
+		this.artifactKey = artifactKey;
 	}
 	
 	public void init(IWorkbench workbench, IStructuredSelection selection) {
@@ -49,7 +56,7 @@ public class ConfigureMavenRepositoriesWizard extends Wizard implements
 
 	@Override
 	public void addPages() {
-		page = new ConfigureMavenRepositoriesWizardPage();
+		page = new ConfigureMavenRepositoriesWizardPage(artifactKey);
 		addPage(page);
 	}
 }
