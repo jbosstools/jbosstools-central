@@ -42,7 +42,7 @@ public class DefaultJBossCentralConfigurator implements
 	}
 	
 	// TODO: for GA, change this from /development/indigo/ to /stable/indigo/
-	private static final String JBOSS_DIRECTORY_URL_DEFAULT = "http://download.jboss.org/jbosstools/updates/development/indigo/jbosstools-directory.xml"; //$NON-NLS-1$
+	private static final String JBOSS_DIRECTORY_URL_DEFAULT = "http://download.jboss.org/jbosstools/updates/stable/indigo/jbosstools-directory.xml"; //$NON-NLS-1$
 	
 	// see pom.xml for actual value -- this is passed it at build-time via Maven
 	private static final String JBOSS_DIRECTORY_URL;
