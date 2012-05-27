@@ -21,7 +21,6 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.lang.StringEscapeUtils;
-import org.eclipse.core.resources.WorkspaceJob;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IContributor;
@@ -1078,18 +1077,14 @@ public class GettingStartedPage extends AbstractJBossCentralPage {
 			return;
 		}
 		Point size;
-		//if (Platform.OS_MACOSX.equals(Platform.getOS())) {
-			size = form.getSize();
-			size.y = form.getBody().getSize().y;
-		//} else {
-		//	size = form.getBody().getSize();
-		//}
+		size = form.getSize();
+		size.y = form.getBody().getSize().y;
 		if (!force && size.equals(oldSize)) {
 			return;
 		}
 		oldSize = size;
 		GridData gd;
-		int widthHint = size.x/2 - 40;
+		int widthHint = size.x/2 - 20;
 		gd = (GridData) newsSection.getLayoutData();
 		if (newsSection.isExpanded()) {
 			if (blogsSection.isExpanded()) {
@@ -1116,45 +1111,35 @@ public class GettingStartedPage extends AbstractJBossCentralPage {
 		
 		gd.widthHint = widthHint;
 		gd.grabExcessVerticalSpace = false;
-		
-		gd = (GridData) tutorialsSection.getLayoutData();
-		//gridData.heightHint = size.y - 40;
-		gd.widthHint = widthHint;
-		gd.grabExcessVerticalSpace = false;
-		tutorialPageBook.pack();
-		//computedSize = tutorialPageBook.computeSize(SWT.DEFAULT, SWT.DEFAULT);
-		//tutorialsSection.setSize(widthHint, computedSize.y);
-		
+				
 		gd = (GridData) documentationSection.getLayoutData();
 		//gridData.heightHint = size.y - 40;
 		gd.widthHint = widthHint;
 		gd.grabExcessVerticalSpace = false;
-		//computedSize = documentationSection.computeSize(SWT.DEFAULT, SWT.DEFAULT);
-		//documentationSection.setSize(widthHint, computedSize.y);
 		
 		gd = (GridData) settingsSection.getLayoutData();
 		gd.widthHint = widthHint;
 		gd.grabExcessVerticalSpace = false;
-		//computedSize = settingsSection.computeSize(SWT.DEFAULT, SWT.DEFAULT);
-		//settingsSection.setSize(widthHint, computedSize.y);
 		
 		gd = (GridData) projectsSection.getLayoutData();
 		//gridData.heightHint = size.y - 40;
 		gd.widthHint = widthHint;
 		gd.grabExcessVerticalSpace = false;
-		//computedSize = projectsSection.computeSize(SWT.DEFAULT, SWT.DEFAULT);
-		//projectsSection.setSize(widthHint, computedSize.y);
 		
-		blogsScrollComposite.setMinSize(widthHint, size.y - 55);
-		newsScrollComposite.setMinSize(widthHint, size.y - 55);
+		gd = (GridData) tutorialsSection.getLayoutData();
+		Point computedSize = tutorialPageBook.computeSize(widthHint, SWT.DEFAULT);
 		
-		Point computedSize = tutorialPageBook.computeSize(SWT.DEFAULT, SWT.DEFAULT);
-		int y = computedSize.y;
-		if (y > 100) {
-			y = 100;
+		if (computedSize.y > (size.y/3)) {
+			gd.heightHint = size.y/3;
+		} else {
+			gd.heightHint = SWT.DEFAULT;
 		}
+		gd.widthHint = widthHint;
+		gd.grabExcessVerticalSpace = false;
 		
-		tutorialScrollComposite.setMinSize(widthHint, y);
+		computedSize = tutorialPageBook.computeSize(widthHint, SWT.DEFAULT);
+		
+		tutorialScrollComposite.setMinSize(widthHint - 20, computedSize.y);
 		
 		recomputeScrollComposite(blogsScrollComposite, blogsPageBook);
 		recomputeScrollComposite(newsScrollComposite, newsPageBook);
