@@ -146,11 +146,17 @@ public class ProjectExampleUtil {
 	}
 
 	public static Set<IProjectExampleSite> getRuntimeSites() {
+		return getRuntimeSites(false);
+	}
+	
+	public static Set<IProjectExampleSite> getRuntimeSites(boolean force) {
 		Set<IProjectExampleSite> sites = new HashSet<IProjectExampleSite>();
-		IPreferenceStore store = ProjectExamplesActivator.getDefault()
-				.getPreferenceStore();
-		if (!store.getBoolean(ProjectExamplesActivator.SHOW_RUNTIME_SITES)) {
-			return sites;
+		if (!force) {
+			IPreferenceStore store = ProjectExamplesActivator.getDefault()
+					.getPreferenceStore();
+			if (!store.getBoolean(ProjectExamplesActivator.SHOW_RUNTIME_SITES)) {
+				return sites;
+			}
 		}
 		IServer[] servers = ServerCore.getServers();
 		for (IServer server:servers) {
