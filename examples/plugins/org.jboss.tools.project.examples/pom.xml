@@ -12,7 +12,7 @@
 
 	<properties>
 		<!-- TODO: for GA, change this from /development/indigo/ to /stable/indigo/ -->
-		<jboss.discovery.directory.url>http://download.jboss.org/jbosstools/updates/development/indigo/jbosstools-directory.xml</jboss.discovery.directory.url>
+		<jboss.discovery.directory.url>http://download.jboss.org/jbosstools/updates/stable/indigo/jbosstools-directory.xml</jboss.discovery.directory.url>
 	</properties>
 
 	<profiles>
