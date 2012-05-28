@@ -11,20 +11,20 @@
 	<artifactId>org.jboss.tools.project.examples</artifactId>
 
 	<properties>
-		<!-- TODO: for GA, change this from /development/indigo/ to /stable/indigo/ -->
-		<jboss.discovery.directory.url>http://download.jboss.org/jbosstools/updates/development/indigo/jbosstools-directory.xml</jboss.discovery.directory.url>
+		<!-- TODO: for GA, change this from /development/juno/ to /stable/juno/ -->
+		<jboss.discovery.directory.url>http://download.jboss.org/jbosstools/updates/development/juno/jbosstools-directory.xml</jboss.discovery.directory.url>
 	</properties>
 
 	<profiles>
 		<!-- _stable_branch jobs could use this profile but the above default (last 
 			stable milestone) is probably better -->
 		<profile>
-			<id>3.3.indigo</id>
+			<id>3.4.juno</id>
 			<activation>
 				<activeByDefault>false</activeByDefault>
 			</activation>
 			<properties>
-				<jboss.discovery.directory.url>http://download.jboss.org/jbosstools/updates/nightly/core/3.3.indigo/jbosstools-directory.xml</jboss.discovery.directory.url>
+				<jboss.discovery.directory.url>http://download.jboss.org/jbosstools/updates/nightly/core/3.4.juno/jbosstools-directory.xml</jboss.discovery.directory.url>
 			</properties>
 		</profile>
 
