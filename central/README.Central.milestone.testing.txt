@@ -2,11 +2,11 @@ JBoss Central has a "software/update" page which gets its content from a hardcod
 
 The published (current) milestone release URL is 
 
-	http://download.jboss.org/jbosstools/updates/development/indigo/jbosstools-directory.xml
+	http://download.jboss.org/jbosstools/updates/development/juno/jbosstools-directory.xml
 
 The stable branch (upcoming milestone) URL is
 
-	http://download.jboss.org/jbosstools/updates/nightly/core/3.3.indigo/jbosstools-directory.xml
+	http://download.jboss.org/jbosstools/updates/nightly/core/3.4.juno/jbosstools-directory.xml
 
 The unstable trunk URL is
 
@@ -16,7 +16,7 @@ The same as used for all milestone releases of JBoss Tools; should you want to p
 
 Thus, when running Eclipse, simply pass in an alternate URL like this:
 
-	./eclipse -vmargs -Djboss.discovery.directory.url=http://download.jboss.org/jbosstools/updates/nightly/core/3.3.indigo/jbosstools-directory.xml
+	./eclipse -vmargs -Djboss.discovery.directory.url=http://download.jboss.org/jbosstools/updates/nightly/core/3.4.juno/jbosstools-directory.xml
 
 Or, you can add the -Djboss.discovery.directory.url flag to your eclipse.ini file after the -vmargs line.
 
