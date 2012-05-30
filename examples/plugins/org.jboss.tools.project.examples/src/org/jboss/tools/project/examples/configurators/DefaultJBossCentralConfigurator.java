@@ -131,7 +131,7 @@ public class DefaultJBossCentralConfigurator implements
 		String directory = System.getProperty(JBOSS_RUNTIME_DIRECTORY, null);
 		if (directory == null) {
 			// else use Maven-generated value (or fall back to default)
-			return JBOSS_DIRECTORY_URL;
+			return JBOSS_RUNTIME_URL;
 		}
 		return directory;		
 	}
