@@ -45,7 +45,7 @@ public class Sites {
 			siteCategories[1]=pluginSite;
 			
 			runtimeSite = new SiteCategory(Messages.Sites_Runtime_sites);
-			Set<IProjectExampleSite> runtimeSites = ProjectExampleUtil.getRuntimeSites();
+			Set<IProjectExampleSite> runtimeSites = ProjectExampleUtil.getRuntimeSites(true);
 			runtimeSite.setSites(runtimeSites);
 			siteCategories[2]= runtimeSite;
 			

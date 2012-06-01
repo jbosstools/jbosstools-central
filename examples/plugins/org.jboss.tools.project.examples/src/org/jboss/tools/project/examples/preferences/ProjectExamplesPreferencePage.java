@@ -154,8 +154,6 @@ public class ProjectExamplesPreferencePage extends PreferencePage implements
 		showInvalidSites.setText(Messages.ProjectExamplesPreferencePage_Show_invalid_sites);
 		showInvalidSites.setSelection(store.getBoolean(ProjectExamplesActivator.SHOW_INVALID_SITES));
 		
-		
-		
 		Group sitesGroup = new Group(composite,SWT.NONE);
 		sitesGroup.setText(Messages.ProjectExamplesPreferencePage_Sites);
 		GridLayout gl = new GridLayout(2,false);
