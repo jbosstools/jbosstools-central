@@ -68,9 +68,11 @@ public class GWTProjectConfigurator extends AbstractProjectConfigurator {
 				
 				log.debug("Configure Output location for GWT Project {}", projectName);
 				try {
-					IPath webContentPath = getWebContentFolder(projectConfig.getProject(), monitor);
-					IFolder outputWorkspaceFolder = projectConfig.getProject().getWorkspace().getRoot().getFolder(webContentPath);
-					WebAppProjectProperties.setLastUsedWarOutLocation(projectConfig.getProject(), outputWorkspaceFolder.getFullPath());
+					IPath webContentPath = ProjectHome.getFirstWebContentPath(projectConfig.getProject());
+					if(webContentPath!=null) {
+						IFolder outputWorkspaceFolder = projectConfig.getProject().getWorkspace().getRoot().getFolder(webContentPath);
+						WebAppProjectProperties.setLastUsedWarOutLocation(projectConfig.getProject(), outputWorkspaceFolder.getFullPath());
+					}
 				} catch (BackingStoreException e) {
 					logError("Exception in Maven GWT Configurator, cannot set war output location", e);
 				}
@@ -148,13 +150,5 @@ public class GWTProjectConfigurator extends AbstractProjectConfigurator {
 	private void logError(final String message, BackingStoreException e) {
 		log.error(message, e);
 		MavenGWTPlugin.log(message,e);
-	}
-	
-	private IPath getWebContentFolder(IProject project, IProgressMonitor monitor) throws CoreException {
-		IPath webContentPath = ProjectHome.getFirstWebContentPath(project);
-		Assert.isTrue(webContentPath != null && !webContentPath.isEmpty(),
-				MessageFormat
-						.format("No web content folder was found in project {0}", project.getName()));
-		return webContentPath;
 	}
 }
