@@ -328,7 +328,7 @@
                url="http://findbugs.sourceforge.net/">
          </overview>
       </connectorDescriptor>
-      <connectorDescriptor
+      <!-- JBDS-2189 remove <connectorDescriptor
             categoryId="org.jboss.tools.central.discovery.testing"
             groupId="org.jboss.tools.central.discovery.testing.local"
             description="Tool support for JSLint"
@@ -349,7 +349,7 @@
          <overview
                url="http://www.jslint.com/">
          </overview>
-      </connectorDescriptor>
+      </connectorDescriptor> -->
       <connectorDescriptor
             categoryId="org.jboss.tools.central.discovery.testing"
             groupId="org.jboss.tools.central.discovery.testing.local"
