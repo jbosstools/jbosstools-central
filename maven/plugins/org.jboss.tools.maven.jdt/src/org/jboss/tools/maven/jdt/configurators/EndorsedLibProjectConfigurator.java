@@ -132,7 +132,7 @@ public class EndorsedLibProjectConfigurator extends AbstractProjectConfigurator 
 		MojoExecution mojoExecution = getCompilerMojoExecution(mavenProjectFacade, session, monitor);
 		
 		//Parse <compilerArgument> for -Djava.endorsed.dirs 
-		String compilerArgument  = maven.getMojoParameterValue(session, mojoExecution, "compilerArgument", String.class);
+		String compilerArgument  = maven.getMojoParameterValue(session, mojoExecution, "compilerArgument", String.class);//
 		File[] javaEndorsedDirs = parseJavaEndorsedDirs(mavenProjectFacade.getProject(), compilerArgument);
 
 		//Check <compilerArguments> for <endorseddirs>
@@ -148,12 +148,29 @@ public class EndorsedLibProjectConfigurator extends AbstractProjectConfigurator 
 		if (compilerArgument == null) {
 			return null;
 		}
-		Matcher matcher = jAVA_ENDORSED_DIRS_PATTERN.matcher(compilerArgument);
-		if (matcher.matches()) {
-			String endorsedDirs = matcher.group(1);
-			return parseEndorsedDirs(project, endorsedDirs);
+		
+		//We can expect patterns like -Djava.endorsed.dirs=/path/white space/dir" "-Dfoo=bar
+		//as a workaround for maven-compiler-plugin  <compilerArgument> not handling multiple values correctly
+		//So instead of using rexeps to parse the path, we manually look for the presence of quotes and spaces
+		String key = "-Djava.endorsed.dirs=";
+		int start = compilerArgument.indexOf(key);
+		if (start < 0) {
+			return null;
 		}
-		return null;
+		File[] dirs = null;
+		int end = compilerArgument.indexOf("\"", start);
+		if (end < 0) {
+			end = compilerArgument.indexOf(" ", start);
+			if (end < 0) {
+				end = compilerArgument.length();
+			}
+		}
+		if (end > 0) {
+			String argument = compilerArgument.substring(start+key.length(), end);
+			dirs = parseEndorsedDirs(project, argument);
+			
+		}
+		return dirs;
 	}
 
 	private File[] parseEndorsedDirs(IProject project, String endorsedDirs) {
