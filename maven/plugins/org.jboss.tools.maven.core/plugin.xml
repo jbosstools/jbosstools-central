@@ -332,9 +332,4 @@
     	</provider>
   	</extension>
 
-    <extension point="org.eclipse.m2e.core.indexes">
-       <index indexId="jboss-releases-repository" isShort="true" 
-              repositoryUrl="https://repository.jboss.org/nexus/content/repositories/releases/">
-       </index>
-    </extension>  	
 </plugin>
