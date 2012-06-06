@@ -14,6 +14,7 @@ import java.io.File;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -74,6 +75,7 @@ import org.jboss.tools.project.examples.wizard.WizardContext;
  */
 public class ArchetypeExamplesWizardFirstPage extends MavenProjectWizardLocationPage implements IProjectExamplesWizardPage {
 
+	private static final String WORKING_SETS = "workingSets"; //$NON-NLS-1$
 	private static final String TARGET_RUNTIME = "targetRuntime"; //$NON-NLS-1$
 	private Label projectNameLabel;
 	private Combo projectNameCombo;
@@ -546,6 +548,18 @@ public class ArchetypeExamplesWizardFirstPage extends MavenProjectWizardLocation
 
 	@Override
 	public Map<String, Object> getPropertiesMap() {
+		try {
+			Field field = this.getClass().getSuperclass().getDeclaredField(WORKING_SETS);
+			field.setAccessible(true);
+			Object object = field.get(this);
+			if (object instanceof List<?>) {
+				Map<String, Object> propertiesMap = new HashMap<String, Object>();
+				propertiesMap.put(WORKING_SETS, object); 
+				return propertiesMap;
+			}
+		} catch (Exception e) {
+			MavenProjectExamplesActivator.log(e);
+		} 
 		return null;
 	}
 

@@ -108,7 +108,7 @@ public class NewProjectExamplesWizard2 extends Wizard implements INewWizard {
 			if (!ProjectExamplesActivator.MAVEN_ARCHETYPE.equals(projectExample.getImportType())) {
 				workingSets = locationPage.getWorkingSets();
 			} else {
-			// FIXME
+				// 
 			}
 			String type = projectExample.getImportType();
 			for (IProjectExamplesWizardPage contributedPage:contributedPages) {

@@ -24,6 +24,7 @@ import org.jboss.tools.project.examples.model.ProjectExample;
 
 public class NewProjectExamplesJob extends WorkspaceJob {
 
+	private static final String WORKING_SETS = "workingSets"; //$NON-NLS-1$
 	private List<ProjectExample> selectedProjects;
 	private List<ProjectExample> projects = new ArrayList<ProjectExample>();
 	private IWorkingSet[] workingSets;
@@ -70,6 +71,15 @@ public class NewProjectExamplesJob extends WorkspaceJob {
 					ProjectExamplesActivator.fixWelcome(project);
 				} else {
 					return Status.CANCEL_STATUS;
+				}
+				if (workingSets == null || workingSets.length == 0) {
+					if (propertiesMap != null) {
+						Object object = propertiesMap.get(WORKING_SETS);
+						if (object instanceof List<?>) {
+							List<IWorkingSet> list = (List<IWorkingSet>) object;
+							workingSets = list.toArray(new IWorkingSet[0]);
+						}
+					}
 				}
 				if (workingSets != null && workingSets.length > 0 && project.getIncludedProjects() != null) {
 					for (String projectName:project.getIncludedProjects()) {
