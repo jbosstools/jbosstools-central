@@ -1,15 +1,9 @@
 package org.jboss.tools.central.test.ui.bot;
 
-import static org.eclipse.swtbot.swt.finder.matchers.WidgetMatcherFactory.widgetOfType;
-
 import java.io.File;
 import java.io.FileNotFoundException;
 
-import org.eclipse.swt.widgets.Link;
-import org.eclipse.swtbot.eclipse.finder.waits.Conditions;
 import org.eclipse.swtbot.swt.finder.exceptions.WidgetNotFoundException;
-import org.eclipse.swtbot.swt.finder.utils.Traverse;
-import org.eclipse.swtbot.swt.finder.widgets.SWTBotMenu;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 import org.jboss.tools.ui.bot.ext.SWTBotFactory;
@@ -18,7 +12,7 @@ import org.jboss.tools.ui.bot.ext.SWTTestExt;
 import org.jboss.tools.ui.bot.ext.condition.NonSystemJobRunsCondition;
 import org.jboss.tools.ui.bot.ext.config.Annotations.Require;
 import org.jboss.tools.ui.bot.ext.config.Annotations.ServerType;
-import org.jboss.tools.ui.bot.ext.gen.ActionItem.Preference;
+import org.jboss.tools.ui.bot.ext.parts.SWTBotFormTextExt;
 import org.jboss.tools.ui.bot.ext.parts.SWTBotTwistie;
 import org.jboss.tools.ui.bot.ext.types.IDELabel;
 import org.jboss.tools.ui.bot.ext.view.ProblemsView;
@@ -29,11 +23,13 @@ import org.junit.Test;
 
 
 //TODO When testing new build try it with type=ServerType.EAP !!!!
-@Require(server=@org.jboss.tools.ui.bot.ext.config.Annotations.Server(type=ServerType.JbossAS))
+@Require(clearProjects=false,server=@org.jboss.tools.ui.bot.ext.config.Annotations.Server(type=ServerType.JbossAS))
 public class CreateProjectsWithServerTest extends SWTTestExt{
 	
 	@BeforeClass
 	public static void setup() throws FileNotFoundException{
+		util.closeAllEditors(false);
+		util.closeAllViews();
 		bot.menu("Window").menu("Preferences").click();
 		bot.waitForShell("Preferences");
 		bot.tree().getTreeItem("Maven").select();
@@ -44,7 +40,6 @@ public class CreateProjectsWithServerTest extends SWTTestExt{
 		if (configuredState.getServer().type.equalsIgnoreCase("EAP")){
 			setupEAP();
 		}
-		
 	}
 	/**
 	 * Sets up maven configuration file with configured EAP and WFK repository and clears ~/.m2/clean-repository 
@@ -52,7 +47,6 @@ public class CreateProjectsWithServerTest extends SWTTestExt{
 	 * @throws FileNotFoundException 
 	 */
 	private static void setupEAP() throws FileNotFoundException{
-		log.info("A mame tady EAPcko !!!!!!");
 		String mvnConfigFileName = System.getProperty("eap.maven.config.file");
 		File mvnConfigFile;
 		try {
@@ -107,7 +101,7 @@ public class CreateProjectsWithServerTest extends SWTTestExt{
 		
 	}
 	
-	@Test
+//	@Test
 	public void createProjectsSectionTest(){
 		//Dynamic web project
 		bot.hyperlink(IDELabel.JBossCentralEditor.DYNAMIC_WEB_PROJECT).click();
@@ -139,7 +133,7 @@ public class CreateProjectsWithServerTest extends SWTTestExt{
 		projectExampleShell.close();
 		
 		//check the rest of project examples
-		checkExample(null, IDELabel.JBossCentralEditor.JAVA_EE_WEB_PROJECT, false);
+		checkExample(null, IDELabel.JBossCentralEditor.JAVA_EE_WEB_PROJECT, true);
 		checkExample(null, IDELabel.JBossCentralEditor.JAVA_EE_PROJECT, true);
 		checkExample(null, IDELabel.JBossCentralEditor.HTML5_PROJECT, true);
 		checkExample(null, IDELabel.JBossCentralEditor.RICHFACES_PROJECT, true);
@@ -238,7 +232,12 @@ public class CreateProjectsWithServerTest extends SWTTestExt{
 		if (formsBot==null){
 			bot.hyperlink(formText).click();
 		}else{
-			formsBot.formTextWithText(formText).click();
+			try{
+				formsBot.formTextWithText(formText).click();
+			}catch(WidgetNotFoundException wnfex){
+				throw new WidgetNotFoundException("Could not found widget of type Hyperlink and text " +
+						formText, wnfex);
+			}
 		}
 		bot.waitForShell(IDELabel.JBossCentralEditor.PROJECT_EXAMPLE);
 		SWTBotWizard wizard = new SWTBotWizard(bot.shell(IDELabel.JBossCentralEditor.PROJECT_EXAMPLE).widget);
