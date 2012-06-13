@@ -1,6 +1,7 @@
 package org.jboss.tools.maven.configurators.tests;
 
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.jpt.jpa.core.JpaFacet;
 import org.eclipse.jpt.jpa.core.JpaProject;
 import org.eclipse.jpt.jpa.core.JpaProjectManager;
@@ -22,8 +23,9 @@ public class JpaConfiguratorTest extends AbstractMavenConfiguratorTest {
 		
 		assertIsJpaProject(project, JpaFacet.VERSION_2_0);
 		assertNoErrors(project);
-		JpaProjectManager manager = JptJpaCorePlugin.getJpaProjectManager();
-		JpaProject jpa = manager.getJpaProject(project);
+		JpaProjectManager manager = JptJpaCorePlugin.getJpaProjectManager(ResourcesPlugin.getWorkspace());
+		JpaProject jpa = (JpaProject)project.getAdapter(JpaProject.class); 
+		//manager.getJpaProject(project);
 		String pid = jpa.getJpaPlatform().getId(); 
 		assertTrue(pid + " is not the expected platform", pid.startsWith("eclipselink") || pid.startsWith("generic"));
 		
@@ -31,7 +33,8 @@ public class JpaConfiguratorTest extends AbstractMavenConfiguratorTest {
 		waitForJobsToComplete();
 		assertIsJpaProject(project, JpaFacet.VERSION_1_0);
 		assertNoErrors(project);
-		jpa = manager.getJpaProject(project);
+		jpa = (JpaProject)project.getAdapter(JpaProject.class);
+		//jpa = manager.getJpaProject(project);
 		pid = jpa.getJpaPlatform().getId(); 
 		assertTrue(pid + " is not the expected hibernate platform", pid.startsWith("hibernate") || pid.startsWith("generic"));
 	}	
