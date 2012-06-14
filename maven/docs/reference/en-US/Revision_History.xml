@@ -1,0 +1,23 @@
+<?xml version='1.0' encoding='utf-8' ?>
+
+<appendix id="appe-Beginners_Guide-Revision_History">
+	<title>Revision History</title>
+	<simpara>
+		<revhistory>
+			<revision>
+				<revnumber>0-0</revnumber>
+				<date>Mon May 21 2012</date>
+				<author>
+					<firstname>Isaac</firstname>
+					<surname>Rooskov</surname>
+				</author>
+				<revdescription>
+					<simplelist>
+						<member>Initial creation of book</member>
+					</simplelist>
+				</revdescription>
+			</revision>
+		</revhistory>
+	</simpara>
+</appendix>
+

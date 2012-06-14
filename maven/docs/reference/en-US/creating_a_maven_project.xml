@@ -1,0 +1,105 @@
+<chapter id="creating_a_maven_project">
+	<title>Creating a Maven Project</title>
+	<para>
+		To create a new <guilabel>Maven Project</guilabel>, from your workspace navigate to <menuchoice><guimenuitem>File</guimenuitem><guimenuitem>New</guimenuitem><guimenuitem>Other</guimenuitem></menuchoice> and from the wizard selection screen select <menuchoice><guimenuitem>Maven</guimenuitem><guimenuitem>Maven Project</guimenuitem></menuchoice>.
+	</para>
+	<figure id="application_creation_01">
+		<title>Selecting the Maven Project wizard</title>
+		<mediaobject>
+			<imageobject>
+				<imagedata fileref="images/application_creation/application_creation_01.png" format="PNG" />
+			</imageobject>
+			<textobject>
+				<phrase>
+					Wizard selection screen with the Maven Project wizard selected.
+				</phrase>
+			</textobject>
+		</mediaobject>
+	</figure>
+	<para>
+		The first screen of the wizard will ask you if you wish to create a simple project (selecting this will skip the ability to select an arhetype), to select a location for the project and if any projects should be added to the working set.
+	</para>
+	<figure id="application_creation_02">
+		<title>Maven project location and basic settings</title>
+		<mediaobject>
+			<imageobject>
+				<imagedata fileref="images/application_creation/application_creation_02.png" format="PNG" />
+			</imageobject>
+			<textobject>
+				<phrase>
+					First screen of the wizard - basic settings.
+				</phrase>
+			</textobject>
+		</mediaobject>
+	</figure>
+	<para>
+		You can also select <guilabel>Advanced</guilabel> options concerning existing workspace projects and the naming convention to use. 
+	</para>
+	<figure id="application_creation_03">
+		<title>Maven project location and advanced settings</title>
+		<mediaobject>
+			<imageobject>
+				<imagedata fileref="images/application_creation/application_creation_03.png" format="PNG" />
+			</imageobject>
+			<textobject>
+				<phrase>
+					First screen of the wizard - advanced settings.
+				</phrase>
+			</textobject>
+		</mediaobject>
+	</figure>
+	<para>
+		The following screen is the <guilabel>Archetype</guilabel> selection screen, and will only appear when you have not selected to create a <guilabel>simple project</guilabel> on the previous screen.
+	</para>
+	<para>
+		Select an archetype based on the purpose of the project you are creating.
+	</para>
+	<figure id="application_creation_04">
+		<title>Archetype selection</title>
+		<mediaobject>
+			<imageobject>
+				<imagedata fileref="images/application_creation/application_creation_04.png" format="PNG" />
+			</imageobject>
+			<textobject>
+				<phrase>
+					Archetype selection - quickstart archetype selected as an example.
+				</phrase>
+			</textobject>
+		</mediaobject>
+	</figure>
+	<para>
+		The final screen of the wizard is where you will set the <guilabel>Group Id</guilabel>, <guilabel>Artifact Id</guilabel> and project <guilabel>Version</guilabel>. The <guilabel>Package</guilabel> name will be created based on the <guilabel>Group Id</guilabel> and <guilabel>Artifact Id</guilabel> values. 
+	</para>
+	<para>
+		You can also add specific properties associated with the chosen archetype, to the project.
+	</para>
+	<figure id="application_creation_05">
+		<title>Final project naming</title>
+		<mediaobject>
+			<imageobject>
+				<imagedata fileref="images/application_creation/application_creation_05.png" format="PNG" />
+			</imageobject>
+			<textobject>
+				<phrase>
+					Naming of the final project and archetype properties selection.
+				</phrase>
+			</textobject>
+		</mediaobject>
+	</figure>
+	<para>
+		Clicking <guibutton>Finish</guibutton> will bring back to the workbench and your Maven project will appear in the <guilabel>Project Explorer</guilabel>.
+	</para>
+	<figure id="application_creation_06">
+		<title>Project in the Project Explorer</title>
+		<mediaobject>
+			<imageobject>
+				<imagedata fileref="images/application_creation/application_creation_06.png" format="PNG" />
+			</imageobject>
+			<textobject>
+				<phrase>
+					The project is now available from the Project Explorer.
+				</phrase>
+			</textobject>
+		</mediaobject>
+	</figure>
+</chapter>

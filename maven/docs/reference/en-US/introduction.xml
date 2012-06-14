@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<chapter id="introduction">
+	<title>Introduction</title>
+	<para>
+		In the context of application development, Maven allows you to extend your applicaitons by referencing and utilizing resources from local and remote repositories.
+	</para>
+	<para>
+		Covered in this reference guide is how to create Maven projects and modules, and how to add Maven functionality to an existing project or application.
+	</para>
+	<para>
+		This guide does not cover how to setup a Maven repository. For information on how to setup a Maven repository consult the documentation associated with your application server or framework kit.
+	</para>
+</chapter>
