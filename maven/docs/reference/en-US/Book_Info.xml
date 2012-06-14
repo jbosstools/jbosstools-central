@@ -1,0 +1,35 @@
+<?xml version='1.0' encoding='utf-8' ?>
+<!DOCTYPE bookinfo PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd" [
+]>
+<bookinfo id="book-Maven_Integration_Guide-Maven_Integration_Guide">
+  <title>Maven Tools Reference Guide</title> 
+  <subtitle>
+    Provides information about the use of <application>Maven</application> within the <application>JBoss Developer Studio</application>.
+  </subtitle>
+   
+  <productname>JBoss Developer Studio</productname>
+   
+  <productnumber>5.0</productnumber>
+   
+  <edition>5.0.0</edition>
+   
+  <pubsnumber>3</pubsnumber>
+   
+  <abstract>
+    <para>
+      The Maven Tools Reference Guide explains how to utilize Maven from within the JBoss Developer Studio.
+    </para>
+  </abstract>
+   
+  <corpauthor>
+    <inlinemediaobject>
+      <imageobject>
+        <imagedata fileref="Common_Content/images/title_logo.svg" format="SVG" />
+      </imageobject>
+    </inlinemediaobject>
+  </corpauthor>
+   
+  <xi:include href="Common_Content/Legal_Notice.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+   
+  <xi:include href="Author_Group.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+</bookinfo>

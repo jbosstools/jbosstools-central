@@ -1,0 +1,168 @@
+<chapter id="creating_a_maven_application">
+	<title>Creating a Maven Module</title>
+	<para>
+		A Maven module is a sub-project. To create a Maven module you will need to already have a Maven project available.
+	</para>
+	<para>
+		The parent project must have its <guilabel>Packaing</guilabel> option be pre-configured to <guimenuitem>pom</guimenuitem> for a module to be created and associated to it. To ensure your parent project has this option set correctly before proceeding, double-click on the <filename>pom.xml</filename> file of your parent project in the <guilabel>Project Explorer</guilabel>. 
+	</para>
+	<para>
+		In the <guilabel>Overview</guilabel> settings page that is now displayed in your workbench, confirm that the option <guibutton>Packaging</guibutton> is set to <guimenuitem>pom</guimenuitem>. If it is not, select <guimenuitem>pom</guimenuitem> from the list menu and save the changes to your <filename>pom.xml</filename> file.
+	</para>
+	<figure id="module_creation_01">
+		<title>Parent project pom.xml file settings</title>
+		<mediaobject>
+			<imageobject>
+				<imagedata fileref="images/module_creation/module_creation_01.png" format="PNG" />
+			</imageobject>
+			<textobject>
+				<phrase>
+					The settings associated with the pom.xml file of the parent project.
+				</phrase>
+			</textobject>
+		</mediaobject>
+	</figure>
+	<para>
+		From your workspace navigate to <menuchoice><guimenuitem>File</guimenuitem><guimenuitem>New</guimenuitem><guimenuitem>Other</guimenuitem></menuchoice> and from the wizard selection screen select <menuchoice><guimenuitem>Maven</guimenuitem><guimenuitem>Maven Module</guimenuitem></menuchoice>.
+	</para>
+	<figure id="module_creation_02">
+		<title>Selecting the Maven Module wizard</title>
+		<mediaobject>
+			<imageobject>
+				<imagedata fileref="images/module_creation/module_creation_02.png" format="PNG" />
+			</imageobject>
+			<textobject>
+				<phrase>
+					Wizard selection screen with the Maven Module wizard selected.
+				</phrase>
+			</textobject>
+		</mediaobject>
+	</figure>
+	<para>
+		Type a name for the module in the <guilabel>Module Name</guilabel> field. 
+	</para>
+	<figure id="module_creation_03">
+		<title>Naming the module</title>
+		<mediaobject>
+			<imageobject>
+				<imagedata fileref="images/module_creation/module_creation_03.png" format="PNG" />
+			</imageobject>
+			<textobject>
+				<phrase>
+					Typing a name for the module.
+				</phrase>
+			</textobject>
+		</mediaobject>
+	</figure>
+	<para>
+		Click the <guibutton>Browse</guibutton> button beside the <guilabel>Parent Project</guilabel> field. This will launch a project selection box. 
+	</para>
+	<para>
+		Select the project to be used as the parent project of the module you are creating, and click <guibutton>OK</guibutton>.
+	</para>
+	<figure id="module_creation_04">
+		<title>Selecting the parent project</title>
+		<mediaobject>
+			<imageobject>
+				<imagedata fileref="images/module_creation/module_creation_04.png" format="PNG" />
+			</imageobject>
+			<textobject>
+				<phrase>
+					Selecting the project that will be the parent project of the module.
+				</phrase>
+			</textobject>
+		</mediaobject>
+	</figure>
+	<para>
+		You will be returned to the <guilabel>Select a parent project</guilabel> screen and the <guilabel>Parent Project</guilabel> field will contain the name of the project you selected.
+	</para>
+	<figure id="module_creation_05">
+		<title>Parent Project field populated with project name</title>
+		<mediaobject>
+			<imageobject>
+				<imagedata fileref="images/module_creation/module_creation_05.png" format="PNG" />
+			</imageobject>
+			<textobject>
+				<phrase>
+					The Select a parent project screen with the Parent Project field now containing the name of the selected project.
+				</phrase>
+			</textobject>
+		</mediaobject>
+	</figure>
+	<para>
+		Click the <guibutton>Next</guibutton> button.
+	</para>
+	<para>
+		Select an archetype available in the list displayed. For the purposes of this example the <guimenuitem>maven-archetype-quickstart</guimenuitem> is selected.
+	</para>
+	<figure id="module_creation_06">
+		<title>Archetype selection screen</title>
+		<mediaobject>
+			<imageobject>
+				<imagedata fileref="images/module_creation/module_creation_06.png" format="PNG" />
+			</imageobject>
+			<textobject>
+				<phrase>
+					Selecting an archetype for the module.
+				</phrase>
+			</textobject>
+		</mediaobject>
+	</figure>
+	<para>
+		Click the <guibutton>Next</guibutton> button.
+	</para>
+	<para>
+		Specify archetype parameters <guilabel>Group Id</guilabel> and <guilabel>Version</guilabel>. Ensure that the values you specify for these fields are unique from those set in the parent project.
+	</para>
+	<para>
+		In this example, the <guilabel>Group Id</guilabel> and <guilabel>Version</guilabel> settings of the parent project used are set to <property>group_id</property> and <property>0.0.1-SNAPSHOT</property> respectively. For the module <guilabel>Group Id</guilabel> and <guilabel>Version</guilabel> settings are being specified as <property>sub_group_id</property> and <property>0.1.1-SNAPSHOT</property> respectively, to avoid conflict.
+	</para>
+	<figure id="module_creation_07">
+		<title>Archetype parameter settings</title>
+		<mediaobject>
+			<imageobject>
+				<imagedata fileref="images/module_creation/module_creation_07.png" format="PNG" />
+			</imageobject>
+			<textobject>
+				<phrase>
+					Specifying the settings to be used by the archetype for the module being created.
+				</phrase>
+			</textobject>
+		</mediaobject>
+	</figure>
+	<para>
+		Click the <guibutton>Finish</guibutton> button.
+	</para>
+	<para>
+		The module will now be created and appear in your <guilabel>Project Explorer</guilabel>.
+	</para>
+	<figure id="module_creation_08">
+		<title>Created module in the Project Explorer</title>
+		<mediaobject>
+			<imageobject>
+				<imagedata fileref="images/module_creation/module_creation_08.png" format="PNG" />
+			</imageobject>
+			<textobject>
+				<phrase>
+					The module has now been created and appears in the Project Explorer.
+				</phrase>
+			</textobject>
+		</mediaobject>
+	</figure>
+	<para>
+		You can view and change settings associated with the module by selecting the module's <filename>pom.xml</filename> file from the <guilabel>Project Explorer</guilabel> and double-clicking on it. This will launch an <guilabel>Overview</guilabel> screen containing the module settings.
+	</para>
+	<figure id="module_creation_09">
+		<title>Module Overview screen</title>
+		<mediaobject>
+			<imageobject>
+				<imagedata fileref="images/module_creation/module_creation_09.png" format="PNG" />
+			</imageobject>
+			<textobject>
+				<phrase>
+					The module Overview page, where settings can be viewed and changed.
+				</phrase>
+			</textobject>
+		</mediaobject>
+	</figure>
+</chapter>
