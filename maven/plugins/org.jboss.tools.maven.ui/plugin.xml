@@ -154,7 +154,7 @@
     <wizard
           category="org.jboss.ide.eclipse.ui.wizards"
           class="org.jboss.tools.maven.ui.wizard.ConfigureMavenRepositoriesWizard"
-          icon="icons/repo_wiz.gif"
+          icon="icons/configure_maven_repo.gif"
           id="org.jboss.tools.maven.ui.wizard.ConfigureMavenRepositoriesWizard"
           name="%Configure_Maven_Repositories">
     </wizard>
