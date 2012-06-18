@@ -1,0 +1,108 @@
+<chapter id="adding_maven_support">
+	<title>Adding Maven support to an existing project</title>
+	<para>
+		Select the project that Maven support will be added to from the <guilabel>Project Explorer</guilabel>.
+	</para>
+	<figure id="adding_maven_support_00">
+		<title>Selecting Maven project conversion</title>
+		<mediaobject>
+			<imageobject>
+				<imagedata fileref="images/adding_maven_support/adding_maven_support_00.png" format="PNG" />
+			</imageobject>
+			<textobject>
+				<phrase>
+					Selecting Convert to Maven Project from the context menu of the chosen project.
+				</phrase>
+			</textobject>
+		</mediaobject>
+	</figure>
+	<para>
+		Right-click on the project to bring up the context menu.
+	</para>
+	<para>
+		From the context menu navigate to <menuchoice><guimenuitem>Configure</guimenuitem><guimenuitem>Convert to Maven Project</guimenuitem></menuchoice>.
+	</para>
+	<figure id="adding_maven_support_01">
+		<title>Selecting Maven project conversion</title>
+		<mediaobject>
+			<imageobject>
+				<imagedata fileref="images/adding_maven_support/adding_maven_support_01.png" format="PNG" />
+			</imageobject>
+			<textobject>
+				<phrase>
+					Selecting Convert to Maven Project from the context menu of the chosen project.
+				</phrase>
+			</textobject>
+		</mediaobject>
+	</figure>
+	<para>
+		Click on the <guimenuitem>Convert to Maven Project</guimenuitem> menu option.
+	</para>
+	<para>
+		A <guilabel>Maven POM</guilabel> wizard will launch. The wizard will create a <filename>pom.xml</filename> file for your project. This file will contain the projects Maven settings. All necessary fields of the wizard will be automatically filled.
+	</para>
+	<figure id="adding_maven_support_02">
+		<title>Maven POM wizard</title>
+		<mediaobject>
+			<imageobject>
+				<imagedata fileref="images/adding_maven_support/adding_maven_support_02.png" format="PNG" />
+			</imageobject>
+			<textobject>
+				<phrase>
+					The wizard to create a <filename>pom.xml</filename> file for your project.
+				</phrase>
+			</textobject>
+		</mediaobject>
+	</figure>
+	<para>
+		It is recommended that you change the <guilabel>Packaging</guilabel> option to <guimenuitem>pom</guimenuitem> to avoid any issues in expansion of the project with Maven modules in the future.
+	</para>
+	<figure id="adding_maven_support_03">
+		<title>Changing Packaging setting to pom</title>
+		<mediaobject>
+			<imageobject>
+				<imagedata fileref="images/adding_maven_support/adding_maven_support_03.png" format="PNG" />
+			</imageobject>
+			<textobject>
+				<phrase>
+					Showing the selection of pom from the drop-down menu of the Packaging setting.
+				</phrase>
+			</textobject>
+		</mediaobject>
+	</figure>
+	<para>
+		Click <guibutton>Finish</guibutton>.
+	</para>
+	<para>
+		Once Maven support has been added to the project, a new <filename>pom.xml</filename> file will appear in the list of files for the project. This can be viewed in the <guilabel>Project Explorer</guilabel>.
+	</para>
+	<figure id="adding_maven_support_04">
+		<title>New pom.xml file</title>
+		<mediaobject>
+			<imageobject>
+				<imagedata fileref="images/adding_maven_support/adding_maven_support_04.png" format="PNG" />
+			</imageobject>
+			<textobject>
+				<phrase>
+					The project now has a new pom.xml file, seen in the Project Explorer.
+				</phrase>
+			</textobject>
+		</mediaobject>
+	</figure>
+	<para>
+		Double-click on the <filename>pom.xml</filename> file to view the settings associated with it. The settings here were set in the <guilabel>Maven POM</guilabel> wizard and can be edited from this <guilabel>Overview</guilabel> screen.
+	</para>
+	<figure id="adding_maven_support_05">
+		<title>Overview screen for pom.xml</title>
+		<mediaobject>
+			<imageobject>
+				<imagedata fileref="images/adding_maven_support/adding_maven_support_05.png" format="PNG" />
+			</imageobject>
+			<textobject>
+				<phrase>
+					The Overview screen for the new pom.xml file.
+				</phrase>
+			</textobject>
+		</mediaobject>
+	</figure>
+</chapter>
