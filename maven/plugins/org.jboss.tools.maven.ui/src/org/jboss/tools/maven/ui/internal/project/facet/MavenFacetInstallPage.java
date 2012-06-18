@@ -157,11 +157,11 @@ IFacetWizardPage {
 				if ("2.0".equals(seamFacetVersion.getVersionString())) { //$NON-NLS-1$
 					seamVersion.setText("2.0.2.SP1"); //$NON-NLS-1$
 				} else if ("2.1".equals(seamFacetVersion.getVersionString())) { //$NON-NLS-1$ 
-					seamVersion.setText("2.1.1.GA"); //$NON-NLS-1$
+					seamVersion.setText("2.1.2.GA"); //$NON-NLS-1$
 				} else if ("2.2".equals(seamFacetVersion.getVersionString())) { //$NON-NLS-1$
-					seamVersion.setText("2.2.1.Final"); //$NON-NLS-1$
+					seamVersion.setText("2.2.2.Final"); //$NON-NLS-1$
 				} else if ("2.3".equals(seamFacetVersion.getVersionString())) { //$NON-NLS-1$
-					seamVersion.setText("2.3.0.ALPHA"); //$NON-NLS-1$
+					seamVersion.setText("2.3.0.Beta2"); //$NON-NLS-1$
 				}
 				Button removeWTPContainers = new Button(composite,SWT.CHECK);
 				removeWTPContainers.setText(Messages.MavenFacetInstallPage_Remove_WTP_Classpath_containers);
