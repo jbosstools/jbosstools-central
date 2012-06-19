@@ -912,6 +912,9 @@ public class MavenSeamActivator extends AbstractUIPlugin {
 			webProjectName = seamFacetModel.getStringProperty(IFacetDataModelProperties.FACET_PROJECT_NAME);
 			
 			IProject seamWebProject = ResourcesPlugin.getWorkspace().getRoot().getProject(webProjectName);
+			
+			MavenCoreActivator.addCompilerPlugin(model.getBuild().getPluginManagement().getPlugins(), seamWebProject);
+			
 			IPath location = seamWebProject.getLocation().removeLastSegments(1);
 			location = location.append(parentProjectName);
 			MavenCoreActivator.createMavenProject(parentProjectName, null, model, false, location);

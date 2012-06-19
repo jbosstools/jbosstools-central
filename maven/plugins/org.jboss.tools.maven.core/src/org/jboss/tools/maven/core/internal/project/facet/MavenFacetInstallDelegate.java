@@ -114,7 +114,7 @@ public class MavenFacetInstallDelegate implements IDelegate {
 				}
 				IProjectFacet seamFacet = ProjectFacetsManager.getProjectFacet(SEAM_FACET_ID);
 				if (!"pom".equals(packaging) && !fpwc.hasProjectFacet(seamFacet)) {
-					MavenCoreActivator.addCompilerPlugin(build, project);
+					MavenCoreActivator.addCompilerPlugin(build.getPlugins(), project);
 				}
 
 				if (!pom.exists()) {
