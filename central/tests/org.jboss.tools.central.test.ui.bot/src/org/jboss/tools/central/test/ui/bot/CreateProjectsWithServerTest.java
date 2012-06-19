@@ -9,7 +9,9 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 import org.jboss.tools.ui.bot.ext.SWTBotFactory;
 import org.jboss.tools.ui.bot.ext.SWTFormsBotExt;
 import org.jboss.tools.ui.bot.ext.SWTTestExt;
+import org.jboss.tools.ui.bot.ext.Timing;
 import org.jboss.tools.ui.bot.ext.condition.NonSystemJobRunsCondition;
+import org.jboss.tools.ui.bot.ext.condition.TaskDuration;
 import org.jboss.tools.ui.bot.ext.config.Annotations.Require;
 import org.jboss.tools.ui.bot.ext.config.Annotations.ServerType;
 import org.jboss.tools.ui.bot.ext.parts.SWTBotFormTextExt;
@@ -101,7 +103,7 @@ public class CreateProjectsWithServerTest extends SWTTestExt{
 		
 	}
 	
-//	@Test
+	@Test
 	public void createProjectsSectionTest(){
 		//Dynamic web project
 		bot.hyperlink(IDELabel.JBossCentralEditor.DYNAMIC_WEB_PROJECT).click();
@@ -118,7 +120,7 @@ public class CreateProjectsWithServerTest extends SWTTestExt{
 		assertTrue("New OpenShift Express Application window should have appeared", bot.activeShell().getText().equals(IDELabel.JBossCentralEditor.OPENSHIFT_APP_WIZARD));
 		//assertTrue("New OpenShift Express Application window should have appeared", bot.shell(IDELabel.JBossCentralEditor.OPENSHIFT_APP_WIZARD).isActive());
 		bot.activeShell().close();
-		
+		bot.waitWhile(new NonSystemJobRunsCondition());
 		bot.hyperlink(IDELabel.JBossCentralEditor.JAVA_EE_WEB_PROJECT).click();
 		SWTBotShell projectExampleShell = bot.waitForShell(IDELabel.JBossCentralEditor.PROJECT_EXAMPLE);
 		assertTrue("Project Example window should have appeared", bot.shell(IDELabel.JBossCentralEditor.PROJECT_EXAMPLE).isActive());
@@ -171,6 +173,12 @@ public class CreateProjectsWithServerTest extends SWTTestExt{
 	 */
 	public void canBeDeployedTest(){
 		servers.show();
+		try{
+			bot.viewByTitle("Project Explorer").close();
+		}catch (WidgetNotFoundException ex){
+			//do nothing
+			log.info("Project Explorer is already closed");
+		}
 		String serverName = bot.tree().getAllItems()[0].getText().substring(0, bot.tree().getAllItems()[0].getText().indexOf(' '));
 		servers.findServerByName(servers.bot().tree(), serverName).contextMenu("Add and Remove...").click();
 		bot.shell("Add and Remove...").activate();
@@ -182,7 +190,7 @@ public class CreateProjectsWithServerTest extends SWTTestExt{
 		}
 		bot.clickButton("Finish");
 		servers.show();
-		bot.waitWhile(new NonSystemJobRunsCondition());
+		bot.waitWhile(new NonSystemJobRunsCondition(), TaskDuration.LONG.getTimeout());
 		assertNull("Errors node should be null", ProblemsView.getErrorsNode(bot));
 		servers.show();
 		bot.waitWhile(new NonSystemJobRunsCondition());

@@ -23,7 +23,7 @@ public class DocumentationSectionTest extends SWTTestExt {
 	public void documentationSectionTest(){
 		testHyperlinkToBrowser("New and Noteworthy");
 		testHyperlinkToBrowser("User Forum");
-		//testHyperlinkToBrowser("Reference");
+		testHyperlinkToBrowser("Reference");
 		testHyperlinkToBrowser("Developer Forum");
 		testHyperlinkToBrowser("FAQ");
 		testHyperlinkToBrowser("Wiki");
