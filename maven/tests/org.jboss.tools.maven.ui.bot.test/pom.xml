@@ -13,10 +13,70 @@
 	<packaging>eclipse-test-plugin</packaging>
 
 	<properties>
-		<systemProperties>-Djbosstools.test.jboss.home.6.0=${requirement.build.root}/jboss-6.0.0.Final -Djbosstools.test.jboss.home.5.1=${requirement.build.root}/jboss-5.1.0.GA -Djbosstools.test.seam.2.0.1.GA.home=${requirement.build.root}/jboss-seam-2.2.0.GA</systemProperties>
+		<systemProperties>-Djbosstools.test.jboss.home.6.0=${project.build.directory}/jboss-6.0.0.Final -Djbosstools.test.jboss.home.5.1=${project.build.directory}/jboss-5.1.0.GA -Djbosstools.test.seam.2.0.1.GA.home=${project.build.directory}/jboss-seam-2.2.0.GA</systemProperties>
 	</properties>
 	<build>
 		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-dependency-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>install-as-6.0.0</id>
+						<phase>pre-integration-test</phase>
+						<goals>
+							<goal>unpack</goal>
+						</goals>
+						<configuration>
+							<artifactItems>
+								<artifactItem>
+										<groupId>org.jboss.jbossas</groupId>
+										<artifactId>jboss-as-distribution</artifactId>
+										<version>6.0.0.Final</version>
+										<type>zip</type>
+									</artifactItem>
+								</artifactItems>
+							<outputDirectory>${project.build.directory}</outputDirectory>
+							<skip>${swtbot.test.skip}</skip>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>com.googlecode.maven-download-plugin</groupId>
+				<artifactId>maven-download-plugin</artifactId>
+				<version>0.2-SNAPSHOT</version>
+				<executions>
+					<execution>
+						<id>install-seam</id>
+						<phase>pre-integration-test</phase>
+						<goals>
+							<goal>wget</goal>
+						</goals>
+						<configuration>
+							<skip>${swtbot.test.skip}</skip>
+							<url>http://repository.jboss.org/sourceforge/jboss-seam-2.2.0.GA.zip</url>
+							<unpack>true</unpack>
+							<outputDirectory>${project.build.directory}</outputDirectory>
+							<md5>febaf032f989240fe3828a8f0f7fe98a</md5>
+						</configuration>
+					</execution>
+					<execution>
+						<id>install-as-5.1.0</id>
+						<phase>pre-integration-test</phase>
+						<goals>
+							<goal>wget</goal>
+						</goals>
+						<configuration>
+							<skip>${swtbot.test.skip}</skip>
+							<url>http://repository.jboss.org/sourceforge/jboss-5.1.0.GA.zip</url>
+							<md5>78322c75ca0c13002a04418b4a8bc920</md5>
+							<unpack>true</unpack>
+							<outputDirectory>${project.build.directory}</outputDirectory>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
 			<plugin>
 				<groupId>org.eclipse.tycho</groupId>
 				<artifactId>tycho-surefire-plugin</artifactId>
