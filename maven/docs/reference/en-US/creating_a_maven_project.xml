@@ -87,7 +87,7 @@
 		</mediaobject>
 	</figure>
 	<para>
-		Clicking <guibutton>Finish</guibutton> will bring back to the workbench and your Maven project will appear in the <guilabel>Project Explorer</guilabel>.
+		Clicking <guibutton>Finish</guibutton> will bring you back to the workbench and your Maven project will appear in the <guilabel>Project Explorer</guilabel>.
 	</para>
 	<figure id="application_creation_06">
 		<title>Project in the Project Explorer</title>
