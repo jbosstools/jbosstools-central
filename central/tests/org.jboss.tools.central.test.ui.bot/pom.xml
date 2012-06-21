@@ -14,7 +14,7 @@
 	<packaging>eclipse-test-plugin</packaging>
 	<properties>
 		<additionalSystemProperties></additionalSystemProperties>
-		<jbosstools.test.jbossas.home>${project.build.directory}/requirements/jboss-as-7.1.1.Final</jbosstools.test.jbossas.home>
+		<jbosstools.test.jbossas.home>${requirementsDirectory}/jboss-as-7.1.1.Final</jbosstools.test.jbossas.home>
 		<!-- for debugging ucomment and comment next line <systemProperties>-Xdebug -Xrunjdwp:transport=dt_socket,address=8001,server=y,suspend=y -Djbosstools.test.jbossas.home=${jbosstools.test.jbossas.home}  -Dswtbot.test.properties.file=${swtbot.properties}</systemProperties> -->
 		<systemProperties>${additionalSystemProperties} -Djbosstools.test.jbossas.home=${jbosstools.test.jbossas.home} -Dswtbot.test.properties.file=${swtbot.properties}</systemProperties>
 	</properties>
@@ -51,7 +51,6 @@
 									<type>zip</type>
 								</artifactItem>
 							</artifactItems>
-							<outputDirectory>${project.build.directory}/requirements</outputDirectory>
 						</configuration>
 					</execution>
 				</executions>
