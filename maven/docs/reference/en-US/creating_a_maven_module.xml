@@ -4,7 +4,7 @@
 		A Maven module is a sub-project. To create a Maven module you will need to already have a Maven project available.
 	</para>
 	<para>
-		The parent project must have its <guilabel>Packaging</guilabel> option be pre-configured to <guimenuitem>pom</guimenuitem>, for a module to be created and associated with it. To ensure your parent project has this option set correctly before proceeding, double-click on the <filename>pom.xml</filename> file of your parent project in the <guilabel>Project Explorer</guilabel>. 
+		The parent project must have its <guilabel>Packaging</guilabel> option pre-configured to <guimenuitem>pom</guimenuitem>, for a module to be created and associated with it. To ensure your parent project has this option set correctly before proceeding, double-click on the <filename>pom.xml</filename> file of your parent project in the <guilabel>Project Explorer</guilabel>. 
 	</para>
 	<para>
 		In the <guilabel>Overview</guilabel> settings page that is now displayed in your workbench, confirm that the option <guibutton>Packaging</guibutton> is set to <guimenuitem>pom</guimenuitem>. If it is not, select <guimenuitem>pom</guimenuitem> from the list menu and save the changes to your <filename>pom.xml</filename> file.

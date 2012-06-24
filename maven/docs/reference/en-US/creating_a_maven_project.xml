@@ -17,7 +17,7 @@
 		</mediaobject>
 	</figure>
 	<para>
-		The first screen of the wizard will ask you if you wish to create a simple project (selecting this will skip the ability to select an arhetype), to select a location for the project and if any projects should be added to the working set.
+		The first screen of the wizard will ask you if you wish to create a simple project (selecting this will skip the ability to select an archetype), to select a location for the project and if any projects should be added to the working set.
 	</para>
 	<figure id="application_creation_02">
 		<title>Maven project location and basic settings</title>
