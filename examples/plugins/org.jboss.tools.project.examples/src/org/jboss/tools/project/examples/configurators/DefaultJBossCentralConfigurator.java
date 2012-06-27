@@ -47,7 +47,7 @@ public class DefaultJBossCentralConfigurator implements
 	// see pom.xml for actual value -- this is passed it at build-time via Maven
 	private static final String JBOSS_DIRECTORY_URL;
 
-	private static final String JBOSS_RUNTIME_URL_DEFAULT = "http://download.jboss.org/examples/download_runtimes.xml"; //$NON-NLS-1$
+	private static final String JBOSS_RUNTIME_URL_DEFAULT = "http://download.jboss.org/jbosstools/examples/download_runtimes.xml"; //$NON-NLS-1$
 	
 	private static final String JBOSS_RUNTIME_DIRECTORY = "jboss.runtime.directory.url"; //$NON-NLS-1$
 	
