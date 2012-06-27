@@ -62,11 +62,11 @@ import org.eclipse.mylyn.internal.discovery.ui.DiscoveryImages;
 import org.eclipse.mylyn.internal.discovery.ui.DiscoveryUi;
 import org.eclipse.mylyn.internal.discovery.ui.wizards.ConnectorDiscoveryWizard;
 import org.eclipse.mylyn.internal.discovery.ui.wizards.Messages;
-import org.eclipse.mylyn.internal.provisional.commons.ui.CommonImages;
-import org.eclipse.mylyn.internal.provisional.commons.ui.CommonThemes;
-import org.eclipse.mylyn.internal.provisional.commons.ui.GradientCanvas;
-import org.eclipse.mylyn.internal.provisional.commons.ui.SelectionProviderAdapter;
-import org.eclipse.mylyn.internal.provisional.commons.ui.WorkbenchUtil;
+import org.eclipse.mylyn.commons.ui.CommonImages;
+import org.eclipse.mylyn.commons.ui.compatibility.CommonThemes;
+import org.eclipse.mylyn.commons.ui.GradientCanvas;
+import org.eclipse.mylyn.commons.ui.SelectionProviderAdapter;
+import org.eclipse.mylyn.commons.workbench.browser.BrowserUtil;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.accessibility.ACC;
@@ -239,7 +239,7 @@ public class DiscoveryViewer {
 					providerLabel.addSelectionListener(new SelectionAdapter() {
 						@Override
 						public void widgetSelected(SelectionEvent e) {
-							WorkbenchUtil.openUrl(connector.getCertification().getUrl(),
+							BrowserUtil.openUrl(connector.getCertification().getUrl(),
 									IWorkbenchBrowserSupport.AS_EXTERNAL);
 						}
 					});

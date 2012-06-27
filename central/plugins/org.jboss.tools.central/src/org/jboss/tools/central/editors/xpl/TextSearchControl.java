@@ -31,7 +31,7 @@ import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.mylyn.internal.commons.ui.CommonsUiPlugin;
-import org.eclipse.mylyn.internal.provisional.commons.ui.Messages;
+import org.eclipse.mylyn.internal.commons.workbench.Messages;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.accessibility.ACC;
 import org.eclipse.swt.accessibility.AccessibleAdapter;
