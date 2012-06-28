@@ -139,7 +139,7 @@ public class CreateProjectsWithServerTest extends SWTTestExt{
 		checkExample(null, IDELabel.JBossCentralEditor.JAVA_EE_PROJECT, true);
 		checkExample(null, IDELabel.JBossCentralEditor.HTML5_PROJECT, true);
 		checkExample(null, IDELabel.JBossCentralEditor.RICHFACES_PROJECT, true);
-		checkExample(null, IDELabel.JBossCentralEditor.SPRING_MVC_PROJECT, false);
+		checkExample(null, IDELabel.JBossCentralEditor.SPRING_MVC_PROJECT, true);
 		
 		bot.toolbarDropDownButtonWithTooltip("New").click();
 		bot.waitForShell("New");
@@ -177,7 +177,12 @@ public class CreateProjectsWithServerTest extends SWTTestExt{
 			bot.viewByTitle("Project Explorer").close();
 		}catch (WidgetNotFoundException ex){
 			//do nothing
-			log.info("Project Explorer is already closed");
+			log.info("Project Explorer is already closed");  
+		}
+		try {
+			bot.viewByTitle("Problems").close();
+		}catch (WidgetNotFoundException ex){
+			//let be...
 		}
 		String serverName = bot.tree().getAllItems()[0].getText().substring(0, bot.tree().getAllItems()[0].getText().indexOf(' '));
 		servers.findServerByName(servers.bot().tree(), serverName).contextMenu("Add and Remove...").click();
@@ -277,7 +282,7 @@ public class CreateProjectsWithServerTest extends SWTTestExt{
 				bot.activeView().close();
 			}else if (readmeText.toLowerCase().contains("readme.md") || readmeText.toLowerCase().contains("readme.txt")){
 				bot.clickButton("Finish");
-				//assertTrue("Readme should have opened in Text Editor", bot.activeEditor().getReference().getEditor(false).getClass().getName().contains("org.eclipse.ui.editors.text.TextEditor")); //because readmes are opening in browser now.. It's a bug. Jira is created.
+				assertTrue("Readme should have opened in Text Editor", bot.activeEditor().getReference().getEditor(false).getClass().getName().contains("org.eclipse.ui.editors.text.TextEditor")); //because readmes are opening in browser now.. It's a bug. Jira is created.
 				bot.activeEditor().close();
 			}else if (readmeText.toLowerCase().contains("readme.htm")){
 				bot.clickButton("Finish");
