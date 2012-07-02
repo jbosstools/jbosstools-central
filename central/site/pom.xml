@@ -26,7 +26,7 @@
 							<tasks>
 								<!-- called AFTER generating update site + zip to add in extra content -->
 								<!-- <ant antfile="build.xml" target="generate.directory.xml.only" dir="../../build/aggregate/"> -->
-								<ant antfile="build.xml" target="basic.build" dir="../../build/aggregate/">
+								<ant antfile="build.xml" target="basic.build" dir="../../../../build/aggregate/">
 									<property name="output.dir" value="${basedir}" />
 									<property name="inputRepo"
 										value="${jbosstools-nightly-staging-composite}" />
