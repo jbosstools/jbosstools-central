@@ -13,12 +13,15 @@ package org.jboss.tools.central.test;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 import java.util.Map;
 
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
+import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.ui.IEditorReference;
 import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IWorkbenchPage;
@@ -32,8 +35,8 @@ import org.jboss.tools.central.jobs.RefreshBlogsJob;
 import org.jboss.tools.central.jobs.RefreshNewsJob;
 import org.jboss.tools.central.jobs.RefreshTutorialsJob;
 import org.jboss.tools.central.model.FeedsEntry;
-import org.jboss.tools.project.examples.model.ProjectExampleCategory;
 import org.jboss.tools.project.examples.model.ProjectExample;
+import org.jboss.tools.project.examples.model.ProjectExampleCategory;
 import org.jboss.tools.test.util.JobUtils;
 import org.jboss.tools.test.util.xpl.EditorTestHelper;
 import org.junit.AfterClass;
@@ -75,8 +78,7 @@ public class CentralTest {
 
 	@Test
 	public void testTutorials() throws Exception {
-		Job.getJobManager().join(JBossCentralActivator.JBOSS_CENTRAL_FAMILY,
-				new NullProgressMonitor());
+		waitForJobs();
 		Map<ProjectExampleCategory, List<ProjectExample>> categories = RefreshTutorialsJob.INSTANCE
 				.getTutorialCategories();
 		assertTrue("No one tutorial is found", categories.size() > 0);
@@ -84,32 +86,28 @@ public class CentralTest {
 
 	@Test
 	public void testNews() throws Exception {
-		Job.getJobManager().join(JBossCentralActivator.JBOSS_CENTRAL_FAMILY,
-				new NullProgressMonitor());
+		waitForJobs();
 		List<FeedsEntry> news = RefreshNewsJob.INSTANCE.getEntries();
 		assertTrue("No one news is found", news.size() >= 0);
 	}
 
 	@Test
 	public void testBlogs() throws Exception {
-		Job.getJobManager().join(JBossCentralActivator.JBOSS_CENTRAL_FAMILY,
-				new NullProgressMonitor());
+		waitForJobs();
 		List<FeedsEntry> blogs = RefreshBlogsJob.INSTANCE.getEntries();
 		assertTrue("No one blog is found", blogs.size() >= 0);
 	}
 
 	@Test
 	public void testCachingBlogs() throws Exception {
-		Job.getJobManager().join(JBossCentralActivator.JBOSS_CENTRAL_FAMILY,
-				new NullProgressMonitor());
+		waitForJobs();
 		assertTrue("Blog entries aren't cached", RefreshBlogsJob.INSTANCE
 				.getCacheFile().exists());
 	}
 
 	@Test
 	public void testCachingNews() throws Exception {
-		Job.getJobManager().join(JBossCentralActivator.JBOSS_CENTRAL_FAMILY,
-				new NullProgressMonitor());
+		waitForJobs();
 		assertTrue("News entries aren't cached", RefreshNewsJob.INSTANCE
 				.getCacheFile().exists());
 	}
@@ -121,8 +119,8 @@ public class CentralTest {
 				JBossCentralActivator.getDefault().showJBossCentralOnStartup());
 		new ShowJBossCentral().earlyStartup();
 		JobUtils.delay(1000);
-		Job.getJobManager().join(JBossCentralActivator.JBOSS_CENTRAL_FAMILY,
-				new NullProgressMonitor());
+
+		waitForJobs();
 
 		assertTrue("The JBoss Central editor isn't open by default",
 				hasOpenEditor());
@@ -134,8 +132,9 @@ public class CentralTest {
 				JBossCentralActivator.getDefault().showJBossCentralOnStartup());
 		EditorTestHelper.closeAllEditors();
 		new ShowJBossCentral().earlyStartup();
-		Job.getJobManager().join(JBossCentralActivator.JBOSS_CENTRAL_FAMILY,
-				new NullProgressMonitor());
+
+		waitForJobs();
+		
 		JobUtils.delay(1000);
 		assertFalse(
 				"The JBoss Central editor is open when the Show On Startup property is unchecked",
@@ -160,5 +159,22 @@ public class CentralTest {
 		}
 		return false;
 	}
+	
+	private void waitForJobs() {
+		
+		try {
+			PlatformUI.getWorkbench().getProgressService().busyCursorWhile(new IRunnableWithProgress() {
+				
+				@Override
+				public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
+					Job.getJobManager().join(JBossCentralActivator.JBOSS_CENTRAL_FAMILY, new NullProgressMonitor());
+				}
+			});
+		} catch (InvocationTargetException e) {
+			assertTrue("InvocationTargetException", false);
+		} catch (InterruptedException e) {
+			assertTrue("InterruptedException", false);
+		}
+}
 
 }
