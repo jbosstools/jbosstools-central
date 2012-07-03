@@ -97,7 +97,7 @@
 						</dependency>
 						<dependency>
 							<type>p2-installable-unit</type>
-							<artifactId>org.eclipse.mylyn.commons.feature.feature.group</artifactId>
+							<artifactId>org.eclipse.mylyn.commons.feature.group</artifactId>
 							<version>0.0.0</version>
 						</dependency>
 					</dependencies>
