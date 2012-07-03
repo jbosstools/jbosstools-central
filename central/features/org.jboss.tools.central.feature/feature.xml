@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<feature id="org.jboss.tools.central.feature" label="%featureName" version="1.0.0.qualifier" provider-name="%providerName" plugin="org.jboss.tools.central"> 
+<feature id="org.jboss.tools.central.feature" label="%featureName" version="1.0.1.qualifier" provider-name="%providerName" plugin="org.jboss.tools.central"> 
    <description>
       %description
    </description>
