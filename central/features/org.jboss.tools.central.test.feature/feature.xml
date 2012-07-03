@@ -2,7 +2,7 @@
 <feature
       id="org.jboss.tools.central.test.feature"
       label="JBoss Tools - Tests - JBoss Central"
-      version="1.0.0.qualifier"
+      version="1.1.0.qualifier"
       provider-name="JBoss by Red Hat">
 
    <description>

@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: %Bundle-Name
 Bundle-SymbolicName: org.jboss.tools.maven.profiles.core; singleton:=true
-Bundle-Version: 1.3.0.qualifier
+Bundle-Version: 1.4.0.qualifier
 Bundle-Localization: plugin
 Bundle-Activator: org.jboss.tools.maven.profiles.core.MavenProfilesCoreActivator
 Require-Bundle: org.eclipse.core.runtime,

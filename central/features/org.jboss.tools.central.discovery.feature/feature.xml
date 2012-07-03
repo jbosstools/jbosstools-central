@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<feature id="org.jboss.tools.central.discovery.feature" label="%featureName" version="1.0.0.qualifier" provider-name="%featureName"> 
+<feature id="org.jboss.tools.central.discovery.feature" label="%featureName" version="1.1.0.qualifier" provider-name="%featureName"> 
    <description>
       %description
    </description>
