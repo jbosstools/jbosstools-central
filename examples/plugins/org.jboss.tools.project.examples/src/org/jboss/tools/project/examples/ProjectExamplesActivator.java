@@ -1224,6 +1224,7 @@ public class ProjectExamplesActivator extends AbstractUIPlugin {
 				urlModified = ECFExamplesTransport.getInstance()
 						.getLastModified(url);
 			} catch (Exception e) {
+				log(e);
 				urlModified = -1;
 			}
 			if (cacheModified == 0 || urlModified != cacheModified) {
@@ -1240,6 +1241,8 @@ public class ProjectExamplesActivator extends AbstractUIPlugin {
 					ProjectExamplesActivator.copyFile(tempFile, cacheFile);
 					tempFile.delete();
 					cacheFile.setLastModified(cacheModified);
+				} else {
+					getLog().log(status);
 				}
 			}
 		} catch (Exception e) {
