@@ -74,14 +74,14 @@ import org.jboss.tools.runtime.ui.preferences.RuntimePreferencePage;
  */
 public class DownloadRuntimeDialog extends Dialog {
 
-	private static final String SEPARATOR = "/";
+	private static final String SEPARATOR = "/"; //$NON-NLS-1$
 	private static final String FOLDER_IS_REQUIRED = "This folder is required";
 	private static final String FOLDER_IS_NOT_WRITABLE = "This folder does not exist or is not writable";
-	private static final String DELETE_ON_EXIT = "deleteOnExit";
-	private static final String JAVA_IO_TMPDIR = "java.io.tmpdir";
-	private static final String USER_HOME = "user.home";
-	private static final String DEFAULT_DIALOG_PATH = "defaultDialogPath";
-	private static final String DEFAULT_DESTINATION_PATH = "defaultDestinationPath";
+	private static final String DELETE_ON_EXIT = "deleteOnExit"; //$NON-NLS-1$
+	private static final String JAVA_IO_TMPDIR = "java.io.tmpdir"; //$NON-NLS-1$
+	private static final String USER_HOME = "user.home"; //$NON-NLS-1$
+	private static final String DEFAULT_DIALOG_PATH = "defaultDialogPath"; //$NON-NLS-1$
+	private static final String DEFAULT_DESTINATION_PATH = "defaultDestinationPath"; //$NON-NLS-1$
 	private IDialogSettings dialogSettings;
 	private Button deleteOnExit;
 	private Text destinationPathText;
@@ -410,13 +410,20 @@ public class DownloadRuntimeDialog extends Dialog {
 			File directory = new File(selectedDirectory);
 			directory.mkdirs();
 			if (!directory.isDirectory()) {
-				String message = "The '" + directory + "' is not a directory.";
+				final String message = "The '" + directory + "' is not a directory.";
 				if (result != null) {
 					ProjectExamplesActivator.getDefault().getLog().log(result);
 				} else {
 					ProjectExamplesActivator.getDefault().getLog().log(result);
 				}
-				MessageDialog.openError(getActiveShell(), "Error", message);
+				Display.getDefault().syncExec(new Runnable() {
+
+					@Override
+					public void run() {
+						MessageDialog.openError(getActiveShell(), "Error", message);
+					}
+					
+				});
 				file.deleteOnExit();
 				file.delete();
 				return Status.CANCEL_STATUS;
@@ -424,13 +431,15 @@ public class DownloadRuntimeDialog extends Dialog {
 			ProjectExamplesActivator.extractZipFile(file, directory, monitor);
 			if (result != null && !result.isOK()) {
 				ProjectExamplesActivator.getDefault().getLog().log(result);
-				String message;
-				if (result.getException() != null) {
-					message = result.getException().getMessage();
-				} else {
-					message = result.getMessage();
-				}
-				MessageDialog.openError(getActiveShell(), "Error", message);
+				final String message = getMessage(result);
+				Display.getDefault().syncExec(new Runnable() {
+
+					@Override
+					public void run() {
+						MessageDialog.openError(getActiveShell(), "Error", message);
+					}
+					
+				});
 				file.deleteOnExit();
 				file.delete();
 				return Status.CANCEL_STATUS;
@@ -452,7 +461,15 @@ public class DownloadRuntimeDialog extends Dialog {
 				file.deleteOnExit();
 				file.delete();
 			}
-			MessageDialog.openError(getActiveShell(), "Error", e.getMessage());
+			final String message = e.getMessage();
+			Display.getDefault().syncExec(new Runnable() {
+
+				@Override
+				public void run() {
+					MessageDialog.openError(getActiveShell(), "Error", message);
+				}
+				
+			});
 		} finally {
 			if (in != null) {
 				try {
@@ -470,6 +487,16 @@ public class DownloadRuntimeDialog extends Dialog {
 			}
 		}
 		return Status.OK_STATUS;
+	}
+
+	private String getMessage(IStatus result) {
+		String message;
+		if (result.getException() != null) {
+			message = result.getException().getMessage();
+		} else {
+			message = result.getMessage();
+		}
+		return message;
 	}
 	
 	private String getRoot(File file, IProgressMonitor monitor) {
