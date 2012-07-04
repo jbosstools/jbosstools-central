@@ -41,9 +41,9 @@
 	<feature url="features/org.jboss.tools.maven.profiles.feature_0.0.0.jar" id="org.jboss.tools.maven.profiles.feature" version="0.0.0">
 		<category name="JBoss Tools maven Nightly Build Update Site"/>
 	</feature>
-	<!--feature url="features/org.jboss.tools.maven.gwt.feature_0.0.0.jar" id="org.jboss.tools.maven.gwt.feature" version="0.0.0">
+	<!-- JBIDE-12287 <feature url="features/org.jboss.tools.maven.gwt.feature_0.0.0.jar" id="org.jboss.tools.maven.gwt.feature" version="0.0.0">
 		<category name="JBoss Tools maven Nightly Build Update Site"/>
-	</feature-->
+	</feature> -->
 	<feature url="features/org.jboss.tools.maven.sourcelookup.feature_0.0.0.jar" id="org.jboss.tools.maven.sourcelookup.feature" version="0.0.0">
 		<category name="JBoss Tools maven Nightly Build Update Site"/>
 	</feature>
@@ -87,9 +87,9 @@
 	<feature url="features/org.jboss.tools.maven.profiles.feature.source_0.0.0.jar" id="org.jboss.tools.maven.profiles.feature.source" version="0.0.0">
 		<category name="JBoss Tools maven Nightly Build Update Site"/>
 	</feature>
-	<!--feature url="features/org.jboss.tools.maven.gwt.feature.source_0.0.0.jar" id="org.jboss.tools.maven.gwt.feature.source" version="0.0.0">
+	<!-- JBIDE-12287 <feature url="features/org.jboss.tools.maven.gwt.feature.source_0.0.0.jar" id="org.jboss.tools.maven.gwt.feature.source" version="0.0.0">
 		<category name="JBoss Tools maven Nightly Build Update Site"/>
-	</feature-->
+	</feature> -->
 	<feature url="features/org.jboss.tools.maven.sourcelookup.feature.source_0.0.0.jar" id="org.jboss.tools.maven.sourcelookup.feature.source" version="0.0.0">
 		<category name="JBoss Tools maven Nightly Build Update Site"/>
 	</feature>
