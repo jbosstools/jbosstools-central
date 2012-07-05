@@ -29,11 +29,11 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.jdt.core.IClasspathEntry;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.JavaCore;
-import org.eclipse.jst.j2ee.componentcore.J2EEModuleVirtualComponent;
 import org.eclipse.wst.common.componentcore.ComponentCore;
 import org.eclipse.wst.common.componentcore.resources.IVirtualComponent;
 import org.eclipse.wst.common.componentcore.resources.IVirtualFolder;
 import org.eclipse.wst.common.frameworks.datamodel.IDataModel;
+import org.jboss.tools.common.web.WebUtils;
 
 /**
  * A utility class for Eclipse Projects.
@@ -125,7 +125,8 @@ public class ProjectUtil {
 	    IPath filePath = new Path(path);
 	    IVirtualFolder root = component.getRootFolder();
 	    IContainer[] underlyingFolders = root.getUnderlyingFolders();
-	    IPath defaultDDFolderPath = J2EEModuleVirtualComponent.getDefaultDeploymentDescriptorFolder(root);
+//	    IPath defaultDDFolderPath = J2EEModuleVirtualComponent.getDefaultDeploymentDescriptorFolder(root);
+	    IPath defaultDDFolderPath = WebUtils.getDefaultDeploymentDescriptorFolder(root);
 	    for (IContainer underlyingFolder : underlyingFolders) {
 	      if (defaultDDFolderPath ==null || !defaultDDFolderPath.equals(underlyingFolder.getProjectRelativePath())) {
 	    	  IPath p = underlyingFolder.getProjectRelativePath().append(filePath);
