@@ -10,76 +10,35 @@
 	<groupId>org.jboss.tools.central</groupId>
 	<artifactId>central.site</artifactId>
 	<name>central.site</name>
-	<packaging>eclipse-update-site</packaging>
+	<packaging>eclipse-repository</packaging>
+
+	<properties>
+		<update.site.description>Snapshots</update.site.description>
+		<update.site.version>${JBT_VERSION} ${BUILD_ALIAS}</update.site.version>
+	</properties>
+
 	<build>
 		<plugins>
 			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-antrun-plugin</artifactId>
-				<version>${maven.antrun.plugin.version}</version>
+				<groupId>org.jboss.tools.tycho-plugins</groupId>
+				<artifactId>repository-utils</artifactId>
+				<version>0.0.1-SNAPSHOT</version>
 				<executions>
 					<execution>
-						<id>install</id>
-						<phase>install</phase>
-						<configuration>
-							<quiet>true</quiet>
-							<tasks>
-								<!-- called AFTER generating update site + zip to add in extra content -->
-								<!-- <ant antfile="build.xml" target="generate.directory.xml.only" dir="../../build/aggregate/"> -->
-								<ant antfile="build.xml" target="basic.build" dir="../../build/aggregate/">
-									<property name="output.dir" value="${basedir}" />
-									<property name="inputRepo"
-										value="${jbosstools-nightly-staging-composite}" />
-									<property name="update.site.name" value="JBoss Tools - Central"/>
-									<property name="JBT_VERSION" value="${JBT_VERSION}" />
-									<property name="BUILD_ALIAS" value="${BUILD_ALIAS}" />
-								</ant>
-								<delete file="index.html"/>
-								<delete file="jbosstools-directory.xml"/>
-							</tasks>
-						</configuration>
+						<id>generate-facade</id>
+						<phase>package</phase>
 						<goals>
-							<goal>run</goal>
+							<goal>generate-repository-facade</goal>
 						</goals>
+						<configuration>
+							<symbols>
+								<update.site.name>JBoss Tools - Central</update.site.name>
+								<update.site.description>${update.site.description}</update.site.description>
+								<update.site.version>${update.site.version}</update.site.version>
+							</symbols>
+						</configuration>
 					</execution>
 				</executions>
-				<dependencies>
-					<dependency>
-						<groupId>commons-net</groupId>
-						<artifactId>commons-net</artifactId>
-						<version>1.4.1</version>
-					</dependency>
-					<dependency>
-						<groupId>org.apache.ant</groupId>
-						<artifactId>ant</artifactId>
-						<version>1.7.1</version>
-					</dependency>
-					<dependency>
-						<groupId>org.apache.ant</groupId>
-						<artifactId>ant-nodeps</artifactId>
-						<version>1.7.1</version>
-					</dependency>
-					<dependency>
-						<groupId>org.apache.ant</groupId>
-						<artifactId>ant-trax</artifactId>
-						<version>1.7.1</version>
-					</dependency>
-					<dependency>
-						<groupId>org.apache.ant</groupId>
-						<artifactId>ant-commons-net</artifactId>
-						<version>1.7.1</version>
-					</dependency>
-					<dependency>
-						<groupId>org.apache.ant</groupId>
-						<artifactId>ant-apache-regexp</artifactId>
-						<version>1.7.1</version>
-					</dependency>
-					<dependency>
-						<groupId>ant-contrib</groupId>
-						<artifactId>ant-contrib</artifactId>
-						<version>1.0b3</version>
-					</dependency>
-				</dependencies>
 			</plugin>
 		</plugins>
 	</build>
