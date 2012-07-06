@@ -21,7 +21,7 @@ public class JBossSarConfiguratorTest extends AbstractMavenConfiguratorTest {
 	@Test
 	public void testBasicSarSupport() throws Exception {
 		IProject project = importProject("projects/jboss-sar/jboss-sar-1/pom.xml");
-		waitForJobsToComplete(new NullProgressMonitor());
+		waitForJobsToComplete();
 		assertIsSarProject(project);
 
 		IVirtualComponent sarComponent = ComponentCore.createComponent(project);
@@ -32,8 +32,9 @@ public class JBossSarConfiguratorTest extends AbstractMavenConfiguratorTest {
 		assertEquals("/lib", references[0].getRuntimePath().toPortableString());
 		
 		IResource[] underlyingResources = getUnderlyingResources(project);
-		assertEquals(1, underlyingResources.length);
+		assertEquals(2, underlyingResources.length);
 		assertEquals(project.getFolder("/src/main/resources"), underlyingResources[0]);
+		assertEquals(project.getFolder("/src/main/java"), underlyingResources[1]);
 	}
 
 	@Test

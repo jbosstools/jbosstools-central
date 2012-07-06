@@ -23,19 +23,15 @@ public class JpaConfiguratorTest extends AbstractMavenConfiguratorTest {
 		
 		assertIsJpaProject(project, JpaFacet.VERSION_2_0);
 		assertNoErrors(project);
-		JpaProjectManager manager = JptJpaCorePlugin.getJpaProjectManager(ResourcesPlugin.getWorkspace());
-		JpaProject jpa = (JpaProject)project.getAdapter(JpaProject.class); 
-		//manager.getJpaProject(project);
-		String pid = jpa.getJpaPlatform().getId(); 
+		String pid = JptJpaCorePlugin.getJpaPlatformId(project); 
 		assertTrue(pid + " is not the expected platform", pid.startsWith("eclipselink") || pid.startsWith("generic"));
 		
 		project = importProject( "projects/jpa/simple-1.0/pom.xml");
 		waitForJobsToComplete();
 		assertIsJpaProject(project, JpaFacet.VERSION_1_0);
 		assertNoErrors(project);
-		jpa = (JpaProject)project.getAdapter(JpaProject.class);
-		//jpa = manager.getJpaProject(project);
-		pid = jpa.getJpaPlatform().getId(); 
+		
+		pid = JptJpaCorePlugin.getJpaPlatformId(project); 
 		assertTrue(pid + " is not the expected hibernate platform", pid.startsWith("hibernate") || pid.startsWith("generic"));
 	}	
 
