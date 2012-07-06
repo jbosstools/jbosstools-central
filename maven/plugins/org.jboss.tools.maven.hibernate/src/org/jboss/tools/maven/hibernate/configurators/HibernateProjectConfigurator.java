@@ -86,23 +86,18 @@ public class HibernateProjectConfigurator extends AbstractProjectConfigurator {
 	}
 
 	private boolean isHibernateProject(MavenProject mavenProject) {
-		List<Artifact> artifacts = new ArrayList<Artifact>();
-		ArtifactFilter filter = new ScopeArtifactFilter(
-				Artifact.SCOPE_TEST);
+		ArtifactFilter filter = new ScopeArtifactFilter(Artifact.SCOPE_TEST);
 		for (Artifact artifact : mavenProject.getArtifacts()) {
 			if (filter.include(artifact)) {
-				artifacts.add(artifact);
+				String groupId = artifact.getGroupId();
+				if (HIBERNATE_GROUP_ID.equals(groupId)) {
+					String artifactId = artifact.getArtifactId();
+					if (artifactId != null && artifactId.startsWith(HIBERNATE_ARTIFACT_ID_PREFIX)) {
+						return true;
+					} 
+				}
 			}
 		}
-        for (Artifact artifact:artifacts) {
-	    	String groupId = artifact.getGroupId();
-    		if (HIBERNATE_GROUP_ID.equals(groupId)) {
-    			String artifactId = artifact.getArtifactId();
-    			if (artifactId != null && artifactId.startsWith(HIBERNATE_ARTIFACT_ID_PREFIX)) {
-	    			return true;
-	    		} 
-	    	}
-	    }
 	    return false;
 	}
 }
