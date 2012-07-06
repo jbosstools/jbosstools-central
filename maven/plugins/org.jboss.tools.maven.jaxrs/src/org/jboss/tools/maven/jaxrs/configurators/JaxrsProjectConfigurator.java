@@ -10,7 +10,9 @@
  ************************************************************************************/
 package org.jboss.tools.maven.jaxrs.configurators;
 
+import org.apache.maven.model.Plugin;
 import org.apache.maven.project.MavenProject;
+import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
@@ -43,8 +45,8 @@ import org.jboss.tools.common.util.EclipseJavaUtil;
 import org.jboss.tools.maven.core.IJBossMavenConstants;
 import org.jboss.tools.maven.core.ProjectUtil;
 import org.jboss.tools.maven.core.internal.project.facet.MavenFacetInstallDataModelProvider;
+import org.jboss.tools.maven.core.xpl.WTPProjectsUtil;
 import org.jboss.tools.maven.ui.Activator;
-import org.maven.ide.eclipse.wtp.WarPluginConfiguration;
 
 /**
  * JAX-RS maven project configurator.
@@ -134,8 +136,7 @@ public class JaxrsProjectConfigurator extends AbstractProjectConfigurator {
 				// see https://issues.jboss.org/browse/JBIDE-10037
 				ProjectUtil.refreshHierarchy(mavenProject.getBasedir(), IResource.DEPTH_INFINITE, new SubProgressMonitor(monitor, 1));
 				IDataModel model = createJaxRsDataModel(fproj,facetVersion);
-				WarPluginConfiguration config = new WarPluginConfiguration(mavenProject, fproj.getProject());
-				String warSourceDirectory = config.getWarSourceDirectory();
+				String warSourceDirectory = getWarSourceDirectory(mavenProject, fproj.getProject());
 				model.setProperty(IJAXRSFacetInstallDataModelProperties.WEBCONTENT_DIR, warSourceDirectory);
 				model.setProperty(IJAXRSFacetInstallDataModelProperties.UPDATEDD, false);
 				fproj.installProjectFacet(facetVersion, model, monitor);
@@ -147,6 +148,25 @@ public class JaxrsProjectConfigurator extends AbstractProjectConfigurator {
 			}
 		}
 	}
+
+	//Copied from WarPlugin in m2e-wtp
+	private String getWarSourceDirectory(MavenProject mavenProject, IProject project) {
+	    Plugin plugin = mavenProject.getPlugin("org.apache.maven.plugins:maven-war-plugin");
+	    if (plugin != null && plugin.getConfiguration() instanceof Xpp3Dom) {
+	    	Xpp3Dom dom = (Xpp3Dom)plugin.getConfiguration(); 
+	    	Xpp3Dom[] warSourceDirectory = dom.getChildren("warSourceDirectory");
+	    	if(warSourceDirectory != null && warSourceDirectory.length > 0) {
+	    		// first one wins
+	    		String dir = warSourceDirectory[0].getValue();
+	    		if(project != null) {
+	    			return WTPProjectsUtil.tryProjectRelativePath(project, dir).toOSString();
+	    		}
+	    		return dir;
+	    	}
+	    }
+		return "src/main/webapp";
+	}
+
 
 	private IDataModel createJaxRsDataModel(IFacetedProject fproj,
 			IProjectFacetVersion facetVersion) {

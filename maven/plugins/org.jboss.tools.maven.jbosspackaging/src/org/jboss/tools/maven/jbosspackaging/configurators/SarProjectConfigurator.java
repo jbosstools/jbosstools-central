@@ -54,8 +54,8 @@ import org.jboss.ide.eclipse.as.ui.mbeans.project.IJBossSARFacetDataModelPropert
 import org.jboss.ide.eclipse.as.ui.mbeans.project.JBossSARFacetDataModelProvider;
 import org.jboss.tools.maven.core.IJBossMavenConstants;
 import org.jboss.tools.maven.core.internal.project.facet.MavenFacetInstallDataModelProvider;
-import org.maven.ide.eclipse.wtp.ArtifactHelper;
-import org.maven.ide.eclipse.wtp.WTPProjectsUtil;
+import org.jboss.tools.maven.core.xpl.ArtifactHelper;
+import org.jboss.tools.maven.core.xpl.WTPProjectsUtil;
 
 /**
  * 
