@@ -298,6 +298,35 @@
                url="http://subclipse.tigris.org/">
          </overview>
       </connectorDescriptor>
+      <connectorDescriptor
+            categoryId="org.jboss.tools.central.discovery.scm"
+            groupId="org.jboss.tools.central.discovery.scm.svn"
+            description="Mylyn support for the Subversion version control system, including SVNKit"
+            id="org.tigris.subversion.subclipse.mylyn"
+            kind="task"
+            license="Free, Subclipse License"
+            name="Mylyn for Subclipse + SVNKit"
+            provider="tigris.org"
+            siteUrl="http://download.jboss.org/jbosstools/updates/stable/indigo/central/core/">
+	<iu id="org.tigris.subversion.subclipse"/>
+	<iu id="org.tigris.subversion.clientadapter.svnkit.feature"/>
+	<iu id="org.tigris.subversion.subclipse.mylyn"/>
+	<iu id="org.eclipse.mylyn_feature"/>
+	<iu id="org.eclipse.mylyn.ide_feature"/>
+	<iu id="org.eclipse.mylyn.commons"/>
+	<iu id="org.eclipse.mylyn.context_feature"/>
+	<iu id="org.eclipse.mylyn.bugzilla_feature"/>
+	<iu id="org.eclipse.mylyn.java_feature"/>
+	<iu id="org.eclipse.mylyn.pde_feature"/>
+	<iu id="org.eclipse.mylyn.team_feature"/>
+	<iu id="org.eclipse.mylyn.versions"/>
+         <icon
+               image32="images/subclipse_32.gif">
+         </icon>
+         <overview
+               url="http://subclipse.tigris.org/">
+         </overview>
+      </connectorDescriptor>
 
        <!-- Testing -->
 
