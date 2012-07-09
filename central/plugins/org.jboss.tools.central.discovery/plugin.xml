@@ -271,7 +271,39 @@
             name="Eclipse EGit"
             provider="eclipse.org"
             siteUrl="http://download.jboss.org/jbosstools/updates/development/juno/central/core/">
-	    <iu id="org.eclipse.egit"/>
+       <iu id="org.eclipse.jgit"/>
+       <iu id="org.eclipse.egit"/>
+         <icon
+               image32="images/egit_32.png">
+         </icon>
+         <overview
+               url="http://www.eclipse.org/egit/">
+         </overview>
+      </connectorDescriptor>
+      <connectorDescriptor
+            categoryId="org.jboss.tools.central.discovery.scm"
+            groupId="org.jboss.tools.central.discovery.scm.git"
+            description="Mylyn support for Git and GitHub"
+            id="org.eclipse.egit.mylyn"
+            kind="task"
+            license="Free, EPL"
+            name="Mylyn support for Eclipse EGit + GitHub"
+            provider="eclipse.org"
+            siteUrl="http://download.jboss.org/jbosstools/updates/development/juno/central/core/">
+	<iu id="org.eclipse.jgit"/>
+	<iu id="org.eclipse.egit"/>
+	<iu id="org.eclipse.egit.mylyn"/>
+	<iu id="org.eclipse.mylyn.github.feature"/>
+	<iu id="org.eclipse.mylyn.git"/>
+	<iu id="org.eclipse.mylyn_feature"/>
+	<iu id="org.eclipse.mylyn.ide_feature"/>
+	<iu id="org.eclipse.mylyn.commons"/>
+	<iu id="org.eclipse.mylyn.context_feature"/>
+	<iu id="org.eclipse.mylyn.bugzilla_feature"/>
+	<iu id="org.eclipse.mylyn.java_feature"/>
+	<iu id="org.eclipse.mylyn.pde_feature"/>
+	<iu id="org.eclipse.mylyn.team_feature"/>
+	<iu id="org.eclipse.mylyn.versions"/>
          <icon
                image32="images/egit_32.png">
          </icon>
