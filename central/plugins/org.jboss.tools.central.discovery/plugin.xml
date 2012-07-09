@@ -342,6 +342,24 @@
       <connectorDescriptor
             categoryId="org.jboss.tools.central.discovery.testing"
             groupId="org.jboss.tools.central.discovery.testing.local"
+            description="Tool support for Checkstyle"
+            id="net.sf.eclipsecs"
+            kind="task"
+            license="Free, LGPL"
+            name="Eclipse Checkstyle"
+            provider="eclipse-cs Project"
+            siteUrl="http://download.jboss.org/jbosstools/updates/development/juno/central/core/">
+	    <iu id="net.sf.eclipsecs"/>
+         <icon
+               image32="images/checkstyle_32.png">
+         </icon>
+         <overview
+               url="http://eclipse-cs.sourceforge.net/">
+         </overview>
+      </connectorDescriptor>
+      <connectorDescriptor
+            categoryId="org.jboss.tools.central.discovery.testing"
+            groupId="org.jboss.tools.central.discovery.testing.local"
             description="Tool support for FindBugs"
             id="edu.umd.cs.findbugs.plugin.eclipse"
             kind="task"
