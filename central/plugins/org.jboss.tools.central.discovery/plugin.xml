@@ -283,11 +283,11 @@
       <connectorDescriptor
             categoryId="org.jboss.tools.central.discovery.scm"
             groupId="org.jboss.tools.central.discovery.scm.git"
-            description="Mylyn support for Git and GitHub"
+            description="Mylyn support for Eclipse EGit and GitHub"
             id="org.eclipse.egit.mylyn"
             kind="task"
             license="Free, EPL"
-            name="Mylyn support for Eclipse EGit + GitHub"
+            name="Eclipse EGit: Mylyn Support"
             provider="eclipse.org"
             siteUrl="http://download.jboss.org/jbosstools/updates/development/juno/central/core/">
 	<iu id="org.eclipse.jgit"/>
@@ -337,7 +337,7 @@
             id="org.tigris.subversion.subclipse.mylyn"
             kind="task"
             license="Free, Subclipse License"
-            name="Mylyn for Subclipse + SVNKit"
+            name="Subclipse + SVNKit: Mylyn Support"
             provider="tigris.org"
             siteUrl="http://download.jboss.org/jbosstools/updates/development/juno/central/core/">
 	<iu id="org.tigris.subversion.subclipse"/>
