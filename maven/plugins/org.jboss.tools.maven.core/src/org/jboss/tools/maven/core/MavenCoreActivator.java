@@ -708,7 +708,7 @@ public class MavenCoreActivator extends Plugin {
 		resource = resource2;
 	}
 
-	public static void addCompilerPlugin(Build build, IProject project) {
+	public static void addCompilerPlugin(List<org.apache.maven.model.Plugin> plugins, IProject project) {
 		String compilerLevel = JavaFacetUtil.getCompilerLevel(project);
 		if (compilerLevel == null || DEFAULT_COMPILER_LEVEL.equals(compilerLevel)) {
 			return;
@@ -716,7 +716,7 @@ public class MavenCoreActivator extends Plugin {
 		org.apache.maven.model.Plugin plugin = new org.apache.maven.model.Plugin();
 		plugin.setGroupId("org.apache.maven.plugins"); //$NON-NLS-1$
 		plugin.setArtifactId("maven-compiler-plugin"); //$NON-NLS-1$
-		plugin.setVersion("2.4");
+		plugin.setVersion("2.5.1");
 		Xpp3Dom configuration = new Xpp3Dom( "configuration" ); //$NON-NLS-1$
 		Xpp3Dom source = new Xpp3Dom("source"); //$NON-NLS-1$
 		source.setValue(compilerLevel); //$NON-NLS-1$
@@ -725,7 +725,7 @@ public class MavenCoreActivator extends Plugin {
 		target.setValue(compilerLevel); //$NON-NLS-1$
 		configuration.addChild(target);
 		plugin.setConfiguration(configuration);
-		build.getPlugins().add(plugin);
+		plugins.add(plugin);
 	}
 	
 	public static PomResourceImpl loadResource(IFile pomFile)
