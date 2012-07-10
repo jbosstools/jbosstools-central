@@ -14,6 +14,9 @@
 	<name>central.all</name>
 	<packaging>pom</packaging>
 	 <!-- 
+		Note: building the update site for this component may require that you first build 
+		the tycho plugins in ../build/tycho-plugins/, if they can't be resolved from Nexus.
+	
 		mvn clean install
 			or
 		mvn clean install -B -U -fae -e -P jbosstools-nightly-staging-composite,jboss-requirements-composite-mirror,jboss-requirements-composite-extras-mirror,local.site -Dlocal.site=file://home/nboldt/tmp/JBT_REPO_Indigo/
