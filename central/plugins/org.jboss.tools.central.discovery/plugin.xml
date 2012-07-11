@@ -61,7 +61,7 @@
             provider="JBoss by Red Hat"
             siteUrl="http://download.jboss.org/jbosstools/updates/development/juno/central/core/">
             <iu id="org.jboss.tools.maven.gwt.feature"/>
-            <iu id="com.google.gdt.eclipse.suite.e37.feature"/>
+            <iu id="com.google.gdt.eclipse.suite.e42.feature"/>
          <icon
                image32="images/jbosstools_icon32.png">
          </icon>
@@ -555,14 +555,14 @@
             categoryId="org.jboss.tools.central.discovery.web"
             groupId="org.jboss.tools.central.discovery.web.extras"
             description="Google Plugin for Eclipse (GPE) + Google Web Toolkit SDK (GWT)"
-            id="com.google.gwt.eclipse.sdkbundle.e37.feature"
+            id="com.google.gwt.eclipse.sdkbundle.e42.feature"
             kind="task"
             license="EPL, Other"
             name="Google Plugin + Web Toolkit"
             provider="Google, Inc."
             siteUrl="http://download.jboss.org/jbosstools/updates/development/juno/central/core/">
-            <iu id="com.google.gwt.eclipse.sdkbundle.e37.feature"/>
-            <iu id="com.google.gdt.eclipse.suite.e37.feature"/>
+            <iu id="com.google.gwt.eclipse.sdkbundle.e42.feature"/>
+            <iu id="com.google.gdt.eclipse.suite.e42.feature"/>
          <icon
                image32="images/google_32.png">
          </icon>
