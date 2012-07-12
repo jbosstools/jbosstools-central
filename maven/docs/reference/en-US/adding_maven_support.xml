@@ -17,9 +17,110 @@
 		</mediaobject>
 	</figure>
 	<para>
-		Right-click on the project to bring up the context menu.
+		Right-click on the project to bring up the context menu and click on <guimenuitem>Properties</guimenuitem>.
+	</para>
+	<!-- Maven Facet option -->
+	<para>
+		From the <guilabel>Properties</guilabel> screen click on <guilabel>Project Facets</guilabel>.
+	</para>
+	<figure id="adding_maven_support_06">
+		<title>Project Facets screen</title>
+		<mediaobject>
+			<imageobject>
+				<imagedata fileref="images/adding_maven_support/adding_maven_support_06.png" format="PNG" />
+			</imageobject>
+			<textobject>
+				<phrase>
+					The Project Facets properties screen.
+				</phrase>
+			</textobject>
+		</mediaobject>
+	</figure>
+	<para>
+		Select <guilabel>JBoss Maven Integration</guilabel> from the facets list. You will notice that a <guibutton>Further configuration required</guibutton> button appears at the bottom of the screen. 
+	</para>
+	<figure id="adding_maven_support_07">
+		<title>Maven Integration facet selected</title>
+		<mediaobject>
+			<imageobject>
+				<imagedata fileref="images/adding_maven_support/adding_maven_support_07.png" format="PNG" />
+			</imageobject>
+			<textobject>
+				<phrase>
+					The Maven integration facet has been selected from the facets menu.
+				</phrase>
+			</textobject>
+		</mediaobject>
+	</figure>
+	<para>
+		Click on the <guibutton>Further configuration required</guibutton> button and you can either modify or accept the default values for all fields. Click the <guibutton>OK</guibutton> button to return to the facets screen.
+	</para>
+	<figure id="adding_maven_support_08">
+		<title>Maven Integration facet settings</title>
+		<mediaobject>
+			<imageobject>
+				<imagedata fileref="images/adding_maven_support/adding_maven_support_08.png" format="PNG" />
+			</imageobject>
+			<textobject>
+				<phrase>
+					Setting the configuration for Maven integration.
+				</phrase>
+			</textobject>
+		</mediaobject>
+	</figure>
+	<para>
+		The <guibutton>Further configuration required</guibutton> button has now changed to  <guibutton>Further configuration available</guibutton>. Click the <guibutton>Apply</guibutton> button and then the <guibutton>OK</guibutton> button to complete the addition of Maven support to your project.
+	</para>
+	<figure id="adding_maven_support_09">
+		<title>Maven Integration facet configured</title>
+		<mediaobject>
+			<imageobject>
+				<imagedata fileref="images/adding_maven_support/adding_maven_support_09.png" format="PNG" />
+			</imageobject>
+			<textobject>
+				<phrase>
+					The JBoss Maven Integration facet has now been configured for the project.
+				</phrase>
+			</textobject>
+		</mediaobject>
+	</figure>
+	<para>
+		Maven support has been added to the project, and a new <filename>pom.xml</filename> file appears in the list of files for the project. This can be viewed in the <guilabel>Project Explorer</guilabel>.
+	</para>
+	<figure id="adding_maven_support_04">
+		<title>New pom.xml file</title>
+		<mediaobject>
+			<imageobject>
+				<imagedata fileref="images/adding_maven_support/adding_maven_support_04.png" format="PNG" />
+			</imageobject>
+			<textobject>
+				<phrase>
+					The project now has a new pom.xml file, seen in the Project Explorer.
+				</phrase>
+			</textobject>
+		</mediaobject>
+	</figure>
+	<para>
+		Double-click on the <filename>pom.xml</filename> file to view the settings associated with it. The settings here were set in the <guilabel>Further configuration required</guilabel> step, and can be edited from this <guilabel>Overview</guilabel> screen.
 	</para>
 	<para>
+		It is recommended that you change the <guilabel>Packaging</guilabel> option to <guimenuitem>pom</guimenuitem> to avoid any issues in expansion of the project with Maven modules in the future.
+	</para>
+	<figure id="adding_maven_support_05">
+		<title>Overview screen for pom.xml</title>
+		<mediaobject>
+			<imageobject>
+				<imagedata fileref="images/adding_maven_support/adding_maven_support_05.png" format="PNG" />
+			</imageobject>
+			<textobject>
+				<phrase>
+					The Overview screen for the new pom.xml file.
+				</phrase>
+			</textobject>
+		</mediaobject>
+	</figure>
+	<!-- Convert to Maven Project option -->
+<!--	<para>
 		From the context menu navigate to <menuchoice><guimenuitem>Configure</guimenuitem><guimenuitem>Convert to Maven Project</guimenuitem></menuchoice>.
 	</para>
 	<figure id="adding_maven_support_01">
@@ -104,5 +205,5 @@
 				</phrase>
 			</textobject>
 		</mediaobject>
-	</figure>
+	</figure> -->
 </chapter>
