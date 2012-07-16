@@ -14,7 +14,6 @@
 
 	<properties>
 		<update.site.description>Snapshots</update.site.description>
-		<update.site.version>${JBT_VERSION} ${BUILD_ALIAS}</update.site.version>
 	</properties>
 
 	<build>
@@ -34,7 +33,8 @@
 							<symbols>
 								<update.site.name>JBoss Tools - Central</update.site.name>
 								<update.site.description>${update.site.description}</update.site.description>
-								<update.site.version>${update.site.version}</update.site.version>
+								<update.site.version>${JBT_VERSION} ${qualifier}</update.site.version>
+								<target.eclipse.version>${targetEclipseVersion}</target.eclipse.version>
 							</symbols>
 						</configuration>
 					</execution>
