@@ -20,6 +20,8 @@ Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-Vendor: %BundleVendor
 Bundle-Localization: plugin
 Export-Package: org.jboss.tools.maven.sourcelookup,
- org.jboss.tools.maven.sourcelookup.containers
+ org.jboss.tools.maven.sourcelookup.containers,
+ org.jboss.tools.maven.sourcelookup.identification,
+ org.jboss.tools.maven.sourcelookup.internal.identification
 Bundle-ClassPath: .,
  lib/nexus-indexer-lucene-rest-api-client.jar

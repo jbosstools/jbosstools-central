@@ -11,7 +11,6 @@
 package org.jboss.tools.maven.sourcelookup.ui.actions;
 
 import java.io.File;
-import java.util.zip.ZipFile;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.ResourcesPlugin;
@@ -40,6 +39,8 @@ import org.eclipse.ui.IEditorActionDelegate;
 import org.eclipse.ui.IEditorPart;
 import org.jboss.tools.maven.sourcelookup.SourceLookupActivator;
 import org.jboss.tools.maven.sourcelookup.containers.JBossSourceContainer;
+import org.jboss.tools.maven.sourcelookup.identification.IFileIdentificationManager;
+import org.jboss.tools.maven.sourcelookup.internal.identification.FileIdentificationManager;
 import org.jboss.tools.maven.sourcelookup.ui.SourceLookupUIActivator;
 
 /**
@@ -78,8 +79,8 @@ public class AttachSourcesActionDelegate implements IEditorActionDelegate {
 						if (fragment.isArchive()) {
 							IFile iFile = ResourcesPlugin.getWorkspace().getRoot().getFile(fragment.getPath());
 							File file = iFile == null || iFile.getLocation() == null ? fragment.getPath().toFile() : iFile.getLocation().toFile();
-							ZipFile jar = new ZipFile(file);
-							final ArtifactKey artifact = JBossSourceContainer.getArtifact(file, jar);
+							IFileIdentificationManager identificationManager = new FileIdentificationManager();
+							final ArtifactKey artifact = identificationManager.identify(file, new NullProgressMonitor());
 							if (artifact != null) {
 								IPath sourcePath = JBossSourceContainer.getSourcePath(artifact);
 								if (sourcePath == null || !sourcePath.toFile().exists()) {
