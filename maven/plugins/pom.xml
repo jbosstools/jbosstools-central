@@ -30,6 +30,7 @@
 		<module>org.jboss.tools.maven.gwt</module>
 		<module>org.jboss.tools.maven.sourcelookup.core</module>
 		<module>org.jboss.tools.maven.sourcelookup.ui</module> 
+		<module>org.jboss.tools.maven.conversion.ui</module>
 		<module>org.jboss.tools.maven.jdt</module>
      </modules>
 </project>

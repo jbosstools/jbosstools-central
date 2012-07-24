@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.5"?>
+<plugin>
+   <extension point="org.eclipse.ui.commands">
+      <command
+            id="org.jboss.tools.maven.conversion.ui.commands.convertToMavenDependencies"
+            name="Convert to Maven Dependency..."
+            defaultHandler="org.jboss.tools.maven.conversion.ui.handlers.ConvertToMavenDependencyHandler"
+            >
+      </command>
+   </extension>
+   <extension point="org.eclipse.ui.menus">
+      <menuContribution 
+      	allPopups="true"
+            locationURI="popup:org.eclipse.ui.popup.any?after=additions">
+      
+      	<command
+              commandId="org.jboss.tools.maven.conversion.ui.commands.convertToMavenDependencies"
+		style="push">
+		<visibleWhen>
+		<or>
+		<with variable="activeMenuSelection">
+		<iterate>
+		<or>
+			<adapt type="org.eclipse.jdt.internal.ui.packageview.ClassPathContainer" />
+			<adapt type="org.eclipse.jdt.core.IPackageFragmentRoot"/>
+		</or>
+		</iterate>
+		</with>
+		</or>
+		</visibleWhen>
+	</command>
+      </menuContribution>
+   </extension>
+
+
+   <extension
+         point="org.eclipse.m2e.core.projectConversionParticipants">
+      <projectConversionParticipant
+            class="org.jboss.tools.maven.conversion.ui.internal.ClasspathConversionParticipant"
+            id="org.jboss.tools.maven.conversion.ui.internal.ClasspathConversionParticipant"
+            name="Classpath conversion participant"
+            nature="org.eclipse.jdt.core.javanature">
+      </projectConversionParticipant>   
+    </extension>   
+</plugin>
