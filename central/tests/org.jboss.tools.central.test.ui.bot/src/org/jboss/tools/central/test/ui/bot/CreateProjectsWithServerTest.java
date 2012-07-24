@@ -8,12 +8,14 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 import org.jboss.tools.ui.bot.ext.SWTBotFactory;
 import org.jboss.tools.ui.bot.ext.SWTFormsBotExt;
+import org.jboss.tools.ui.bot.ext.SWTOpenExt;
 import org.jboss.tools.ui.bot.ext.SWTTestExt;
 import org.jboss.tools.ui.bot.ext.Timing;
 import org.jboss.tools.ui.bot.ext.condition.NonSystemJobRunsCondition;
 import org.jboss.tools.ui.bot.ext.condition.TaskDuration;
 import org.jboss.tools.ui.bot.ext.config.Annotations.Require;
 import org.jboss.tools.ui.bot.ext.config.Annotations.ServerType;
+import org.jboss.tools.ui.bot.ext.gen.ActionItem.Preference;
 import org.jboss.tools.ui.bot.ext.parts.SWTBotFormTextExt;
 import org.jboss.tools.ui.bot.ext.parts.SWTBotTwistie;
 import org.jboss.tools.ui.bot.ext.types.IDELabel;
@@ -32,9 +34,11 @@ public class CreateProjectsWithServerTest extends SWTTestExt{
 	public static void setup() throws FileNotFoundException{
 		util.closeAllEditors(false);
 		util.closeAllViews();
-		bot.menu("Window").menu("Preferences").click();
+		SWTOpenExt open = new SWTOpenExt(bot);
+		open.preferenceOpen(Preference.create("Maven"));
+		/*bot.menu("Window").menu("Preferences").click();
 		bot.waitForShell("Preferences");
-		bot.tree().getTreeItem("Maven").select();
+		bot.tree().getTreeItem("Maven").select();*/
 		bot.checkBox("Download repository index updates on startup").deselect();
 		bot.clickButton("OK");
 		bot.menu("Help").menu(IDELabel.JBossCentralEditor.JBOSS_CENTRAL).click();
