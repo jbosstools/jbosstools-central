@@ -50,7 +50,7 @@
 			<repositories>
 				<repository>
 					<id>jboss-eap</id>
-					<url>http://download.lab.bos.redhat.com/rel-eng/repos/jb-eap-6-rhel-6-build/JBEAP-6.0.0-ER6.1/442736/maven/</url>
+					<url>http://maven.repository.redhat.com/techpreview/all/</url>
 					<releases>
 						<enabled>true</enabled>
 					</releases>
@@ -62,7 +62,7 @@
 			<pluginRepositories>
 				<pluginRepository>
 					<id>jboss-eap-maven-plugin-repository</id>
-					<url>http://download.lab.bos.redhat.com/rel-eng/repos/jb-eap-6-rhel-6-build/JBEAP-6.0.0-ER6.1/442736/maven/</url>
+					<url>http://maven.repository.redhat.com/techpreview/all/</url>
 					<releases>
 						<enabled>true</enabled>
 					</releases>
@@ -78,7 +78,7 @@
 			<repositories>
 				<repository>
 					<id>jboss-eap</id>
-					<url>file:///home/rhopp/repositories/jboss-eap-6.0.0.ER5-maven-repository</url>
+					<url>file:///home/rhopp/repositories/jboss-eap-6.0.0-maven-repository</url>
 					<releases>
 						<enabled>true</enabled>
 					</releases>
@@ -90,7 +90,7 @@
 			<pluginRepositories>
 				<pluginRepository>
 					<id>jboss-eap-maven-plugin-repository</id>
-					<url>file:///home/rhopp/repositories/jboss-eap-6.0.0.ER5-maven-repository</url>
+					<url>file:///home/rhopp/repositories/jboss-eap-6.0.0.CR1-maven-repository</url>
 					<releases>
 						<enabled>true</enabled>
 					</releases>
@@ -107,7 +107,7 @@
 				<repository>
 					<id>jboss-wfk-repository</id>
 					<name>JBoss WFK Maven Repository</name>
-					<url>file:///home/rhopp/repositories/jboss-wfk-2.0.0.ER5-maven-repository</url>
+					<url>file:///home/rhopp/repositories/jboss-wfk-2.0.0-maven-repository</url>
 					<layout>default</layout>
 					<releases>
 						<enabled>true</enabled>
@@ -123,7 +123,7 @@
 				<pluginRepository>
 					<id>jboss-wfk-repository-group</id>
 					<name>JBoss WFK Maven Repository</name>
-					<url>file:///home/rhopp/repositories/jboss-wfk-2.0.0.ER5-maven-repository</url>
+					<url>file:///home/rhopp/repositories/jboss-wfk-2.0.0-maven-repository</url>
 					<layout>default</layout>
 					<releases>
 						<enabled>true</enabled>

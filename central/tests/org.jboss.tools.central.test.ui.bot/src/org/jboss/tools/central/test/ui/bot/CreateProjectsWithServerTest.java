@@ -99,11 +99,6 @@ public class CreateProjectsWithServerTest extends SWTTestExt{
 	}
 	
 	@Test
-	public void dummyTest(){
-		
-	}
-	
-	@Test
 	public void createProjectsSectionTest(){
 		//Dynamic web project
 		bot.hyperlink(IDELabel.JBossCentralEditor.DYNAMIC_WEB_PROJECT).click();
@@ -118,6 +113,7 @@ public class CreateProjectsWithServerTest extends SWTTestExt{
 		bot.waitForShell(IDELabel.JBossCentralEditor.OPENSHIFT_APP_WIZARD);
 		bot.waitWhile(new NonSystemJobRunsCondition());
 		assertTrue("New OpenShift Express Application window should have appeared", bot.activeShell().getText().equals(IDELabel.JBossCentralEditor.OPENSHIFT_APP_WIZARD));
+		bot.waitWhile(new NonSystemJobRunsCondition());
 		//assertTrue("New OpenShift Express Application window should have appeared", bot.shell(IDELabel.JBossCentralEditor.OPENSHIFT_APP_WIZARD).isActive());
 		bot.activeShell().close();
 		bot.waitWhile(new NonSystemJobRunsCondition());
