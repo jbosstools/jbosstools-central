@@ -533,7 +533,7 @@ public class MavenCoreActivator extends Plugin {
 		if (libraryBuild == null) {
 			return;
 		}
-		List<org.eclipse.m2e.model.edit.pom.Plugin> libraryPlugins = projectModel.getBuild().getPlugins();
+		List<org.eclipse.m2e.model.edit.pom.Plugin> libraryPlugins = libraryModel.getBuild().getPlugins();
 		for (org.eclipse.m2e.model.edit.pom.Plugin plugin:libraryPlugins) {
 			org.eclipse.m2e.model.edit.pom.Build projectBuild = projectModel.getBuild();
 			if (projectBuild == null) {
