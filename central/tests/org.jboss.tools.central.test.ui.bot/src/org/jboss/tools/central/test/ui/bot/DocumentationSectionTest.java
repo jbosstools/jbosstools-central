@@ -21,12 +21,12 @@ public class DocumentationSectionTest extends SWTTestExt {
 	
 	@Test
 	public void documentationSectionTest(){
+		testHyperlinkToBrowser("Wiki");
 		testHyperlinkToBrowser("New and Noteworthy");
 		testHyperlinkToBrowser("User Forum");
 		testHyperlinkToBrowser("Reference");
 		testHyperlinkToBrowser("Developer Forum");
 		testHyperlinkToBrowser("FAQ");
-		testHyperlinkToBrowser("Wiki");
 		testHyperlinkToBrowser("Screencasts");
 		testHyperlinkToBrowser("Issue Tracker");
 	}
