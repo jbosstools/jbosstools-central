@@ -10,8 +10,8 @@
 
 	<properties>
 		<translation>en-US</translation>
-		<docname>Maven_Reference_Guide</docname>
-		<bookname>Maven_Reference_Guide</bookname>
+		<docname>Maven_Tools_Reference_Guide</docname>
+		<bookname>Maven Tools Reference Guide</bookname>
 	</properties>
 
 	<profiles>
