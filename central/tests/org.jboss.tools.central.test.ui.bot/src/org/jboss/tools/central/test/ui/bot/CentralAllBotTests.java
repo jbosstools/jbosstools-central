@@ -9,7 +9,7 @@ import org.junit.runners.Suite.SuiteClasses;
 	BaseFunctionalityTest.class,
 	CreateProjectsWithServerTest.class,
 //	CreateProjectsWithoutServerTest.class
-	DocumentationSectionTest.class
+//	DocumentationSectionTest.class
 //	EmptyTestForHudson.class
 //	InstallTest.class
 	})

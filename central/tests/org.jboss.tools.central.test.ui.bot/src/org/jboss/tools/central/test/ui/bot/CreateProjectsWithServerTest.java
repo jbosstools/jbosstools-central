@@ -36,9 +36,6 @@ public class CreateProjectsWithServerTest extends SWTTestExt{
 		util.closeAllViews();
 		SWTOpenExt open = new SWTOpenExt(bot);
 		open.preferenceOpen(Preference.create("Maven"));
-		/*bot.menu("Window").menu("Preferences").click();
-		bot.waitForShell("Preferences");
-		bot.tree().getTreeItem("Maven").select();*/
 		bot.checkBox("Download repository index updates on startup").deselect();
 		bot.clickButton("OK");
 		bot.menu("Help").menu(IDELabel.JBossCentralEditor.JBOSS_CENTRAL).click();
