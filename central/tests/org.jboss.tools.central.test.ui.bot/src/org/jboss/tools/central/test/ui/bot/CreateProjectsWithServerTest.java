@@ -99,7 +99,7 @@ public class CreateProjectsWithServerTest extends SWTTestExt{
 		}*/
 	}
 	
-	@Test
+//	@Test
 	public void createProjectsSectionTest(){
 		//Dynamic web project
 		bot.hyperlink(IDELabel.JBossCentralEditor.DYNAMIC_WEB_PROJECT).click();
