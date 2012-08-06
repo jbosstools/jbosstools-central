@@ -37,7 +37,6 @@ public class DocumentationSectionTest extends SWTTestExt {
 		bot.waitUntil(new BrowserIsLoaded(browser), TaskDuration.LONG.getTimeout());
 		assertFalse("JBoss Central sould not be active editor right now", bot.activeEditor().getTitle().equals("JBoss Central"));
 		//And also can't be empty page
-		//System.out.println(browser.getText());
 		Pattern pattern = Pattern.compile(".*<body></body>.*", Pattern.DOTALL);
 		Matcher matcher = pattern.matcher(browser.getText());
 		assertFalse("Page cannot be empty", matcher.matches());

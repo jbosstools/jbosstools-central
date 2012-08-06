@@ -93,13 +93,9 @@ public class CreateProjectsWithServerTest extends SWTTestExt{
 	@After
 	public void teardown(){
 		servers.removeAllProjectsFromServer("AS-7.0");
-		/*SWTBotTreeItem[] items = ProblemsView.getErrorsNode(bot).getItems();
-		for (SWTBotTreeItem swtBotTreeItem : items) {
-			log.error(swtBotTreeItem.toString());
-		}*/
 	}
 	
-//	@Test
+	@Test
 	public void createProjectsSectionTest(){
 		//Dynamic web project
 		bot.hyperlink(IDELabel.JBossCentralEditor.DYNAMIC_WEB_PROJECT).click();
@@ -108,14 +104,11 @@ public class CreateProjectsWithServerTest extends SWTTestExt{
 		bot.activeShell().close();
 		//Openshift app
 		log.info(bot.activeShell().getText());
-		
-		//TODO will put back when IDELabel.JBossCentralEditor.OPENSHIFT_APP_WIZARD will be correct
 		bot.hyperlink(IDELabel.JBossCentralEditor.OPENSHIFT_APP).click();
 		bot.waitForShell(IDELabel.JBossCentralEditor.OPENSHIFT_APP_WIZARD);
 		bot.waitWhile(new NonSystemJobRunsCondition());
 		assertTrue("New OpenShift Express Application window should have appeared", bot.activeShell().getText().equals(IDELabel.JBossCentralEditor.OPENSHIFT_APP_WIZARD));
 		bot.waitWhile(new NonSystemJobRunsCondition());
-		//assertTrue("New OpenShift Express Application window should have appeared", bot.shell(IDELabel.JBossCentralEditor.OPENSHIFT_APP_WIZARD).isActive());
 		bot.activeShell().close();
 		bot.waitWhile(new NonSystemJobRunsCondition());
 		bot.hyperlink(IDELabel.JBossCentralEditor.JAVA_EE_WEB_PROJECT).click();
@@ -150,17 +143,14 @@ public class CreateProjectsWithServerTest extends SWTTestExt{
 	public void projectExamplesSectionTest(){
 		SWTBotTwistie twistieBot = bot.twistieByLabel("JBoss Quickstarts");
 		int counter = 0;
-		while (!twistieBot.isExpanded() && counter>10){
+		while (!twistieBot.isExpanded() && counter<10){
 			twistieBot.toggle();
 			counter++;
 		}
-		/*if (!twistieBot.isExpanded()){
-			twistieBot.toggle();
-		}*/
 		SWTFormsBotExt formsBot = SWTBotFactory.getFormsBot();
 		checkExample(formsBot, "Helloworld", true);
 		checkExample(formsBot, "Numberguess", true);
-		checkExample(formsBot, "Login", true, "login.xml"); //Login example ma nejaky divny login.xml cheatsheet
+		checkExample(formsBot, "Login", true, "login.xml"); //Login has some weird login.xml cheatsheet
 		checkExample(formsBot, "Kitchensink", true);
 		checkExample(formsBot, "HTML5", true);
 		canBeDeployedTest();
@@ -291,22 +281,4 @@ public class CreateProjectsWithServerTest extends SWTTestExt{
 			bot.clickButton("Finish");
 		}
 	}
-	
-//	private void checkCreateProject(String formText){
-//		//formsBot.formTextWithText(formText).click();
-//		bot.hyperlink(formText).click();
-//		bot.waitForShell(IDELabel.JBossCentralEditor.PROJECT_EXAMPLE);
-//		SWTBotWizard wizard = new SWTBotWizard(bot.shell(IDELabel.JBossCentralEditor.PROJECT_EXAMPLE).widget);
-//		wizard.next();
-//		wizard.finishWithWait();
-//		bot.activeShell().close();
-//		if (bot.activeEditor().getTitle().equalsIgnoreCase("cheat sheets")){
-//			bot.activeEditor().close();
-//		}
-////		assertTrue("Project Example window should have appeared", bot.shell(IDELabel.JBossCentralEditor.PROJECT_EXAMPLE).isActive());
-////		bot.button("Start").click();
-////		bot.waitForShell(wizzardShellText);
-////		assertTrue(wizzardShellText+"  should have appeared", bot.shell(wizzardShellText).isActive());
-////		bot.activeShell().close();
-//	}
 }

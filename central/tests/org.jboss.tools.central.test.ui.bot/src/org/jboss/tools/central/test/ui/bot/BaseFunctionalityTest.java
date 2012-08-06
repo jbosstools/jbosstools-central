@@ -9,7 +9,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite.SuiteClasses;
 
-//@RunWith(SWTBotJunit4ClassRunner.class)
 @RunWith(RequirementAwareSuite.class)
 @SuiteClasses({CentralAllBotTests.class})
 public class BaseFunctionalityTest extends SWTTestExt {
@@ -19,7 +18,6 @@ public class BaseFunctionalityTest extends SWTTestExt {
 	 */
 	@BeforeClass
 	public static void setup(){
-		//jbt.closeReportUsageWindowIfOpened(false);
 		util.closeAllEditors(false);
 		util.closeAllViews();
 	}
@@ -45,6 +43,8 @@ public class BaseFunctionalityTest extends SWTTestExt {
 		assertTrue("JBoss Central is not active",bot.editorByTitle(IDELabel.JBossCentralEditor.JBOSS_CENTRAL).isActive());
 	}
 	
+	
+	//TODO Refactor search Test
 //	@Test
 //	public void testSearch(){
 //		assertTrue("JBoss Central is not active",bot.editorByTitle("JBoss Central").isActive());
