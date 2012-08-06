@@ -10,9 +10,6 @@
  ******************************************************************************/ 
 package org.jboss.tools.maven.ui.bot.test;
 
-import junit.framework.TestCase;
-
-import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 import org.eclipse.swtbot.swt.finder.junit.SWTBotJunit4ClassRunner;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotMenu;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
@@ -26,7 +23,7 @@ import org.junit.runner.RunWith;
  * 
  */
 @RunWith(SWTBotJunit4ClassRunner.class)
-public class JBossPerspectiveTest extends TestCase {
+public class JBossPerspectiveTest extends AbstractMavenSWTBotTest {
 
 	/**
 	 * Tests JBoss perspective has Maven stuff
@@ -34,8 +31,6 @@ public class JBossPerspectiveTest extends TestCase {
 	 */
 	@Test
 	public void testJBossPerspective() throws WorkbenchException {
-		SWTWorkbenchBot bot = new SWTWorkbenchBot();
-		bot.viewByTitle("Welcome").close();
 		bot.menu("Window").menu("Open Perspective").menu("Other...").click();
 		SWTBotShell shell = bot.shell("Open Perspective");
 	    shell.activate();

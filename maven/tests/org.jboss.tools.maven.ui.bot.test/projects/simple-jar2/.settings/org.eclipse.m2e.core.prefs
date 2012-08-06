@@ -1,5 +1,4 @@
-#Tue Jan 24 17:11:28 CET 2012
-activeProfiles=common-profile, jboss.repository, jbosss.repository
+activeProfiles=common-profile, profile.from.settings.xml, jboss
 eclipse.preferences.version=1
 resolveWorkspaceProjects=true
 version=1

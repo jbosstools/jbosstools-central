@@ -24,10 +24,9 @@ Require-Bundle: org.eclipse.ui,
  org.jboss.tools.seam.core,
  org.eclipse.datatools.connectivity,
  org.eclipse.datatools.connectivity.db.generic,
- org.eclipse.m2e.wtp;bundle-version="0.16.0"
+ org.hamcrest
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Eclipse-RegisterBuddy: org.apache.log4j
 Import-Package: org.apache.maven.model
-Export-Package: org.jboss.tools.maven.ui.bot.test
 

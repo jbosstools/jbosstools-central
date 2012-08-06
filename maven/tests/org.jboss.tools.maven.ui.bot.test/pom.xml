@@ -13,7 +13,7 @@
 	<packaging>eclipse-test-plugin</packaging>
 
 	<properties>
-		<systemProperties>-Djbosstools.test.jboss.home.6.0=${requirementsDirectory}/jboss-6.0.0.Final -Djbosstools.test.jboss.home.5.1=${requirementsDirectory}/jboss-5.1.0.GA -Djbosstools.test.seam.2.0.1.GA.home=${requirementsDirectory}/jboss-seam-2.2.0.GA</systemProperties>
+		<systemProperties>-Djbosstools.test.jboss.home.7.1=${requirementsDirectory}/jboss-as-7.1.1.Final -Djbosstools.test.seam.2.2.0.home=${requirementsDirectory}/jboss-seam-2.2.0.GA -Djbosstools.test.seam.2.3.0.home=${requirementsDirectory}/jboss-seam-2.3.0</systemProperties>
 	</properties>
 	<build>
 		<plugins>
@@ -22,7 +22,7 @@
 				<artifactId>maven-dependency-plugin</artifactId>
 				<executions>
 					<execution>
-						<id>install-as-6.0.0</id>
+						<id>install-as-7.1.1</id>
 						<phase>pre-integration-test</phase>
 						<goals>
 							<goal>unpack</goal>
@@ -30,9 +30,9 @@
 						<configuration>
 							<artifactItems>
 								<artifactItem>
-										<groupId>org.jboss.jbossas</groupId>
-										<artifactId>jboss-as-distribution</artifactId>
-										<version>6.0.0.Final</version>
+										<groupId>org.jboss.as</groupId>
+										<artifactId>jboss-as-dist</artifactId>
+										<version>7.1.1.Final</version>
 										<type>zip</type>
 									</artifactItem>
 								</artifactItems>
@@ -46,7 +46,7 @@
 				<artifactId>maven-download-plugin</artifactId>
 				<executions>
 					<execution>
-						<id>install-seam</id>
+						<id>install-seam22</id>
 						<phase>pre-integration-test</phase>
 						<goals>
 							<goal>wget</goal>
@@ -58,15 +58,16 @@
 						</configuration>
 					</execution>
 					<execution>
-						<id>install-as-5.1.0</id>
+						<id>install-seam23</id>
 						<phase>pre-integration-test</phase>
 						<goals>
 							<goal>wget</goal>
 						</goals>
 						<configuration>
-							<url>http://repository.jboss.org/sourceforge/jboss-5.1.0.GA.zip</url>
-							<md5>78322c75ca0c13002a04418b4a8bc920</md5>
+							<url>http://sourceforge.net/projects/jboss/files/JBoss%20Seam/2.3.0.ALPHA/jboss-seam-2.3.0.ALPHA-distribution.zip</url>
 							<unpack>true</unpack>
+							<outputDirectory>${requirementsDirectory}/jboss-seam-2.3.0</outputDirectory>
+							<md5>07b19de75bcb86b5f4cff3a15d7e2158</md5>
 						</configuration>
 					</execution>
 				</executions>
@@ -79,6 +80,9 @@
 					<skip>${swtbot.test.skip}</skip>
 					<testSuite>org.jboss.tools.maven.ui.bot.test</testSuite>
 					<testClass>org.jboss.tools.maven.ui.bot.test.MavenAllBotTests</testClass>
+					<!-- <environmentVariables>
+						<DISPLAY>:2.0</DISPLAY>
+					</environmentVariables> -->
 					<dependencies>
 						<dependency combine.children="append">
 							<type>p2-installable-unit</type>
@@ -115,14 +119,20 @@
 							<artifactId>org.jboss.tools.common.jdt.feature.feature.group</artifactId>
 							<version>0.0.0</version>
 						</dependency>
-						
+
+						<dependency>
+							<type>p2-installable-unit</type>
+							<artifactId>org.jboss.tools.common.jdt.feature.feature.group</artifactId>
+							<version>0.0.0</version>
+						</dependency>
+
 						<!-- configurator test -->
 						<dependency>
 							<type>p2-installable-unit</type>
 							<artifactId>org.jboss.tools.ws.jaxrs.feature.feature.group</artifactId>
 							<version>0.0.0</version>
 						</dependency>
-						
+
 						<!-- seam test -->
 						<dependency>
 							<type>p2-installable-unit</type>
@@ -139,9 +149,9 @@
 							<artifactId>org.eclipse.datatools.enablement.feature.feature.group</artifactId>
 							<version>0.0.0</version>
 						</dependency>
-									
-						
-						
+
+
+
 						<!-- maven -->
 						<dependency>
 							<type>p2-installable-unit</type>
@@ -158,7 +168,7 @@
 							<artifactId>org.jboss.tools.maven.feature.feature.group</artifactId>
 							<version>0.0.0</version>
 						</dependency>
-						 <dependency>
+						<dependency>
 							<type>p2-installable-unit</type>
 							<artifactId>org.jboss.tools.maven.seam.feature.feature.group</artifactId>
 							<version>0.0.0</version>

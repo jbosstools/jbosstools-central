@@ -2,10 +2,48 @@
 <settings>
 	<profiles>
 		<profile>
-			<activation>
-				<activeByDefault>true</activeByDefault>
-			</activation>
 			<id>profile.from.settings.xml</id>
 		</profile>
+		<profile>
+			<id>jboss</id>
+			<repositories>
+				<repository>
+					<id>jboss</id>
+					<name>jboss</name>
+					<url>https://repository.jboss.org/nexus/content/repositories/releases/
+					</url>
+					<layout>default</layout>
+					<releases>
+						<enabled>true</enabled>
+						<updatePolicy>never</updatePolicy>
+					</releases>
+					<snapshots>
+						<enabled>false</enabled>
+						<updatePolicy>never</updatePolicy>
+					</snapshots>
+				</repository>
+			</repositories>
+			<pluginRepositories>
+				<pluginRepository>
+					<id>jboss</id>
+					<name>jboss</name>
+					<url>https://repository.jboss.org/nexus/content/repositories/releases/
+					</url>
+					<layout>default</layout>
+					<releases>
+						<enabled>true</enabled>
+						<updatePolicy>never</updatePolicy>
+					</releases>
+					<snapshots>
+						<enabled>false</enabled>
+						<updatePolicy>never</updatePolicy>
+					</snapshots>
+				</pluginRepository>
+			</pluginRepositories>
+		</profile>
 	</profiles>
+	<activeProfiles>
+		<activeProfile>profile.from.settings.xml</activeProfile>
+		<activeProfile>jboss</activeProfile>
+	</activeProfiles>
 </settings>

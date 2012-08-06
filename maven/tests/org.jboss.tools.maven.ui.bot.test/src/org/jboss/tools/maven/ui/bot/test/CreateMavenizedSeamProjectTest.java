@@ -11,27 +11,14 @@
 
 package org.jboss.tools.maven.ui.bot.test;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-
 import java.io.File;
-import java.io.FilenameFilter;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Properties;
 
-import org.eclipse.core.resources.IFolder;
-import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IProject;
-import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
-import org.eclipse.core.runtime.IPath;
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.NullProgressMonitor;
-import org.eclipse.core.runtime.Path;
 import org.eclipse.datatools.connectivity.ConnectionProfileConstants;
 import org.eclipse.datatools.connectivity.ConnectionProfileException;
 import org.eclipse.datatools.connectivity.ProfileManager;
@@ -43,262 +30,128 @@ import org.eclipse.datatools.connectivity.drivers.IDriverMgmtConstants;
 import org.eclipse.datatools.connectivity.drivers.IPropertySet;
 import org.eclipse.datatools.connectivity.drivers.PropertySetImpl;
 import org.eclipse.datatools.connectivity.drivers.models.TemplateDescriptor;
-import org.eclipse.m2e.core.internal.IMavenConstants;
 import org.eclipse.m2e.tests.common.WorkspaceHelpers;
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Event;
-import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
-import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
-import org.eclipse.swtbot.swt.finder.SWTBot;
-import org.eclipse.swtbot.swt.finder.widgets.SWTBotMenu;
-import org.eclipse.swtbot.swt.finder.widgets.SWTBotRadio;
-import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
-import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
-import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
-import org.eclipse.ui.IPerspectiveDescriptor;
-import org.eclipse.ui.IPerspectiveRegistry;
-import org.eclipse.ui.IWorkbench;
-import org.eclipse.ui.PlatformUI;
-import org.eclipse.wst.server.core.IModule;
-import org.eclipse.wst.server.core.IRuntime;
-import org.eclipse.wst.server.core.IRuntimeType;
-import org.eclipse.wst.server.core.IRuntimeWorkingCopy;
-import org.eclipse.wst.server.core.IServer;
-import org.eclipse.wst.server.core.IServerType;
-import org.eclipse.wst.server.core.IServerWorkingCopy;
-import org.eclipse.wst.server.core.ServerCore;
-import org.eclipse.wst.server.core.ServerUtil;
-import org.eclipse.wst.server.core.internal.RuntimeWorkingCopy;
-import org.eclipse.wst.server.core.internal.ServerWorkingCopy;
-import org.eclipse.wst.validation.ValidationFramework;
 import org.jboss.tools.seam.core.project.facet.SeamRuntime;
 import org.jboss.tools.seam.core.project.facet.SeamRuntimeManager;
 import org.jboss.tools.seam.core.project.facet.SeamVersion;
-import org.jboss.tools.test.util.ResourcesUtils;
+import org.jboss.tools.ui.bot.ext.SWTBotExt;
+import org.jboss.tools.ui.bot.ext.SWTUtilExt;
 import org.jboss.tools.ui.bot.ext.config.Annotations.Require;
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-/**
- * @author Snjeza
- *
- */
 @SuppressWarnings("restriction")
-@Require(perspective="Seam")
-public class CreateMavenizedSeamProjectTest{
-	
-	protected static final long IDLE_TIME = 1 * 60 * 1000L;
+@Require(perspective = "Java EE")
+public class CreateMavenizedSeamProjectTest extends AbstractMavenSWTBotTest {
 
-	private static final String CONNECTION_PROFILE_NAME = "DefaultDS";
-
-	private static final String SEAM_RUNTIME_NAME = "Seam 2.2";
-
-	private static final String JBOSS_AS_RUNTIME_NAME = "JBoss AS 5.1 Runtime";
-
-	public static final String PACKAGE_EXPLORER = "Package Explorer"; //$NON-NLS-1$
-	
-	private static final String JBOSS_AS_SERVER_NAME = "JBoss AS 5.1 Server";
-
-	public static final String JBOSS_AS_HOST = "localhost"; //$NON-NLS-1$
-
-	public static final String JBOSS_AS_DEFAULT_CONFIGURATION_NAME = "default"; //$NON-NLS-1$
-
-	public static final String HSQL_DRIVER_DEFINITION_ID 
-												= "DriverDefn.Hypersonic DB"; //$NON-NLS-1$
-
-	public static final String HSQL_DRIVER_NAME = "Hypersonic DB"; //$NON-NLS-1$
-
-	public static final String HSQL_DRIVER_TEMPLATE_ID 
-						= "org.eclipse.datatools.enablement.hsqldb.1_8.driver"; //$NON-NLS-1$
-
-	public static final String DTP_DB_URL_PROPERTY_ID 
-								= "org.eclipse.datatools.connectivity.db.URL"; //$NON-NLS-1$
-	
+	public static final String SEAM_WEB_PROJECT = "seamWeb";
+	public static final String SEAM_EAR_PROJECT = "seamEar";
+	public static final String JBOSS_AS_7_1 = System.getProperty("jbosstools.test.jboss.home.7.1");
+	public static final String SEAM_2_3 = System.getProperty("jbosstools.test.seam.2.3.0.home");
+	public static final String SEAM_2_3_NAME = "jboss-seam-2.3.0";
+	public static final String SEAM_2_2 = System.getProperty("jbosstools.test.seam.2.2.0.home");
+	public static final String SEAM_2_2_NAME = "jboss-seam-2.2.0";
+	public static final String CONNECTION_PROFILE_NAME = "DefaultDS";
+	public static final String HSQL_DRIVER_DEFINITION_ID ="DriverDefn.Hypersonic DB";
+	public static final String HSQL_DRIVER_NAME ="Hypersonic DB";
+	public static final String HSQL_DRIVER_TEMPLATE_ID = "org.eclipse.datatools.enablement.hsqldb.1_8.driver";
+	public static final String DTP_DB_URL_PROPERTY_ID = "org.eclipse.datatools.connectivity.db.URL";
 	public static final String HSQL_PROFILE_ID = "org.eclipse.datatools.enablement.hsqldb.connectionProfile";
-																																	
-	public static final String JBOSS_AS_HOME = System.getProperty("jbosstools.test.jboss.home.5.1");
-
-	public static final String JBOSS_AS_RUNTIME_ID = "org.jboss.ide.eclipse.as.runtime.51";
+	public static final String HSQLDB_DRIVER_LOCATION ="lib/hsqldb.jar";
+	public static final String CURRENT_SEAM_2_3 = "2.3.0.Beta2";
+	public static final String CURRENT_SEAM_2_2 ="2.2.2.Final";
 	
-	public static final String JBOSS_AS_SERVER_ID = "org.jboss.ide.eclipse.as.51";
-	
-	public static final String SEAM_HOME_PROPERTY = System.getProperty("jbosstools.test.seam.2.0.1.GA.home");
-
-	public static final String HSQLDB_DRIVER_JAR_NAME = "hsqldb.jar"; //$NON-NLS-1$
-	
-	public static final String HSQLDB_DRIVER_LOCATION = "lib/ + HSQLDB_DRIVER_JAR_NAME";//$NON-NLS-1$
-	
-	public static final String PROJECT_NAME_WAR = "MavenizedSeamProjectWar";
-	
-	public static final String TEST_PROJECT_NAME_WAR = "MavenizedSeamProjectWar-test";
-	
-	public static final String PARENT_PROJECT_NAME_WAR = "MavenizedSeamProjectWar-parent";
-	
-	
-	public static final String PROJECT_NAME = "MavenizedSeamProject";
-	
-	public static final String EAR_PROJECT_NAME = "MavenizedSeamProject-ear";
-	
-	public static final String EJB_PROJECT_NAME = "MavenizedSeamProject-ejb";
-	
-	public static final String TEST_PROJECT_NAME = "MavenizedSeamProject-test";
-	
-	public static final String PARENT_PROJECT_NAME = "MavenizedSeamProject-parent";
-	
-	public static final String DEPLOY_TYPE_EAR = "EAR";
-	
-	public static final String DEPLOY_TYPE_WAR = "WAR";
-	
-	protected static SWTWorkbenchBot bot;
+			
+	private SWTUtilExt botUtil = new SWTUtilExt(bot);
 
 	@BeforeClass
-	public final static void beforeClass() throws Exception {
-		bot = AbstractMavenSWTBotTest.initSWTBot();
-
-		String asLocation = JBOSS_AS_HOME;
-		
-		String runtimeType = JBOSS_AS_RUNTIME_ID;
-		String serverType = JBOSS_AS_SERVER_ID;
-		
-		createJBossServer(new File(asLocation), serverType, runtimeType, JBOSS_AS_SERVER_NAME, JBOSS_AS_RUNTIME_NAME);
-		
-		String seamPath = SEAM_HOME_PROPERTY;
-		createSeamRuntime(SEAM_RUNTIME_NAME, seamPath, SeamVersion.SEAM_2_2);
-		
-		createDriver(asLocation, HSQLDB_DRIVER_LOCATION);
-		
-		activateSchell();
-		
-		createNewSeamWebProjectWizard(PROJECT_NAME, DEPLOY_TYPE_EAR);
-		
-		createNewSeamWebProjectWizard(PROJECT_NAME_WAR, DEPLOY_TYPE_WAR);
+	public static void setup() {
+		SWTBotExt setup = new SWTBotExt();
+		setup.menu("Window").menu("Show View").menu("Other...").click();
+		setup.tree().expandNode("Java").select("Package Explorer").click();
+		setup.button("OK").click();
 	}
-
-
-
-	private static void removeProjects() throws Exception {
+	
+	@Test
+	public void createSeamProjectTest() throws InterruptedException, ConnectionProfileException, IOException, CoreException{
+		createSeamProject(SEAM_WEB_PROJECT,"2.3", "WAR", "Disable Library Configuration");
+		createSeamProject(SEAM_EAR_PROJECT,"2.3", "EAR", "Disable Library Configuration");
+		//checkErrors(); TODO QuickFix Project
 		WorkspaceHelpers.cleanWorkspace();
-	}
-
-	private static void removeServers() throws CoreException {
-		IServer server = ServerCore.findServer(JBOSS_AS_SERVER_NAME);
-		IServerWorkingCopy wc = server.createWorkingCopy();
-		IModule[] modules = wc.getModules();
-		IProgressMonitor monitor = new NullProgressMonitor();
-		wc.modifyModules(new IModule[] {} , modules, monitor);
-		wc.save(true, monitor);
-		server.publish(IServer.PUBLISH_INCREMENTAL, monitor);
-		waitForIdle();
-		server.getRuntime().delete();
-		server.delete();
-		waitForIdle();
-	}
-
-	protected static void switchPerspective(final String pid) {
-		Display.getDefault().syncExec(new Runnable() {
-
-			public void run() {
-				IWorkbench workbench = PlatformUI.getWorkbench();
-				IPerspectiveRegistry perspectiveRegistry = workbench
-						.getPerspectiveRegistry();
-				IPerspectiveDescriptor perspective = perspectiveRegistry
-						.findPerspectiveWithId(pid);
-				workbench.getActiveWorkbenchWindow().getActivePage()
-						.setPerspective(perspective);
-			}
-		});
+		createSeamProject(SEAM_WEB_PROJECT,"2.2", "WAR", "Disable Library Configuration");
+		createSeamProject(SEAM_EAR_PROJECT,"2.2", "EAR", "Disable Library Configuration");
+		//checkErrors();
 	}
 	
-	@Before
-    public void setUp() throws Exception {
-        activateSchell();
-    }
-
-	private static void activateSchell() {
-		AbstractMavenSWTBotTest.activateSchell();
+	private void checkErrors() throws CoreException{
+		IProject[] projects = ResourcesPlugin.getWorkspace().getRoot().getProjects();
+		for(IProject project: projects){
+			assertNoErrors(project);
+		}
 	}
 	
-	@After
-	public void tearDown() throws Exception {
-		
-	}
-	
-	@AfterClass
-	public final static void afterClass() throws Exception {
-		boolean buildAutomatically = ResourcesUtils.setBuildAutomatically(false);
-		ValidationFramework.getDefault().suspendAllValidation(true);
-		try {
-			removeServers();
-			removeProjects();
-		} finally {
-			ResourcesUtils.setBuildAutomatically(buildAutomatically);
-			ValidationFramework.getDefault().suspendAllValidation(false);
+	private void createSeamProject(String name, String version, String type, String JSFLibrary) throws InterruptedException, ConnectionProfileException, IOException, CoreException {
+		createDriver(JBOSS_AS_7_1, HSQLDB_DRIVER_LOCATION);
+		if(version.equals("2.3")){
+			createSeamRuntime(SEAM_2_3_NAME, SEAM_2_3, SeamVersion.SEAM_2_3);
+		} else if(version.equals("2.2")){
+			createSeamRuntime(SEAM_2_2_NAME, SEAM_2_2, SeamVersion.SEAM_2_2);
 		}
-		waitForIdle();
-	}
-	
-	protected static void createJBossServer(File asLocation, String serverType, String runtimeType, String name, String runtimeName) throws CoreException {
-		if (!asLocation.isDirectory()) {
-			return;
+		bot.menu("File").menu("New").menu("Other...").click();
+		waitForShell(botUtil, "New");
+		bot.tree().expandNode("Seam").select("Seam Web Project");
+		bot.button("Next >").click();
+		waitForShell(botUtil, "New Seam Project");
+		bot.textWithLabel("Project name:").setText(name);
+		bot.button("New Runtime...").click();
+		waitForShell(botUtil, "New Server Runtime Environment");
+		bot.tree().expandNode("JBoss Community").select("JBoss 7.1 Runtime");
+		bot.button("Next >").click();
+		bot.textWithLabel("Home Directory").setText(JBOSS_AS_7_1);
+		bot.button("Finish").click();
+		bot.button("New...").click();
+		waitForShell(botUtil, "New Server");
+		bot.tree().expandNode("JBoss Community").select("JBoss AS 7.1");
+		bot.button("Finish").click();
+		bot.button("Modify...").click();
+		waitForShell(botUtil, "Project Facets");
+		bot.tree().getTreeItem("Seam").contextMenu("Change Version...").click();
+	    waitForShell(botUtil, "Change Version");
+	    bot.comboBoxWithLabel("Version:").setSelection(version);
+	    bot.button("OK").click();
+		bot.tree().getTreeItem("JBoss Maven Integration").check();    
+		bot.button("OK").click();
+		bot.button("Next >").click();
+		bot.button("Next >").click();
+		bot.button("Next >").click();
+		assertTrue("Seam project doesn't have war packaging set by default", bot.comboBoxWithLabel("Packaging:").selection() == "war");
+		String seamVersion = bot.textWithLabel("Seam Maven version:").getText();
+		if(version.equals("2.3")){
+			assertTrue(version+ " Seam project has " + seamVersion + " set by default", seamVersion.equals(CURRENT_SEAM_2_3));
+		} else if(version.equals("2.2")){
+			assertTrue(version+ " Seam project has " + seamVersion + " set by default", seamVersion.equals(CURRENT_SEAM_2_2));
 		}
-		IPath jbossAsLocationPath = new Path(asLocation.getAbsolutePath());
-
-		IServer[] servers = ServerCore.getServers();
-		for (int i = 0; i < servers.length; i++) {
-			IRuntime runtime = servers[i].getRuntime();
-			if(runtime != null && runtime.getLocation().equals(jbossAsLocationPath)) {
-				return;
-			}
+		bot.button("Next >").click();
+		bot.comboBoxWithLabel("Type:").setSelection("Disable Library Configuration");
+		bot.button("Next >").click();
+		if(version.equals("2.3")){
+			bot.comboBox(0).setSelection(SEAM_2_3_NAME);
+		} else if(version.equals("2.2")){
+			bot.comboBox(0).setSelection(SEAM_2_2_NAME);
 		}
-
-		IRuntime runtime = null;
-		IRuntime[] runtimes = ServerCore.getRuntimes();
-		for (int i = 0; i < runtimes.length; i++) {
-			if (runtimes[0].getLocation().equals(jbossAsLocationPath)) {
-				runtime = runtimes[0].createWorkingCopy();
-				break;
-			}
-		}
-
-		IProgressMonitor progressMonitor = new NullProgressMonitor();
-		if (runtime == null) {
-			runtime = createRuntime(runtimeName, asLocation.getAbsolutePath(), progressMonitor, runtimeType);
-		}
-		if (runtime != null) {
-			createServer( runtime, serverType, name, progressMonitor);
-		}
-	}
-
-	protected static IRuntime createRuntime(String runtimeName, String jbossASLocation, IProgressMonitor progressMonitor, String runtimeType) throws CoreException {
-		IRuntimeWorkingCopy runtime = null;
-		String type = null;
-		String version = null;
-		String runtimeId = null;
-		IPath jbossAsLocationPath = new Path(jbossASLocation);
-		IRuntimeType[] runtimeTypes = ServerUtil.getRuntimeTypes(type, version, runtimeType);
-		if (runtimeTypes.length > 0) {
-			runtime = runtimeTypes[0].createRuntime(runtimeId, progressMonitor);
-			runtime.setLocation(jbossAsLocationPath);
-			if(runtimeName!=null) {
-				runtime.setName(runtimeName);				
-			}
-			((RuntimeWorkingCopy) runtime).setAttribute("org.jboss.ide.eclipse.as.core.runtime.configurationName", JBOSS_AS_DEFAULT_CONFIGURATION_NAME); //$NON-NLS-1$
-
-			return runtime.save(false, progressMonitor);
-		}
-		return runtime;
+		bot.radio(type).click();
+		bot.button("Finish").click();
+		waitForShell(botUtil, "Open Associated Perspective?");
+		bot.button("No").click();
+		botUtil.waitForNonIgnoredJobs();
 	}
 
-	protected static void createDriver(String jbossASLocation, String driverLocation) throws ConnectionProfileException, IOException {
-		if(ProfileManager.getInstance().getProfileByName(CONNECTION_PROFILE_NAME) != null) {
+	protected static void createDriver(String jbossASLocation,String driverLocation) throws ConnectionProfileException,IOException {
+		if (ProfileManager.getInstance().getProfileByName(CONNECTION_PROFILE_NAME) != null) {
 			return;
 		}
 		String driverPath = new File(jbossASLocation + driverLocation).getCanonicalPath(); //$NON-NLS-1$
-		
+
 		DriverInstance driver = DriverManager.getInstance().getDriverInstanceByName(HSQL_DRIVER_NAME);
 		if (driver == null) {
 			TemplateDescriptor descr = TemplateDescriptor.getDriverTemplateDescriptor(HSQL_DRIVER_TEMPLATE_ID);
@@ -316,8 +169,10 @@ public class CreateMavenizedSeamProjectTest{
 				props.setProperty(id, value == null ? "" : value); //$NON-NLS-1$
 			}
 			props.setProperty(DTP_DB_URL_PROPERTY_ID, "jdbc:hsqldb:."); //$NON-NLS-1$
-			props.setProperty(IDriverMgmtConstants.PROP_DEFN_TYPE, descr.getId());
-			props.setProperty(IDriverMgmtConstants.PROP_DEFN_JARLIST, driverPath);
+			props.setProperty(IDriverMgmtConstants.PROP_DEFN_TYPE,
+					descr.getId());
+			props.setProperty(IDriverMgmtConstants.PROP_DEFN_JARLIST,
+					driverPath);
 
 			instance.setBaseProperties(props);
 			DriverManager.getInstance().removeDriverInstance(instance.getID());
@@ -326,47 +181,24 @@ public class CreateMavenizedSeamProjectTest{
 		}
 
 		driver = DriverManager.getInstance().getDriverInstanceByName(HSQL_DRIVER_NAME);
-		if (driver != null && ProfileManager.getInstance().getProfileByName(CONNECTION_PROFILE_NAME) == null) { //$NON-NLS-1$
+		if (driver != null && ProfileManager.getInstance().getProfileByName(CONNECTION_PROFILE_NAME) == null) {
 			// create profile
 			Properties props = new Properties();
-			props.setProperty(ConnectionProfileConstants.PROP_DRIVER_DEFINITION_ID, HSQL_DRIVER_DEFINITION_ID);
-			props.setProperty(IDBConnectionProfileConstants.CONNECTION_PROPERTIES_PROP_ID, ""); //$NON-NLS-1$
-			props.setProperty(IDBDriverDefinitionConstants.DRIVER_CLASS_PROP_ID, driver.getProperty(IDBDriverDefinitionConstants.DRIVER_CLASS_PROP_ID));
-			props.setProperty(IDBDriverDefinitionConstants.DATABASE_VENDOR_PROP_ID,	driver.getProperty(IDBDriverDefinitionConstants.DATABASE_VENDOR_PROP_ID));
-			props.setProperty(IDBDriverDefinitionConstants.DATABASE_VERSION_PROP_ID, driver.getProperty(IDBDriverDefinitionConstants.DATABASE_VERSION_PROP_ID));
-			props.setProperty(IDBDriverDefinitionConstants.DATABASE_NAME_PROP_ID, "Default"); //$NON-NLS-1$
-			props.setProperty(IDBDriverDefinitionConstants.PASSWORD_PROP_ID, ""); //$NON-NLS-1$
-			props.setProperty(IDBConnectionProfileConstants.SAVE_PASSWORD_PROP_ID, "false"); //$NON-NLS-1$
-			props.setProperty(IDBDriverDefinitionConstants.USERNAME_PROP_ID, driver.getProperty(IDBDriverDefinitionConstants.USERNAME_PROP_ID));
+			props.setProperty(ConnectionProfileConstants.PROP_DRIVER_DEFINITION_ID,	HSQL_DRIVER_DEFINITION_ID);
+			props.setProperty(IDBConnectionProfileConstants.CONNECTION_PROPERTIES_PROP_ID,""); 
+			props.setProperty(IDBDriverDefinitionConstants.DRIVER_CLASS_PROP_ID,driver.getProperty(IDBDriverDefinitionConstants.DRIVER_CLASS_PROP_ID));
+			props.setProperty(IDBDriverDefinitionConstants.DATABASE_VENDOR_PROP_ID,driver.getProperty(IDBDriverDefinitionConstants.DATABASE_VENDOR_PROP_ID));
+			props.setProperty(IDBDriverDefinitionConstants.DATABASE_VERSION_PROP_ID,driver.getProperty(IDBDriverDefinitionConstants.DATABASE_VERSION_PROP_ID));
+			props.setProperty(IDBDriverDefinitionConstants.DATABASE_NAME_PROP_ID,"Default");
+			props.setProperty(IDBDriverDefinitionConstants.PASSWORD_PROP_ID, "");
+			props.setProperty(IDBConnectionProfileConstants.SAVE_PASSWORD_PROP_ID,"false");
+			props.setProperty(IDBDriverDefinitionConstants.USERNAME_PROP_ID,driver.getProperty(IDBDriverDefinitionConstants.USERNAME_PROP_ID));
 			props.setProperty(IDBDriverDefinitionConstants.URL_PROP_ID, driver.getProperty(IDBDriverDefinitionConstants.URL_PROP_ID));
-
-			ProfileManager.getInstance().createProfile(CONNECTION_PROFILE_NAME,	"The JBoss AS Hypersonic embedded database", HSQL_PROFILE_ID, props, "", false); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+			ProfileManager.getInstance().createProfile(CONNECTION_PROFILE_NAME,"The JBoss AS Hypersonic embedded database", HSQL_PROFILE_ID, props, "", false);
 		}
-		
+
 	}
 	
-	protected static IServerWorkingCopy createServer(IRuntime runtime, String runtimeType, String name, IProgressMonitor progressMonitor) throws CoreException {
-		IServerType serverType = ServerCore.findServerType(runtimeType);
-		IServerWorkingCopy server = serverType.createServer(null, null, runtime, progressMonitor);
-
-		server.setHost(JBOSS_AS_HOST);
-		server.setName(name);
-		
-		// JBossServer.DEPLOY_DIRECTORY
-		String deployVal = runtime.getLocation().append("server").append(JBOSS_AS_DEFAULT_CONFIGURATION_NAME).append("deploy").toOSString(); //$NON-NLS-1$ //$NON-NLS-2$
-		((ServerWorkingCopy) server).setAttribute("org.jboss.ide.eclipse.as.core.server.deployDirectory", deployVal); //$NON-NLS-1$
-
-		// IDeployableServer.TEMP_DEPLOY_DIRECTORY
-		String deployTmpFolderVal = runtime.getLocation().append("server").append(JBOSS_AS_DEFAULT_CONFIGURATION_NAME).append("tmp").append("jbosstoolsTemp").toOSString(); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-		((ServerWorkingCopy) server).setAttribute("org.jboss.ide.eclipse.as.core.server.tempDeployDirectory", deployTmpFolderVal); //$NON-NLS-1$
-
-		// If we'd need to set up a username / pw for JMX, do it here.
-//		((ServerWorkingCopy)serverWC).setAttribute(JBossServer.SERVER_USERNAME, authUser);
-//		((ServerWorkingCopy)serverWC).setAttribute(JBossServer.SERVER_PASSWORD, authPass);
-
-		server.save(false, progressMonitor);
-		return server;
-	}
 
 	protected static void createSeamRuntime(String name, String seamPath, SeamVersion seamVersion) {
 		SeamRuntime seamRuntime = SeamRuntimeManager.getInstance().findRuntimeByName(name);
@@ -381,213 +213,8 @@ public class CreateMavenizedSeamProjectTest{
 			rt.setDefault(true);
 			rt.setVersion(seamVersion);
 			SeamRuntimeManager.getInstance().addRuntime(rt);
-		}
-	}
-	
-	public static void createNewSeamWebProjectWizard(String projectName, String deployType) throws Exception {
-		waitForIdle();
-		bot.menu("File").menu("New").menu("Seam Web Project").click();
-		
-		SWTBotShell mainShell = bot.shell("New Seam Project");
-		mainShell.activate();
-
-		bot.textWithLabel("Project name:").setText(projectName);
-		bot.button("Modify...").click();
-		SWTBotShell shell = bot.shell("Project Facets");
-		shell.activate();
-
-		SWTBotTree treeWidget = bot.tree();
-		SWTBotTreeItem jmi = treeWidget.getTreeItem("JBoss Maven Integration");
-		jmi.check();
-		
-		bot.button("OK").click();
-		
-		mainShell.activate();
-		
-		bot.comboBox(0).setSelection(JBOSS_AS_RUNTIME_NAME);
-		bot.comboBox(2).setSelection(JBOSS_AS_SERVER_NAME);
-		
-		bot.button("Next >").click();
-		bot.button("Next >").click();
-		bot.button("Next >").click();
-		bot.button("Next >").click();
-		
-		bot.comboBox(0).setSelection("Library Provided by Target Runtime");
-		bot.button("Next >").click();
-		
-		bot.comboBox(0).setSelection(SEAM_RUNTIME_NAME);
-		String otherType = DEPLOY_TYPE_EAR;
-		if (DEPLOY_TYPE_EAR.equals(deployType)) {
-			otherType = DEPLOY_TYPE_WAR;
-		}
-		final SWTBotRadio radio = bot.radio(deployType);
-		final SWTBotRadio otherRadio = bot.radio(otherType);
-		radio.click();
-		Display.getDefault().syncExec(new Runnable() {
-
-			public void run() {
-				radio.widget.setSelection(true);
-				otherRadio.widget.setSelection(false);
-				Event event = new Event();
-				event.time = (int) System.currentTimeMillis();
-				event.widget = radio.widget;
-				event.display = Display.getCurrent();
-				radio.widget.notifyListeners(SWT.Selection, event);
-			}
-		});
-		//comboBox(1) = Libraries
-		bot.comboBox(2).setSelection("HSQL");
-		bot.comboBox(3).setSelection(CONNECTION_PROFILE_NAME);
-		bot.button("Finish").click();
-		
-		waitForIdle();
-		}
-	
-	@Test
-	public void testAsLocation() {
-		String asLocation = JBOSS_AS_HOME;
-		assertTrue("Invalid JBoss AS location:" + asLocation, new File(asLocation).isDirectory());
-	}
-	
-	@Test
-	public void testSeamLocation() {
-		String seamLocation = SEAM_HOME_PROPERTY;
-		assertTrue("Invalid Seam Runtime location:" + seamLocation, new File(seamLocation).isDirectory());
-	}
-	
-	@Test
-	public void testErrors() throws Exception {
-		checkErrors(PROJECT_NAME);
-		checkErrors(EAR_PROJECT_NAME);
-		checkErrors(EJB_PROJECT_NAME);
-		checkErrors(TEST_PROJECT_NAME);
-		checkErrors(PARENT_PROJECT_NAME);
-		checkErrors(PROJECT_NAME_WAR);
-		checkErrors(TEST_PROJECT_NAME_WAR);
-		checkErrors(PARENT_PROJECT_NAME_WAR);
-	}
-
-	private void checkErrors(String projectName) throws CoreException {
-		waitForIdle();
-		List<IMarker> markers = new ArrayList<IMarker>();
-		IProject project = ResourcesPlugin.getWorkspace().getRoot()
-				.getProject(projectName);
-		IMarker[] projectMarkers = project.findMarkers(IMarker.PROBLEM, true,
-				IResource.DEPTH_INFINITE);
-		for (int i = 0; i < projectMarkers.length; i++) {
-			if (projectMarkers[i].getAttribute(IMarker.SEVERITY,
-					IMarker.SEVERITY_ERROR) == IMarker.SEVERITY_ERROR) {
-				if (!"org.eclipse.m2e.core.maven2Problem.lifecycleMapping".equals(projectMarkers[i].getType())) {
-						markers.add(projectMarkers[i]);
-				}
-			}
-		}
-		assertTrue("The '" + projectName + "' contains errors.", markers.size() == 0);
-	}
-	
-	@Test
-	public void testMavenProjects() throws Exception {
-		isMavenProject(PROJECT_NAME);
-		isMavenProject(EAR_PROJECT_NAME);
-		isMavenProject(EJB_PROJECT_NAME);
-		isMavenProject(TEST_PROJECT_NAME);
-		isMavenProject(PARENT_PROJECT_NAME);
-		isMavenProject(PROJECT_NAME_WAR);
-		isMavenProject(TEST_PROJECT_NAME_WAR);
-		isMavenProject(PARENT_PROJECT_NAME_WAR);
-	}
-
-	private void isMavenProject(String projectName) throws CoreException {
-		IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject(projectName);
-		assertTrue("The '" + projectName + "' project isn't a Maven project.", project.hasNature(IMavenConstants.NATURE_ID));
-	}
-
-	// see https://jira.jboss.org/browse/JBIDE-6587
-	@Test
-	public void testMavenWarArchive() throws Exception {
-		final SWTBotView packageExplorer = bot.viewByTitle("Package Explorer");
-		SWTBot innerBot = packageExplorer.bot();
-		innerBot.activeShell().activate();
-		SWTBotTree tree = innerBot.tree();
-		final SWTBotTreeItem warProjectItem = tree.getTreeItem(PROJECT_NAME_WAR);
-		warProjectItem.select();
-		
-		SWTBotMenu runAs = tree.contextMenu("Run As");
-		runAs.menu("5 Maven build...").click();
-		waitForIdle();
-		SWTBotShell shell = bot.shell("Edit Configuration");
-		shell.activate();
-		SWTBot b = shell.bot();
-		b.textWithLabel("Goals:").setText("clean package");
-		b.button("Run").click();
-		waitForIdle();
-		
-		IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject(PROJECT_NAME_WAR);
-		project.getFolder("target").refreshLocal(IResource.DEPTH_INFINITE, new NullProgressMonitor());
-
-		IFolder warFolder = project.getFolder("target/" + PROJECT_NAME_WAR + "-0.0.1-SNAPSHOT");
-
-		assertTrue(warFolder +" is missing ", warFolder.exists());
-		
-		IPath webInfPath = new Path("WEB-INF");
-		assertFalse(warFolder.getFolder(webInfPath.append("src")).exists());
-		assertFalse(warFolder.getFolder(webInfPath.append("dev")).exists());
-		assertTrue(warFolder.getFolder(webInfPath.append("lib")).exists());
-		
-	}
-	
-	private static void waitForIdle() {
-		AbstractMavenSWTBotTest.waitForIdle();
-	}
-
-	public static void delay(long waitTimeMillis) {
-		Display display = Display.getCurrent();
-		if (display != null) {
-			long endTimeMillis = System.currentTimeMillis() + waitTimeMillis;
-			while (System.currentTimeMillis() < endTimeMillis) {
-				if (!display.readAndDispatch())
-					display.sleep();
-			}
-			display.update();
-		}
-		// Otherwise, perform a simple sleep.
-		else {
-			try {
-				Thread.sleep(waitTimeMillis);
-			} catch (InterruptedException e) {
-				// Ignored.
-			}
-		}
-	}
-	
-	
-	// see https://jira.jboss.org/browse/JBIDE-6767
-	@Test
-	public void testLibraries() throws Exception {
-		IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject(EAR_PROJECT_NAME);
-		File rootDirectory = new File(project.getLocation().toOSString(), "EarContent");
-		String[] libs = rootDirectory.list(new FilenameFilter() {
-			
-			public boolean accept(File dir, String name) {
-				if (name.endsWith(".jar")) {
-					return true;
-				}
-				return false;
-			}
-		});
-		assertTrue(libs.length == 0);
-		File libDirectory = new File (rootDirectory,"lib");
-		if (libDirectory.isDirectory()) {
-			libs = libDirectory.list(new FilenameFilter() {
-
-				public boolean accept(File dir, String name) {
-					if (name.endsWith(".jar")) {
-						return true;
-					}
-					return false;
-				}
-			});
-			assertTrue(libs.length == 0);
+		} else {
+			fail("Invalid seam runtime.");
 		}
 	}
 	
