@@ -150,7 +150,7 @@ public class CreateProjectsWithServerTest extends SWTTestExt{
 	public void projectExamplesSectionTest(){
 		SWTBotTwistie twistieBot = bot.twistieByLabel("JBoss Quickstarts");
 		int counter = 0;
-		while (!twistieBot.isExpanded() || counter>10){
+		while (!twistieBot.isExpanded() && counter>10){
 			twistieBot.toggle();
 			counter++;
 		}
