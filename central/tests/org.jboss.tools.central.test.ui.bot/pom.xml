@@ -17,6 +17,7 @@
 		<jbosstools.test.jbossas.home>${requirementsDirectory}/jboss-as-7.1.1.Final</jbosstools.test.jbossas.home>
 		<!-- for debugging ucomment and comment next line <systemProperties>-Xdebug -Xrunjdwp:transport=dt_socket,address=8001,server=y,suspend=y -Djbosstools.test.jbossas.home=${jbosstools.test.jbossas.home}  -Dswtbot.test.properties.file=${swtbot.properties}</systemProperties> -->
 		<systemProperties>${additionalSystemProperties} -Djbosstools.test.jbossas.home=${jbosstools.test.jbossas.home} -Dtest.configurations.dir=${test.configurations.dir} -Deap.maven.config.file=${eap.maven.config.file}</systemProperties>
+		<surefire.timeout>10800</surefire.timeout>
 	</properties>
 	
 	<profiles>
@@ -63,7 +64,6 @@
 					<testClass>org.jboss.tools.central.test.ui.bot.CentralAllBotTests</testClass>
 					<useUIThread>false</useUIThread>
 					<skip>${swtbot.test.skip}</skip>
-					<forkedProcessTimeoutInSeconds>10800</forkedProcessTimeoutInSeconds>
 					<dependencies combine.children="append">
 						<dependency>
 							<type>p2-installable-unit</type>
