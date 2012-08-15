@@ -3,14 +3,16 @@ package org.jboss.tools.central.test.ui.bot;
 import org.eclipse.swtbot.swt.finder.exceptions.WidgetNotFoundException;
 import org.jboss.tools.ui.bot.ext.RequirementAwareSuite;
 import org.jboss.tools.ui.bot.ext.SWTTestExt;
+import org.jboss.tools.ui.bot.ext.config.Annotations.Require;
 import org.jboss.tools.ui.bot.ext.types.IDELabel;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite.SuiteClasses;
 
-@RunWith(RequirementAwareSuite.class)
+//@RunWith(RequirementAwareSuite.class)
 @SuiteClasses({CentralAllBotTests.class})
+@Require(perspective="JBoss")
 public class BaseFunctionalityTest extends SWTTestExt {
 	
 	/**
