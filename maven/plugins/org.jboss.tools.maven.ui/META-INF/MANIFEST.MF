@@ -12,14 +12,16 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.wst.common.frameworks.ui,
  org.eclipse.core.resources,
  org.jboss.tools.maven.core,
- org.eclipse.m2e.core.ui;bundle-version="[1.0.0,1.2.0)",
+ org.eclipse.m2e.core.ui;bundle-version="[1.0.0,2.0.0)",
  org.eclipse.ui.ide,
  org.eclipse.jface.text,
  org.eclipse.jdt.ui;bundle-version="3.7.0",
  org.eclipse.jdt;bundle-version="3.7.0",
- org.eclipse.compare;bundle-version="3.5.202"
+ org.eclipse.compare;bundle-version="3.5.202",
+ org.eclipse.jst.j2ee.ui;bundle-version="1.1.503",
+ org.eclipse.jst.jee.ui;bundle-version="1.0.401"
 Bundle-ActivationPolicy: lazy
-Bundle-RequiredExecutionEnvironment: J2SE-1.5
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-Vendor: %Bundle-Vendor
 Export-Package: org.jboss.tools.maven.ui,
  org.jboss.tools.maven.ui.internal.libprov,

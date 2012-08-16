@@ -18,6 +18,6 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.jdt;bundle-version="3.7.0",
  org.jboss.tools.maven.profiles.core
 Bundle-ActivationPolicy: lazy
-Bundle-RequiredExecutionEnvironment: J2SE-1.5
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-Vendor: %Bundle-Vendor
 Export-Package: org.jboss.tools.maven.profiles.ui
