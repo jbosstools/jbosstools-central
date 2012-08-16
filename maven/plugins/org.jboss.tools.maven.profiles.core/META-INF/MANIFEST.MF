@@ -10,7 +10,7 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.m2e.core;bundle-version="[1.0.0,1.2.0)";visibility:=reexport,
  org.eclipse.m2e.maven.runtime;bundle-version="[1.0.0,1.2.0)";visibility:=reexport
 Bundle-ActivationPolicy: lazy
-Bundle-RequiredExecutionEnvironment: J2SE-1.5
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-Vendor: %Bundle-Vendor
 Export-Package: org.jboss.tools.maven.profiles.core,
  org.jboss.tools.maven.profiles.core.profiles
