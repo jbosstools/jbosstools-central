@@ -12,13 +12,17 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.maven.artifact.Artifact;
+import org.apache.maven.artifact.InvalidRepositoryException;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Parent;
 import org.apache.maven.model.Profile;
+import org.apache.maven.model.Repository;
 import org.apache.maven.project.MavenProject;
+import org.apache.maven.repository.RepositorySystem;
 import org.apache.maven.settings.Settings;
 import org.apache.maven.settings.SettingsUtils;
+import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.util.StringUtils;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
@@ -26,11 +30,14 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.embedder.IMaven;
+import org.eclipse.m2e.core.internal.MavenPluginActivator;
+import org.eclipse.m2e.core.internal.NoSuchComponentException;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.project.IProjectConfigurationManager;
 import org.eclipse.m2e.core.project.MavenUpdateRequest;
 import org.eclipse.m2e.core.project.ResolverConfiguration;
 import org.eclipse.osgi.util.NLS;
+import org.jboss.tools.maven.profiles.core.MavenProfilesCoreActivator;
 import org.jboss.tools.maven.profiles.core.profiles.IProfileManager;
 import org.jboss.tools.maven.profiles.core.profiles.ProfileState;
 import org.jboss.tools.maven.profiles.core.profiles.ProfileStatus;
@@ -235,7 +242,14 @@ public class ProfileManager implements IProfileManager {
 		models.add(projectModel);
 		Parent p  = projectModel.getParent();
 		if (p != null) {
-			Model parentModel = resolvePomModel(p.getGroupId(), p.getArtifactId(), p.getVersion(), monitor);
+			
+			IMaven maven = MavenPlugin.getMaven(); 
+			
+			List<ArtifactRepository> repositories = new ArrayList<ArtifactRepository>();
+			repositories.addAll(getProjectRepositories(projectModel));
+			repositories.addAll(maven.getArtifactRepositories());
+			
+			Model parentModel = resolvePomModel(p.getGroupId(), p.getArtifactId(), p.getVersion(), repositories, monitor);
 			if (parentModel != null) {
 				getModelHierarchy(models, parentModel, monitor);
 			}
@@ -243,7 +257,35 @@ public class ProfileManager implements IProfileManager {
 		return models;
 	}
 	
-	 private Model resolvePomModel(String groupId, String artifactId, String version, IProgressMonitor monitor)
+	 private List<ArtifactRepository> getProjectRepositories(Model projectModel) {
+		 List<ArtifactRepository> repos = new ArrayList<ArtifactRepository>();
+		 List<Repository> modelRepos = projectModel.getRepositories();
+		 if (modelRepos != null && !modelRepos.isEmpty()) {
+			 RepositorySystem repositorySystem = getRepositorySystem();
+			 for (Repository modelRepo : modelRepos) {
+				ArtifactRepository ar;
+				try {
+					ar = repositorySystem.buildArtifactRepository(modelRepo);
+					if (ar != null) {
+						repos.add(ar);
+					}
+				} catch (InvalidRepositoryException e) {
+					MavenProfilesCoreActivator.log(e);
+				}
+			 }
+		 }
+		 return repos;
+	}
+
+	private RepositorySystem getRepositorySystem() {
+		try {
+			return MavenPluginActivator.getDefault().getPlexusContainer().lookup(RepositorySystem.class);
+		} catch (ComponentLookupException e) {
+			throw new NoSuchComponentException(e);
+		}
+	}
+
+	private Model resolvePomModel(String groupId, String artifactId, String version, List<ArtifactRepository> repositories, IProgressMonitor monitor)
 		      throws CoreException {
 	    monitor.subTask(NLS.bind("Resolving {0}:{1}:{2}", new Object[] { groupId, artifactId, version}));
 
@@ -254,7 +296,6 @@ public class ProfileManager implements IProfileManager {
 	    	return facade.getMavenProject(monitor).getModel();
 	    }
 	    
-	    List<ArtifactRepository> repositories = maven.getArtifactRepositories();
 	    Artifact artifact = maven.resolve(groupId, artifactId, version, "pom", null, repositories, monitor); //$NON-NLS-1$
 	    File file = artifact.getFile();
 	    if(file == null) {

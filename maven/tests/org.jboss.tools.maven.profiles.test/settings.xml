@@ -1,0 +1,19 @@
+<settings>
+  <profiles>
+    <profile>
+      <id>activebydefault-settings-profile</id>
+      <activation><activeByDefault>true</activeByDefault></activation>
+    </profile>
+    <profile>
+      <id>inactive-settings-profile</id>
+    </profile>
+    <profile>
+      <id>active-settings-profile</id>
+    </profile>
+  </profiles>
+
+  <activeProfiles>
+    <activeProfile>active-settings-profile</activeProfile>
+  </activeProfiles>
+
+</settings>
