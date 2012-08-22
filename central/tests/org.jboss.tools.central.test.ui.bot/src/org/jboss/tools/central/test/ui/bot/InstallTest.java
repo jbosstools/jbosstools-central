@@ -6,7 +6,6 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotCheckBox;
 import org.jboss.tools.ui.bot.ext.RequirementAwareSuite;
 import org.jboss.tools.ui.bot.ext.SWTTestExt;
 import org.jboss.tools.ui.bot.ext.condition.TaskDuration;
-import org.jboss.tools.ui.bot.ext.config.Annotations.Require;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;

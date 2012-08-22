@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"	
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-	
+
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
 		<groupId>org.jboss.tools.central</groupId>
@@ -10,16 +11,19 @@
 	</parent>
 	<groupId>org.jboss.tools.central.tests</groupId>
 	<artifactId>org.jboss.tools.central.test.ui.bot</artifactId>
-	
+
 	<packaging>eclipse-test-plugin</packaging>
 	<properties>
 		<additionalSystemProperties></additionalSystemProperties>
 		<jbosstools.test.jbossas.home>${requirementsDirectory}/jboss-as-7.1.1.Final</jbosstools.test.jbossas.home>
-		<!-- for debugging ucomment and comment next line <systemProperties>-Xdebug -Xrunjdwp:transport=dt_socket,address=8001,server=y,suspend=y -Djbosstools.test.jbossas.home=${jbosstools.test.jbossas.home}  -Dswtbot.test.properties.file=${swtbot.properties}</systemProperties> -->
-		<systemProperties>${additionalSystemProperties} -Djbosstools.test.jbossas.home=${jbosstools.test.jbossas.home} -Dtest.configurations.dir=${test.configurations.dir} -Deap.maven.config.file=${eap.maven.config.file}</systemProperties>
+		<jbosstools.test.eap.6.0.home>${requirementsDirectory}/jboss-eap-6.0</jbosstools.test.eap.6.0.home>
+		<!-- for debugging ucomment and comment next line <systemProperties>-Xdebug 
+			-Xrunjdwp:transport=dt_socket,address=8001,server=y,suspend=y -Djbosstools.test.jbossas.home=${jbosstools.test.jbossas.home} 
+			-Dswtbot.test.properties.file=${swtbot.properties}</systemProperties> -->
+		<systemProperties>${additionalSystemProperties} -Djbosstools.test.jbossas.home=${jbosstools.test.jbossas.home} -Djbosstools.test.eap.6.0.home=${jbosstools.test.eap.6.0.home} -Dtest.configurations.dir=${test.configurations.dir} -Deap.maven.config.file=${eap.maven.config.file} -Dorg.jboss.tools.tests.skipPrivateRequirements=${skipPrivateRequirements}</systemProperties>
 		<surefire.timeout>10800</surefire.timeout>
 	</properties>
-	
+
 	<profiles>
 		<profile>
 			<id>debug</id>
@@ -28,7 +32,7 @@
 			</properties>
 		</profile>
 	</profiles>
-	
+
 	<build>
 		<plugins>
 			<plugin>
@@ -57,6 +61,25 @@
 				</executions>
 			</plugin>
 			<plugin>
+				<groupId>com.googlecode.maven-download-plugin</groupId>
+				<artifactId>maven-download-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>install-eap-6.0.0</id>
+						<phase>pre-integration-test</phase>
+						<goals>
+							<goal>wget</goal>
+						</goals>
+						<configuration>
+							<url>http://download.devel.redhat.com/released/JBEAP-6/6.0.0/zip/jboss-eap-6.0.0.zip</url>
+							<md5>ca0e20c5523281233888c296689b7172</md5>
+							<unpack>true</unpack>
+							<skip>${skipPrivateRequirements}</skip>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
 				<groupId>org.eclipse.tycho</groupId>
 				<artifactId>tycho-surefire-plugin</artifactId>
 				<configuration>
@@ -70,11 +93,8 @@
 							<artifactId>org.jboss.tools.central.feature.feature.group</artifactId>
 							<version>0.0.0</version>
 						</dependency>
-						<!--<dependency>
-							<type>p2-installable-unit</type>
-							<artifactId>org.jboss.tools.central.discovery.feature.feature.group</artifactId>
-							<version>0.0.0</version>
-						</dependency>-->
+						<!--<dependency> <type>p2-installable-unit</type> <artifactId>org.jboss.tools.central.discovery.feature.feature.group</artifactId> 
+							<version>0.0.0</version> </dependency> -->
 						<dependency>
 							<type>p2-installable-unit</type>
 							<artifactId>org.eclipse.mylyn.commons.feature.group</artifactId>
