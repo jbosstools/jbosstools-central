@@ -1,5 +1,6 @@
 package org.jboss.tools.maven.conversion.ui.internal;
 
+import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
@@ -9,9 +10,11 @@ import org.apache.maven.model.Model;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.jdt.core.IClasspathContainer;
 import org.eclipse.jdt.core.IClasspathEntry;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.JavaCore;
+import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jface.window.Window;
 import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.m2e.core.project.conversion.AbstractProjectConversionParticipant;
@@ -34,6 +37,7 @@ public class ClasspathConversionParticipant extends
 			throws CoreException {
 
 		if (accept(project)) {
+			
 			IJavaProject javaProject = JavaCore.create(project);
 			IClasspathEntry[] classpath = javaProject.getRawClasspath();
 			Set<IClasspathEntry> entries = new LinkedHashSet<IClasspathEntry>(classpath.length);
@@ -43,7 +47,7 @@ public class ClasspathConversionParticipant extends
 				}
 			}
 			
-			if (entries.isEmpty()) {
+			if (!hasDependencies(javaProject, entries)) {
 				return;
 			}
 			
@@ -64,6 +68,24 @@ public class ClasspathConversionParticipant extends
 				}
 			});
 		}
+	}
+
+	private boolean hasDependencies(IJavaProject javaProject, Collection<IClasspathEntry> initialEntries) throws JavaModelException {
+		for (IClasspathEntry entry : initialEntries) {
+			if ((entry.getEntryKind() == IClasspathEntry.CPE_LIBRARY && entry.getPath() != null)
+					|| (entry.getEntryKind() == IClasspathEntry.CPE_PROJECT)) {
+				return true;
+			} else if (entry.getEntryKind() == IClasspathEntry.CPE_CONTAINER) {
+				IClasspathContainer container = JavaCore.getClasspathContainer(entry.getPath(), javaProject );
+				if (container != null) {
+					IClasspathEntry[] cpes = container.getClasspathEntries();
+					if (cpes != null && cpes.length > 0) {
+						return true;
+					}
+				}
+			}
+		}
+		return false;
 	}
 
 	private boolean isValid(IClasspathEntry cpe) {

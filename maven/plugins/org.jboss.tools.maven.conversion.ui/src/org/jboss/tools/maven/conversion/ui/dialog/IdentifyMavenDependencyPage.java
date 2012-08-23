@@ -17,6 +17,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import org.apache.maven.model.Dependency;
@@ -54,6 +55,7 @@ import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 import org.jboss.tools.maven.conversion.ui.handlers.IdentifyJarJob;
+import org.jboss.tools.maven.conversion.ui.internal.CellListener;
 import org.jboss.tools.maven.conversion.ui.internal.MavenDependencyConversionActivator;
 import org.jboss.tools.maven.sourcelookup.identification.IFileIdentificationManager;
 import org.jboss.tools.maven.sourcelookup.identification.IdentificationUtil;
@@ -244,10 +246,27 @@ public class IdentifyMavenDependencyPage extends WizardPage {
 		dependenciesViewer.setInput(dependencyMap.entrySet());
 		dependenciesViewer.setAllChecked(true);
 
+		dependenciesViewer.getTable().addListener(SWT.MouseDoubleClick, new CellListener(dependenciesViewer.getTable()) {
+			
+			@Override
+			protected void handle(int columnIndex, TableItem item) {
+				if (columnIndex == DEPENDENCY_COLUMN) {
+					Entry<IClasspathEntry, Dependency> entry = (Map.Entry<IClasspathEntry, Dependency>) item.getData();
+					Dependency d= entry.getValue();
+					EditDependencyDialog editDependencyDialog = new EditDependencyDialog(getShell());
+					editDependencyDialog.setDependency(d);
+					if(editDependencyDialog.open() == Window.OK) {
+						entry.setValue(editDependencyDialog.getDependency());
+					}
+				}
+			}
+		});
+		
+		
 		addSelectionButton(container, "Select All", true);
 		addSelectionButton(container, "Deselect All", false);
-		addIdentifyButton(container, "Identify dependencies");
-		//addResetButton(container, "Reset");
+		//addIdentifyButton(container, "Identify dependencies");
+		addResetButton(container, "Reset");
 
 		addCellEditors();
 	}
@@ -302,13 +321,7 @@ public class IdentifyMavenDependencyPage extends WizardPage {
 			super(parent);
 	    }
 		
-	    protected Button createButton(Composite parent) {
-	        Button result = new Button(parent, SWT.DOWN);
-	        result.setText("Edit..."); //$NON-NLS-1$
-	        return result;
-	    }
-		
-		@Override
+	    @Override
 		protected Object openDialogBox(Control cellEditorWindow) {
 			Table table = (Table)cellEditorWindow.getParent(); 
 			int idx = table.getSelectionIndex();
@@ -493,7 +506,10 @@ public class IdentifyMavenDependencyPage extends WizardPage {
 		List<Dependency> dependencies = new ArrayList<Dependency>(selection.length);
 		for (Object o : selection) {
 			Map.Entry<IClasspathEntry, Dependency> entry = (Map.Entry<IClasspathEntry, Dependency>) o;
-			dependencies.add(entry.getValue());
+			Dependency d = entry.getValue();
+			if (d != null) {
+				dependencies.add(d);
+			}
 		}
 		return dependencies;
 	}
