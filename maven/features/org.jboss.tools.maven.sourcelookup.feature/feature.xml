@@ -18,6 +18,10 @@
       %license
    </license>
 
+   <requires>
+      <import feature="org.eclipse.m2e.feature" version="1.1.0" match="greaterOrEqual"/>
+   </requires>
+   
    <plugin
          id="org.jboss.tools.maven.sourcelookup.core"
          download-size="0"
