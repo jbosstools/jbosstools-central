@@ -67,7 +67,11 @@ public class CreateProjectsWithServerTest extends SWTTestExt{
 		bot.menu("Window").menu("Preferences").click();
 		bot.waitForShell("Preferences");
 		bot.tree().expandNode("Maven").select("User Settings");
-		bot.text(1).setText(mvnConfigFileName);
+		if (bot.text(1).getText().equals("User settings file doesn't exist")){
+			bot.text(2).setText(mvnConfigFileName);
+		}else{
+			bot.text(1).setText(mvnConfigFileName);
+		}
 		bot.clickButton("Update Settings");
 		util.waitForNonIgnoredJobs();
 		bot.clickButton("Apply");
