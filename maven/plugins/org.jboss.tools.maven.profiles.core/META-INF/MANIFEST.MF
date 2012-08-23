@@ -7,8 +7,8 @@ Bundle-Localization: plugin
 Bundle-Activator: org.jboss.tools.maven.profiles.core.MavenProfilesCoreActivator
 Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.core.resources;visibility:=reexport,
- org.eclipse.m2e.core;bundle-version="[1.0.0,1.2.0)";visibility:=reexport,
- org.eclipse.m2e.maven.runtime;bundle-version="[1.0.0,1.2.0)";visibility:=reexport
+ org.eclipse.m2e.core;bundle-version="[1.0.0,2.0.0)";visibility:=reexport,
+ org.eclipse.m2e.maven.runtime;bundle-version="[1.0.0,2.0.0)";visibility:=reexport
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-Vendor: %Bundle-Vendor
