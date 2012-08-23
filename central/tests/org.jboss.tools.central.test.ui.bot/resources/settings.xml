@@ -143,7 +143,7 @@
 				<repository>
 					<id>jboss-wfk-repository</id>
 					<name>JBoss WFK Maven Repository</name>
-					<url>http://maven.repository.redhat.com/jboss-wfk/2.0.0-beta1/maven-repository/</url>
+					<url>http://maven.repository.redhat.com/techpreview/wfk2/2.0.0/maven-repository/</url>
 					<layout>default</layout>
 					<releases>
 						<enabled>true</enabled>
@@ -159,7 +159,7 @@
 				<pluginRepository>
 					<id>jboss-wfk-repository-group</id>
 					<name>JBoss WFK Maven Repository</name>
-					<url>http://maven.repository.redhat.com/jboss-wfk/2.0.0-beta1/maven-repository/</url>
+					<url>http://maven.repository.redhat.com/techpreview/wfk2/2.0.0/maven-repository/</url>
 					<layout>default</layout>
 					<releases>
 						<enabled>true</enabled>
@@ -179,9 +179,9 @@
 		<!-- Optionally, make the repository active by default -->
 		<!-- <activeProfile>jboss-public-repository</activeProfile> -->
 <!-- 		<activeProfile>jboss-eap-maven-repository</activeProfile> -->
-		<activeProfile>jboss-wfk-repository</activeProfile>
+		<!--<activeProfile>jboss-wfk-repository</activeProfile>-->
 		<activeProfile>jboss-eap-maven-online-repository</activeProfile>
-		<!-- <activeProfile>jboss-wfk-online-repository</activeProfile> -->
+		<activeProfile>jboss-wfk-online-repository</activeProfile>
 	</activeProfiles>
 
 </settings>
