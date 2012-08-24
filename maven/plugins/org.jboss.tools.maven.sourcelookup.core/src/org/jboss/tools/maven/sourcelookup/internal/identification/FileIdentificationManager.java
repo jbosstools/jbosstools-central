@@ -14,8 +14,10 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.m2e.core.embedder.ArtifactKey;
 import org.jboss.tools.maven.sourcelookup.identification.ArtifactIdentifier;
 import org.jboss.tools.maven.sourcelookup.identification.IFileIdentificationManager;
@@ -33,30 +35,60 @@ public class FileIdentificationManager implements IFileIdentificationManager {
 		initArtifactIdentifiers();
 	}
 	
-	private void initArtifactIdentifiers() {
+	protected void initArtifactIdentifiers() {
 		//TODO read from extension points?
-		artifactIdentifiers = new ArrayList<ArtifactIdentifier>(3);
-		artifactIdentifiers.add(new MavenPropertiesIdentifier());
-		artifactIdentifiers.add(new NexusIndexIdentifier());
-		artifactIdentifiers.add(new NexusRepositoryIdentifier());
+		addArtifactIdentifier(new MavenPropertiesIdentifier());
+		addArtifactIdentifier(new NexusIndexIdentifier());
+		addArtifactIdentifier(new NexusRepositoryIdentifier());
+	}
+
+	public synchronized void addArtifactIdentifier(ArtifactIdentifier identifier) {
+		Assert.isNotNull(identifier, "Artifact identifier can not be null");
+		if (artifactIdentifiers == null) {
+			artifactIdentifiers = new ArrayList<ArtifactIdentifier>();
+		}
+		artifactIdentifiers.add(identifier);
+		//System.err.println("Added "+ identifier);
+	}
+
+	public synchronized void removeArtifactIdentifier(ArtifactIdentifier identifier) {
+		if (identifier != null) {
+			getArtifactIdentifiers().remove(identifier);
+		}
+	}
+
+	protected List<ArtifactIdentifier> getArtifactIdentifiers() {
+		if (artifactIdentifiers == null) {
+			initArtifactIdentifiers();
+		}
+		return artifactIdentifiers;
 	}
 
 	@Override
 	public ArtifactKey identify(File file, IProgressMonitor monitor) throws CoreException {
+		if (file == null) {
+			return null;
+		}
+		if (monitor == null) {
+			monitor = new NullProgressMonitor();
+		}
 		ArtifactKey artifactKey = null;
-		long start = System.currentTimeMillis();
+		//long start = System.currentTimeMillis();
 		for (ArtifactIdentifier identifier : artifactIdentifiers) {
 			if (monitor.isCanceled()) {
 				return null;
 			}
 			artifactKey = identifier.identify(file);
 			if (artifactKey != null) {
-				long stop = System.currentTimeMillis();
-				System.err.println(file.getName() + " identified as " + artifactKey + " in " + (stop-start) + " ms");
+				//long stop = System.currentTimeMillis();
+				//System.err.println(file.getName() + " identified as " + artifactKey + " in " + (stop-start) + " ms");
 				break;
 			}
 		}
+		//if (artifactKey == null)
+			//System.err.println("Could not identify "+file);
 		return artifactKey;
 	}
+	
 	
 }

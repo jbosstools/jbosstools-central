@@ -1,12 +1,21 @@
+/*************************************************************************************
+ * Copyright (c) 2012 Red Hat, Inc. and others.
+ * All rights reserved. This program and the accompanying materials 
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ * 
+ * Contributors:
+ *     JBoss by Red Hat - Initial implementation.
+ ************************************************************************************/
 package org.jboss.tools.maven.sourcelookup.internal.identification;
 
 import static org.jboss.tools.maven.sourcelookup.identification.IdentificationUtil.getSHA1;
-import static org.jboss.tools.maven.sourcelookup.identification.IdentificationUtil.getSourcesClassifier;
 
 import java.io.File;
+import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.net.URLEncoder;
 import java.util.Set;
 
 import javax.xml.bind.JAXBContext;
@@ -16,20 +25,21 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.m2e.core.embedder.ArtifactKey;
 import org.jboss.tools.maven.sourcelookup.NexusRepository;
 import org.jboss.tools.maven.sourcelookup.SourceLookupActivator;
-import org.jboss.tools.maven.sourcelookup.identification.ArtifactIdentifier;
 import org.sonatype.nexus.rest.model.NexusArtifact;
 import org.sonatype.nexus.rest.model.SearchResponse;
 
-public class NexusRepositoryIdentifier implements ArtifactIdentifier {
+public class NexusRepositoryIdentifier extends AbstractArtifactIdentifier {
 
-	private static final String PATH_SEPARATOR = "/";
-
+	public NexusRepositoryIdentifier() {
+		super("Nexus repository identifier");
+	}
+	
 	@Override
 	public ArtifactKey identify(File file) throws CoreException {
 		return getArtifactFromRemoteNexusRepository(file);
 	}
 
-	private static ArtifactKey getArtifactFromRemoteNexusRepository(File file) {
+	private ArtifactKey getArtifactFromRemoteNexusRepository(File file) {
 		String sha1;
 		try {
 			sha1 = getSHA1(file);
@@ -42,55 +52,52 @@ public class NexusRepositoryIdentifier implements ArtifactIdentifier {
 			if (!repository.isEnabled()) {
 				continue;
 			}
-			ArtifactKey key = getArtifactFromRemoteNexusRepository(sha1,	repository);
-			if (key != null) {
-				ArtifactKey sourcesArtifact = new ArtifactKey(
-						key.getGroupId(), key.getArtifactId(),
-						key.getVersion(),
-						getSourcesClassifier(key.getClassifier()));
-				ArtifactKey resolvedKey = getSourcesArtifactFromJBossNexusRepository(sourcesArtifact, repository);
-				if (resolvedKey != null) {
+			try {
+				ArtifactKey key = searchArtifactFromRemoteNexusRepository(repository.getSearchUrl(sha1));
+				if (key != null) {
+					/*
+					Searching for sources here makes no sense here :
+					ex : guice.jar (from seam 2.3) is found in jboss nexus via a SHA1 search but subsequent search
+					of its sources on this repo returns null => guice.jar can never be identified in that case!
+					Source resolution / Missing sources should be dealt upstream from here 
+					
+					String searchSourcesUrl = repository.getSearchUrl(key.getArtifactId(),
+							                                   key.getGroupId(),
+							                                   key.getVersion(),
+							                                   getSourcesClassifier(key.getClassifier()));
+				
+					ArtifactKey resolvedKey = searchArtifactFromRemoteNexusRepository(searchSourcesUrl);
+
+					if (resolvedKey != null) {
+						return key;
+					}
+					*/
 					return key;
 				}
+			} catch (UnsupportedEncodingException e) {
+				e.printStackTrace();
 			}
 		}
+		System.err.println(getName()+ "Couldn't find match for SHA1="+sha1);
 		return null;
 	}
 
-	private static ArtifactKey getArtifactFromRemoteNexusRepository(String sha1,
-			NexusRepository nexusRepository) {
-		if (sha1 == null || nexusRepository == null	|| nexusRepository.getUrl() == null) {
+	private static ArtifactKey searchArtifactFromRemoteNexusRepository(String searchUrl) {
+		if (searchUrl == null) {
 			return null;
 		}
-		HttpURLConnection connection = null;
+		HttpURLConnection connection = null;//TODO use eclipse connections to handle proxies
 		try {
-			String base = nexusRepository.getUrl();
-			if (!base.endsWith(PATH_SEPARATOR)) {
-				base = base + PATH_SEPARATOR;
-			}
-			// String url =
-			// "https://repository.jboss.org/nexus/service/local/data_index?sha1=";
-			String url = base + "service/local/data_index?sha1=";
-			url = url + URLEncoder.encode(sha1, "UTF-8");
 			JAXBContext context = JAXBContext.newInstance(SearchResponse.class);
 			Unmarshaller unmarshaller = context.createUnmarshaller();
-			connection = (HttpURLConnection) new URL(url).openConnection();
+			connection = (HttpURLConnection) new URL(searchUrl).openConnection();
 			connection.connect();
 			Object object = unmarshaller.unmarshal(connection.getInputStream());
 			if (object instanceof SearchResponse) {
-				SearchResponse searchResponse = (SearchResponse) object;
-				for (NexusArtifact nexusArtifact : searchResponse.getData()) {
-					String groupId = nexusArtifact.getGroupId();
-					String artifactId = nexusArtifact.getArtifactId();
-					String version = nexusArtifact.getVersion();
-					String classifier = nexusArtifact.getClassifier();
-					ArtifactKey artifact = new ArtifactKey(groupId, artifactId,
-							version, classifier);
-					return artifact;
-				}
+				return extractArtifactKey((SearchResponse)object);
 			}
 		} catch (Exception e) {
-			return null;
+			e.printStackTrace();
 		} finally {
 			if (connection != null) {
 				connection.disconnect();
@@ -99,48 +106,15 @@ public class NexusRepositoryIdentifier implements ArtifactIdentifier {
 		return null;
 	}
 
-	private static ArtifactKey getSourcesArtifactFromJBossNexusRepository(ArtifactKey key,
-			NexusRepository nexusRepository) {
-		if (key == null || nexusRepository == null
-				|| nexusRepository.getUrl() == null) {
-			return null;
-		}
-		HttpURLConnection connection = null;
-		try {
-			String base = nexusRepository.getUrl();
-			if (!base.endsWith(PATH_SEPARATOR)) {
-				base = base + PATH_SEPARATOR;
-			}
-			// String url =
-			// "https://repository.jboss.org/nexus/service/local/data_index?g=groupId&a=artifactId&v=version&c=classifier";
-			String url = base + "service/local/data_index?";
-			url= url + "g=" + URLEncoder.encode(key.getGroupId(), "UTF-8") + "&";
-			url= url + "a=" + URLEncoder.encode(key.getArtifactId(), "UTF-8") + "&";
-			url= url + "v=" + URLEncoder.encode(key.getVersion(), "UTF-8") + "&";
-			url= url + "c=" + URLEncoder.encode(key.getClassifier(), "UTF-8");
-			JAXBContext context = JAXBContext.newInstance(SearchResponse.class);
-			Unmarshaller unmarshaller = context.createUnmarshaller();
-			connection = (HttpURLConnection) new URL(url).openConnection();
-			connection.connect();
-			Object object = unmarshaller.unmarshal(connection.getInputStream());
-			if (object instanceof SearchResponse) {
-				SearchResponse searchResponse = (SearchResponse) object;
-				for (NexusArtifact nexusArtifact : searchResponse.getData()) {
-					String groupId = nexusArtifact.getGroupId();
-					String artifactId = nexusArtifact.getArtifactId();
-					String version = nexusArtifact.getVersion();
-					String classifier = nexusArtifact.getClassifier();
-					ArtifactKey artifact = new ArtifactKey(groupId, artifactId,
-							version, classifier);
-					return artifact;
-				}
-			}
-		} catch (Exception e) {
-			return null;
-		} finally {
-			if (connection != null) {
-				connection.disconnect();
-			}
+	private static ArtifactKey extractArtifactKey(SearchResponse searchResponse) {
+		for (NexusArtifact nexusArtifact : searchResponse.getData()) {
+			String groupId = nexusArtifact.getGroupId();
+			String artifactId = nexusArtifact.getArtifactId();
+			String version = nexusArtifact.getVersion();
+			String classifier = nexusArtifact.getClassifier();
+			ArtifactKey artifact = new ArtifactKey(groupId, artifactId,
+					version, classifier);
+			return artifact;
 		}
 		return null;
 	}

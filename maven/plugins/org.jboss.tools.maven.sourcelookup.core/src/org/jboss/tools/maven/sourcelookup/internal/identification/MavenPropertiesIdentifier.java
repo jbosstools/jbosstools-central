@@ -1,3 +1,13 @@
+/*************************************************************************************
+ * Copyright (c) 2012 Red Hat, Inc. and others.
+ * All rights reserved. This program and the accompanying materials 
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ * 
+ * Contributors:
+ *     JBoss by Red Hat - Initial implementation.
+ ************************************************************************************/
 package org.jboss.tools.maven.sourcelookup.internal.identification;
 
 import java.io.File;
@@ -10,27 +20,25 @@ import java.util.zip.ZipFile;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.m2e.core.embedder.ArtifactKey;
-import org.jboss.tools.maven.sourcelookup.identification.ArtifactIdentifier;
 
-public class MavenPropertiesIdentifier implements ArtifactIdentifier {
+public class MavenPropertiesIdentifier extends AbstractArtifactIdentifier {
+
+	public MavenPropertiesIdentifier() {
+		super("Maven Properties identifier");
+	}
 
 	@Override
 	public ArtifactKey identify(File file) throws CoreException {
 		ZipFile jar;
 		try {
-//			try {
-//				Random r = new Random();
-//				Thread.sleep(r.nextInt(10)*1000);
-//			} catch (InterruptedException e) {
-//			}
 			jar = new ZipFile(file);
 			return getArtifactFromMetaInf(jar);
 		} catch (ZipException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+		//System.err.println(getName() + " could not identify "+file);
 		return null;
 	}
 

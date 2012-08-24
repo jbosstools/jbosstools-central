@@ -1,3 +1,13 @@
+/*************************************************************************************
+ * Copyright (c) 2012 Red Hat, Inc. and others.
+ * All rights reserved. This program and the accompanying materials 
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ * 
+ * Contributors:
+ *     JBoss by Red Hat - Initial implementation.
+ ************************************************************************************/
 package org.jboss.tools.maven.sourcelookup.internal.identification;
 
 import java.io.File;
@@ -14,14 +24,14 @@ import org.eclipse.m2e.core.internal.index.nexus.NexusIndex;
 import org.eclipse.m2e.core.internal.index.nexus.NexusIndexManager;
 import org.eclipse.m2e.core.repository.IRepository;
 import org.eclipse.m2e.core.repository.IRepositoryRegistry;
-import org.jboss.tools.maven.sourcelookup.identification.ArtifactIdentifier;
 
 @SuppressWarnings("restriction")
-public class NexusIndexIdentifier implements ArtifactIdentifier {
+public class NexusIndexIdentifier extends AbstractArtifactIdentifier {
 
 	private List<IRepository> globalRepositories;
-
+	
 	public NexusIndexIdentifier() {
+		super("Nexus Index identifier");
 		globalRepositories = initGlobalRepositories();
 	}
 	
@@ -61,6 +71,7 @@ public class NexusIndexIdentifier implements ArtifactIdentifier {
 				}
 			}
 		}
+		//System.err.println(getName() + " could not identify "+file);
 		return artifact;
 	}
 
