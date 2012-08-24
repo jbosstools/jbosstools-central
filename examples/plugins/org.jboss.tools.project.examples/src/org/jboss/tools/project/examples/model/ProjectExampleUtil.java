@@ -29,6 +29,11 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.StringTokenizer;
+import java.util.concurrent.Callable;
+import java.util.concurrent.CompletionService;
+import java.util.concurrent.ExecutorCompletionService;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -308,16 +313,22 @@ public class ProjectExampleUtil {
 	public static List<ProjectExampleCategory> getProjects(
 			Set<IProjectExampleSite> sites, IProgressMonitor monitor) {
 		monitor.setTaskName(Messages.ProjectUtil_Parsing_project_description_files);
-
 		List<ProjectExampleCategory> list = new ArrayList<ProjectExampleCategory>();
 		invalidSites.clear();
 		ProjectExampleCategory other = ProjectExampleCategory.OTHER;
+		int threads = Runtime.getRuntime().availableProcessors();
+		//threads = 1;
+		ExecutorService service = Executors.newFixedThreadPool(threads);
+		CompletionService<Tuple<IProjectExampleSite, Document>> pool = new ExecutorCompletionService<Tuple<IProjectExampleSite, Document>>(service);
 		try {
 			boolean showExperimentalSites = ProjectExamplesActivator
 					.getDefault()
 					.getPreferenceStore()
 					.getBoolean(
 							ProjectExamplesActivator.SHOW_EXPERIMENTAL_SITES);
+			
+			
+		    int count = 0;
 			for (IProjectExampleSite site : sites) {
 				if (!showExperimentalSites && site.isExperimental()) {
 					continue;
@@ -326,28 +337,17 @@ public class ProjectExampleUtil {
 					invalidSites.add(site);
 					continue;
 				}
-				File file = getProjectExamplesFile(site.getUrl(),
-						"projectExamples", ".xml", monitor); //$NON-NLS-1$ //$NON-NLS-2$
-				if (monitor.isCanceled()) {
-					invalidSites.add(site);
-					continue;
-				}
-				if (file == null || !file.exists() || !file.isFile()) {
-					ProjectExamplesActivator.log(NLS.bind(
-							Messages.ProjectUtil_Invalid_URL, site.getUrl()
-									.toString()));
-					invalidSites.add(site);
-					continue;
-				}
-
-				Document doc;
-				try {
-					DocumentBuilderFactory dbf = DocumentBuilderFactory
-							.newInstance();
-					DocumentBuilder db = dbf.newDocumentBuilder();
-					doc = db.parse(file);
-				} catch (Exception e) {
-					ProjectExamplesActivator.log(e);
+				
+				pool.submit(new FetchProjectExampleDocumentTask(site));
+				count++;
+			}
+			
+			for (int k=0; k <count; k++) {
+				//Handle the next finished task first
+				Tuple<IProjectExampleSite, Document> tuple = pool.take().get();
+				IProjectExampleSite site = tuple.key;
+				Document doc = tuple.value;
+				if (doc == null) {
 					invalidSites.add(site);
 					continue;
 				}
@@ -486,6 +486,8 @@ public class ProjectExampleUtil {
 			}
 		} catch (Exception e) {
 			ProjectExamplesActivator.log(e);
+		} finally {
+			service.shutdown();
 		}
 		list.add(other);
 		handleCategories(list, monitor);
@@ -900,4 +902,45 @@ public class ProjectExampleUtil {
 		return selection;
 	}
 	
+	private static class Tuple<X, Y> {
+		
+		X key;
+		Y value;
+
+		public Tuple(X key) {
+			this.key = key;
+		}
+		
+	}
+	
+	private static class FetchProjectExampleDocumentTask implements Callable<Tuple<IProjectExampleSite, Document>> {
+
+		Tuple<IProjectExampleSite, Document> tuple; 
+		
+		public FetchProjectExampleDocumentTask(IProjectExampleSite site) {
+			 tuple = new Tuple<IProjectExampleSite, Document>(site);
+		}
+
+		@Override
+		public Tuple<IProjectExampleSite, Document> call() throws Exception {
+			URL url = tuple.key.getUrl();
+			File file = getProjectExamplesFile(url, "projectExamples", ".xml", new NullProgressMonitor()); 
+			if(file == null || !file.exists() || !file.isFile()) {
+				ProjectExamplesActivator.log(NLS.bind(Messages.ProjectUtil_Invalid_URL, url.toString()));
+				return tuple;
+			}
+			
+			try {
+				DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+				DocumentBuilder db = dbf.newDocumentBuilder();
+				Document doc = db.parse(file);
+				tuple.value = doc;
+				
+			} catch (Exception e) {
+				ProjectExamplesActivator.log(e);
+			}
+			return tuple;
+		}
+
+	}	
 }
