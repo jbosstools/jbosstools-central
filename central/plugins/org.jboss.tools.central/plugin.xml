@@ -271,6 +271,11 @@
             id="org.jboss.tools.central.theme"
             label="JBoss Tools &amp; Developer Studio">
       </theme>
+      <theme
+            basestylesheeturi="css/jboss.css"
+            id="org.jboss.tools.central.communityTheme"
+            label="JBoss Community Theme">
+      </theme>
    </extension>
    
 </plugin>
