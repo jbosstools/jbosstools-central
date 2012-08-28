@@ -159,4 +159,15 @@
           name="%Configure_Maven_Repositories">
     </wizard>
   </extension>
+  
+     <extension
+        point="org.eclipse.ui.preferencePages">
+     <page
+           category="org.jboss.tools.common.model.ui.MainPreferencePage"
+           class="org.jboss.tools.maven.ui.preferences.RemoteRepositoriesPreferencePage"
+           id="org.jboss.tools.maven.ui.preferences.RemoteRepositoriesPreferencePage"
+           name="Remote Repositories"/>
+   </extension>
+  
+  
 </plugin>

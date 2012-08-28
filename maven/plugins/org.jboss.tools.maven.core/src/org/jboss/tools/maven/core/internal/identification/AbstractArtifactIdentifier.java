@@ -8,9 +8,9 @@
  * Contributors:
  *     JBoss by Red Hat - Initial implementation.
  ************************************************************************************/
-package org.jboss.tools.maven.sourcelookup.internal.identification;
+package org.jboss.tools.maven.core.internal.identification;
 
-import org.jboss.tools.maven.sourcelookup.identification.ArtifactIdentifier;
+import org.jboss.tools.maven.core.identification.ArtifactIdentifier;
 
 abstract class AbstractArtifactIdentifier implements ArtifactIdentifier {
 

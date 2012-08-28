@@ -8,7 +8,7 @@
  * Contributors:
  *     JBoss by Red Hat - Initial implementation.
  ************************************************************************************/
-package org.jboss.tools.maven.sourcelookup.internal.identification;
+package org.jboss.tools.maven.core.internal.identification;
 
 import java.io.File;
 import java.util.Collections;
@@ -35,7 +35,6 @@ public class NexusIndexIdentifier extends AbstractArtifactIdentifier {
 		globalRepositories = initGlobalRepositories();
 	}
 	
-	@Override
 	public ArtifactKey identify(File file) throws CoreException {
 		IndexManager indexManager = MavenPlugin.getIndexManager();
 		IIndex index = indexManager.getAllIndexes();

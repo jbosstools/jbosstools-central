@@ -37,10 +37,10 @@ import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.m2e.core.embedder.ArtifactKey;
 import org.eclipse.ui.IEditorActionDelegate;
 import org.eclipse.ui.IEditorPart;
+import org.jboss.tools.maven.core.identification.IFileIdentificationManager;
+import org.jboss.tools.maven.core.internal.identification.FileIdentificationManager;
 import org.jboss.tools.maven.sourcelookup.SourceLookupActivator;
 import org.jboss.tools.maven.sourcelookup.containers.JBossSourceContainer;
-import org.jboss.tools.maven.sourcelookup.identification.IFileIdentificationManager;
-import org.jboss.tools.maven.sourcelookup.internal.identification.FileIdentificationManager;
 import org.jboss.tools.maven.sourcelookup.ui.SourceLookupUIActivator;
 
 /**

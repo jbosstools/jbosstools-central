@@ -8,7 +8,7 @@
  * Contributors:
  *     JBoss by Red Hat - Initial implementation.
  ************************************************************************************/
-package org.jboss.tools.maven.sourcelookup;
+package org.jboss.tools.maven.core.repositories;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;

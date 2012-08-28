@@ -8,7 +8,7 @@
  * Contributors:
  *     JBoss by Red Hat - Initial implementation.
  ************************************************************************************/
-package org.jboss.tools.maven.sourcelookup.internal.identification;
+package org.jboss.tools.maven.core.internal.identification;
 
 import java.io.File;
 import java.io.IOException;
@@ -27,7 +27,6 @@ public class MavenPropertiesIdentifier extends AbstractArtifactIdentifier {
 		super("Maven Properties identifier");
 	}
 
-	@Override
 	public ArtifactKey identify(File file) throws CoreException {
 		ZipFile jar;
 		try {

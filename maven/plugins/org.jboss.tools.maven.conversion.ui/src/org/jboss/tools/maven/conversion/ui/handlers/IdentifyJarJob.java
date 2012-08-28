@@ -10,7 +10,7 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.m2e.core.embedder.ArtifactKey;
 import org.jboss.tools.maven.conversion.ui.internal.MavenDependencyConversionActivator;
-import org.jboss.tools.maven.sourcelookup.identification.IFileIdentificationManager;
+import org.jboss.tools.maven.core.identification.IFileIdentificationManager;
 
 public class IdentifyJarJob extends Job {
 

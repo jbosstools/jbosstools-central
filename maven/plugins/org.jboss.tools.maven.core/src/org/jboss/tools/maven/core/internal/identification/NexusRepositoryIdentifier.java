@@ -8,9 +8,9 @@
  * Contributors:
  *     JBoss by Red Hat - Initial implementation.
  ************************************************************************************/
-package org.jboss.tools.maven.sourcelookup.internal.identification;
+package org.jboss.tools.maven.core.internal.identification;
 
-import static org.jboss.tools.maven.sourcelookup.identification.IdentificationUtil.getSHA1;
+import static org.jboss.tools.maven.core.identification.IdentificationUtil.getSHA1;
 
 import java.io.File;
 import java.io.UnsupportedEncodingException;
@@ -23,8 +23,9 @@ import javax.xml.bind.Unmarshaller;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.m2e.core.embedder.ArtifactKey;
-import org.jboss.tools.maven.sourcelookup.NexusRepository;
-import org.jboss.tools.maven.sourcelookup.SourceLookupActivator;
+import org.jboss.tools.maven.core.MavenCoreActivator;
+import org.jboss.tools.maven.core.repositories.NexusRepository;
+import org.jboss.tools.maven.core.repositories.RemoteRepositoryManager;
 import org.sonatype.nexus.rest.model.NexusArtifact;
 import org.sonatype.nexus.rest.model.SearchResponse;
 
@@ -34,7 +35,6 @@ public class NexusRepositoryIdentifier extends AbstractArtifactIdentifier {
 		super("Nexus repository identifier");
 	}
 	
-	@Override
 	public ArtifactKey identify(File file) throws CoreException {
 		return getArtifactFromRemoteNexusRepository(file);
 	}
@@ -46,8 +46,8 @@ public class NexusRepositoryIdentifier extends AbstractArtifactIdentifier {
 		} catch (Exception e) {
 			return null;
 		}
-		Set<NexusRepository> nexusRepositories = SourceLookupActivator
-				.getNexusRepositories();
+		 RemoteRepositoryManager repoManager = MavenCoreActivator.getDefault().getRepositoryManager();
+		Set<NexusRepository> nexusRepositories = repoManager .getNexusRepositories();
 		for (NexusRepository repository : nexusRepositories) {
 			if (!repository.isEnabled()) {
 				continue;
@@ -78,7 +78,7 @@ public class NexusRepositoryIdentifier extends AbstractArtifactIdentifier {
 				e.printStackTrace();
 			}
 		}
-		System.err.println(getName()+ "Couldn't find match for SHA1="+sha1);
+		//System.err.println(getName()+ "Couldn't find match for SHA1="+sha1);
 		return null;
 	}
 

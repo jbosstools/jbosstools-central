@@ -8,7 +8,7 @@
  * Contributors:
  *     JBoss by Red Hat - Initial implementation.
  ************************************************************************************/
-package org.jboss.tools.maven.sourcelookup.identification;
+package org.jboss.tools.maven.core.identification;
 
 import java.io.File;
 

@@ -8,10 +8,11 @@
  * Contributors:
  *     JBoss by Red Hat - Initial implementation.
  ************************************************************************************/
-package org.jboss.tools.maven.sourcelookup.internal.identification;
+package org.jboss.tools.maven.core.internal.identification;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import org.eclipse.core.runtime.Assert;
@@ -19,8 +20,8 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.m2e.core.embedder.ArtifactKey;
-import org.jboss.tools.maven.sourcelookup.identification.ArtifactIdentifier;
-import org.jboss.tools.maven.sourcelookup.identification.IFileIdentificationManager;
+import org.jboss.tools.maven.core.identification.ArtifactIdentifier;
+import org.jboss.tools.maven.core.identification.IFileIdentificationManager;
 
 /**
  * 
@@ -33,6 +34,12 @@ public class FileIdentificationManager implements IFileIdentificationManager {
 	
 	public FileIdentificationManager() {
 		initArtifactIdentifiers();
+	}
+
+	public FileIdentificationManager(Collection<ArtifactIdentifier> identifiers) {
+		for (ArtifactIdentifier identifier : identifiers) {
+			addArtifactIdentifier(identifier);
+		}
 	}
 	
 	protected void initArtifactIdentifiers() {
@@ -64,7 +71,6 @@ public class FileIdentificationManager implements IFileIdentificationManager {
 		return artifactIdentifiers;
 	}
 
-	@Override
 	public ArtifactKey identify(File file, IProgressMonitor monitor) throws CoreException {
 		if (file == null) {
 			return null;

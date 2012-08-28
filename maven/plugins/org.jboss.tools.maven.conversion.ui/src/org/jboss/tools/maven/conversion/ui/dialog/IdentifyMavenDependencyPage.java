@@ -57,9 +57,9 @@ import org.eclipse.swt.widgets.TableItem;
 import org.jboss.tools.maven.conversion.ui.handlers.IdentifyJarJob;
 import org.jboss.tools.maven.conversion.ui.internal.CellListener;
 import org.jboss.tools.maven.conversion.ui.internal.MavenDependencyConversionActivator;
-import org.jboss.tools.maven.sourcelookup.identification.IFileIdentificationManager;
-import org.jboss.tools.maven.sourcelookup.identification.IdentificationUtil;
-import org.jboss.tools.maven.sourcelookup.internal.identification.FileIdentificationManager;
+import org.jboss.tools.maven.core.identification.IFileIdentificationManager;
+import org.jboss.tools.maven.core.identification.IdentificationUtil;
+import org.jboss.tools.maven.core.internal.identification.FileIdentificationManager;
 
 public class IdentifyMavenDependencyPage extends WizardPage {
 

@@ -10,8 +10,6 @@
  ************************************************************************************/
 package org.jboss.tools.maven.sourcelookup.containers;
 
-import static org.jboss.tools.maven.sourcelookup.identification.IdentificationUtil.getSourcesClassifier;
-
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -49,9 +47,10 @@ import org.jboss.ide.eclipse.as.core.server.internal.JBossServer;
 import org.jboss.ide.eclipse.as.core.util.IJBossRuntimeResourceConstants;
 import org.jboss.ide.eclipse.as.core.util.IJBossToolingConstants;
 import org.jboss.ide.eclipse.as.core.util.ServerConverter;
+import org.jboss.tools.maven.core.identification.IFileIdentificationManager;
+import org.jboss.tools.maven.core.identification.IdentificationUtil;
+import org.jboss.tools.maven.core.internal.identification.FileIdentificationManager;
 import org.jboss.tools.maven.sourcelookup.SourceLookupActivator;
-import org.jboss.tools.maven.sourcelookup.identification.IFileIdentificationManager;
-import org.jboss.tools.maven.sourcelookup.internal.identification.FileIdentificationManager;
 
 /**
  * 
@@ -302,7 +301,7 @@ public class JBossSourceContainer extends AbstractSourceContainer {
 		final ArtifactKey sourcesArtifact = new ArtifactKey(
 				artifact.getGroupId(), artifact.getArtifactId(),
 				artifact.getVersion(),
-				getSourcesClassifier(artifact.getClassifier()));
+				IdentificationUtil.getSourcesClassifier(artifact.getClassifier()));
 		resolvedFile = null;
 		Job job = new Job("Downloading sources for " + file.getName()) {
 
@@ -348,7 +347,7 @@ public class JBossSourceContainer extends AbstractSourceContainer {
 
 	public static IPath getSourcePath(ArtifactKey a) {
 		File file = getAttachedArtifactFile(a,
-				getSourcesClassifier(a.getClassifier()));
+				IdentificationUtil.getSourcesClassifier(a.getClassifier()));
 
 		if (file != null) {
 			return Path.fromOSString(file.getAbsolutePath());

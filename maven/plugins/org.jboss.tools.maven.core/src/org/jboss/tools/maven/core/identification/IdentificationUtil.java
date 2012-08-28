@@ -8,7 +8,7 @@
  * Contributors:
  *     JBoss by Red Hat - Initial implementation.
  ************************************************************************************/
-package org.jboss.tools.maven.sourcelookup.identification;
+package org.jboss.tools.maven.core.identification;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -27,7 +27,9 @@ public class IdentificationUtil {
 	
 	public static String getSHA1(File file) throws IOException,
 			NoSuchAlgorithmException {
-		
+		if (file == null) {
+			return null;
+		}
 		InputStream inputStream = null;
 		StringBuilder sb = new StringBuilder();
 		try {

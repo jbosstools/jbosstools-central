@@ -41,6 +41,8 @@ import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Plugin;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.preferences.IEclipsePreferences;
+import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.jdt.core.IClasspathAttribute;
@@ -70,7 +72,9 @@ import org.eclipse.wst.common.componentcore.resources.IVirtualComponent;
 import org.eclipse.wst.common.componentcore.resources.IVirtualFolder;
 import org.eclipse.wst.common.frameworks.datamodel.IDataModel;
 import org.eclipse.wst.common.project.facet.core.IProjectFacetVersion;
+import org.jboss.tools.maven.core.repositories.RemoteRepositoryManager;
 import org.osgi.framework.BundleContext;
+import org.osgi.service.prefs.BackingStoreException;
 
 /**
  * The activator class controls the plug-in life cycle
@@ -100,6 +104,8 @@ public class MavenCoreActivator extends Plugin {
 	private static MavenCoreActivator plugin;
 
 	private static PomResourceImpl resource;
+	
+	private RemoteRepositoryManager repositoryManager;
 	
 	/**
 	 * The constructor
@@ -745,4 +751,27 @@ public class MavenCoreActivator extends Plugin {
 		}
 	}
         
+	
+	public RemoteRepositoryManager getRepositoryManager() {
+		if (repositoryManager == null) {
+			repositoryManager = new RemoteRepositoryManager();
+		}
+		return repositoryManager;
+	}
+	
+	public static IEclipsePreferences getPreferences() {
+		IEclipsePreferences prefs = InstanceScope.INSTANCE.getNode(PLUGIN_ID);
+		return prefs;
+	}
+	
+	public void savePreferences() {
+		IEclipsePreferences prefs = getPreferences();
+		try {
+			prefs.flush();
+		} catch (BackingStoreException e) {
+			log(e);
+		}
+	}
+
+	
 }

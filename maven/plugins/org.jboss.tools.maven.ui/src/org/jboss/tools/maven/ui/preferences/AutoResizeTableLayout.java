@@ -8,7 +8,7 @@
  * Contributors:
  *     JBoss by Red Hat - Initial implementation.
  ************************************************************************************/
-package org.jboss.tools.maven.sourcelookup.ui.preferences;
+package org.jboss.tools.maven.ui.preferences;
 
 import java.util.ArrayList;
 import java.util.List;
