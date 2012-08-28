@@ -14,6 +14,7 @@
 	<packaging>pom</packaging>
 	<modules>
 		<module>org.jboss.tools.maven.configurators.tests</module>
+		<module>org.jboss.tools.maven.common.test</module>
 		<module>org.jboss.tools.maven.profiles.test</module>
 		<module>org.jboss.tools.maven.ui.bot.test</module>
 	</modules>
