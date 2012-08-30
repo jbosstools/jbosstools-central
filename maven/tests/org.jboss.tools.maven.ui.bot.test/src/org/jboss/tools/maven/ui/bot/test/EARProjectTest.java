@@ -35,7 +35,7 @@ import org.xml.sax.SAXException;
 
 
 @Require(perspective="Java EE")
-public class CreateMavenizedEARProjectTest extends AbstractMavenSWTBotTest{
+public class EARProjectTest extends AbstractMavenSWTBotTest{
 	
 	public static final String WAR_PROJECT_NAME="earWeb";
 	public static final String EJB_PROJECT_NAME="earEJB";
@@ -75,8 +75,10 @@ public class CreateMavenizedEARProjectTest extends AbstractMavenSWTBotTest{
 		addDependencies(EAR_PROJECT_NAME, "org.jboss.tools", WAR_PROJECT_NAME, "0.0.1-SNAPSHOT", "war");
 		addDependencies(EAR_PROJECT_NAME, "org.jboss.tools", EJB_PROJECT_NAME, "0.0.1-SNAPSHOT", "ejb");
 		confEarMavenPlugn(EAR_PROJECT_NAME);
-		bot.viewByTitle("Project Explorer").bot().tree().getTreeItem(EAR_PROJECT_NAME).contextMenu("Run As").menu("3 Maven build...").click();
-		waitForIdle();
+		bot.viewByTitle("Package Explorer").setFocus();
+		SWTBotTree innerBot = bot.viewByTitle("Package Explorer").bot().tree().select(EAR_PROJECT_NAME);
+		ContextMenuHelper.clickContextMenu(innerBot,"Run As","3 Maven build...");
+		waitForShell(botUtil,"Edit Configuration");
 		bot.textWithLabel("Goals:").setText("clean package");
 		bot.button("Run").click();
 		waitForIdle();
@@ -103,7 +105,7 @@ public class CreateMavenizedEARProjectTest extends AbstractMavenSWTBotTest{
 	    shellProperties.tree().select("Project Facets");
 	    shellProperties.tree(1).getTreeItem("JBoss Maven Integration").check();
 	    waitForIdle();
-	    Thread.sleep(500);
+	    bot.sleep(500);
 	    bot.hyperlink("Further configuration required...").click();
 	    bot.button("OK").click();
 	    bot.button("OK").click();
@@ -133,10 +135,12 @@ public class CreateMavenizedEARProjectTest extends AbstractMavenSWTBotTest{
 		bot.button("OK").click();
 		SWTBotTree innerBot = bot.viewByTitle("Package Explorer").bot().tree().select(projectName);
 		ContextMenuHelper.clickContextMenu(innerBot,"Run As","5 Maven build...");
+		waitForShell(botUtil,"Edit Configuration");
 		bot.textWithLabel("Goals:").setText("clean install");
 		bot.button("Run").click();
 		waitForIdle();
 		botUtil.waitForAll();
+		bot.sleep(5000);
 	}
 	
 	private void confEarMavenPlugn(String projectName) throws ParserConfigurationException, SAXException, IOException, CoreException, TransformerException{

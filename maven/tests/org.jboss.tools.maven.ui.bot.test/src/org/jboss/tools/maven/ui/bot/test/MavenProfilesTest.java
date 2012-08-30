@@ -26,6 +26,7 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 import org.jboss.tools.ui.bot.ext.SWTBotExt;
 import org.jboss.tools.ui.bot.ext.SWTUtilExt;
+import org.jboss.tools.ui.bot.ext.condition.ButtonIsDisabled;
 import org.jboss.tools.ui.bot.ext.config.Annotations.Require;
 import org.junit.After;
 import org.junit.BeforeClass;
@@ -33,7 +34,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 @Require(perspective="Java")
-public class MavenProfileSelectionTest extends AbstractMavenSWTBotTest {
+public class MavenProfilesTest extends AbstractMavenSWTBotTest {
 	
 	public static final String AUTOACTIVATED_PROFILE_IN_POM = "active-profile";
 	public static final String[] AUTOACTIVATED_PROFILES_IN_USER_SETTINGS = {"profile.from.settings.xml", "jboss"};
@@ -78,7 +79,7 @@ public class MavenProfileSelectionTest extends AbstractMavenSWTBotTest {
 	    testActivatedProfiles(project.getName(), null);
 	}
 	
-	//@Test
+	@Test
 	public void testOpenMultipleMavenProfiles() throws IOException, InterruptedException, CoreException, ParseException{
 		importMavenProject("projects/simple-jar/pom.xml");
 		importMavenProject("projects/simple-jar1/pom.xml");
@@ -98,6 +99,7 @@ public class MavenProfileSelectionTest extends AbstractMavenSWTBotTest {
 		testActivatedProfiles(project2.getName(), COMMON_PROFILES);
 	}
 	
+	@SuppressWarnings("unused")
 	private void openProfilesDialog(SWTBotTreeItem projectItem) throws ParseException{
 		projectItem.pressShortcut(Keystrokes.CTRL, Keystrokes.ALT,KeyStroke.getInstance("P"));
 		final SWTBotShell selectDialogShell = bot.shell("Select Maven profiles");
@@ -137,7 +139,7 @@ public class MavenProfileSelectionTest extends AbstractMavenSWTBotTest {
 		bot.comboBoxWithLabel("Root Directory:").setText((new File(pomPath)).getParentFile().getCanonicalPath());
 		bot.button("Refresh").click();
 		waitForShell(botUtil, "Import Maven Projects");
-		Thread.sleep(5000);
+		bot.waitWhile(new ButtonIsDisabled("Finish"),150000);
 		bot.button("Finish").click();
 		botUtil.waitForAll();
 	}

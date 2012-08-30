@@ -12,9 +12,9 @@
 
 	<packaging>eclipse-test-plugin</packaging>
 
-	<properties>
-		<systemProperties>-Djbosstools.test.jboss.home.7.1=${requirementsDirectory}/jboss-as-7.1.1.Final -Djbosstools.test.seam.2.2.0.home=${requirementsDirectory}/jboss-seam-2.2.0.GA -Djbosstools.test.seam.2.3.0.home=${requirementsDirectory}/jboss-seam-2.3.0</systemProperties>
-	</properties>
+		<properties>
+			<systemProperties>-Djbosstools.test.jboss.home.7.1=${requirementsDirectory}/jboss-as-7.1.1.Final -Djbosstools.test.seam.2.2.0.home=${requirementsDirectory}/jboss-seam-2.2.0.GA -Djbosstools.test.seam.2.3.0.home=${requirementsDirectory}/jboss-seam-2.3.0</systemProperties>
+		</properties>
 	<build>
 		<plugins>
 			<plugin>
@@ -80,9 +80,6 @@
 					<skip>${swtbot.test.skip}</skip>
 					<testSuite>org.jboss.tools.maven.ui.bot.test</testSuite>
 					<testClass>org.jboss.tools.maven.ui.bot.test.MavenAllBotTests</testClass>
-					<!-- <environmentVariables>
-						<DISPLAY>:2.0</DISPLAY>
-					</environmentVariables> -->
 					<dependencies>
 						<dependency combine.children="append">
 							<type>p2-installable-unit</type>
@@ -185,7 +182,17 @@
 						</dependency>
 						<dependency>
 							<type>p2-installable-unit</type>
+							<artifactId>org.jboss.tools.maven.jpa.feature.feature.group</artifactId>
+							<version>0.0.0</version>
+						</dependency>
+						<dependency>
+							<type>p2-installable-unit</type>
 							<artifactId>org.jboss.tools.maven.jsf.feature.feature.group</artifactId>
+							<version>0.0.0</version>
+						</dependency>
+						<dependency>
+							<type>p2-installable-unit</type>
+							<artifactId>org.jboss.tools.maven.hibernate.feature.feature.group</artifactId>
 							<version>0.0.0</version>
 						</dependency>
 						<dependency>

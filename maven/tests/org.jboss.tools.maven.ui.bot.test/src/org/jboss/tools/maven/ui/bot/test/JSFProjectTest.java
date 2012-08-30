@@ -1,6 +1,5 @@
 package org.jboss.tools.maven.ui.bot.test;
 
-import static org.hamcrest.MatcherAssert.assertThat;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -23,27 +22,19 @@ import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.swtbot.swt.finder.SWTBot;
 import org.eclipse.swtbot.swt.finder.keyboard.Keystrokes;
-import org.eclipse.swtbot.swt.finder.waits.ICondition;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
-import org.eclipse.swtbot.swt.finder.widgets.TimeoutException;
-import org.hamcrest.Description;
-import org.hamcrest.TypeSafeMatcher;
 import org.jboss.tools.ui.bot.ext.SWTBotExt;
-import org.jboss.tools.ui.bot.ext.SWTBotFactory;
 import org.jboss.tools.ui.bot.ext.SWTUtilExt;
-import org.jboss.tools.ui.bot.ext.condition.TaskDuration;
 import org.jboss.tools.ui.bot.ext.config.Annotations.Require;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
 
 //TODO deployment
-@SuppressWarnings("restriction")
-@Require(perspective = "Web Development")
-public class CreateMavenizedJSFProjectTest extends AbstractMavenSWTBotTest{
+@Require(perspective="Web Development")
+public class JSFProjectTest extends AbstractMavenSWTBotTest{
 	public static final String JBOSS7_AS_HOME=System.getProperty("jbosstools.test.jboss.home.7.1");
 	public static final String POM_FILE = "pom.xml";
 	public static final String PROJECT_NAME7="JSFProject7";
@@ -66,7 +57,7 @@ public class CreateMavenizedJSFProjectTest extends AbstractMavenSWTBotTest{
 		setup.button("OK").click();
 	}
 	
-	//@Test
+	@Test
 	public void createJSFProjectTest_AS7_JSFv2() throws InterruptedException, CoreException, ParserConfigurationException, SAXException, IOException, TransformerException{
 		createJSFProject(SERVER_RUNTIME7, SERVER7, JBOSS7_AS_HOME,"JSF 2.0", PROJECT_NAME7);
 		activateMavenFacet(PROJECT_NAME7);
@@ -88,7 +79,11 @@ public class CreateMavenizedJSFProjectTest extends AbstractMavenSWTBotTest{
 	
 	
 	private void createJSFProject(String serverRuntime, String server, String serverHome, String jsfVersion, String projectName) throws InterruptedException, CoreException{
-		bot.menu("File").menu("New").menu("JSF Project").click();
+		bot.menu("File").menu("New").menu("Other...").click();
+		waitForShell(botUtil, "New");
+		bot.tree().expandNode("JBoss Tools Web").expandNode("JSF").select("JSF Project");
+		bot.button("Next >").click();
+		waitForShell(botUtil, "New JSF Project");
 		bot.textWithLabel("Project Name*").setText(projectName);
 		bot.comboBox(0).setSelection(jsfVersion);
 		bot.comboBox(1).setSelection("JSFKickStartWithoutLibs");
@@ -141,6 +136,7 @@ public class CreateMavenizedJSFProjectTest extends AbstractMavenSWTBotTest{
 	}
 	
 	private void activateMavenFacet(String projectName) throws InterruptedException, CoreException{
+		bot.viewByTitle("Package Explorer").setFocus();
 		SWTBotTreeItem item = bot.viewByTitle("Package Explorer").bot().tree().getTreeItem(projectName).select();
 	    item.pressShortcut(Keystrokes.ALT,Keystrokes.LF);
 	    waitForShell(botUtil,"Properties for "+projectName);

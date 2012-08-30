@@ -3,14 +3,11 @@ package org.jboss.tools.maven.ui.bot.test;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.jface.bindings.keys.KeyStroke;
-import org.eclipse.jface.dialogs.MessageDialog;
 
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
 import org.eclipse.swtbot.swt.finder.keyboard.Keystrokes;
-import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
-import org.hamcrest.Matcher;
 import org.jboss.tools.ui.bot.ext.SWTBotExt;
 import org.jboss.tools.ui.bot.ext.SWTUtilExt;
 import org.jboss.tools.ui.bot.ext.config.Annotations.Require;
@@ -64,10 +61,10 @@ public class MaterializeLibraryTest extends AbstractMavenSWTBotTest{
 		item.pressShortcut(k);
 		waitForShell(botUtil, "Materialize Classpath Library");
 		bot.button("OK").click();
-		Thread.sleep(1000);
+		bot.sleep(1000);
 		bot.activeShell().activate();
 		bot.button("OK").click();
-		waitForIdle();
+		botUtil.waitForAll(Long.MAX_VALUE);
 		assertFalse(project.getName()+" is still a maven project!",isMavenProject(project.getName()));
 		testExcludedResources(project);
 		assertNoErrors(project);

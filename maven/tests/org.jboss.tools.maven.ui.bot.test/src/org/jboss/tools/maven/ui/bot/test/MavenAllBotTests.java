@@ -21,13 +21,18 @@ import org.junit.runners.Suite;
  */
 @RunWith(RequirementAwareSuite.class)
 @Suite.SuiteClasses({
-	CreateMavenizedSeamProjectTest.class, //OK
-	CreateMavenizedEARProjectTest.class, //OK
-	CreateMavenizedJSFProjectTest.class, //OK
-	MavenProfileSelectionTest.class, //OK
-	MaterializeLibraryTest.class, //OK
-	ConfiguratorsTest.class, //OK
-	CreateMavenProjectsTest.class, //OK but, bad jsf archetype
+	SeamProjectTest.class,
+	EARProjectTest.class,
+	JSFProjectTest.class,
+	MavenProfilesTest.class,
+	MaterializeLibraryTest.class,
+	JAXRSConfiguratorTest.class,
+	JPAConfiguratorTest.class,
+	JSFConfiguratorTest.class,
+	SeamConfiguratorTest.class,
+	CDIConfiguratorTest.class,
+	CreateMavenProjectsTest.class,
+	//ArchetypesTest.class,
 	JBossPerspectiveTest.class
 })
 public class MavenAllBotTests {

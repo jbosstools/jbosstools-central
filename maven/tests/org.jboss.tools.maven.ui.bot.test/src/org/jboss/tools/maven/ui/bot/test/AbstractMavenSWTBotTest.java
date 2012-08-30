@@ -22,15 +22,22 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.jface.bindings.keys.KeyStroke;
 import org.eclipse.m2e.core.internal.IMavenConstants;
 import org.eclipse.m2e.tests.common.AbstractMavenProjectTestCase;
 import org.eclipse.m2e.tests.common.JobHelpers;
 import org.eclipse.m2e.tests.common.WorkspaceHelpers;
+import org.eclipse.swtbot.swt.finder.SWTBot;
 import org.eclipse.swtbot.swt.finder.junit.SWTBotJunit4ClassRunner;
+import org.eclipse.swtbot.swt.finder.keyboard.Keystrokes;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 import org.eclipse.swtbot.swt.finder.widgets.TimeoutException;
 import org.eclipse.ui.IWorkbenchPreferenceConstants;
 import org.eclipse.ui.internal.IPreferenceConstants;
@@ -42,14 +49,13 @@ import org.jboss.tools.test.util.ResourcesUtils;
 import org.jboss.tools.ui.bot.ext.SWTBotExt;
 import org.jboss.tools.ui.bot.ext.SWTUtilExt;
 import org.jboss.tools.ui.bot.ext.helper.ContextMenuHelper;
+import org.jboss.tools.ui.bot.ext.parts.SWTBotRadioExt;
 import org.jboss.tools.ui.bot.ext.view.ErrorLogView;
-import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.runner.RunWith;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-@SuppressWarnings("restriction")
 @RunWith(SWTBotJunit4ClassRunner.class)
 public abstract class AbstractMavenSWTBotTest extends AbstractMavenProjectTestCase {
 
@@ -62,15 +68,14 @@ public abstract class AbstractMavenSWTBotTest extends AbstractMavenProjectTestCa
 	
 	@BeforeClass 
 	public static void beforeClass() throws Exception {
-		setUserSettings();
+		setUserSettingsAndPerspective();
 		WorkbenchPlugin.getDefault().getPreferenceStore()
 		.setValue(IPreferenceConstants.RUN_IN_BACKGROUND, true);
 
 		PrefUtil.getAPIPreferenceStore().setValue(
 		IWorkbenchPreferenceConstants.ENABLE_ANIMATIONS, false);
-		setUserSettings();
 	}
-	
+
 	//@AfterClass
 	public final static void cleanUp() throws Exception {
 		boolean buildAutomatically = ResourcesUtils.setBuildAutomatically(false);
@@ -159,13 +164,16 @@ public abstract class AbstractMavenSWTBotTest extends AbstractMavenProjectTestCa
 		botUtil.waitForNonIgnoredJobs();
 	}
 	
-	private static void setUserSettings() throws InterruptedException, IOException, CoreException{
+	private static void setUserSettingsAndPerspective() throws InterruptedException, IOException, CoreException{
 		SWTBotExt botExt = new SWTBotExt();
 		botExt.menu("Window").menu("Preferences").click();
 		botExt.tree().expandNode("Maven").select("User Settings").click();
 		File f = new File("usersettings/settings.xml");
 		botExt.text(1).setText(f.getAbsolutePath());
 		botExt.button("Update Settings").click();
+		botExt.tree().expandNode("General").select("Perspectives").click();
+		SWTBotRadioExt radio = new SWTBotRadioExt(botExt.radio("Never open").widget);
+		radio.clickWithoutDeselectionEvent();
 		botExt.button("OK").click();
 	}
 	
@@ -180,6 +188,26 @@ public abstract class AbstractMavenSWTBotTest extends AbstractMavenProjectTestCa
 			errorLog.logMessages();
 			fail("Unexpected messages in Error log, see test log");
 		}
+	}
+	
+	public void buildProject(String projectName, String mavenBuild, String packaging, String version) throws Exception {
+		IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject(projectName);
+		bot.viewByTitle("Package Explorer").setFocus();
+		SWTBot explorer = bot.viewByTitle("Package Explorer").bot();
+		bot.sleep(500);
+		SWTBotTreeItem item = explorer.tree().getTreeItem(projectName).select();
+		SWTBotExt swtBot = new SWTBotExt();
+		item.pressShortcut(Keystrokes.SHIFT,Keystrokes.ALT,KeyStroke.getInstance("X"));
+		bot.sleep(1000);
+		item.pressShortcut(KeyStroke.getInstance("M"));
+		swtBot.waitForShell("Edit Configuration");
+		swtBot.textWithLabel("Goals:").setText("clean package");
+		swtBot.button("Run").click();
+		waitForIdle();
+		project = ResourcesPlugin.getWorkspace().getRoot().getProject(projectName);
+		project.getFolder("target").refreshLocal(IResource.DEPTH_INFINITE,new NullProgressMonitor());
+		IFile jarFile = project.getFile("target/" + projectName + version+"."+packaging);
+		assertTrue(jarFile + " is missing ", jarFile.exists());
 	}
 	
 }

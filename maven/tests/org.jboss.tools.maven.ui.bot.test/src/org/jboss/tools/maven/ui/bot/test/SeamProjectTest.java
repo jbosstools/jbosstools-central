@@ -40,9 +40,8 @@ import org.jboss.tools.ui.bot.ext.config.Annotations.Require;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-@SuppressWarnings("restriction")
 @Require(perspective = "Java EE")
-public class CreateMavenizedSeamProjectTest extends AbstractMavenSWTBotTest {
+public class SeamProjectTest extends AbstractMavenSWTBotTest {
 
 	public static final String SEAM_WEB_PROJECT = "seamWeb";
 	public static final String SEAM_EAR_PROJECT = "seamEar";
@@ -141,9 +140,7 @@ public class CreateMavenizedSeamProjectTest extends AbstractMavenSWTBotTest {
 		}
 		bot.radio(type).click();
 		bot.button("Finish").click();
-		waitForShell(botUtil, "Open Associated Perspective?");
-		bot.button("No").click();
-		botUtil.waitForNonIgnoredJobs();
+		waitForIdle();
 	}
 
 	protected static void createDriver(String jbossASLocation,String driverLocation) throws ConnectionProfileException,IOException {
