@@ -27,5 +27,18 @@
 		<module>tests</module>
 		<module>site</module>
 	</modules>
+	<repositories>
+		<repository>
+			<id>jbosstools-m2e-wtp-mirror</id>
+			<layout>p2</layout>
+			<url>http://download.jboss.org/jbosstools/updates/requirements/m2eclipse/m2e-wtp-juno/</url>
+			<releases>
+				<enabled>true</enabled>
+			</releases>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
+		</repository>
+	</repositories>
 </project>
 	
