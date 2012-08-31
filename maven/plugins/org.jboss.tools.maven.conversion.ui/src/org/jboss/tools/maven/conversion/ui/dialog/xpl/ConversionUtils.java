@@ -14,14 +14,16 @@
  *     Terry Parker <tparker@google.com> - DeltaProcessor misses state changes in archive files, see https://bugs.eclipse.org/bugs/show_bug.cgi?id=357425
  *     Red Hat - copied code from {@link org.eclipse.jdt.internal.core.JavaModelManager.#getZipFile(IPath)} 
  *******************************************************************************/
-package org.jboss.tools.maven.conversion.ui.dialog;
+package org.jboss.tools.maven.conversion.ui.dialog.xpl;
 
 import java.io.File;
 import java.net.URI;
 
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IStatus;
@@ -44,6 +46,7 @@ public class ConversionUtils {
 	 * @throws CoreException
 	 */
 	public static File getFile(IClasspathEntry cpe) throws CoreException {
+		Assert.isNotNull(cpe, "ClasspathEntry can not be null");
 		IPath path = cpe.getPath();
 		IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
 		IResource file = root.findMember(path);
@@ -62,6 +65,19 @@ public class ConversionUtils {
 			localFile= path.toFile();
 		}
 		return localFile;
+	}
+
+	public static IFile getIFile(IClasspathEntry cpe) throws CoreException {
+		Assert.isNotNull(cpe, "ClasspathEntry can not be null");
+		IPath path = cpe.getPath();
+		if (path != null) {
+			IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
+			IResource file = root.findMember(path);
+			if (file != null && file instanceof IFile) {
+				return (IFile) file;
+			}
+		}
+		return null;
 	}
 
 }

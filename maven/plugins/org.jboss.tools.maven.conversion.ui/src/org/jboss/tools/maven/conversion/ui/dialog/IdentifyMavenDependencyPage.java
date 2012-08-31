@@ -1,5 +1,5 @@
 /*************************************************************************************
- * Copyright (c) 2009-2011 Red Hat, Inc. and others.
+ * Copyright (c) 2012 Red Hat, Inc. and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -30,18 +30,17 @@ import org.eclipse.jdt.core.IClasspathContainer;
 import org.eclipse.jdt.core.IClasspathEntry;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.JavaCore;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.ArrayContentProvider;
-import org.eclipse.jface.viewers.CellEditor;
 import org.eclipse.jface.viewers.CheckStateChangedEvent;
 import org.eclipse.jface.viewers.CheckboxTableViewer;
 import org.eclipse.jface.viewers.ColumnLabelProvider;
-import org.eclipse.jface.viewers.DialogCellEditor;
-import org.eclipse.jface.viewers.ICellModifier;
 import org.eclipse.jface.viewers.ICheckStateListener;
 import org.eclipse.jface.viewers.TableViewerColumn;
 import org.eclipse.jface.window.Window;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Image;
@@ -49,11 +48,12 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
+import org.jboss.tools.maven.conversion.ui.dialog.xpl.ConversionUtils;
+import org.jboss.tools.maven.conversion.ui.dialog.xpl.EditDependencyDialog;
 import org.jboss.tools.maven.conversion.ui.handlers.IdentifyJarJob;
 import org.jboss.tools.maven.conversion.ui.internal.CellListener;
 import org.jboss.tools.maven.conversion.ui.internal.MavenDependencyConversionActivator;
@@ -63,10 +63,12 @@ import org.jboss.tools.maven.core.internal.identification.FileIdentificationMana
 
 public class IdentifyMavenDependencyPage extends WizardPage {
 
+	/*
 	private static final String SOURCE_PROPERTY = "SOURCE_PROPERTY";
 
 	private static final String DEPENDENCY_PROPERTY = "DEPENDENCY_PROPERTY";
-
+    */
+	
 	private static final int DEPENDENCY_COLUMN = 2;
 
 	private Map<IClasspathEntry, Dependency> dependencyMap;
@@ -85,6 +87,11 @@ public class IdentifyMavenDependencyPage extends WizardPage {
 	
 	private CheckboxTableViewer dependenciesViewer;
 	
+	private Button deleteJarsBtn;
+	
+	private boolean deleteJars;
+
+
 	public IdentifyMavenDependencyPage(IProject project, Set<IClasspathEntry> entries) {
 		super("");
 		this.project = project;
@@ -140,15 +147,29 @@ public class IdentifyMavenDependencyPage extends WizardPage {
 		container.setLayout(layout);
 		container.setLayoutData(new GridData(GridData.FILL_BOTH));
 		
-		String message = "Identify existing classpath entries as Maven dependencies";
+		String message = "Identify existing classpath entries as Maven dependencies. Double-click on a Maven Dependency to edit its details";
 		setMessage(message);
 
 		displayDependenciesTable(container);
 
+		deleteJarsBtn = addCheckButton(container, "Delete classpath entries from project", deleteJars);
+		deleteJarsBtn.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				deleteJars = deleteJarsBtn.getSelection();
+			}
+		});
 		runIdentificationJobs();
 	}
-	
 
+	private Button addCheckButton(Composite container, String label,
+			boolean selected) {
+		Button checkBtn = new Button(container, SWT.CHECK);
+		checkBtn.setText(label);
+		checkBtn.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, true, false, 2, 1));
+		checkBtn.setSelection(selected);
+		return checkBtn;
+	}
+	
 	private void displayDependenciesTable(Composite container) {
 		GridData gd = new GridData(SWT.FILL, SWT.FILL, true, true, 2, 4);
 		gd.heightHint = 500;
@@ -258,6 +279,8 @@ public class IdentifyMavenDependencyPage extends WizardPage {
 					if(editDependencyDialog.open() == Window.OK) {
 						entry.setValue(editDependencyDialog.getDependency());
 					}
+				} else {
+					MessageDialog.openInformation(getShell(), "you dbl-clicked", "you dbl-clicked");
 				}
 			}
 		});
@@ -265,10 +288,12 @@ public class IdentifyMavenDependencyPage extends WizardPage {
 		
 		addSelectionButton(container, "Select All", true);
 		addSelectionButton(container, "Deselect All", false);
-		//addIdentifyButton(container, "Identify dependencies");
+		if (Boolean.getBoolean("org.jboss.tools.maven.conversion.debug")) {
+			addIdentifyButton(container, "Identify dependencies");
+		}
 		addResetButton(container, "Reset");
 
-		addCellEditors();
+		//addCellEditors();
 	}
 
 	
@@ -277,6 +302,7 @@ public class IdentifyMavenDependencyPage extends WizardPage {
 		return true;
 	} 
 	
+	/*
 	protected void addCellEditors() {
 		dependenciesViewer.setColumnProperties(
 				new String[] { "EMPTY",	SOURCE_PROPERTY, DEPENDENCY_PROPERTY });
@@ -286,7 +312,7 @@ public class IdentifyMavenDependencyPage extends WizardPage {
 		dependenciesViewer.setCellEditors(editors);
 		dependenciesViewer.setCellModifier(new DependencyCellModifier());
 	}
-
+    
 	private class DependencyCellModifier implements ICellModifier {
 
 		public boolean canModify(Object element, String property) {
@@ -333,9 +359,8 @@ public class IdentifyMavenDependencyPage extends WizardPage {
 			}
 			return d;
 		}
-		
 	}
-
+    */
 
 	private Button addSelectionButton(Composite container, String label,
 			final boolean ischecked) {
@@ -513,4 +538,10 @@ public class IdentifyMavenDependencyPage extends WizardPage {
 		}
 		return dependencies;
 	}
+
+
+	public boolean isDeleteJars() {
+		return deleteJars;
+	}
+
 }

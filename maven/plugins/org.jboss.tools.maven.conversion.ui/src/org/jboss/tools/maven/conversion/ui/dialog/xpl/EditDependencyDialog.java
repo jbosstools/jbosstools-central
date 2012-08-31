@@ -9,7 +9,7 @@
  *      Sonatype, Inc. - initial API and implementation
  *******************************************************************************/
 
-package org.jboss.tools.maven.conversion.ui.dialog;
+package org.jboss.tools.maven.conversion.ui.dialog.xpl;
 
 import static org.eclipse.m2e.core.ui.internal.util.Util.nvl;
 
