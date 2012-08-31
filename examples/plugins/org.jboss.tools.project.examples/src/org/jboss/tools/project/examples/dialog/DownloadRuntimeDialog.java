@@ -553,11 +553,11 @@ public class DownloadRuntimeDialog extends Dialog {
 		final RuntimePath runtimePath = new RuntimePath(directory);
 		List<RuntimeDefinition> serverDefinitions = locator.searchForRuntimes(
 				runtimePath.getPath(), monitor);
-		runtimePath.getServerDefinitions().clear();
+		runtimePath.getRuntimeDefinitions().clear();
 		for (RuntimeDefinition serverDefinition : serverDefinitions) {
 			serverDefinition.setRuntimePath(runtimePath);
 		}
-		runtimePath.getServerDefinitions().addAll(serverDefinitions);
+		runtimePath.getRuntimeDefinitions().addAll(serverDefinitions);
 		RuntimeUIActivator.getDefault().getRuntimePaths().add(runtimePath);
 		RuntimeUIActivator.getDefault().saveRuntimePaths();
 		if (serverDefinitions.size() == 0) {
