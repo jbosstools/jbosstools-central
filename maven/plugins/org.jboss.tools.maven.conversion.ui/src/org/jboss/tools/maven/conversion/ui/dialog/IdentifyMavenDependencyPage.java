@@ -19,10 +19,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
+import org.apache.maven.artifact.Artifact;
+import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.model.Dependency;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.jobs.IJobChangeEvent;
 import org.eclipse.core.runtime.jobs.IJobChangeListener;
 import org.eclipse.core.runtime.jobs.Job;
@@ -39,6 +44,9 @@ import org.eclipse.jface.viewers.ICheckStateListener;
 import org.eclipse.jface.viewers.TableViewerColumn;
 import org.eclipse.jface.window.Window;
 import org.eclipse.jface.wizard.WizardPage;
+import org.eclipse.jst.j2ee.internal.validation.DependencyUtil;
+import org.eclipse.m2e.core.MavenPlugin;
+import org.eclipse.m2e.core.embedder.IMaven;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -76,7 +84,9 @@ public class IdentifyMavenDependencyPage extends WizardPage {
 	private Map<IClasspathEntry, IdentifyJarJob> identificationJobs;
 
 	private Set<IClasspathEntry> initialEntries;
-	
+
+	private Map<Dependency, Boolean> dependencyResolution = new ConcurrentHashMap<Dependency, Boolean>();
+
 	private IProject project;
 	
 	private Image jarImage;
@@ -84,6 +94,7 @@ public class IdentifyMavenDependencyPage extends WizardPage {
 	private Image okImage;
 	private Image failedImage;
 	private Image loadingImage;
+	private Image unresolvedImage;
 	
 	private CheckboxTableViewer dependenciesViewer;
 	
@@ -123,10 +134,22 @@ public class IdentifyMavenDependencyPage extends WizardPage {
 		}
 	}
 
+	
+	public void dispose() {
+		if (jarImage != null) jarImage.dispose();
+		if (okImage != null) okImage.dispose();
+		if (projectImage != null) projectImage.dispose();
+		if (failedImage != null) failedImage.dispose();
+		if (loadingImage != null) loadingImage.dispose();
+		if (unresolvedImage != null) unresolvedImage.dispose();
+	}
+	
+	
 	private void initImages() {
 		jarImage = MavenDependencyConversionActivator.getJarIcon();
 		projectImage = MavenDependencyConversionActivator.getProjectIcon();
 		okImage = MavenDependencyConversionActivator.getOkIcon();
+		unresolvedImage = MavenDependencyConversionActivator.getWarningIcon();
 		failedImage = MavenDependencyConversionActivator.getFailedIcon();
 		loadingImage = MavenDependencyConversionActivator.getLoadingIcon();
 	}
@@ -242,7 +265,7 @@ public class IdentifyMavenDependencyPage extends WizardPage {
 			@Override
 			@SuppressWarnings("unchecked")
 			public Image getImage(Object element) {
-				Map.Entry<IClasspathEntry, String> entry = (Map.Entry<IClasspathEntry, String>) element;
+				Map.Entry<IClasspathEntry, Dependency> entry = (Map.Entry<IClasspathEntry, Dependency>) element;
 				IdentifyJarJob job = identificationJobs ==null? null:identificationJobs.get(entry.getKey());
 				if (job != null) {
 					int jobState = job.getState();
@@ -253,6 +276,7 @@ public class IdentifyMavenDependencyPage extends WizardPage {
 				if (entry.getValue() == null) {
 					return failedImage;
 				} else {
+					//return (isResolved(entry.getValue(), null))?okImage:unresolvedImage;
 					return okImage;
 				}
 			}
@@ -277,11 +301,26 @@ public class IdentifyMavenDependencyPage extends WizardPage {
 					EditDependencyDialog editDependencyDialog = new EditDependencyDialog(getShell());
 					editDependencyDialog.setDependency(d);
 					if(editDependencyDialog.open() == Window.OK) {
-						entry.setValue(editDependencyDialog.getDependency());
+						Dependency newDep = editDependencyDialog.getDependency();
+						entry.setValue(newDep);
+						/*
+						if (!eq(newDep,d)) {
+							isResolved(newDep, new NullProgressMonitor());
+						}
+						*/
+						refresh();
 					}
-				} else {
-					MessageDialog.openInformation(getShell(), "you dbl-clicked", "you dbl-clicked");
 				}
+			}
+
+			private boolean eq(Dependency newDep, Dependency d) {
+				if (newDep == d) {
+					return true;
+				}
+				if (d == null) {
+					return false;
+				}
+				return newDep.toString().equals(d.toString());
 			}
 		});
 		
@@ -498,6 +537,7 @@ public class IdentifyMavenDependencyPage extends WizardPage {
 								@Override
 								public void run() {
 									Dependency d = job.getDependency();
+									//isResolved(d, new NullProgressMonitor());
 									dependencyMap.put(entry.getKey(), d);
 									refresh();
 								}
@@ -544,4 +584,32 @@ public class IdentifyMavenDependencyPage extends WizardPage {
 		return deleteJars;
 	}
 
+	private boolean isResolved(Dependency d, IProgressMonitor monitor) {
+		if (d == null) {
+			return false;
+		}
+		if (monitor == null) {
+			monitor = new NullProgressMonitor();
+		}
+		Boolean resolved = dependencyResolution.get(d);
+		if (resolved == null) {
+			String groupId = d.getGroupId();
+			String artifactId = d.getArtifactId();
+			String version = d.getVersion();
+			String type = d.getType();
+			String classifier = d.getClassifier();
+			IMaven maven = MavenPlugin.getMaven();
+			Artifact a =null;
+			try {
+				List<ArtifactRepository> artifactRepositories = maven.getArtifactRepositories();
+				a = maven.resolve(groupId , artifactId , version , type , classifier , artifactRepositories , monitor);
+			} catch(CoreException e) {
+				//ignore
+			}
+			resolved = a != null && a.isResolved();
+			dependencyResolution.put (d, resolved);
+		}
+		return resolved;
+	}
+	
 }
