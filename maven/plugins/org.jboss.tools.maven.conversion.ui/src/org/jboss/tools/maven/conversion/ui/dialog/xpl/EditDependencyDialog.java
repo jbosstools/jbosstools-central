@@ -201,7 +201,8 @@ public class EditDependencyDialog extends SelectionStatusDialog  {
   
 
   public void setDependency(Dependency dependency) {
-    this.dependency = dependency;
+
+	this.dependency = dependency == null? null : dependency.clone();
 
     if(dependency != null 
        && groupIdText != null 

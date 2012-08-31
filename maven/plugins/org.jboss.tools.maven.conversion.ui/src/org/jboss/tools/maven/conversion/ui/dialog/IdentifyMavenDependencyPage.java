@@ -35,7 +35,6 @@ import org.eclipse.jdt.core.IClasspathContainer;
 import org.eclipse.jdt.core.IClasspathEntry;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.JavaCore;
-import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.CheckStateChangedEvent;
 import org.eclipse.jface.viewers.CheckboxTableViewer;
@@ -44,7 +43,6 @@ import org.eclipse.jface.viewers.ICheckStateListener;
 import org.eclipse.jface.viewers.TableViewerColumn;
 import org.eclipse.jface.window.Window;
 import org.eclipse.jface.wizard.WizardPage;
-import org.eclipse.jst.j2ee.internal.validation.DependencyUtil;
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.embedder.IMaven;
 import org.eclipse.swt.SWT;
@@ -57,6 +55,7 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
@@ -101,6 +100,12 @@ public class IdentifyMavenDependencyPage extends WizardPage {
 	private Button deleteJarsBtn;
 	
 	private boolean deleteJars;
+
+	private Label warningImg;
+
+	private Label warningLabel;
+
+	private static String MESSAGE = "Identify existing classpath entries as Maven dependencies. Double-click on a Maven Dependency to edit its details";
 
 
 	public IdentifyMavenDependencyPage(IProject project, Set<IClasspathEntry> entries) {
@@ -169,9 +174,8 @@ public class IdentifyMavenDependencyPage extends WizardPage {
 		layout.marginLeft = 12;
 		container.setLayout(layout);
 		container.setLayoutData(new GridData(GridData.FILL_BOTH));
-		
-		String message = "Identify existing classpath entries as Maven dependencies. Double-click on a Maven Dependency to edit its details";
-		setMessage(message);
+
+		setMessage(MESSAGE);
 
 		displayDependenciesTable(container);
 
@@ -276,8 +280,8 @@ public class IdentifyMavenDependencyPage extends WizardPage {
 				if (entry.getValue() == null) {
 					return failedImage;
 				} else {
-					//return (isResolved(entry.getValue(), null))?okImage:unresolvedImage;
-					return okImage;
+					return (isResolved(entry.getValue(), null))?okImage:unresolvedImage;
+					//return okImage;
 				}
 			}
 		});
@@ -303,11 +307,9 @@ public class IdentifyMavenDependencyPage extends WizardPage {
 					if(editDependencyDialog.open() == Window.OK) {
 						Dependency newDep = editDependencyDialog.getDependency();
 						entry.setValue(newDep);
-						/*
 						if (!eq(newDep,d)) {
 							isResolved(newDep, new NullProgressMonitor());
 						}
-						*/
 						refresh();
 					}
 				}
@@ -481,6 +483,14 @@ public class IdentifyMavenDependencyPage extends WizardPage {
 		if (dependenciesViewer != null && !dependenciesViewer.getTable().isDisposed()) {
 			dependenciesViewer.refresh();
 		}
+		
+		for (Dependency d : getDependencies()) {
+			if (Boolean.FALSE.equals(dependencyResolution.get(d))) {
+				setMessage("Some selected dependencies can not be resolved using the repositories from your settings.xml", WARNING);
+				return;
+			}
+		} 
+		setMessage(MESSAGE);
 	}
 	
 
@@ -537,7 +547,7 @@ public class IdentifyMavenDependencyPage extends WizardPage {
 								@Override
 								public void run() {
 									Dependency d = job.getDependency();
-									//isResolved(d, new NullProgressMonitor());
+									isResolved(d, new NullProgressMonitor());
 									dependencyMap.put(entry.getKey(), d);
 									refresh();
 								}

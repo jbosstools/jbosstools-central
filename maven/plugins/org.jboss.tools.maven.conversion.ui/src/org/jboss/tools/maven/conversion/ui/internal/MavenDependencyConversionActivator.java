@@ -95,12 +95,20 @@ public class MavenDependencyConversionActivator extends AbstractUIPlugin {
 	}
 
 	public static Image getIcon(String pathToIcon) {
-		Image img = null;
 		ImageDescriptor descriptor = imageDescriptorFromPlugin(PLUGIN_ID, pathToIcon);
+        return getIcon(descriptor);
+	}
+
+	private static Image getIcon(ImageDescriptor descriptor) {
+		Image img = null;
         if(descriptor != null) {
         	img = descriptor.createImage();
         }
         return img;
+	}
+	
+	public static Image getWarningIcon() {
+		return getIcon("icons/warning.gif");
 	}
 
 }
