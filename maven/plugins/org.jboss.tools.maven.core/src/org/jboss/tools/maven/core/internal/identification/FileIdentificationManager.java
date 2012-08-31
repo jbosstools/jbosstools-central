@@ -72,7 +72,7 @@ public class FileIdentificationManager implements IFileIdentificationManager {
 	}
 
 	public ArtifactKey identify(File file, IProgressMonitor monitor) throws CoreException {
-		if (file == null) {
+		if (file == null || !file.exists()) {
 			return null;
 		}
 		if (monitor == null) {
