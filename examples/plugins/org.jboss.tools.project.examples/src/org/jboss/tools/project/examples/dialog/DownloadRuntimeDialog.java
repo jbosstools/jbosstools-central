@@ -581,7 +581,7 @@ public class DownloadRuntimeDialog extends Dialog {
 			});
 			
 		} else {
-			Set<IRuntimeDetector> detectors = RuntimeCoreActivator
+			Set<IRuntimeDetector> detectors = RuntimeCoreActivator.getDefault()
 					.getRuntimeDetectors();
 			for (IRuntimeDetector detector : detectors) {
 				if (detector.isEnabled()) {
