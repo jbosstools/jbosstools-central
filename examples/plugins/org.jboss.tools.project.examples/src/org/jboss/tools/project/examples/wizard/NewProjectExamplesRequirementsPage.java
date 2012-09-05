@@ -54,12 +54,13 @@ import org.eclipse.ui.browser.IWorkbenchBrowserSupport;
 import org.eclipse.ui.dialogs.PreferencesUtil;
 import org.jboss.tools.project.examples.Messages;
 import org.jboss.tools.project.examples.ProjectExamplesActivator;
-import org.jboss.tools.project.examples.dialog.DownloadRuntimeDialog;
 import org.jboss.tools.project.examples.model.ProjectExample;
 import org.jboss.tools.project.examples.model.ProjectFix;
-import org.jboss.tools.project.examples.runtimes.DownloadRuntime;
+import org.jboss.tools.runtime.core.RuntimeCoreActivator;
+import org.jboss.tools.runtime.core.model.DownloadRuntime;
 import org.jboss.tools.runtime.ui.IDownloadRuntimes;
 import org.jboss.tools.runtime.ui.RuntimeUIActivator;
+import org.jboss.tools.runtime.ui.download.DownloadRuntimeDialog;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.ServiceReference;
 
@@ -359,7 +360,7 @@ public class NewProjectExamplesRequirementsPage extends WizardPage {
 	private DownloadRuntime getDownloadRuntime(ProjectFix fix) {
 		final String downloadId = fix.getProperties().get(ProjectFix.DOWNLOAD_ID);
 		if (downloadId != null) {
-			return ProjectExamplesActivator.getDefault().getDownloadRuntimes().get(downloadId);
+			return RuntimeCoreActivator.getDefault().getDownloadRuntimes().get(downloadId);
 		}
 		return null;
 	}

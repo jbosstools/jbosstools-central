@@ -34,9 +34,6 @@ import java.util.StringTokenizer;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-
 import org.apache.commons.lang.StringEscapeUtils;
 import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.filesystem.IFileStore;
@@ -55,7 +52,6 @@ import org.eclipse.core.runtime.IExtensionRegistry;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
@@ -115,7 +111,6 @@ import org.eclipse.wst.validation.internal.operations.ValidationBuilder;
 import org.jboss.tools.project.examples.configurators.DefaultJBossCentralConfigurator;
 import org.jboss.tools.project.examples.configurators.IJBossCentralConfigurator;
 import org.jboss.tools.project.examples.dialog.MarkerDialog;
-import org.jboss.tools.project.examples.filetransfer.ECFExamplesTransport;
 import org.jboss.tools.project.examples.fixes.PluginFix;
 import org.jboss.tools.project.examples.fixes.ProjectExamplesFix;
 import org.jboss.tools.project.examples.fixes.SeamRuntimeFix;
@@ -124,7 +119,6 @@ import org.jboss.tools.project.examples.model.IImportProjectExample;
 import org.jboss.tools.project.examples.model.ProjectExample;
 import org.jboss.tools.project.examples.model.ProjectExampleUtil;
 import org.jboss.tools.project.examples.model.ProjectFix;
-import org.jboss.tools.project.examples.runtimes.DownloadRuntime;
 import org.jboss.tools.project.examples.wizard.ContributedPage;
 import org.jboss.tools.project.examples.wizard.ImportDefaultProjectExample;
 import org.jboss.tools.project.examples.wizard.NewProjectExamplesJob;
@@ -132,10 +126,6 @@ import org.jboss.tools.project.examples.wizard.ProjectReadyWizard;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Version;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
 /**
  * The activator class controls the plug-in life cycle
@@ -185,13 +175,8 @@ public class ProjectExamplesActivator extends AbstractUIPlugin {
 	public static final boolean SHOW_QUICK_FIX_VALUE = true;
 	
 	private static final String IMPORT_PROJECT_EXAMPLES_EXTENSION_ID = "org.jboss.tools.project.examples.importProjectExamples"; //$NON-NLS-1$
-	private static final String NAME = "name"; //$NON-NLS-1$
 	private static final String TYPE = "type"; //$NON-NLS-1$
-	
-	public static final String DOWNLOAD_RUNTIMES_EXTENSION_ID = "org.jboss.tools.project.examples.downloadruntimes"; //$NON-NLS-1$
-
-	private static final String ID = "id"; //$NON-NLS-1$
-	
+	public static final String NAME = "name"; //$NON-NLS-1$
 	public static final String CLASS = "class"; //$NON-NLS-1$
 	
 	private static final String PRIORITY = "priority"; //$NON-NLS-1$
@@ -239,13 +224,6 @@ public class ProjectExamplesActivator extends AbstractUIPlugin {
 	private ImportDefaultProjectExample defaultImportProjectExample;
 
 	private static final String VERSION = "version"; //$NON-NLS-1$
-	private static final String URL = "url"; //$NON-NLS-1$
-
-	private static final String DISCLAIMER = "disclaimer"; //$NON-NLS-1$
-
-	private static final String DOWNLOAD_RUNTIMES_FILE = "download_runtime.xml"; //$NON-NLS-1$
-	
-	private Map<String, DownloadRuntime> downloadRuntimes;
 	
 	private Map<String, List<ContributedPage>> contributedPages;
 	
@@ -1173,114 +1151,6 @@ public class ProjectExamplesActivator extends AbstractUIPlugin {
 		}
 		return contributedPages;
 	}
-	
-	public Map<String, DownloadRuntime> getDownloadRuntimes() {
-		if (downloadRuntimes == null) {
-			downloadRuntimes = new HashMap<String, DownloadRuntime>();
-			IExtensionRegistry registry = Platform.getExtensionRegistry();
-			IExtensionPoint extensionPoint = registry
-					.getExtensionPoint(DOWNLOAD_RUNTIMES_EXTENSION_ID);
-			IExtension[] extensions = extensionPoint.getExtensions();
-			for (int i = 0; i < extensions.length; i++) {
-				IExtension extension = extensions[i];
-				IConfigurationElement[] configurationElements = extension
-						.getConfigurationElements();
-				for (int j = 0; j < configurationElements.length; j++) {
-					IConfigurationElement configurationElement = configurationElements[j];
-					String name = configurationElement.getAttribute(NAME);
-					String id = configurationElement.getAttribute(ID);
-					String version = configurationElement.getAttribute(VERSION);
-					String url = configurationElement.getAttribute(URL);
-					String disclaimer = configurationElement.getAttribute(DISCLAIMER);
-					DownloadRuntime downloadRuntime = new DownloadRuntime(id, name, version, url);
-					if (Boolean.FALSE.toString().equals(disclaimer)) {
-						downloadRuntime.setDisclaimer(false);
-					}
-					downloadRuntimes.put(id, downloadRuntime);
-				}
-			}
-			addExternalRuntimes();
-		}
-		return downloadRuntimes;
-	}
-	
-	private void addExternalRuntimes() {
-		if (downloadRuntimes == null) {
-			return;
-		}
-		String urlString = getConfigurator().getDownloadRuntimesURL();
-		File cacheFile = null;
-		try {
-			long cacheModified = 0;
-			IPath location = ProjectExamplesActivator.getDefault()
-					.getStateLocation();
-			cacheFile = new File(location.toFile(), DOWNLOAD_RUNTIMES_FILE);
-			if (cacheFile.isFile()) {
-				cacheModified = cacheFile.lastModified();
-			}
-			URL url = new URL(urlString);
-			long urlModified;
-			try {
-				urlModified = ECFExamplesTransport.getInstance()
-						.getLastModified(url);
-			} catch (Exception e) {
-				log(e);
-				urlModified = -1;
-			}
-			if (cacheModified == 0 || urlModified != cacheModified) {
-				File tempFile = File
-						.createTempFile("download_runtimes", ".xml");  //$NON-NLS-1$//$NON-NLS-2$
-				tempFile.deleteOnExit();
-				OutputStream destination = new FileOutputStream(tempFile);
-				IStatus status = ECFExamplesTransport.getInstance().download(
-						DOWNLOAD_RUNTIMES_FILE, urlString, destination,
-						new NullProgressMonitor());
-				if (status.isOK() && url != null) {
-					cacheModified = ECFExamplesTransport.getInstance()
-							.getLastModified(url);
-					ProjectExamplesActivator.copyFile(tempFile, cacheFile);
-					tempFile.delete();
-					cacheFile.setLastModified(cacheModified);
-				} else {
-					getLog().log(status);
-				}
-			}
-		} catch (Exception e) {
-			log(e);
-		}
-		if (cacheFile != null && cacheFile.isFile()) {
-			try {
-				DocumentBuilderFactory dbf = DocumentBuilderFactory
-						.newInstance();
-				DocumentBuilder db = dbf.newDocumentBuilder();
-				Document doc = db.parse(cacheFile);
-				NodeList runtimes = doc.getElementsByTagName("runtime"); //$NON-NLS-1$
-				int len = runtimes.getLength();
-				for (int i = 0; i < len; i++) {
-					Node node = runtimes.item(i);
-					if (node.getNodeType() == Node.ELEMENT_NODE) {
-						Element element = (Element) node;
-						String id = element.getAttribute("id"); //$NON-NLS-1$
-						String name = element.getAttribute("name"); //$NON-NLS-1$
-						String version = element.getAttribute("version"); //$NON-NLS-1$
-						String url = element.getAttribute("url"); //$NON-NLS-1$
-						String disclaimer = element.getAttribute("disclaimer"); //$NON-NLS-1$
-						if (id == null || name == null || version == null || url == null) {
-							ProjectExamplesActivator.log("Invalid runtime: id=" + id + ",name=" + 
-									name + ",version=" + version + ",url=" + url);
-						} else {
-							DownloadRuntime runtime = new DownloadRuntime(id, name, version, url);
-							runtime.setDisclaimer("true".equals(disclaimer)); //$NON-NLS-1$
-							downloadRuntimes.put(id, runtime);
-						}
-					}
-				}
-			} catch (Exception e) {
-				ProjectExamplesActivator.log(e);
-			} 
-		}
-	}
-
 	
 	public IJBossCentralConfigurator getConfigurator() {
 		if (configurator == null) {
