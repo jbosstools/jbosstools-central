@@ -576,7 +576,9 @@ public class IdentifyMavenDependencyPage extends WizardPage {
     }
 
 	public List<Dependency> getDependencies() {
-		
+		if (dependenciesViewer == null || dependenciesViewer.getTable().isDisposed()) {
+			return Collections.emptyList();
+		}
 		Object[] selection = dependenciesViewer.getCheckedElements();
 		List<Dependency> dependencies = new ArrayList<Dependency>(selection.length);
 		for (Object o : selection) {
