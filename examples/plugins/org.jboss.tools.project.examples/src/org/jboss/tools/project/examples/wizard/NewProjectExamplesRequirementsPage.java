@@ -58,7 +58,7 @@ import org.jboss.tools.project.examples.model.ProjectExample;
 import org.jboss.tools.project.examples.model.ProjectFix;
 import org.jboss.tools.runtime.core.RuntimeCoreActivator;
 import org.jboss.tools.runtime.core.model.DownloadRuntime;
-import org.jboss.tools.runtime.ui.IDownloadRuntimes;
+import org.jboss.tools.runtime.core.model.IDownloadRuntimes;
 import org.jboss.tools.runtime.ui.RuntimeUIActivator;
 import org.jboss.tools.runtime.ui.download.DownloadRuntimeDialog;
 import org.osgi.framework.Bundle;
