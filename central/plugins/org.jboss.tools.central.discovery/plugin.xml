@@ -229,7 +229,7 @@
                image32="images/m2e_32.gif">
          </icon>
          <overview
-               url="http://www.eclipse.org/m2e/">
+               url="https://github.com/jbosstools/m2e-apt/">
          </overview>
       </connectorDescriptor>
       <connectorDescriptor
@@ -242,12 +242,12 @@
             name="Maven Integration for Web Tools (m2e-wtp)"
             provider="eclipse.org"
             siteUrl="http://download.jboss.org/jbosstools/updates/development/juno/central/core/">
-	    <iu id="org.maven.ide.eclipse.wtp.feature"/>
+	     <iu id="org.eclipse.m2e.wtp.feature"/>
          <icon
                image32="images/m2e_32.gif">
          </icon>
          <overview
-               url="http://www.eclipse.org/m2e/">
+               url="http://www.eclipse.org/m2e-wtp/">
          </overview>
       </connectorDescriptor>
 
