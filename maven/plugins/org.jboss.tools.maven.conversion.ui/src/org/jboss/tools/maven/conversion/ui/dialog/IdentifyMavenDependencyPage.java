@@ -332,7 +332,7 @@ public class IdentifyMavenDependencyPage extends WizardPage {
 		if (Boolean.getBoolean("org.jboss.tools.maven.conversion.debug")) {
 			addIdentifyButton(container, "Identify dependencies");
 		}
-		addResetButton(container, "Reset");
+		//addResetButton(container, "Reset");
 
 		//addCellEditors();
 	}
