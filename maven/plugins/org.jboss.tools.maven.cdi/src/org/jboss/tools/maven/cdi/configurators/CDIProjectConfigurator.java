@@ -53,11 +53,10 @@ public class CDIProjectConfigurator extends AbstractProjectConfigurator {
 	protected static final IProjectFacetVersion ejbVersion;
 	
 	protected static final IProjectFacet cdiFacet;
-	protected static final IProjectFacetVersion cdiVersion;
 	
 	protected static final IProjectFacet m2Facet;
 	protected static final IProjectFacetVersion m2Version;
-	private static final String DEFAULT_CDI_VERSION = "1.0";
+	private static final String DEFAULT_CDI_VERSION;
 	
 	static {
 		dynamicWebFacet = ProjectFacetsManager.getProjectFacet("jst.web"); //$NON-NLS-1$
@@ -65,7 +64,7 @@ public class CDIProjectConfigurator extends AbstractProjectConfigurator {
 		ejbFacet = ProjectFacetsManager.getProjectFacet("jst.ejb"); //$NON-NLS-1$
 		ejbVersion = ejbFacet.getVersion("3.0");  //$NON-NLS-1$
 		cdiFacet = ProjectFacetsManager.getProjectFacet("jst.cdi"); //$NON-NLS-1$
-		cdiVersion = cdiFacet.getVersion(DEFAULT_CDI_VERSION); //$NON-NLS-1$
+		DEFAULT_CDI_VERSION = cdiFacet.getDefaultVersion().getVersionString();
 		m2Facet = ProjectFacetsManager.getProjectFacet("jboss.m2"); //$NON-NLS-1$
 		m2Version = m2Facet.getVersion("1.0"); //$NON-NLS-1$
 	}
@@ -145,11 +144,33 @@ public class CDIProjectConfigurator extends AbstractProjectConfigurator {
 	private void installCDIFacet(IFacetedProject fproj, String cdiVersionString, IProgressMonitor monitor)
 			throws CoreException {
 		if (!fproj.hasProjectFacet(cdiFacet)) {
-			if (cdiVersionString.startsWith("1.0")) { //$NON-NLS-1$
-				IDataModel model = MavenCDIActivator.getDefault().createCDIDataModel(fproj,cdiVersion);
-				fproj.installProjectFacet(cdiVersion, model, monitor);	
+			IProjectFacetVersion facetVersion = getCdiFacetVersion(cdiVersionString);
+			if (facetVersion != null) { //$NON-NLS-1$
+				IDataModel model = MavenCDIActivator.getDefault().createCDIDataModel(fproj,facetVersion);
+				fproj.installProjectFacet(facetVersion, model, monitor);	
 			}
 		}
+	}
+	
+	private IProjectFacetVersion getCdiFacetVersion(String cdiVersionString) {
+		String majorMinor = getMajorMinorVersion(cdiVersionString);
+		IProjectFacetVersion facetVersion; 
+		try {
+			facetVersion = cdiFacet.getVersion(majorMinor);
+		} catch(IllegalArgumentException iae) {
+			//ignore missing version
+			facetVersion = cdiFacet.getDefaultVersion();
+			MavenCDIActivator.log("CDI version " + majorMinor + " has no corresponding Facet, falling back to "+facetVersion.getVersionString());
+		}
+		return facetVersion;
+	}
+
+	private String getMajorMinorVersion(String versionString) {
+		String[] pointVersions = versionString.split("\\.");
+		if (pointVersions.length > 1) {
+			return pointVersions[0] + "." + pointVersions[1];
+		} 
+		return versionString;
 	}
 	
 	private String getCDIVersion(MavenProject mavenProject) {

@@ -34,6 +34,15 @@ public class CDIConfiguratorTest extends AbstractMavenConfiguratorTest {
 		assertIsCDIProject(cdiProject, DEFAULT_CDI_VERSION);
 	}
 
+	@Test
+	public void testJBIDE12558_unsupportedCdiVersion() throws Exception {
+		String projectLocation = "projects/cdi/unsupported-cdi-version";
+		IProject cdiProject = importProject(projectLocation+"/pom.xml");
+		waitForJobsToComplete();
+		assertNoErrors(cdiProject);
+		assertIsCDIProject(cdiProject, DEFAULT_CDI_VERSION);
+	}
+
 	private void assertIsCDIProject(IProject project, IProjectFacetVersion expectedCdiVersion) throws Exception {
 		assertNoErrors(project);
 		assertTrue("CDI nature is missing", project.hasNature(CDICoreNature.NATURE_ID));
