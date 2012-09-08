@@ -55,4 +55,4 @@ Export-Package: org.jboss.tools.project.examples,
  org.jboss.tools.project.examples.runtimes,
  org.jboss.tools.project.examples.wizard
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
-Service-Component: OSGI-INF/downloadRuntime.xml
+
