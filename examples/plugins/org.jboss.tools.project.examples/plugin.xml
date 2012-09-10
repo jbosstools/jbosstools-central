@@ -78,14 +78,14 @@
     <extension
         point="org.jboss.tools.project.examples.projectExamplesXml"
         name="Shared examples">
-        <url>http://download.jboss.org/jbosstools/examples/project-examples-shared-3.3.GA.xml</url> 
+        <url>http://download.jboss.org/jbosstools/examples/project-examples-shared-4.0.Alpha1</url> 
         <experimental>false</experimental>
     </extension>
     
     <extension
         point="org.jboss.tools.project.examples.categories"
         name="Project Examples Categories">
-        <url>http://download.jboss.org/jbosstools/examples/project-examples-category-3.3.xml</url>
+        <url>http://download.jboss.org/jbosstools/examples/project-examples-category-4.0.xml</url>
     </extension>
     
     <extension
