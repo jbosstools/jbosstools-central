@@ -16,4 +16,6 @@ public interface IProjectExamplesWizardPage extends IWizardPage, IWizardContextC
 	Map<String, Object> getPropertiesMap();
 	
 	void setWizardContext(WizardContext context);
+
+	String getPageType();
 }

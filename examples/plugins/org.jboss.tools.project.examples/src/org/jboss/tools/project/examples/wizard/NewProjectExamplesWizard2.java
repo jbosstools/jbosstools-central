@@ -15,6 +15,7 @@ package org.jboss.tools.project.examples.wizard;
  * 
  */
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -143,30 +144,34 @@ public class NewProjectExamplesWizard2 extends Wizard implements INewWizard {
 	@Override
 	public void addPages() {
 		createContributedPages();
-		requirementsPage = new NewProjectExamplesRequirementsPage();
-		//readyPage = new NewProjectExamplesReadyPage();
+		
 		if (projectExample == null) {
-			mainPage = new NewProjectExamplesMainPage(requirementsPage, contributedPages);
+			mainPage = new NewProjectExamplesMainPage();
 			addPage(mainPage);
-		} else {
-			requirementsPage.setProjectExample(projectExample);
-			//readyPage.setProjectExample(projectExample);
+		} 
+		for(IProjectExamplesWizardPage page: getContributedPages("requirement")) {
+			if (projectExample == null || projectExample.getImportType().equals(page.getProjectExampleType())) {
+				addPage(page);
+			}
 		}
-		addPage(requirementsPage);
+
 		locationPage = new NewProjectExamplesLocationPage();
 		addPage(locationPage);
 		if (getSelection() != null) {
 			locationPage.init(getSelection(), getActivePart());
 		}
+		
 		// contributed page
-		for(IProjectExamplesWizardPage page:contributedPages) {
-			addPage(page);
+		for(IProjectExamplesWizardPage page: getContributedPages("extra")) {
+			if (projectExample == null || projectExample.getImportType().equals(page.getProjectExampleType())) {
+				addPage(page);
+			}
 		}
-		//addPage(readyPage);
-		//quickFixPage = new QuickFixPage("Quick Fix Descripton", new LinkedHashMap());
-		//addPage(quickFixPage);
 	}
 
+	
+	
+	
 	protected void createContributedPages() {
 		Map<String, List<ContributedPage>> extensionPages = ProjectExamplesActivator.getDefault().getContributedPages();
 		Set<String> keySet = extensionPages.keySet();
@@ -228,6 +233,22 @@ public class NewProjectExamplesWizard2 extends Wizard implements INewWizard {
 		return contributedPages;
 	}
 
+	public List<IProjectExamplesWizardPage> getContributedPages(String pageType) {
+		if (contributedPages == null || contributedPages.isEmpty()) {
+			return Collections.emptyList();
+		}
+		
+		List<IProjectExamplesWizardPage> filteredPages = new ArrayList<IProjectExamplesWizardPage>();
+		
+		for (IProjectExamplesWizardPage p : contributedPages) {
+			if (pageType.equals(p.getPageType())) {
+				filteredPages.add(p);
+			}
+		}
+		
+		return filteredPages;
+	}
+	
 	public IWizardPage getLocationsPage() {
 		return locationPage;
 	}

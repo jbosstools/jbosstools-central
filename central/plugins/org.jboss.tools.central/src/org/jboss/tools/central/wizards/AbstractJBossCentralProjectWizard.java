@@ -18,12 +18,9 @@ import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.resource.ImageDescriptor;
-import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.jboss.tools.central.JBossCentralActivator;
 import org.jboss.tools.central.jobs.RefreshTutorialsJob;
-import org.jboss.tools.project.examples.ProjectExamplesActivator;
 import org.jboss.tools.project.examples.model.ProjectExample;
 import org.jboss.tools.project.examples.wizard.NewProjectExamplesWizard2;
 
@@ -33,7 +30,7 @@ public abstract class AbstractJBossCentralProjectWizard extends NewProjectExampl
 	
 	public AbstractJBossCentralProjectWizard(String exampleName) {
 		super();
-		Assert.isNotNull(exampleName);
+		Assert.isNotNull(exampleName, "Project name is null");
 		this.exampleName = exampleName;
 		ProjectExample example = lookupProjectExample();
 		initializeProjectExample(example);
@@ -69,9 +66,9 @@ public abstract class AbstractJBossCentralProjectWizard extends NewProjectExampl
 	
 	private boolean matches(ProjectExample expl) {
 		if (expl != null && exampleName.equals(expl.getName())) {
-			if (expl.getSite() != null && "Shared examples".equals(expl.getSite().getName())){
+//			if (expl.getSite() != null && "Shared examples".equals(expl.getSite().getName())){
 				return true;
-			}
+//			}
 		}
 		return false;
 	}

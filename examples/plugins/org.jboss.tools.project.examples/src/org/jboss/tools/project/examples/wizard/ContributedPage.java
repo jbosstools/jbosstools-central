@@ -4,26 +4,28 @@ import org.eclipse.core.runtime.IConfigurationElement;
 
 public class ContributedPage implements Comparable<ContributedPage> {
 
-	private String type;
+	private String exampleType;
 	private int priority;
 	private IConfigurationElement configurationElement;
 	private String clazz;
+	private String pageType;
 
 	public ContributedPage(IConfigurationElement configurationElement,
-			String type, int priority, String clazz) {
+			String type, String pageType, int priority, String clazz) {
 		super();
 		this.configurationElement = configurationElement;
-		this.type = type;
+		this.exampleType = type;
+		this.setPageType(pageType);
 		this.priority = priority;
 		this.clazz = clazz;
 	}
 
 	public String getType() {
-		return type;
+		return exampleType;
 	}
 
 	public void setType(String type) {
-		this.type = type;
+		this.exampleType = type;
 	}
 
 	public int getPriority() {
@@ -61,6 +63,14 @@ public class ContributedPage implements Comparable<ContributedPage> {
 		else if (other > this.priority)
 			return -1;
 		return 0;
+	}
+
+	public String getPageType() {
+		return pageType;
+	}
+
+	public void setPageType(String pageType) {
+		this.pageType = pageType;
 	}
 
 }

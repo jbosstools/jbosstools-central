@@ -5,6 +5,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -64,7 +65,7 @@ import org.jboss.tools.runtime.ui.download.DownloadRuntimeDialog;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.ServiceReference;
 
-public class NewProjectExamplesRequirementsPage extends WizardPage {
+public class NewProjectExamplesRequirementsPage extends WizardPage implements IProjectExamplesWizardPage {
 
 	private static final String PAGE_NAME = "org.jboss.tools.project.examples.requirements"; //$NON-NLS-1$
 	private ProjectExample projectExample;
@@ -78,12 +79,18 @@ public class NewProjectExamplesRequirementsPage extends WizardPage {
 	private Link link;
 	
 	public NewProjectExamplesRequirementsPage(ProjectExample projectExample) {
-		super(PAGE_NAME);
-		this.projectExample = projectExample;
-		setTitleAndDescription(projectExample);
+		this(PAGE_NAME, projectExample);
 	}
 
-	private void setTitleAndDescription(ProjectExample projectExample) {
+	public NewProjectExamplesRequirementsPage(String pageName, ProjectExample projectExample) {
+		super(pageName);
+		this.projectExample = projectExample;
+		setTitleAndDescription(projectExample);
+        checkboxOn = RuntimeUIActivator.imageDescriptorFromPlugin(RuntimeUIActivator.PLUGIN_ID, "/icons/xpl/complete_tsk.gif").createImage();
+		checkboxOff = RuntimeUIActivator.imageDescriptorFromPlugin(RuntimeUIActivator.PLUGIN_ID, "/icons/xpl/incomplete_tsk.gif").createImage();
+	}
+
+	protected void setTitleAndDescription(ProjectExample projectExample) {
 		setTitle( "Requirements" );
         setDescription( "Project Example Requirements" );
 		if (projectExample != null) {
@@ -111,7 +118,7 @@ public class NewProjectExamplesRequirementsPage extends WizardPage {
 		}
 	}
 
-	protected NewProjectExamplesRequirementsPage() {
+	public NewProjectExamplesRequirementsPage() {
 		super(PAGE_NAME);
         setTitleAndDescription(null);
         checkboxOn = RuntimeUIActivator.imageDescriptorFromPlugin(RuntimeUIActivator.PLUGIN_ID, "/icons/xpl/complete_tsk.gif").createImage();
@@ -565,13 +572,13 @@ public class NewProjectExamplesRequirementsPage extends WizardPage {
 	@Override
 	public IWizardPage getNextPage() {
 		// FIXME
-		if (projectExample != null && ProjectExamplesActivator.MAVEN_ARCHETYPE.equals(projectExample.getImportType())) {
+		if (projectExample != null) {
 			IWizard wizard = getWizard();
 			if (wizard instanceof NewProjectExamplesWizard2) {
-				ProjectExample projectExample = ((NewProjectExamplesWizard2)wizard).getSelectedProjectExample();
+				NewProjectExamplesWizard2 exampleWizard = ((NewProjectExamplesWizard2)wizard); 
+				ProjectExample projectExample = exampleWizard.getSelectedProjectExample();
 				if (projectExample != null && projectExample.getImportType() != null) {
-					List<IProjectExamplesWizardPage> pages = ((NewProjectExamplesWizard2)wizard).getContributedPages();
-					for (IProjectExamplesWizardPage page:pages) {
+					for (IProjectExamplesWizardPage page: exampleWizard.getContributedPages("extra")) {
 						if (projectExample.getImportType().equals(page.getProjectExampleType())) {
 							return page;
 						}
@@ -592,5 +599,38 @@ public class NewProjectExamplesRequirementsPage extends WizardPage {
 			checkboxOn.dispose();
 		}
 		super.dispose();
+	}
+
+	@Override
+	public void onWizardContextChange(String key, Object value) {
+		// TODO Auto-generated method stub
+	}
+
+	@Override
+	public boolean finishPage() {
+		// TODO Auto-generated method stub
+		return true;
+	}
+
+	@Override
+	public String getProjectExampleType() {
+		return "zip";
+	}
+
+	@Override
+	public Map<String, Object> getPropertiesMap() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void setWizardContext(WizardContext context) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public String getPageType() {
+		return "requirement";
 	}
 }

@@ -31,6 +31,8 @@ import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
+import org.eclipse.jface.wizard.IWizard;
+import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
@@ -72,19 +74,13 @@ public class NewProjectExamplesMainPage extends WizardPage {
 	private Combo siteCombo;
 	private List<ProjectExampleCategory> categories;
 	private Text descriptionText;
-	private NewProjectExamplesRequirementsPage requirementsPage;
-	//private NewProjectExamplesReadyPage readyPage;
-	private List<IProjectExamplesWizardPage> pages;
 	private ProjectExample selectedProject;
 	private Combo targetRuntimeTypesCombo;
 	
-	public NewProjectExamplesMainPage(NewProjectExamplesRequirementsPage requirementsPage, List<IProjectExamplesWizardPage> pages) {
+	public NewProjectExamplesMainPage() {
 		super("org.jboss.tools.project.examples.main"); //$NON-NLS-1$
         setTitle( Messages.NewProjectExamplesWizardPage_Project_Example );
         setDescription( Messages.NewProjectExamplesWizardPage_Import_Project_Example );
-        this.requirementsPage = requirementsPage;
-        //this.readyPage = readyPage;
-        this.pages = pages;
     }
 
 	public void createControl(Composite parent) {
@@ -189,22 +185,15 @@ public class NewProjectExamplesMainPage extends WizardPage {
 			public void selectionChanged(SelectionChangedEvent event) {
 				selection = (IStructuredSelection) event.getSelection();
 				Object selected = selection.getFirstElement();
+				String projectType = null;
 				if (selected instanceof ProjectExample && selection.size() == 1) {
 					selectedProject = (ProjectExample) selected;
 					descriptionText.setText(selectedProject.getDescription());
 					projectName.setText(selectedProject.getName());
 					projectURL.setText(selectedProject.getUrl());
 					projectSize.setText(selectedProject.getSizeAsText());
-					requirementsPage.setProjectExample(selectedProject);
 					//readyPage.setProjectExample(selectedProject);
-					String projectType = selectedProject.getImportType();
-					for (IProjectExamplesWizardPage page:pages) {
-						if (projectType != null && projectType.equals(page.getProjectExampleType())) {
-							page.setProjectExample(selectedProject);
-						} else {
-							page.setProjectExample(null);
-						}
-					}
+					projectType = selectedProject.getImportType();
 				} else {
 					selectedProject = null;
 					String description = ""; //$NON-NLS-1$
@@ -218,9 +207,19 @@ public class NewProjectExamplesMainPage extends WizardPage {
 					projectName.setText(""); //$NON-NLS-1$
 					projectURL.setText(""); //$NON-NLS-1$
 					projectSize.setText(""); //$NON-NLS-1$
-					requirementsPage.setProjectExample(null);
-					//readyPage.setProjectExample(null);
 				}
+				
+				for (IWizardPage page : getWizard().getPages()) {
+					if (page instanceof IProjectExamplesWizardPage) {
+						IProjectExamplesWizardPage pewp = (IProjectExamplesWizardPage) page;
+						if (projectType != null && projectType.equals(pewp.getProjectExampleType())) {
+							pewp.setProjectExample(selectedProject);
+						} else {
+							pewp.setProjectExample(null);
+						}
+					}
+				}
+				
 				boolean canFinish = refresh(false);
 				setPageComplete(canFinish);
 			}
@@ -511,5 +510,23 @@ public class NewProjectExamplesMainPage extends WizardPage {
 		}
 		//Reset position of combo to the appropriate item index
 		combo.select(selectedIdx); 
+	}
+	
+	@Override
+	public IWizardPage getNextPage() {
+		IWizard wizard = getWizard();
+		if (wizard instanceof NewProjectExamplesWizard2) {
+			ProjectExample projectExample = ((NewProjectExamplesWizard2)wizard).getSelectedProjectExample();
+			if (projectExample != null && projectExample.getImportType() != null) {
+				List<IProjectExamplesWizardPage> pages = ((NewProjectExamplesWizard2)wizard).getContributedPages("requirement");
+				for (IProjectExamplesWizardPage page:pages) {
+					if (projectExample.getImportType().equals(page.getProjectExampleType())) {
+						return page;
+					}
+				}
+			} 
+			//return ((NewProjectExamplesWizard2)wizard).getReadyPage();
+		}
+		return super.getNextPage();
 	}
 }

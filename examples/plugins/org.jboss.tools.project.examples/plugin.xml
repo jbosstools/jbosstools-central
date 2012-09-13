@@ -76,7 +76,7 @@
    
     <extension
         point="org.jboss.tools.project.examples.projectExamplesXml"
-        name="Shared examples">
+        name="Shared Examples">
         <url>http://download.jboss.org/jbosstools/examples/project-examples-shared-4.0.Alpha1.xml</url>
         <experimental>false</experimental>
     </extension>
@@ -86,5 +86,16 @@
         name="Project Examples Categories">
         <url>http://download.jboss.org/jbosstools/examples/project-examples-category-3.3.xml</url>
     </extension>
-    
+   
+    <extension
+         point="org.jboss.tools.project.examples.wizardpages">
+         <page
+            class="org.jboss.tools.project.examples.wizard.NewProjectExamplesRequirementsPage"
+            id="org.jboss.tools.project.examples.wizard.NewProjectExamplesRequirementsPage"
+            name="Project Example requirementPage"
+            priority="1"
+            pageType="requirement"
+            type="zip">
+      </page>
+   </extension>
 </plugin>

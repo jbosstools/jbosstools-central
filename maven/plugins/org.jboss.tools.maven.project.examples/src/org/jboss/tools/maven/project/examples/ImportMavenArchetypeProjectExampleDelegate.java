@@ -44,12 +44,6 @@ public class ImportMavenArchetypeProjectExampleDelegate extends AbstractImportMa
 			Map<String, Object> propertiesMap, final IProgressMonitor monitor) throws Exception {
 		List<ProjectExample> projects = new ArrayList<ProjectExample>();
 		projects.add(projectDescription);
-//		ArchetypeExamplesWizard wizard = new ArchetypeExamplesWizard(projectDescription);
-//		WizardDialog wizardDialog = new WizardDialog(getActiveShell(), wizard);
-//		int ok = wizardDialog.open();
-//		if (ok != Window.OK) {
-//			return false;
-//		}
 		List<String> includedProjects = projectDescription.getIncludedProjects();
 		if (includedProjects == null) {
 			includedProjects = new ArrayList<String>();

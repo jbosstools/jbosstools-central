@@ -87,6 +87,23 @@
                </appInfo>
             </annotation>
          </attribute>
+         <attribute name="pageType" use="required">
+            <annotation>
+               <documentation>
+                  Page type. Valid values are : requirement, location, extra
+               </documentation>
+            </annotation>
+            <simpleType>
+               <restriction base="string">
+                  <enumeration value="requirement">
+                  </enumeration>
+                  <enumeration value="location">
+                  </enumeration>
+                  <enumeration value="extra">
+                  </enumeration>
+               </restriction>
+            </simpleType>
+         </attribute>
       </complexType>
    </element>
 

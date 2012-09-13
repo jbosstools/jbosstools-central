@@ -507,5 +507,10 @@ public class ArchetypeExamplesWizardPage extends
 	    };
 	    return model;
 	  }
-	
+
+	@Override
+	public String getPageType() {
+		return "extra";
+	}
+
 }

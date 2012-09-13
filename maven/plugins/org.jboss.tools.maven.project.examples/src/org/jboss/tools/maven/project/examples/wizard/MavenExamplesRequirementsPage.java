@@ -8,11 +8,15 @@
  * Contributors:
  *     JBoss by Red Hat - Initial implementation.
  ************************************************************************************/
-package org.jboss.tools.project.examples.wizard;
+package org.jboss.tools.maven.project.examples.wizard;
 
-public interface IWizardContextChangeListener {
+import org.jboss.tools.project.examples.wizard.NewProjectExamplesRequirementsPage;
 
-	String PROJECT_EXAMPLE_KEY = "project.example"; //$NON-NLS-1$
-	
-	void onWizardContextChange(String key, Object value);
+
+public class MavenExamplesRequirementsPage extends NewProjectExamplesRequirementsPage {
+
+	 @Override
+	public String getProjectExampleType() {
+		return "maven";
+	}
 }

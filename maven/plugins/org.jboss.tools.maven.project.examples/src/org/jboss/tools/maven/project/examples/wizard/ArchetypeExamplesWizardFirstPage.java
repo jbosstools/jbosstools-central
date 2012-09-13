@@ -523,7 +523,7 @@ public class ArchetypeExamplesWizardFirstPage extends MavenProjectWizardLocation
 		if (wizard instanceof NewProjectExamplesWizard2) {
 			ProjectExample projectExample = ((NewProjectExamplesWizard2)wizard).getSelectedProjectExample();
 			if (projectExample != null && projectExample.getImportType() != null) {
-				List<IProjectExamplesWizardPage> pages = ((NewProjectExamplesWizard2)wizard).getContributedPages();
+				List<IProjectExamplesWizardPage> pages = ((NewProjectExamplesWizard2)wizard).getContributedPages("extra");
 				for (IProjectExamplesWizardPage page:pages) {
 					if (page == this) {
 						continue;
@@ -541,7 +541,15 @@ public class ArchetypeExamplesWizardFirstPage extends MavenProjectWizardLocation
 	public IWizardPage getPreviousPage() {
 		IWizard wizard = getWizard();
 		if (wizard instanceof NewProjectExamplesWizard2) {
-			return ((NewProjectExamplesWizard2) wizard).getRequirementsPage();
+			ProjectExample projectExample = ((NewProjectExamplesWizard2)wizard).getSelectedProjectExample();
+			if (projectExample != null && projectExample.getImportType() != null) {
+				List<IProjectExamplesWizardPage> pages = ((NewProjectExamplesWizard2)wizard).getContributedPages("requirement");
+				for (IProjectExamplesWizardPage page:pages) {
+					if (projectExample.getImportType().equals(page.getProjectExampleType())) {
+						return page;
+					}
+				}
+			} 
 		}
 		return super.getPreviousPage();
 	}
@@ -603,6 +611,11 @@ public class ArchetypeExamplesWizardFirstPage extends MavenProjectWizardLocation
 	
 	private Model getModel() {
 		return (Model) context.getProperty(MavenProjectConstants.MAVEN_MODEL);
+	}
+
+	@Override
+	public String getPageType() {
+		return "extra";
 	}
 	
 }

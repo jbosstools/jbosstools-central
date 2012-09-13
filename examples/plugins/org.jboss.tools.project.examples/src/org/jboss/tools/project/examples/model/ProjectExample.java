@@ -54,7 +54,7 @@ public class ProjectExample implements ProjectModelElement,
 	private Set<String> essentialEnterpriseDependencies;
 	private String iconPath;
 	private String sourceLocation;
-
+	private String stacksId;
 	public ProjectExample() {
 		name = ""; //$NON-NLS-1$
 		shortDescription = ""; //$NON-NLS-1$
@@ -62,7 +62,7 @@ public class ProjectExample implements ProjectModelElement,
 		url = ""; //$NON-NLS-1$
 		welcome = false;
 		perspectiveId = null;
-		importType = null;
+		importType = "zip";
 		setCategory(ProjectExampleCategory.OTHER);
 	}
 
@@ -362,4 +362,13 @@ public class ProjectExample implements ProjectModelElement,
 	public void setSourceLocation(String sourceLocation) {
 		this.sourceLocation = sourceLocation;
 	}
+	
+	public String getStacksId() {
+		return stacksId;
+	}
+
+	public void setStacksId(String stacksId) {
+		this.stacksId = stacksId;
+	}
+
 }

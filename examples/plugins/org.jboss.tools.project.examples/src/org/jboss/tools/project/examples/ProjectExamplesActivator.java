@@ -1138,7 +1138,8 @@ public class ProjectExamplesActivator extends AbstractUIPlugin {
 						}
 					}
 					String type = configurationElement.getAttribute(TYPE);
-					ContributedPage contributedPage = new ContributedPage(configurationElement, type, priority, clazz);
+					String pageType = configurationElement.getAttribute("pageType");
+					ContributedPage contributedPage = new ContributedPage(configurationElement, type, pageType, priority, clazz);
 					List<ContributedPage> contributions = contributedPages.get(type);
 					if (contributions == null) {
 						contributions = new ArrayList<ContributedPage>();

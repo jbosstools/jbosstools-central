@@ -10,10 +10,15 @@
  ************************************************************************************/
 package org.jboss.tools.project.examples.wizard;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import org.eclipse.ui.IWorkingSet;
+import org.jboss.tools.project.examples.model.ProjectExample;
 
 public class WizardContext {
 
@@ -42,6 +47,14 @@ public class WizardContext {
 			fireChangeEvent(key, value);
 		}
 	}
+	
+	public ProjectExample getProjectExample() {
+		return (ProjectExample) context.get(IWizardContextChangeListener.PROJECT_EXAMPLE_KEY) ;
+	}
+	
+	public void setProjectExample(ProjectExample example) {
+		context.put(IWizardContextChangeListener.PROJECT_EXAMPLE_KEY, example);
+	}
 
 	public Object getProperty(String key) {
 		return context.get(key);
@@ -51,5 +64,17 @@ public class WizardContext {
 		for (IWizardContextChangeListener listener : listeners) {
 			listener.onWizardContextChange(key, value);
 		}
+	}
+	
+	public List<IWorkingSet> getWorkingSets() {
+		return (List<IWorkingSet>) context.get("workingSets") ;
+	}
+	
+	public void setWorkingSets(List<IWorkingSet> workingSets) {
+		context.put("workingSets", workingSets);
+	}
+
+	public Map<String, Object> getProperties() {
+		return Collections.unmodifiableMap(context);
 	}
 }

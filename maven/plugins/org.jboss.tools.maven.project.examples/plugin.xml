@@ -21,10 +21,27 @@
    <extension
          point="org.jboss.tools.project.examples.wizardpages">
       <page
+            class="org.jboss.tools.maven.project.examples.wizard.MavenExamplesRequirementsPage"
+            id="org.jboss.tools.maven.project.examples.wizard.MavenExamplesRequirementsPage"
+            name="Maven Project Requirement Page"
+            priority="1"
+            pageType="requirement"
+            type="maven">
+      </page>      
+      <page
+            class="org.jboss.tools.maven.project.examples.wizard.NewProjectExamplesStacksRequirementsPage"
+            id="org.jboss.tools.maven.project.examples.wizard.NewProjectExamplesStacksRequirementsPage"
+            name="Maven Archetype First Page"
+            priority="1"
+            pageType="requirement"
+            type="mavenArchetype">
+      </page>
+      <page
             class="org.jboss.tools.maven.project.examples.wizard.ArchetypeExamplesWizardFirstPage"
             id="org.jboss.tools.maven.project.examples.wizard.ArchetypeExamplesWizardFirstPage"
             name="Maven Archetype First Page"
             priority="1"
+            pageType="extra"
             type="mavenArchetype">
       </page>
       <page
@@ -32,9 +49,8 @@
             id="org.jboss.tools.maven.project.examples.wizard.ArchetypeExamplesWizardPage"
             name="Maven Archetype Second Page"
             priority="2"
+            pageType="extra"
             type="mavenArchetype">
       </page>
    </extension>
-   
-
 </plugin>

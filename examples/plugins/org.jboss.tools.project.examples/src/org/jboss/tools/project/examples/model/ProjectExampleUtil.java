@@ -478,6 +478,11 @@ public class ProjectExampleUtil {
 									}
 								} else if (nodeName.equals("essentialEnterpriseDependencies")) {
 									parseEssentialEnterpriseDependencies(project, child);
+								} else if (nodeName.equals("stacksId")) {
+									String stacksId = child.getAttribute("stacksId"); //$NON-NLS-1$
+									if (stacksId != null) {
+										project.setStacksId(stacksId);
+									}
 								}
 							}
 						}
