@@ -1,0 +1,15 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Themes
+Bundle-SymbolicName: org.jboss.tools.central.themes
+Bundle-Version: 1.1.0.qualifier
+Bundle-Activator: org.jboss.tools.central.themes.Activator
+Bundle-Vendor: JBoss, by Red Hat
+Require-Bundle: org.eclipse.ui,
+ org.eclipse.core.runtime,
+ org.eclipse.e4.ui.css.core;bundle-version="0.10.1",
+ org.eclipse.e4.ui.css.swt;bundle-version="0.10.1",
+ javax.inject;bundle-version="1.0.0",
+ org.eclipse.e4.ui.css.swt.theme;bundle-version="0.9.2"
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-ActivationPolicy: lazy

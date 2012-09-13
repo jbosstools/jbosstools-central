@@ -17,6 +17,8 @@
    </feature>
    <feature url="features/org.jboss.tools.central.discovery.feature.source_0.0.0.jar" id="org.jboss.tools.central.discovery.feature.source" version="0.0.0">
    </feature>
+   <feature id="org.jboss.tools.central.themes.feature" version="0.0.0"/>
+   <feature id="org.jboss.tools.central.themes.feature.source" version="0.0.0"/>
 
    <feature url="features/org.jboss.tools.central.test.feature_0.0.0.jar" id="org.jboss.tools.central.test.feature" version="0.0.0">
       <category name="JBoss Central Nightly Build Update Site"/>

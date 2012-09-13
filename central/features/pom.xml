@@ -9,14 +9,15 @@
 	</parent>
 	<groupId>org.jboss.tools.central</groupId>
 	<artifactId>features</artifactId>
-	
-	<name>central.features</name>	
+
+	<name>central.features</name>
 	<packaging>pom</packaging>
 	<modules>
 		<module>org.jboss.tools.central.feature</module>
 		<module>org.jboss.tools.community.central.feature</module>
 		<module>org.jboss.tools.central.discovery.feature</module>
+		<module>org.jboss.tools.central.themes.feature</module>
 		<module>org.jboss.tools.central.test.feature</module>
 	</modules>
 </project>
-	
+
