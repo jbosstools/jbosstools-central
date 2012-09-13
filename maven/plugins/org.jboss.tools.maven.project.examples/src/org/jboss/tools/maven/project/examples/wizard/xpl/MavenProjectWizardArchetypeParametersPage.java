@@ -12,6 +12,7 @@ package org.jboss.tools.maven.project.examples.wizard.xpl;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -26,10 +27,13 @@ import org.apache.maven.archetype.exception.UnknownArchetype;
 import org.apache.maven.archetype.metadata.ArchetypeDescriptor;
 import org.apache.maven.archetype.metadata.RequiredProperty;
 import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.execution.MavenSession;
 import org.apache.maven.model.Model;
+import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.viewers.CellEditor;
 import org.eclipse.jface.viewers.ICellModifier;
@@ -40,6 +44,8 @@ import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.embedder.IMaven;
 import org.eclipse.m2e.core.internal.MavenPluginActivator;
+import org.eclipse.m2e.core.internal.archetype.ArchetypeCatalogFactory.RemoteCatalogFactory;
+import org.eclipse.m2e.core.internal.archetype.ArchetypeManager;
 import org.eclipse.m2e.core.project.ProjectImportConfiguration;
 import org.eclipse.m2e.core.ui.internal.Messages;
 import org.eclipse.m2e.core.ui.internal.components.TextComboBoxCellEditor;
@@ -384,54 +390,72 @@ public class MavenProjectWizardArchetypeParametersPage extends AbstractMavenWiza
   }
 
   void loadArchetypeDescriptor() {
-    final String groupId = archetype.getGroupId();
-    final String artifactId = archetype.getArtifactId();
-    final String version = archetype.getVersion();
-    final String archetypeName = groupId + ":" + artifactId + ":" + version; //$NON-NLS-1$ //$NON-NLS-2$
+	    
+	    try {
+	      RequiredPropertiesLoader propertiesLoader = new RequiredPropertiesLoader(archetype);
+	      getContainer().run(true, true, propertiesLoader);
+	      
+	      List<?> properties = propertiesLoader.getProperties();
+	      if(properties != null) {
+	        for(Object o : properties) {
+	          if(o instanceof RequiredProperty) {
+	            RequiredProperty rp = (RequiredProperty) o;
+	            requiredProperties.add(rp.getKey());
+	            addTableItem(rp.getKey(), rp.getDefaultValue());
+	          }
+	        }
+	      }
 
-    try {
-      getContainer().run(false, true, new IRunnableWithProgress() {
-        public void run(IProgressMonitor monitor) {
-          monitor.beginTask(NLS.bind(org.eclipse.m2e.core.ui.internal.Messages.MavenProjectWizardArchetypeParametersPage_task, archetypeName), IProgressMonitor.UNKNOWN);
-          try {
-            IMaven maven = MavenPlugin.getMaven();
+	    } catch(InterruptedException ex) {
+	      // ignore
+	    } catch(InvocationTargetException ex) {
+	      String msg = NLS.bind(org.eclipse.m2e.core.ui.internal.Messages.MavenProjectWizardArchetypeParametersPage_error_download, getName(archetype));
+	      MavenProjectExamplesActivator.log(ex, msg);
+	      setErrorMessage(msg + "\n" + ex.toString()); //$NON-NLS-1$
+	    }
+	  }
 
-            ArtifactRepository localRepository = maven.getLocalRepository();
-
-            List<ArtifactRepository> repositories = maven.getArtifactRepositories();
-
-            ArchetypeArtifactManager aaMgr = MavenPluginActivator.getDefault().getArchetypeArtifactManager();
-            if(aaMgr.isFileSetArchetype(groupId, artifactId, version, null, localRepository, repositories)) {
-              ArchetypeDescriptor descriptor = aaMgr.getFileSetArchetypeDescriptor(groupId, artifactId, version, null,
-                  localRepository, repositories);
-              List<?> properties = descriptor.getRequiredProperties();
-              if(properties != null) {
-                for(Object o : properties) {
-                  if(o instanceof RequiredProperty) {
-                    RequiredProperty rp = (RequiredProperty) o;
-                    requiredProperties.add(rp.getKey());
-                    addTableItem(rp.getKey(), rp.getDefaultValue());
-                  }
-                }
-              }
-            }
-          } catch(UnknownArchetype e) {
-        	  MavenProjectExamplesActivator.log(e, NLS.bind("Error downloading archetype {0}",archetypeName));
-          } catch(CoreException ex) {
-            MavenProjectExamplesActivator.log(ex, ex.getMessage());
-          } finally {
-            monitor.done();
-          }
-        }
-      });
-    } catch(InterruptedException ex) {
-      // ignore
-    } catch(InvocationTargetException ex) {
-      String msg = NLS.bind(org.eclipse.m2e.core.ui.internal.Messages.MavenProjectWizardArchetypeParametersPage_error_download, archetypeName);
-      setErrorMessage(msg + "\n" + ex.toString()); //$NON-NLS-1$
-    }
-  }
-
+	  static String getName(Archetype archetype) {
+	    final String groupId = archetype.getGroupId();
+	    final String artifactId = archetype.getArtifactId();
+	    final String version = archetype.getVersion();
+	    return groupId + ":" + artifactId + ":" + version; //$NON-NLS-1$ //$NON-NLS-2$
+	  }
+	  
+	  private static class RequiredPropertiesLoader implements IRunnableWithProgress {
+	    
+	    private Archetype archetype;
+	    
+	    private List<?> properties;
+	    
+	    RequiredPropertiesLoader(Archetype archetype) {
+	      this.archetype = archetype;
+	    }
+	    
+	    List<?> getProperties() {
+	      return properties;
+	    }
+	    
+	    public void run(IProgressMonitor monitor) {
+	      String archetypeName = getName(archetype);
+	      monitor.beginTask(NLS.bind(org.eclipse.m2e.core.ui.internal.Messages.MavenProjectWizardArchetypeParametersPage_task, archetypeName ), IProgressMonitor.UNKNOWN);
+	      
+	      try {
+	        
+	        ArtifactRepository remoteArchetypeRepository = getArchetypeRepository(archetype);
+	        
+	        properties = getRequiredProperties(archetype, remoteArchetypeRepository, monitor);
+	        
+	      } catch(UnknownArchetype e) {
+	    	  String msg = NLS.bind("Error downloading archetype {0}",archetypeName);
+	    	  MavenProjectExamplesActivator.log(e, msg); //$NON-NLS-1$
+	      } catch(CoreException ex) {
+	    	  MavenProjectExamplesActivator.log(ex, ex.getMessage()); //$NON-NLS-1$
+	      } finally {
+	        monitor.done();
+	      }
+	    }    
+	  }
   /**
    * @param key
    * @param value
@@ -585,4 +609,91 @@ public class MavenProjectWizardArchetypeParametersPage extends AbstractMavenWiza
   public static String getDefaultJavaPackage(String groupId, String artifactId) {
     return org.eclipse.m2e.core.ui.internal.wizards.MavenProjectWizardArchetypeParametersPage.getDefaultJavaPackage(groupId, artifactId);
   }
+  
+  /**
+   * Gets the remote {@link ArtifactRepository} of the given {@link Archetype}, or null if none is found.
+   * The repository url is extracted from {@link Archetype#getRepository()}, or, if it has none, the remote catalog the archetype is found in. 
+   * The {@link ArtifactRepository} id is set to <strong>archetypeId+"-repo"</strong>, to enable authentication on that repository.
+   *
+   * @see <a href="http://maven.apache.org/archetype/maven-archetype-plugin/faq.html">http://maven.apache.org/archetype/maven-archetype-plugin/faq.html</a>
+   * @param archetype
+   * @return the remote {@link ArtifactRepository} of the given {@link Archetype}, or null if none is found.
+   * @throws CoreException
+   */
+  public static ArtifactRepository getArchetypeRepository(Archetype archetype) throws CoreException {
+    String repoUrl = archetype.getRepository();
+    if (repoUrl == null) {
+      RemoteCatalogFactory catalogFactory = MavenPluginActivator.getDefault().getArchetypeManager().findParentCatalogFactory(archetype, RemoteCatalogFactory.class);
+      if (catalogFactory != null ) {
+        repoUrl = catalogFactory.getRepositoryUrl();
+      }
+    }
+    return repoUrl == null?null:MavenPlugin.getMaven().createArtifactRepository(archetype.getArtifactId()+"-repo", repoUrl); //$NON-NLS-1$
+  }
+
+
+  /**
+   * Gets the required properties of an {@link Archetype}.
+   * 
+   * @param archetype the archetype possibly declaring required properties
+   * @param remoteArchetypeRepository the remote archetype repository, can be null.
+   * @param monitor the progress monitor, can be null.
+   * @return the required properties of the archetypes, null if none is found.
+   * @throws UnknownArchetype thrown if no archetype is can be resolved
+   * @throws CoreException
+   */
+  public static List<?> getRequiredProperties(Archetype archetype, ArtifactRepository remoteArchetypeRepository, IProgressMonitor monitor) throws UnknownArchetype, CoreException {
+    Assert.isNotNull(archetype, "Archetype can not be null");
+    
+    if (monitor == null) {
+      monitor = new NullProgressMonitor();
+    }
+    
+    final String groupId = archetype.getGroupId();
+    final String artifactId = archetype.getArtifactId();
+    final String version = archetype.getVersion();
+    
+    IMaven maven = MavenPlugin.getMaven();
+
+    ArtifactRepository localRepository = maven.getLocalRepository();
+
+    List<ArtifactRepository> repositories;
+    
+    if (remoteArchetypeRepository == null) {
+      repositories = maven.getArtifactRepositories();
+    } else {
+      repositories = Collections.singletonList(remoteArchetypeRepository);
+    }
+
+    MavenSession session = maven.createSession(maven.createExecutionRequest(monitor), null);
+    
+    MavenSession oldSession = MavenPluginActivator.getDefault().setSession(session);
+
+    ArchetypeArtifactManager aaMgr = MavenPluginActivator.getDefault().getArchetypeArtifactManager();
+
+    List<?> properties = null;
+
+    try {
+      if(aaMgr.isFileSetArchetype(groupId,
+                                  artifactId,
+                                  version,
+                                  null,
+                                  localRepository,
+                                  repositories)) {
+        ArchetypeDescriptor descriptor = aaMgr.getFileSetArchetypeDescriptor(groupId,
+                                                                             artifactId,
+                                                                             version,
+                                                                             null,
+                                                                             localRepository,
+                                                                             repositories);
+        
+        properties = descriptor.getRequiredProperties();
+      }
+    } finally {
+      MavenPluginActivator.getDefault().setSession(oldSession);
+    }
+
+    return properties;
+  }
+  
 }
