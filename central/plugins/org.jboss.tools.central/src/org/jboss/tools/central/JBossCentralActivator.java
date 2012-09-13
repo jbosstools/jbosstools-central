@@ -339,6 +339,10 @@ public class JBossCentralActivator extends AbstractUIPlugin {
 			return image;
 		}
 		ImageDescriptor imageDescriptor = getImageDescriptor(imagePath);
+		if (imageDescriptor == null) {
+			logWarning(imagePath + " can not be found!");
+			return null;
+		}
 		image = imageDescriptor.createImage();
 		registry.put(imagePath, image);
 		return image;

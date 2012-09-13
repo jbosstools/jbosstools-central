@@ -970,7 +970,7 @@ public class GettingStartedPage extends AbstractJBossCentralPage {
 		
 		String iconPath = tutorial.getIconPath();
 		if (iconPath != null) {
-		  Image image = JBossCentralActivator.getDefault().getImage(tutorial.getIconPath());
+		  Image image = JBossCentralActivator.getDefault().getImage(iconPath);
 		  if (image != null) {
 		    tutorialText.setImage("image", image);
 		  }
