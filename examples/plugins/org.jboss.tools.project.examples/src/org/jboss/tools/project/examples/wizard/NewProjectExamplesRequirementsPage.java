@@ -614,7 +614,7 @@ public class NewProjectExamplesRequirementsPage extends WizardPage implements IP
 
 	@Override
 	public String getProjectExampleType() {
-		return "zip";
+		return ProjectExample.IMPORT_TYPE_ZIP;
 	}
 
 	@Override

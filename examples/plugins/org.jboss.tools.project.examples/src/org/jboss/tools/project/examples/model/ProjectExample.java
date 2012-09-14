@@ -27,6 +27,7 @@ import org.jboss.tools.project.examples.ProjectExamplesActivator;
 public class ProjectExample implements ProjectModelElement,
 		Comparable<ProjectExample> {
 
+	public static final String IMPORT_TYPE_ZIP = "zip"; //$NON-NLS-1$
 	private static final String SEP = "/"; //$NON-NLS-1$
 	private static String[] PREFIXES = { "file:", "http:", "https:", "ftp:" }; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 	private String name;
@@ -62,7 +63,7 @@ public class ProjectExample implements ProjectModelElement,
 		url = ""; //$NON-NLS-1$
 		welcome = false;
 		perspectiveId = null;
-		importType = "zip";
+		importType = IMPORT_TYPE_ZIP;
 		setCategory(ProjectExampleCategory.OTHER);
 	}
 

@@ -462,7 +462,7 @@ public class NewProjectExamplesMainPage extends WizardPage {
 				canFinish=true;
 				ProjectExample project = (ProjectExample) object;
 				String importType = project.getImportType();
-				if (importType != null && importType.length() > 0) {
+				if (!ProjectExample.IMPORT_TYPE_ZIP.equals(importType) && importType != null && importType.length() > 0) {
 					IImportProjectExample importProjectExample = ProjectExamplesActivator.getDefault().getImportProjectExample(importType);
 					if (importProjectExample == null) {
 						// FIXME

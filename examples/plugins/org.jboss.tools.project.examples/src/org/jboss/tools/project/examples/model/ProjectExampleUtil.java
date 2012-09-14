@@ -77,7 +77,7 @@ import org.xml.sax.helpers.DefaultHandler;
  */
 public class ProjectExampleUtil {
 
-	private static final String SERVER_PROJECT_EXAMPLE_XML = ".project_example.xml";
+	private static final String SERVER_PROJECT_EXAMPLE_XML = ".project_example.xml"; //$NON-NLS-1$
 
 	private static final String URL = "url"; //$NON-NLS-1$
 
@@ -476,9 +476,9 @@ public class ProjectExampleUtil {
 									if (path != null) {
 										project.setIconPath(path);
 									}
-								} else if (nodeName.equals("essentialEnterpriseDependencies")) {
+								} else if (nodeName.equals("essentialEnterpriseDependencies")) { //$NON-NLS-1$
 									parseEssentialEnterpriseDependencies(project, child);
-								} else if (nodeName.equals("stacksId")) {
+								} else if (nodeName.equals("stacksId")) { //$NON-NLS-1$
 									String stacksId = child.getAttribute("stacksId"); //$NON-NLS-1$
 									if (stacksId != null) {
 										project.setStacksId(stacksId);
@@ -795,11 +795,11 @@ public class ProjectExampleUtil {
 				if (monitor.isCanceled()) {
 					return null;
 				}
-				BufferedOutputStream destination = new BufferedOutputStream(
-						new FileOutputStream(file));
 				if (monitor.isCanceled()) {
 					return null;
 				}
+				BufferedOutputStream destination = new BufferedOutputStream(
+						new FileOutputStream(file));
 				IStatus result = getTransport().download(prefix,
 						url.toExternalForm(), destination, monitor);
 				if (!result.isOK()) {
@@ -929,7 +929,7 @@ public class ProjectExampleUtil {
 		@Override
 		public Tuple<IProjectExampleSite, Document> call() throws Exception {
 			URL url = tuple.key.getUrl();
-			File file = getProjectExamplesFile(url, "projectExamples", ".xml", new NullProgressMonitor()); 
+			File file = getProjectExamplesFile(url, "projectExamples", ".xml", new NullProgressMonitor());  //$NON-NLS-1$ //$NON-NLS-2$
 			if(file == null || !file.exists() || !file.isFile()) {
 				ProjectExamplesActivator.log(NLS.bind(Messages.ProjectUtil_Invalid_URL, url.toString()));
 				return tuple;
