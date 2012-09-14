@@ -43,7 +43,7 @@ import org.jboss.ide.eclipse.as.core.server.IJBossServerRuntime;
 import org.jboss.ide.eclipse.as.core.server.bean.JBossServerType;
 import org.jboss.ide.eclipse.as.core.server.bean.ServerBean;
 import org.jboss.ide.eclipse.as.core.server.bean.ServerBeanLoader;
-import org.jboss.ide.eclipse.as.core.server.internal.JBossServer;
+import org.jboss.ide.eclipse.as.core.server.IJBossServer;
 import org.jboss.ide.eclipse.as.core.util.IJBossRuntimeResourceConstants;
 import org.jboss.ide.eclipse.as.core.util.IJBossToolingConstants;
 import org.jboss.ide.eclipse.as.core.util.ServerConverter;
@@ -80,7 +80,7 @@ public class JBossSourceContainer extends AbstractSourceContainer {
 			throws CoreException {
 		IServer server = ServerUtil.getServer(configuration);
 		if (server != null) {
-			JBossServer jbossServer = ServerConverter
+			IJBossServer jbossServer = ServerConverter
 					.checkedGetJBossServer(server);
 			if (jbossServer != null) {
 				IJBossServerRuntime runtime = jbossServer.getRuntime();

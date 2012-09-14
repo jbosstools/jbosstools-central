@@ -40,7 +40,7 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.wst.server.core.IServer;
 import org.eclipse.wst.server.core.ServerCore;
 import org.jboss.ide.eclipse.as.core.server.IJBossServerRuntime;
-import org.jboss.ide.eclipse.as.core.server.internal.JBossServer;
+import org.jboss.ide.eclipse.as.core.server.IJBossServer;
 import org.jboss.ide.eclipse.as.core.util.ServerConverter;
 import org.jboss.tools.maven.sourcelookup.ui.SourceLookupUIActivator;
 
@@ -68,7 +68,7 @@ public class JBossSourceContainerDialog extends TitleAreaDialog {
 		List<IJBossServerRuntime> runtimes = new ArrayList<IJBossServerRuntime>();
 		if (servers != null) {
 			for (IServer server : servers) {
-				JBossServer jbossServer = null;
+				IJBossServer jbossServer = null;
 				try {
 					jbossServer = ServerConverter.checkedGetJBossServer(server);
 				} catch (CoreException e) {
