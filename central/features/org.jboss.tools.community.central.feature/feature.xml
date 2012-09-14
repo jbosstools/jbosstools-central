@@ -1,5 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<feature id="org.jboss.tools.community.central.feature" label="%featureName" version="1.1.0.qualifier" provider-name="%providerName" plugin="org.jboss.tools.community.central">
+<feature
+      id="org.jboss.tools.community.central.feature"
+      label="%featureName"
+      version="1.1.0.qualifier"
+      provider-name="%providerName"
+      plugin="org.jboss.tools.community.central">
+
    <description>
       %description
    </description>
@@ -14,19 +20,13 @@
 
    <requires>
       <import feature="org.jboss.tools.central.feature" version="1.1.0" match="greaterOrEqual"/>
-      <!-- JBIDE-11299 - include Examples features when installing Central -->
       <import feature="org.jboss.tools.project.examples.feature" version="1.4.0" match="greaterOrEqual"/>
       <import feature="org.jboss.tools.community.project.examples.feature" version="1.4.0" match="greaterOrEqual"/>
       <import feature="org.jboss.tools.maven.project.examples.feature" version="1.4.0" match="greaterOrEqual"/>
-      <!-- JBIDE-10803 - include AS, Seam, Runtime features when installing Central -->
       <import feature="org.jboss.ide.eclipse.as.feature" version="2.4.0" match="greaterOrEqual"/>
       <import feature="org.jboss.tools.seam.feature" version="3.4.0" match="greaterOrEqual"/>
       <import feature="org.jboss.tools.runtime.core.feature" version="2.0.0" match="greaterOrEqual"/>
-      <import feature="org.jboss.tools.runtime.as.detector.feature" version="2.4.0" match="greaterOrEqual"/>
       <import feature="org.jboss.tools.runtime.seam.detector.feature" version="3.4.0" match="greaterOrEqual"/>
    </requires>
-
-   <!-- JBIDE-11299 remove unneeded plugin, but keep this feature around for ease-of-use when installing Central into Eclipse 
-   <plugin id="org.jboss.tools.community.central" download-size="0" install-size="0" version="0.0.0"/> -->
 
 </feature>
