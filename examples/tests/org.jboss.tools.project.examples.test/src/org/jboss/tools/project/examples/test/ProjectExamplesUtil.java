@@ -59,7 +59,7 @@ import org.jboss.tools.seam.core.project.facet.SeamVersion;
  */
 public class ProjectExamplesUtil {
 	
-	public static final int IDLE_TIME = 60000;
+	public static final int IDLE_TIME = 60 * 1000;
 
 	public static final String CONNECTION_PROFILE_NAME = "DefaultDS";
 

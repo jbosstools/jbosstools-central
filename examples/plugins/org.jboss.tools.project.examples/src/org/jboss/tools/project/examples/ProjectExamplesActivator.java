@@ -370,7 +370,7 @@ public class ProjectExamplesActivator extends AbstractUIPlugin {
 
 	public IImportProjectExample getImportProjectExample(String importType) {
 		initImportProjectExamples();
-		if (importType == null) {
+		if (importType == null || ProjectExample.IMPORT_TYPE_ZIP.equals(importType)) {
 			return defaultImportProjectExample;
 		}
 		return importProjectExamplesMap.get(importType);
