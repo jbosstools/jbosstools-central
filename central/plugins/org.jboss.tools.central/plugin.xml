@@ -12,13 +12,13 @@
             id="org.jboss.tools.central.editors.JBossCentralEditor">
       </editor>
    </extension>
-   
+
    <extension
          point="org.eclipse.ui.startup">
       <startup class="org.jboss.tools.central.ShowJBossCentral">
       </startup>
    </extension>
-   
+
    <extension
         point="org.eclipse.ui.preferencePages">
      <page
@@ -42,7 +42,7 @@
 					menubarPath="help/group.intro"
 					tooltip="JBoss Central" />
 		</actionSet>
-   </extension>   
+   </extension>
    <extension
          point="org.eclipse.ui.commands">
       <command
@@ -55,19 +55,19 @@
             name="JBoss Tools Home"
             id="org.jboss.tools.central.openJBossToolsHome">
       </command>
-      
+
       <command
       		defaultHandler="org.jboss.tools.central.actions.OpenJBossBlogsHandler"
             name="Blogs"
             id="org.jboss.tools.central.openJBossBlogs">
       </command>
-      
+
       <command
       		defaultHandler="org.jboss.tools.central.actions.OpenJBossNewsHandler"
             name="News"
             id="org.jboss.tools.central.openJBossNews">
       </command>
-      
+
       <command
       		defaultHandler="org.jboss.tools.central.actions.RefreshJBossTutorialsHandler"
             name="Refresh"
@@ -88,38 +88,38 @@
             name="Refresh"
             id="org.jboss.tools.central.refreshDiscovery">
       </command>
-      
-      
+
+
       <command
       		defaultHandler="org.jboss.tools.central.actions.OpenJBossToolsTwitterHandler"
             name="Twitter"
             id="org.jboss.tools.central.openJBossToolsTwitter">
       </command>
-      
+
       <command
       		defaultHandler="org.jboss.tools.central.actions.NewProjectExamplesWizardHandler"
             name="Project Examples Wizard"
             id="org.jboss.tools.central.newProjectExamplesWizard">
       </command>
-      
+
       <command
       		defaultHandler="org.jboss.tools.central.actions.FavoriteAtEclipseMarketplaceHandler"
             name="Favorite this @ Eclipse Marketplace"
             id="org.jboss.tools.central.favoriteAtEclipseMarketplace">
       </command>
-      
+
       <command
       		defaultHandler="org.jboss.tools.central.actions.JBossCentralPreferencesHandler"
             name="Preferences"
             id="org.jboss.tools.central.preferences">
       </command>
-      
+
       <command
       		defaultHandler="org.jboss.tools.central.actions.JBossRuntimeDetectionPreferencesHandler"
             name="JBoss Runtime Detection"
             id="org.jboss.tools.runtime.preferences">
       </command>
-      
+
       <command
       		defaultHandler="org.jboss.tools.central.actions.WTPRuntimePreferencesHandler"
             name="WTP Runtime Preferences"
@@ -133,9 +133,9 @@
       		name="Warning"
             id="org.jboss.tools.central.blogsWarning">
       </command>
-      
+
    </extension>
-   
+
    <extension
          point="org.eclipse.ui.commandImages">
       <image
@@ -166,7 +166,7 @@
             commandId="org.jboss.tools.central.refreshDiscovery"
             icon="icons/refresh.gif">
       </image>
-      
+
       <image
             commandId="org.jboss.tools.central.openJBossToolsTwitter"
             icon="icons/twitter.png">
@@ -183,18 +183,18 @@
             commandId="org.jboss.tools.runtime.preferences"
             icon="icons/search_local.png">
       </image>
-      
+
       <image
             commandId="org.jboss.tools.wtp.runtime.preferences"
             icon="icons/wtp_server.gif">
       </image>
-      
+
       <image
             commandId="org.jboss.tools.central.newProjectExamplesWizard"
             icon="icons/examples_wiz.gif">
       </image>
-   </extension>   
-   
+   </extension>
+
    <!-- new wizards -->
    <extension
          point="org.eclipse.ui.newWizards">
@@ -249,9 +249,9 @@
             icon="icons/new-gdt-project.png"
             name="GWT Web Project"
             project="true">
-      </wizard>            
+      </wizard>
    </extension>
-   
+
    <extension
 		point="org.eclipse.ui.perspectiveExtensions">
 		<perspectiveExtension
@@ -264,18 +264,5 @@
 			<newWizardShortcut id="org.jboss.tools.central.wizards.NewGwtProjectWizard"/>
 		</perspectiveExtension>
    </extension>
-   <extension
-         point="org.eclipse.e4.ui.css.swt.theme">
-      <theme
-            basestylesheeturi="css/jbt.css"
-            id="org.jboss.tools.central.theme"
-            label="JBoss Tools &amp; Developer Studio">
-      </theme>
-      <theme
-            basestylesheeturi="css/jboss.css"
-            id="org.jboss.tools.central.communityTheme"
-            label="JBoss Community Theme">
-      </theme>
-   </extension>
-   
+
 </plugin>

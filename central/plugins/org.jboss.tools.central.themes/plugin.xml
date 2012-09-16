@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+
+   <extension point="org.eclipse.e4.ui.css.swt.theme">
+      <theme
+            basestylesheeturi="css/jbt.css"
+            id="org.jboss.tools.central.theme"
+            label="JBoss Tools &amp; Developer Studio">
+      </theme>
+      <theme
+            basestylesheeturi="css/jboss.css"
+            id="org.jboss.tools.central.communityTheme"
+            label="JBoss Community Theme">
+      </theme>
+   </extension>
+
+</plugin>
