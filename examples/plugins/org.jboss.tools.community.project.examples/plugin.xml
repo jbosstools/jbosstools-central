@@ -46,7 +46,7 @@
   <extension
         point="org.jboss.tools.project.examples.projectExamplesXml"
         name="%JBoss_Tools_40_Community_GateIn_Portal_Examples">
-         <url>https://github.com/downloads/ppalaga/gatein-portal-quickstart/project-examples-gatein-4.0.xml</url>
+         <url>https://github.com/downloads/ppalaga/gatein-portal-quickstart/project-examples-gatein-4.0-001.xml</url>
         <experimental>true</experimental>
   </extension>    
    
