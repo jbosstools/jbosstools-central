@@ -1,7 +1,7 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Themes
-Bundle-SymbolicName: org.jboss.tools.central.themes
+Bundle-SymbolicName: org.jboss.tools.central.themes;singleton:=true
 Bundle-Version: 1.1.0.qualifier
 Bundle-Activator: org.jboss.tools.central.themes.Activator
 Bundle-Vendor: JBoss, by Red Hat
