@@ -177,13 +177,9 @@ public class NewProjectExamplesWizard2 extends Wizard implements INewWizard {
 		Set<String> keySet = extensionPages.keySet();
 		for (String key:keySet) {
 			List<ContributedPage> contributions = extensionPages.get(key);
-			boolean canSetProjectExample = isCentral && projectExample != null && key.equals(projectExample.getImportType());
 			for(ContributedPage page:contributions) {
 				try {
 					IProjectExamplesWizardPage contributedPage = (IProjectExamplesWizardPage) page.getConfigurationElement().createExecutableExtension(ProjectExamplesActivator.CLASS);
-					if (canSetProjectExample) {
-						contributedPage.setProjectExample(projectExample);
-					}
 					contributedPages.add(contributedPage);
 				} catch (CoreException e) {
 					ProjectExamplesActivator.log(e);
@@ -290,6 +286,10 @@ public class NewProjectExamplesWizard2 extends Wizard implements INewWizard {
 			IProjectExamplesWizardPage ewp = (IProjectExamplesWizardPage)page;
 			ewp.setWizardContext(wizardContext);
 			wizardContext.addListener(ewp);
+			if (projectExample != null && ewp.getProjectExampleType().equals(projectExample.getImportType())) {
+				ewp.setProjectExample(projectExample);
+			}
+
 		}
 		super.addPage(page);
 	}

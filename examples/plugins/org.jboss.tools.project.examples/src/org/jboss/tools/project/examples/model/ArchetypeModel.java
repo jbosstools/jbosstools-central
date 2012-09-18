@@ -16,7 +16,7 @@ import java.util.Properties;
  * @author snjeza
  * 
  */
-public class ArchetypeModel {
+public class ArchetypeModel implements Cloneable {
 	private String groupId;
 	private String artifactId;
 	private String version;
@@ -98,5 +98,10 @@ public class ArchetypeModel {
 
 	public void addProperty(String key, String value) {
 		archetypeProperties.put(key, value);
+	}
+	
+	@Override
+	public Object clone() throws CloneNotSupportedException {
+		return super.clone();
 	}
 }

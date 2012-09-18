@@ -12,6 +12,8 @@ public final class MavenProjectConstants {
 
 	public static final String MAVEN_MODEL = "mavenModel";
 	
+	public static final String ARCHETYPE_MODEL = "archetypeModel";
+	
 	private MavenProjectConstants(){
 	}
 }

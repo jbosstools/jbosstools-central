@@ -45,7 +45,6 @@ import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.embedder.IMaven;
 import org.eclipse.m2e.core.internal.MavenPluginActivator;
 import org.eclipse.m2e.core.internal.archetype.ArchetypeCatalogFactory.RemoteCatalogFactory;
-import org.eclipse.m2e.core.internal.archetype.ArchetypeManager;
 import org.eclipse.m2e.core.project.ProjectImportConfiguration;
 import org.eclipse.m2e.core.ui.internal.Messages;
 import org.eclipse.m2e.core.ui.internal.components.TextComboBoxCellEditor;
@@ -368,23 +367,26 @@ public class MavenProjectWizardArchetypeParametersPage extends AbstractMavenWiza
 
   public void setArchetype(Archetype archetype) {
     if(archetype == null) {
-      propertiesTable.removeAll();
+      if (propertiesTable != null)
+    	  propertiesTable.removeAll();
       archetypeChanged = false;
     } else if(!archetype.equals(this.archetype)) {
       this.archetype = archetype;
-      propertiesTable.removeAll();
       requiredProperties.clear();
       optionalProperties.clear();
       archetypeChanged = true;
 
-      Properties properties = archetype.getProperties();
-      if(properties != null) {
-        for(Iterator<Map.Entry<Object, Object>> it = properties.entrySet().iterator(); it.hasNext();) {
-          Map.Entry<?, ?> e = it.next();
-          String key = (String) e.getKey();
-          addTableItem(key, (String) e.getValue());
-          optionalProperties.add(key);
-        }
+      if (propertiesTable != null) {
+    	  propertiesTable.removeAll();
+    	  Properties properties = archetype.getProperties();
+    	  if(properties != null) {
+    		  for(Iterator<Map.Entry<Object, Object>> it = properties.entrySet().iterator(); it.hasNext();) {
+    			  Map.Entry<?, ?> e = it.next();
+    			  String key = (String) e.getKey();
+    			  addTableItem(key, (String) e.getValue());
+    			  optionalProperties.add(key);
+    		  }
+    	  }
       }
     }
   }

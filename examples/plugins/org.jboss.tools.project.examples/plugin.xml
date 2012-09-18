@@ -77,7 +77,11 @@
     <extension
         point="org.jboss.tools.project.examples.projectExamplesXml"
         name="Shared Examples">
-        <url>http://download.jboss.org/jbosstools/examples/project-examples-shared-4.0.Alpha1.xml</url>
+        <!--
+        <url>http://download.jboss.org/jbosstools/examples/project-examples-shared-4.0.Alpha2.xml</url>
+        -->
+        <url>file://D:/Dev/jbt-trunk/download.jboss.org/jbosstools/examples/project-examples-shared-4.0.Alpha2.xml</url>
+        
         <experimental>false</experimental>
     </extension>
     

@@ -77,6 +77,8 @@ public class ArchetypeExamplesWizardPage extends
 	private MissingRepositoryWarningComponent warningComponent;
 	private IStatus enterpriseRepoStatus;
 
+	private ArchetypeModel archetypeModel;
+	
 	public ArchetypeExamplesWizardPage() {
 		super(new ProjectImportConfiguration());
 	}
@@ -103,14 +105,17 @@ public class ArchetypeExamplesWizardPage extends
 		});
 		
 		if (projectExample != null && !initialized) {
-			initialize();
+			initializeArchetype();
 		}
 		
 	}
 
-	protected void initialize() {
+	protected void initializeArchetype() {
+		if (getContainer() == null || archetypeModel == null) {
+			return;
+		}
+		//System.err.println("Initializing archetype data "+ archetypeModel.getArchetypeArtifactId() + " "+archetypeModel.getArchetypeVersion());
 		Archetype archetype = new Archetype();
-		ArchetypeModel archetypeModel = projectDescription.getArchetypeModel();
 
 		archetype.setGroupId(archetypeModel.getArchetypeGroupId());
 		archetype.setArtifactId(archetypeModel.getArchetypeArtifactId());
@@ -141,7 +146,9 @@ public class ArchetypeExamplesWizardPage extends
 		// when setVisible() is called in MavenProjectWizardArchetypeParametersPage.
 		// It needs to be called AFTER setArchetype(archetype) !!! 
 		archetypeChanged = false;
-		resolverConfigurationComponent.setExpanded(!resolverConfigurationComponent.getResolverConfiguration().getActiveProfileList().isEmpty());
+		if (resolverConfigurationComponent != null) {
+			resolverConfigurationComponent.setExpanded(!resolverConfigurationComponent.getResolverConfiguration().getActiveProfileList().isEmpty());
+		}
 		initialized = true;
 	}
 
@@ -452,9 +459,8 @@ public class ArchetypeExamplesWizardPage extends
 			    }
 			}
 			projectDescription = projectExample;
-			if (getContainer() != null) {
-				initialize();
-			}
+			archetypeModel  = projectDescription.getArchetypeModel();
+			initializeArchetype();
 		}
 	}
 	
@@ -475,6 +481,11 @@ public class ArchetypeExamplesWizardPage extends
 			//Make sure it's a boolean :
 			Boolean enterprise = Boolean.parseBoolean(value.toString());
 			updateArchetypeProperty("enterprise", enterprise.toString());
+		} else if (MavenProjectConstants.ARCHETYPE_MODEL.equals(key)) {
+			if (value instanceof ArchetypeModel) {
+				archetypeModel = (ArchetypeModel)value;
+				initializeArchetype();
+			}
 		}
 	}
 

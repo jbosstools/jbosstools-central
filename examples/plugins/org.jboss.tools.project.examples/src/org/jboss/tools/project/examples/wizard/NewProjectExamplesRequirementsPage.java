@@ -68,11 +68,13 @@ import org.osgi.framework.ServiceReference;
 public class NewProjectExamplesRequirementsPage extends WizardPage implements IProjectExamplesWizardPage {
 
 	private static final String PAGE_NAME = "org.jboss.tools.project.examples.requirements"; //$NON-NLS-1$
-	private ProjectExample projectExample;
-	private Text descriptionText;
-	private Text projectSize;
+	protected ProjectExample projectExample;
+	protected Text descriptionText;
+	protected Label projectSizeLabel;
+	protected Text projectSize;
+	protected WizardContext wizardContext;
+	protected TableViewer tableViewer;
 	private List<ProjectFix> fixes = new ArrayList<ProjectFix>();
-	private TableViewer tableViewer;
 	private ArrayList<ProjectFix> unsatisfiedFixes = new ArrayList<ProjectFix>();
 	private Image checkboxOn;
 	private Image checkboxOff;
@@ -90,6 +92,36 @@ public class NewProjectExamplesRequirementsPage extends WizardPage implements IP
 		checkboxOff = RuntimeUIActivator.imageDescriptorFromPlugin(RuntimeUIActivator.PLUGIN_ID, "/icons/xpl/incomplete_tsk.gif").createImage();
 	}
 
+	protected void setDescriptionArea(Composite composite) {
+		Label descriptionLabel = new Label(composite,SWT.NONE);
+		descriptionLabel.setText(Messages.NewProjectExamplesWizardPage_Description);
+		GridData gd = new GridData(SWT.BEGINNING, SWT.FILL, false, false);
+		gd.horizontalSpan = 2;
+		descriptionLabel.setLayoutData(gd);
+		descriptionText = new Text(composite, SWT.H_SCROLL | SWT.V_SCROLL
+				| SWT.READ_ONLY | SWT.BORDER | SWT.WRAP);
+		gd = new GridData(SWT.FILL, SWT.FILL, false, false);
+		GC gc = new GC(composite.getParent());
+		gd.heightHint = Dialog.convertHeightInCharsToPixels(gc
+				.getFontMetrics(), 6);
+		gc.dispose();
+		gd.horizontalSpan = 2;
+		gd.widthHint = 250;
+		descriptionText.setLayoutData(gd);
+	}
+	
+	protected void setSelectionArea(Composite composite) {
+		projectSizeLabel = new Label(composite,SWT.NULL);
+		projectSizeLabel.setText(Messages.NewProjectExamplesWizardPage_Project_size);
+		projectSize = new Text(composite,SWT.READ_ONLY);
+		projectSize.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+		
+		Label label = new Label(composite, SWT.NONE);
+		GridData gd = new GridData(SWT.FILL, SWT.FILL, true, false);
+		gd.horizontalSpan = 2;
+		label.setLayoutData(gd);
+	}
+	
 	protected void setTitleAndDescription(ProjectExample projectExample) {
 		setTitle( "Requirements" );
         setDescription( "Project Example Requirements" );
@@ -104,7 +136,7 @@ public class NewProjectExamplesRequirementsPage extends WizardPage implements IP
 				if (projectExample.getDescription() != null) {
 					descriptionText.setText(projectExample.getDescription());
 				}
-				if (projectExample.getSizeAsText() != null) {
+				if (projectExample.getSizeAsText() != null && projectSize != null) {
 					projectSize.setText(projectExample.getSizeAsText());
 				}
 			}
@@ -113,7 +145,9 @@ public class NewProjectExamplesRequirementsPage extends WizardPage implements IP
 	        setDescription( "Project Example Requirements" );
 	        if (descriptionText != null) {
 	        	descriptionText.setText(""); //$NON-NLS-1$
-	        	projectSize.setText(""); //$NON-NLS-1$
+	        	if (projectSize != null) {
+	        		projectSize.setText(""); //$NON-NLS-1$
+	        	}
 	        }
 		}
 	}
@@ -133,31 +167,11 @@ public class NewProjectExamplesRequirementsPage extends WizardPage implements IP
 		composite.setLayoutData(gd);
 		Dialog.applyDialogFont(composite);
 
-		Label descriptionLabel = new Label(composite,SWT.NONE);
-		descriptionLabel.setText(Messages.NewProjectExamplesWizardPage_Description);
-		gd = new GridData(SWT.BEGINNING, SWT.FILL, false, false);
-		gd.horizontalSpan = 2;
-		descriptionLabel.setLayoutData(gd);
-		descriptionText = new Text(composite, SWT.H_SCROLL | SWT.V_SCROLL
-				| SWT.READ_ONLY | SWT.BORDER | SWT.WRAP);
-		gd = new GridData(SWT.FILL, SWT.FILL, false, false);
-		GC gc = new GC(parent);
-		gd.heightHint = Dialog.convertHeightInCharsToPixels(gc
-				.getFontMetrics(), 6);
-		gc.dispose();
-		gd.horizontalSpan = 2;
-		gd.widthHint = 250;
-		descriptionText.setLayoutData(gd);
+		//Set description
+		setDescriptionArea(composite);
 		
-		Label projectSizeLabel = new Label(composite,SWT.NULL);
-		projectSizeLabel.setText(Messages.NewProjectExamplesWizardPage_Project_size);
-		projectSize = new Text(composite,SWT.READ_ONLY);
-		projectSize.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-		
-		Label label = new Label(composite, SWT.NONE);
-		gd = new GridData(SWT.FILL, SWT.FILL, true, false);
-		gd.horizontalSpan = 2;
-		label.setLayoutData(gd);
+		//Set project size label or runtime/archetype selection
+		setSelectionArea(composite);
 				
 		Group fixesGroup = new Group(composite, SWT.NONE);
 		gd = new GridData(SWT.FILL, SWT.FILL, true, false);
@@ -569,6 +583,16 @@ public class NewProjectExamplesRequirementsPage extends WizardPage implements IP
 
 	}
 
+
+	public void setDescriptionText(String longDescription) {
+		if (descriptionText != null) {
+			if (longDescription == null) {
+				longDescription = "";
+			}
+			descriptionText.setText(longDescription);
+		}
+	}
+	
 	@Override
 	public IWizardPage getNextPage() {
 		// FIXME
@@ -625,8 +649,7 @@ public class NewProjectExamplesRequirementsPage extends WizardPage implements IP
 
 	@Override
 	public void setWizardContext(WizardContext context) {
-		// TODO Auto-generated method stub
-		
+		this.wizardContext = context;
 	}
 
 	@Override

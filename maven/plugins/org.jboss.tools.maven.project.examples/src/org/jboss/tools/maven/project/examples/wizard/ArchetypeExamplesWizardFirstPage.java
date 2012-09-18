@@ -62,6 +62,7 @@ import org.jboss.tools.maven.project.examples.MavenProjectExamplesActivator;
 import org.jboss.tools.maven.project.examples.Messages;
 import org.jboss.tools.maven.project.examples.utils.MavenArtifactHelper;
 import org.jboss.tools.project.examples.ProjectExamplesActivator;
+import org.jboss.tools.project.examples.model.ArchetypeModel;
 import org.jboss.tools.project.examples.model.ProjectExample;
 import org.jboss.tools.project.examples.wizard.IProjectExamplesWizardPage;
 import org.jboss.tools.project.examples.wizard.NewProjectExamplesWizard2;
@@ -93,6 +94,7 @@ public class ArchetypeExamplesWizardFirstPage extends MavenProjectWizardLocation
 	private IRuntimeLifecycleListener listener;
 	private Button isWorkspace;
 	private Combo outputDirectoryCombo;
+	private ArchetypeModel archetypeModel;
 	
 	public ArchetypeExamplesWizardFirstPage() {
 		super(new ProjectImportConfiguration(), "", "",new ArrayList<IWorkingSet>());
@@ -183,8 +185,8 @@ public class ArchetypeExamplesWizardFirstPage extends MavenProjectWizardLocation
 
 		
 		/*
-		projectNameCombo.setText(projectDescription.getArchetypeModel().getArtifactId());
-		packageCombo.setText(projectDescription.getArchetypeModel().getJavaPackage());
+		projectNameCombo.setText(archetypeModel.getArtifactId());
+		packageCombo.setText(archetypeModel.getJavaPackage());
 		*/
 	}
 	
@@ -361,22 +363,23 @@ public class ArchetypeExamplesWizardFirstPage extends MavenProjectWizardLocation
 			return;
 		}
 		projectDescription = projectExample;
-		String projectName = projectDescription.getArchetypeModel().getArtifactId();
-		if (StringUtils.isNotBlank(projectName)) {
-			IProject p = ResourcesPlugin.getWorkspace().getRoot().getProject(projectName);
-			if (!p.exists()) {
-				projectNameCombo.setText(projectName);
+		if (archetypeModel != null) {
+			String projectName = archetypeModel.getArtifactId();
+			if (StringUtils.isNotBlank(projectName)) {
+				IProject p = ResourcesPlugin.getWorkspace().getRoot().getProject(projectName);
+				if (!p.exists()) {
+					projectNameCombo.setText(projectName);
+				}
+			}
+			
+			String packageName = archetypeModel.getJavaPackage();
+			if (StringUtils.isBlank(packageName) && packageCombo.getItemCount() > 0) {
+				packageName = packageCombo.getItem(0);
+			}
+			if (packageName != null) {
+				packageCombo.setText(packageName);
 			}
 		}
-		
-		String packageName = projectDescription.getArchetypeModel().getJavaPackage();
-		if (StringUtils.isBlank(packageName) && packageCombo.getItemCount() > 0) {
-			packageName = packageCombo.getItem(0);
-		}
-		if (packageName != null) {
-			packageCombo.setText(packageName);
-		}
-		
 		//Force setting of enterprise value
 		context.setProperty(MavenProjectConstants.ENTERPRISE_TARGET, isEnterpriseTargetRuntime());
 
@@ -513,6 +516,7 @@ public class ArchetypeExamplesWizardFirstPage extends MavenProjectWizardLocation
 			if (projectExample.getDescription() != null) {
 				setDescription(ProjectExamplesActivator.getShortDescription(projectExample.getDescription()));
 			}
+			archetypeModel = projectExample.getArchetypeModel();
 			initDefaultValues();
 		} 
 	}
