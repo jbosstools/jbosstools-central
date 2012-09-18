@@ -19,12 +19,12 @@
 		<!-- _stable_branch jobs could use this profile but the above default (last 
 			stable milestone) is probably better -->
 		<profile>
-			<id>3.4.juno</id>
+			<id>4.0.juno</id>
 			<activation>
 				<activeByDefault>false</activeByDefault>
 			</activation>
 			<properties>
-				<jboss.discovery.directory.url>http://download.jboss.org/jbosstools/updates/nightly/core/3.4.juno/jbosstools-directory.xml</jboss.discovery.directory.url>
+				<jboss.discovery.directory.url>http://download.jboss.org/jbosstools/updates/nightly/core/4.0.juno/jbosstools-directory.xml</jboss.discovery.directory.url>
 			</properties>
 		</profile>
 
