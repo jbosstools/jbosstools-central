@@ -18,9 +18,11 @@ package org.jboss.tools.central.actions;
  */
 public class FavoriteAtEclipseMarketplaceHandler extends OpenWithBrowserHandler {
 
+	private static final String MARKETPLACE_ECLIPSE_URL = "http://marketplace.eclipse.org/node/420896";
+
 	@Override
 	public String getLocation() {
-		return "http://marketplace.eclipse.org/node/121986";
+		return MARKETPLACE_ECLIPSE_URL;
 	}
 
 }
