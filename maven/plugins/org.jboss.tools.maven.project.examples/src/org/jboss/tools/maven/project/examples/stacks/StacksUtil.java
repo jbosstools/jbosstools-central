@@ -13,7 +13,9 @@ package org.jboss.tools.maven.project.examples.stacks;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 
 import org.jboss.jdf.stacks.model.Archetype;
@@ -23,11 +25,26 @@ import org.jboss.jdf.stacks.model.Stacks;
 import org.jboss.tools.project.examples.model.ArchetypeModel;
 
 public class StacksUtil {
-	/*
+	
+	private static final Map<String, String> RUNTIMES_MAP;
+
+	static {
+		
+		Map<String, String> serverIdMap = new HashMap<String, String>();
+		
+		serverIdMap.put("org.jboss.ide.eclipse.as.runtime.eap.60","jbosseap6runtime");
+		serverIdMap.put("org.jboss.ide.eclipse.as.runtime.71","jboss-as711runtime");
+		//serverIdMap.put("org.jboss.ide.eclipse.as.runtime.71","jboss-as710runtime");
+		serverIdMap.put("org.jboss.ide.eclipse.as.runtime.70","jboss-as702runtime-web");
+		//serverIdMap.put("org.jboss.ide.eclipse.as.runtime.70","jboss-as702runtime-full");
+		
+		RUNTIMES_MAP = Collections.unmodifiableMap(serverIdMap);
+	}
+	
 	public static final String EAP_TYPE = "EAP";
 
 	public static final String AS_TYPE = "AS";
-	*/
+
 	private StacksUtil() {
 		// no need for public constructor
 	}
@@ -86,12 +103,55 @@ public class StacksUtil {
 		return Collections.unmodifiableList(runtimes);
 	}
 
+	public static Runtime getRuntime(Stacks fromStacks, String runtimeId) {
+		if (fromStacks == null || runtimeId == null) {
+			return null;
+		}
+		
+		for (Runtime runtime : fromStacks.getAvailableRuntimes()) {
+			if (runtimeId.equals(runtime.getId())) {
+				return runtime;
+			}
+		}
+		return null;
+	}
 
-	/*
-	public static List<Runtime> getCompatibleRuntimes(Archetype archetype, Stacks fromStacks) {
+	public static Runtime getRuntimeFromWtp(Stacks fromStacks, String wtpRuntimeId) {
+		if (fromStacks == null || wtpRuntimeId == null) {
+			return null;
+		}
+		for (Runtime runtime : fromStacks.getAvailableRuntimes()) {
+			Properties p = runtime.getLabels();
+			if (p != null && wtpRuntimeId.equals(p.get("wtp-runtime-id"))) {
+				return runtime;
+			}
+		}
+		//Fall back on hard coded map
+		String stacksRuntimeId = RUNTIMES_MAP.get(wtpRuntimeId);
+		
+		return getRuntime(fromStacks, stacksRuntimeId);
+	}
+
+
+	
+	public static Runtime getRuntimeFromWtpId(Stacks fromStacks, String wtpRuntimeId) {
+		if (fromStacks == null || wtpRuntimeId == null) {
+			return null;
+		}
+		for (Runtime runtime : fromStacks.getAvailableRuntimes()) {
+			Properties p = runtime.getLabels();
+			if (p != null && wtpRuntimeId.equals(p.get("wtp-runtime-id"))) {
+				return runtime;
+			}
+		}
+		//Fall back on hard coded map
+		String stacksRuntimeId = RUNTIMES_MAP.get(wtpRuntimeId);
+		return getRuntime(fromStacks, stacksRuntimeId);
+	}
+
+	public static List<Runtime> getCompatibleServerRuntimes(Archetype archetype, Stacks fromStacks) {
 		return getCompatibleRuntimes(archetype, fromStacks, AS_TYPE, EAP_TYPE);
 	}
-	*/
 
 	/**
 	 * Returns an unmodifiable {@link List} of compatible {@link ArchetypeVersion} of an {@link Archetype} for a given {@link Runtime}. 
@@ -133,11 +193,9 @@ public class StacksUtil {
 		return versions != null && versions.contains(archetypeVersion);
 	}
 
-	/*
 	public static boolean isEnterprise(Runtime runtime) {
 		return EAP_TYPE.equals(getRuntimeType(runtime)); 
 	}
-	*/
 
 	public static String getRuntimeType(Runtime runtime) {
 		if (runtime == null) {
@@ -145,7 +203,7 @@ public class StacksUtil {
 		}
 		
 		Properties p = runtime.getLabels();
-		return (String)p.get("runtimeType"); 
+		return (String)p.get("runtime-type"); 
 	}
 
 	public static ArchetypeModel createArchetypeModel(ArchetypeModel archetypeModel, ArchetypeVersion archetypeVersion) throws CloneNotSupportedException {

@@ -3,6 +3,7 @@ package org.jboss.tools.project.examples.wizard;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -74,8 +75,8 @@ public class NewProjectExamplesRequirementsPage extends WizardPage implements IP
 	protected Text projectSize;
 	protected WizardContext wizardContext;
 	protected TableViewer tableViewer;
-	private List<ProjectFix> fixes = new ArrayList<ProjectFix>();
-	private ArrayList<ProjectFix> unsatisfiedFixes = new ArrayList<ProjectFix>();
+	protected List<ProjectFix> fixes = new ArrayList<ProjectFix>();
+	protected ArrayList<ProjectFix> unsatisfiedFixes = new ArrayList<ProjectFix>();
 	private Image checkboxOn;
 	private Image checkboxOff;
 	private Link link;
@@ -92,36 +93,6 @@ public class NewProjectExamplesRequirementsPage extends WizardPage implements IP
 		checkboxOff = RuntimeUIActivator.imageDescriptorFromPlugin(RuntimeUIActivator.PLUGIN_ID, "/icons/xpl/incomplete_tsk.gif").createImage();
 	}
 
-	protected void setDescriptionArea(Composite composite) {
-		Label descriptionLabel = new Label(composite,SWT.NONE);
-		descriptionLabel.setText(Messages.NewProjectExamplesWizardPage_Description);
-		GridData gd = new GridData(SWT.BEGINNING, SWT.FILL, false, false);
-		gd.horizontalSpan = 2;
-		descriptionLabel.setLayoutData(gd);
-		descriptionText = new Text(composite, SWT.H_SCROLL | SWT.V_SCROLL
-				| SWT.READ_ONLY | SWT.BORDER | SWT.WRAP);
-		gd = new GridData(SWT.FILL, SWT.FILL, false, false);
-		GC gc = new GC(composite.getParent());
-		gd.heightHint = Dialog.convertHeightInCharsToPixels(gc
-				.getFontMetrics(), 6);
-		gc.dispose();
-		gd.horizontalSpan = 2;
-		gd.widthHint = 250;
-		descriptionText.setLayoutData(gd);
-	}
-	
-	protected void setSelectionArea(Composite composite) {
-		projectSizeLabel = new Label(composite,SWT.NULL);
-		projectSizeLabel.setText(Messages.NewProjectExamplesWizardPage_Project_size);
-		projectSize = new Text(composite,SWT.READ_ONLY);
-		projectSize.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-		
-		Label label = new Label(composite, SWT.NONE);
-		GridData gd = new GridData(SWT.FILL, SWT.FILL, true, false);
-		gd.horizontalSpan = 2;
-		label.setLayoutData(gd);
-	}
-	
 	protected void setTitleAndDescription(ProjectExample projectExample) {
 		setTitle( "Requirements" );
         setDescription( "Project Example Requirements" );
@@ -209,12 +180,47 @@ public class NewProjectExamplesRequirementsPage extends WizardPage implements IP
 		gd.horizontalSpan=2;
 		link.setLayoutData(gd);
 		
+		setAdditionalControls(composite);
+		
 		setPageComplete(true);
 		setControl(composite);
 		if (projectExample != null) {
 			setProjectExample(projectExample);
 		}
 		
+	}
+
+	protected void setDescriptionArea(Composite composite) {
+		Label descriptionLabel = new Label(composite,SWT.NONE);
+		descriptionLabel.setText(Messages.NewProjectExamplesWizardPage_Description);
+		GridData gd = new GridData(SWT.BEGINNING, SWT.FILL, false, false);
+		gd.horizontalSpan = 2;
+		descriptionLabel.setLayoutData(gd);
+		descriptionText = new Text(composite, SWT.H_SCROLL | SWT.V_SCROLL
+				| SWT.READ_ONLY | SWT.BORDER | SWT.WRAP);
+		gd = new GridData(SWT.FILL, SWT.FILL, false, false);
+		GC gc = new GC(composite.getParent());
+		gd.heightHint = Dialog.convertHeightInCharsToPixels(gc
+				.getFontMetrics(), 6);
+		gc.dispose();
+		gd.horizontalSpan = 2;
+		gd.widthHint = 250;
+		descriptionText.setLayoutData(gd);
+	}
+	
+	protected void setSelectionArea(Composite composite) {
+		projectSizeLabel = new Label(composite,SWT.NULL);
+		projectSizeLabel.setText(Messages.NewProjectExamplesWizardPage_Project_size);
+		projectSize = new Text(composite,SWT.READ_ONLY);
+		projectSize.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+		
+		Label label = new Label(composite, SWT.NONE);
+		GridData gd = new GridData(SWT.FILL, SWT.FILL, true, false);
+		gd.horizontalSpan = 2;
+		label.setLayoutData(gd);
+	}
+	
+	protected void setAdditionalControls(Composite composite) {
 	}
 
 	private void createButtons(Composite parent, final TableViewer viewer) {
@@ -298,8 +304,8 @@ public class NewProjectExamplesRequirementsPage extends WizardPage implements IP
 			public void widgetSelected(SelectionEvent e) {
 				ProjectFix fix = getSelectedProjectFix();
 				if (fix != null) {
-					DownloadRuntime runtime = getDownloadRuntime(fix);
-					DownloadRuntimeDialog dialog = new DownloadRuntimeDialog(getShell(), runtime);
+					List<DownloadRuntime> runtimes = getDownloadRuntimes(fix);
+					DownloadRuntimeDialog dialog = new DownloadRuntimeDialog(getShell(), runtimes);
 					dialog.open();
 					refreshFixes();
 				}
@@ -347,10 +353,18 @@ public class NewProjectExamplesRequirementsPage extends WizardPage implements IP
 						}
 						if (ProjectFix.WTP_RUNTIME.equals(fixType)
 								|| ProjectFix.SEAM_RUNTIME.equals(fixType)) {
-							DownloadRuntime downloadRuntime = getDownloadRuntime(fix);
-							downloadAndInstall.setEnabled(downloadRuntime != null);
-							if (downloadRuntime != null) {
-								downloadAndInstall.setToolTipText("Download and install " + downloadRuntime.getName());
+							List<DownloadRuntime> downloadRuntimes = getDownloadRuntimes(fix);
+							if (downloadRuntimes != null && !downloadRuntimes.isEmpty()) {
+								StringBuilder tooltip = new StringBuilder("Download and install ");
+								if (downloadRuntimes.size() > 1) {
+									tooltip.append("a runtime");
+								} else {
+									tooltip.append(downloadRuntimes.get(0).getName());
+								}
+								downloadAndInstall.setToolTipText(tooltip.toString());
+								downloadAndInstall.setEnabled(true);
+							} else {
+								downloadAndInstall.setEnabled(false);
 							}
 							install.setEnabled(true);
 							install.setToolTipText("JBoss Runtime Detection");
@@ -378,10 +392,11 @@ public class NewProjectExamplesRequirementsPage extends WizardPage implements IP
 		return null;
 	}
 
-	private DownloadRuntime getDownloadRuntime(ProjectFix fix) {
+	protected List<DownloadRuntime> getDownloadRuntimes(ProjectFix fix) {
 		final String downloadId = fix.getProperties().get(ProjectFix.DOWNLOAD_ID);
 		if (downloadId != null) {
-			return RuntimeCoreActivator.getDefault().getDownloadRuntimes().get(downloadId);
+			DownloadRuntime dr = RuntimeCoreActivator.getDefault().getDownloadRuntimes().get(downloadId);
+			return Collections.singletonList(dr);
 		}
 		return null;
 	}
@@ -589,7 +604,10 @@ public class NewProjectExamplesRequirementsPage extends WizardPage implements IP
 			if (longDescription == null) {
 				longDescription = "";
 			}
-			descriptionText.setText(longDescription);
+			if (!longDescription.equals(descriptionText.getText())) {
+				//only change text if necessary to avoid flickering
+				descriptionText.setText(longDescription);
+			}
 		}
 	}
 	

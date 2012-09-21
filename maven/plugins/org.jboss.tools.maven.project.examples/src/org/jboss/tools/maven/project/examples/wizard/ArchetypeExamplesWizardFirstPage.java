@@ -13,12 +13,9 @@ package org.jboss.tools.maven.project.examples.wizard;
 import java.io.File;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.regex.Pattern;
 
 import org.apache.maven.model.Model;
@@ -27,13 +24,11 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.ResourcesPlugin;
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.wizard.IWizard;
 import org.eclipse.jface.wizard.IWizardPage;
-import org.eclipse.jst.j2ee.project.facet.IJ2EEFacetConstants;
 import org.eclipse.m2e.core.project.ProjectImportConfiguration;
 import org.eclipse.m2e.core.ui.internal.wizards.MavenProjectWizardLocationPage;
 import org.eclipse.osgi.util.NLS;
@@ -46,21 +41,12 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.IWorkingSet;
-import org.eclipse.wst.common.project.facet.core.IProjectFacetVersion;
-import org.eclipse.wst.common.project.facet.core.ProjectFacetsManager;
-import org.eclipse.wst.common.project.facet.core.runtime.RuntimeManager;
-import org.eclipse.wst.server.core.IRuntime;
 import org.eclipse.wst.server.core.IRuntimeLifecycleListener;
-import org.eclipse.wst.server.core.ServerCore;
-import org.eclipse.wst.server.core.internal.facets.FacetUtil;
-import org.jboss.ide.eclipse.as.core.util.RuntimeUtils;
 import org.jboss.tools.maven.project.examples.MavenProjectExamplesActivator;
 import org.jboss.tools.maven.project.examples.Messages;
-import org.jboss.tools.maven.project.examples.utils.MavenArtifactHelper;
 import org.jboss.tools.project.examples.ProjectExamplesActivator;
 import org.jboss.tools.project.examples.model.ArchetypeModel;
 import org.jboss.tools.project.examples.model.ProjectExample;
@@ -77,17 +63,11 @@ import org.jboss.tools.project.examples.wizard.WizardContext;
 public class ArchetypeExamplesWizardFirstPage extends MavenProjectWizardLocationPage implements IProjectExamplesWizardPage {
 
 	private static final String WORKING_SETS = "workingSets"; //$NON-NLS-1$
-	private static final String TARGET_RUNTIME = "targetRuntime"; //$NON-NLS-1$
 	private Label projectNameLabel;
 	private Combo projectNameCombo;
 	private Label packageLabel;
 	private Combo packageCombo;
-	private Combo serverTargetCombo;
-	private Map<String, IRuntime> serverRuntimes;
-	private MissingRepositoryWarningComponent warningComponent;
 	private boolean initialized;
-	private IStatus enterpriseRepoStatus;
-	private ProjectExample projectDescription;
 	private ProjectExample projectExample;
 	private WizardContext context;
 	
@@ -104,7 +84,7 @@ public class ArchetypeExamplesWizardFirstPage extends MavenProjectWizardLocation
 			ProjectImportConfiguration configuration,
 			ProjectExample projectDescription, List<IWorkingSet> workingSet) {
 		super(configuration, projectDescription.getShortDescription(),Messages.ArchetypeExamplesWizardFirstPage_Title, workingSet);
-		this.projectDescription = projectDescription;
+		this.projectExample = projectDescription;
 		setPageComplete(false);
 	}
 	
@@ -116,35 +96,6 @@ public class ArchetypeExamplesWizardFirstPage extends MavenProjectWizardLocation
 	@Override
 	protected void createAdditionalControls(Composite container) {
 
-		listener = new IRuntimeLifecycleListener() {
-			
-			@Override
-			public void runtimeRemoved(IRuntime runtime) {
-				runInUIThread();
-			}
-			
-			@Override
-			public void runtimeChanged(IRuntime runtime) {
-				runInUIThread();
-			}
-			
-			@Override
-			public void runtimeAdded(IRuntime runtime) {
-				runInUIThread();
-			}
-			
-			private void runInUIThread() {
-				Display.getDefault().asyncExec(new Runnable() {
-					
-					@Override
-					public void run() {
-						configureRuntimeCombo();
-					}
-				});
-			}
-			
-		};
-		ServerCore.addRuntimeLifecycleListener(listener);
 		GridData gridData = new GridData(SWT.FILL, SWT.TOP, true, false, 2, 1);
 		projectNameLabel = new Label(container, SWT.NONE);
 		projectNameLabel.setText(Messages.ArchetypeExamplesWizardFirstPage_ProjectName_Label);
@@ -177,81 +128,15 @@ public class ArchetypeExamplesWizardFirstPage extends MavenProjectWizardLocation
 			}
 		});
 
-		createServerTargetComposite(container);
+		//createServerTargetComposite(container);
 		
 		Label emptyLabel = new Label(container, SWT.NONE);
 		emptyLabel.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false,
 				3, 1));
 
 		
-		/*
-		projectNameCombo.setText(archetypeModel.getArtifactId());
-		packageCombo.setText(archetypeModel.getJavaPackage());
-		*/
 	}
 	
-	@Override
-	protected void createAdvancedSettings(Composite composite, GridData gridData) {
-		warningComponent = new MissingRepositoryWarningComponent(composite, false);
-	}
-
-	protected void createServerTargetComposite(Composite parent) {
-		Label serverTargetLabel = new Label(parent, SWT.NONE);
-		serverTargetLabel.setText(Messages.ArchetypeExamplesWizardFirstPage_Target_Runtime_Label);
-
-		GridData gridData = new GridData(SWT.FILL, SWT.TOP, true, false, 2, 1);
-		serverTargetCombo = new Combo(parent, SWT.BORDER | SWT.READ_ONLY);
-		serverTargetCombo.setLayoutData(gridData);
-		serverTargetCombo.add(Messages.ArchetypeExamplesWizardFirstPage_No_TargetRuntime);
-		serverTargetCombo.addModifyListener(new ModifyListener() {
-
-			@Override
-			public void modifyText(ModifyEvent e) {
-				if (isCurrentPage()) {
-					context.setProperty(MavenProjectConstants.ENTERPRISE_TARGET, isEnterpriseTargetRuntime());
-				}
-				validateEnterpriseRepo();
-			}
-		});
-		
-		configureRuntimeCombo();
-
-	}
-
-	protected void configureRuntimeCombo() {
-		if (serverTargetCombo == null || serverTargetCombo.isDisposed()) {
-			return;
-		}
-		//TODO read facet version from project example metadata
-		IProjectFacetVersion facetVersion;
-		try {
-			facetVersion = ProjectFacetsManager.getProjectFacet(
-					IJ2EEFacetConstants.DYNAMIC_WEB).getLatestVersion();
-		} catch (CoreException e) {
-			MavenProjectExamplesActivator.log(e);
-			return;
-		}
-			
-		int i =0, selectedRuntimeIdx = 0;
-		String lastUsedRuntime = dialogSettings.get(TARGET_RUNTIME);
-
-		serverRuntimes = getServerRuntimes(facetVersion);
-		serverTargetCombo.removeAll();
-		serverTargetCombo.add(Messages.ArchetypeExamplesWizardFirstPage_No_TargetRuntime);
-		for (Map.Entry<String, IRuntime> entry : serverRuntimes.entrySet()) {
-			serverTargetCombo.add(entry.getKey());
-			++i;
-			IRuntime runtime = entry.getValue();
-			if (lastUsedRuntime != null && lastUsedRuntime.equals(runtime.getId())) {
-				selectedRuntimeIdx = i;
-			}
-		}
-				
-		if (selectedRuntimeIdx > 0) {
-			serverTargetCombo.select(selectedRuntimeIdx);
-		}
-	}
-
 	protected void validate() {
 		if (!initialized) {
 			return;
@@ -275,7 +160,7 @@ public class ArchetypeExamplesWizardFirstPage extends MavenProjectWizardLocation
 		setMessage(null);
 		setPageComplete(errorMessage == null);
 
-		validateEnterpriseRepo();
+		//validateEnterpriseRepo();
 		
 	}
 
@@ -319,34 +204,6 @@ public class ArchetypeExamplesWizardFirstPage extends MavenProjectWizardLocation
 		return (projectNameCombo == null) ? null : projectNameCombo.getText();
 	}
 
-	protected void validateEnterpriseRepo() {
-		if (warningComponent != null) {
-			boolean isWarningLinkVisible = false;
-			if (isEnterpriseTargetRuntime()) {
-				if (enterpriseRepoStatus == null) {
-					enterpriseRepoStatus = MavenArtifactHelper.checkEnterpriseRequirementsAvailable(projectExample); 
-				}
-				isWarningLinkVisible = !enterpriseRepoStatus.isOK();
-				if (isWarningLinkVisible) {
-					warningComponent.setLinkText(enterpriseRepoStatus.getMessage());
-					//warninglink.setText(enterpriseRepoStatus.getMessage());
-					//warningComponent.getParent().layout(true, true);
-				}
-			}
-			warningComponent.setVisible(isWarningLinkVisible);
-		}
-	}
-
-	
-	public boolean isEnterpriseTargetRuntime() {
-		if (serverTargetCombo == null)
-			return false;
-		String serverId = serverTargetCombo.getText();
-		IRuntime runtime = serverRuntimes.get(serverId);
-		return (runtime != null && RuntimeUtils.isEAP(runtime));
-	}
-
-	
 	public void setVisible(boolean visible) {
 		super.setVisible(visible);
 
@@ -362,7 +219,6 @@ public class ArchetypeExamplesWizardFirstPage extends MavenProjectWizardLocation
 		if (projectExample == null || projectNameCombo == null) {
 			return;
 		}
-		projectDescription = projectExample;
 		if (archetypeModel != null) {
 			String projectName = archetypeModel.getArtifactId();
 			if (StringUtils.isNotBlank(projectName)) {
@@ -380,32 +236,10 @@ public class ArchetypeExamplesWizardFirstPage extends MavenProjectWizardLocation
 				packageCombo.setText(packageName);
 			}
 		}
-		//Force setting of enterprise value
-		context.setProperty(MavenProjectConstants.ENTERPRISE_TARGET, isEnterpriseTargetRuntime());
 
 		initialized = true;
 		validate();
 	}
-
-	protected Map<String, IRuntime> getServerRuntimes(
-			IProjectFacetVersion facetVersion) {
-		Set<org.eclipse.wst.common.project.facet.core.runtime.IRuntime> runtimesSet;
-		if (facetVersion == null) {
-			runtimesSet =RuntimeManager.getRuntimes();
-		} else {
-			runtimesSet = RuntimeManager.getRuntimes(Collections.singleton(facetVersion));
-		}
-		
-		Map<String, IRuntime> runtimesMap = new LinkedHashMap<String, IRuntime>();
-		for (org.eclipse.wst.common.project.facet.core.runtime.IRuntime r : runtimesSet) {
-			IRuntime serverRuntime = FacetUtil.getRuntime(r);
-			if (serverRuntime != null) {
-				runtimesMap.put(r.getLocalizedName(), serverRuntime);
-			}
-		}
-		return runtimesMap;
-	}
-
 
 	public void setUseDefaultWorkspaceLocation(boolean value) {
 		try {
@@ -479,22 +313,7 @@ public class ArchetypeExamplesWizardFirstPage extends MavenProjectWizardLocation
 		}
 		return file.canWrite();
 	}
-	@Override
-	public void dispose() {
-		if (dialogSettings != null && serverRuntimes != null && serverTargetCombo != null) {
-			IRuntime lastUsedRuntime = serverRuntimes.get(serverTargetCombo.getText());
-			if (lastUsedRuntime != null) {
-				dialogSettings.put(TARGET_RUNTIME, lastUsedRuntime.getId());
-			}
-		}
-		if (listener != null) {
-			ServerCore.removeRuntimeLifecycleListener(listener);
-			listener = null;
-		}
-		super.dispose();
-	}
-
-
+	
 	@Override
 	public boolean finishPage() {
 		return true;
@@ -600,7 +419,6 @@ public class ArchetypeExamplesWizardFirstPage extends MavenProjectWizardLocation
 			}
 		}
 	}	
-	
 	
 	@Override
 	public void setWizardContext(WizardContext context) {

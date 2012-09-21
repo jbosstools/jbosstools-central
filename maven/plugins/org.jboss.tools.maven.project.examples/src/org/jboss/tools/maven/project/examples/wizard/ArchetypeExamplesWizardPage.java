@@ -149,7 +149,13 @@ public class ArchetypeExamplesWizardPage extends
 		if (resolverConfigurationComponent != null) {
 			resolverConfigurationComponent.setExpanded(!resolverConfigurationComponent.getResolverConfiguration().getActiveProfileList().isEmpty());
 		}
-		initialized = true;
+		if (propertiesTable != null) {
+			initialized = true;
+		}
+		
+		Object enterpriseValue = context.getProperty(MavenProjectConstants.ENTERPRISE_TARGET);
+		Boolean enterprise = (enterpriseValue instanceof Boolean)?(Boolean)enterpriseValue:Boolean.FALSE;
+		updateArchetypeProperty(MavenProjectConstants.ENTERPRISE_TARGET, enterprise.toString());
 	}
 
 	@Override
@@ -284,7 +290,7 @@ public class ArchetypeExamplesWizardPage extends
 		checkEnterpriseProperty();
 		super.validate();
 	}
-
+	
 	private void checkEnterpriseProperty() {
 		if (warningComponent == null) {
 			//Not initialized yet
@@ -337,7 +343,6 @@ public class ArchetypeExamplesWizardPage extends
 			MavenProjectExamplesActivator.log("Cannot import maven archetype");
 			return false;
 		}
-		IPath locationPath = simplePage.getLocationPath();
 		final ProjectImportConfiguration configuration = getImportConfiguration();
 		String projectName = configuration.getProjectName(model);
 		propertiesMap.put(ProjectExamplesActivator.PROPERTY_PROJECT_NAME, projectName);
@@ -479,12 +484,18 @@ public class ArchetypeExamplesWizardPage extends
 			setPackageName(packageName);
 		} else if (MavenProjectConstants.ENTERPRISE_TARGET.equals(key)) {
 			//Make sure it's a boolean :
-			Boolean enterprise = Boolean.parseBoolean(value.toString());
-			updateArchetypeProperty("enterprise", enterprise.toString());
+			Boolean enterprise = Boolean.FALSE;
+			if (value instanceof Boolean) {
+				enterprise = (Boolean)value;
+			}
+			updateArchetypeProperty(MavenProjectConstants.ENTERPRISE_TARGET, enterprise.toString());
 		} else if (MavenProjectConstants.ARCHETYPE_MODEL.equals(key)) {
 			if (value instanceof ArchetypeModel) {
 				archetypeModel = (ArchetypeModel)value;
-				initializeArchetype();
+				if (getControl() != null) {
+					//reset control contents with archetype data
+					initializeArchetype();
+				}
 			}
 		}
 	}
