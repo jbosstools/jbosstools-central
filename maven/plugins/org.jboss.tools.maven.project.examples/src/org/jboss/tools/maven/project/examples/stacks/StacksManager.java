@@ -14,7 +14,6 @@ import static org.jboss.tools.project.examples.model.ProjectExampleUtil.getProje
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.Properties;
@@ -67,13 +66,13 @@ public class StacksManager {
 	private static String getStacksUrlFromJar() {
 		InputStream is = null;
 		try {
-			is = Stacks.class.getResourceAsStream("config.properties");
+			is = StacksManager.class.getResourceAsStream("/org/jboss/jdf/stacks/client/config.properties");
 			Properties p = new Properties();
 			p.load(is);
 			return p.getProperty(StacksClientConfiguration.REPO_PROPERTY);
-		} catch (IOException ioe) {
+		} catch (Exception e) {
 			System.err.println("Can't read stacks url from the stacks-client.jar");
-			ioe.printStackTrace();
+			e.printStackTrace();
 		} finally {
 			IOUtil.close(is);
 		}
