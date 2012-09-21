@@ -105,7 +105,6 @@ public class NewProjectExamplesStacksRequirementsPage extends NewProjectExamples
 		return "mavenArchetype";
 	}
 	
-	
 	@Override
 	public void setProjectExample(ProjectExample projectExample) {
 		super.setProjectExample(projectExample);
@@ -127,64 +126,72 @@ public class NewProjectExamplesStacksRequirementsPage extends NewProjectExamples
 	}
 
 	private void setArchetypeVersion() {
-		if (stacksArchetype == null) {
-			return;
-		}
+
+		ArchetypeModel mavenArchetype = null;
+		StringBuilder description = new StringBuilder();
 		
-		org.jboss.jdf.stacks.model.Archetype a;
-
-		if (useBlankArchetype != null && useBlankArchetype.getSelection()) {
-			a = stacksArchetype.getBlank();
-			
+		if (stacksArchetype == null) {
+			description.append(projectExample.getDescription());
+			mavenArchetype = projectExample.getArchetypeModel();
 		} else {
-			a = stacksArchetype;
-		}
-
-		version = null;
-		//get selected runtime from combo
-		if (serverTargetCombo != null && !serverTargetCombo.isDisposed()) {
-			String wtpServerId = serverTargetCombo.getText();
-			IRuntime wtpRuntime = serverRuntimes.get(wtpServerId);
-			if (wtpRuntime != null && wtpRuntime.getRuntimeType() != null) {
-				String wtpRuntimeId = wtpRuntime.getRuntimeType().getId();
-				//System.err.println(wtpRuntimeId);
-				Runtime stacksRuntime = StacksUtil.getRuntimeFromWtpId(stacks, wtpRuntimeId );
-				if (stacksRuntime != null) {
-					List<ArchetypeVersion> compatibleVersions = StacksUtil.getCompatibleArchetypeVersions(a, stacksRuntime);
-					if (compatibleVersions != null && !compatibleVersions.isEmpty()) {
-						version = compatibleVersions.get(0);
+			org.jboss.jdf.stacks.model.Archetype a;
+	
+			if (useBlankArchetype != null && useBlankArchetype.getSelection()) {
+				a = stacksArchetype.getBlank();
+				
+			} else {
+				a = stacksArchetype;
+			}
+	
+			version = null;
+			//get selected runtime from combo
+			if (serverTargetCombo != null && !serverTargetCombo.isDisposed()) {
+				String wtpServerId = serverTargetCombo.getText();
+				IRuntime wtpRuntime = serverRuntimes.get(wtpServerId);
+				if (wtpRuntime != null && wtpRuntime.getRuntimeType() != null) {
+					String wtpRuntimeId = wtpRuntime.getRuntimeType().getId();
+					//System.err.println(wtpRuntimeId);
+					Runtime stacksRuntime = StacksUtil.getRuntimeFromWtpId(stacks, wtpRuntimeId );
+					if (stacksRuntime != null) {
+						List<ArchetypeVersion> compatibleVersions = StacksUtil.getCompatibleArchetypeVersions(a, stacksRuntime);
+						if (compatibleVersions != null && !compatibleVersions.isEmpty()) {
+							version = compatibleVersions.get(0);
+						}
+					} else {
+						//No stacks runtime matching that server id
 					}
-				} else {
-					//No stacks runtime matching that server id
 				}
 			}
+			//contains wtp runtime id
+			
+			if (version == null) {
+				version = StacksUtil.getDefaultArchetypeVersion(a, stacks);
+			}
+			
+			description.append(version.getArchetype().getDescription());
+			
+			try {
+				mavenArchetype = createArchetypeModel(projectExample.getArchetypeModel(), version);
+				
+				wizardContext.setProperty(MavenProjectConstants.ARCHETYPE_MODEL, mavenArchetype);
+			} catch (CloneNotSupportedException e) {
+				e.printStackTrace();
+			}
 		}
-		//contains wtp runtime id
 		
-		if (version == null) {
-			version = StacksUtil.getDefaultArchetypeVersion(a, stacks);
+		if (mavenArchetype != null) {
+			description.append("\r\n").append("\r\n")
+			.append("Project based on the ")
+			.append(mavenArchetype.getArchetypeGroupId())
+			.append(":")
+			.append(mavenArchetype.getArchetypeArtifactId())
+			.append(":")
+			.append(mavenArchetype.getArchetypeVersion())
+			.append(" Maven archetype");
 		}
-		
-		StringBuilder description = new StringBuilder(version.getArchetype().getDescription());
-		description.append("\r\n").append("\r\n")
-		           .append("Project based on the ")
-		           .append(version.getArchetype().getGroupId())
-		           .append(":")
-		           .append(version.getArchetype().getArtifactId())
-		           .append(":")
-		           .append(version.getVersion())
-		           .append(" Maven archetype");
 		
 		setDescriptionText(description.toString());
 		
-		ArchetypeModel mavenArchetype;
-		try {
-			mavenArchetype = createArchetypeModel(projectExample.getArchetypeModel(), version);
-			
-			wizardContext.setProperty(MavenProjectConstants.ARCHETYPE_MODEL, mavenArchetype);
-		} catch (CloneNotSupportedException e) {
-			e.printStackTrace();
-		}
 		
 	}
 
