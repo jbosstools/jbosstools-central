@@ -778,23 +778,19 @@ public class ProjectExampleUtil {
 						return file;
 					}
 				}
-				if (urlModified == 0) {
-					if (file.exists()) {
-						return file;
-					}
-				}
+				//!!! urlModified == 0 when querying files from github 
+				//It means that files from github can not be cached! 
 				if (file.exists()) {
 					long modified = file.lastModified();
-					if (urlModified == modified) {
+					if (modified > 0 && //file already exists and doesn't come from github (or other server sending lastmodified = 0) 
+							(urlModified == 0 //and now there is a problem downloading the file
+							|| urlModified == modified )) {//or the file hasn't changed
 						return file;
 					}
 				}
 				// file = File.createTempFile(prefix, suffix);
 				// file.deleteOnExit();
 				file.getParentFile().mkdirs();
-				if (monitor.isCanceled()) {
-					return null;
-				}
 				if (monitor.isCanceled()) {
 					return null;
 				}
