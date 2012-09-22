@@ -17,12 +17,9 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.apache.maven.artifact.Artifact;
-import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.model.Dependency;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
@@ -43,8 +40,6 @@ import org.eclipse.jface.viewers.ICheckStateListener;
 import org.eclipse.jface.viewers.TableViewerColumn;
 import org.eclipse.jface.window.Window;
 import org.eclipse.jface.wizard.WizardPage;
-import org.eclipse.m2e.core.MavenPlugin;
-import org.eclipse.m2e.core.embedder.IMaven;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -55,13 +50,13 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 import org.jboss.tools.maven.conversion.ui.dialog.xpl.ConversionUtils;
 import org.jboss.tools.maven.conversion.ui.dialog.xpl.EditDependencyDialog;
 import org.jboss.tools.maven.conversion.ui.handlers.IdentifyJarJob;
+import org.jboss.tools.maven.conversion.ui.handlers.IdentifyJarJob.Task;
 import org.jboss.tools.maven.conversion.ui.internal.CellListener;
 import org.jboss.tools.maven.conversion.ui.internal.MavenDependencyConversionActivator;
 import org.jboss.tools.maven.core.identification.IFileIdentificationManager;
@@ -101,10 +96,6 @@ public class IdentifyMavenDependencyPage extends WizardPage {
 	
 	private boolean deleteJars;
 
-	private Label warningImg;
-
-	private Label warningLabel;
-
 	private static String MESSAGE = "Identify existing classpath entries as Maven dependencies. Double-click on a Maven Dependency to edit its details";
 
 
@@ -139,7 +130,6 @@ public class IdentifyMavenDependencyPage extends WizardPage {
 		}
 	}
 
-	
 	public void dispose() {
 		if (jarImage != null) jarImage.dispose();
 		if (okImage != null) okImage.dispose();
@@ -185,7 +175,8 @@ public class IdentifyMavenDependencyPage extends WizardPage {
 				deleteJars = deleteJarsBtn.getSelection();
 			}
 		});
-		runIdentificationJobs();
+
+		runIdentificationJobs(null);
 	}
 
 	private Button addCheckButton(Composite container, String label,
@@ -220,14 +211,14 @@ public class IdentifyMavenDependencyPage extends WizardPage {
 			@Override
 			@SuppressWarnings("unchecked")
 			public String getText(Object element) {
-				Map.Entry<IClasspathEntry, Dependency> entry = (Map.Entry<IClasspathEntry, Dependency>) element;
-				return entry.getKey().getPath().lastSegment();
+				IClasspathEntry cpe = (IClasspathEntry) element;
+				return cpe.getPath().lastSegment();
 			}
 			
 			@Override
 			public String getToolTipText(Object element) {
 				try {
-					return "SHA1 Checksum : "+IdentificationUtil.getSHA1(ConversionUtils.getFile(((Map.Entry<IClasspathEntry, Dependency>) element).getKey()));
+					return "SHA1 Checksum : "+IdentificationUtil.getSHA1(ConversionUtils.getFile(((IClasspathEntry) element)));
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -237,9 +228,9 @@ public class IdentifyMavenDependencyPage extends WizardPage {
 			@Override
 			@SuppressWarnings("unchecked")
 			public Image getImage(Object element) {
-				Map.Entry<IClasspathEntry, String> entry = (Map.Entry<IClasspathEntry, String>) element;
+				IClasspathEntry cpe = (IClasspathEntry) element;
 				Image img;
-				if (entry.getKey().getEntryKind() == IClasspathEntry.CPE_LIBRARY) {
+				if (cpe.getEntryKind() == IClasspathEntry.CPE_LIBRARY) {
 					img = jarImage;
 				} else {
 					img = projectImage;
@@ -251,40 +242,7 @@ public class IdentifyMavenDependencyPage extends WizardPage {
 		TableViewerColumn dependencyColumn = new TableViewerColumn(dependenciesViewer, SWT.NONE);
 		dependencyColumn.getColumn().setText("Maven Dependency");
 		dependencyColumn.getColumn().setWidth(270);
-		dependencyColumn.setLabelProvider(new ColumnLabelProvider() {
-			@Override
-			@SuppressWarnings("unchecked")
-			public String getText(Object element) {
-				Map.Entry<IClasspathEntry, Dependency> entry = (Map.Entry<IClasspathEntry, Dependency>) element;
-				IdentifyJarJob job = identificationJobs ==null? null:identificationJobs.get(entry.getKey());
-				if (job != null) {
-					int jobState = job.getState();
-					if (jobState == Job.RUNNING || jobState == Job.WAITING) {
-						return "Identification in progress...";
-					}
-				}
-				return IdentifyMavenDependencyPage.toString(entry.getValue());
-			}
-			
-			@Override
-			@SuppressWarnings("unchecked")
-			public Image getImage(Object element) {
-				Map.Entry<IClasspathEntry, Dependency> entry = (Map.Entry<IClasspathEntry, Dependency>) element;
-				IdentifyJarJob job = identificationJobs ==null? null:identificationJobs.get(entry.getKey());
-				if (job != null) {
-					int jobState = job.getState();
-					if (jobState == Job.RUNNING || jobState == Job.WAITING) {
-						return loadingImage;
-					}
-				}
-				if (entry.getValue() == null) {
-					return failedImage;
-				} else {
-					return (isResolved(entry.getValue(), null))?okImage:unresolvedImage;
-					//return okImage;
-				}
-			}
-		});
+		dependencyColumn.setLabelProvider(new DependencyLabelProvider());
 
 		dependenciesViewer.setContentProvider(ArrayContentProvider.getInstance());
 		dependenciesViewer.addCheckStateListener(new ICheckStateListener() {
@@ -292,7 +250,7 @@ public class IdentifyMavenDependencyPage extends WizardPage {
 				refresh();
 			}
 		});
-		dependenciesViewer.setInput(dependencyMap.entrySet());
+		dependenciesViewer.setInput(dependencyMap.keySet());
 		dependenciesViewer.setAllChecked(true);
 
 		dependenciesViewer.getTable().addListener(SWT.MouseDoubleClick, new CellListener(dependenciesViewer.getTable()) {
@@ -300,17 +258,22 @@ public class IdentifyMavenDependencyPage extends WizardPage {
 			@Override
 			protected void handle(int columnIndex, TableItem item) {
 				if (columnIndex == DEPENDENCY_COLUMN) {
-					Entry<IClasspathEntry, Dependency> entry = (Map.Entry<IClasspathEntry, Dependency>) item.getData();
-					Dependency d= entry.getValue();
+					IClasspathEntry cpe = (IClasspathEntry) item.getData();
+					
+					IdentifyJarJob job = identificationJobs.get(cpe);
+					if (Job.RUNNING == job.getState()) {
+						return;
+					}
+					
+					Dependency d= dependencyMap.get(cpe);
 					EditDependencyDialog editDependencyDialog = new EditDependencyDialog(getShell());
 					editDependencyDialog.setDependency(d);
 					if(editDependencyDialog.open() == Window.OK) {
 						Dependency newDep = editDependencyDialog.getDependency();
-						entry.setValue(newDep);
+						dependencyMap.put(cpe,newDep);
 						if (!eq(newDep,d)) {
-							isResolved(newDep, new NullProgressMonitor());
+							resolve(cpe, newDep);
 						}
-						refresh();
 					}
 				}
 			}
@@ -331,78 +294,30 @@ public class IdentifyMavenDependencyPage extends WizardPage {
 		addSelectionButton(container, "Deselect All", false);
 		if (Boolean.getBoolean("org.jboss.tools.maven.conversion.debug")) {
 			addIdentifyButton(container, "Identify dependencies");
+			addResetButton(container, "Reset");
 		}
-		addResetButton(container, "Reset");
 
-		//addCellEditors();
 	}
 
+
+	private void resolve(IClasspathEntry cpe, Dependency d) {
+		if (d != null) {
+			IdentifyJarJob job = identificationJobs.get(cpe);
+			job.setDependency(d);
+			job.setRequestedProcess(Task.RESOLUTION_ONLY);
+			job.schedule();
+		}
+	}
 	
-	@Override
-	public boolean isPageComplete() {
+	public boolean hasNoRunningJobs() {
+		for (IdentifyJarJob job : identificationJobs.values()) {
+			if (job.getState() == Job.RUNNING){
+				return false;
+			}
+		}
 		return true;
 	} 
 	
-	/*
-	protected void addCellEditors() {
-		dependenciesViewer.setColumnProperties(
-				new String[] { "EMPTY",	SOURCE_PROPERTY, DEPENDENCY_PROPERTY });
-
-		DependencyCellEditor dce = new DependencyCellEditor(dependenciesViewer.getTable());
-		CellEditor[] editors = new CellEditor[] { null, null, dce};
-		dependenciesViewer.setCellEditors(editors);
-		dependenciesViewer.setCellModifier(new DependencyCellModifier());
-	}
-    
-	private class DependencyCellModifier implements ICellModifier {
-
-		public boolean canModify(Object element, String property) {
-			return DEPENDENCY_PROPERTY.equals(property);
-		}
-
-		public Object getValue(Object element, String property) {
-			Map.Entry<IClasspathEntry, Dependency> entry = (Map.Entry<IClasspathEntry, Dependency>) element;
-			if (property.equals(SOURCE_PROPERTY)) {
-				return entry.getKey().getPath().toOSString();
-			} else if (property.equals(DEPENDENCY_PROPERTY)) {
-				return IdentifyMavenDependencyPage.toString(entry.getValue());
-			}
-			return ""; //$NON-NLS-1$
-		}
-
-		public void modify(Object element, String property, Object value) {
-			if (property.equals(DEPENDENCY_PROPERTY)) {
-				TableItem item = (TableItem) element;
-				Map.Entry<IClasspathEntry, Dependency> entry = (Map.Entry<IClasspathEntry, Dependency>) item.getData();
-				if (value instanceof Dependency) {
-					entry.setValue((Dependency)value);
-					refresh();
-				}
-			}
-		}
-	}
-
-	private class DependencyCellEditor extends DialogCellEditor {
-
-		DependencyCellEditor (Composite parent) {
-			super(parent);
-	    }
-		
-	    @Override
-		protected Object openDialogBox(Control cellEditorWindow) {
-			Table table = (Table)cellEditorWindow.getParent(); 
-			int idx = table.getSelectionIndex();
-			Dependency d= ((Map.Entry<IClasspathEntry, Dependency>) table.getItem(idx).getData()).getValue();
-			EditDependencyDialog editDependencyDialog = new EditDependencyDialog(cellEditorWindow.getShell());
-			editDependencyDialog.setDependency(d);
-			if(editDependencyDialog.open() == Window.OK) {
-				return editDependencyDialog.getDependency();
-			}
-			return d;
-		}
-	}
-    */
-
 	private Button addSelectionButton(Composite container, String label,
 			final boolean ischecked) {
 		Button button = new Button(container, SWT.NONE);
@@ -429,7 +344,7 @@ public class IdentifyMavenDependencyPage extends WizardPage {
 		button.addSelectionListener(new SelectionListener() {
 			public void widgetSelected(SelectionEvent e) {
 				initDependencyMap( );
-				dependenciesViewer.setInput(dependencyMap.entrySet());
+				dependenciesViewer.setInput(dependencyMap.keySet());
 				dependenciesViewer.setAllChecked(true);
 				refresh();
 			}
@@ -449,7 +364,7 @@ public class IdentifyMavenDependencyPage extends WizardPage {
 		button.setText(label);
 		button.addSelectionListener(new SelectionListener() {
 			public void widgetSelected(SelectionEvent e) {
-				runIdentificationJobs();
+				runIdentificationJobs(null);
 			}
 
 			public void widgetDefaultSelected(SelectionEvent e) {
@@ -460,26 +375,30 @@ public class IdentifyMavenDependencyPage extends WizardPage {
 		return button;
 	}
 	
-	protected void runIdentificationJobs() {
+	protected void runIdentificationJobs(IProgressMonitor monitor) {
 		
 		initJobs();
+		if (monitor == null) {
+			monitor = new NullProgressMonitor();
+		}
 		for (Map.Entry<IClasspathEntry, Dependency> entry : dependencyMap.entrySet()) {
 			if (entry.getValue() != null) {
 				//don't need to run identification
-				continue;
+				//continue;
 			}
 			IdentifyJarJob job = identificationJobs.get(entry.getKey());
 			if (job != null) {
+				job.setProgressGroup(monitor, 1);
 				int jobState = job.getState();
 				if (jobState == Job.NONE) {
+					job.setRequestedProcess(Task.ALL);
 					job.schedule();
 				}
 			}
 		}
-		
 	}
 
-	protected void refresh() {
+	private synchronized void refresh() {
 		if (dependenciesViewer != null && !dependenciesViewer.getTable().isDisposed()) {
 			dependenciesViewer.refresh();
 		}
@@ -490,16 +409,15 @@ public class IdentifyMavenDependencyPage extends WizardPage {
 				return;
 			}
 		} 
+		setPageComplete(hasNoRunningJobs());
 		setMessage(MESSAGE);
 	}
 	
-
-    static String toString(Dependency d) {
+    private static String toString(Dependency d) {
 		if (d == null) {
-			return "   Unidentified dependency";
+			return "Unidentified dependency";
 		}
-		StringBuilder text = new StringBuilder("   ");
-		text.append(d.getGroupId())
+		StringBuilder text = new StringBuilder(d.getGroupId())
 		.append(":")
 		.append(d.getArtifactId())
 		.append(":")
@@ -507,7 +425,7 @@ public class IdentifyMavenDependencyPage extends WizardPage {
 		return text.toString();
 	}
     
-    void initJobs() {
+    private void initJobs() {
     	if (identificationJobs == null) {
     		identificationJobs = new HashMap<IClasspathEntry, IdentifyJarJob>(dependencyMap.size());
     		
@@ -515,65 +433,86 @@ public class IdentifyMavenDependencyPage extends WizardPage {
     		IFileIdentificationManager fileIdentificationManager = new FileIdentificationManager();
     		
     		for (final TableItem item : t.getItems()) {
-    			final Map.Entry<IClasspathEntry, Dependency> entry = (Map.Entry<IClasspathEntry, Dependency>)item.getData();
-    			if (entry.getValue() != null) {
+    			final IClasspathEntry cpe = (IClasspathEntry)item.getData();
+    			Dependency dep = dependencyMap.get(cpe);
+    			if (dep != null) {
     				//already identified
     				continue;
     			}
     			File jar;
 				try {
-					jar = ConversionUtils.getFile(entry.getKey());
+					jar = ConversionUtils.getFile(cpe);
 					
 					final IdentifyJarJob job = new IdentifyJarJob("Search the Maven coordinates for "+jar.getAbsolutePath(), fileIdentificationManager, jar);
 					job.addJobChangeListener(new IJobChangeListener() {
 						
 						@Override
 						public void sleeping(IJobChangeEvent event) {
+							//refreshUI();
 						}
 						
 						@Override
 						public void scheduled(IJobChangeEvent event) {
-							item.setImage(DEPENDENCY_COLUMN, loadingImage);
-							item.setText(DEPENDENCY_COLUMN, "Identification in progress...");
+							//refreshUI();
 						}
 						
 						@Override
 						public void running(IJobChangeEvent event) {
+							refreshUI();
 						}
 						
 						@Override
 						public void done(IJobChangeEvent event) {
-							Display.getDefault().asyncExec(new Runnable() {
-								@Override
-								public void run() {
-									Dependency d = job.getDependency();
-									isResolved(d, new NullProgressMonitor());
-									dependencyMap.put(entry.getKey(), d);
-									refresh();
-								}
-							});
+							Dependency d = job.getDependency();
+							dependencyMap.put(cpe, d);
+							if (d != null) {
+								dependencyResolution.put(d, job.isResolvable());
+							}
+							refreshUI();
 						}
 						
 						@Override
 						public void awake(IJobChangeEvent event) {
-							// TODO Auto-generated method stub
-							
+							//refreshUI();							
 						}
 						
 						@Override
 						public void aboutToRun(IJobChangeEvent event) {
-							// TODO Auto-generated method stub
-							
+							//refreshUI();
+						}
+						
+						private void refreshUI() {
+							Display.getDefault().syncExec(new Runnable() {
+								@Override
+								public void run() {
+									refresh(cpe);
+								}
+							});
 						}
 					});
-					identificationJobs.put(entry.getKey(), job);
+					identificationJobs.put(cpe, job);
 				} catch (CoreException e) {
 					e.printStackTrace();
 				}
     		}    		
     	}
-    	
     }
+
+	private synchronized void refresh(IClasspathEntry key) {
+		if (dependenciesViewer == null || dependenciesViewer.getTable().isDisposed()) {
+			return;
+		}
+		//dependenciesViewer.refresh();
+		for (TableItem item : dependenciesViewer.getTable().getItems()) {
+			@SuppressWarnings("unchecked")
+			final IClasspathEntry cpe = (IClasspathEntry)item.getData();
+			if (cpe.equals(key)) {
+				dependenciesViewer.refresh(cpe, false);
+				setPageComplete(hasNoRunningJobs());
+				return;
+			}
+		}
+	}
 
 	public List<Dependency> getDependencies() {
 		if (dependenciesViewer == null || dependenciesViewer.getTable().isDisposed()) {
@@ -582,8 +521,8 @@ public class IdentifyMavenDependencyPage extends WizardPage {
 		Object[] selection = dependenciesViewer.getCheckedElements();
 		List<Dependency> dependencies = new ArrayList<Dependency>(selection.length);
 		for (Object o : selection) {
-			Map.Entry<IClasspathEntry, Dependency> entry = (Map.Entry<IClasspathEntry, Dependency>) o;
-			Dependency d = entry.getValue();
+			IClasspathEntry cpe = (IClasspathEntry) o;
+			Dependency d = dependencyMap.get(cpe);
 			if (d != null) {
 				dependencies.add(d);
 			}
@@ -596,32 +535,61 @@ public class IdentifyMavenDependencyPage extends WizardPage {
 		return deleteJars;
 	}
 
-	private boolean isResolved(Dependency d, IProgressMonitor monitor) {
+	private boolean isResolved(Dependency d) {
 		if (d == null) {
 			return false;
 		}
-		if (monitor == null) {
-			monitor = new NullProgressMonitor();
-		}
 		Boolean resolved = dependencyResolution.get(d);
-		if (resolved == null) {
-			String groupId = d.getGroupId();
-			String artifactId = d.getArtifactId();
-			String version = d.getVersion();
-			String type = d.getType();
-			String classifier = d.getClassifier();
-			IMaven maven = MavenPlugin.getMaven();
-			Artifact a =null;
-			try {
-				List<ArtifactRepository> artifactRepositories = maven.getArtifactRepositories();
-				a = maven.resolve(groupId , artifactId , version , type , classifier , artifactRepositories , monitor);
-			} catch(CoreException e) {
-				//ignore
-			}
-			resolved = a != null && a.isResolved();
-			dependencyResolution.put (d, resolved);
-		}
-		return resolved;
+		return resolved == null? false:resolved.booleanValue();
 	}
 	
+	private class DependencyLabelProvider extends ColumnLabelProvider {
+			@Override
+			@SuppressWarnings("unchecked")
+			public String getText(Object element) {
+				IClasspathEntry cpe = (IClasspathEntry) element;
+				IdentifyJarJob job = identificationJobs ==null? null:identificationJobs.get(cpe);
+				if (job != null) {
+					int jobState = job.getState();
+					if (jobState == Job.RUNNING || jobState == Job.WAITING) {
+						return "Identification in progress...";
+					}
+				}
+				Dependency d = dependencyMap.get(cpe);
+				return IdentifyMavenDependencyPage.toString(d);
+			}
+			
+			@Override
+			@SuppressWarnings("unchecked")
+			public Image getImage(Object element) {
+				IClasspathEntry cpe = (IClasspathEntry) element;
+				IdentifyJarJob job = identificationJobs ==null? null:identificationJobs.get(cpe);
+				if (job != null) {
+					int jobState = job.getState();
+					if (jobState == Job.RUNNING || jobState == Job.WAITING) {
+						return loadingImage;
+					}
+				}
+				
+				Dependency d = dependencyMap.get(cpe);
+				
+				if (d == null) {
+					return failedImage;
+				} else {
+					Image img;
+					if (isResolved(d)) {
+						img = okImage;
+					} else {
+						img = unresolvedImage;
+					}
+					return img;
+				}
+			}
+	}
+
+	public void cancel() {
+		for (IdentifyJarJob job : identificationJobs.values()) {
+			job.cancel();
+		}
+	}
 }
