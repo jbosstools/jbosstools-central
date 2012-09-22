@@ -49,6 +49,12 @@ public class ConvertToMavenDependencyWizard extends Wizard {
 		//addPage(page2);
 	}
 	
+	@Override
+	public boolean performCancel() {
+		identificationPage.cancel();
+		return super.performCancel();
+	}
+	
 	
 	@Override
 	public boolean performFinish() {
