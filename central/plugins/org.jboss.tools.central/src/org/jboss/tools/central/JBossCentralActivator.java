@@ -284,37 +284,37 @@ public class JBossCentralActivator extends AbstractUIPlugin {
 		final WorkbenchWindow window = (WorkbenchWindow) PlatformUI
 				.getWorkbench().getActiveWorkbenchWindow();
 		final IWorkbenchPage page = window.getActivePage();
-		if (page.findView(ORG_ECLIPSE_UI_INTERNAL_INTROVIEW) != null
-				&& !window.getCoolBarVisible()
-				&& !window.getPerspectiveBarVisible()) {
-			IViewReference viewRef = page
-					.findViewReference(ORG_ECLIPSE_UI_INTERNAL_INTROVIEW);
-			if (page.getPartState(viewRef) == IWorkbenchPage.STATE_MAXIMIZED) {
-				window.addPropertyChangeListener(new IPropertyChangeListener() {
-
-					@Override
-					public void propertyChange(PropertyChangeEvent event) {
-						String property = event.getProperty();
-						if (WorkbenchWindow.PROP_COOLBAR_VISIBLE
-								.equals(property)
-								|| WorkbenchWindow.PROP_COOLBAR_VISIBLE
-										.equals(property)) {
-							Object newValue = event.getNewValue();
-							if (newValue instanceof Boolean
-									&& ((Boolean) newValue).booleanValue()) {
-								openJBossCentralEditor(page);
-								window.removePropertyChangeListener(this);
-							}
-						}
-					}
-				});
-			} else {
-				return openJBossCentralEditor(page);
-			}
-		} else {
-			return openJBossCentralEditor(page);
-		}
-		return null;
+//		if (page.findView(ORG_ECLIPSE_UI_INTERNAL_INTROVIEW) != null
+//				&& !window.getCoolBarVisible()
+//				&& !window.getPerspectiveBarVisible()) {
+//			IViewReference viewRef = page
+//					.findViewReference(ORG_ECLIPSE_UI_INTERNAL_INTROVIEW);
+//			if (page.getPartState(viewRef) == IWorkbenchPage.STATE_MAXIMIZED) {
+//				window.addPropertyChangeListener(new IPropertyChangeListener() {
+//
+//					@Override
+//					public void propertyChange(PropertyChangeEvent event) {
+//						String property = event.getProperty();
+//						if (WorkbenchWindow.PROP_COOLBAR_VISIBLE
+//								.equals(property)
+//								|| WorkbenchWindow.PROP_COOLBAR_VISIBLE
+//										.equals(property)) {
+//							Object newValue = event.getNewValue();
+//							if (newValue instanceof Boolean
+//									&& ((Boolean) newValue).booleanValue()) {
+//								openJBossCentralEditor(page);
+//								window.removePropertyChangeListener(this);
+//							}
+//						}
+//					}
+//				});
+//			} else {
+//				return openJBossCentralEditor(page);
+//			}
+//		} else {
+//			return openJBossCentralEditor(page);
+//		}
+		return openJBossCentralEditor(page);
 	}
 
 	protected static JBossCentralEditor openJBossCentralEditor(
