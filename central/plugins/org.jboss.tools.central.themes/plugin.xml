@@ -6,12 +6,12 @@
       <theme
             basestylesheeturi="css/jbt.css"
             id="org.jboss.tools.central.themes.jbds"
-            label="JBoss Tools &amp; Developer Studio">
+            label="JBoss Tools - Red">
       </theme>
       <theme
             basestylesheeturi="css/jboss.css"
             id="org.jboss.tools.central.themes.community"
-            label="JBoss Community Theme">
+            label="JBoss Tools - Blue">
       </theme>
    </extension>
 
