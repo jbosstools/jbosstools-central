@@ -32,6 +32,9 @@ import org.eclipse.jdt.core.IClasspathContainer;
 import org.eclipse.jdt.core.IClasspathEntry;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.JavaCore;
+import org.eclipse.jface.dialogs.Dialog;
+import org.eclipse.jface.layout.GridDataFactory;
+import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.CheckStateChangedEvent;
 import org.eclipse.jface.viewers.CheckboxTableViewer;
@@ -39,6 +42,7 @@ import org.eclipse.jface.viewers.ColumnLabelProvider;
 import org.eclipse.jface.viewers.ICheckStateListener;
 import org.eclipse.jface.viewers.TableViewerColumn;
 import org.eclipse.jface.window.Window;
+import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -51,6 +55,7 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Link;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
@@ -68,6 +73,7 @@ import org.jboss.tools.maven.conversion.ui.internal.jobs.IdentifyProjectJob;
 import org.jboss.tools.maven.core.identification.IFileIdentificationManager;
 import org.jboss.tools.maven.core.identification.IdentificationUtil;
 import org.jboss.tools.maven.core.internal.identification.FileIdentificationManager;
+import org.jboss.tools.maven.ui.wizard.ConfigureMavenRepositoriesWizard;
 
 public class IdentifyMavenDependencyPage extends WizardPage {
 
@@ -105,6 +111,10 @@ public class IdentifyMavenDependencyPage extends WizardPage {
 	private Button startIdentification;
 
 	private Button stopButton;
+
+	private Label warningImg;
+
+	private Link warningLink;
 
 	private static String MESSAGE = "Identify existing classpath entries as Maven dependencies. Double-click on a Maven Dependency to edit its details";
 
@@ -159,6 +169,31 @@ public class IdentifyMavenDependencyPage extends WizardPage {
 		loadingImage = MavenDependencyConversionActivator.getLoadingIcon();
 	}
 
+	private void createWarning(Composite container) {
+		warningImg = new Label(container,  SWT.CENTER); 
+		warningLink = new Link(container, SWT.NONE);
+		warningLink.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 2, 1));
+		GridDataFactory.fillDefaults().align(SWT.LEFT, SWT.CENTER).applyTo(warningImg);
+		warningImg.setImage(JFaceResources.getImage(Dialog.DLG_IMG_MESSAGE_WARNING));
+		warningLink.setText("Some selected dependencies can not be resolved. Click <a>here</a> to configure repositories in your settings.xml.");
+		warningLink.addSelectionListener(new SelectionListener() {
+	        public void widgetSelected(SelectionEvent e) {
+	          openSettingsRepositoriesWizard();
+	        }
+
+	        private void openSettingsRepositoriesWizard() {
+				ConfigureMavenRepositoriesWizard wizard = new ConfigureMavenRepositoriesWizard();
+				WizardDialog dialog = new WizardDialog(Display.getDefault().getActiveShell(), wizard);
+				dialog.create();
+				dialog.open(); 
+			}
+
+			public void widgetDefaultSelected(SelectionEvent e) {
+	        	widgetSelected(e);
+	        }
+	      });
+	}
+	
 	@Override
 	public void createControl(Composite parent) {
 
@@ -177,6 +212,8 @@ public class IdentifyMavenDependencyPage extends WizardPage {
 
 		setMessage(MESSAGE);
 
+		createWarning(container);
+		
 		displayDependenciesTable(container);
 
 		Link remoteRepoPrefsLink = new Link(container, SWT.NONE);
@@ -422,8 +459,22 @@ public class IdentifyMavenDependencyPage extends WizardPage {
 
 	private synchronized void refresh() {
 		enableIdentificationButtons();
+		displayWarning();
 		setPageComplete(hasNoRunningJobs());
 		//setMessage(MESSAGE);
+	}
+
+	private void displayWarning() {
+		for (Dependency d : getDependencies()) {
+			if (Boolean.FALSE.equals(dependencyResolution.get(d))) {
+				setVisible(warningImg, true);
+				setVisible(warningLink, true);
+				return;
+			}
+		} 
+		setVisible(warningImg, false);
+		setVisible(warningLink, false);
+
 	}
 
 	private void setVisible(Control control, boolean visible) {
@@ -561,6 +612,7 @@ public class IdentifyMavenDependencyPage extends WizardPage {
 				}
 			}
 		} finally {
+			displayWarning();
 			enableIdentificationButtons();
 		}
 	}

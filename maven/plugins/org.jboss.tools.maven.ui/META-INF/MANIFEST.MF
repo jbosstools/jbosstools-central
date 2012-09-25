@@ -26,4 +26,5 @@ Bundle-Vendor: %Bundle-Vendor
 Export-Package: org.jboss.tools.maven.ui,
  org.jboss.tools.maven.ui.internal.libprov,
  org.jboss.tools.maven.ui.internal.project.facet,
- org.jboss.tools.maven.ui.preferences
+ org.jboss.tools.maven.ui.preferences,
+ org.jboss.tools.maven.ui.wizard
