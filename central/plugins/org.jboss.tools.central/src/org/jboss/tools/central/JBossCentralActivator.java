@@ -25,21 +25,18 @@ import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.ImageRegistry;
-import org.eclipse.jface.util.IPropertyChangeListener;
-import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.browser.Browser;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
-import org.eclipse.ui.IViewReference;
 import org.eclipse.ui.IWorkbenchPage;
+import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.browser.IWebBrowser;
 import org.eclipse.ui.browser.IWorkbenchBrowserSupport;
-import org.eclipse.ui.internal.WorkbenchWindow;
 import org.eclipse.ui.internal.browser.WebBrowserPreference;
 import org.eclipse.ui.internal.browser.WorkbenchBrowserSupport;
 import org.eclipse.ui.menus.CommandContributionItem;
@@ -281,7 +278,7 @@ public class JBossCentralActivator extends AbstractUIPlugin {
 	}
 
 	public static JBossCentralEditor getJBossCentralEditor() {
-		final WorkbenchWindow window = (WorkbenchWindow) PlatformUI
+		final IWorkbenchWindow window = PlatformUI
 				.getWorkbench().getActiveWorkbenchWindow();
 		final IWorkbenchPage page = window.getActivePage();
 //		if (page.findView(ORG_ECLIPSE_UI_INTERNAL_INTROVIEW) != null
