@@ -94,6 +94,7 @@ public abstract class IdentificationJob extends Job {
 		if (monitor.isCanceled()) {
 			return;
 		}
+		resolvable = Boolean.FALSE;
 		String groupId = dependency.getGroupId();
 		String artifactId = dependency.getArtifactId();
 		String version = dependency.getVersion();
@@ -102,7 +103,12 @@ public abstract class IdentificationJob extends Job {
 		IMaven maven = MavenPlugin.getMaven();
 		
 		List<ArtifactRepository> artifactRepositories = maven.getArtifactRepositories();
-		Artifact a = maven.resolve(groupId , artifactId , version , type , classifier , artifactRepositories , monitor);
+		Artifact a = null;
+		try {
+			a = maven.resolve(groupId , artifactId , version , type , classifier , artifactRepositories , monitor);
+		} catch (CoreException e) {
+			//Expected 
+		}
 		resolvable = (a != null && a.isResolved());
 	}
 
