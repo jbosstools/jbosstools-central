@@ -49,19 +49,22 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Link;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
+import org.eclipse.ui.dialogs.PreferencesUtil;
 import org.jboss.tools.maven.conversion.ui.dialog.xpl.ConversionUtils;
 import org.jboss.tools.maven.conversion.ui.dialog.xpl.EditDependencyDialog;
 import org.jboss.tools.maven.conversion.ui.internal.CellListener;
 import org.jboss.tools.maven.conversion.ui.internal.MavenDependencyConversionActivator;
 import org.jboss.tools.maven.conversion.ui.internal.jobs.DependencyResolutionJob;
 import org.jboss.tools.maven.conversion.ui.internal.jobs.IdentificationJob;
+import org.jboss.tools.maven.conversion.ui.internal.jobs.IdentificationJob.Task;
 import org.jboss.tools.maven.conversion.ui.internal.jobs.IdentifyJarJob;
 import org.jboss.tools.maven.conversion.ui.internal.jobs.IdentifyProjectJob;
-import org.jboss.tools.maven.conversion.ui.internal.jobs.IdentificationJob.Task;
 import org.jboss.tools.maven.core.identification.IFileIdentificationManager;
 import org.jboss.tools.maven.core.identification.IdentificationUtil;
 import org.jboss.tools.maven.core.internal.identification.FileIdentificationManager;
@@ -98,6 +101,10 @@ public class IdentifyMavenDependencyPage extends WizardPage {
 	private Button deleteJarsBtn;
 	
 	private boolean deleteJars;
+
+	private Button startIdentification;
+
+	private Button stopButton;
 
 	private static String MESSAGE = "Identify existing classpath entries as Maven dependencies. Double-click on a Maven Dependency to edit its details";
 
@@ -172,6 +179,20 @@ public class IdentifyMavenDependencyPage extends WizardPage {
 
 		displayDependenciesTable(container);
 
+		Link remoteRepoPrefsLink = new Link(container, SWT.NONE);
+		remoteRepoPrefsLink.setText("Manage <a>remote repositories</a> used to identify dependencies.");
+		GridData gd = new GridData(SWT.FILL, SWT.FILL, true, true, 3, 1);
+		remoteRepoPrefsLink.setLayoutData(gd);
+		remoteRepoPrefsLink.addSelectionListener(new SelectionListener() {
+	        public void widgetSelected(SelectionEvent e) {
+	          openRemoteRepoPrefs();
+	        }
+
+	        public void widgetDefaultSelected(SelectionEvent e) {
+	        	widgetSelected(e);
+	        }
+	      });
+
 		deleteJarsBtn = addCheckButton(container, "Delete classpath entries from project", deleteJars);
 		deleteJarsBtn.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
@@ -190,8 +211,14 @@ public class IdentifyMavenDependencyPage extends WizardPage {
 		checkBtn.setSelection(selected);
 		return checkBtn;
 	}
-	
+
+    private void openRemoteRepoPrefs() {
+	      String id = "org.jboss.tools.maven.ui.preferences.RemoteRepositoriesPreferencePage";
+	      PreferencesUtil.createPreferenceDialogOn(getShell(), id, new String[] {id}, null).open();
+	}
+    
 	private void displayDependenciesTable(Composite container) {
+		
 		GridData gd = new GridData(SWT.FILL, SWT.FILL, true, true, 2, 4);
 		gd.heightHint = 500;
 		gd.widthHint = 545;
@@ -295,11 +322,8 @@ public class IdentifyMavenDependencyPage extends WizardPage {
 		
 		addSelectionButton(container, "Select All", true);
 		addSelectionButton(container, "Deselect All", false);
-		if (Boolean.getBoolean("org.jboss.tools.maven.conversion.debug")) {
-			addIdentifyButton(container, "Identify dependencies");
-			addResetButton(container, "Reset");
-		}
-
+		addIdentifyButton(container, "Identify dependencies");
+		addStopButton(container, "Stop identification");
 	}
 
 
@@ -314,7 +338,7 @@ public class IdentifyMavenDependencyPage extends WizardPage {
 	
 	public boolean hasNoRunningJobs() {
 		for (IdentificationJob job : identificationJobs.values()) {
-			if (job.getState() == Job.RUNNING){
+			if (job.getState() == Job.RUNNING || job.getState() == Job.WAITING){
 				return false;
 			}
 		}
@@ -340,42 +364,36 @@ public class IdentifyMavenDependencyPage extends WizardPage {
 		return button;
 	}
 
-	private Button addResetButton(Composite container, String label) {
-		Button button = new Button(container, SWT.NONE);
-		button.setLayoutData(new GridData(SWT.FILL, SWT.UP, false, false, 1, 1));
-		button.setText(label);
-		button.addSelectionListener(new SelectionListener() {
+	private void addStopButton(Composite container, String label) {
+		stopButton = new Button(container, SWT.NONE);
+		stopButton.setLayoutData(new GridData(SWT.FILL, SWT.UP, false, false, 1, 1));
+		stopButton.setText(label);
+		stopButton.addSelectionListener(new SelectionListener() {
 			public void widgetSelected(SelectionEvent e) {
-				initDependencyMap( );
-				dependenciesViewer.setInput(dependencyMap.keySet());
-				dependenciesViewer.setAllChecked(true);
+				cancel();
 				refresh();
 			}
 
 			public void widgetDefaultSelected(SelectionEvent e) {
-
+				widgetSelected(e);
 			}
 		});
-
-		return button;
 	}
 
 	
-	private Button addIdentifyButton(Composite container, String label) {
-		Button button = new Button(container, SWT.NONE);
-		button.setLayoutData(new GridData(SWT.FILL, SWT.UP, false, false, 1, 1));
-		button.setText(label);
-		button.addSelectionListener(new SelectionListener() {
+	private void addIdentifyButton(Composite container, String label) {
+		startIdentification = new Button(container, SWT.NONE);
+		startIdentification.setLayoutData(new GridData(SWT.FILL, SWT.UP, false, false, 1, 1));
+		startIdentification.setText(label);
+		startIdentification.addSelectionListener(new SelectionListener() {
 			public void widgetSelected(SelectionEvent e) {
 				runIdentificationJobs(null);
 			}
 
 			public void widgetDefaultSelected(SelectionEvent e) {
-
+				widgetSelected(e);
 			}
 		});
-
-		return button;
 	}
 	
 	protected void runIdentificationJobs(IProgressMonitor monitor) {
@@ -399,21 +417,33 @@ public class IdentifyMavenDependencyPage extends WizardPage {
 				}
 			}
 		}
+		refresh();
 	}
 
 	private synchronized void refresh() {
+		enableIdentificationButtons();
+		setPageComplete(hasNoRunningJobs());
+		//setMessage(MESSAGE);
+	}
+
+	private void setVisible(Control control, boolean visible) {
+		if (control != null && !control.isDisposed()) {
+			control.setVisible(visible);
+		}
+	}
+
+	private void enableIdentificationButtons() {
+		boolean hasNoRunningJobs = hasNoRunningJobs();
+		if (startIdentification != null && !startIdentification.isDisposed()) {
+			startIdentification.setEnabled(hasNoRunningJobs);
+		}
+		if (stopButton != null && !stopButton.isDisposed()) {
+			stopButton.setEnabled(!hasNoRunningJobs);
+		}
+		
 		if (dependenciesViewer != null && !dependenciesViewer.getTable().isDisposed()) {
 			dependenciesViewer.refresh();
 		}
-		
-		for (Dependency d : getDependencies()) {
-			if (Boolean.FALSE.equals(dependencyResolution.get(d))) {
-				setMessage("Some selected dependencies can not be resolved using the repositories from your settings.xml", WARNING);
-				return;
-			}
-		} 
-		setPageComplete(hasNoRunningJobs());
-		setMessage(MESSAGE);
 	}
 	
     private static String toString(Dependency d) {
@@ -513,21 +543,25 @@ public class IdentifyMavenDependencyPage extends WizardPage {
 			return;
 		}
 		//dependenciesViewer.refresh();
-		for (TableItem item : dependenciesViewer.getTable().getItems()) {
-			@SuppressWarnings("unchecked")
-			final IClasspathEntry cpe = (IClasspathEntry)item.getData();
-			if (cpe.equals(key)) {
-				dependenciesViewer.refresh(cpe, false);
-				//Don't force check when there's an existing dependency, only uncheck if they're is not.
-				if (dependencyMap.get(cpe) == null) {
-					Job job = identificationJobs.get(cpe);
-					if (job != null && job.getState() == Job.NONE) {
-						dependenciesViewer.setChecked(cpe, false);
+		try {
+			for (TableItem item : dependenciesViewer.getTable().getItems()) {
+				@SuppressWarnings("unchecked")
+				final IClasspathEntry cpe = (IClasspathEntry)item.getData();
+				if (cpe.equals(key)) {
+					dependenciesViewer.refresh(cpe, false);
+					//Don't force check when there's an existing dependency, only uncheck if they're is not.
+					if (dependencyMap.get(cpe) == null) {
+						Job job = identificationJobs.get(cpe);
+						if (job != null && job.getState() == Job.NONE) {
+							dependenciesViewer.setChecked(cpe, false);
+						}
 					}
+					setPageComplete(hasNoRunningJobs());
+					return;
 				}
-				setPageComplete(hasNoRunningJobs());
-				return;
 			}
+		} finally {
+			enableIdentificationButtons();
 		}
 	}
 
