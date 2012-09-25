@@ -55,10 +55,13 @@ import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 import org.jboss.tools.maven.conversion.ui.dialog.xpl.ConversionUtils;
 import org.jboss.tools.maven.conversion.ui.dialog.xpl.EditDependencyDialog;
-import org.jboss.tools.maven.conversion.ui.handlers.IdentifyJarJob;
-import org.jboss.tools.maven.conversion.ui.handlers.IdentifyJarJob.Task;
 import org.jboss.tools.maven.conversion.ui.internal.CellListener;
 import org.jboss.tools.maven.conversion.ui.internal.MavenDependencyConversionActivator;
+import org.jboss.tools.maven.conversion.ui.internal.jobs.DependencyResolutionJob;
+import org.jboss.tools.maven.conversion.ui.internal.jobs.IdentificationJob;
+import org.jboss.tools.maven.conversion.ui.internal.jobs.IdentifyJarJob;
+import org.jboss.tools.maven.conversion.ui.internal.jobs.IdentifyProjectJob;
+import org.jboss.tools.maven.conversion.ui.internal.jobs.IdentificationJob.Task;
 import org.jboss.tools.maven.core.identification.IFileIdentificationManager;
 import org.jboss.tools.maven.core.identification.IdentificationUtil;
 import org.jboss.tools.maven.core.internal.identification.FileIdentificationManager;
@@ -75,7 +78,7 @@ public class IdentifyMavenDependencyPage extends WizardPage {
 
 	private Map<IClasspathEntry, Dependency> dependencyMap;
 
-	private Map<IClasspathEntry, IdentifyJarJob> identificationJobs;
+	private Map<IClasspathEntry, IdentificationJob> identificationJobs;
 
 	private Set<IClasspathEntry> initialEntries;
 
@@ -260,7 +263,7 @@ public class IdentifyMavenDependencyPage extends WizardPage {
 				if (columnIndex == DEPENDENCY_COLUMN) {
 					IClasspathEntry cpe = (IClasspathEntry) item.getData();
 					
-					IdentifyJarJob job = identificationJobs.get(cpe);
+					IdentificationJob job = identificationJobs.get(cpe);
 					if (Job.RUNNING == job.getState()) {
 						return;
 					}
@@ -302,7 +305,7 @@ public class IdentifyMavenDependencyPage extends WizardPage {
 
 	private void resolve(IClasspathEntry cpe, Dependency d) {
 		if (d != null) {
-			IdentifyJarJob job = identificationJobs.get(cpe);
+			IdentificationJob job = identificationJobs.get(cpe);
 			job.setDependency(d);
 			job.setRequestedProcess(Task.RESOLUTION_ONLY);
 			job.schedule();
@@ -310,7 +313,7 @@ public class IdentifyMavenDependencyPage extends WizardPage {
 	}
 	
 	public boolean hasNoRunningJobs() {
-		for (IdentifyJarJob job : identificationJobs.values()) {
+		for (IdentificationJob job : identificationJobs.values()) {
 			if (job.getState() == Job.RUNNING){
 				return false;
 			}
@@ -386,7 +389,7 @@ public class IdentifyMavenDependencyPage extends WizardPage {
 				//don't need to run identification
 				//continue;
 			}
-			IdentifyJarJob job = identificationJobs.get(entry.getKey());
+			IdentificationJob job = identificationJobs.get(entry.getKey());
 			if (job != null) {
 				job.setProgressGroup(monitor, 1);
 				int jobState = job.getState();
@@ -427,7 +430,7 @@ public class IdentifyMavenDependencyPage extends WizardPage {
     
     private void initJobs() {
     	if (identificationJobs == null) {
-    		identificationJobs = new HashMap<IClasspathEntry, IdentifyJarJob>(dependencyMap.size());
+    		identificationJobs = new HashMap<IClasspathEntry, IdentificationJob>(dependencyMap.size());
     		
     		Table t = dependenciesViewer.getTable();
     		IFileIdentificationManager fileIdentificationManager = new FileIdentificationManager();
@@ -441,9 +444,16 @@ public class IdentifyMavenDependencyPage extends WizardPage {
     			}
     			File jar;
 				try {
-					jar = ConversionUtils.getFile(cpe);
+					final IdentificationJob job;
+					if (cpe.getEntryKind() == IClasspathEntry.CPE_PROJECT) {
+						job = new IdentifyProjectJob("Search the Maven coordinates for "+cpe.getPath(), cpe.getPath());
+					} else if (cpe.getEntryKind() == IClasspathEntry.CPE_LIBRARY) {
+						jar = ConversionUtils.getFile(cpe);
+						job = new IdentifyJarJob("Search the Maven coordinates for "+jar.getAbsolutePath(), fileIdentificationManager, jar);
+					} else {
+						job = new DependencyResolutionJob("Resolve the Maven dependency for "+cpe.getPath());
+					}
 					
-					final IdentifyJarJob job = new IdentifyJarJob("Search the Maven coordinates for "+jar.getAbsolutePath(), fileIdentificationManager, jar);
 					job.addJobChangeListener(new IJobChangeListener() {
 						
 						@Override
@@ -508,6 +518,13 @@ public class IdentifyMavenDependencyPage extends WizardPage {
 			final IClasspathEntry cpe = (IClasspathEntry)item.getData();
 			if (cpe.equals(key)) {
 				dependenciesViewer.refresh(cpe, false);
+				//Don't force check when there's an existing dependency, only uncheck if they're is not.
+				if (dependencyMap.get(cpe) == null) {
+					Job job = identificationJobs.get(cpe);
+					if (job != null && job.getState() == Job.NONE) {
+						dependenciesViewer.setChecked(cpe, false);
+					}
+				}
 				setPageComplete(hasNoRunningJobs());
 				return;
 			}
@@ -530,7 +547,6 @@ public class IdentifyMavenDependencyPage extends WizardPage {
 		return dependencies;
 	}
 
-
 	public boolean isDeleteJars() {
 		return deleteJars;
 	}
@@ -548,7 +564,7 @@ public class IdentifyMavenDependencyPage extends WizardPage {
 			@SuppressWarnings("unchecked")
 			public String getText(Object element) {
 				IClasspathEntry cpe = (IClasspathEntry) element;
-				IdentifyJarJob job = identificationJobs ==null? null:identificationJobs.get(cpe);
+				IdentificationJob job = identificationJobs ==null? null:identificationJobs.get(cpe);
 				if (job != null) {
 					int jobState = job.getState();
 					if (jobState == Job.RUNNING || jobState == Job.WAITING) {
@@ -563,7 +579,7 @@ public class IdentifyMavenDependencyPage extends WizardPage {
 			@SuppressWarnings("unchecked")
 			public Image getImage(Object element) {
 				IClasspathEntry cpe = (IClasspathEntry) element;
-				IdentifyJarJob job = identificationJobs ==null? null:identificationJobs.get(cpe);
+				IdentificationJob job = identificationJobs ==null? null:identificationJobs.get(cpe);
 				if (job != null) {
 					int jobState = job.getState();
 					if (jobState == Job.RUNNING || jobState == Job.WAITING) {
@@ -588,7 +604,7 @@ public class IdentifyMavenDependencyPage extends WizardPage {
 	}
 
 	public void cancel() {
-		for (IdentifyJarJob job : identificationJobs.values()) {
+		for (IdentificationJob job : identificationJobs.values()) {
 			job.cancel();
 		}
 	}
