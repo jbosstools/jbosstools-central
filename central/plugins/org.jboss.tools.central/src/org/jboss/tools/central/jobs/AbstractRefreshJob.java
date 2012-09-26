@@ -22,7 +22,7 @@ import org.eclipse.core.runtime.jobs.Job;
 import org.jboss.tools.central.JBossCentralActivator;
 import org.jboss.tools.central.model.FeedsEntry;
 import org.jboss.tools.project.examples.ProjectExamplesActivator;
-import org.jboss.tools.project.examples.filetransfer.ECFExamplesTransport;
+import org.jboss.tools.runtime.core.util.ECFTransport;
 
 import com.sun.syndication.feed.synd.SyndContent;
 import com.sun.syndication.feed.synd.SyndEntry;
@@ -183,14 +183,14 @@ public abstract class AbstractRefreshJob extends Job {
 				File tempFile = File.createTempFile("news", ".xml");
 				tempFile.deleteOnExit();
 				OutputStream destination = new FileOutputStream(tempFile);
-				IStatus status = ECFExamplesTransport.getInstance().download(
+				IStatus status = ECFTransport.getInstance().download(
 						cacheFile.getName(), urlString, destination, monitor);
 				URL url = getURL();
 				if (monitor.isCanceled()) {
 					return getValidEntries(monitor);
 				}
 				if (status.isOK() && url != null) {
-					cacheModified = ECFExamplesTransport.getInstance().getLastModified(url);
+					cacheModified = ECFTransport.getInstance().getLastModified(url);
 					ProjectExamplesActivator.copyFile(tempFile, cacheFile);
 					tempFile.delete();
 					if (monitor.isCanceled()) {
@@ -250,7 +250,7 @@ public abstract class AbstractRefreshJob extends Job {
 		}
 		long urlModified;
 		try {
-			urlModified = ECFExamplesTransport.getInstance().getLastModified(
+			urlModified = ECFTransport.getInstance().getLastModified(
 					url);
 		} catch (CoreException e) {
 			exception = e;

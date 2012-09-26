@@ -63,7 +63,7 @@ import org.eclipse.wst.server.core.ServerCore;
 import org.jboss.ide.eclipse.as.core.server.IJBossServerRuntime;
 import org.jboss.tools.project.examples.Messages;
 import org.jboss.tools.project.examples.ProjectExamplesActivator;
-import org.jboss.tools.project.examples.filetransfer.ECFExamplesTransport;
+import org.jboss.tools.runtime.core.util.ECFTransport;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
@@ -771,7 +771,7 @@ public class ProjectExampleUtil {
 				long urlModified = -1;
 				file = getFile(url);
 				try {
-					urlModified = ECFExamplesTransport.getInstance()
+					urlModified = ECFTransport.getInstance()
 							.getLastModified(url);
 				} catch (CoreException e) {
 					if (file.exists()) {
@@ -823,8 +823,8 @@ public class ProjectExampleUtil {
 		return file;
 	}
 
-	private static ECFExamplesTransport getTransport() {
-		return ECFExamplesTransport.getInstance();
+	private static ECFTransport getTransport() {
+		return ECFTransport.getInstance();
 	}
 
 	public static Document getDocument() throws ParserConfigurationException {
