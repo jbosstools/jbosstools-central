@@ -183,7 +183,7 @@ public class ProjectExample implements ProjectModelElement,
 	}
 
 	public String getWelcomeURL() {
-		return welcomeURL;
+		return (welcomeURL == null) ? "" : welcomeURL;
 	}
 
 	public void setWelcomeURL(String welcomeURL) {

@@ -50,6 +50,10 @@ public class ImportMavenArchetypeProjectExampleDelegate extends AbstractImportMa
 			projectDescription.setIncludedProjects(includedProjects);
 		}
 		projectDescription.getIncludedProjects().clear();
+		//JBIDE-12711 : reset welcomeURL for maven archetypes. 
+		projectDescription.setWelcomeURL(null);
+		projectDescription.setWelcome(false);
+		
 		String projectName = (String) propertiesMap.get(ProjectExamplesActivator.PROPERTY_PROJECT_NAME);
 		includedProjects.add(projectName);
 		String artifactId = (String) propertiesMap.get(ProjectExamplesActivator.PROPERTY_ARTIFACT_ID);
