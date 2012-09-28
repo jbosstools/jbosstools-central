@@ -65,7 +65,7 @@ public class ShowJBossCentral implements IStartup {
 
 			@Override
 			public void run() {
-				JBossCentralActivator.getJBossCentralEditor();
+				JBossCentralActivator.getJBossCentralEditor(false);
 			}
 		});
 	}

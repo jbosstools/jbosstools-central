@@ -25,18 +25,21 @@ import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.ImageRegistry;
+import org.eclipse.jface.util.IPropertyChangeListener;
+import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.browser.Browser;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
+import org.eclipse.ui.IViewReference;
 import org.eclipse.ui.IWorkbenchPage;
-import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.browser.IWebBrowser;
 import org.eclipse.ui.browser.IWorkbenchBrowserSupport;
+import org.eclipse.ui.internal.WorkbenchWindow;
 import org.eclipse.ui.internal.browser.WebBrowserPreference;
 import org.eclipse.ui.internal.browser.WorkbenchBrowserSupport;
 import org.eclipse.ui.menus.CommandContributionItem;
@@ -277,41 +280,44 @@ public class JBossCentralActivator extends AbstractUIPlugin {
 		return new CommandContributionItem(parameter);
 	}
 
-	public static JBossCentralEditor getJBossCentralEditor() {
-		final IWorkbenchWindow window = PlatformUI
+	public static JBossCentralEditor getJBossCentralEditor(boolean activate) {
+		final WorkbenchWindow window = (WorkbenchWindow) PlatformUI
 				.getWorkbench().getActiveWorkbenchWindow();
 		final IWorkbenchPage page = window.getActivePage();
-//		if (page.findView(ORG_ECLIPSE_UI_INTERNAL_INTROVIEW) != null
-//				&& !window.getCoolBarVisible()
-//				&& !window.getPerspectiveBarVisible()) {
-//			IViewReference viewRef = page
-//					.findViewReference(ORG_ECLIPSE_UI_INTERNAL_INTROVIEW);
-//			if (page.getPartState(viewRef) == IWorkbenchPage.STATE_MAXIMIZED) {
-//				window.addPropertyChangeListener(new IPropertyChangeListener() {
-//
-//					@Override
-//					public void propertyChange(PropertyChangeEvent event) {
-//						String property = event.getProperty();
-//						if (WorkbenchWindow.PROP_COOLBAR_VISIBLE
-//								.equals(property)
-//								|| WorkbenchWindow.PROP_COOLBAR_VISIBLE
-//										.equals(property)) {
-//							Object newValue = event.getNewValue();
-//							if (newValue instanceof Boolean
-//									&& ((Boolean) newValue).booleanValue()) {
-//								openJBossCentralEditor(page);
-//								window.removePropertyChangeListener(this);
-//							}
-//						}
-//					}
-//				});
-//			} else {
-//				return openJBossCentralEditor(page);
-//			}
-//		} else {
-//			return openJBossCentralEditor(page);
-//		}
-		return openJBossCentralEditor(page);
+		if (activate) {
+			return openJBossCentralEditor(page);
+		}
+		if (page.findView(ORG_ECLIPSE_UI_INTERNAL_INTROVIEW) != null
+				&& !window.getCoolBarVisible()
+				&& !window.getPerspectiveBarVisible()) {
+			IViewReference viewRef = page
+					.findViewReference(ORG_ECLIPSE_UI_INTERNAL_INTROVIEW);
+			if (page.getPartState(viewRef) == IWorkbenchPage.STATE_MAXIMIZED) {
+				window.addPropertyChangeListener(new IPropertyChangeListener() {
+
+					@Override
+					public void propertyChange(PropertyChangeEvent event) {
+						String property = event.getProperty();
+						if (WorkbenchWindow.PROP_COOLBAR_VISIBLE
+								.equals(property)
+								|| WorkbenchWindow.PROP_COOLBAR_VISIBLE
+										.equals(property)) {
+							Object newValue = event.getNewValue();
+							if (newValue instanceof Boolean
+									&& ((Boolean) newValue).booleanValue()) {
+								openJBossCentralEditor(page);
+								window.removePropertyChangeListener(this);
+							}
+						}
+					}
+				});
+			} else {
+				return openJBossCentralEditor(page);
+			}
+		} else {
+			return openJBossCentralEditor(page);
+		}
+		return null;
 	}
 
 	protected static JBossCentralEditor openJBossCentralEditor(

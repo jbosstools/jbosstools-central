@@ -26,13 +26,13 @@ import org.jboss.tools.central.JBossCentralActivator;
 public class ShowJBossCentralHandler extends AbstractHandler implements IWorkbenchWindowActionDelegate {
 
 	public Object execute(ExecutionEvent event) throws ExecutionException {
-		JBossCentralActivator.getJBossCentralEditor();
+		JBossCentralActivator.getJBossCentralEditor(true);
 		return null;
 	}
 
 	@Override
 	public void run(IAction action) {
-		JBossCentralActivator.getJBossCentralEditor();
+		JBossCentralActivator.getJBossCentralEditor(true);
 	}
 
 	@Override

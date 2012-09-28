@@ -42,7 +42,7 @@ public class RefreshDiscoveryJob extends Job {
 			
 			@Override
 			public void run() {
-				editors[0] = JBossCentralActivator.getJBossCentralEditor();
+				editors[0] = JBossCentralActivator.getJBossCentralEditor(false);
 			}
 		});
 		if (editors[0] != null) {
