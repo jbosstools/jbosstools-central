@@ -47,12 +47,6 @@ public class DefaultJBossCentralConfigurator implements
 	// see pom.xml for actual value -- this is passed it at build-time via Maven
 	private static final String JBOSS_DIRECTORY_URL;
 
-	private static final String JBOSS_RUNTIME_URL_DEFAULT = "http://download.jboss.org/jbosstools/examples/download_runtimes.xml"; //$NON-NLS-1$
-	
-	private static final String JBOSS_RUNTIME_DIRECTORY = "jboss.runtime.directory.url"; //$NON-NLS-1$
-	
-	private static final String JBOSS_RUNTIME_URL;
-
 	static {
 		ResourceBundle rb = ResourceBundle.getBundle("org.jboss.tools.project.examples.configurators.discovery"); //$NON-NLS-1$
 		String url = rb.getString("discovery.url").trim(); //$NON-NLS-1$
@@ -61,13 +55,6 @@ public class DefaultJBossCentralConfigurator implements
 			JBOSS_DIRECTORY_URL = JBOSS_DIRECTORY_URL_DEFAULT;
 		} else {
 			JBOSS_DIRECTORY_URL = url;
-		}
-		url = rb.getString("runtime.url").trim(); //$NON-NLS-1$
-		if ("".equals(url) || "${jboss.runtime.directory.url}".equals(url)){  //$NON-NLS-1$//$NON-NLS-2$
-			//was not filtered, fallback to default value
-			JBOSS_RUNTIME_URL = JBOSS_RUNTIME_URL_DEFAULT;
-		} else {
-			JBOSS_RUNTIME_URL = url;
 		}
 	}
 
@@ -125,14 +112,4 @@ public class DefaultJBossCentralConfigurator implements
 		return headerImage;
 	}
 
-	@Override
-	public String getDownloadRuntimesURL() {
-		// use commandline override -Djboss.runtime.directory.url
-		String directory = System.getProperty(JBOSS_RUNTIME_DIRECTORY, null);
-		if (directory == null) {
-			// else use Maven-generated value (or fall back to default)
-			return JBOSS_RUNTIME_URL;
-		}
-		return directory;		
-	}
 }
