@@ -8,7 +8,7 @@
  * Contributors:
  *     JBoss by Red Hat - Initial implementation.
  ************************************************************************************/
-package org.jboss.tools.maven.core.libprov;
+package org.jboss.tools.maven.hibernate.libprov;
 
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;

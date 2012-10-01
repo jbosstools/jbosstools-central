@@ -12,6 +12,8 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.jst.j2ee.core,
  org.eclipse.jst.j2ee,
  org.eclipse.wst.common.emfworkbench.integration,
+ org.eclipse.jpt.common.core;bundle-version="1.0.0",
+ org.eclipse.jpt.jpa.core, 
  org.hibernate.eclipse.console
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6

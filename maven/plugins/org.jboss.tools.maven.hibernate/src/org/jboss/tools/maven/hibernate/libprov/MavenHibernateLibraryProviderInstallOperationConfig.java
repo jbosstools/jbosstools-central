@@ -8,7 +8,7 @@
  * Contributors:
  *     JBoss by Red Hat - Initial implementation.
  ************************************************************************************/
-package org.jboss.tools.maven.core.libprov;
+package org.jboss.tools.maven.hibernate.libprov;
 
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
@@ -16,6 +16,7 @@ import org.eclipse.jpt.common.core.JptCommonCorePlugin;
 import org.eclipse.jpt.common.core.libval.LibraryValidator;
 import org.eclipse.jpt.jpa.core.libprov.JpaLibraryProviderInstallOperationConfig;
 import org.eclipse.jpt.jpa.core.platform.JpaPlatformDescription;
+import org.jboss.tools.maven.core.libprov.MavenLibraryProviderInstallOperationConfig;
 
 /**
  * @author Fred Bricon

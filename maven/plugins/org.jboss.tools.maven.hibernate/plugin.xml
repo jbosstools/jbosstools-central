@@ -22,5 +22,101 @@
           name="%Hibernate_Project_configurator" 
           secondaryTo="org.eclipse.m2e.jdt.javaConfigurator"/>
     </extension>
-    
+
+    <extension point="org.eclipse.jst.common.project.facet.core.libraryProviders">
+    	<provider id="maven-hibernate-library-provider" abstract="true"  extends="maven-library-provider">
+      		<label>%Maven_Hibernate_library_provider</label>
+      		<priority>500</priority>
+      		<action type="INSTALL">
+        		<config class="org.jboss.tools.maven.hibernate.libprov.MavenHibernateLibraryProviderInstallOperationConfig"/>
+        		<operation class="org.jboss.tools.maven.core.libprov.MavenLibraryProviderInstallOperation"/>
+      		</action>
+    	</provider>    	
+  	</extension>    
+  	
+  	<extension point="org.eclipse.jst.common.project.facet.core.libraryProviders">
+    	<provider id="hibernate332-maven-library-provider" extends="maven-hibernate-library-provider">
+      		<label>%Hibernate_3_3_2_Libraries</label>
+      		<param name="template" value="platform:/plugin/org.jboss.tools.maven.hibernate/poms/hibernate332-template.xml"/>
+      		<enablement>
+      		  <and>
+        		<with variable="projectFacets">
+          			<test property="org.jboss.tools.maven.core.projectFacets" value="jpt.jpa,jboss.m2" forcePluginActivation="true"/>
+        		</with>
+        		<with variable="requestingProjectFacet">
+                    <test property="org.eclipse.wst.common.project.facet.core.projectFacet" value="jpt.jpa:1.0" forcePluginActivation="true"/>
+                </with>
+                <with variable="jpaPlatform">
+					<equals value="hibernate"/>
+				</with>
+        	  </and>
+      		</enablement>
+    	</provider>
+  	</extension>
+  	<extension point="org.eclipse.jst.common.project.facet.core.libraryProviders">
+    	<provider id="hibernate41X-maven-library-provider" extends="maven-hibernate-library-provider">
+      		<label>%Hibernate_4_1_X_Libraries</label>
+      		<param name="template" value="platform:/plugin/org.jboss.tools.maven.hibernate/poms/hibernate41X-template.xml"/>
+      		<enablement>
+      		  <and>
+        		<with variable="projectFacets">
+          			<test property="org.jboss.tools.maven.core.projectFacets" value="jpt.jpa,jboss.m2" forcePluginActivation="true"/>
+        		</with>
+        		<with variable="requestingProjectFacet">
+                    <test property="org.eclipse.wst.common.project.facet.core.projectFacet" value="jpt.jpa:2.0" forcePluginActivation="true"/>
+                </with>
+        	  </and>
+      		</enablement>
+    	</provider>
+  	</extension>
+  	<extension point="org.eclipse.jst.common.project.facet.core.libraryProviders">
+    	<provider id="hibernate36X-maven-library-provider" extends="maven-hibernate-library-provider">
+      		<label>%Hibernate_3_6_X_Libraries</label>
+      		<param name="template" value="platform:/plugin/org.jboss.tools.maven.hibernate/poms/hibernate36X-template.xml"/>
+      		<enablement>
+      		  <or>
+	      		  <and>
+	        		<with variable="projectFacets">
+	          			<test property="org.jboss.tools.maven.core.projectFacets" value="jpt.jpa,jboss.m2" forcePluginActivation="true"/>
+	        		</with>
+		        		<with variable="requestingProjectFacet">
+		                    <test property="org.eclipse.wst.common.project.facet.core.projectFacet" value="jpt.jpa:2.0" forcePluginActivation="true"/>
+		                </with>
+	        	  </and>
+	      		  <and>
+	        		<with variable="projectFacets">
+	          			<test property="org.jboss.tools.maven.core.projectFacets" value="jpt.jpa,jboss.m2" forcePluginActivation="true"/>
+	        		</with>
+		        		<with variable="requestingProjectFacet">
+		                    <test property="org.eclipse.wst.common.project.facet.core.projectFacet" value="jpt.jpa:1.0" forcePluginActivation="true"/>
+		                </with>
+	        	  </and>
+				</or>
+      		</enablement>
+    	</provider>
+  	</extension>  	
+  	
+	<extension
+        point="org.eclipse.jpt.common.core.libraryValidators">
+        <!-- Using a noop validator to fix https://issues.jboss.org/browse/JBIDE-11624 -->
+        <libraryValidator
+                id="jpaMavenLibraryValidator"
+                class="org.jboss.tools.maven.hibernate.libprov.HibernateLibValidator">
+                <enablement>
+                     <or>
+                        <with variable="libraryProvider">
+                                <test property="org.eclipse.jpt.common.core.extendsId" value="hibernate41X-maven-library-provider"/>
+                        </with>
+                        <with variable="libraryProvider">
+                                <test property="org.eclipse.jpt.common.core.extendsId" value="hibernate36X-maven-library-provider"/>
+                        </with>
+                        <with variable="libraryProvider">
+                                <test property="org.eclipse.jpt.common.core.extendsId" value="hibernate332-maven-library-provider"/>
+                        </with>
+                     </or>
+                </enablement>
+        </libraryValidator>
+	</extension>  	
+  	
+  	  	
 </plugin>
