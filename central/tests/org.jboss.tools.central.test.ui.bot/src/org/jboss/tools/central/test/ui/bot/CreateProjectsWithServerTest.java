@@ -27,7 +27,7 @@ import org.junit.Test;
 
 
 //TODO When testing new build try it with type=ServerType.EAP !!!!
-@Require(clearProjects=false,server=@org.jboss.tools.ui.bot.ext.config.Annotations.Server(type=ServerType.ALL))
+@Require(clearProjects=false,server=@org.jboss.tools.ui.bot.ext.config.Annotations.Server(type=ServerType.EAP))
 public class CreateProjectsWithServerTest extends SWTTestExt{
 	
 	@BeforeClass
@@ -107,7 +107,7 @@ public class CreateProjectsWithServerTest extends SWTTestExt{
 		assertTrue("New Dynamic Web Project should have appeared", bot.shell(IDELabel.JBossCentralEditor.NEW_DYNAMIC_WEB_PROJECT).isActive());
 		bot.activeShell().close();
 		//Openshift app
-		log.info(bot.activeShell().getText());
+		
 		bot.hyperlink(IDELabel.JBossCentralEditor.OPENSHIFT_APP).click();
 		bot.waitForShell(IDELabel.JBossCentralEditor.OPENSHIFT_APP_WIZARD);
 		bot.waitWhile(new NonSystemJobRunsCondition());
@@ -115,6 +115,7 @@ public class CreateProjectsWithServerTest extends SWTTestExt{
 		bot.waitWhile(new NonSystemJobRunsCondition());
 		bot.activeShell().close();
 		bot.waitWhile(new NonSystemJobRunsCondition());
+		
 		bot.hyperlink(IDELabel.JBossCentralEditor.JAVA_EE_WEB_PROJECT).click();
 		SWTBotShell projectExampleShell = bot.waitForShell(IDELabel.JBossCentralEditor.PROJECT_EXAMPLE);
 		assertTrue("Project Example window should have appeared", bot.shell(IDELabel.JBossCentralEditor.PROJECT_EXAMPLE).isActive());
@@ -249,13 +250,13 @@ public class CreateProjectsWithServerTest extends SWTTestExt{
 		SWTBotWizard wizard = new SWTBotWizard(bot.shell(IDELabel.JBossCentralEditor.PROJECT_EXAMPLE).widget);
 		wizard.next();
 		if (wizard.canNext()){
-			bot.comboBox(2).setSelection(1);
-			try{
+		//	bot.comboBox(2).setSelection(1);
+			/*try{
 				bot.link();
 				fail("There is something wrong with maven repo. Message: \n"+bot.link().getText());
 			}catch (WidgetNotFoundException ex){
 				//everything fine
-			}
+			}*/
 			wizard.next();
 		}
 		wizard.finishWithWait();
