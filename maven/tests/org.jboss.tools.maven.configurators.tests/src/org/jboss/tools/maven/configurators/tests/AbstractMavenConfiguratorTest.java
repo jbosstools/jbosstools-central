@@ -11,6 +11,10 @@
 package org.jboss.tools.maven.configurators.tests;
 
 import java.io.File;
+import java.util.Iterator;
+import java.util.List;
+
+import junit.framework.Assert;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
@@ -22,6 +26,7 @@ import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.project.IProjectConfigurationManager;
 import org.eclipse.m2e.core.project.ResolverConfiguration;
 import org.eclipse.m2e.tests.common.AbstractMavenProjectTestCase;
+import org.eclipse.m2e.tests.common.WorkspaceHelpers;
 import org.eclipse.wst.common.project.facet.core.IFacetedProject;
 import org.eclipse.wst.common.project.facet.core.IProjectFacetVersion;
 import org.eclipse.wst.common.project.facet.core.ProjectFacetsManager;
@@ -105,7 +110,19 @@ public abstract class AbstractMavenConfiguratorTest extends
 		fail("Error Message '"+ errorMessage +"' was not found on "+project.getName());
 	}
 	
-	protected String getMessage(IMarker marker) throws CoreException {
+	protected static String getMessage(IMarker marker) throws CoreException {
 		return (String)marker.getAttribute(IMarker.MESSAGE);
 	}
+	
+	protected static void assertNoErrors(IProject project) throws CoreException {
+	    List<IMarker> markers = WorkspaceHelpers.findErrorMarkers(project);
+	    Iterator<IMarker> ite = markers.iterator();
+	    while (ite.hasNext()) {
+	    	IMarker m  =ite.next();
+	    	if (getMessage(m).contains("Referenced file contains errors (http://java.sun.com/xml/ns/javaee/web-facesconfig_2_1.xsd)")) {
+	    		ite.remove();
+	    	}
+	    }
+	    Assert.assertEquals("Unexpected error markers " + toString(markers), 0, markers.size());
+    }
 }
