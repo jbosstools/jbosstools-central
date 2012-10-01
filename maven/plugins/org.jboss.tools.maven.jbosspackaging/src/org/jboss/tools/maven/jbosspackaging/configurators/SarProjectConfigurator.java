@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.jboss.tools.maven.jbosspackaging.configurators;
 
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.Set;
@@ -18,6 +19,7 @@ import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
 import org.apache.maven.artifact.resolver.filter.ScopeArtifactFilter;
 import org.apache.maven.project.MavenProject;
+import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
@@ -30,8 +32,6 @@ import org.eclipse.jdt.core.IClasspathEntry;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.JavaModelException;
-import org.eclipse.jst.common.project.facet.core.JavaFacet;
-import org.eclipse.jst.common.project.facet.core.internal.JavaFacetUtil;
 import org.eclipse.jst.j2ee.classpathdep.IClasspathDependencyConstants;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.project.MavenProjectChangedEvent;
@@ -39,6 +39,9 @@ import org.eclipse.m2e.core.project.MavenProjectUtils;
 import org.eclipse.m2e.core.project.configurator.AbstractProjectConfigurator;
 import org.eclipse.m2e.core.project.configurator.ProjectConfigurationRequest;
 import org.eclipse.m2e.jdt.internal.MavenClasspathHelpers;
+import org.eclipse.m2e.wtp.ArtifactHelper;
+import org.eclipse.m2e.wtp.ResourceCleaner;
+import org.eclipse.m2e.wtp.WTPProjectsUtil;
 import org.eclipse.wst.common.componentcore.ComponentCore;
 import org.eclipse.wst.common.componentcore.ModuleCoreNature;
 import org.eclipse.wst.common.componentcore.resources.IVirtualComponent;
@@ -54,8 +57,6 @@ import org.jboss.ide.eclipse.as.ui.mbeans.project.IJBossSARFacetDataModelPropert
 import org.jboss.ide.eclipse.as.ui.mbeans.project.JBossSARFacetDataModelProvider;
 import org.jboss.tools.maven.core.IJBossMavenConstants;
 import org.jboss.tools.maven.core.internal.project.facet.MavenFacetInstallDataModelProvider;
-import org.jboss.tools.maven.core.xpl.ArtifactHelper;
-import org.jboss.tools.maven.core.xpl.WTPProjectsUtil;
 
 /**
  * 
@@ -97,14 +98,11 @@ public class SarProjectConfigurator extends AbstractProjectConfigurator {
 		IMavenProjectFacade facade = request.getMavenProjectFacade();
 		
 		ResourceCleaner fileCleaner = new ResourceCleaner(project);
-		addFilesToClean(fileCleaner, facade.getResourceLocations());
-		addFilesToClean(fileCleaner, facade.getTestResourceLocations());
-		addFilesToClean(fileCleaner, facade.getCompileSourceLocations());
-		addFilesToClean(fileCleaner, facade.getTestCompileSourceLocations());
+		addFoldersToClean(fileCleaner, facade);
 		
 		IPath source = facade.getResourceLocations()[0];
 		
-		installJavaFacet(actions, project, facetedProject);
+		WTPProjectsUtil.installJavaFacet(actions, project, facetedProject);
 		if (!actions.isEmpty()) {
 			facetedProject.modify(actions, monitor);
 		}
@@ -116,7 +114,7 @@ public class SarProjectConfigurator extends AbstractProjectConfigurator {
 
 		removeTestFolderLinks(project, mavenProject, monitor, "/");
 
-		setNonDependencyAttributeToContainer(project, monitor);
+		WTPProjectsUtil.setNonDependencyAttributeToContainer(project, monitor);
 
 		WTPProjectsUtil.removeWTPClasspathContainer(project);
 		
@@ -140,21 +138,6 @@ public class SarProjectConfigurator extends AbstractProjectConfigurator {
 	    }
     }
 
-   /**
-    * @param actions
-    * @param project
-    * @param facetedProject
-    */
-	//TODO Fix/refactor that method from WTPProjectUtils in m2e-wtp 0.14.x
-   public static void installJavaFacet(Set<Action> actions, IProject project, IFacetedProject facetedProject) {
-       IProjectFacetVersion javaFv = JavaFacet.FACET.getVersion(JavaFacetUtil.getCompilerLevel(project));
-       if(!facetedProject.hasProjectFacet(JavaFacet.FACET)) {
-         actions.add(new IFacetedProject.Action(IFacetedProject.Action.Type.INSTALL, javaFv, null));
-       } else if(!facetedProject.hasProjectFacet(javaFv)) {
-         actions.add(new IFacetedProject.Action(IFacetedProject.Action.Type.VERSION_CHANGE, javaFv, null));
-       } 
-    }
-   
 	private void installM2Facet(IFacetedProject fproj, IProgressMonitor monitor) throws CoreException {
 		if (!fproj.hasProjectFacet(m2Facet)) {
 			IDataModel config = (IDataModel) new MavenFacetInstallDataModelProvider().create();
@@ -221,7 +204,9 @@ public class SarProjectConfigurator extends AbstractProjectConfigurator {
 				if (workspaceDependency != null && !workspaceDependency.getProject().equals(project)
 						&& workspaceDependency.getFullPath(artifact.getFile()) != null) {
 					// artifact dependency is a workspace project
-					depComponent = ComponentCore.createComponent(workspaceDependency.getProject());
+					IProject depProject = workspaceDependency.getProject();
+					configureWtpUtil(workspaceDependency, monitor);
+					depComponent = ComponentCore.createComponent(depProject);
 				} else {
 					// artifact dependency should be added as a JEE module,
 					// referenced with M2_REPO variable
@@ -241,12 +226,6 @@ public class SarProjectConfigurator extends AbstractProjectConfigurator {
 		if (WTPProjectsUtil.hasChanged(sarComponent.getReferences(), newRefsArray)) {
 			sarComponent.setReferences(newRefsArray);
 		}
-	}
-
-	protected void setNonDependencyAttributeToContainer(IProject project, IProgressMonitor monitor)
-			throws JavaModelException {
-		updateContainerAttributes(project, NONDEPENDENCY_ATTRIBUTE,
-				IClasspathDependencyConstants.CLASSPATH_COMPONENT_DEPENDENCY, monitor);
 	}
 
 	protected void updateContainerAttributes(IProject project, IClasspathAttribute attributeToAdd,
@@ -279,10 +258,115 @@ public class SarProjectConfigurator extends AbstractProjectConfigurator {
 		setModuleDependencies(event.getMavenProject().getProject(), event.getMavenProject().getMavenProject(), monitor);
 	}
 	
-	private void addFilesToClean(ResourceCleaner cleaner, IPath[] paths) {
-	   for (IPath resourceFolderPath : paths) {
-	     cleaner.addFiles(resourceFolderPath.append("META-INF/MANIFEST.MF"));
-	   }
-	}
+	protected void configureWtpUtil(IMavenProjectFacade facade, IProgressMonitor monitor) throws CoreException {
+		    // Adding utility facet on JEE projects is not allowed
+		    IProject project = facade.getProject();
+		    MavenProject mavenProject = facade.getMavenProject();
+		    if(  !WTPProjectsUtil.isJavaProject(facade)
+		       || WTPProjectsUtil.isJavaEEProject(project) 
+		       || WTPProjectsUtil.isQualifiedAsWebFragment(facade)) {
+		      return;
+		    }
+		    
+		    IPath[] sourceRoots = MavenProjectUtils.getSourceLocations(project, mavenProject.getCompileSourceRoots());
+		    IPath[] resourceRoots = MavenProjectUtils.getResourceLocations(project, mavenProject.getResources());
+		    
+		    if (!checkJavaConfiguration(project, sourceRoots, resourceRoots)) {
+		      return;
+		    }
 
+		    IFacetedProject facetedProject = ProjectFacetsManager.create(project, true, monitor);
+		    Set<Action> actions = new LinkedHashSet<Action>();
+
+		    WTPProjectsUtil.installJavaFacet(actions, project, facetedProject);
+
+			if(!facetedProject.hasProjectFacet(WTPProjectsUtil.UTILITY_FACET)) {
+				actions.add(new IFacetedProject.Action(IFacetedProject.Action.Type.INSTALL, WTPProjectsUtil.UTILITY_10, null));
+			} else if(!facetedProject.hasProjectFacet(WTPProjectsUtil.UTILITY_10)) {
+				actions.add(new IFacetedProject.Action(IFacetedProject.Action.Type.VERSION_CHANGE, WTPProjectsUtil.UTILITY_10,
+	          null));
+			}
+		    
+		    if (!actions.isEmpty()) {
+		      ResourceCleaner fileCleaner = new ResourceCleaner(project);
+		      try {
+		        addFoldersToClean(fileCleaner, facade);
+		        facetedProject.modify(actions, monitor);      
+		      } finally {
+		        //Remove any unwanted MANIFEST.MF the Facet installation has created
+		        fileCleaner.cleanUp();
+		      } 
+		    }
+		    
+		    WTPProjectsUtil.fixMissingModuleCoreNature(project, monitor);
+		    
+		    //MNGECLIPSE-904 remove tests folder links for utility jars
+		    removeTestFolderLinks(project, mavenProject, monitor, "/");
+		    
+		    //Remove "library unavailable at runtime" warning.
+		    WTPProjectsUtil.setNonDependencyAttributeToContainer(project, monitor);
+		    
+		    WTPProjectsUtil.removeWTPClasspathContainer(project);
+	  }
+
+	  /**
+	   * Checks the maven source folders are correctly added to the project classpath
+	   */
+	  private boolean checkJavaConfiguration(IProject project, IPath[] sourceRoots, IPath[] resourceRoots) throws JavaModelException {
+	    IJavaProject javaProject = JavaCore.create(project);
+	    if (javaProject == null) {
+	      return false;
+	    }
+	    IClasspathEntry[] cpEntries = javaProject.getRawClasspath();
+	    if (cpEntries == null) {
+	      return false;
+	    }
+	    Set<IPath> currentPaths = new HashSet<IPath>();
+	    for (IClasspathEntry entry  : cpEntries) {
+	      if (IClasspathEntry.CPE_SOURCE == entry.getEntryKind()){
+	        currentPaths.add(entry.getPath().makeRelativeTo(project.getFullPath()));
+	      }
+	    }
+	    for(IPath mavenSource : sourceRoots) {
+	        if (mavenSource != null && !mavenSource.isEmpty()) {
+	          IFolder sourceFolder = project.getFolder(mavenSource);
+	          if (sourceFolder.exists() && !currentPaths.contains(mavenSource)) {
+	            return false;
+	          }
+	        }
+	    }
+	    for(IPath mavenSource : resourceRoots) {
+	      if (mavenSource != null && !mavenSource.isEmpty()) {
+	        IFolder resourceFolder = project.getFolder(mavenSource);
+	        if (resourceFolder.exists() && !currentPaths.contains(mavenSource)) {
+	          return false;
+	        }
+	      }
+	  }
+	    return true;
+	  }
+
+	  
+	  
+	  protected void addFoldersToClean(ResourceCleaner fileCleaner, IMavenProjectFacade facade) {
+	    for (IPath p : facade.getCompileSourceLocations()) {
+	      if (p != null) {
+	        fileCleaner.addFiles(p.append("META-INF/MANIFEST.MF"));
+	        fileCleaner.addFolder(p);
+	      }
+	    }
+	    for (IPath p : facade.getResourceLocations()) {
+	      if (p != null) {
+	        fileCleaner.addFiles(p.append("META-INF/MANIFEST.MF"));
+	        fileCleaner.addFolder(p);
+	      }
+	    }
+	    for (IPath p : facade.getTestCompileSourceLocations()) {
+	      if (p != null) fileCleaner.addFolder(p);
+	    }
+	    for (IPath p : facade.getTestResourceLocations()) {
+	      if (p != null) fileCleaner.addFolder(p);
+	    }
+	  }
+	  	  
 }

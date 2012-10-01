@@ -13,7 +13,8 @@ Require-Bundle: org.eclipse.ui;bundle-version="3.7.0",
  org.eclipse.jst.j2ee,
  org.eclipse.wst.common.emfworkbench.integration;bundle-version="1.2.100",
  org.sonatype.m2e.mavenarchiver;bundle-version="0.14.0",
- org.jboss.ide.eclipse.as.ui.mbeans;bundle-version="2.3.0"
+ org.jboss.ide.eclipse.as.ui.mbeans;bundle-version="2.3.0",
+ org.eclipse.m2e.wtp;bundle-version="0.16.0"
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-Vendor: %Bundle-Vendor

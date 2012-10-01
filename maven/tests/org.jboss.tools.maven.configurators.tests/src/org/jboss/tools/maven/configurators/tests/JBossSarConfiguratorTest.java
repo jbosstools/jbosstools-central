@@ -116,6 +116,29 @@ public class JBossSarConfiguratorTest extends AbstractMavenConfiguratorTest {
 	// message, 1, "", project);
 	// }
 
+	@Test
+	public void testWorkspaceDependency() throws Exception {
+		IProject[] projects = importProjects("projects/jboss-sar/", 
+										  new String[] {"jboss-sar-4/pom.xml", "util/pom.xml"}, 
+										  new ResolverConfiguration());
+		waitForJobsToComplete();
+		IProject project = projects[0];
+		IProject util = projects[1];
+		
+		assertIsSarProject(project);
+
+		IVirtualComponent sarComponent = ComponentCore.createComponent(project);
+		assertNotNull(sarComponent);
+		IVirtualReference[] references = sarComponent.getReferences();
+		assertEquals(2, references.length);
+		assertEquals(util, references[0].getReferencedComponent().getProject());
+		assertEquals("util-0.0.1-SNAPSHOT.jar", references[0].getArchiveName());
+		assertEquals("/lib", references[0].getRuntimePath().toPortableString());
+		assertEquals("commons-lang-2.5.jar", references[1].getArchiveName());
+		assertEquals("/lib", references[1].getRuntimePath().toPortableString());
+	}
+	
+	
 	private void assertIsSarProject(IProject project) throws Exception {
 		IProjectFacetVersion expectedJaxRsVersion = SarProjectConfigurator.JBOSS_SAR_FACET_VERSION_1_0;
 		assertNoErrors(project);
