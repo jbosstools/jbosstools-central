@@ -39,9 +39,16 @@
          point="org.eclipse.m2e.core.projectConversionParticipants">
       <projectConversionParticipant
             class="org.jboss.tools.maven.conversion.ui.internal.ClasspathConversionParticipant"
-            id="org.jboss.tools.maven.conversion.ui.internal.ClasspathConversionParticipant"
+            id="org.jboss.tools.maven.conversion.ui.ClasspathConversionParticipant"
             name="Classpath conversion participant"
             nature="org.eclipse.jdt.core.javanature">
       </projectConversionParticipant>   
+      <projectConversionParticipant
+            class="org.jboss.tools.maven.conversion.ui.internal.ClasspathConversionParticipant"
+            id="org.jboss.tools.maven.conversion.ui.ModuleConversionParticipant"
+            name="EAR conversion participant"
+            nature="org.eclipse.wst.common.modulecore.ModuleCoreNature">
+      </projectConversionParticipant>   
     </extension>   
+    
 </plugin>

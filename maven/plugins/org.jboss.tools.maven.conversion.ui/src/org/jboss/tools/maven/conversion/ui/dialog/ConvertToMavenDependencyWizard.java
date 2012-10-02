@@ -11,26 +11,31 @@
 package org.jboss.tools.maven.conversion.ui.dialog;
 
 import java.util.List;
-import java.util.Set;
 
 import org.apache.maven.model.Dependency;
 import org.eclipse.core.resources.IProject;
-import org.eclipse.jdt.core.IClasspathEntry;
 import org.eclipse.jface.wizard.Wizard;
+import org.jboss.tools.maven.conversion.core.ProjectDependency;
 
+/**
+ * Convert project dependencies to Maven dependencies wizard
+ * 
+ * @author Fred Bricon
+ *
+ */
 public class ConvertToMavenDependencyWizard extends Wizard {
 
 	private IProject project;
 	
-	private Set<IClasspathEntry> entries;
-
+	private List<ProjectDependency> entries;
 
 	IdentifyMavenDependencyPage identificationPage;
+	
 	private List<Dependency> dependencies;
 	
-	public ConvertToMavenDependencyWizard(IProject project, Set<IClasspathEntry> entries) {
+	public ConvertToMavenDependencyWizard(IProject project, List<ProjectDependency> projectDependencies) {
 		this.project = project;
-		this.entries = entries;
+		this.entries = projectDependencies;
 		String title = "Convert to Maven ";
 		if (entries.size() > 1) {
 			title += "Dependencies";

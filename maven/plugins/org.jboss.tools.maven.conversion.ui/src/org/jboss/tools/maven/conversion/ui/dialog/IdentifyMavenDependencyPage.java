@@ -17,7 +17,6 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.maven.model.Dependency;
@@ -28,10 +27,6 @@ import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.jobs.IJobChangeEvent;
 import org.eclipse.core.runtime.jobs.IJobChangeListener;
 import org.eclipse.core.runtime.jobs.Job;
-import org.eclipse.jdt.core.IClasspathContainer;
-import org.eclipse.jdt.core.IClasspathEntry;
-import org.eclipse.jdt.core.IJavaProject;
-import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.resource.JFaceResources;
@@ -61,6 +56,8 @@ import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.ui.dialogs.PreferencesUtil;
+import org.jboss.tools.maven.conversion.core.ProjectDependency;
+import org.jboss.tools.maven.conversion.core.ProjectDependency.DependencyKind;
 import org.jboss.tools.maven.conversion.ui.dialog.xpl.ConversionUtils;
 import org.jboss.tools.maven.conversion.ui.dialog.xpl.EditDependencyDialog;
 import org.jboss.tools.maven.conversion.ui.internal.CellListener;
@@ -85,11 +82,11 @@ public class IdentifyMavenDependencyPage extends WizardPage {
 	
 	private static final int DEPENDENCY_COLUMN = 2;
 
-	private Map<IClasspathEntry, Dependency> dependencyMap;
+	private Map<ProjectDependency, Dependency> dependencyMap;
 
-	private Map<IClasspathEntry, IdentificationJob> identificationJobs;
+	private Map<ProjectDependency, IdentificationJob> identificationJobs;
 
-	private Set<IClasspathEntry> initialEntries;
+	private List<ProjectDependency> initialEntries;
 
 	private Map<Dependency, Boolean> dependencyResolution = new ConcurrentHashMap<Dependency, Boolean>();
 
@@ -116,37 +113,20 @@ public class IdentifyMavenDependencyPage extends WizardPage {
 
 	private Link warningLink;
 
-	private static String MESSAGE = "Identify existing classpath entries as Maven dependencies. Double-click on a Maven Dependency to edit its details";
+	private static String MESSAGE = "Identify existing project references as Maven dependencies. Double-click on a Maven dependency to edit its details";
 
 
-	public IdentifyMavenDependencyPage(IProject project, Set<IClasspathEntry> entries) {
+	public IdentifyMavenDependencyPage(IProject project, List<ProjectDependency> entries) {
 		super("");
 		this.project = project;
-		initialEntries = Collections.unmodifiableSet(entries);
+		initialEntries = Collections.unmodifiableList(entries);
 		initDependencyMap();
 	}
 
 	private void initDependencyMap() {
-		dependencyMap = new LinkedHashMap<IClasspathEntry, Dependency>(initialEntries.size());
-		IJavaProject javaProject = JavaCore.create(project);
-		try {
-			
-			for (IClasspathEntry entry : initialEntries) {
-				if ((entry.getEntryKind() == IClasspathEntry.CPE_LIBRARY && entry.getPath() != null)
-						|| (entry.getEntryKind() == IClasspathEntry.CPE_PROJECT)) {
-					dependencyMap.put(entry, null);
-				} else if (entry.getEntryKind() == IClasspathEntry.CPE_CONTAINER) {
-					IClasspathContainer container = JavaCore.getClasspathContainer(entry.getPath(), javaProject );
-					if (container != null) {
-						for (IClasspathEntry cpe: container.getClasspathEntries()) {
-							dependencyMap.put(cpe, null);
-						}
-					}
-				}
-			}
-			
-		} catch(Exception e) {
-			setMessage(e.getLocalizedMessage());
+		dependencyMap = new LinkedHashMap<ProjectDependency, Dependency>(initialEntries.size());
+		for (ProjectDependency entry : initialEntries) {
+				dependencyMap.put(entry, null);
 		}
 	}
 
@@ -230,7 +210,7 @@ public class IdentifyMavenDependencyPage extends WizardPage {
 	        }
 	      });
 
-		deleteJarsBtn = addCheckButton(container, "Delete classpath entries from project", deleteJars);
+		deleteJarsBtn = addCheckButton(container, "Delete original references from project", deleteJars);
 		deleteJarsBtn.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				deleteJars = deleteJarsBtn.getSelection();
@@ -272,20 +252,24 @@ public class IdentifyMavenDependencyPage extends WizardPage {
 		emptyColumn.setWidth(20);
 
 		TableViewerColumn sourceColumn = new TableViewerColumn(dependenciesViewer, SWT.NONE);
-		sourceColumn.getColumn().setText("Classpath Entry ");
+		sourceColumn.getColumn().setText("Project Reference");
 		sourceColumn.getColumn().setWidth(270);
 		sourceColumn.setLabelProvider(new ColumnLabelProvider(){
 			@Override
 			@SuppressWarnings("unchecked")
 			public String getText(Object element) {
-				IClasspathEntry cpe = (IClasspathEntry) element;
-				return cpe.getPath().lastSegment();
+				ProjectDependency projectDependency = (ProjectDependency) element;
+				return projectDependency.getPath().lastSegment();
 			}
 			
 			@Override
 			public String getToolTipText(Object element) {
+				ProjectDependency projectDependency = (ProjectDependency) element;
+				if (projectDependency.getDependencyKind() == DependencyKind.Project) {
+					return "";
+				}
 				try {
-					return "SHA1 Checksum : "+IdentificationUtil.getSHA1(ConversionUtils.getFile(((IClasspathEntry) element)));
+					return "SHA1 Checksum : "+IdentificationUtil.getSHA1(ConversionUtils.getFile(projectDependency.getPath()));
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -295,9 +279,9 @@ public class IdentifyMavenDependencyPage extends WizardPage {
 			@Override
 			@SuppressWarnings("unchecked")
 			public Image getImage(Object element) {
-				IClasspathEntry cpe = (IClasspathEntry) element;
+				ProjectDependency projectDependency = (ProjectDependency) element;
 				Image img;
-				if (cpe.getEntryKind() == IClasspathEntry.CPE_LIBRARY) {
+				if (projectDependency.getDependencyKind() == ProjectDependency.DependencyKind.Archive) {
 					img = jarImage;
 				} else {
 					img = projectImage;
@@ -325,21 +309,21 @@ public class IdentifyMavenDependencyPage extends WizardPage {
 			@Override
 			protected void handle(int columnIndex, TableItem item) {
 				if (columnIndex == DEPENDENCY_COLUMN) {
-					IClasspathEntry cpe = (IClasspathEntry) item.getData();
+					ProjectDependency projectDep = (ProjectDependency) item.getData();
 					
-					IdentificationJob job = identificationJobs.get(cpe);
+					IdentificationJob job = identificationJobs.get(projectDep);
 					if (Job.RUNNING == job.getState()) {
 						return;
 					}
 					
-					Dependency d= dependencyMap.get(cpe);
+					Dependency d= dependencyMap.get(projectDep);
 					EditDependencyDialog editDependencyDialog = new EditDependencyDialog(getShell());
 					editDependencyDialog.setDependency(d);
 					if(editDependencyDialog.open() == Window.OK) {
 						Dependency newDep = editDependencyDialog.getDependency();
-						dependencyMap.put(cpe,newDep);
+						dependencyMap.put(projectDep,newDep);
 						if (!eq(newDep,d)) {
-							resolve(cpe, newDep);
+							resolve(projectDep, newDep);
 						}
 					}
 				}
@@ -364,9 +348,9 @@ public class IdentifyMavenDependencyPage extends WizardPage {
 	}
 
 
-	private void resolve(IClasspathEntry cpe, Dependency d) {
+	private void resolve(ProjectDependency projectDependency, Dependency d) {
 		if (d != null) {
-			IdentificationJob job = identificationJobs.get(cpe);
+			IdentificationJob job = identificationJobs.get(projectDependency);
 			job.setDependency(d);
 			job.setRequestedProcess(Task.RESOLUTION_ONLY);
 			job.schedule();
@@ -439,7 +423,7 @@ public class IdentifyMavenDependencyPage extends WizardPage {
 		if (monitor == null) {
 			monitor = new NullProgressMonitor();
 		}
-		for (Map.Entry<IClasspathEntry, Dependency> entry : dependencyMap.entrySet()) {
+		for (Map.Entry<ProjectDependency, Dependency> entry : dependencyMap.entrySet()) {
 			if (entry.getValue() != null) {
 				//don't need to run identification
 				//continue;
@@ -511,28 +495,28 @@ public class IdentifyMavenDependencyPage extends WizardPage {
     
     private void initJobs() {
     	if (identificationJobs == null) {
-    		identificationJobs = new HashMap<IClasspathEntry, IdentificationJob>(dependencyMap.size());
+    		identificationJobs = new HashMap<ProjectDependency, IdentificationJob>(dependencyMap.size());
     		
     		Table t = dependenciesViewer.getTable();
     		IFileIdentificationManager fileIdentificationManager = new FileIdentificationManager();
     		
     		for (final TableItem item : t.getItems()) {
-    			final IClasspathEntry cpe = (IClasspathEntry)item.getData();
-    			Dependency dep = dependencyMap.get(cpe);
-    			if (dep != null) {
+    			final ProjectDependency projectDep = (ProjectDependency)item.getData();
+    			Dependency mavenDep = dependencyMap.get(projectDep);
+    			if (mavenDep != null) {
     				//already identified
     				continue;
     			}
     			File jar;
 				try {
 					final IdentificationJob job;
-					if (cpe.getEntryKind() == IClasspathEntry.CPE_PROJECT) {
-						job = new IdentifyProjectJob("Search the Maven coordinates for "+cpe.getPath(), cpe.getPath());
-					} else if (cpe.getEntryKind() == IClasspathEntry.CPE_LIBRARY) {
-						jar = ConversionUtils.getFile(cpe);
+					if (projectDep.getDependencyKind() == ProjectDependency.DependencyKind.Project) {
+						job = new IdentifyProjectJob("Search the Maven coordinates for "+projectDep.getPath(), projectDep.getPath());
+					} else if (projectDep.getDependencyKind() == ProjectDependency.DependencyKind.Archive) {
+						jar = ConversionUtils.getFile(projectDep.getPath());
 						job = new IdentifyJarJob("Search the Maven coordinates for "+jar.getAbsolutePath(), fileIdentificationManager, jar);
 					} else {
-						job = new DependencyResolutionJob("Resolve the Maven dependency for "+cpe.getPath());
+						job = new DependencyResolutionJob("Resolve the Maven dependency for "+projectDep.getPath());
 					}
 					
 					job.addJobChangeListener(new IJobChangeListener() {
@@ -555,7 +539,7 @@ public class IdentifyMavenDependencyPage extends WizardPage {
 						@Override
 						public void done(IJobChangeEvent event) {
 							Dependency d = job.getDependency();
-							dependencyMap.put(cpe, d);
+							dependencyMap.put(projectDep, d);
 							if (d != null) {
 								dependencyResolution.put(d, job.isResolvable());
 							}
@@ -576,12 +560,12 @@ public class IdentifyMavenDependencyPage extends WizardPage {
 							Display.getDefault().syncExec(new Runnable() {
 								@Override
 								public void run() {
-									refresh(cpe);
+									refresh(projectDep);
 								}
 							});
 						}
 					});
-					identificationJobs.put(cpe, job);
+					identificationJobs.put(projectDep, job);
 				} catch (CoreException e) {
 					e.printStackTrace();
 				}
@@ -589,7 +573,7 @@ public class IdentifyMavenDependencyPage extends WizardPage {
     	}
     }
 
-	private synchronized void refresh(IClasspathEntry key) {
+	private synchronized void refresh(ProjectDependency key) {
 		if (dependenciesViewer == null || dependenciesViewer.getTable().isDisposed()) {
 			return;
 		}
@@ -597,14 +581,14 @@ public class IdentifyMavenDependencyPage extends WizardPage {
 		try {
 			for (TableItem item : dependenciesViewer.getTable().getItems()) {
 				@SuppressWarnings("unchecked")
-				final IClasspathEntry cpe = (IClasspathEntry)item.getData();
-				if (cpe.equals(key)) {
-					dependenciesViewer.refresh(cpe, false);
+				final ProjectDependency projectDep = (ProjectDependency)item.getData();
+				if (projectDep.equals(key)) {
+					dependenciesViewer.refresh(projectDep, false);
 					//Don't force check when there's an existing dependency, only uncheck if they're is not.
-					if (dependencyMap.get(cpe) == null) {
-						Job job = identificationJobs.get(cpe);
+					if (dependencyMap.get(projectDep) == null) {
+						Job job = identificationJobs.get(projectDep);
 						if (job != null && job.getState() == Job.NONE) {
-							dependenciesViewer.setChecked(cpe, false);
+							dependenciesViewer.setChecked(projectDep, false);
 						}
 					}
 					setPageComplete(hasNoRunningJobs());
@@ -624,8 +608,8 @@ public class IdentifyMavenDependencyPage extends WizardPage {
 		Object[] selection = dependenciesViewer.getCheckedElements();
 		List<Dependency> dependencies = new ArrayList<Dependency>(selection.length);
 		for (Object o : selection) {
-			IClasspathEntry cpe = (IClasspathEntry) o;
-			Dependency d = dependencyMap.get(cpe);
+			ProjectDependency projectDep = (ProjectDependency) o;
+			Dependency d = dependencyMap.get(projectDep);
 			if (d != null) {
 				dependencies.add(d);
 			}
@@ -649,23 +633,23 @@ public class IdentifyMavenDependencyPage extends WizardPage {
 			@Override
 			@SuppressWarnings("unchecked")
 			public String getText(Object element) {
-				IClasspathEntry cpe = (IClasspathEntry) element;
-				IdentificationJob job = identificationJobs ==null? null:identificationJobs.get(cpe);
+				ProjectDependency projectDep = (ProjectDependency) element;
+				IdentificationJob job = identificationJobs ==null? null:identificationJobs.get(projectDep);
 				if (job != null) {
 					int jobState = job.getState();
 					if (jobState == Job.RUNNING || jobState == Job.WAITING) {
 						return "Identification in progress...";
 					}
 				}
-				Dependency d = dependencyMap.get(cpe);
+				Dependency d = dependencyMap.get(projectDep);
 				return IdentifyMavenDependencyPage.toString(d);
 			}
 			
 			@Override
 			@SuppressWarnings("unchecked")
 			public Image getImage(Object element) {
-				IClasspathEntry cpe = (IClasspathEntry) element;
-				IdentificationJob job = identificationJobs ==null? null:identificationJobs.get(cpe);
+				ProjectDependency projectDep = (ProjectDependency) element;
+				IdentificationJob job = identificationJobs ==null? null:identificationJobs.get(projectDep);
 				if (job != null) {
 					int jobState = job.getState();
 					if (jobState == Job.RUNNING || jobState == Job.WAITING) {
@@ -673,7 +657,7 @@ public class IdentifyMavenDependencyPage extends WizardPage {
 					}
 				}
 				
-				Dependency d = dependencyMap.get(cpe);
+				Dependency d = dependencyMap.get(projectDep);
 				
 				if (d == null) {
 					return failedImage;

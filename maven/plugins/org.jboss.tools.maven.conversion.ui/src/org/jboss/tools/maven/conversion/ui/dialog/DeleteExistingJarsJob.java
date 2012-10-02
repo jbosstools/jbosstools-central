@@ -28,6 +28,7 @@ import org.eclipse.jdt.core.IClasspathContainer;
 import org.eclipse.jdt.core.IClasspathEntry;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.JavaCore;
+import org.jboss.tools.maven.conversion.core.ProjectDependency;
 import org.jboss.tools.maven.conversion.ui.dialog.xpl.ConversionUtils;
 import org.jboss.tools.maven.core.MavenCoreActivator;
 
@@ -37,15 +38,22 @@ public class DeleteExistingJarsJob extends Job {
 
 	private IJavaProject javaProject;
 
-	public DeleteExistingJarsJob(IProject project, Set<IClasspathEntry> entries) {
+	public DeleteExistingJarsJob(IProject project, List<ProjectDependency> entries2) {
 		super("Delete classpath entries"
 				+ ((project == null) ? "" : "for " + project.getName()));
 		this.javaProject = JavaCore.create(project);
-		this.entries = entries;
+		this.entries = toClasspathEntries(entries2);
+	}
+
+	private Set<IClasspathEntry> toClasspathEntries(List<ProjectDependency> entries2) {
+		return null;
 	}
 
 	@Override
 	protected IStatus run(IProgressMonitor monitor) {
+		if (entries == null) {
+			return Status.OK_STATUS;
+		}
 		Set<IPath> pathsToRemove = new HashSet<IPath>();
 		Set<IFile> filesToRemove = new HashSet<IFile>();
 		try {

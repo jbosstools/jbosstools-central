@@ -49,34 +49,19 @@ public class ConvertToMavenDependencyHandler extends AbstractHandler {
     
     Set<IClasspathEntry> entries = getSelectedClasspathEntries(selection);
     
-    //System.err.println(entries);
-    
     if (entries == null || entries.isEmpty()) {
     	MessageDialogWithToggle.openInformation(window.getShell(), "Convert to Maven Dependency", "Nothing to convert");
     	return null;
     }
     
-    /*
-      IPath path = libraryFromUI.getClasspathEntry().getPath();
-      
-      IJavaProject javaProject = libraryFromUI.getJavaProject();
-      
-      final String libName = libraryFromUI.getLabel();
-      */
-        /*
-    	IClasspathContainer containerToMaterialize = JavaCore.getClasspathContainer(path, javaProject);
-      
-        IProject project = javaProject.getProject();
-        
-        */
-        ConvertToMavenDependencyWizard wizard = new ConvertToMavenDependencyWizard( 
-                                                                       null, //project,
-                                                                       entries 
-                                                                       ); 
-    
-        WizardDialog dialog = new WizardDialog(window.getShell(), wizard);
-		dialog.open();
-        return null;
+    ConvertToMavenDependencyWizard wizard = new ConvertToMavenDependencyWizard( 
+                                                                   null, //project,
+                                                                   null 
+                                                                   ); 
+
+    WizardDialog dialog = new WizardDialog(window.getShell(), wizard);
+	dialog.open();
+    return null;
   }
 
 

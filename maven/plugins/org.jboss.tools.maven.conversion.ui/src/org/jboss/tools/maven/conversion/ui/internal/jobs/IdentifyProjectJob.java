@@ -47,13 +47,6 @@ public class IdentifyProjectJob extends IdentificationJob {
 				if (a.getArtifactHandler() != null &&
 					a.getArtifactHandler().getPackaging() != null) {
 					String type  = a.getArtifactHandler().getPackaging();
-					//case where classpath dependency is a war : it usually corresponds to 
-					//a jar of the war classes, having the "classes" classifier. 
-					if ("war".equals(type)) {
-						type = "jar";
-						dependency.setClassifier("classes");
-					}
-					
 					dependency.setType(type);
 				}
 			}

@@ -48,6 +48,11 @@ public class ConversionUtils {
 	public static File getFile(IClasspathEntry cpe) throws CoreException {
 		Assert.isNotNull(cpe, "ClasspathEntry can not be null");
 		IPath path = cpe.getPath();
+		return getFile(path);
+	}
+	
+	public static File getFile(IPath path) throws CoreException {
+		Assert.isNotNull(path, "path can not be null");
 		IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
 		IResource file = root.findMember(path);
 		File localFile = null;
@@ -65,7 +70,7 @@ public class ConversionUtils {
 			localFile= path.toFile();
 		}
 		return localFile;
-	}
+	}	
 
 	public static IFile getIFile(IClasspathEntry cpe) throws CoreException {
 		Assert.isNotNull(cpe, "ClasspathEntry can not be null");
