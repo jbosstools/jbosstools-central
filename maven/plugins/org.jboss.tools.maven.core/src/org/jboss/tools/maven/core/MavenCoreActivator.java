@@ -28,7 +28,6 @@ import org.apache.maven.model.Resource;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
-import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IProjectDescription;
 import org.eclipse.core.resources.IWorkspaceRoot;
@@ -198,13 +197,6 @@ public class MavenCoreActivator extends Plugin {
 		}
 	}
 
-	private static IFolder createFolder(String folderName,IProgressMonitor monitor,
-			IProject project) throws CoreException {
-		IFolder folder = project.getFolder(folderName);
-		folder.create(false, true, monitor);
-		return folder;
-	}
-	
 	public static boolean addMavenNature(IProject project,
 			IProgressMonitor monitor) throws CoreException {
 		boolean hasMavenNature = project.hasNature(IMavenConstants.NATURE_ID);
@@ -311,7 +303,7 @@ public class MavenCoreActivator extends Plugin {
 		org.apache.maven.model.Plugin plugin = new org.apache.maven.model.Plugin();
 		plugin.setGroupId("org.apache.maven.plugins"); //$NON-NLS-1$
 		plugin.setArtifactId("maven-war-plugin"); //$NON-NLS-1$
-		plugin.setVersion("2.2");//$NON-NLS-1$
+		plugin.setVersion("2.3");//$NON-NLS-1$
 		Xpp3Dom configuration = new Xpp3Dom( "configuration" ); //$NON-NLS-1$
 		if (!isDefaultWarSource){
 			Xpp3Dom warSourceDirectory = new Xpp3Dom("warSourceDirectory"); //$NON-NLS-1$
@@ -356,7 +348,7 @@ public class MavenCoreActivator extends Plugin {
 		org.apache.maven.model.Plugin plugin = new org.apache.maven.model.Plugin();
 		plugin.setGroupId("org.apache.maven.plugins"); //$NON-NLS-1$
 		plugin.setArtifactId("maven-ear-plugin"); //$NON-NLS-1$
-		plugin.setVersion("2.7");//$NON-NLS-1$
+		plugin.setVersion("2.8");//$NON-NLS-1$
 		Xpp3Dom configuration = new Xpp3Dom( "configuration" ); //$NON-NLS-1$
 		if (earFacetVersion != null) {
 			String earVersion = earFacetVersion.getVersionString();
