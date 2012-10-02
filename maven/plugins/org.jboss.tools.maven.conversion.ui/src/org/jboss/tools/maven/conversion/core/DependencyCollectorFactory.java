@@ -20,7 +20,7 @@ import org.jboss.tools.maven.conversion.core.internal.JavaDependencyCollector;
 
 public class DependencyCollectorFactory {
 
-	public static DependencyCollectorFactory INSTANCE = new DependencyCollectorFactory();
+	public static final DependencyCollectorFactory INSTANCE = new DependencyCollectorFactory();
 	
 	Set<DependencyCollector> dependencyCollectors = new HashSet<DependencyCollector>();
 	

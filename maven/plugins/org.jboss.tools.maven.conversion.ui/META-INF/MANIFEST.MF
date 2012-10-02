@@ -19,7 +19,8 @@ Require-Bundle: org.eclipse.ui;bundle-version="3.7.0",
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-Vendor: %BundleVendor
 Bundle-Localization: plugin
-Export-Package: org.jboss.tools.maven.conversion.ui,
+Export-Package: org.jboss.tools.maven.conversion.core,
+ org.jboss.tools.maven.conversion.ui,
  org.jboss.tools.maven.conversion.ui.dialog,
  org.jboss.tools.maven.conversion.ui.handlers
 Bundle-ActivationPolicy: lazy
