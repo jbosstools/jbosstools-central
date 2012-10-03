@@ -38,13 +38,13 @@
    <extension
          point="org.eclipse.m2e.core.projectConversionParticipants">
       <projectConversionParticipant
-            class="org.jboss.tools.maven.conversion.ui.internal.ClasspathConversionParticipant"
+            class="org.jboss.tools.maven.conversion.ui.internal.ProjectClasspathConversionParticipant"
             id="org.jboss.tools.maven.conversion.ui.ClasspathConversionParticipant"
             name="Classpath conversion participant"
             nature="org.eclipse.jdt.core.javanature">
       </projectConversionParticipant>   
       <projectConversionParticipant
-            class="org.jboss.tools.maven.conversion.ui.internal.ClasspathConversionParticipant"
+            class="org.jboss.tools.maven.conversion.ui.internal.ComponentReferenceConversionParticipant"
             id="org.jboss.tools.maven.conversion.ui.ModuleConversionParticipant"
             name="EAR conversion participant"
             nature="org.eclipse.wst.common.modulecore.ModuleCoreNature">

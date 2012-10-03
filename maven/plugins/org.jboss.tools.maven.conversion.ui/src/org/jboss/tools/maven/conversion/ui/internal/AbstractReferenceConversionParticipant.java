@@ -24,28 +24,28 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.PlatformUI;
 import org.jboss.tools.maven.conversion.core.DependencyCollector;
-import org.jboss.tools.maven.conversion.core.DependencyCollectorFactory;
 import org.jboss.tools.maven.conversion.core.ProjectDependency;
 import org.jboss.tools.maven.conversion.ui.dialog.ConvertToMavenDependencyWizard;
 
-public class ClasspathConversionParticipant extends
+public abstract class AbstractReferenceConversionParticipant extends
 		AbstractProjectConversionParticipant {
 
+	private DependencyCollector dependencyCollector;
+
+	public AbstractReferenceConversionParticipant(DependencyCollector dependencyCollector) {
+		this.dependencyCollector = dependencyCollector;
+	}
+	
 	@Override
 	public boolean accept(IProject project) throws CoreException {
-		return getDependencyCollector(project) != null;
-	}
-
-	private DependencyCollector getDependencyCollector(IProject project) throws CoreException {
-		return DependencyCollectorFactory.INSTANCE.getDependencyCollector(project);
+		return dependencyCollector != null && dependencyCollector.appliesTo(project);
 	}
 
 	@Override
 	public void convert(final IProject project, final Model model, final IProgressMonitor monitor)
 			throws CoreException {
-
-		DependencyCollector dependencyCollector = getDependencyCollector(project);
-		if (dependencyCollector != null) {
+		
+		if (dependencyCollector != null && dependencyCollector.appliesTo(project)) {
 			List<ProjectDependency> entries = dependencyCollector.collectDependencies(project);
 			if (entries == null || entries.isEmpty()) {
 				return;
@@ -55,7 +55,6 @@ public class ClasspathConversionParticipant extends
 				
 				@Override
 				public void run() {
-					// TODO Auto-generated method stub
 					Shell shell = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();
 					WizardDialog dialog = new WizardDialog(shell, conversionWizard);
 					if (dialog.open() == Window.OK) {

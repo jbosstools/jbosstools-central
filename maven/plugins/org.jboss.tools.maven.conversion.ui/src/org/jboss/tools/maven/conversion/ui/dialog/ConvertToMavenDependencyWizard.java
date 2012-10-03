@@ -14,7 +14,10 @@ import java.util.List;
 
 import org.apache.maven.model.Dependency;
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IResource;
 import org.eclipse.jface.wizard.Wizard;
+import org.eclipse.ltk.ui.refactoring.RefactoringWizardOpenOperation;
+import org.eclipse.ltk.ui.refactoring.resource.DeleteResourcesWizard;
 import org.jboss.tools.maven.conversion.core.ProjectDependency;
 
 /**
@@ -29,11 +32,12 @@ public class ConvertToMavenDependencyWizard extends Wizard {
 	
 	private List<ProjectDependency> entries;
 
-	IdentifyMavenDependencyPage identificationPage;
+	private IdentifyMavenDependencyPage identificationPage;
 	
 	private List<Dependency> dependencies;
 	
 	public ConvertToMavenDependencyWizard(IProject project, List<ProjectDependency> projectDependencies) {
+		System.err.println("New wizard");
 		this.project = project;
 		this.entries = projectDependencies;
 		String title = "Convert to Maven ";
@@ -50,8 +54,6 @@ public class ConvertToMavenDependencyWizard extends Wizard {
 	public void addPages() {
 		identificationPage = new IdentifyMavenDependencyPage(project, entries);
 		addPage(identificationPage);
-		//DependencyConversionPreviewPage page2 = new DependencyConversionPreviewPage("Foo");
-		//addPage(page2);
 	}
 	
 	@Override
@@ -67,14 +69,16 @@ public class ConvertToMavenDependencyWizard extends Wizard {
 			dependencies = identificationPage.getDependencies();
 			
 			if (identificationPage.isDeleteJars()) {
-				/* actually only delete classpath entries */
-				DeleteExistingJarsJob deleteJob = new DeleteExistingJarsJob(project, entries);
-				deleteJob.schedule();
-				try {
-					deleteJob.join();//wait for job to finish to prevent bad concurrency issues 
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-					//ignore
+				//Only delete jars that are directly under a project's hierarchy
+				IResource[] resourcesToDelete = identificationPage.getResourcesToDelete();
+				if (resourcesToDelete != null && resourcesToDelete.length > 0) {
+					DeleteResourcesWizard wizard = new DeleteResourcesWizard(resourcesToDelete);
+					try {
+						RefactoringWizardOpenOperation op = new RefactoringWizardOpenOperation(wizard);
+						op.run(getShell(), "Delete project relative jars");
+					} catch(InterruptedException e) {
+						// ignored
+					}
 				}
 			}
 		}
@@ -82,10 +86,8 @@ public class ConvertToMavenDependencyWizard extends Wizard {
 		return true;
 	}
 
-
 	public List<Dependency> getDependencies() {
 		return dependencies;
 	}
-
 	
 }
