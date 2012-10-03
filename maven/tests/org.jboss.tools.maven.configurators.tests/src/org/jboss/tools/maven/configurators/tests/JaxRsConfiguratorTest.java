@@ -59,6 +59,27 @@ public class JaxRsConfiguratorTest extends AbstractMavenConfiguratorTest {
 		assertIsJaxRsProject(jaxRsProject, JaxrsProjectConfigurator.JAX_RS_FACET_1_1);
 	}
 
+	@Test
+	public void testJBIDE12727_badCaching() throws Exception {
+		String projectLocation = "projects/jaxrs/chimera/";
+		IProject jaxRsProject = importProject(projectLocation+"/jaxrs/jaxrs-chimera/pom.xml");
+		waitForJobsToComplete(new NullProgressMonitor());
+		IFacetedProject facetedProject = ProjectFacetsManager.create(jaxRsProject);
+		assertNotNull(jaxRsProject.getName() + " is not a faceted project", facetedProject);
+		assertTrue("JAX-RS Facet should be present", facetedProject.hasProjectFacet(JaxrsProjectConfigurator.JAX_RS_FACET));
+		
+		
+		jaxRsProject.delete(true, monitor);
+		waitForJobsToComplete();
+		
+		jaxRsProject = importProject(projectLocation+"/nojaxrs/jaxrs-chimera/pom.xml");
+		waitForJobsToComplete(new NullProgressMonitor());
+		assertNoErrors(jaxRsProject);
+		facetedProject = ProjectFacetsManager.create(jaxRsProject);
+		assertFalse("JAX-RS Facet should be missing", facetedProject.hasProjectFacet(JaxrsProjectConfigurator.JAX_RS_FACET));
+	}
+
+	
 	private void assertHasJaxRsConfigurationError(IProject project, String message) throws Exception {
 		WorkspaceHelpers.assertErrorMarker(MavenJaxRsConstants.JAXRS_CONFIGURATION_ERROR_MARKER_ID, message, 1, "", project);
 	}

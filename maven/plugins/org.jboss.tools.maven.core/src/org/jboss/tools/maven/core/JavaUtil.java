@@ -4,7 +4,6 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.JavaModelException;
-import org.jboss.tools.common.util.EclipseJavaUtil;
 
 /**
  * 
@@ -42,7 +41,7 @@ public class JavaUtil {
     	boolean result = false;
         if (javaProject != null) {
            try {
-       		 result = EclipseJavaUtil.findType(javaProject, className) != null;
+       		 result = javaProject.findType(className) != null;
        	   } catch (JavaModelException e) {
        		 e.printStackTrace();
        	   }

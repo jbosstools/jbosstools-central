@@ -41,7 +41,6 @@ import org.eclipse.wst.common.project.facet.core.IFacetedProject;
 import org.eclipse.wst.common.project.facet.core.IProjectFacet;
 import org.eclipse.wst.common.project.facet.core.IProjectFacetVersion;
 import org.eclipse.wst.common.project.facet.core.ProjectFacetsManager;
-import org.jboss.tools.common.util.EclipseJavaUtil;
 import org.jboss.tools.maven.core.IJBossMavenConstants;
 import org.jboss.tools.maven.core.ProjectUtil;
 import org.jboss.tools.maven.core.internal.project.facet.MavenFacetInstallDataModelProvider;
@@ -183,12 +182,12 @@ public class JaxrsProjectConfigurator extends AbstractProjectConfigurator {
 		if (javaProject != null) {
 			IType type = null;
 			try {
-				type = EclipseJavaUtil.findType(javaProject, "javax.ws.rs.ApplicationPath");//$NON-NLS-1$ 
+				type = javaProject.findType("javax.ws.rs.ApplicationPath");//$NON-NLS-1$ 
 				if (type != null) {
 				   return JAX_RS_FACET_1_1;
 				}
 
-				type = EclipseJavaUtil.findType(javaProject, "javax.ws.rs.Path");//$NON-NLS-1$ 
+				type = javaProject.findType("javax.ws.rs.Path");//$NON-NLS-1$ 
 				if (type != null) {
 				   return JAX_RS_FACET_1_0;
 				}
