@@ -63,7 +63,7 @@ public class CentralTest {
 		if (welcomeView != null) {
 			page.hideView(welcomeView);
 		}
-		editor = JBossCentralActivator.getJBossCentralEditor();
+		editor = JBossCentralActivator.getJBossCentralEditor(true);
 	}
 
 	@AfterClass
