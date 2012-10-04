@@ -20,6 +20,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.maven.model.Dependency;
+import org.codehaus.plexus.util.StringUtils;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
@@ -89,7 +90,7 @@ public class IdentifyMavenDependencyPage extends WizardPage {
 
 	private List<ProjectDependency> initialEntries;
 
-	private Map<Dependency, Boolean> dependencyResolution = new ConcurrentHashMap<Dependency, Boolean>();
+	private Map<String, Boolean> dependencyResolution = new ConcurrentHashMap<String, Boolean>();
 
 	private IProject project;
 	
@@ -348,22 +349,13 @@ public class IdentifyMavenDependencyPage extends WizardPage {
 					if(editDependencyDialog.open() == Window.OK) {
 						Dependency newDep = editDependencyDialog.getDependency();
 						dependencyMap.put(projectDep,newDep);
-						if (!eq(newDep,d)) {
+						if (!getKey(newDep).equals(getKey(d))) {
 							resolve(projectDep, newDep);
 						}
 					}
 				}
 			}
 
-			private boolean eq(Dependency newDep, Dependency d) {
-				if (newDep == d) {
-					return true;
-				}
-				if (d == null) {
-					return false;
-				}
-				return newDep.toString().equals(d.toString());
-			}
 		});
 		
 		
@@ -476,7 +468,7 @@ public class IdentifyMavenDependencyPage extends WizardPage {
 
 	private void displayWarning() {
 		for (Dependency d : getDependencies()) {
-			if (Boolean.FALSE.equals(dependencyResolution.get(d))) {
+			if (!isResolved(d)) {
 				setVisible(warningImg, true);
 				setVisible(warningLink, true);
 				return;
@@ -507,18 +499,6 @@ public class IdentifyMavenDependencyPage extends WizardPage {
 		}
 	}
 	
-    private static String toString(Dependency d) {
-		if (d == null) {
-			return "Unidentified dependency";
-		}
-		StringBuilder text = new StringBuilder(d.getGroupId())
-		.append(":")
-		.append(d.getArtifactId())
-		.append(":")
-		.append(d.getVersion());
-		return text.toString();
-	}
-    
     private void initJobs() {
     	if (identificationJobs == null) {
     		identificationJobs = new HashMap<ProjectDependency, IdentificationJob>(dependencyMap.size());
@@ -567,7 +547,7 @@ public class IdentifyMavenDependencyPage extends WizardPage {
 							Dependency d = job.getDependency();
 							dependencyMap.put(projectDep, d);
 							if (d != null) {
-								dependencyResolution.put(d, job.isResolvable());
+								dependencyResolution.put(getKey(d), job.isResolvable());
 							}
 							refreshUI();
 						}
@@ -598,6 +578,17 @@ public class IdentifyMavenDependencyPage extends WizardPage {
     		}    		
     	}
     }
+
+	protected static String getKey(Dependency d) {
+		StringBuilder sb = new StringBuilder();
+		sb.append(StringUtils.defaultString(d.getGroupId())).append(":");
+		sb.append(StringUtils.defaultString(d.getArtifactId())).append(":");
+		sb.append(StringUtils.defaultString(d.getVersion()));
+		if (StringUtils.isNotEmpty(d.getClassifier())) {
+			sb.append(":").append(d.getClassifier());
+		}
+		return sb.toString();
+	}
 
 	private synchronized void refresh(ProjectDependency key) {
 		if (dependenciesViewer == null || dependenciesViewer.getTable().isDisposed()) {
@@ -660,7 +651,7 @@ public class IdentifyMavenDependencyPage extends WizardPage {
 		if (d == null) {
 			return false;
 		}
-		Boolean resolved = dependencyResolution.get(d);
+		Boolean resolved = dependencyResolution.get(getKey(d));
 		return resolved == null? false:resolved.booleanValue();
 	}
 	
@@ -677,7 +668,10 @@ public class IdentifyMavenDependencyPage extends WizardPage {
 					}
 				}
 				Dependency d = dependencyMap.get(projectDep);
-				return IdentifyMavenDependencyPage.toString(d);
+				if (d == null) {
+					return "Unidentified dependency";
+				}
+				return IdentifyMavenDependencyPage.getKey(d);
 			}
 			
 			@Override
