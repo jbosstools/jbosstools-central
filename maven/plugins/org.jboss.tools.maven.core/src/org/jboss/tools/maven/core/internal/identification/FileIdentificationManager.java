@@ -84,7 +84,7 @@ public class FileIdentificationManager implements IFileIdentificationManager {
 			if (monitor.isCanceled()) {
 				return null;
 			}
-			artifactKey = identifier.identify(file);
+			artifactKey = identifier.identify(file, monitor);
 			if (artifactKey != null) {
 				//long stop = System.currentTimeMillis();
 				//System.err.println(file.getName() + " identified as " + artifactKey + " in " + (stop-start) + " ms");

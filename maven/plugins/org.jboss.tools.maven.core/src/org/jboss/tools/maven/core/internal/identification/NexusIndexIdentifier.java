@@ -15,6 +15,8 @@ import java.util.Collections;
 import java.util.List;
 
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.embedder.ArtifactKey;
 import org.eclipse.m2e.core.internal.index.IIndex;
@@ -36,10 +38,21 @@ public class NexusIndexIdentifier extends AbstractArtifactIdentifier {
 	}
 	
 	public ArtifactKey identify(File file) throws CoreException {
+		return identify(file, null);
+	}
+		
+	public ArtifactKey identify(File file, IProgressMonitor monitor) throws CoreException {
+		if (monitor == null) {
+			monitor = new NullProgressMonitor();
+		}
 		IndexManager indexManager = MavenPlugin.getIndexManager();
 		IIndex index = indexManager.getAllIndexes();
 		IndexedArtifactFile info = null;
 		try {
+			if (monitor.isCanceled()) {
+				return null;
+			}
+			monitor.setTaskName("Checking global m2e Nexus index for "+file.getName()); 
 			info = index.identify(file);
 		} catch (Throwable e) {
 			// ignore
@@ -57,6 +70,10 @@ public class NexusIndexIdentifier extends AbstractArtifactIdentifier {
 				NexusIndex nexusIndex = nexusIndexManager.getIndex(repository);
 				if (nexusIndex != null) {
 					try {
+						if (monitor.isCanceled()) {
+							return null;
+						}
+						monitor.setTaskName("Checking Nexus index of '"+ repository.getId() + "' repository for "+file.getName()); 
 						info = nexusIndex.identify(file);
 					} catch (Throwable t) {
 						// ignore
@@ -70,7 +87,6 @@ public class NexusIndexIdentifier extends AbstractArtifactIdentifier {
 				}
 			}
 		}
-		//System.err.println(getName() + " could not identify "+file);
 		return artifact;
 	}
 

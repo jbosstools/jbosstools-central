@@ -16,12 +16,16 @@ import java.io.File;
 import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.net.UnknownHostException;
+import java.util.LinkedHashSet;
 import java.util.Set;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Unmarshaller;
 
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.m2e.core.embedder.ArtifactKey;
 import org.jboss.tools.maven.core.MavenCoreActivator;
 import org.jboss.tools.maven.core.repositories.NexusRepository;
@@ -36,10 +40,20 @@ public class NexusRepositoryIdentifier extends AbstractArtifactIdentifier {
 	}
 	
 	public ArtifactKey identify(File file) throws CoreException {
-		return getArtifactFromRemoteNexusRepository(file);
+		return getArtifactFromRemoteNexusRepository(file, null);
 	}
 
-	private ArtifactKey getArtifactFromRemoteNexusRepository(File file) {
+	public ArtifactKey identify(File file, IProgressMonitor monitor) throws CoreException {
+		return getArtifactFromRemoteNexusRepository(file, monitor);
+	}
+
+	private ArtifactKey getArtifactFromRemoteNexusRepository(File file, IProgressMonitor monitor) {
+		if (monitor == null) {
+			monitor = new NullProgressMonitor();
+		}
+		if (monitor.isCanceled()) {
+			return null;
+		}
 		String sha1;
 		try {
 			sha1 = getSHA1(file);
@@ -47,38 +61,25 @@ public class NexusRepositoryIdentifier extends AbstractArtifactIdentifier {
 			return null;
 		}
 		 RemoteRepositoryManager repoManager = MavenCoreActivator.getDefault().getRepositoryManager();
-		Set<NexusRepository> nexusRepositories = repoManager .getNexusRepositories();
+		Set<NexusRepository> nexusRepositories = new LinkedHashSet<NexusRepository>(repoManager.getNexusRepositories());
 		for (NexusRepository repository : nexusRepositories) {
+			if (monitor.isCanceled()) {
+				return null;
+			}
 			if (!repository.isEnabled()) {
 				continue;
 			}
+			monitor.setTaskName("Querying "+repository.getUrl() + " for "+file.getName()); 
+
 			try {
 				ArtifactKey key = searchArtifactFromRemoteNexusRepository(repository.getSearchUrl(sha1));
 				if (key != null) {
-					/*
-					Searching for sources here makes no sense here :
-					ex : guice.jar (from seam 2.3) is found in jboss nexus via a SHA1 search but subsequent search
-					of its sources on this repo returns null => guice.jar can never be identified in that case!
-					Source resolution / Missing sources should be dealt upstream from here 
-					
-					String searchSourcesUrl = repository.getSearchUrl(key.getArtifactId(),
-							                                   key.getGroupId(),
-							                                   key.getVersion(),
-							                                   getSourcesClassifier(key.getClassifier()));
-				
-					ArtifactKey resolvedKey = searchArtifactFromRemoteNexusRepository(searchSourcesUrl);
-
-					if (resolvedKey != null) {
-						return key;
-					}
-					*/
 					return key;
 				}
 			} catch (UnsupportedEncodingException e) {
 				e.printStackTrace();
 			}
 		}
-		//System.err.println(getName()+ "Couldn't find match for SHA1="+sha1);
 		return null;
 	}
 
@@ -96,6 +97,8 @@ public class NexusRepositoryIdentifier extends AbstractArtifactIdentifier {
 			if (object instanceof SearchResponse) {
 				return extractArtifactKey((SearchResponse)object);
 			}
+		} catch (UnknownHostException uhe) {
+			System.err.println("NexusRepositoryIdentifier can't connect to remote repository :"+ uhe.getMessage());
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {

@@ -13,10 +13,14 @@ package org.jboss.tools.maven.core.identification;
 import java.io.File;
 
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.m2e.core.embedder.ArtifactKey;
 
 public interface ArtifactIdentifier {
 	
+	@Deprecated
 	ArtifactKey identify(File file) throws CoreException;
+
+	ArtifactKey identify(File file, IProgressMonitor monitor) throws CoreException;
 
 }
