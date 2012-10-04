@@ -28,7 +28,7 @@ public class MavenPropertiesIdentifier extends AbstractArtifactIdentifier {
 	}
 
 	public ArtifactKey identify(File file) throws CoreException {
-		ZipFile jar;
+		ZipFile jar = null;
 		try {
 			jar = new ZipFile(file);
 			return getArtifactFromMetaInf(jar);
@@ -36,11 +36,18 @@ public class MavenPropertiesIdentifier extends AbstractArtifactIdentifier {
 			e.printStackTrace();
 		} catch (IOException e) {
 			e.printStackTrace();
+		} finally {
+			if (jar != null) {
+				try {
+					jar.close();
+				} catch (IOException e) {
+				}
+			}
 		}
-		//System.err.println(getName() + " could not identify "+file);
 		return null;
 	}
 
+	@SuppressWarnings("nls")
 	protected static ArtifactKey getArtifactFromMetaInf(ZipFile jar) throws IOException {
 		ZipEntry mavenEntry = jar.getEntry("META-INF/maven");//$NON-NLS-1$
 		if (mavenEntry == null) {
