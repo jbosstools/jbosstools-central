@@ -27,6 +27,12 @@ public class FileIdentificationManagerTest extends AbstractIdentificationTest {
 			public ArtifactKey identify(File file) throws CoreException {
 				return null;
 			}
+
+			@Override
+			public ArtifactKey identify(File file, IProgressMonitor monitor) throws CoreException {
+				// TODO Auto-generated method stub
+				return null;
+			}
 		};
 		monitor = new NullProgressMonitor();
 		fileIdentificationManager = new FileIdentificationManager(Collections.singleton(identifier1));
@@ -42,6 +48,12 @@ public class FileIdentificationManagerTest extends AbstractIdentificationTest {
 				@Override
 				public ArtifactKey identify(File file) throws CoreException {
 					return new ArtifactKey("junit", "junit", "4.10", null);
+				}
+
+				@Override
+				public ArtifactKey identify(File file, IProgressMonitor monitor) throws CoreException {
+					// TODO Auto-generated method stub
+					return null;
 				}
 			}
 		);
