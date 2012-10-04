@@ -33,6 +33,8 @@ import org.eclipse.core.runtime.jobs.IJobChangeEvent;
 import org.eclipse.core.runtime.jobs.IJobChangeListener;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.dialogs.Dialog;
+import org.eclipse.jface.dialogs.DialogSettings;
+import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.viewers.ArrayContentProvider;
@@ -112,6 +114,8 @@ public class IdentifyMavenDependencyPage extends WizardPage {
 
 	private Link warningLink;
 
+	private IDialogSettings dialogSettings;
+
 	private static String MESSAGE = "Identify existing project references as Maven dependencies. Double-click on a Maven dependency to edit its details";
 
 
@@ -120,6 +124,7 @@ public class IdentifyMavenDependencyPage extends WizardPage {
 		this.project = project;
 		initialEntries = Collections.unmodifiableList(entries);
 		initDependencyMap();
+		initDialogSettings();
 	}
 
 	private void initDependencyMap() {
@@ -128,8 +133,29 @@ public class IdentifyMavenDependencyPage extends WizardPage {
 				dependencyMap.put(entry, null);
 		}
 	}
+	
+    /** Loads the dialog settings using the page name as a section name. */
+	private void initDialogSettings() {
+	    IDialogSettings pluginSettings;
+	    
+	    // This is strictly to get SWT Designer working locally without blowing up.
+	    if( MavenDependencyConversionActivator.getDefault() == null ) {
+	      pluginSettings = new DialogSettings("Workbench");
+	    }
+	    else {
+	      pluginSettings = MavenDependencyConversionActivator.getDefault().getDialogSettings();      
+	    }
+	    
+	    dialogSettings = pluginSettings.getSection(getName());
+	    if(dialogSettings == null) {
+	      dialogSettings = pluginSettings.addNewSection(getName());
+	      pluginSettings.addSection(dialogSettings);
+	    }
+	}
 
 	public void dispose() {
+		
+		dialogSettings.put("isDeleteJars", isDeleteJars());
 		if (jarImage != null) jarImage.dispose();
 		if (okImage != null) okImage.dispose();
 		if (projectImage != null) projectImage.dispose();
@@ -209,6 +235,7 @@ public class IdentifyMavenDependencyPage extends WizardPage {
 	        }
 	      });
 
+		deleteJars = dialogSettings.getBoolean("isDeleteJars");
 		deleteJarsBtn = addCheckButton(container, "Delete original references from project", deleteJars);
 		deleteJarsBtn.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
