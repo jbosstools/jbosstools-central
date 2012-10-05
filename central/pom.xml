@@ -19,7 +19,7 @@
 
 		mvn clean install
 			or
-		mvn clean install -B -U -fae -e -P jbosstools-nightly-staging-composite,jboss-requirements-composite-mirror,jboss-requirements-composite-extras-mirror,local.site -Dlocal.site=file://home/nboldt/tmp/JBT_REPO_Indigo/
+		mvn clean install -B -U -fae -e -P jbosstools-nightly-staging-composite,jboss-requirements-composite-mirror,jboss-requirements-composite-extras-mirror,local.site -Dlocal.site=file:///home/nboldt/tmp/JBT_REPO_Juno/
 	-->
 	<modules>
 		<module>plugins</module>
@@ -27,18 +27,5 @@
 		<module>tests</module>
 		<module>site</module>
 	</modules>
-	<repositories>
-		<repository>
-			<id>jbosstools-m2e-wtp-mirror</id>
-			<layout>p2</layout>
-			<url>http://download.jboss.org/jbosstools/updates/requirements/m2eclipse/m2e-wtp-juno/</url>
-			<releases>
-				<enabled>true</enabled>
-			</releases>
-			<snapshots>
-				<enabled>false</enabled>
-			</snapshots>
-		</repository>
-	</repositories>
 </project>
 
