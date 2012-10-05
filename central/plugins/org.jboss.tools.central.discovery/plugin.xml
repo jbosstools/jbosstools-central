@@ -568,7 +568,7 @@
             <iu id="com.android.ide.eclipse.traceview"/>
             <!-- DO NOT INCLUDE com.android.ide.eclipse.ndk feature because it requires CDT -->
          <icon
-               image32="images/google_32.png">
+               image32="images/android_32.png">
          </icon>
          <overview
                url="http://developer.android.com/tools/sdk/eclipse-adt.html">
