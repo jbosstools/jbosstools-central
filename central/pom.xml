@@ -27,5 +27,19 @@
 		<module>tests</module>
 		<module>site</module>
 	</modules>
+	<repositories>
+                <!-- JBIDE-12294 merge m2e, m2e-wtp, and m2e-apt into a single site defined in parent pom -->
+		<repository>
+			<id>m2e</id>
+			<url>${m2e}</url>
+			<layout>p2</layout>
+			<snapshots>
+				<enabled>true</enabled>
+			</snapshots>
+			<releases>
+				<enabled>true</enabled>
+			</releases>
+		</repository>
+	</repositories>
 </project>
 
