@@ -554,6 +554,54 @@
       <connectorDescriptor
             categoryId="org.jboss.tools.central.discovery.web"
             groupId="org.jboss.tools.central.discovery.web.extras"
+            description="Android Development Tools, DDMS, Hierarchy Viewer, OpenGL Tracer, Traceview"
+            id="com.android.ide.eclipse.adt"
+            kind="task"
+            license="EPL, Other"
+            name="Android Development Tools"
+            provider="Google, Inc."
+            siteUrl="http://download.jboss.org/jbosstools/updates/development/juno/central/core/">
+            <iu id="com.android.ide.eclipse.adt"/>
+            <iu id="com.android.ide.eclipse.ddms"/>
+            <iu id="com.android.ide.eclipse.hierarchyviewer"/>
+            <iu id="com.android.ide.eclipse.gldebugger"/>
+            <iu id="com.android.ide.eclipse.traceview"/>
+            <!-- DO NOT INCLUDE com.android.ide.eclipse.ndk feature because it requires CDT -->
+         <icon
+               image32="images/google_32.png">
+         </icon>
+         <overview
+               url="http://developer.android.com/tools/sdk/eclipse-adt.html">
+         </overview>
+      </connectorDescriptor>
+      <connectorDescriptor
+            categoryId="org.jboss.tools.central.discovery.web"
+            groupId="org.jboss.tools.central.discovery.web.extras"
+            description="Google Web Toolkit Designer + WindowBuilder"
+            id="com.google.gdt.eclipse.designer.editor.feature"
+            kind="task"
+            license="EPL, Other"
+            name="Google Web Toolkit Designer"
+            provider="Google, Inc."
+            siteUrl="http://download.jboss.org/jbosstools/updates/development/juno/central/core/">
+            <iu id="com.google.gdt.eclipse.designer.editor.feature"/>
+            <iu id="com.google.gdt.eclipse.designer.gpe.feature"/>
+            <iu id="com.google.gdt.eclipse.designer.hosted.feature"/>
+            <iu id="com.google.gwt.eclipse.sdkbundle.e42.feature"/>
+            <iu id="com.google.gdt.eclipse.suite.e42.feature"/>
+            <iu id="org.eclipse.wb.core.feature"/>
+            <iu id="org.eclipse.wb.core.xml.feature"/>
+            <iu id="org.eclipse.wb.css.feature"/>
+         <icon
+               image32="images/google_32.png">
+         </icon>
+         <overview
+               url="https://developers.google.com/web-toolkit/tools/gwtdesigner/quick_start">
+         </overview>
+      </connectorDescriptor>
+      <connectorDescriptor
+            categoryId="org.jboss.tools.central.discovery.web"
+            groupId="org.jboss.tools.central.discovery.web.extras"
             description="Google Plugin for Eclipse (GPE) + Google Web Toolkit SDK (GWT)"
             id="com.google.gwt.eclipse.sdkbundle.e42.feature"
             kind="task"
@@ -567,7 +615,7 @@
                image32="images/google_32.png">
          </icon>
          <overview
-               url="http://code.google.com/p/google-plugin-for-eclipse/">
+               url="https://developers.google.com/eclipse/">
          </overview>
       </connectorDescriptor>
       <connectorDescriptor
