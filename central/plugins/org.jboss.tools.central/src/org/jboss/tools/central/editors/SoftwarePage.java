@@ -80,6 +80,8 @@ public class SoftwarePage extends AbstractJBossCentralPage implements IRunnableC
 	private InstallAction installAction;
 
 	private Button installButton;
+
+	private ToolBarManager toolBarManager;
 	
 	public SoftwarePage(FormEditor editor) {
 		super(editor, ID, "Software/Update");
@@ -231,7 +233,7 @@ public class SoftwarePage extends AbstractJBossCentralPage implements IRunnableC
 	    headerComposite.setLayout(rowLayout);
 	    headerComposite.setBackground(null);
 	    
-	    ToolBarManager toolBarManager = new ToolBarManager(SWT.FLAT | SWT.HORIZONTAL);
+	    toolBarManager = new ToolBarManager(SWT.FLAT | SWT.HORIZONTAL);
 		toolBarManager.createControl(headerComposite);
 
 		installAction = new InstallAction();
@@ -307,6 +309,10 @@ public class SoftwarePage extends AbstractJBossCentralPage implements IRunnableC
 		if (refreshJobChangeListener != null) {
 			RefreshDiscoveryJob.INSTANCE.removeJobChangeListener(refreshJobChangeListener);
 			refreshJobChangeListener = null;
+		}
+		if (toolBarManager != null) {
+			toolBarManager.dispose();
+			toolBarManager = null;
 		}
 		super.dispose();
 	}

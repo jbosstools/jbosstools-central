@@ -159,6 +159,7 @@ public class GettingStartedPage extends AbstractJBossCentralPage {
 	private ToolBarManager newsToolBarManager;
 	private ToolBarManager blogsToolBarManager;
 	private Action blogsWarning;
+	private ToolBarManager tutorialsToolBarManager;
 	
 	public GettingStartedPage(FormEditor editor) {
 		super(editor, ID, "Getting Started");
@@ -484,25 +485,25 @@ public class GettingStartedPage extends AbstractJBossCentralPage {
 	    headerComposite.setLayout(rowLayout);
 	    headerComposite.setBackground(null);
 	    
-	    ToolBarManager toolBarManager = new ToolBarManager(SWT.FLAT | SWT.HORIZONTAL);
-		toolBarManager.createControl(headerComposite);
+	    tutorialsToolBarManager = new ToolBarManager(SWT.FLAT | SWT.HORIZONTAL);
+		tutorialsToolBarManager.createControl(headerComposite);
 		
 		CommandContributionItem item = JBossCentralActivator.createContributionItem(getSite(), "org.jboss.tools.central.newProjectExamplesWizard");
-		toolBarManager.add(item);
+		tutorialsToolBarManager.add(item);
 		
 		item = JBossCentralActivator.createContributionItem(getSite(), "org.jboss.tools.runtime.preferences");
-		toolBarManager.add(item);
+		tutorialsToolBarManager.add(item);
 
 		item = JBossCentralActivator.createContributionItem(getSite(), "org.jboss.tools.wtp.runtime.preferences");
-		toolBarManager.add(item);
+		tutorialsToolBarManager.add(item);
 		
 		item = JBossCentralActivator.createContributionItem(getSite(), "org.jboss.tools.central.refreshJBossTutorials");
-		toolBarManager.add(item);
+		tutorialsToolBarManager.add(item);
 
 		//Action action = new DownloadRuntimeAction("Download and Install JBoss AS 7.0.1", JBossCentralActivator.imageDescriptorFromPlugin(JBossCentralActivator.PLUGIN_ID, "/icons/jbossas7.png"), "org.jboss.tools.runtime.core.as.701");
 		//toolBarManager.add(action);
 
-	    toolBarManager.update(true);
+	    tutorialsToolBarManager.update(true);
 	    
 		section.setTextClient(headerComposite);
 	}
@@ -750,8 +751,22 @@ public class GettingStartedPage extends AbstractJBossCentralPage {
 
 	@Override
 	public void dispose() {
-		newWizardDropDownAction.dispose();
-		newWizardDropDownAction = null;
+		if (newWizardDropDownAction != null) {
+			newWizardDropDownAction.dispose();
+			newWizardDropDownAction = null;
+		}
+		if (newsToolBarManager != null) {
+			newsToolBarManager.dispose();
+			newsToolBarManager = null;
+		}
+		if (blogsToolBarManager != null) {
+			blogsToolBarManager.dispose();
+			blogsToolBarManager = null;
+		}
+		if (tutorialsToolBarManager != null) {
+			tutorialsToolBarManager.dispose();
+			tutorialsToolBarManager = null;
+		}
 		if (refreshBlogsJobChangeListener != null) {
 			RefreshBlogsJob.INSTANCE.removeJobChangeListener(refreshBlogsJobChangeListener);
 			refreshBlogsJobChangeListener = null;

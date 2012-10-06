@@ -24,6 +24,7 @@ import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.action.ControlContribution;
 import org.eclipse.jface.action.GroupMarker;
 import org.eclipse.jface.action.IToolBarManager;
+import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.text.Document;
 import org.eclipse.jface.text.TextViewer;
 import org.eclipse.swt.SWT;
@@ -38,9 +39,9 @@ import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
-import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
@@ -96,6 +97,8 @@ public class JBossCentralEditor extends SharedHeaderFormEditor {
 	}
 
 	public void dispose() {
+		gettingStartedPage = null;
+		softwarePage = null;
 		if (headerImage != null) {
 			headerImage.dispose();
 			headerImage = null;
@@ -116,6 +119,9 @@ public class JBossCentralEditor extends SharedHeaderFormEditor {
 		} catch (InterruptedException e) {
 			// ignore
 		}
+		
+		getSite().setSelectionProvider(null);
+		
 		super.dispose();
 	}
 
@@ -186,7 +192,7 @@ public class JBossCentralEditor extends SharedHeaderFormEditor {
 		form.setImage(getHeaderImage());
 		getToolkit().decorateFormHeading(form.getForm());
 		
-		IToolBarManager toolbar = form.getToolBarManager();
+		final IToolBarManager toolbar = form.getToolBarManager();
 		ControlContribution searchControl = new ControlContribution("Search") {
 			@Override
 			protected Control createControl(Composite parent) {
@@ -204,6 +210,18 @@ public class JBossCentralEditor extends SharedHeaderFormEditor {
 		}
 
 		toolbar.update(true);
+		form.addDisposeListener(new DisposeListener() {
+			
+			@Override
+			public void widgetDisposed(DisposeEvent e) {
+				if (toolbar instanceof ToolBarManager) {
+					((ToolBarManager)toolbar).dispose();
+				} else {
+					toolbar.removeAll();
+				}
+				form.removeDisposeListener(this);
+			}
+		});
 		form.layout(true, true);
 	}
 
@@ -240,7 +258,7 @@ public class JBossCentralEditor extends SharedHeaderFormEditor {
 		searchControl.setLayoutData(gd);
 		searchControl.setBackground(null);
 		getToolkit().adapt(searchControl);
-		searchControl.addSelectionListener(new SelectionAdapter() {
+		final SelectionListener searchControlListener = new SelectionAdapter() {
 
 			@Override
 			public void widgetDefaultSelected(SelectionEvent e) {
@@ -284,8 +302,16 @@ public class JBossCentralEditor extends SharedHeaderFormEditor {
 				}
 			}
 
+		};
+		searchControl.addSelectionListener(searchControlListener);
+		searchControl.addDisposeListener(new DisposeListener() {
+			
+			@Override
+			public void widgetDisposed(DisposeEvent e) {
+				searchControl.removeSelectionListener(searchControlListener);
+				searchControl.removeDisposeListener(this);
+			}
 		});
-
 		final Menu menu = new Menu(menuLink);
 		final MenuItem searchCommunityPortal = new MenuItem(menu, SWT.CHECK);
 		searchCommunityPortal
@@ -300,7 +326,7 @@ public class JBossCentralEditor extends SharedHeaderFormEditor {
 		} else {
 			searchCommunity.setSelection(true);
 		}
-		searchCommunity.addSelectionListener(new SelectionAdapter() {
+		final SelectionListener searchCommunityListener = new SelectionAdapter() {
 
 			@Override
 			public void widgetSelected(SelectionEvent e) {
@@ -310,9 +336,18 @@ public class JBossCentralEditor extends SharedHeaderFormEditor {
 						.setInitialMessage(JBossCentralActivator.SEARCH_THE_COMMUNITY);
 			}
 
+		};
+		searchCommunity.addSelectionListener(searchCommunityListener);
+		searchCommunity.addDisposeListener(new DisposeListener() {
+			
+			@Override
+			public void widgetDisposed(DisposeEvent e) {
+				searchCommunity.removeSelectionListener(searchCommunityListener);
+				searchCommunity.removeDisposeListener(this);
+			}
 		});
 
-		searchCommunityPortal.addSelectionListener(new SelectionAdapter() {
+		final SelectionListener searchCommunityPortalListener = new SelectionAdapter() {
 
 			@Override
 			public void widgetSelected(SelectionEvent e) {
@@ -322,8 +357,17 @@ public class JBossCentralEditor extends SharedHeaderFormEditor {
 						.setInitialMessage(JBossCentralActivator.SEARCH_RED_HAT_CUSTOMER_PORTAL);
 			}
 
-		});
+		};
+		searchCommunityPortal.addSelectionListener(searchCommunityPortalListener);
 
+		searchCommunityPortal.addDisposeListener(new DisposeListener() {
+			
+			@Override
+			public void widgetDisposed(DisposeEvent e) {
+				searchCommunityPortal.removeSelectionListener(searchCommunityPortalListener);
+				searchCommunityPortal.removeDisposeListener(this);
+			}
+		});
 		menuLink.addMouseListener(new MouseListener() {
 
 			@Override
@@ -339,6 +383,14 @@ public class JBossCentralEditor extends SharedHeaderFormEditor {
 			@Override
 			public void mouseDoubleClick(MouseEvent e) {
 
+			}
+		});
+		searchComposite.addDisposeListener(new DisposeListener() {
+			
+			@Override
+			public void widgetDisposed(DisposeEvent e) {
+				menu.dispose();
+				searchComposite.removeDisposeListener(this);
 			}
 		});
 		return searchComposite;

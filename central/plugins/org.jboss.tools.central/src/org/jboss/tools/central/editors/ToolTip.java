@@ -467,7 +467,7 @@ public abstract class ToolTip {
 		CURRENT_TOOLTIP = shell;
 
 		control.getShell().addListener(SWT.Deactivate, shellListener);
-		control.getShell().addDisposeListener(new DisposeListener() {
+		control.addDisposeListener(new DisposeListener() {
 			
 			@Override
 			public void widgetDisposed(DisposeEvent e) {
