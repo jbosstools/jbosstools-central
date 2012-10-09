@@ -21,25 +21,22 @@ import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
-import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.Path;
-import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.embedder.MavenModelManager;
 import org.eclipse.m2e.core.project.AbstractProjectScanner;
+import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.project.LocalProjectScanner;
 import org.eclipse.m2e.core.project.MavenProjectInfo;
 import org.eclipse.m2e.core.project.ProjectImportConfiguration;
 import org.eclipse.m2e.core.ui.internal.actions.OpenMavenConsoleAction;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
-import org.eclipse.ui.PlatformUI;
 import org.jboss.tools.maven.ui.Activator;
 import org.jboss.tools.project.examples.ProjectExamplesActivator;
 import org.jboss.tools.project.examples.model.ProjectExample;
@@ -246,7 +243,13 @@ public class ImportMavenProjectExampleDelegate extends AbstractImportMavenProjec
 				Model model = info.getModel();
 				if (model != null && model.getArtifactId() != null
 						&& model.getArtifactId().trim().length() > 0) {
-					projectNames.add(model.getArtifactId());
+					
+					IMavenProjectFacade f = MavenPlugin.getMavenProjectRegistry().getMavenProject(model.getGroupId(), 
+							                                                                      model.getArtifactId(), 
+							                                                                      model.getVersion());
+					if (f != null && f.getProject() != null) {
+						projectNames.add(f.getProject().getName());
+					}
 				}
 			}
 		} catch (CoreException ex) {
