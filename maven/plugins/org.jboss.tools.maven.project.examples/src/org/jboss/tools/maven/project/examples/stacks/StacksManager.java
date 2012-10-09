@@ -66,12 +66,12 @@ public class StacksManager {
 	private static String getStacksUrlFromJar() {
 		InputStream is = null;
 		try {
-			is = StacksManager.class.getResourceAsStream("/org/jboss/jdf/stacks/client/config.properties");
+			is = StacksManager.class.getResourceAsStream("/org/jboss/jdf/stacks/client/config.properties"); //$NON-NLS-1$
 			Properties p = new Properties();
 			p.load(is);
 			return p.getProperty(StacksClientConfiguration.REPO_PROPERTY);
 		} catch (Exception e) {
-			System.err.println("Can't read stacks url from the stacks-client.jar");
+			System.err.println("Can't read stacks url from the stacks-client.jar"); //$NON-NLS-1$
 			e.printStackTrace();
 		} finally {
 			IOUtil.close(is);

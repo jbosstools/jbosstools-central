@@ -32,18 +32,18 @@ public class StacksUtil {
 		
 		Map<String, String> serverIdMap = new HashMap<String, String>();
 		
-		serverIdMap.put("org.jboss.ide.eclipse.as.runtime.eap.60","jbosseap6runtime");
-		serverIdMap.put("org.jboss.ide.eclipse.as.runtime.71","jboss-as711runtime");
+		serverIdMap.put("org.jboss.ide.eclipse.as.runtime.eap.60","jbosseap6runtime"); //$NON-NLS-1$ //$NON-NLS-2$
+		serverIdMap.put("org.jboss.ide.eclipse.as.runtime.71","jboss-as711runtime"); //$NON-NLS-1$ //$NON-NLS-2$
 		//serverIdMap.put("org.jboss.ide.eclipse.as.runtime.71","jboss-as710runtime");
-		serverIdMap.put("org.jboss.ide.eclipse.as.runtime.70","jboss-as702runtime-web");
+		serverIdMap.put("org.jboss.ide.eclipse.as.runtime.70","jboss-as702runtime-web"); //$NON-NLS-1$ //$NON-NLS-2$
 		//serverIdMap.put("org.jboss.ide.eclipse.as.runtime.70","jboss-as702runtime-full");
 		
 		RUNTIMES_MAP = Collections.unmodifiableMap(serverIdMap);
 	}
 	
-	public static final String EAP_TYPE = "EAP";
+	public static final String EAP_TYPE = "EAP"; //$NON-NLS-1$
 
-	public static final String AS_TYPE = "AS";
+	public static final String AS_TYPE = "AS"; //$NON-NLS-1$
 
 	private StacksUtil() {
 		// no need for public constructor
@@ -122,7 +122,7 @@ public class StacksUtil {
 		}
 		for (Runtime runtime : fromStacks.getAvailableRuntimes()) {
 			Properties p = runtime.getLabels();
-			if (p != null && wtpRuntimeId.equals(p.get("wtp-runtime-id"))) {
+			if (p != null && wtpRuntimeId.equals(p.get("wtp-runtime-id"))) { //$NON-NLS-1$
 				return runtime;
 			}
 		}
@@ -140,7 +140,7 @@ public class StacksUtil {
 		}
 		for (Runtime runtime : fromStacks.getAvailableRuntimes()) {
 			Properties p = runtime.getLabels();
-			if (p != null && wtpRuntimeId.equals(p.get("wtp-runtime-id"))) {
+			if (p != null && wtpRuntimeId.equals(p.get("wtp-runtime-id"))) { //$NON-NLS-1$
 				return runtime;
 			}
 		}
@@ -203,7 +203,7 @@ public class StacksUtil {
 		}
 		
 		Properties p = runtime.getLabels();
-		return (String)p.get("runtime-type"); 
+		return (String)p.get("runtime-type");  //$NON-NLS-1$
 	}
 
 	public static ArchetypeModel createArchetypeModel(ArchetypeModel archetypeModel, ArchetypeVersion archetypeVersion) throws CloneNotSupportedException {
@@ -211,6 +211,7 @@ public class StacksUtil {
 		a.setArchetypeArtifactId(archetypeVersion.getArchetype().getArtifactId());
 		a.setArchetypeGroupId(archetypeVersion.getArchetype().getGroupId());
 		a.setArchetypeVersion(archetypeVersion.getVersion());
+		a.setArchetypeRepository(archetypeVersion.getRepositoryURL());
 		return a;
 	}
 
