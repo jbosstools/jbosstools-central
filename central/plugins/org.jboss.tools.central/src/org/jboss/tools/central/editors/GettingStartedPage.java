@@ -216,8 +216,6 @@ public class GettingStartedPage extends AbstractJBossCentralPage {
 	private void createBlogsSection(FormToolkit toolkit, Composite parent) {
 		blogsSection = createSection(toolkit, parent, "Blogs", ExpandableComposite.TITLE_BAR|ExpandableComposite.EXPANDED|ExpandableComposite.TWISTIE);
 	    GridData gd = new GridData(SWT.FILL, SWT.FILL, true, false);
-	    //gd.widthHint = 350;
-	    //gd.heightHint = 100;
 	    blogsSection.setLayoutData(gd);
 		createBlogsToolbar(toolkit, blogsSection);
 				
@@ -269,8 +267,6 @@ public class GettingStartedPage extends AbstractJBossCentralPage {
 	private void createNewsSection(FormToolkit toolkit, Composite parent) {
 		newsSection = createSection(toolkit, parent, "News", ExpandableComposite.TITLE_BAR|ExpandableComposite.EXPANDED|ExpandableComposite.TWISTIE);
 	    GridData gd = new GridData(SWT.FILL, SWT.FILL, true, false);
-	    //gd.widthHint = 350;
-	    //gd.heightHint = 100;
 	    newsSection.setLayoutData(gd);
 		createNewsToolbar(toolkit, newsSection);
 				
@@ -360,7 +356,7 @@ public class GettingStartedPage extends AbstractJBossCentralPage {
 		};
 		blogsWarning.setId(BLOGS_WARNING_ID);
 		blogsWarning.setActionDefinitionId(BLOGS_WARNING_ID);
-		//blogsWarning.setEnabled(false);
+
 		blogsToolBarManager.add(blogsWarning);
 		
 		setItemVisible(blogsToolBarManager, BLOGS_WARNING_ID, false);
@@ -392,7 +388,7 @@ public class GettingStartedPage extends AbstractJBossCentralPage {
 		};
 		newsWarning.setId(NEWS_WARNING_ID);
 		newsWarning.setActionDefinitionId(NEWS_WARNING_ID);
-		//newsWarning.setEnabled(false);
+
 		newsToolBarManager.add(newsWarning);
 		
 		setItemVisible(newsToolBarManager, NEWS_WARNING_ID, false);
@@ -424,8 +420,6 @@ public class GettingStartedPage extends AbstractJBossCentralPage {
 	private void createTutorialsSection(FormToolkit toolkit, Composite parent) {
 		tutorialsSection = createSection(toolkit, parent, "Project Examples", ExpandableComposite.TITLE_BAR|ExpandableComposite.TWISTIE|ExpandableComposite.EXPANDED);
 	    GridData gd = new GridData(SWT.FILL, SWT.FILL, false, false);
-	    //gd.widthHint = 350;
-	    //gd.heightHint = 100;
 	    tutorialsSection.setLayoutData(gd);
 	    
 	    createTutorialsToolbar(toolkit, tutorialsSection);
@@ -444,11 +438,6 @@ public class GettingStartedPage extends AbstractJBossCentralPage {
     	tutorialScrollComposite.setExpandVertical(true);
     	tutorialScrollComposite.setExpandHorizontal(true);
     	tutorialScrollComposite.setAlwaysShowScrollBars(false);
-//    	tutorialScrollComposite.addControlListener(new ControlAdapter() {
-//    		public void controlResized(ControlEvent e) {
-//    			recomputeScrollComposite(tutorialScrollComposite, tutorialPageBook);
-//    		}
-//    	});
 	    		
 	    tutorialsNoteText = createNoteText(toolkit, tutorialPageBook);
 	    tutorialsLoadingComposite = createLoadingComposite(toolkit, tutorialPageBook);	    
@@ -513,11 +502,8 @@ public class GettingStartedPage extends AbstractJBossCentralPage {
 		projectsSection.setText("Create Projects");
 	    projectsSection.setLayout(new GridLayout());
 	    GridData gd = new GridData(SWT.FILL, SWT.FILL, false, false);
-	    //gd.widthHint = 350;
-	    //gd.heightHint = 100;
 	    projectsSection.setLayoutData(gd);
 	    
-		
 	    Composite headerComposite = toolkit.createComposite(projectsSection, SWT.NONE);
 	    RowLayout rowLayout = new RowLayout();
 	    rowLayout.marginTop = 0;
@@ -676,8 +662,6 @@ public class GettingStartedPage extends AbstractJBossCentralPage {
 	public void createDocumentationSection(FormToolkit toolkit, Composite parent) {
 		documentationSection = createSection(toolkit, parent, "Documentation", ExpandableComposite.TITLE_BAR|ExpandableComposite.TWISTIE|ExpandableComposite.EXPANDED);
 	    GridData gd = new GridData(SWT.FILL, SWT.FILL, false, false);
-	    //gd.widthHint = 350;
-	    //gd.heightHint = 100;
 	    documentationSection.setLayoutData(gd);
 	    
 		documentationComposite = toolkit.createComposite(documentationSection);
@@ -887,43 +871,52 @@ public class GettingStartedPage extends AbstractJBossCentralPage {
 	public void refreshTutorials() {
 		RefreshTutorialsJob job = RefreshTutorialsJob.INSTANCE;
 		if (job.getException() != null) {
-			showException(tutorialPageBook, tutorialsExceptionText, job.getException());
+			showException(tutorialPageBook, tutorialsExceptionText,
+					job.getException());
 			return;
 		}
-		Map<ProjectExampleCategory, List<ProjectExample>> categories = job.getTutorialCategories();
+		Map<ProjectExampleCategory, List<ProjectExample>> categories = job
+				.getTutorialCategories();
 		if (categories == null || categories.size() == 0) {
-			showNote(tutorialPageBook, tutorialsNoteText, tutorialScrollComposite);
+			showNote(tutorialPageBook, tutorialsNoteText,
+					tutorialScrollComposite);
 			return;
 		}
 		showTutorials(categories);
+		resize(true);
 	}
 
-	private void showTutorials(Map<ProjectExampleCategory, List<ProjectExample>> categories) {
+	private void showTutorials(
+			Map<ProjectExampleCategory, List<ProjectExample>> categories) {
 		disposeChildren(tutorialsComposite);
-		List<ProjectExampleCategory> sortedCategories = new ArrayList<ProjectExampleCategory>(categories.keySet()); 
+		List<ProjectExampleCategory> sortedCategories = new ArrayList<ProjectExampleCategory>(
+				categories.keySet());
 		Collections.sort(sortedCategories);
 		for (final ProjectExampleCategory category : sortedCategories) {
-			int style = ExpandableComposite.TITLE_BAR|ExpandableComposite.TWISTIE;
+			int style = ExpandableComposite.TITLE_BAR
+					| ExpandableComposite.TWISTIE;
 			if (expandedCategories.contains(category)) {
-				style|=ExpandableComposite.EXPANDED;
+				style |= ExpandableComposite.EXPANDED;
 			}
-			
-			final CategoryExpandableComposite categoryComposite = new CategoryExpandableComposite(tutorialsComposite, toolkit.getOrientation(),
-					style);
-			
+
+			final CategoryExpandableComposite categoryComposite = new CategoryExpandableComposite(
+					tutorialsComposite, toolkit.getOrientation(), style);
+
 			categoryComposite.setFont(getBoldFont(categoryComposite.getFont()));
-			
-			categoryComposite.setTitleBarForeground(toolkit.getColors().getColor(IFormColors.TB_TOGGLE));
+
+			categoryComposite.setTitleBarForeground(toolkit.getColors()
+					.getColor(IFormColors.TB_TOGGLE));
 			categoryComposite.setText(category.getName());
-			
+
 			GridData gd = new GridData(SWT.FILL, SWT.FILL, false, false);
 			categoryComposite.setLayoutData(gd);
 			categoryComposite.setLayout(new GridLayout());
-			final Composite composite = toolkit.createComposite(categoryComposite);
+			final Composite composite = toolkit
+					.createComposite(categoryComposite);
 			gd = new GridData(SWT.FILL, SWT.FILL, false, false);
 			composite.setLayoutData(gd);
 			composite.setLayout(new GridLayout(1, false));
-			
+
 			categoryComposite.addExpansionListener(new ExpansionAdapter() {
 				public void expansionStateChanged(ExpansionEvent e) {
 					if (e.getState()) {
@@ -938,18 +931,19 @@ public class GettingStartedPage extends AbstractJBossCentralPage {
 			displayTutorialLinks(categories.get(category), composite, true);
 			categoryComposite.setClient(composite);
 			String description = category.getDescription();
-			if (description != null && !description.isEmpty() && categoryComposite.getControl() != null && !categoryComposite.getControl().isDisposed()) {
-				final DescriptionToolTip toolTip = new DescriptionToolTip(categoryComposite.getControl(), description);
-				toolTip.activate();	
+			if (description != null && !description.isEmpty()
+					&& categoryComposite.getControl() != null
+					&& !categoryComposite.getControl().isDisposed()) {
+				final DescriptionToolTip toolTip = new DescriptionToolTip(
+						categoryComposite.getControl(), description);
+				toolTip.activate();
 			}
 		}
-		
+
 		tutorialPageBook.showPage(tutorialsComposite);
 		tutorialPageBook.layout(true, true);
 		form.reflow(true);
-		//form.redraw();
 		resize();
-		//recomputeScrollComposite(tutorialScrollComposite, tutorialPageBook);
 	}
 
   private Font getBoldFont(Font font) {
@@ -999,8 +993,6 @@ public class GettingStartedPage extends AbstractJBossCentralPage {
 					NewProjectExamplesWizard2 wizard = new NewProjectExamplesWizard2(tutorial);
 					WizardDialog dialog = new WizardDialog(getSite().getShell(), wizard);
 					dialog.open();
-					//ProjectExamplesDialog dialog = new ProjectExamplesDialog(getSite().getShell(), tutorial);
-					//dialog.open();
 					refreshTutorials();
 				}
 			}
@@ -1078,7 +1070,6 @@ public class GettingStartedPage extends AbstractJBossCentralPage {
 		pageBook.showPage(composite);
 		pageBook.layout(true, true);
 		form.reflow(true);
-		//form.redraw();
 		recomputeScrollComposite(scrollable, pageBook);
 		resize();
 	}
@@ -1099,11 +1090,11 @@ public class GettingStartedPage extends AbstractJBossCentralPage {
 		}
 		oldSize = size;
 		GridData gd;
-		int widthHint = size.x/2 - 20;
+		int widthHint = size.x / 2 - 20;
 		gd = (GridData) newsSection.getLayoutData();
 		if (newsSection.isExpanded()) {
 			if (blogsSection.isExpanded()) {
-				gd.heightHint = size.y/2 - 20;
+				gd.heightHint = size.y / 2 - 20;
 			} else {
 				gd.heightHint = size.y - 40;
 			}
@@ -1112,56 +1103,57 @@ public class GettingStartedPage extends AbstractJBossCentralPage {
 		}
 		gd.widthHint = widthHint;
 		gd.grabExcessVerticalSpace = false;
-		
+
 		gd = (GridData) blogsSection.getLayoutData();
 		if (blogsSection.isExpanded()) {
 			if (newsSection.isExpanded()) {
-				gd.heightHint = size.y/2 - 20;
+				gd.heightHint = size.y / 2 - 20;
 			} else {
 				gd.heightHint = size.y - 40;
 			}
 		} else {
 			gd.heightHint = 20;
 		}
-		
+
 		gd.widthHint = widthHint;
 		gd.grabExcessVerticalSpace = false;
-				
+
 		gd = (GridData) documentationSection.getLayoutData();
-		//gridData.heightHint = size.y - 40;
+		
 		gd.widthHint = widthHint;
 		gd.grabExcessVerticalSpace = false;
-		
+
 		gd = (GridData) settingsSection.getLayoutData();
 		gd.widthHint = widthHint;
 		gd.grabExcessVerticalSpace = false;
-		
+
 		gd = (GridData) projectsSection.getLayoutData();
-		//gridData.heightHint = size.y - 40;
+		
 		gd.widthHint = widthHint;
 		gd.grabExcessVerticalSpace = false;
-		
+
 		gd = (GridData) tutorialsSection.getLayoutData();
-		Point computedSize = tutorialPageBook.computeSize(widthHint, SWT.DEFAULT);
-		
-		if (computedSize.y > (size.y/3)) {
-			gd.heightHint = size.y/3;
+		Point computedSize = tutorialPageBook.computeSize(widthHint,
+				SWT.DEFAULT);
+
+		if (computedSize.y > (size.y / 3)) {
+			gd.heightHint = size.y / 3;
 		} else {
 			gd.heightHint = SWT.DEFAULT;
 		}
 		gd.widthHint = widthHint;
 		gd.grabExcessVerticalSpace = false;
-		
+
 		computedSize = tutorialPageBook.computeSize(widthHint, SWT.DEFAULT);
-		
+
 		tutorialScrollComposite.setMinSize(widthHint - 20, computedSize.y);
-		
+
 		recomputeScrollComposite(blogsScrollComposite, blogsPageBook);
 		recomputeScrollComposite(newsScrollComposite, newsPageBook);
-		
+
 		form.layout(true, true);
 		form.reflow(true);
-		
+
 	}
 
 	private class RefreshBlogsJobChangeListener implements IJobChangeListener {
