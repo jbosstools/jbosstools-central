@@ -75,6 +75,7 @@ public class CreateProjectsWithJava7Test extends CreateProjectsWithServerTest{
 			fail("Unable to select Java 1.7 in Project Facets");
 		}else{
 			facetsShell.bot().list().select("1.7");
+			facetsShell.bot().list().pressShortcut(SWT.CR, SWT.LF);
 		}
 	}
 	/**
