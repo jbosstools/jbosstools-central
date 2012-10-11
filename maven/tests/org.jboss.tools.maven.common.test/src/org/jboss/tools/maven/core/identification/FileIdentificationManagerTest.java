@@ -1,6 +1,17 @@
+/*************************************************************************************
+ * Copyright (c) 2008-2012 Red Hat, Inc. and others.
+ * All rights reserved. This program and the accompanying materials 
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ * 
+ * Contributors:
+ *     JBoss by Red Hat - Initial implementation.
+ ************************************************************************************/
 package org.jboss.tools.maven.core.identification;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 
 import java.io.File;
 import java.util.Collections;
@@ -47,13 +58,13 @@ public class FileIdentificationManagerTest extends AbstractIdentificationTest {
 			new ArtifactIdentifier() {
 				@Override
 				public ArtifactKey identify(File file) throws CoreException {
-					return new ArtifactKey("junit", "junit", "4.10", null);
+					return identify(file, null);
 				}
 
 				@Override
 				public ArtifactKey identify(File file, IProgressMonitor monitor) throws CoreException {
 					// TODO Auto-generated method stub
-					return null;
+					return new ArtifactKey("junit", "junit", "4.10", null);
 				}
 			}
 		);
