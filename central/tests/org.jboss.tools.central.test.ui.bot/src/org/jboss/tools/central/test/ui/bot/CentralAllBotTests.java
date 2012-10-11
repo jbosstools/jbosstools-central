@@ -7,6 +7,7 @@ import org.junit.runners.Suite.SuiteClasses;
 @RunWith(RequirementAwareSuite.class)
 @SuiteClasses({
 	BaseFunctionalityTest.class,
+	CreateProjectsWithJava7Test.class,
 	CreateProjectsWithServerTest.class,
 	DocumentationSectionTest.class
 //	InstallTest.class

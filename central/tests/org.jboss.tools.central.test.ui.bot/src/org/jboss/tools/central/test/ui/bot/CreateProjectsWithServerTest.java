@@ -10,13 +10,11 @@ import org.jboss.tools.ui.bot.ext.SWTBotFactory;
 import org.jboss.tools.ui.bot.ext.SWTFormsBotExt;
 import org.jboss.tools.ui.bot.ext.SWTOpenExt;
 import org.jboss.tools.ui.bot.ext.SWTTestExt;
-import org.jboss.tools.ui.bot.ext.Timing;
 import org.jboss.tools.ui.bot.ext.condition.NonSystemJobRunsCondition;
 import org.jboss.tools.ui.bot.ext.condition.TaskDuration;
 import org.jboss.tools.ui.bot.ext.config.Annotations.Require;
 import org.jboss.tools.ui.bot.ext.config.Annotations.ServerType;
 import org.jboss.tools.ui.bot.ext.gen.ActionItem.Preference;
-import org.jboss.tools.ui.bot.ext.parts.SWTBotFormTextExt;
 import org.jboss.tools.ui.bot.ext.parts.SWTBotTwistie;
 import org.jboss.tools.ui.bot.ext.types.IDELabel;
 import org.jboss.tools.ui.bot.ext.view.ProblemsView;
@@ -27,7 +25,7 @@ import org.junit.Test;
 
 
 //TODO When testing new build try it with type=ServerType.EAP !!!!
-@Require(clearProjects=false,server=@org.jboss.tools.ui.bot.ext.config.Annotations.Server(type=ServerType.ALL))
+@Require(clearProjects=false,server=@org.jboss.tools.ui.bot.ext.config.Annotations.Server(type=ServerType.JbossAS))
 public class CreateProjectsWithServerTest extends SWTTestExt{
 	
 	@BeforeClass
@@ -64,9 +62,7 @@ public class CreateProjectsWithServerTest extends SWTTestExt{
 			deleteDirectory(mvnLocalRepo);
 		}
 		//Now is ~/.m2/clean-repository deleted and settings.xml exists. Next step is to tell eclipse to use our settings.xml
-		bot.menu("Window").menu("Preferences").click();
-		bot.waitForShell("Preferences");
-		bot.tree().expandNode("Maven").select("User Settings");
+		open.preferenceOpen(Preference.create("Maven", "User Settings"));
 		if (bot.text(1).getText().equals("User settings file doesn't exist")){
 			bot.text(2).setText(mvnConfigFileName);
 		}else{
@@ -96,6 +92,7 @@ public class CreateProjectsWithServerTest extends SWTTestExt{
 	
 	@After
 	public void teardown(){
+		projectExplorer.deleteAllProjects();
 		servers.removeAllProjectsFromServer("AS-7.0");
 	}
 	
@@ -128,24 +125,44 @@ public class CreateProjectsWithServerTest extends SWTTestExt{
 		projectExampleShell.activate();
 		assertFalse("Button \"Download and Install...\" should not be enabled, because all requirements should have been met, condition", bot.button("Download and Install...").isEnabled());
 		projectExampleShell.close();
-		
-		//check the rest of project examples
-		checkExample(null, IDELabel.JBossCentralEditor.JAVA_EE_WEB_PROJECT, true);
-		checkExample(null, IDELabel.JBossCentralEditor.JAVA_EE_PROJECT, true);
-		checkExample(null, IDELabel.JBossCentralEditor.HTML5_PROJECT, true);
-		checkExample(null, IDELabel.JBossCentralEditor.RICHFACES_PROJECT, true);
-		checkExample(null, IDELabel.JBossCentralEditor.SPRING_MVC_PROJECT, true);
-		
 		bot.toolbarDropDownButtonWithTooltip("New").click();
 		bot.waitForShell("New");
 		assertTrue("Shell \"New\" should have appeared", bot.shell("New").isActive());
 		bot.activeShell().close();
+	}
+	
+	
+	@Test
+	public void createProjectSectionJavaEEWebProjectTest(){
+		checkExample(null, IDELabel.JBossCentralEditor.JAVA_EE_WEB_PROJECT, true);
 		canBeDeployedTest();
-		projectExplorer.deleteAllProjects();
 	}
 	
 	@Test
-	public void projectExamplesSectionTest(){
+	public void createProjectSectionJavaEEProjectTest(){
+		checkExample(null, IDELabel.JBossCentralEditor.JAVA_EE_PROJECT, true);
+		canBeDeployedTest();
+	}
+	
+	@Test
+	public void createProjectSectionHTML5ProjectTest(){
+		checkExample(null, IDELabel.JBossCentralEditor.HTML5_PROJECT, true);
+		canBeDeployedTest();
+	}
+	
+	@Test
+	public void createProjectSectionRichFacesProjectTest(){
+		checkExample(null, IDELabel.JBossCentralEditor.RICHFACES_PROJECT, true);
+		canBeDeployedTest();
+	}
+	
+	@Test
+	public void createProjectSectionSpringMVCProjectTest(){
+		checkExample(null, IDELabel.JBossCentralEditor.SPRING_MVC_PROJECT, true);
+		canBeDeployedTest();
+	}
+	
+	public void projectExamplesSectionTest(String name, String projectName, String readmeFile){
 		SWTBotTwistie twistieBot = bot.twistieByLabel("JBoss Quickstarts");
 		int counter = 0;
 		while (!twistieBot.isExpanded() && counter<10){
@@ -153,17 +170,45 @@ public class CreateProjectsWithServerTest extends SWTTestExt{
 			counter++;
 		}
 		SWTFormsBotExt formsBot = SWTBotFactory.getFormsBot();
-		checkExample(formsBot, "Helloworld", true);
-		checkExample(formsBot, "Numberguess", true);
-		checkExample(formsBot, "Login", true, "login.xml"); //Login has some weird login.xml cheatsheet
-		checkExample(formsBot, "Kitchensink", true);
-		checkExample(formsBot, "HTML5", true);
+		if (readmeFile == null){
+			checkExample(formsBot, name, true, projectName);
+		}else{
+			checkExample(formsBot, name, true, projectName, readmeFile);
+		}
 		canBeDeployedTest();
-		projectExplorer.deleteAllProjects();
+	}
+	
+	public void projectExamplesSectionTest(String name, String projectName){
+		projectExamplesSectionTest(name, projectName, null);
+	}
+	
+	@Test
+	public void projectExamplesSectionHelloworldTest(){
+		projectExamplesSectionTest("Helloworld", "jboss-as-helloworld");
+	}
+	
+	@Test
+	public void projectExamplesSectionNumberguessTest(){
+		projectExamplesSectionTest("Numberguess", "jboss-as-numberguess");
+	}
+	
+	@Test
+	public void projectExamplesSectionLoginTest(){
+		projectExamplesSectionTest("Login", "jboss-as-login", "login.xml");
+	}
+	
+	@Test
+	public void projectExamplesSectionKitchensinkTest(){
+		projectExamplesSectionTest("Kitchensink", "jboss-as-kitchensink");
+	}
+	
+	@Test
+	public void projectExamplesSectionHTML5Test(){
+		projectExamplesSectionTest("HTML5", "helloworld-html5");
 	}
 	
 	/**
-	 * Tries to deploy all projects
+	 * Tries to deploy all imported projects
 	 */
 	public void canBeDeployedTest(){
 		servers.show();
@@ -202,7 +247,7 @@ public class CreateProjectsWithServerTest extends SWTTestExt{
 				log.info("Project: "+projectName.getText()+" is properly deployed.");
 			}catch (WidgetNotFoundException wnfe){
 				//exception for Java EE Web project. It hase 4 projects, multi, multi-ear, multi-ejb and multi-web.
-				if (!projectName.getText().contains("multi")){
+				if (!projectName.getText().contains("JavaEEProject")){
 					fail("Project <"+projectName.getText()+"> is not deployed on server correctly");
 				}
 			}
@@ -214,6 +259,10 @@ public class CreateProjectsWithServerTest extends SWTTestExt{
 		bot.sleep(Long.MAX_VALUE);
 	}
 	
+	
+	private void checkExample(SWTFormsBotExt formsBot, String formText, boolean readme){
+		checkExample(formsBot, formText, readme, null, null);
+	}
 
 	/**
 	 * 
@@ -222,8 +271,8 @@ public class CreateProjectsWithServerTest extends SWTTestExt{
 	 * @param readme true if readme should be shown
 	 */
 	
-	private void checkExample(SWTFormsBotExt formsBot, String formText, boolean readme){
-		checkExample(formsBot, formText, readme, null);
+	private void checkExample(SWTFormsBotExt formsBot, String formText, boolean readme, String projectName){
+		checkExample(formsBot, formText, readme, projectName, null);
 	}
 	
 	/**
@@ -234,7 +283,7 @@ public class CreateProjectsWithServerTest extends SWTTestExt{
 	 * @param readmeFileName 
 	 */
 	
-	private void checkExample(SWTFormsBotExt formsBot, String formText, boolean readme, String readmeFileName){
+	protected void checkExample(SWTFormsBotExt formsBot, String formText, boolean readme, String projectName, String readmeFileName){
 		problems.show();
 		if (formsBot==null){
 			bot.hyperlink(formText).click();
@@ -248,18 +297,23 @@ public class CreateProjectsWithServerTest extends SWTTestExt{
 		}
 		bot.waitForShell(IDELabel.JBossCentralEditor.PROJECT_EXAMPLE);
 		SWTBotWizard wizard = new SWTBotWizard(bot.shell(IDELabel.JBossCentralEditor.PROJECT_EXAMPLE).widget);
-		wizard.next();
-		if (wizard.canNext()){
-		//	bot.comboBox(2).setSelection(1);
-			/*try{
+		if (formsBot == null){
+			bot.comboBox(0).setSelection(1); //Target runtime combobox
+			try{
 				bot.link();
 				fail("There is something wrong with maven repo. Message: \n"+bot.link().getText());
 			}catch (WidgetNotFoundException ex){
 				//everything fine
-			}*/
+			}
+			//bot.checkBox(0); //Create a blank project checkbox
 			wizard.next();
+			bot.comboBox().setText(formText.replaceAll("\\s", ""));
+			if (wizard.canNext()) wizard.next();
+			wizard.finishWithWait();
+		}else{
+			while (wizard.canNext()) wizard.next();
+			wizard.finishWithWait();
 		}
-		wizard.finishWithWait();
 		String readmeText = bot.checkBox(1).getText();
 		assertFalse("Quick fix should not be enabled (Everything should be fine)", bot.checkBox(0).isEnabled());
 		if (readme){
