@@ -27,7 +27,12 @@ public class CreateProjectsWithJava7Test extends CreateProjectsWithServerTest{
 		}else{
 			setupProject((projectName==null) ? formText : projectName, true, true);
 		}
-		assertNull("There should be no errors in Problems view", ProblemsView.getErrorsNode(bot));
+		if (ProblemsView.getErrorsNode(bot) != null){
+			for (String error : ProblemsView.getErrorsNode(bot).getNodes()) {
+				log.error("Found error in Problems View: "+error);
+			}
+			fail("There should be no errors in Problems view");
+		}
 	}
 	
 	private void setupMultiProject(String formText){
