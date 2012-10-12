@@ -242,7 +242,7 @@
             name="Maven Integration for Web Tools (m2e-wtp)"
             provider="eclipse.org"
             siteUrl="http://download.jboss.org/jbosstools/updates/development/juno/central/core/">
-	     <iu id="org.eclipse.m2e.wtp.feature"/>
+	    <iu id="org.eclipse.m2e.wtp.feature"/>
          <icon
                image32="images/m2e_32.gif">
          </icon>
@@ -290,20 +290,20 @@
             name="Eclipse EGit: Mylyn Support"
             provider="eclipse.org"
             siteUrl="http://download.jboss.org/jbosstools/updates/development/juno/central/core/">
-	<iu id="org.eclipse.jgit"/>
-	<iu id="org.eclipse.egit"/>
-	<iu id="org.eclipse.egit.mylyn"/>
-	<iu id="org.eclipse.mylyn.github.feature"/>
-	<iu id="org.eclipse.mylyn.git"/>
-	<iu id="org.eclipse.mylyn_feature"/>
-	<iu id="org.eclipse.mylyn.ide_feature"/>
-	<iu id="org.eclipse.mylyn.commons"/>
-	<iu id="org.eclipse.mylyn.context_feature"/>
-	<iu id="org.eclipse.mylyn.bugzilla_feature"/>
-	<iu id="org.eclipse.mylyn.java_feature"/>
-	<iu id="org.eclipse.mylyn.pde_feature"/>
-	<iu id="org.eclipse.mylyn.team_feature"/>
-	<iu id="org.eclipse.mylyn.versions"/>
+	    <iu id="org.eclipse.jgit"/>
+	    <iu id="org.eclipse.egit"/>
+	    <iu id="org.eclipse.egit.mylyn"/>
+	    <iu id="org.eclipse.mylyn.github.feature"/>
+	    <iu id="org.eclipse.mylyn.git"/>
+	    <iu id="org.eclipse.mylyn_feature"/>
+	    <iu id="org.eclipse.mylyn.ide_feature"/>
+	    <iu id="org.eclipse.mylyn.commons"/>
+	    <iu id="org.eclipse.mylyn.context_feature"/>
+	    <iu id="org.eclipse.mylyn.bugzilla_feature"/>
+	    <iu id="org.eclipse.mylyn.java_feature"/>
+	    <iu id="org.eclipse.mylyn.pde_feature"/>
+	    <iu id="org.eclipse.mylyn.team_feature"/>
+	    <iu id="org.eclipse.mylyn.versions"/>
          <icon
                image32="images/egit_32.png">
          </icon>
@@ -340,18 +340,18 @@
             name="Subclipse + SVNKit: Mylyn Support"
             provider="tigris.org"
             siteUrl="http://download.jboss.org/jbosstools/updates/development/juno/central/core/">
-	<iu id="org.tigris.subversion.subclipse"/>
-	<iu id="org.tigris.subversion.clientadapter.svnkit.feature"/>
-	<iu id="org.tigris.subversion.subclipse.mylyn"/>
-	<iu id="org.eclipse.mylyn_feature"/>
-	<iu id="org.eclipse.mylyn.ide_feature"/>
-	<iu id="org.eclipse.mylyn.commons"/>
-	<iu id="org.eclipse.mylyn.context_feature"/>
-	<iu id="org.eclipse.mylyn.bugzilla_feature"/>
-	<iu id="org.eclipse.mylyn.java_feature"/>
-	<iu id="org.eclipse.mylyn.pde_feature"/>
-	<iu id="org.eclipse.mylyn.team_feature"/>
-	<iu id="org.eclipse.mylyn.versions"/>
+	    <iu id="org.tigris.subversion.subclipse"/>
+	    <iu id="org.tigris.subversion.clientadapter.svnkit.feature"/>
+	    <iu id="org.tigris.subversion.subclipse.mylyn"/>
+	    <iu id="org.eclipse.mylyn_feature"/>
+	    <iu id="org.eclipse.mylyn.ide_feature"/>
+	    <iu id="org.eclipse.mylyn.commons"/>
+	    <iu id="org.eclipse.mylyn.context_feature"/>
+	    <iu id="org.eclipse.mylyn.bugzilla_feature"/>
+	    <iu id="org.eclipse.mylyn.java_feature"/>
+	    <iu id="org.eclipse.mylyn.pde_feature"/>
+	    <iu id="org.eclipse.mylyn.team_feature"/>
+	    <iu id="org.eclipse.mylyn.versions"/>
          <icon
                image32="images/subclipse_32.gif">
          </icon>
@@ -466,7 +466,7 @@
             name="PMD"
             provider="PMD Developers"
             siteUrl="http://download.jboss.org/jbosstools/updates/development/juno/central/core/">
-       <iu id="net.sourceforge.pmd.eclipse"/>
+       	    <iu id="net.sourceforge.pmd.eclipse"/>
          <icon
                image32="images/pmd_32.png">
          </icon>
