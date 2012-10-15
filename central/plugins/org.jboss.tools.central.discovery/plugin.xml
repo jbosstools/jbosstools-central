@@ -4,13 +4,15 @@
 	<extension
          point="org.eclipse.mylyn.discovery.core.connectorDiscovery">
       
+      <!-- use connectorCategory relevance value to sort from largest (80) to smallest (20) -->
+
       <!-- a. Web and Mobile Development -->
 
       <connectorCategory
             description="Plugins for web and mobile development"
             id="org.jboss.tools.central.discovery.a.web"
             name="Web and Mobile Development"
-            relevance="60">
+            relevance="80">
          <group id="org.jboss.tools.central.discovery.a.web.core" /> 
          <group id="org.jboss.tools.central.discovery.a.web.extras" />
       </connectorCategory>
@@ -247,7 +249,7 @@
             description="Plugins for testing + code quality"
             id="org.jboss.tools.central.discovery.c.testing"
             name="Testing"
-            relevance="60">
+            relevance="40">
 	<group id="org.jboss.tools.central.discovery.c.testing.local" />
  	<group id="org.jboss.tools.central.discovery.c.testing.remote" />
       </connectorCategory>
@@ -385,7 +387,7 @@
             description="Plugins for working with Maven"
             id="org.jboss.tools.central.discovery.d.maven"
             name="Maven"
-            relevance="60">
+            relevance="20">
             <!-- use groups to reorder items in a category; otherwise default to alpha order -->
          <group id="org.jboss.tools.central.discovery.d.maven.core" /> 
          <group id="org.jboss.tools.central.discovery.d.maven.configurators" /> 
