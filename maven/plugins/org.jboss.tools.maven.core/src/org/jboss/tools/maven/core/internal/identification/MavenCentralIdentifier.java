@@ -44,7 +44,7 @@ public class MavenCentralIdentifier extends AbstractArtifactIdentifier {
 	public ArtifactKey identify(File file, IProgressMonitor monitor) throws CoreException {
 		ArtifactKey key = sha1Search(file, monitor);
 		if (key == null) {
-			System.out.println("Can't identify "+file + " falling back on name+version search" );
+			//System.out.println("Can't identify "+file + " falling back on name+version search" );
 			key = nameVersionSearch(file, monitor);
 		}
 		return key;
