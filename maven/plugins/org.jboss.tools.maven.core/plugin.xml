@@ -234,4 +234,10 @@
       		</enablement>
     	</provider>
   	</extension>
+  	
+    <extension point="org.eclipse.m2e.core.archetypeCatalogs">
+      <remote url="https://repository.jboss.org/nexus/content/repositories/releases/archetype-catalog.xml" 
+              description="JBoss Nexus Archetypes"/>
+    </extension>  	
+  	
 </plugin>
