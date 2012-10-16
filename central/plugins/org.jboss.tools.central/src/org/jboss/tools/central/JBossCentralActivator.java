@@ -12,8 +12,10 @@ package org.jboss.tools.central;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Dictionary;
 import java.util.Hashtable;
+import java.util.List;
 
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
@@ -30,10 +32,16 @@ import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.browser.Browser;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
+import org.eclipse.ui.IEditorDescriptor;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
+import org.eclipse.ui.IEditorReference;
+import org.eclipse.ui.IEditorRegistry;
 import org.eclipse.ui.IViewReference;
+import org.eclipse.ui.IWorkbench;
+import org.eclipse.ui.IWorkbenchListener;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
@@ -42,6 +50,7 @@ import org.eclipse.ui.browser.IWorkbenchBrowserSupport;
 import org.eclipse.ui.internal.WorkbenchWindow;
 import org.eclipse.ui.internal.browser.WebBrowserPreference;
 import org.eclipse.ui.internal.browser.WorkbenchBrowserSupport;
+import org.eclipse.ui.internal.registry.EditorRegistry;
 import org.eclipse.ui.menus.CommandContributionItem;
 import org.eclipse.ui.menus.CommandContributionItemParameter;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
@@ -106,6 +115,37 @@ public class JBossCentralActivator extends AbstractUIPlugin {
 	private static JBossCentralActivator plugin;
 
 	private static Boolean isInternalWebBrowserAvailable;
+	
+	private IWorkbenchListener workbenchListener = new IWorkbenchListener() {
+		
+		@Override
+		public boolean preShutdown(IWorkbench workbench, boolean forced) {
+			Display.getDefault().syncExec(new Runnable() {
+				
+				@Override
+				public void run() {
+					IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
+					IEditorReference[] references = page.getEditorReferences();
+					if (references != null) {
+						List<IEditorReference> l = new ArrayList<IEditorReference>();
+						for (IEditorReference reference:references) {
+							if (EditorRegistry.EMPTY_EDITOR_ID.equals(reference.getId()) ||
+									JBossCentralEditor.ID.equals(reference.getId())) {
+								l.add(reference);
+							}
+						}
+						if (l.size() > 0) {
+							page.closeEditors(l.toArray(new IEditorReference[0]), false);
+						}
+					}
+				}
+			});
+			return true;
+		}
+		
+		@Override
+		public void postShutdown(IWorkbench workbench) {}
+	};
 
 	/**
 	 * The constructor
@@ -124,6 +164,7 @@ public class JBossCentralActivator extends AbstractUIPlugin {
 		super.start(context);
 		this.bundleContext = context;
 		plugin = this;
+		PlatformUI.getWorkbench().addWorkbenchListener(workbenchListener);
 	}
 
 	/*
@@ -140,6 +181,8 @@ public class JBossCentralActivator extends AbstractUIPlugin {
 		plugin = null;
 		bundleContext = null;
 		super.stop(context);
+		
+		PlatformUI.getWorkbench().removeWorkbenchListener(workbenchListener);
 	}
 
 	/**
@@ -305,7 +348,14 @@ public class JBossCentralActivator extends AbstractUIPlugin {
 							Object newValue = event.getNewValue();
 							if (newValue instanceof Boolean
 									&& ((Boolean) newValue).booleanValue()) {
-								openJBossCentralEditor(page);
+								Display.getCurrent().asyncExec(new Runnable() {
+									
+									@Override
+									public void run() {
+										openJBossCentralEditor(page);
+									}
+								});
+								
 								window.removePropertyChangeListener(this);
 							}
 						}
