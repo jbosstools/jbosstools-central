@@ -12,8 +12,8 @@
 	<packaging>pom</packaging>
 
 	<modules>
-		<module>maven/tests</module>
-		<module>examples/tests</module>
-		<module>central/tests</module>
+		<module>../maven/tests</module>
+		<module>../examples/tests</module>
+		<module>../central/tests</module>
 	</modules>
 </project>
