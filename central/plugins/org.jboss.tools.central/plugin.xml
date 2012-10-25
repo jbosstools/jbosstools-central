@@ -215,7 +215,7 @@
             id="org.jboss.tools.central.wizards.NewJavaeeEarProjectWizard"
             class="org.jboss.tools.central.wizards.NewJavaeeEarProjectWizard"
             icon="icons/ear-wiz-icon.gif"
-            name="Java EE Project"
+            name="Java EE EAR Project"
             project="true">
       </wizard>
       <wizard
