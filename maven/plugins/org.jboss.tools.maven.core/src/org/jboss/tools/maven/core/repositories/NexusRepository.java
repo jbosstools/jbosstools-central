@@ -21,6 +21,7 @@ import org.eclipse.core.runtime.Assert;
  * @author snjeza
  *
  */
+@SuppressWarnings("nls")
 public class NexusRepository {
 	private String name;
 	private String url;

@@ -764,6 +764,5 @@ public class MavenCoreActivator extends Plugin {
 			log(e);
 		}
 	}
-
 	
 }

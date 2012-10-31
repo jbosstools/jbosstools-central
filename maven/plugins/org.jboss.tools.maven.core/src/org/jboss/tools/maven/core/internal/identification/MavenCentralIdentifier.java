@@ -15,9 +15,6 @@ import static org.jboss.tools.maven.core.identification.IdentificationUtil.getSH
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.net.UnknownHostException;
 import java.util.jar.JarFile;
 import java.util.jar.Manifest;
 
@@ -28,6 +25,7 @@ import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.m2e.core.embedder.ArtifactKey;
 import org.eclipse.osgi.util.NLS;
 import org.jboss.dmr.ModelNode;
+import org.jboss.tools.common.util.HttpUtil;
 
 public class MavenCentralIdentifier extends AbstractArtifactIdentifier {
 
@@ -44,7 +42,6 @@ public class MavenCentralIdentifier extends AbstractArtifactIdentifier {
 	public ArtifactKey identify(File file, IProgressMonitor monitor) throws CoreException {
 		ArtifactKey key = sha1Search(file, monitor);
 		if (key == null) {
-			//System.out.println("Can't identify "+file + " falling back on name+version search" );
 			key = nameVersionSearch(file, monitor);
 		}
 		return key;
@@ -107,37 +104,20 @@ public class MavenCentralIdentifier extends AbstractArtifactIdentifier {
 		return find(searchUrl);
 	}
 	
-	
-	
 	private ArtifactKey find(String searchUrl) {
-		HttpURLConnection connection = null;//TODO use eclipse connections to handle proxies
 		InputStream is = null;
 		try {
-			connection = (HttpURLConnection) new URL(searchUrl).openConnection();
-			connection.setConnectTimeout(5*1000);
-			connection.connect();
-			int status = connection.getResponseCode();
-	        switch (status) {
-	            case 200:
-	            case 201: {
-	            	is = connection.getInputStream();
-	            	ModelNode modelNode = ModelNode.fromJSONStream(is);
-	            	if (modelNode.isDefined()) {
-	            		return extractKey(modelNode);
-	            	}
-	            }    
-	            default:
-	            		
-	        }
-		} catch (UnknownHostException uhe) {
-			System.err.println("Can't connect to search.maven.org:"+ uhe.getMessage());
+			is = HttpUtil.getInputStreamFromUrlByGetMethod(searchUrl);
+        	ModelNode modelNode = ModelNode.fromJSONStream(is);
+        	if (modelNode.isDefined()) {
+        		return extractKey(modelNode);
+        	}
+		} catch (IOException ioe) {
+			System.err.println("MavenCentralIdentifier can't connect to " + searchUrl + " : "+ ioe.getMessage());
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
 			IOUtil.close(is);
-			if (connection != null) {
-				connection.disconnect();
-			}
 		}
 		return null;
 	}
