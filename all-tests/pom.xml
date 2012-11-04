@@ -4,8 +4,9 @@
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
 		<groupId>org.jboss.tools</groupId>
-		<artifactId>central.maven.examples.all</artifactId>
-		<version>4.0.0-SNAPSHOT</version>
+		<artifactId>parent</artifactId>
+		<version>4.0.0.Beta2-SNAPSHOT</version>
+                <relativePath>../../jbosstools-build/parent/pom.xml</relativePath>
 	</parent>
 	<groupId>org.jboss.tools</groupId>
 	<artifactId>central.maven.examples.all.tests</artifactId>
