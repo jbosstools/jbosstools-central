@@ -105,7 +105,7 @@ public class ImportMavenProjectExampleDelegate extends AbstractImportMavenProjec
 		if (file.isFile()) {
 			ok = ProjectExamplesActivator.extractZipFile(file, destination, monitor);
 		}
-		if (file.isDirectory()) {
+		else if (file.isDirectory()) {
 			destination.mkdirs();
 			IFileStore descStore = EFS.getLocalFileSystem().fromLocalFile(destination);
 			IFileStore srcStore = EFS.getLocalFileSystem().fromLocalFile(file);

@@ -58,6 +58,7 @@ import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.embedder.MavenModelManager;
 import org.eclipse.m2e.core.internal.IMavenConstants;
 import org.eclipse.m2e.core.project.IProjectConfigurationManager;
+import org.eclipse.m2e.jdt.IClasspathManager;
 import org.eclipse.m2e.jdt.internal.BuildPathManager;
 import org.eclipse.m2e.model.edit.pom.Dependency;
 import org.eclipse.m2e.model.edit.pom.DependencyManagement;
@@ -251,8 +252,8 @@ public class MavenCoreActivator extends Plugin {
 		IClasspathEntry[] cp = javaProject.getRawClasspath();
 		for (int i = 0; i < cp.length; i++) {
 			if (IClasspathEntry.CPE_CONTAINER == cp[i].getEntryKind()
-					&& BuildPathManager.CONTAINER_ID.equals(cp[i]
-							.getPath())) {
+					&& cp[i].getPath() != null && cp[i].getPath().segmentCount() > 0
+					&& IClasspathManager.CONTAINER_ID.equals(cp[i].getPath().segment(0))) {
 				LinkedHashMap<String, IClasspathAttribute> attrs = new LinkedHashMap<String, IClasspathAttribute>();
 				for (IClasspathAttribute attr : cp[i].getExtraAttributes()) {
 					attrs.put(attr.getName(), attr);

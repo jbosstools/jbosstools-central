@@ -84,7 +84,6 @@ public class JBossCentralEditor extends SharedHeaderFormEditor {
 
 	private SoftwarePage softwarePage;
 
-	private Image headerImage;
 	private Image gettingStartedImage;
 	private Image softwareImage;
 
@@ -99,10 +98,6 @@ public class JBossCentralEditor extends SharedHeaderFormEditor {
 	public void dispose() {
 		gettingStartedPage = null;
 		softwarePage = null;
-		if (headerImage != null) {
-			headerImage.dispose();
-			headerImage = null;
-		}
 		if (gettingStartedImage != null) {
 			gettingStartedImage.dispose();
 			gettingStartedImage = null;
