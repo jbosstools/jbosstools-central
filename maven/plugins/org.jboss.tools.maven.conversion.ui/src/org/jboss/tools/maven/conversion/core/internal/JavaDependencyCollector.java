@@ -70,7 +70,10 @@ public class JavaDependencyCollector extends DependencyCollector {
 
 	@Override
 	public boolean appliesTo(IProject project) throws CoreException {
-		return project != null && project.hasNature(JavaCore.NATURE_ID);
+		return project != null && project.hasNature(JavaCore.NATURE_ID)
+				//With tycho's Manifest first approach, converting classpath entries 
+				//to maven dependencies is irrelevant
+				&& !project.hasNature("org.eclipse.pde.PluginNature"); 
 	}
 
 	private boolean isValid(IClasspathEntry cpe) {
