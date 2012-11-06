@@ -29,9 +29,13 @@ public class ProjectDependencyCollectorTest extends AbstractMavenConversionTest 
 		assertEquals(web.getFullPath() , deps.get(1).getPath());
 		
 		//library reference
+		/*
 		File localRepo = MavenPlugin.getRepositoryRegistry().getLocalRepository().getBasedir();
 		String junitLocation = localRepo.getAbsolutePath().replace('\\', '/')+"/junit/junit/4.10/junit-4.10.jar";
 		assertEquals(junitLocation, deps.get(2).getPath().toPortableString());
+		*/
+		assertTrue(deps.get(2).getPath().toPortableString().endsWith("/junit/junit/4.10/junit-4.10.jar"));
+		
 		
 		//jar not in lib
 		assertEquals("/ear/EarContent/ant-1.8.4.jar"          , deps.get(3).getPath().toPortableString());
