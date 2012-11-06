@@ -349,7 +349,7 @@ public class IdentifyMavenDependencyPage extends WizardPage {
 					if(editDependencyDialog.open() == Window.OK) {
 						Dependency newDep = editDependencyDialog.getDependency();
 						dependencyMap.put(projectDep,newDep);
-						if (!getKey(newDep).equals(getKey(d))) {
+						if (newDep != null && (d == null || !getKey(newDep).equals(getKey(d)))) {
 							resolve(projectDep, newDep);
 						}
 					}
