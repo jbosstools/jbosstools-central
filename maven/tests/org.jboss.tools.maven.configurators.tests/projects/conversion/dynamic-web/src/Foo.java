@@ -1,1 +1,1 @@
-public Foo {}
+public interface Foo {}
