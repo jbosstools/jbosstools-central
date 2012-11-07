@@ -49,6 +49,11 @@ public class ProjectDependencyCollectorTest extends AbstractMavenConversionTest 
 	public void testCollectWarDependencies() throws Exception {
 		IProject util = createExisting("util", "projects/conversion/util");
 		IProject war = createExisting("war", "projects/conversion/war");
+		// Dirty hack to give WTP some time to initialize the Web library
+		// otherwise, test will fail randomly on some *nix hosts :
+		// org.eclipse.jst.j2ee.internal.web.container having no classpath entries,
+		// wrong number of dependencies collected.
+		Thread.sleep(2000);
 		waitForJobsToComplete();
 		
 		DependencyCollector collector = DependencyCollectorFactory.INSTANCE.getDependencyCollector(war);
