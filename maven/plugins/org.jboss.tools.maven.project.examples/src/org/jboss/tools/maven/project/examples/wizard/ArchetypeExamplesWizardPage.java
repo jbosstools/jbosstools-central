@@ -50,7 +50,10 @@ import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.TableItem;
+import org.jboss.tools.maven.core.MavenCoreActivator;
+import org.jboss.tools.maven.core.settings.MavenSettingsChangeListener;
 import org.jboss.tools.maven.project.examples.MavenProjectExamplesActivator;
 import org.jboss.tools.maven.project.examples.utils.MavenArtifactHelper;
 import org.jboss.tools.maven.project.examples.wizard.xpl.MavenProjectWizardArchetypeParametersPage;
@@ -67,7 +70,7 @@ import org.jboss.tools.project.examples.wizard.WizardContext;
  *
  */
 public class ArchetypeExamplesWizardPage extends
-		MavenProjectWizardArchetypeParametersPage implements IProjectExamplesWizardPage {
+		MavenProjectWizardArchetypeParametersPage implements IProjectExamplesWizardPage, MavenSettingsChangeListener  {
 
 	private ProjectExample projectDescription;
 	private ProjectExample projectExample;
@@ -86,6 +89,7 @@ public class ArchetypeExamplesWizardPage extends
 	@Override
 	public void createControl(Composite parent) {
 		super.createControl(parent);
+
 		packageCombo.addModifyListener(new ModifyListener() {
 			@Override
 			public void modifyText(ModifyEvent e) {
@@ -108,6 +112,7 @@ public class ArchetypeExamplesWizardPage extends
 			initializeArchetype();
 		}
 		
+		MavenCoreActivator.getDefault().registerMavenSettingsChangeListener(this);
 	}
 
 	protected void initializeArchetype() {
@@ -529,10 +534,23 @@ public class ArchetypeExamplesWizardPage extends
 	    };
 	    return model;
 	  }
-
 	@Override
 	public String getPageType() {
 		return "extra";
 	}
+	
+	@Override
+	public void dispose() {
+		MavenCoreActivator.getDefault().unregisterMavenSettingsChangeListener(this);
+		super.dispose();
+	}
+	
+	@Override
+	public void onSettingsChanged() {
+		Display.getDefault().asyncExec( new Runnable() {  public void run() { 
+			//Reset previous status
+			enterpriseRepoStatus = null;
+			checkEnterpriseProperty();
+		} });
+	}}
 
-}

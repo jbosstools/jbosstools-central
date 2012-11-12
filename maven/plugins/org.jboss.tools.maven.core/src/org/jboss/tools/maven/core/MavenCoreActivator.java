@@ -1,5 +1,5 @@
 /*************************************************************************************
- * Copyright (c) 2008-2011 Red Hat, Inc. and others.
+ * Copyright (c) 2008-2012 Red Hat, Inc. and others.
  * All rights reserved. This program and the accompanying materials 
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -19,8 +19,11 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.maven.model.Build;
 import org.apache.maven.model.Model;
@@ -73,6 +76,7 @@ import org.eclipse.wst.common.componentcore.resources.IVirtualFolder;
 import org.eclipse.wst.common.frameworks.datamodel.IDataModel;
 import org.eclipse.wst.common.project.facet.core.IProjectFacetVersion;
 import org.jboss.tools.maven.core.repositories.RemoteRepositoryManager;
+import org.jboss.tools.maven.core.settings.MavenSettingsChangeListener;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.prefs.BackingStoreException;
 
@@ -106,6 +110,9 @@ public class MavenCoreActivator extends Plugin {
 	private static PomResourceImpl resource;
 	
 	private RemoteRepositoryManager repositoryManager;
+
+	//Concurrent HashSet
+	private Set<MavenSettingsChangeListener> mavenSettingsListeners = Collections.newSetFromMap(new ConcurrentHashMap<MavenSettingsChangeListener, Boolean>());
 	
 	/**
 	 * The constructor
@@ -119,6 +126,7 @@ public class MavenCoreActivator extends Plugin {
 	 */
 	public void start(BundleContext context) throws Exception {
 		super.start(context);
+		mavenSettingsListeners.clear();
 		plugin = this;
 	}
 
@@ -128,6 +136,7 @@ public class MavenCoreActivator extends Plugin {
 	 */
 	public void stop(BundleContext context) throws Exception {
 		plugin = null;
+		mavenSettingsListeners.clear();
 		super.stop(context);
 	}
 
@@ -766,4 +775,21 @@ public class MavenCoreActivator extends Plugin {
 		}
 	}
 	
+	public void notifyMavenSettingsChanged() {
+		for (MavenSettingsChangeListener mscl : mavenSettingsListeners) {
+			try {
+				mscl.onSettingsChanged();
+			} catch(Exception e) {
+				log(e);
+			}
+		}
+	}
+	
+	public void registerMavenSettingsChangeListener(MavenSettingsChangeListener listener) {
+		mavenSettingsListeners.add(listener);
+	}
+	
+	public void unregisterMavenSettingsChangeListener(MavenSettingsChangeListener listener) {
+		mavenSettingsListeners.remove(listener);
+	}
 }

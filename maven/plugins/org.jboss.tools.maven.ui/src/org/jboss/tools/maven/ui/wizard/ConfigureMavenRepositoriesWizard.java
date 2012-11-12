@@ -10,8 +10,13 @@
  ************************************************************************************/
 package org.jboss.tools.maven.ui.wizard;
 
+import org.eclipse.jface.dialogs.IPageChangeProvider;
+import org.eclipse.jface.dialogs.IPageChangedListener;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.jface.wizard.IWizard;
+import org.eclipse.jface.wizard.IWizardContainer;
+import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.m2e.core.embedder.ArtifactKey;
 import org.eclipse.ui.INewWizard;
@@ -28,6 +33,7 @@ public class ConfigureMavenRepositoriesWizard extends Wizard implements
 
 	private ConfigureMavenRepositoriesWizardPage page;
 	private ArtifactKey artifactKey;
+	private String preSelectedProfileId;
 
 	public ConfigureMavenRepositoriesWizard() {
 		super();
@@ -38,7 +44,12 @@ public class ConfigureMavenRepositoriesWizard extends Wizard implements
 		this();
 		this.artifactKey = artifactKey;
 	}
-	
+
+	public ConfigureMavenRepositoriesWizard(ArtifactKey artifactKey, String profileId) {
+		this(artifactKey);
+		this.preSelectedProfileId = profileId;
+	}
+
 	public void init(IWorkbench workbench, IStructuredSelection selection) {
 		initializeDefaultPageImageDescriptor();
 	}
@@ -56,7 +67,29 @@ public class ConfigureMavenRepositoriesWizard extends Wizard implements
 
 	@Override
 	public void addPages() {
-		page = new ConfigureMavenRepositoriesWizardPage(artifactKey);
+		page = new ConfigureMavenRepositoriesWizardPage(artifactKey, preSelectedProfileId);
 		addPage(page);
+	}
+	
+	@Override
+	public void addPage(IWizardPage page) {
+		IWizardContainer container = getContainer(); 
+		if (container instanceof IPageChangeProvider && page instanceof IPageChangedListener) { 
+			((IPageChangeProvider) container).addPageChangedListener((IPageChangedListener)page); 
+		} 
+		super.addPage(page);
+	}
+	
+	@Override
+	public void dispose() {
+		IWizardContainer container = getContainer(); 
+		if (container instanceof IPageChangeProvider) { 
+			for (IWizardPage page : getPages()) {
+				if (page instanceof IPageChangedListener) {
+					((IPageChangeProvider) container).removePageChangedListener((IPageChangedListener)page); 
+				}
+			}
+		} 
+		super.dispose();
 	}
 }

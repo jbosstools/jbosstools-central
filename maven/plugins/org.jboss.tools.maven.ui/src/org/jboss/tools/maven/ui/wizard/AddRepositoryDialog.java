@@ -63,6 +63,7 @@ import org.sonatype.aether.resolution.ArtifactResolutionException;
 import org.sonatype.aether.resolution.ArtifactResult;
 import org.sonatype.aether.util.artifact.DefaultArtifact;
 
+@SuppressWarnings("nls")
 public class AddRepositoryDialog extends TitleAreaDialog {
 
 	private static final String URL_ALREADY_EXISTS = "URL already exists";
@@ -105,6 +106,7 @@ public class AddRepositoryDialog extends TitleAreaDialog {
 	private Label artifactLabel;
 	private String coords;
 	private Label artifactImageLabel;
+	private String preSelectedProfile;
 
 	public AddRepositoryDialog(Shell parentShell,
 			Set<RepositoryWrapper> availableRepositories,
@@ -161,44 +163,8 @@ public class AddRepositoryDialog extends TitleAreaDialog {
 		profileCombo.addSelectionListener(new SelectionAdapter() {
 
 			@Override
-			public void widgetSelected(SelectionEvent e) {
-				Settings settings;
-				String id = profileCombo.getText();
-				if (id == null || id.trim().isEmpty()) {
-					return;
-				}
-				for (RepositoryWrapper wrapper:availableRepositories) {
-					if (wrapper.getProfileId() != null && wrapper.getRepository() != null && id.equals(wrapper.getProfileId())) {
-						updateRepository(wrapper.getRepository());
-						activeByDefaultButton.setSelection(true);
-						return;
-					}
-				}
-				try {
-					settings = maven.getSettings();
-					for (Profile profile : settings.getProfiles()) {
-						if (id.equals(profile.getId())) {
-							if (profile.getActivation() == null) {
-								activeByDefaultButton.setSelection(false);
-							}
-							if (profile.getActivation() != null) {
-								activeByDefaultButton.setSelection(profile
-									.getActivation().isActiveByDefault());
-							}
-							List<Repository> repositories = profile
-									.getRepositories();
-							if (repositories != null
-									&& repositories.size() == 1) {
-								Repository repository = repositories.get(0);
-								updateRepository(repository);
-							}
-						}
-						break;
-					}
-				} catch (CoreException e1) {
-					Activator.log(e1);
-				}
-				
+			public void widgetSelected(SelectionEvent event) {
+				selectProfile();
 			}
 
 		});
@@ -366,7 +332,17 @@ public class AddRepositoryDialog extends TitleAreaDialog {
 				}
 			});
 		}
-		
+
+		if (preSelectedProfile != null) {
+			for (int i = 0; i < profileIDs.length; i++) {
+				if (preSelectedProfile.equals(profileIDs[i])){
+					profileCombo.select(i);
+					selectProfile();
+					break;
+				}
+			}
+		}
+
 		return area;
 	}
 
@@ -454,23 +430,24 @@ public class AddRepositoryDialog extends TitleAreaDialog {
 		profileComboDecoration.hide();
 		urlValidTextDecoration.hide();
 		urlExistsTextDecoration.hide();
-		getButton(IDialogConstants.OK_ID).setEnabled(true);
+		enableOkButton(true);
+		
 		setMessage(null);
 		if (profileCombo.getText().trim().isEmpty()) {
 			setMessage(PROFILE_ID_IS_REQUIRED, IMessageProvider.ERROR);
-			getButton(IDialogConstants.OK_ID).setEnabled(false);
+			enableOkButton(false);
 			showDecoration();
 			return;
 		}
 		if (idText.getText().trim().isEmpty()) {
 			setMessage(REPOSITORY_ID_IS_REQUIRED, IMessageProvider.ERROR);
-			getButton(IDialogConstants.OK_ID).setEnabled(false);
+			enableOkButton(false);
 			showDecoration();
 			return;
 		}
 		if (urlText.getText().trim().isEmpty()) {
 			setMessage(REPOSITORY_URL_IS_REQUIRED, IMessageProvider.ERROR);
-			getButton(IDialogConstants.OK_ID).setEnabled(false);
+			enableOkButton(false);
 			showDecoration();
 			return;
 		}
@@ -479,7 +456,7 @@ public class AddRepositoryDialog extends TitleAreaDialog {
 			urlString = new URL(urlText.getText().trim()).toString();
 		} catch (MalformedURLException e) {
 			setMessage(URL_IS_NOT_VALID, IMessageProvider.ERROR);
-			getButton(IDialogConstants.OK_ID).setEnabled(false);
+			enableOkButton(false);
 			showDecoration();
 			return;
 		}
@@ -489,7 +466,7 @@ public class AddRepositoryDialog extends TitleAreaDialog {
 		for (RepositoryWrapper wrapper:includedRepositories) {
 			if (urlString.equals(wrapper.getRepository().getUrl())) {
 				setMessage(URL_ALREADY_EXISTS, IMessageProvider.ERROR);
-				getButton(IDialogConstants.OK_ID).setEnabled(false);
+				enableOkButton(false);
 				showDecoration();
 				return;
 			}
@@ -498,6 +475,13 @@ public class AddRepositoryDialog extends TitleAreaDialog {
 			setMessage(REPOSITORY_NAME_IS_EMPTY, IMessageProvider.WARNING);
 			showDecoration();
 			return;
+		}
+	}
+
+	private void enableOkButton(boolean enabled) {
+		Button okButton = getButton(IDialogConstants.OK_ID);
+		if (okButton != null) {
+			okButton.setEnabled(enabled);		
 		}
 	}
 
@@ -547,22 +531,6 @@ public class AddRepositoryDialog extends TitleAreaDialog {
 				ids.add(wrapper.getProfileId());
 			}
 		}
-//		Settings settings;
-//		try {
-//			settings = maven.getSettings();
-//		} catch (CoreException e) {
-//			return ids.toArray(new String[0]);
-//		}
-//		for (Profile profile : settings.getProfiles()) {
-//			if (profile.getId() != null) {
-//				ids.add(profile.getId());
-//			}
-//		}
-//		for (RepositoryWrapper wrapper:availableRepositories) {
-//			if (wrapper.getProfileId() != null && !wrapper.getProfileId().isEmpty()) {
-//				ids.add(wrapper.getProfileId());
-//			}
-//		}
 		return ids.toArray(new String[0]);
 	}
 
@@ -848,5 +816,48 @@ public class AddRepositoryDialog extends TitleAreaDialog {
 
 	public boolean isActiveByDefault() {
 		return activeByDefault;
+	}
+
+	public void setPreSelectedProfile(String profileId) {
+		this.preSelectedProfile = profileId;
+	}
+
+	private void selectProfile() {
+		Settings settings;
+		String id = profileCombo.getText();
+		if (id == null || id.trim().isEmpty()) {
+			return;
+		}
+		for (RepositoryWrapper wrapper:availableRepositories) {
+			if (wrapper.getProfileId() != null && wrapper.getRepository() != null && id.equals(wrapper.getProfileId())) {
+				updateRepository(wrapper.getRepository());
+				activeByDefaultButton.setSelection(true);
+				return;
+			}
+		}
+		try {
+			settings = maven.getSettings();
+			for (Profile profile : settings.getProfiles()) {
+				if (id.equals(profile.getId())) {
+					if (profile.getActivation() == null) {
+						activeByDefaultButton.setSelection(false);
+					}
+					if (profile.getActivation() != null) {
+						activeByDefaultButton.setSelection(profile
+							.getActivation().isActiveByDefault());
+					}
+					List<Repository> repositories = profile
+							.getRepositories();
+					if (repositories != null
+							&& repositories.size() == 1) {
+						Repository repository = repositories.get(0);
+						updateRepository(repository);
+					}
+				}
+				break;
+			}
+		} catch (CoreException e1) {
+			Activator.log(e1);
+		}
 	}
 }

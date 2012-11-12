@@ -54,6 +54,8 @@ import org.jboss.ide.eclipse.as.core.util.RuntimeUtils;
 import org.jboss.jdf.stacks.model.ArchetypeVersion;
 import org.jboss.jdf.stacks.model.Runtime;
 import org.jboss.jdf.stacks.model.Stacks;
+import org.jboss.tools.maven.core.MavenCoreActivator;
+import org.jboss.tools.maven.core.settings.MavenSettingsChangeListener;
 import org.jboss.tools.maven.project.examples.MavenProjectExamplesActivator;
 import org.jboss.tools.maven.project.examples.Messages;
 import org.jboss.tools.maven.project.examples.stacks.StacksManager;
@@ -65,7 +67,7 @@ import org.jboss.tools.project.examples.model.ProjectFix;
 import org.jboss.tools.project.examples.wizard.NewProjectExamplesRequirementsPage;
 import org.jboss.tools.runtime.core.model.DownloadRuntime;
 
-public class NewProjectExamplesStacksRequirementsPage extends NewProjectExamplesRequirementsPage {
+public class NewProjectExamplesStacksRequirementsPage extends NewProjectExamplesRequirementsPage implements MavenSettingsChangeListener {
 
 	private static final String PAGE_NAME = "org.jboss.tools.project.examples.stacksrequirements"; //$NON-NLS-1$
 
@@ -259,6 +261,8 @@ public class NewProjectExamplesStacksRequirementsPage extends NewProjectExamples
 		//the dialog page area, once it's set as visible.
 		//Anybody who can find a proper solution will have my eternal gratitude
 		GridDataFactory.fillDefaults().hint(625, 45).applyTo(warningComponent);
+
+		MavenCoreActivator.getDefault().registerMavenSettingsChangeListener(this);
 	}
 	
 	@Override
@@ -423,6 +427,7 @@ public class NewProjectExamplesStacksRequirementsPage extends NewProjectExamples
 			listener = null;
 		}
 		
+		MavenCoreActivator.getDefault().unregisterMavenSettingsChangeListener(this);
 	    saveInputHistory();
 
 		super.dispose();
@@ -515,5 +520,14 @@ public class NewProjectExamplesStacksRequirementsPage extends NewProjectExamples
 	      combos.add(combo);
 	    }
 	  }
+
+	@Override
+	public void onSettingsChanged() {
+		Display.getDefault().asyncExec( new Runnable() {  public void run() { 
+			//Reset previous status
+			enterpriseRepoStatus = null;
+			validateEnterpriseRepo();
+		} });
+	}
 
 }
