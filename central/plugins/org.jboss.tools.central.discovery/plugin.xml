@@ -3,6 +3,18 @@
 <plugin>
 	<extension
          point="org.eclipse.mylyn.discovery.core.connectorDiscovery">
+
+      <!-- JBDS-2379, JBDS-2278, JBDS-2361, JBIDE-10333 -->
+      <certification id="com.jboss.jbds.discovery.certification.supported" name="Supported" url="https://devstudio.jboss.com">
+         <description>
+Supported by Red Hat.</description>
+         <icon image48="images/redhat_48.png"></icon>
+      </certification>
+      <certification id="com.jboss.jbds.discovery.certification.tested" name="Tested" url="https://devstudio.jboss.com">
+         <description>
+Tested by Red Hat.</description>
+         <icon image48="images/redhat_48.png"></icon>
+      </certification>
       
       <!-- use connectorCategory relevance value to sort from largest (80) to smallest (20) -->
 
@@ -20,6 +32,7 @@
       <connectorDescriptor
             categoryId="org.jboss.tools.central.discovery.a.web"
             groupId="org.jboss.tools.central.discovery.a.web.core"
+            certificationId="com.jboss.jbds.discovery.certification.tested"
             description="JST Server Core, UI, Adapters, User Doc"
             id="org.eclipse.jst.server_core.feature"
             kind="task"
@@ -43,6 +56,7 @@
       <connectorDescriptor
             categoryId="org.jboss.tools.central.discovery.a.web"
             groupId="org.jboss.tools.central.discovery.a.web.extras"
+            certificationId="com.jboss.jbds.discovery.certification.tested"
             description="Android Development Tools, DDMS, Hierarchy Viewer, OpenGL Tracer, Traceview"
             id="com.android.ide.eclipse.adt"
             kind="task"
@@ -67,6 +81,7 @@
       <connectorDescriptor
             categoryId="org.jboss.tools.central.discovery.a.web"
             groupId="org.jboss.tools.central.discovery.a.web.extras"
+            certificationId="com.jboss.jbds.discovery.certification.tested"
             description="Google Web Toolkit Designer + WindowBuilder"
             id="com.google.gdt.eclipse.designer.editor.feature"
             kind="task"
@@ -92,6 +107,7 @@
       <connectorDescriptor
             categoryId="org.jboss.tools.central.discovery.a.web"
             groupId="org.jboss.tools.central.discovery.a.web.extras"
+            certificationId="com.jboss.jbds.discovery.certification.tested"
             description="Google Plugin for Eclipse (GPE) + Google Web Toolkit SDK (GWT)"
             id="com.google.gwt.eclipse.sdkbundle.e42.feature"
             kind="task"
@@ -111,6 +127,7 @@
       <connectorDescriptor
             categoryId="org.jboss.tools.central.discovery.a.web"
             groupId="org.jboss.tools.central.discovery.a.web.extras"
+            certificationId="com.jboss.jbds.discovery.certification.tested"
             description="Tool support for the Spring Framework"
             id="org.springframework.ide.eclipse.feature"
             kind="task"
@@ -147,6 +164,7 @@
       <connectorDescriptor
             categoryId="org.jboss.tools.central.discovery.b.scm"
             groupId="org.jboss.tools.central.discovery.b.scm.git"
+            certificationId="com.jboss.jbds.discovery.certification.tested"
             description="Eclipse Team Provider for the Git version control system"
             id="org.eclipse.egit"
             kind="task"
@@ -166,6 +184,7 @@
       <connectorDescriptor
             categoryId="org.jboss.tools.central.discovery.b.scm"
             groupId="org.jboss.tools.central.discovery.b.scm.git"
+            certificationId="com.jboss.jbds.discovery.certification.tested"
             description="Mylyn support for Eclipse EGit and GitHub"
             id="org.eclipse.egit.mylyn"
             kind="task"
@@ -197,6 +216,7 @@
       <connectorDescriptor
             categoryId="org.jboss.tools.central.discovery.b.scm"
             groupId="org.jboss.tools.central.discovery.b.scm.svn"
+            certificationId="com.jboss.jbds.discovery.certification.tested"
             description="Eclipse Team Provider for the Subversion version control system, including SVNKit"
             id="org.tigris.subversion.subclipse"
             kind="task"
@@ -216,6 +236,7 @@
       <connectorDescriptor
             categoryId="org.jboss.tools.central.discovery.b.scm"
             groupId="org.jboss.tools.central.discovery.b.scm.svn"
+            certificationId="com.jboss.jbds.discovery.certification.tested"
             description="Mylyn support for the Subversion version control system, including SVNKit"
             id="org.tigris.subversion.subclipse.mylyn"
             kind="task"
@@ -257,6 +278,7 @@
       <connectorDescriptor
             categoryId="org.jboss.tools.central.discovery.c.testing"
             groupId="org.jboss.tools.central.discovery.c.testing.local"
+            certificationId="com.jboss.jbds.discovery.certification.tested"
             description="Tool support for Checkstyle"
             id="net.sf.eclipsecs"
             kind="task"
@@ -275,6 +297,7 @@
       <connectorDescriptor
             categoryId="org.jboss.tools.central.discovery.c.testing"
             groupId="org.jboss.tools.central.discovery.c.testing.local"
+            certificationId="com.jboss.jbds.discovery.certification.tested"
             description="Tool support for FindBugs"
             id="edu.umd.cs.findbugs.plugin.eclipse"
             kind="task"
@@ -295,6 +318,7 @@
       <connectorDescriptor
             categoryId="org.jboss.tools.central.discovery.c.testing"
             groupId="org.jboss.tools.central.discovery.c.testing.local"
+            certificationId="com.jboss.jbds.discovery.certification.supported"
             description="Mylyn support for reporting JBoss JIRAs and Red Hat Bugzillas"
             id="org.jboss.tools.common.mylyn.feature"
             kind="task"
@@ -322,6 +346,7 @@
       <connectorDescriptor
             categoryId="org.jboss.tools.central.discovery.c.testing"
             groupId="org.jboss.tools.central.discovery.c.testing.local"
+            certificationId="com.jboss.jbds.discovery.certification.tested"
             description="Tool support for PMD"
             id="net.sourceforge.pmd.eclipse"
             kind="task"
@@ -341,6 +366,7 @@
 	  <connectorDescriptor
             categoryId="org.jboss.tools.central.discovery.c.testing"
             groupId="org.jboss.tools.central.discovery.c.testing.local"
+            certificationId="com.jboss.jbds.discovery.certification.supported"
             description="Tool support for TestNG"
             id="org.testng.eclipse"
             kind="task"
@@ -361,6 +387,7 @@
       <connectorDescriptor
             categoryId="org.jboss.tools.central.discovery.c.testing"
             groupId="org.jboss.tools.central.discovery.c.testing.remote"
+            certificationId="com.jboss.jbds.discovery.certification.tested"
             description="Tool support for JRebel - requires JST Server"
             id="org.zeroturnaround.eclipse.feature"
             kind="task"
@@ -395,6 +422,7 @@
       <connectorDescriptor
             categoryId="org.jboss.tools.central.discovery.d.maven"
             groupId="org.jboss.tools.central.discovery.d.maven.core"
+            certificationId="com.jboss.jbds.discovery.certification.supported"
             description="JBoss Maven Integration"
             id="org.jboss.tools.maven.feature"
             kind="task"
@@ -413,6 +441,7 @@
       <connectorDescriptor
             categoryId="org.jboss.tools.central.discovery.d.maven"
             groupId="org.jboss.tools.central.discovery.d.maven.configurators"
+            certificationId="com.jboss.jbds.discovery.certification.supported"
             description="JBoss Maven CDI Configurator"
             id="org.jboss.tools.maven.cdi.feature"
             kind="task"
@@ -431,6 +460,7 @@
       <connectorDescriptor
             categoryId="org.jboss.tools.central.discovery.d.maven"
             groupId="org.jboss.tools.central.discovery.d.maven.configurators"
+            certificationId="com.jboss.jbds.discovery.certification.supported"
             description="JBoss Maven GWT Configurator"
             id="org.jboss.tools.maven.gwt.feature"
             kind="task"
@@ -450,6 +480,7 @@
       <connectorDescriptor
             categoryId="org.jboss.tools.central.discovery.d.maven"
             groupId="org.jboss.tools.central.discovery.d.maven.configurators"
+            certificationId="com.jboss.jbds.discovery.certification.supported"
             description="JBoss Maven Hibernate Configurator"
             id="org.jboss.tools.maven.hibernate.feature"
             kind="task"
@@ -468,6 +499,7 @@
       <connectorDescriptor
             categoryId="org.jboss.tools.central.discovery.d.maven"
             groupId="org.jboss.tools.central.discovery.d.maven.configurators"
+            certificationId="com.jboss.jbds.discovery.certification.supported"
             description="JBoss Maven JAX-RS Configurator"
             id="org.jboss.tools.maven.jaxrs.feature"
             kind="task"
@@ -486,6 +518,7 @@
       <connectorDescriptor
             categoryId="org.jboss.tools.central.discovery.d.maven"
             groupId="org.jboss.tools.central.discovery.d.maven.configurators"
+            certificationId="com.jboss.jbds.discovery.certification.supported"
             description="JBoss Maven JSF Configurator"
             id="org.jboss.tools.maven.jsf.feature"
             kind="task"
@@ -504,6 +537,7 @@
       <connectorDescriptor
             categoryId="org.jboss.tools.central.discovery.d.maven"
             groupId="org.jboss.tools.central.discovery.d.maven.configurators"
+            certificationId="com.jboss.jbds.discovery.certification.supported"
             description="JBoss Maven Portlet Configurator"
             id="org.jboss.tools.maven.portlet.feature"
             kind="task"
@@ -522,6 +556,7 @@
       <connectorDescriptor
             categoryId="org.jboss.tools.central.discovery.d.maven"
             groupId="org.jboss.tools.central.discovery.d.maven.configurators"
+            certificationId="com.jboss.jbds.discovery.certification.supported"
             description="JBoss Maven Seam Configurator"
             id="org.jboss.tools.maven.seam.feature"
             kind="task"
@@ -540,6 +575,7 @@
       <connectorDescriptor
             categoryId="org.jboss.tools.central.discovery.d.maven"
             groupId="org.jboss.tools.central.discovery.d.maven.configurators"
+            certificationId="com.jboss.jbds.discovery.certification.supported"
             description="JBoss Maven JPA Configurator"
             id="org.jboss.tools.maven.jpa.feature"
             kind="task"
@@ -558,6 +594,7 @@
       <connectorDescriptor
             categoryId="org.jboss.tools.central.discovery.d.maven"
             groupId="org.jboss.tools.central.discovery.d.maven.configurators"
+            certificationId="com.jboss.jbds.discovery.certification.supported"
             description="Maven Profile Management UI"
             id="org.jboss.tools.maven.profiles.feature"
             kind="task"
@@ -577,6 +614,7 @@
       <connectorDescriptor
             categoryId="org.jboss.tools.central.discovery.d.maven"
             groupId="org.jboss.tools.central.discovery.d.maven.upstream"
+            certificationId="com.jboss.jbds.discovery.certification.tested"
             description="Maven Integration for Eclipse (m2e)"
             id="org.eclipse.m2e.feature"
             kind="task"
@@ -595,6 +633,7 @@
       <connectorDescriptor
             categoryId="org.jboss.tools.central.discovery.d.maven"
             groupId="org.jboss.tools.central.discovery.d.maven.upstream"
+            certificationId="com.jboss.jbds.discovery.certification.supported"
             description="Maven Integration for Eclipse JDT APT (m2e-apt)"
             id="org.jboss.tools.maven.apt.feature"
             kind="task"
@@ -613,6 +652,7 @@
       <connectorDescriptor
             categoryId="org.jboss.tools.central.discovery.d.maven"
             groupId="org.jboss.tools.central.discovery.d.maven.upstream"
+            certificationId="com.jboss.jbds.discovery.certification.supported"
             description="Maven Integration for Web Tools (m2e-wtp)"
             id="org.maven.ide.eclipse.wtp.feature"
             kind="task"
