@@ -22,7 +22,6 @@ import org.jboss.tools.maven.ui.wizard.ConfigureMavenRepositoriesWizard;
 public class ConfigureMavenRepositoriesMarkerResolution implements IMarkerResolution,
 		IMarkerResolution2 {
 
-	
 	private ArtifactKey artifactKey;
 
 	public ConfigureMavenRepositoriesMarkerResolution() {
@@ -46,11 +45,15 @@ public class ConfigureMavenRepositoriesMarkerResolution implements IMarkerResolu
 
 	public void run(IMarker marker) {
 
-		ConfigureMavenRepositoriesWizard wizard = new ConfigureMavenRepositoriesWizard(artifactKey);
+		ConfigureMavenRepositoriesWizard wizard = new ConfigureMavenRepositoriesWizard(artifactKey, getRepositoryProfileId());
 		WizardDialog dialog = new WizardDialog(Display.getDefault().getActiveShell(), wizard);
 		dialog.create();
 		dialog.open(); 
 		
+	}
+
+	protected String getRepositoryProfileId() {
+		return null;
 	}
 	
 }

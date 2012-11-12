@@ -10,20 +10,20 @@
  ************************************************************************************/
 package org.jboss.tools.maven.project.examples.wizard;
 
-import java.net.URL;
-
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.resource.JFaceResources;
+import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Link;
-import org.eclipse.ui.PlatformUI;
+import org.jboss.tools.maven.ui.wizard.ConfigureMavenRepositoriesWizard;
 
 public class MissingRepositoryWarningComponent extends Composite {
 
@@ -46,13 +46,11 @@ public class MissingRepositoryWarningComponent extends Composite {
 		warninglink.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				try {
-					// Open default external browser
-					PlatformUI.getWorkbench().getBrowserSupport()
-							.getExternalBrowser().openURL(new URL(e.text));
-				} catch (Exception ex) {
-					ex.printStackTrace();
-				}
+				
+				ConfigureMavenRepositoriesWizard wizard = new ConfigureMavenRepositoriesWizard(null, "redhat-techpreview-all-repository"); //$NON-NLS-1$
+				WizardDialog dialog = new WizardDialog(Display.getDefault().getActiveShell(), wizard);
+				dialog.create();
+				dialog.open(); 
 			}
 		});
 		

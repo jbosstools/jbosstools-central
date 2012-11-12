@@ -57,12 +57,16 @@ public class MavenDependencyMarkerResolutionGenerator implements
 					};
 		case EAP_REPO:
 			return new IMarkerResolution[] { 
-					new ConfigureMavenRepositoriesMarkerResolution(key),
+					new ConfigureRedHatRepositoryMarkerResolution(key),
 					new OpenPageInBrowserMarkerResolution(Messages.Quickfix_setupEnterpriseRepo, 
 							JBOSS_ENTERPRISE_REPO_SETUP_GUIDE_URL)
 					};
+		default:
+			return new IMarkerResolution[] {
+					new ConfigureMavenRepositoriesMarkerResolution(key)
+				   };
+				
 		}
-		return new IMarkerResolution[0];
 	}
 
 	public boolean hasResolutions(IMarker marker) {
