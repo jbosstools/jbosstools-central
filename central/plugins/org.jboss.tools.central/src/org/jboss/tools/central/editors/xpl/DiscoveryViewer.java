@@ -232,7 +232,7 @@ public class DiscoveryViewer {
 			configureLook(providerLabel, background);
 			GridDataFactory.fillDefaults().align(SWT.END, SWT.CENTER).applyTo(providerLabel);
 			if (connector.getCertification() != null) {
-				providerLabel.setText(NLS.bind(Messages.DiscoveryViewer_Certification_Label0,
+				providerLabel.setText(NLS.bind(org.jboss.tools.central.Messages.DiscoveryViewer_Certification_Label0,
 						new String[] { connector.getProvider(), connector.getLicense(),
 								connector.getCertification().getName() }));
 				if (connector.getCertification().getUrl() != null) {

@@ -35,6 +35,7 @@ Export-Package: org.jboss.tools.maven.core,
  org.jboss.tools.maven.core.internal.project.facet,
  org.jboss.tools.maven.core.libprov,
  org.jboss.tools.maven.core.repositories,
+ org.jboss.tools.maven.core.settings,
  org.jboss.tools.maven.core.xpl
 Bundle-ClassPath: lib/nexus-indexer-lucene-rest-api-client.jar,
  lib/jboss-dmr-1.1.1.Final.jar,
