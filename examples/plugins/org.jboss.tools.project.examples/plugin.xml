@@ -77,7 +77,7 @@
     <extension
         point="org.jboss.tools.project.examples.projectExamplesXml"
         name="JBoss Featured Examples">
-        <url>http://download.jboss.org/jbosstools/examples/project-examples-shared-4.0.Beta1.xml</url> 
+        <url>http://download.jboss.org/jbosstools/examples/project-examples-shared-4.0.Beta2.xml</url> 
         <experimental>false</experimental>
     </extension>
     

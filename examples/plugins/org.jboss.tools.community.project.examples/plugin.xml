@@ -5,7 +5,7 @@
   <extension
         point="org.jboss.tools.project.examples.projectExamplesXml"
         name="%JBoss_Tools_Community_Examples">
-        <url>http://download.jboss.org/jbosstools/examples/project-examples-community-4.0.Beta1.xml</url>
+        <url>http://download.jboss.org/jbosstools/examples/project-examples-community-4.0.Beta2.xml</url>
         <experimental>false</experimental>
    </extension>
    <!--
@@ -30,7 +30,7 @@
  <extension
         point="org.jboss.tools.project.examples.projectExamplesXml"
         name="%JBoss_Tools_Community_Maven_Examples">
-        <url>http://download.jboss.org/jbosstools/examples/project-examples-maven-4.0.Beta1.xml</url>
+        <url>http://download.jboss.org/jbosstools/examples/project-examples-maven-4.0.Beta2.xml</url>
         <experimental>false</experimental>
   </extension>
   
