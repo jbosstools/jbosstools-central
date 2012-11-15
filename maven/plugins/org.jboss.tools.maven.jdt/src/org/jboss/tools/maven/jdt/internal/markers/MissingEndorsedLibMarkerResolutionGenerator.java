@@ -81,6 +81,9 @@ public class MissingEndorsedLibMarkerResolutionGenerator implements	IMarkerResol
 		if (p != null) {
 			for (PluginExecution pe : p.getExecutions()) {
 				String phase = pe.getPhase();
+				if (phase == null) {
+					phase = "process-sources";
+				}
 				if (INTERESTING_PHASES.contains(phase) && pe.getGoals().contains("copy")) {
 					return phase;
 				}
