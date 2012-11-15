@@ -109,7 +109,7 @@ Tested by Red Hat.</description>
             groupId="org.jboss.tools.central.discovery.a.web.extras"
             certificationId="com.jboss.jbds.discovery.certification.tested"
             description="Google Plugin for Eclipse (GPE) + Google Web Toolkit SDK (GWT)"
-            id="com.google.gwt.eclipse.sdkbundle.e42.feature"
+            id="com.google.gpe.gwt"
             kind="task"
             license="EPL, Other"
             name="Google Plugin + Web Toolkit"
