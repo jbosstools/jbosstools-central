@@ -460,9 +460,6 @@ Tested by Red Hat.</description>
                url="http://www.jboss.org/tools">
          </overview>
       </connectorDescriptor>
-
-      <!-- TODO: JBDS-2382 - Should a new connector be added to JBT/JBDS Central for org.jboss.tools.maven.jbosspackaging.feature? -->
-
       <connectorDescriptor
             categoryId="org.jboss.tools.central.discovery.d.maven"
             groupId="org.jboss.tools.central.discovery.d.maven.configurators"
@@ -510,6 +507,27 @@ Tested by Red Hat.</description>
             provider="JBoss by Red Hat"
             siteUrl="http://download.jboss.org/jbosstools/updates/development/juno/central/core/">
             <iu id="org.jboss.tools.maven.jsf.feature"/>
+         <icon
+               image32="images/jbosstools_icon32.png">
+         </icon>
+         <overview
+               url="http://www.jboss.org/tools">
+         </overview>
+      </connectorDescriptor>
+      <connectorDescriptor
+            categoryId="org.jboss.tools.central.discovery.d.maven"
+            groupId="org.jboss.tools.central.discovery.d.maven.configurators"
+            description="JBoss Tools Maven Packaging Configurator"
+            id="org.jboss.tools.maven.jbosspackaging.feature"
+            kind="task"
+            license="Free, EPL"
+            name="JBoss Tools Maven Packaging Configurator"
+            provider="JBoss by Red Hat"
+            siteUrl="http://download.jboss.org/jbosstools/updates/development/juno/central/core/">
+            <iu id="org.jboss.tools.maven.jbosspackaging.feature"/>
+            <iu id="org.eclipse.m2e.feature"/>
+            <iu id="org.eclipse.m2e.wtp.feature"/>
+            <iu id="org.jboss.ide.eclipse.as.feature"/>
          <icon
                image32="images/jbosstools_icon32.png">
          </icon>
