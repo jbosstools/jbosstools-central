@@ -104,7 +104,7 @@ public class NewProjectExamplesStacksRequirementsPage extends NewProjectExamples
 
 	@Override
 	public String getProjectExampleType() {
-		return "mavenArchetype";
+		return "mavenArchetype"; //$NON-NLS-1$
 	}
 	
 	@Override
@@ -170,7 +170,18 @@ public class NewProjectExamplesStacksRequirementsPage extends NewProjectExamples
 				version = StacksUtil.getDefaultArchetypeVersion(a, stacks);
 			}
 			
-			description.append(version.getArchetype().getDescription());
+			String exampleDescription = projectExample.getDescription();
+			if (exampleDescription == null || exampleDescription.trim().isEmpty()) {
+				//Fall back on archetype description
+				String archetypeDescription = version.getArchetype().getDescription();
+				if (archetypeDescription == null || archetypeDescription.trim().isEmpty()) {
+					description.append("No description available"); //$NON-NLS-1$
+				} else {
+					description.append(archetypeDescription);
+				}
+			} else {
+				description.append(exampleDescription);
+			}
 			
 			try {
 				mavenArchetype = createArchetypeModel(projectExample.getArchetypeModel(), version);
@@ -182,14 +193,14 @@ public class NewProjectExamplesStacksRequirementsPage extends NewProjectExamples
 		}
 		
 		if (mavenArchetype != null) {
-			description.append("\r\n").append("\r\n")
-			.append("Project based on the ")
+			description.append("\r\n").append("\r\n") //$NON-NLS-1$ //$NON-NLS-2$
+			.append("Project based on the ") //$NON-NLS-1$
 			.append(mavenArchetype.getArchetypeGroupId())
-			.append(":")
+			.append(":") //$NON-NLS-1$
 			.append(mavenArchetype.getArchetypeArtifactId())
-			.append(":")
+			.append(":") //$NON-NLS-1$
 			.append(mavenArchetype.getArchetypeVersion())
-			.append(" Maven archetype");
+			.append(" Maven archetype"); //$NON-NLS-1$
 		}
 		
 		setDescriptionText(description.toString());
@@ -206,7 +217,7 @@ public class NewProjectExamplesStacksRequirementsPage extends NewProjectExamples
 		
 		useBlankArchetype.setLayoutData(gd);
 		
-		useBlankArchetype.setText("Create a blank project");
+		useBlankArchetype.setText("Create a blank project"); //$NON-NLS-1$
 		useBlankArchetype.addSelectionListener(new SelectionListener() {
 			
 			@Override
@@ -454,7 +465,7 @@ public class NewProjectExamplesStacksRequirementsPage extends NewProjectExamples
 	    
 	    // This is strictly to get SWT Designer working locally without blowing up.
 	    if( MavenPluginActivator.getDefault() == null ) {
-	      pluginSettings = new DialogSettings("Workbench");
+	      pluginSettings = new DialogSettings("Workbench"); //$NON-NLS-1$
 	    }
 	    else {
 	      pluginSettings = M2EUIPluginActivator.getDefault().getDialogSettings();      

@@ -1205,7 +1205,7 @@ public class ProjectExamplesActivator extends AbstractUIPlugin {
 			return description;
 		}
 		char[] chars = StringEscapeUtils.unescapeHtml(description.trim()).toCharArray();
-		StringBuffer buffer = new StringBuffer();
+		StringBuilder buffer = new StringBuilder();
 		int i = 0;
 		for (char c:chars) {
 			if (i++ < DESCRIPTION_LENGTH) {

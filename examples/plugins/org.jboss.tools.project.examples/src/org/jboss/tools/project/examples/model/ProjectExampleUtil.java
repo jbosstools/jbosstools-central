@@ -483,6 +483,11 @@ public class ProjectExampleUtil {
 									if (stacksId != null) {
 										project.setStacksId(stacksId);
 									}
+								} else if (nodeName.equals("headLine")) { //$NON-NLS-1$
+									String headLine = getContent(child); 
+									if (headLine != null) {
+										project.setHeadLine(headLine);
+									}
 								}
 							}
 						}

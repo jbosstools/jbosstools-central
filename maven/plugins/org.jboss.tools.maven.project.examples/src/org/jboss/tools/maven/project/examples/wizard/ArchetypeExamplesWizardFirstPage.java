@@ -332,8 +332,8 @@ public class ArchetypeExamplesWizardFirstPage extends MavenProjectWizardLocation
 			if (projectExample.getShortDescription() != null) {
 				setTitle(projectExample.getShortDescription());
 			}
-			if (projectExample.getDescription() != null) {
-				setDescription(ProjectExamplesActivator.getShortDescription(projectExample.getDescription()));
+			if (projectExample.getHeadLine() != null) {
+				setDescription(ProjectExamplesActivator.getShortDescription(projectExample.getHeadLine()));
 			}
 			archetypeModel = projectExample.getArchetypeModel();
 			initDefaultValues();

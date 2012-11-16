@@ -30,7 +30,11 @@ public class ProjectExample implements ProjectModelElement,
 	public static final String IMPORT_TYPE_ZIP = "zip"; //$NON-NLS-1$
 	private static final String SEP = "/"; //$NON-NLS-1$
 	private static String[] PREFIXES = { "file:", "http:", "https:", "ftp:" }; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+	//name acts as example id
 	private String name;
+	//headline used in project wizards
+	private String headLine;
+	//short description used in generic project-example wizard
 	private String shortDescription;
 	private String description;
 	private String url;
@@ -370,6 +374,17 @@ public class ProjectExample implements ProjectModelElement,
 
 	public void setStacksId(String stacksId) {
 		this.stacksId = stacksId;
+	}
+
+	public String getHeadLine() {
+		if (headLine == null) {
+			headLine = getShortDescription(); 
+		}
+		return headLine;
+	}
+
+	public void setHeadLine(String headLine) {
+		this.headLine = headLine;
 	}
 
 }
