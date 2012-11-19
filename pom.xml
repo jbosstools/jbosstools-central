@@ -23,7 +23,7 @@
 		<profile>
 			<id>bootstrap</id>
 			<modules>
-				<module>../portlet</module>
+				<module>../jbosstools-portlet</module>
 			</modules>
 		</profile>
 	</profiles>
