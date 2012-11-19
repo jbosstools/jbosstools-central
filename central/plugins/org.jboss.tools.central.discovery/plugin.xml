@@ -152,9 +152,29 @@ Tested by Red Hat.</description>
             id="org.jboss.tools.central.discovery.b.scm"
             name="Source Control Management"
             relevance="60">
+         		<group id="org.jboss.tools.central.discovery.b.scm.atlassian" />
  			<group id="org.jboss.tools.central.discovery.b.scm.git" /> 
  			<group id="org.jboss.tools.central.discovery.b.scm.svn" />
       </connectorCategory>
+
+      <connectorDescriptor
+            categoryId="org.jboss.tools.central.discovery.b.scm"
+            groupId="org.jboss.tools.central.discovery.b.scm.atlassian"
+            description="Atlassian Connector for Eclipse"
+            id="com.atlassian.connector.eclipse"
+            kind="task"
+            license="EPL, Other"
+            name="Atlassian Connector"
+            provider="Atlassian"
+            siteUrl="http://download.jboss.org/jbosstools/updates/development/juno/central/core/">
+            <iu id="com.atlassian.connector.eclipse"/>
+         <icon
+               image32="images/atlassian_32.png">
+         </icon>
+         <overview
+               url="https://confluence.atlassian.com/display/IDEPLUGIN/Atlassian+Connector+for+Eclipse">
+         </overview>
+      </connectorDescriptor>
 
       <connectorDescriptor
             categoryId="org.jboss.tools.central.discovery.b.scm"
@@ -218,6 +238,12 @@ Tested by Red Hat.</description>
             siteUrl="http://download.jboss.org/jbosstools/updates/development/juno/central/core/">
             <iu id="org.tigris.subversion.subclipse"/>
             <iu id="org.tigris.subversion.clientadapter.svnkit.feature"/>
+            <iu id="com.collabnet.subversion.merge.feature"/>
+            <iu id="net.java.dev.jna"/>
+            <iu id="org.tigris.subversion.clientadapter.feature"/>
+            <iu id="org.tigris.subversion.clientadapter.javahl.feature"/>
+            <iu id="org.tigris.subversion.subclipse.graph.feature"/>
+            <iu id="org.tmatesoft.svnkit"/>
          <icon
                image32="images/subclipse_32.gif">
          </icon>
@@ -238,6 +264,12 @@ Tested by Red Hat.</description>
             <iu id="org.tigris.subversion.subclipse"/>
             <iu id="org.tigris.subversion.clientadapter.svnkit.feature"/>
             <iu id="org.tigris.subversion.subclipse.mylyn"/>
+            <iu id="com.collabnet.subversion.merge.feature"/>
+            <iu id="net.java.dev.jna"/>
+            <iu id="org.tigris.subversion.clientadapter.feature"/>
+            <iu id="org.tigris.subversion.clientadapter.javahl.feature"/>
+            <iu id="org.tigris.subversion.subclipse.graph.feature"/>
+            <iu id="org.tmatesoft.svnkit"/>
 
 	    <iu id="org.eclipse.mylyn_feature"/>
 	    <iu id="org.eclipse.mylyn.ide_feature"/>
@@ -278,6 +310,7 @@ Tested by Red Hat.</description>
             provider="eclipse-cs Project"
             siteUrl="http://download.jboss.org/jbosstools/updates/development/juno/central/core/">
             <iu id="net.sf.eclipsecs"/>
+            <iu id="com.github.sevntu.checkstyle.checks.feature"/>
          <icon
                image32="images/checkstyle_32.png">
          </icon>
@@ -316,6 +349,8 @@ Tested by Red Hat.</description>
             provider="JBoss by Red Hat"
             siteUrl="http://download.jboss.org/jbosstools/updates/development/juno/central/core/">
          <iu id="org.jboss.tools.common.mylyn.feature"/>
+         <iu id="com.atlassian.connector.eclipse.jira"/>
+         <iu id="com.atlassian.connector.eclipse.monitor"/>
          <iu id="org.eclipse.mylyn_feature"/>
          <iu id="org.eclipse.mylyn.ide_feature"/>
          <iu id="org.eclipse.mylyn.commons"/>
