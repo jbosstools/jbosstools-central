@@ -698,5 +698,23 @@ Tested by Red Hat.</description>
          </overview>
       </connectorDescriptor>
 
+	  <connectorDescriptor
+            categoryId="org.jboss.tools.central.discovery.a.web"
+            groupId="org.jboss.tools.central.discovery.a.web.extras"
+            description="Atlassian Connector for Eclipse"
+            id="com.atlassian.connector.eclipse"
+            kind="task"
+            license="EPL, Other"
+            name="Atlassian Connector"
+            provider="Atlassian"
+            siteUrl="http://update.atlassian.com/atlassian-eclipse-plugin/e3.8">
+            <iu id="com.atlassian.connector.eclipse"/>
+         <icon
+               image32="images/atlassian_icon-32.png">
+         </icon>
+         <overview
+               url="https://confluence.atlassian.com/display/IDEPLUGIN/Atlassian+Connector+for+Eclipse">
+         </overview>
+      </connectorDescriptor>
 	</extension>
 </plugin>
