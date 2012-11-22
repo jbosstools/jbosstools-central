@@ -24,5 +24,6 @@ Bundle-Localization: plugin
 Export-Package: org.jboss.tools.maven.conversion.core,
  org.jboss.tools.maven.conversion.ui,
  org.jboss.tools.maven.conversion.ui.dialog,
- org.jboss.tools.maven.conversion.ui.handlers
+ org.jboss.tools.maven.conversion.ui.handlers,
+ org.jboss.tools.maven.conversion.ui.internal.jobs;x-friends:="org.jboss.tools.maven.conversion.test"
 Bundle-ActivationPolicy: lazy
