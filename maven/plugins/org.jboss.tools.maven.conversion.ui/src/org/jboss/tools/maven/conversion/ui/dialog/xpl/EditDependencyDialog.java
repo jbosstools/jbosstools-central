@@ -171,7 +171,8 @@ public class EditDependencyDialog extends SelectionStatusDialog  {
     final String groupId = valueOrNull(groupIdText.getText());
     final String artifactId = valueOrNull(artifactIdText.getText());
     final String version =  valueOrNull(versionText.getText()); 
-    final String type = valueOrNull(typeCombo.getText());
+    String type = valueOrNull(typeCombo.getText());
+    type = (type == null)?"jar":type;
     final String scope = valueOrNull(scopeCombo.getText());
     final String classifier = valueOrNull(classifierText.getText());
     final String system = valueOrNull(systemPathText.getText());
