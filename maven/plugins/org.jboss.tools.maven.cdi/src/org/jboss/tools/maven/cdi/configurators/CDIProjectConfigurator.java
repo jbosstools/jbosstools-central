@@ -11,14 +11,20 @@
 package org.jboss.tools.maven.cdi.configurators;
 
 import java.util.List;
+import java.util.Set;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.project.MavenProject;
+import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.core.runtime.Path;
+import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.project.MavenProjectChangedEvent;
@@ -32,8 +38,10 @@ import org.eclipse.wst.common.project.facet.core.IProjectFacetVersion;
 import org.eclipse.wst.common.project.facet.core.ProjectFacetsManager;
 import org.jboss.tools.cdi.core.CDICoreNature;
 import org.jboss.tools.cdi.core.CDIUtil;
+import org.jboss.tools.common.model.util.EclipseResourceUtil;
 import org.jboss.tools.maven.cdi.MavenCDIActivator;
 import org.jboss.tools.maven.core.IJBossMavenConstants;
+import org.jboss.tools.maven.core.ProjectUtil;
 import org.jboss.tools.maven.core.internal.project.facet.MavenFacetInstallDataModelProvider;
 import org.jboss.tools.maven.ui.Activator;
 
@@ -91,7 +99,7 @@ public class CDIProjectConfigurator extends AbstractProjectConfigurator {
 			return;
 		}
 		String packaging = mavenProject.getPackaging();
-	    String cdiVersion = getCDIVersion(mavenProject);
+	    String cdiVersion = getCDIVersion(project, mavenProject);
 	    if (cdiVersion != null) {
 	    	if ( (fproj != null) && ("war".equals(packaging) || "ejb".equals(packaging)) ) { //$NON-NLS-1$
 	    		installDefaultFacets(fproj, cdiVersion, monitor);
@@ -173,10 +181,13 @@ public class CDIProjectConfigurator extends AbstractProjectConfigurator {
 		return versionString;
 	}
 	
-	private String getCDIVersion(MavenProject mavenProject) {
+	private String getCDIVersion(IProject project, MavenProject mavenProject) throws CoreException {
 		String version = Activator.getDefault().getDependencyVersion(mavenProject, CDI_API_GROUP_ID, CDI_API_ARTIFACT_ID);
 		if (version == null) {
 			version = inferCdiVersionFromDependencies(mavenProject);
+		}
+		if (version == null) {
+			version = (hasBeansXml(project))?DEFAULT_CDI_VERSION:null;
 		}
 	    return version;
 	}
@@ -206,8 +217,23 @@ public class CDIProjectConfigurator extends AbstractProjectConfigurator {
 		return (artifact.getGroupId().startsWith("org.jboss.seam.") 
 			&& artifact.getVersion().startsWith("3."))
 			|| artifact.getGroupId().startsWith("org.apache.deltaspike.");
-		
-		
 	}
 
+	public boolean hasBeansXml(IProject project) throws CoreException {
+		IFacetedProject facetedProject = ProjectFacetsManager.create(project);
+		if(facetedProject!=null && facetedProject.hasProjectFacet(dynamicWebFacet)) {
+			IFile beansXml = ProjectUtil.getWebResourceFile(project, "WEB-INF/beans.xml");
+			return beansXml != null && beansXml.exists();
+		} else if(project.hasNature(JavaCore.NATURE_ID)) {
+			Set<IFolder> sources = EclipseResourceUtil.getSourceFolders(project);
+			IPath beansPath = new Path("META-INF/beans.xml");
+			for (IFolder src : sources) {
+				IFile beansXml = src.getFile(beansPath);
+				if(beansXml!=null && beansXml.exists()) {
+					return true;
+				}
+			}
+		}
+		return false;
+	}	
 }
