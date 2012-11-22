@@ -33,6 +33,7 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jst.j2ee.project.facet.IJ2EEFacetConstants;
 import org.eclipse.jst.jsf.core.internal.project.facet.IJSFFacetInstallDataModelProperties;
@@ -105,6 +106,10 @@ public class JSFProjectConfigurator extends AbstractProjectConfigurator {
 	
 	private void configureInternal(MavenProject mavenProject,IProject project,
 			IProgressMonitor monitor) throws CoreException {
+
+		if (Platform.getBundle("org.eclipse.m2e.wtp.jsf") != null) {
+			return;
+		}
 		
 		if (!"war".equals(mavenProject.getPackaging()))  {//$NON-NLS-1$
 			return;

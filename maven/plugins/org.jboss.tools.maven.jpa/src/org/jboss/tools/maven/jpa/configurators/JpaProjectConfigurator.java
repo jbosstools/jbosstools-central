@@ -21,6 +21,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jpt.common.core.resource.ResourceLocator;
@@ -161,6 +162,9 @@ public class JpaProjectConfigurator extends AbstractProjectConfigurator {
 	}
 
 	private boolean canConfigure(IProject project) throws CoreException {
+		if (Platform.getBundle("org.eclipse.m2e.wtp.jpa") != null) {
+			return false;
+		}
 		IPreferenceStore store = Activator.getDefault().getPreferenceStore();
 		boolean configureJpa = store.getBoolean(Activator.CONFIGURE_JPA);
 		return configureJpa 

@@ -19,6 +19,7 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.SubProgressMonitor;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IType;
@@ -86,6 +87,10 @@ public class JaxrsProjectConfigurator extends AbstractProjectConfigurator {
 	
 	private void configureInternal(MavenProject mavenProject,IProject project,
 			IProgressMonitor monitor) throws CoreException {
+		
+		if (Platform.getBundle("org.eclipse.m2e.wtp.jaxrs") != null) {
+			return;
+		}
 		
 		if(!"war".equals(mavenProject.getPackaging())) { //$NON-NLS-1$
 			return;
