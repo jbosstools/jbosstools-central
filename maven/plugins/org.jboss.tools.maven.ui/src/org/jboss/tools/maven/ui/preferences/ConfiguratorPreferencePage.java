@@ -50,7 +50,11 @@ public class ConfiguratorPreferencePage extends PreferencePage implements
 	private static final String ORG_JBOSS_TOOLS_MAVEN_JAXRS = "org.jboss.tools.maven.jaxrs"; //$NON-NLS-1$
 	private static final String ORG_JBOSS_TOOLS_MAVEN_JPA = "org.jboss.tools.maven.jpa"; //$NON-NLS-1$
 	private static final String ORG_JBOSS_TOOLS_MAVEN_GWT = "org.jboss.tools.maven.gwt"; //$NON-NLS-1$
-	
+
+	private static final String ORG_ECLIPSE_M2E_WTP_JAXRS = "org.eclipse.m2e.wtp.jaxrs"; //$NON-NLS-1$
+	private static final String ORG_ECLIPSE_M2E_WTP_JPA = "org.eclipse.m2e.wtp.jpa"; //$NON-NLS-1$
+	private static final String ORG_ECLIPSE_M2E_WTP_JSF = "org.eclipse.m2e.wtp.jsf"; //$NON-NLS-1$
+
 	private Button configureSeamButton;
 	private Button configureSeamRuntimeButton;
 	private Button configureSeamArtifactsButton;
@@ -107,7 +111,7 @@ public class ConfiguratorPreferencePage extends PreferencePage implements
 			});
 		}
 		
-		if (bundleExists(ORG_JBOSS_TOOLS_MAVEN_JSF)) { 
+		if (bundleExists(ORG_JBOSS_TOOLS_MAVEN_JSF) && !bundleExists(ORG_ECLIPSE_M2E_WTP_JSF) ) { 
 			configureJSFButton = new Button(composite,SWT.CHECK);
 			configureJSFButton.setText(Messages.ConfiguratorPreferencePage_Configure_JSF_facet);
 			boolean configureJSF = store.getBoolean(Activator.CONFIGURE_JSF);
@@ -151,14 +155,14 @@ public class ConfiguratorPreferencePage extends PreferencePage implements
 			configureHibernateButton.setSelection(configureHibernate);
 		}
 		
-		if (bundleExists(ORG_JBOSS_TOOLS_MAVEN_JAXRS)) { 
+		if (bundleExists(ORG_JBOSS_TOOLS_MAVEN_JAXRS) && !bundleExists(ORG_ECLIPSE_M2E_WTP_JAXRS) ) { 
 			configureJaxRsButton = new Button(composite,SWT.CHECK);
 			configureJaxRsButton.setText(Messages.ConfiguratorPreferencePage_Configure_JAX_RS_facet);
 			boolean configureJaxRs = store.getBoolean(Activator.CONFIGURE_JAXRS);
 			configureJaxRsButton.setSelection(configureJaxRs);
 		}
 		
-		if (bundleExists(ORG_JBOSS_TOOLS_MAVEN_JPA)) { 
+		if (bundleExists(ORG_JBOSS_TOOLS_MAVEN_JPA) && !bundleExists(ORG_ECLIPSE_M2E_WTP_JPA) ) { 
 			configureJpaButton = new Button(composite,SWT.CHECK);
 			configureJpaButton.setText(Messages.ConfiguratorPreferencePage_Configure_JPA_facet);
 			boolean configureJpa = store.getBoolean(Activator.CONFIGURE_JPA);
@@ -210,7 +214,7 @@ public class ConfiguratorPreferencePage extends PreferencePage implements
 
 	@Override
 	protected void performDefaults() {
-		if (bundleExists(ORG_JBOSS_TOOLS_MAVEN_JSF)) { 
+		if (bundleExists(ORG_JBOSS_TOOLS_MAVEN_JSF) && !bundleExists(ORG_ECLIPSE_M2E_WTP_JSF) ) { 
 			configureJSFButton.setSelection(Activator.CONFIGURE_JSF_VALUE);
 			configureWebxmlJSF20Button.setSelection(Activator.CONFIGURE_WEBXML_JSF20_VALUE);
 		}
@@ -234,13 +238,17 @@ public class ConfiguratorPreferencePage extends PreferencePage implements
 			configureHibernateButton.setSelection(Activator.CONFIGURE_HIBERNATE_VALUE);
 		}
 		
-		if (bundleExists(ORG_JBOSS_TOOLS_MAVEN_JAXRS)) { 
+		if (bundleExists(ORG_JBOSS_TOOLS_MAVEN_JAXRS) && !bundleExists(ORG_ECLIPSE_M2E_WTP_JAXRS)) { 
 			configureJaxRsButton.setSelection(Activator.CONFIGURE_JAXRS_VALUE);
+		}
+
+		if (bundleExists(ORG_JBOSS_TOOLS_MAVEN_JPA) && !bundleExists(ORG_ECLIPSE_M2E_WTP_JPA)) { 
+			configureJpaButton.setSelection(Activator.CONFIGURE_JPA_VALUE);
 		}
 		
 		IPreferenceStore store = Activator.getDefault().getPreferenceStore();
 		
-		if (bundleExists(ORG_JBOSS_TOOLS_MAVEN_JSF)) { 
+		if (bundleExists(ORG_JBOSS_TOOLS_MAVEN_JSF) && !bundleExists(ORG_ECLIPSE_M2E_WTP_JSF)) { 
 			store.setValue(Activator.CONFIGURE_JSF, Activator.CONFIGURE_JSF_VALUE);
 		}
 		
@@ -266,11 +274,11 @@ public class ConfiguratorPreferencePage extends PreferencePage implements
 			store.setValue(Activator.CONFIGURE_HIBERNATE, Activator.CONFIGURE_HIBERNATE_VALUE);
 		}
 
-		if (bundleExists(ORG_JBOSS_TOOLS_MAVEN_JAXRS)) { 
+		if (bundleExists(ORG_JBOSS_TOOLS_MAVEN_JAXRS) && !bundleExists(ORG_ECLIPSE_M2E_WTP_JAXRS)) { 
 			store.setValue(Activator.CONFIGURE_JAXRS, Activator.CONFIGURE_JAXRS_VALUE);
 		}
 
-		if (bundleExists(ORG_JBOSS_TOOLS_MAVEN_JPA)) { 
+		if (bundleExists(ORG_JBOSS_TOOLS_MAVEN_JPA) && !bundleExists(ORG_ECLIPSE_M2E_WTP_JPA)) { 
 			store.setValue(Activator.CONFIGURE_JPA, Activator.CONFIGURE_JPA_VALUE);
 		}
 		
@@ -284,7 +292,7 @@ public class ConfiguratorPreferencePage extends PreferencePage implements
 	@Override
 	public boolean performOk() {
 		IPreferenceStore store = Activator.getDefault().getPreferenceStore();
-		if (bundleExists(ORG_JBOSS_TOOLS_MAVEN_JSF)) { 
+		if (bundleExists(ORG_JBOSS_TOOLS_MAVEN_JSF) && !bundleExists(ORG_ECLIPSE_M2E_WTP_JSF)) { 
 			store.setValue(Activator.CONFIGURE_JSF, configureJSFButton.getSelection());
 			store.setValue(Activator.CONFIGURE_WEBXML_JSF20, configureWebxmlJSF20Button.getSelection());
 		}
@@ -309,11 +317,11 @@ public class ConfiguratorPreferencePage extends PreferencePage implements
 			store.setValue(Activator.CONFIGURE_HIBERNATE, configureHibernateButton.getSelection());
 		}
 
-		if (bundleExists(ORG_JBOSS_TOOLS_MAVEN_JAXRS)) {
+		if (bundleExists(ORG_JBOSS_TOOLS_MAVEN_JAXRS) && !bundleExists(ORG_ECLIPSE_M2E_WTP_JAXRS)) {
 			store.setValue(Activator.CONFIGURE_JAXRS, configureJaxRsButton.getSelection());
 		}
 
-		if (bundleExists(ORG_JBOSS_TOOLS_MAVEN_JPA)) {
+		if (bundleExists(ORG_JBOSS_TOOLS_MAVEN_JPA) && !bundleExists(ORG_ECLIPSE_M2E_WTP_JPA)) {
 			store.setValue(Activator.CONFIGURE_JPA, configureJpaButton.getSelection());
 		}
 		
