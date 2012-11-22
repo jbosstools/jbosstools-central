@@ -91,7 +91,7 @@ public abstract class IdentificationJob extends Job {
 	protected abstract void identifyDependency(IProgressMonitor monitor) throws CoreException;
 
 	protected void checkResolution(IProgressMonitor monitor) throws CoreException {
-		if (monitor.isCanceled()) {
+		if (dependency == null || monitor.isCanceled()) {
 			return;
 		}
 		resolvable = Boolean.FALSE;
@@ -99,6 +99,11 @@ public abstract class IdentificationJob extends Job {
 		String artifactId = dependency.getArtifactId();
 		String version = dependency.getVersion();
 		String type = dependency.getType();
+		
+		if (groupId == null || artifactId == null || version == null || type == null ) {
+			//unresolvable
+			return;
+		}
 		String classifier = dependency.getClassifier();
 		IMaven maven = MavenPlugin.getMaven();
 		
