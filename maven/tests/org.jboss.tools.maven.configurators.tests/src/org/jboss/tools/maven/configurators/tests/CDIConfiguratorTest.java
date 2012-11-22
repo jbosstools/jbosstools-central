@@ -27,16 +27,44 @@ public class CDIConfiguratorTest extends AbstractMavenConfiguratorTest {
 	
 	@Test
 	public void testJBIDE11741_deltaSpikeDependency() throws Exception {
-		String projectLocation = "projects/cdi/deltaspike";
-		IProject cdiProject = importProject(projectLocation+"/pom.xml");
-		waitForJobsToComplete();
-		assertNoErrors(cdiProject);
-		assertIsCDIProject(cdiProject, DEFAULT_CDI_VERSION);
+		testCdiProject("deltaspike");
 	}
 
 	@Test
 	public void testJBIDE12558_unsupportedCdiVersion() throws Exception {
-		String projectLocation = "projects/cdi/unsupported-cdi-version";
+		testCdiProject("unsupported-cdi-version");
+	}
+
+	@Test
+	public void testJBIDE13128_warHasBeansXml() throws Exception {
+		testCdiProject("war-has-beans-xml");
+	}
+
+	@Test
+	public void testJBIDE13128_warHasMetaInfBeansXml() throws Exception {
+		testCdiProject("war-has-metainfbeans-xml");
+	}
+
+	@Test
+	public void testJBIDE13128_jarHasBeansXml() throws Exception {
+		testCdiProject("jar-has-beans-xml");
+	}
+
+	@Test
+	public void testJBIDE13128_warNoCdi() throws Exception {
+		String projectLocation = "projects/cdi/war-no-cdi";
+		IProject notCdiProject = importProject(projectLocation+"/pom.xml");
+		waitForJobsToComplete();
+		assertNoErrors(notCdiProject);
+		assertFalse("CDI nature should be missing", notCdiProject.hasNature(CDICoreNature.NATURE_ID));
+
+		IFacetedProject facetedProject = ProjectFacetsManager.create(notCdiProject);
+		assertNull("CDI Facet should be missing ",facetedProject.getInstalledVersion(CDI_FACET));
+	}
+
+	
+	protected void testCdiProject(String projectName) throws Exception {
+		String projectLocation = "projects/cdi/"+projectName;
 		IProject cdiProject = importProject(projectLocation+"/pom.xml");
 		waitForJobsToComplete();
 		assertNoErrors(cdiProject);
