@@ -65,6 +65,7 @@ import org.jboss.tools.maven.core.IJBossMavenConstants;
 import org.jboss.tools.maven.core.MavenCoreActivator;
 import org.jboss.tools.maven.core.ProjectUtil;
 import org.jboss.tools.maven.core.xpl.ProjectUpdater;
+import org.jboss.tools.maven.seam.utils.SeamUtils;
 import org.jboss.tools.seam.core.SeamUtil;
 import org.jboss.tools.seam.core.project.facet.SeamRuntime;
 import org.jboss.tools.seam.core.project.facet.SeamRuntimeManager;
@@ -144,6 +145,10 @@ public class MavenSeamActivator extends AbstractUIPlugin {
 	public void configureSeamProject(IDataModel seamFacetModel, IDataModel m2FacetModel) {
 		Assert.isNotNull(seamFacetModel);
 		Assert.isNotNull(m2FacetModel);
+		String seamVersion = m2FacetModel.getStringProperty(IJBossMavenConstants.SEAM_MAVEN_VERSION);
+		if (!SeamUtils.isSeamConversionSupported(seamVersion)) {
+			return;
+		}
 		webProjectName = seamFacetModel.getStringProperty(IFacetDataModelProperties.FACET_PROJECT_NAME);
 		artifactId = m2FacetModel.getStringProperty(IJBossMavenConstants.ARTIFACT_ID);
 		groupId = m2FacetModel.getStringProperty(IJBossMavenConstants.GROUP_ID);
