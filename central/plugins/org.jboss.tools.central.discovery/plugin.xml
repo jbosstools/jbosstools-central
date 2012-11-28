@@ -58,11 +58,11 @@ Tested by Red Hat.</description>
             description="Android Development Tools, DDMS, Hierarchy Viewer, OpenGL Tracer, Traceview"
             id="com.android.ide.eclipse.adt"
             kind="task"
-            license="EPL, Other"
+            license="Free, EPL, Other"
             name="Android Development Tools"
             provider="Google, Inc."
-            siteUrl="http://download.jboss.org/jbosstools/updates/development/juno/central/core/">
-            <!-- https://issues.jboss.org/browse/JBIDE-12498 -->
+            siteUrl="https://dl-ssl.google.com/android/eclipse/">
+            <!-- https://issues.jboss.org/browse/JBIDE-12498, JBIDE-13167 -->
             <iu id="com.android.ide.eclipse.adt"/>
             <iu id="com.android.ide.eclipse.ddms"/>
             <iu id="com.android.ide.eclipse.hierarchyviewer"/>
@@ -82,7 +82,7 @@ Tested by Red Hat.</description>
             description="Google Web Toolkit Designer + WindowBuilder"
             id="com.google.gdt.eclipse.designer.editor.feature"
             kind="task"
-            license="EPL, Other"
+            license="Free, EPL, Other"
             name="Google Web Toolkit Designer"
             provider="Google, Inc."
             siteUrl="http://download.jboss.org/jbosstools/updates/development/juno/central/core/">
@@ -107,7 +107,7 @@ Tested by Red Hat.</description>
             description="Google Plugin for Eclipse (GPE) + Google Web Toolkit SDK (GWT)"
             id="com.google.gpe.gwt"
             kind="task"
-            license="EPL, Other"
+            license="Free, EPL, Other"
             name="Google Plugin + Web Toolkit"
             provider="Google, Inc."
             siteUrl="http://download.jboss.org/jbosstools/updates/development/juno/central/core/">
@@ -163,7 +163,7 @@ Tested by Red Hat.</description>
             description="Atlassian Connector for Eclipse"
             id="com.atlassian.connector.eclipse"
             kind="task"
-            license="EPL, Other"
+            license="Free, EPL, Other"
             name="Atlassian Connector"
             provider="Atlassian"
             siteUrl="http://download.jboss.org/jbosstools/updates/development/juno/central/core/">
