@@ -1,12 +1,16 @@
 JBoss Central has a "software/update" page which gets its content from a hardcoded URL, set in the org.jboss.tools.central plugin.
 
+The published (current) stable release URL is 
+
+	http://download.jboss.org/jbosstools/updates/stable/juno/jbosstools-directory.xml
+
 The published (current) milestone release URL is 
 
 	http://download.jboss.org/jbosstools/updates/development/juno/jbosstools-directory.xml
 
 The stable branch (upcoming milestone) URL is
 
-	http://download.jboss.org/jbosstools/updates/nightly/core/3.4.juno/jbosstools-directory.xml
+	http://download.jboss.org/jbosstools/updates/nightly/core/4.0.juno/jbosstools-directory.xml
 
 The unstable trunk URL is
 
