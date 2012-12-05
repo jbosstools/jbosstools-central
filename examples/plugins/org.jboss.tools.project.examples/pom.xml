@@ -12,7 +12,7 @@
 
 	<properties>
 		<!-- TODO: for GA, change this from /development/juno/ to /stable/juno/ -->
-		<jboss.discovery.directory.url>http://download.jboss.org/jbosstools/updates/development/juno/jbosstools-directory.xml</jboss.discovery.directory.url>
+		<jboss.discovery.directory.url>http://download.jboss.org/jbosstools/updates/stable/juno/jbosstools-directory.xml</jboss.discovery.directory.url>
 	</properties>
 
 	<profiles>
