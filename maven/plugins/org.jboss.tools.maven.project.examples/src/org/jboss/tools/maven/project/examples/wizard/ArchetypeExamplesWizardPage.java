@@ -468,7 +468,10 @@ public class ArchetypeExamplesWizardPage extends
 			    }
 			}
 			projectDescription = projectExample;
-			archetypeModel  = projectDescription.getArchetypeModel();
+			archetypeModel = (ArchetypeModel) context.getProperty(MavenProjectConstants.ARCHETYPE_MODEL);
+			if (archetypeModel == null) {
+				archetypeModel = projectExample.getArchetypeModel();
+			}
 			initializeArchetype();
 		}
 	}
