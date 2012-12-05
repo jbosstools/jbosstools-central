@@ -335,7 +335,10 @@ public class ArchetypeExamplesWizardFirstPage extends MavenProjectWizardLocation
 			if (projectExample.getHeadLine() != null) {
 				setDescription(ProjectExamplesActivator.getShortDescription(projectExample.getHeadLine()));
 			}
-			archetypeModel = projectExample.getArchetypeModel();
+			archetypeModel = (ArchetypeModel) context.getProperty(MavenProjectConstants.ARCHETYPE_MODEL);
+			if (archetypeModel == null) {
+				archetypeModel = projectExample.getArchetypeModel();
+			}
 			initDefaultValues();
 		} 
 	}
