@@ -105,7 +105,7 @@ public class ArchetypeExamplesWizardFirstPage extends MavenProjectWizardLocation
 		projectNameCombo.addModifyListener(new ModifyListener() {
 			@Override
 			public void modifyText(ModifyEvent e) {
-				if (isCurrentPage()) {
+				if (!initialized || isCurrentPage()) {
 					context.setProperty(MavenProjectConstants.PROJECT_NAME, getProjectName());
 				}
 				validate();
@@ -121,7 +121,7 @@ public class ArchetypeExamplesWizardFirstPage extends MavenProjectWizardLocation
 		packageCombo.addModifyListener(new ModifyListener() {
 			@Override
 			public void modifyText(ModifyEvent e) {
-				if (isCurrentPage()) {
+				if (!initialized || isCurrentPage()) {
 					context.setProperty(MavenProjectConstants.PACKAGE, packageCombo.getText());
 				}
 				validate();
