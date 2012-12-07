@@ -372,6 +372,9 @@ public class JBossCentralActivator extends AbstractUIPlugin {
 
 	protected static JBossCentralEditor openJBossCentralEditor(
 			IWorkbenchPage page) {
+		if (!PlatformUI.isWorkbenchRunning() || PlatformUI.getWorkbench().isClosing()) {
+			return null;
+		}
 		IEditorInput input = JBossCentralEditorInput.INSTANCE;
 		try {
 			IEditorPart editor = page.openEditor(input, JBossCentralEditor.ID);
