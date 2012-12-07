@@ -35,6 +35,8 @@ import org.eclipse.core.runtime.jobs.IJobChangeEvent;
 import org.eclipse.core.runtime.jobs.IJobChangeListener;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
+import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener;
+import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IContributionItem;
 import org.eclipse.jface.action.ToolBarManager;
@@ -703,7 +705,7 @@ public class GettingStartedPage extends AbstractJBossCentralPage {
 	    settingsComposite.setLayout(layout);
 	    GridDataFactory.fillDefaults().grab(true, true).applyTo(settingsComposite);
 		
-	    Button showOnStartup = toolkit.createButton(settingsComposite, "Show on Startup", SWT.CHECK);
+	    final Button showOnStartup = toolkit.createButton(settingsComposite, "Show on Startup", SWT.CHECK);
 		showOnStartup.setLayoutData(new GridData(SWT.BEGINNING, SWT.BOTTOM, false, false));
 		showOnStartup.setBackground(settingsComposite.getBackground());
 		showOnStartup.setSelection(JBossCentralActivator.getDefault().showJBossCentralOnStartup());
@@ -719,6 +721,19 @@ public class GettingStartedPage extends AbstractJBossCentralPage {
 		
 		});
 
+		JBossCentralActivator.getDefault().getPreferences().addPreferenceChangeListener(new IPreferenceChangeListener() {
+			
+			@Override
+			public void preferenceChange(PreferenceChangeEvent event) {
+				if (JBossCentralActivator.SHOW_JBOSS_CENTRAL_ON_STARTUP.equals(event.getKey())) {
+					Object value = event.getNewValue();
+					if (value instanceof String) {
+						boolean newValue = new Boolean((String)value).booleanValue();
+						showOnStartup.setSelection(newValue);
+					}
+				}
+			}
+		});
 		settingsSection.setClient(settingsComposite);
 	}
 
