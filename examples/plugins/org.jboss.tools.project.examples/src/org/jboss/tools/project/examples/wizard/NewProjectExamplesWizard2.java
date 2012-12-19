@@ -53,7 +53,6 @@ public class NewProjectExamplesWizard2 extends Wizard implements INewWizard {
 
 	private WizardContext wizardContext = new WizardContext();
 	
-	private boolean isCentral = false;
 	//private QuickFixPage quickFixPage;
 
 	public NewProjectExamplesWizard2() {
@@ -69,7 +68,6 @@ public class NewProjectExamplesWizard2 extends Wizard implements INewWizard {
 
 	protected void initializeProjectExample(ProjectExample projectExample) {
 		this.projectExample = projectExample;
-		this.isCentral = true;
 		setWindowTitle(Messages.NewProjectExamplesWizard_New_Project_Example);
 		setNeedsProgressMonitor(true);
 	}

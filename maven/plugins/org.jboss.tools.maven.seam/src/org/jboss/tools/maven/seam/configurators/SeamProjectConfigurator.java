@@ -25,7 +25,6 @@ import org.eclipse.core.resources.ProjectScope;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.core.runtime.preferences.IScopeContext;
@@ -36,7 +35,6 @@ import org.eclipse.jdt.core.IPackageFragmentRoot;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jface.preference.IPreferenceStore;
-import org.eclipse.jst.j2ee.application.internal.operations.RemoveComponentFromEnterpriseApplicationOperation;
 import org.eclipse.jst.j2ee.project.EarUtilities;
 import org.eclipse.jst.j2ee.project.JavaEEProjectUtilities;
 import org.eclipse.jst.jsf.core.internal.project.facet.IJSFFacetInstallDataModelProperties;
@@ -633,20 +631,7 @@ public class SeamProjectConfigurator extends AbstractProjectConfigurator {
 		}
 		return seamRuntime3;
 	}
-	
-	private static class RemoveComponentFromEnterpriseApplicationOperationEx extends RemoveComponentFromEnterpriseApplicationOperation {
 
-		public RemoveComponentFromEnterpriseApplicationOperationEx(
-				IDataModel model) {
-			super(model);
-		}
-
-		@Override
-		protected void updateEARDD(IProgressMonitor monitor) {
-			//super.updateEARDD(monitor);
-		}
-	}
-	
 	private static interface Criteria {
 		boolean applies(IProject project);
 	}

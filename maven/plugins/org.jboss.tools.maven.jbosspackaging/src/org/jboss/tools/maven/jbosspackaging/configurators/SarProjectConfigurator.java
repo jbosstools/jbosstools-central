@@ -32,7 +32,6 @@ import org.eclipse.jdt.core.IClasspathEntry;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.JavaModelException;
-import org.eclipse.jst.j2ee.classpathdep.IClasspathDependencyConstants;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.project.MavenProjectChangedEvent;
 import org.eclipse.m2e.core.project.MavenProjectUtils;
@@ -70,8 +69,6 @@ public class SarProjectConfigurator extends AbstractProjectConfigurator {
 	public static final ArtifactFilter SCOPE_FILTER_RUNTIME = new ScopeArtifactFilter(Artifact.SCOPE_RUNTIME);
 	protected static final IProjectFacet m2Facet;
 	protected static final IProjectFacetVersion m2Version;
-	private static final IClasspathAttribute NONDEPENDENCY_ATTRIBUTE = JavaCore.newClasspathAttribute(
-			IClasspathDependencyConstants.CLASSPATH_COMPONENT_NON_DEPENDENCY, "");
 	static {
 		JBOSS_SAR_FACET = ProjectFacetsManager.getProjectFacet("jst.jboss.sar");
 		JBOSS_SAR_FACET_VERSION_1_0 = JBOSS_SAR_FACET.getVersion("1.0");//$NON-NLS-1$

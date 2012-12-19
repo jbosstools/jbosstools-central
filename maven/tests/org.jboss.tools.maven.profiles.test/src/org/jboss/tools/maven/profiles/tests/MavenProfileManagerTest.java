@@ -17,7 +17,6 @@ import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.jboss.tools.maven.profiles.core.profiles.ProfileState;
 import org.jboss.tools.maven.profiles.core.profiles.ProfileStatus;
 import org.junit.Test;
-import static org.junit.Assert.*;
 
 @SuppressWarnings("restriction")
 public class MavenProfileManagerTest extends AbstractMavenProfileTest {

@@ -10,9 +10,6 @@
  ************************************************************************************/
 package org.jboss.tools.maven.hibernate.configurators;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
 import org.apache.maven.artifact.resolver.filter.ScopeArtifactFilter;

@@ -18,8 +18,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.MavenSession;
@@ -55,8 +53,6 @@ import org.jboss.tools.maven.jdt.utils.ClasspathHelpers;
  */
 public class EndorsedLibProjectConfigurator extends AbstractProjectConfigurator implements IJavaProjectConfigurator {
 
-	private static final Pattern jAVA_ENDORSED_DIRS_PATTERN = Pattern.compile("-Djava.endorsed.dirs=([^ \\t]+)");
-	
 	private static final String MISSING_ENDORSED_DIRS_MARKER = "org.jbosstools.maven.configuration.jdt.endorsedlib";
 
 	@SuppressWarnings("restriction")

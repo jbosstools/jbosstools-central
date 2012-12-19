@@ -7,7 +7,6 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IncrementalProjectBuilder;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
-import org.eclipse.m2e.core.embedder.MavenModelManager;
 import org.eclipse.m2e.core.project.ResolverConfiguration;
 import org.eclipse.wst.common.project.facet.core.IFacetedProject;
 import org.eclipse.wst.common.project.facet.core.IProjectFacet;

@@ -10,9 +10,6 @@
  ************************************************************************************/
 package org.jboss.tools.project.examples.cheatsheet.actions;
 
-import java.io.File;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -33,7 +30,6 @@ import org.jboss.tools.project.examples.ProjectExamplesActivator;
 import org.jboss.tools.project.examples.cheatsheet.Activator;
 import org.jboss.tools.project.examples.model.IImportProjectExample;
 import org.jboss.tools.project.examples.model.ProjectExample;
-import org.jboss.tools.project.examples.model.ProjectExampleUtil;
 
 /**
  * 

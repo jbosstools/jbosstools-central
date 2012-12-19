@@ -1,10 +1,8 @@
 package org.jboss.tools.maven.conversion.tests;
 
-import java.io.File;
 import java.util.List;
 
 import org.eclipse.core.resources.IProject;
-import org.eclipse.m2e.core.MavenPlugin;
 import org.jboss.tools.maven.conversion.core.DependencyCollector;
 import org.jboss.tools.maven.conversion.core.DependencyCollectorFactory;
 import org.jboss.tools.maven.conversion.core.ProjectDependency;

@@ -223,8 +223,6 @@ public class ProjectExamplesActivator extends AbstractUIPlugin {
 	private Map<String, IImportProjectExample> importProjectExamplesMap;
 	private ImportDefaultProjectExample defaultImportProjectExample;
 
-	private static final String VERSION = "version"; //$NON-NLS-1$
-	
 	private Map<String, List<ContributedPage>> contributedPages;
 	
 	/**

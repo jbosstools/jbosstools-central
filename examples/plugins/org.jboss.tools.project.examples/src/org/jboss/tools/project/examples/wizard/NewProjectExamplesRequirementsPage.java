@@ -11,7 +11,6 @@ import java.util.Set;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.MessageDialog;
@@ -60,11 +59,8 @@ import org.jboss.tools.project.examples.model.ProjectExample;
 import org.jboss.tools.project.examples.model.ProjectFix;
 import org.jboss.tools.runtime.core.RuntimeCoreActivator;
 import org.jboss.tools.runtime.core.model.DownloadRuntime;
-import org.jboss.tools.runtime.core.model.IDownloadRuntimes;
 import org.jboss.tools.runtime.ui.RuntimeUIActivator;
 import org.jboss.tools.runtime.ui.download.DownloadRuntimeDialog;
-import org.osgi.framework.Bundle;
-import org.osgi.framework.ServiceReference;
 
 public class NewProjectExamplesRequirementsPage extends WizardPage implements IProjectExamplesWizardPage {
 
@@ -401,17 +397,6 @@ public class NewProjectExamplesRequirementsPage extends WizardPage implements IP
 		return null;
 	}
 	
-	private IDownloadRuntimes getDownloader() {
-		Bundle bundle = Platform.getBundle(ProjectExamplesActivator.PLUGIN_ID);
-		if (bundle != null) {
-			ServiceReference<IDownloadRuntimes> reference = bundle.getBundleContext().getServiceReference(IDownloadRuntimes.class);
-			if (reference != null) {
-				return bundle.getBundleContext().getService(reference);
-			}
-		}
-		return null;
-	}
-	
 	public ProjectExample getProjectExample() {
 		return projectExample;
 	}
@@ -476,20 +461,6 @@ public class NewProjectExamplesRequirementsPage extends WizardPage implements IP
 		
 		return projectFix.getProperties().get(ProjectFix.DESCRIPTION);
 	}
-	
-	private Image getProjectFixImage(ProjectFix projectFix) {
-		if (ProjectFix.WTP_RUNTIME.equals(projectFix.getType())) {
-			return ProjectExamplesActivator.getDefault().getImage("/icons/wtp_server.gif"); //$NON-NLS-1$
-		}
-		if (ProjectFix.SEAM_RUNTIME.equals(projectFix.getType())) {
-			return ProjectExamplesActivator.getDefault().getImage("/icons/seam16.png"); //$NON-NLS-1$
-		} 
-		if (ProjectFix.PLUGIN_TYPE.equals(projectFix.getType())) {
-			return ProjectExamplesActivator.getDefault().getImage("/icons/software.png"); //$NON-NLS-1$
-		}
-		return null;
-	}
-
 	
 	protected void install(final Set<String> connectorIds) throws InvocationTargetException, InterruptedException {
 		final IStatus[] results = new IStatus[1];

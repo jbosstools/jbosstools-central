@@ -24,7 +24,6 @@ import org.eclipse.m2e.jdt.IClasspathDescriptor;
 import org.eclipse.m2e.jdt.IClasspathEntryDescriptor;
 import org.eclipse.m2e.jdt.internal.ClasspathDescriptor;
 import org.eclipse.m2e.jdt.internal.ClasspathEntryDescriptor;
-import org.eclipse.m2e.jdt.internal.MavenClasspathHelpers;
 import org.jboss.tools.maven.jdt.MavenJdtActivator;
 
 public class ClasspathHelpers {
