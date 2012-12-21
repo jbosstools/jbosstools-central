@@ -75,7 +75,7 @@ public class SiteDialog extends TitleAreaDialog {
 		}
 		ImageDescriptor descriptor = ProjectExamplesActivator
 		.imageDescriptorFromPlugin(ProjectExamplesActivator.PLUGIN_ID,
-				"icons/new_wiz.gif"); //$NON-NLS-1$
+				"icons/SiteWizBan.png"); //$NON-NLS-1$
         if(descriptor != null) {
         	dlgTitleImage = descriptor.createImage();
         	setTitleImage(dlgTitleImage);
@@ -94,19 +94,10 @@ public class SiteDialog extends TitleAreaDialog {
 	@Override
 	protected Control createDialogArea(Composite parent) {
 		Composite parentComposite = (Composite) super.createDialogArea(parent);
-        Composite composite = new Composite(parentComposite, SWT.NONE);
-        GridLayout layout = new GridLayout();
-        layout.marginHeight = convertVerticalDLUsToPixels(IDialogConstants.VERTICAL_MARGIN);
-        layout.marginWidth = convertHorizontalDLUsToPixels(IDialogConstants.HORIZONTAL_MARGIN);
-        layout.verticalSpacing = convertVerticalDLUsToPixels(IDialogConstants.VERTICAL_SPACING);
-        layout.horizontalSpacing = convertHorizontalDLUsToPixels(IDialogConstants.HORIZONTAL_SPACING);
-        composite.setLayout(layout);
-        composite.setLayoutData(new GridData(GridData.FILL_BOTH));
-        composite.setFont(parentComposite.getFont());
         
 		Composite container = new Composite(parentComposite, SWT.FILL);
-		layout = new GridLayout(3,false);
-		layout.marginWidth = layout.marginHeight = 5;
+		GridLayout layout = new GridLayout(3,false);
+		layout.marginWidth = layout.marginHeight = 10;
 		container.setLayout(layout);
 		GridData gd = new GridData(GridData.FILL_BOTH);
 		container.setLayoutData(gd);
