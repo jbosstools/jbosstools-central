@@ -19,16 +19,21 @@ import java.util.Map;
 import org.apache.maven.model.Model;
 import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.filesystem.IFileStore;
+import org.eclipse.core.internal.jobs.JobManager;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.jobs.IJobManager;
+import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.embedder.MavenModelManager;
+import org.eclipse.m2e.core.internal.jobs.IBackgroundProcessingQueue;
 import org.eclipse.m2e.core.project.AbstractProjectScanner;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.project.LocalProjectScanner;
@@ -163,12 +168,47 @@ public class ImportMavenProjectExampleDelegate extends AbstractImportMavenProjec
 			store.setValue(Activator.CONFIGURE_JAXRS, configureJaxRs);
 		}
 		new OpenMavenConsoleAction().run();
+		
 		List<String> includedProjects = projectDescription.getIncludedProjects();
-		includedProjects.clear();
-		projectDescription.getIncludedProjects().addAll(projectNames);
+		if (includedProjects == null) {
+			includedProjects = new ArrayList<String>();
+			projectDescription.setIncludedProjects(includedProjects);
+		}
+		
+		if (projectNames != null && projectNames.size() > 0) {
+			includedProjects.clear();
+			includedProjects.addAll(projectNames);
+		} else {
+			if (!includedProjects.contains(projectName)) {
+				includedProjects.add(projectName);
+			}
+		}
+		waitForMavenJobs(monitor);
+
 		MavenProjectExamplesActivator.updateMavenConfiguration(projectName, includedProjects, monitor);
 		return true;
 	}
+
+	private static void waitForMavenJobs(IProgressMonitor monitor) throws InterruptedException, CoreException {
+		Job[] jobs = Job.getJobManager().find(null);
+		if (jobs != null) {
+			for (Job job : jobs) {
+				if (job instanceof IBackgroundProcessingQueue) {
+					IBackgroundProcessingQueue queue = (IBackgroundProcessingQueue) job;
+					queue.join();
+					if (!queue.isEmpty()) {
+						IStatus status = queue.run(monitor);
+						if (!status.isOK()) {
+							throw new CoreException(status);
+						}
+					}
+					if (queue.isEmpty()) {
+						queue.cancel();
+					}
+				}
+			}
+		}
+	  }
 
 	private List<String> importMavenProjects(final File destination,
 			final ProjectExample projectDescription, IProgressMonitor monitor) {
