@@ -4,6 +4,7 @@ import java.io.File;
 import java.util.List;
 
 import org.apache.maven.model.Model;
+import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IWorkspace;
@@ -128,9 +129,10 @@ public class MavenProjectExamplesActivator extends AbstractUIPlugin {
 				// ignore
 			}
 		}
+		IProject[] selectedProjects = new IProject[includedProjects.size()+1];
+		selectedProjects[0] = project;
 		if (includedProjects.size() > 0) {
-			IProject[] selectedProjects = new IProject[includedProjects.size()];
-			int i = 0;
+			int i = 1;
 			
 			for (String selectedProjectName:includedProjects) {
 				project = ResourcesPlugin.getWorkspace().getRoot().getProject(selectedProjectName);
@@ -141,13 +143,14 @@ public class MavenProjectExamplesActivator extends AbstractUIPlugin {
 					// ignore
 				}
 			}
-			Job updateJob = new UpdateMavenProjectJob(selectedProjects , true, false);
-			updateJob.schedule();
-			try {
-				updateJob.join();
-			} catch (InterruptedException e) {
-				// ignore
-			}
 		}
+		Job updateJob = new UpdateMavenProjectJob(selectedProjects);
+		updateJob.schedule();
+		try {
+			updateJob.join();
+		} catch (InterruptedException e) {
+			// ignore
+		}
+			
 	}
 }

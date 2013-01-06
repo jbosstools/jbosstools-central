@@ -3,6 +3,9 @@ package org.jboss.tools.project.examples.wizard;
 import java.util.List;
 
 import org.eclipse.core.resources.IMarker;
+import org.eclipse.core.resources.IResourceChangeEvent;
+import org.eclipse.core.resources.IResourceChangeListener;
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.wizard.IWizard;
@@ -15,6 +18,7 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
 import org.jboss.tools.project.examples.ProjectExamplesActivator;
 import org.jboss.tools.project.examples.model.ProjectExample;
 
@@ -25,6 +29,7 @@ public class NewProjectExamplesReadyPage extends WizardPage {
 	private Button showReadme;
 	private List<ProjectExample> projectExamples;
 	private Button showQuickFix;
+	private IResourceChangeListener resourceChangeListener;
 
 	public NewProjectExamplesReadyPage(List<ProjectExample> projectExamples) {
 		super("org.jboss.tools.project.examples.ready"); //$NON-NLS-1$
@@ -109,9 +114,39 @@ public class NewProjectExamplesReadyPage extends WizardPage {
 				}
 			});
 		}
+		resourceChangeListener = new IResourceChangeListener() {
+
+			public void resourceChanged(IResourceChangeEvent event) {
+				Display.getDefault().asyncExec(new Runnable() {
+
+					public void run() {
+						configure(projectExamples);
+					}
+
+				});
+
+			}
+
+		};
+		ResourcesPlugin.getWorkspace().addResourceChangeListener(
+				resourceChangeListener);
+
 	}
 	
 	public void configure(List<ProjectExample> projectExamples) {
+		if (getControl() == null || getControl().isDisposed()) {
+			return;
+		}
+		if (showQuickFix != null) {
+			showQuickFix.setSelection(false);
+			showQuickFix.setEnabled(false);
+		}
+		
+		if (showReadme != null) {
+			showReadme.setSelection(false);
+			showReadme.setEnabled(false);
+		}
+		
 		ProjectExample projectExample = projectExamples.get(0);
 		IPreferenceStore store = ProjectExamplesActivator.getDefault().getPreferenceStore();
 		
@@ -173,6 +208,16 @@ public class NewProjectExamplesReadyPage extends WizardPage {
 
 	public Button getShowQuickFix() {
 		return showQuickFix;
+	}
+
+	@Override
+	public void dispose() {
+		if (resourceChangeListener != null) {
+			ResourcesPlugin.getWorkspace().removeResourceChangeListener(
+					resourceChangeListener);
+			resourceChangeListener = null;
+		}
+		super.dispose();
 	}
 
 }
