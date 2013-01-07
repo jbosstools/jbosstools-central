@@ -24,6 +24,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.jface.dialogs.TrayDialog;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
@@ -52,20 +53,28 @@ public class NewProjectExamplesWizard2 extends Wizard implements INewWizard {
 	private ProjectExample projectExample;
 
 	private WizardContext wizardContext = new WizardContext();
+	private boolean helpAvailable;
 	
 	//private QuickFixPage quickFixPage;
 
 	public NewProjectExamplesWizard2() {
 		super();
+		saveHelpAvailable();
 		setWindowTitle(Messages.NewProjectExamplesWizard_New_Project_Example);
 		setNeedsProgressMonitor(true);
 	}
-	
+
 	public NewProjectExamplesWizard2(ProjectExample projectExample) {
 		super();
+		saveHelpAvailable();
 		initializeProjectExample(projectExample);
 	}
 
+	private void saveHelpAvailable() {
+		helpAvailable = TrayDialog.isDialogHelpAvailable();
+		TrayDialog.setDialogHelpAvailable(false);
+	}
+	
 	protected void initializeProjectExample(ProjectExample projectExample) {
 		this.projectExample = projectExample;
 		setWindowTitle(Messages.NewProjectExamplesWizard_New_Project_Example);
@@ -290,5 +299,11 @@ public class NewProjectExamplesWizard2 extends Wizard implements INewWizard {
 
 		}
 		super.addPage(page);
+	}
+
+	@Override
+	public void dispose() {
+		TrayDialog.setDialogHelpAvailable(helpAvailable);
+		super.dispose();
 	}
 }
