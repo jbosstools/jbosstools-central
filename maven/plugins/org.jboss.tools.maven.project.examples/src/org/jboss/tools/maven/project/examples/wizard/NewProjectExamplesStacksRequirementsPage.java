@@ -93,12 +93,12 @@ public class NewProjectExamplesStacksRequirementsPage extends NewProjectExamples
 
 	public NewProjectExamplesStacksRequirementsPage() {
 		this(null);
-		stacks = new StacksManager().getStacks(new NullProgressMonitor());
 	}
 	
 	public NewProjectExamplesStacksRequirementsPage(ProjectExample projectExample) {
 		super(PAGE_NAME, projectExample);
 	    fieldsWithHistory = new HashMap<String, List<Combo>>();
+	    stacks = new StacksManager().getStacks(new NullProgressMonitor());
 	    initDialogSettings();
 	}
 
@@ -268,11 +268,14 @@ public class NewProjectExamplesStacksRequirementsPage extends NewProjectExamples
 	@Override
 	protected void setAdditionalControls(Composite composite) {
 		warningComponent = new MissingRepositoryWarningComponent(composite, false);
-		//Yuck!! Necessary evil in order to have the warning component fitting in 
-		//the dialog page area, once it's set as visible.
-		//Anybody who can find a proper solution will have my eternal gratitude
-		GridDataFactory.fillDefaults().hint(625, 45).applyTo(warningComponent);
-
+		GridData data = new GridData();
+        data.minimumWidth = 1;
+        data.minimumHeight = 1;
+        data.horizontalAlignment = SWT.FILL;
+        data.verticalAlignment = SWT.FILL;
+        data.widthHint = 650;
+		warningComponent.setLayoutData(data);
+		
 		MavenCoreActivator.getDefault().registerMavenSettingsChangeListener(this);
 	}
 	
