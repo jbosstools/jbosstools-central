@@ -29,6 +29,7 @@ import org.apache.maven.archetype.metadata.RequiredProperty;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.model.Model;
+import org.codehaus.plexus.util.StringUtils;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -370,7 +371,7 @@ public class MavenProjectWizardArchetypeParametersPage extends AbstractMavenWiza
       if (propertiesTable != null)
     	  propertiesTable.removeAll();
       archetypeChanged = false;
-    } else if(!archetype.equals(this.archetype)) {
+    } else if(!areEqual(archetype, this.archetype)) {
       this.archetype = archetype;
       requiredProperties.clear();
       optionalProperties.clear();
@@ -697,5 +698,24 @@ public class MavenProjectWizardArchetypeParametersPage extends AbstractMavenWiza
 
     return properties;
   }
+
   
+  /**
+   * Checks {@link Archetype} equality by testing <code>groupId</code>, <code>artifactId</code> and <code>version</code>
+   * 
+   * code copied from ArchetypeUtil in m2e 1.3
+   */
+  public static boolean areEqual(Archetype one, Archetype another) {
+    if(one == another) {
+      return true;
+    }
+
+    if(another == null) {
+      return false;
+    }
+
+    return StringUtils.equals(one.getGroupId(), another.getGroupId())
+        && StringUtils.equals(one.getArtifactId(), another.getArtifactId())
+        && StringUtils.equals(one.getVersion(), another.getVersion());
+  }
 }
