@@ -52,13 +52,13 @@ public class StacksManager {
 				}
 			}
 		} catch (Exception e) {
-			MavenProjectExamplesActivator.log(e,
-					"Can't access or parse  " + STACKS_URL //$NON-NLS-1$
-							+ ", falling back on default Stacks Client values"); //$NON-NLS-1$
+			MavenProjectExamplesActivator.log(e, "Can't access or parse  " + STACKS_URL ); //$NON-NLS-1$
+		}
+		if (stacks == null) {
+			MavenProjectExamplesActivator.log("Stacks from "+STACKS_URL +" can not be read, falling back on default Stacks Client values");
 			StacksClient client = new StacksClient();
 			stacks = client.getStacks();
 		}
-
 		return stacks;
 
 	}

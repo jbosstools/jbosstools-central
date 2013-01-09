@@ -93,12 +93,12 @@ public class NewProjectExamplesStacksRequirementsPage extends NewProjectExamples
 
 	public NewProjectExamplesStacksRequirementsPage() {
 		this(null);
-		stacks = new StacksManager().getStacks(new NullProgressMonitor());
 	}
 	
 	public NewProjectExamplesStacksRequirementsPage(ProjectExample projectExample) {
 		super(PAGE_NAME, projectExample);
 	    fieldsWithHistory = new HashMap<String, List<Combo>>();
+	    stacks = new StacksManager().getStacks(new NullProgressMonitor());
 	    initDialogSettings();
 	}
 
