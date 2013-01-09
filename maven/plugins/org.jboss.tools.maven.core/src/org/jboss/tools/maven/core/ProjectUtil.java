@@ -72,7 +72,7 @@ public class ProjectUtil {
 				while(ite.hasNext()) {
 					IProject project = ite.next();
 					final IPath projectLocation = project.getLocation();
-					if(projectLocation.equals(basedirPath) && project.isAccessible()) {
+					if(projectLocation != null && projectLocation.equals(basedirPath) && project.isAccessible()) {
 						project.refreshLocal(refreshDepth, monitor);
 						count++;
 						ite.remove();
