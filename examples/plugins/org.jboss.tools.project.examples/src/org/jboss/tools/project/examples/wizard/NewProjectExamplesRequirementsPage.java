@@ -5,6 +5,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -350,9 +351,17 @@ public class NewProjectExamplesRequirementsPage extends WizardPage implements IP
 						if (ProjectFix.WTP_RUNTIME.equals(fixType)
 								|| ProjectFix.SEAM_RUNTIME.equals(fixType)) {
 							List<DownloadRuntime> downloadRuntimes = getDownloadRuntimes(fix);
+							if (downloadRuntimes != null) {
+								for (Iterator iterator = downloadRuntimes.iterator(); iterator.hasNext();) {
+									DownloadRuntime downloadRuntime = (DownloadRuntime) iterator.next();
+									if (downloadRuntime == null) {
+										iterator.remove();
+									}
+								}
+							}
 							if (downloadRuntimes != null && !downloadRuntimes.isEmpty()) {
 								StringBuilder tooltip = new StringBuilder("Download and install ");
-								if (downloadRuntimes.size() > 1) {
+								if (downloadRuntimes.size() > 1 && downloadRuntimes.get(0) != null && downloadRuntimes.get(0).getName() != null) {
 									tooltip.append("a runtime");
 								} else {
 									tooltip.append(downloadRuntimes.get(0).getName());
