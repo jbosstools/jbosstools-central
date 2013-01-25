@@ -35,9 +35,13 @@ import org.eclipse.jdt.core.IPackageFragmentRoot;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.jst.common.project.facet.core.libprov.ILibraryProvider;
+import org.eclipse.jst.common.project.facet.core.libprov.LibraryInstallDelegate;
+import org.eclipse.jst.common.project.facet.core.libprov.LibraryProviderFramework;
 import org.eclipse.jst.j2ee.project.EarUtilities;
 import org.eclipse.jst.j2ee.project.JavaEEProjectUtilities;
 import org.eclipse.jst.jsf.core.internal.project.facet.IJSFFacetInstallDataModelProperties;
+import org.eclipse.jst.jsf.core.internal.project.facet.JSFFacetInstallDataModelProvider;
 import org.eclipse.m2e.core.internal.IMavenConstants;
 import org.eclipse.m2e.core.internal.MavenPluginActivator;
 import org.eclipse.m2e.core.internal.project.registry.MavenProjectManager;
@@ -58,7 +62,6 @@ import org.eclipse.wst.common.project.facet.core.ProjectFacetsManager;
 import org.jboss.tools.maven.core.IJBossMavenConstants;
 import org.jboss.tools.maven.core.MavenUtil;
 import org.jboss.tools.maven.core.internal.project.facet.MavenFacetInstallDataModelProvider;
-import org.jboss.tools.maven.jsf.MavenJSFActivator;
 import org.jboss.tools.maven.seam.MavenSeamActivator;
 import org.jboss.tools.maven.ui.Activator;
 import org.jboss.tools.seam.core.SeamCorePlugin;
@@ -378,7 +381,7 @@ public class SeamProjectConfigurator extends AbstractProjectConfigurator {
 	private void installJSFFacet(IFacetedProject fproj, IProjectFacetVersion jsfVersion, IProgressMonitor monitor)
 			throws CoreException {
 		if (jsfFacet != null && !fproj.hasProjectFacet(jsfFacet)) {
-			IDataModel model = MavenJSFActivator.getDefault().createJSFDataModel(fproj,jsfVersion );
+			IDataModel model = createJSFDataModel(fproj,jsfVersion );
 			//Fix for JBIDE-9454, to prevent complete overwrite of web.xml 
 			model.setBooleanProperty(IJSFFacetInstallDataModelProperties.CONFIGURE_SERVLET,false);
 			fproj.installProjectFacet(jsfVersion, model, monitor);
@@ -643,5 +646,16 @@ public class SeamProjectConfigurator extends AbstractProjectConfigurator {
 	    		message
 	    		,-1,  IMarker.SEVERITY_ERROR);
 		
+	}
+	
+	private IDataModel createJSFDataModel(IFacetedProject fproj, IProjectFacetVersion facetVersion) {
+		IDataModel config = (IDataModel) new JSFFacetInstallDataModelProvider().create();
+		LibraryInstallDelegate libraryDelegate = new LibraryInstallDelegate(fproj, facetVersion);
+		ILibraryProvider provider = LibraryProviderFramework.getProvider("jsf-no-op-library-provider"); //$NON-NLS-1$
+		libraryDelegate.setLibraryProvider(provider);
+		config.setProperty(IJSFFacetInstallDataModelProperties.LIBRARY_PROVIDER_DELEGATE, libraryDelegate);
+		config.setProperty(IJSFFacetInstallDataModelProperties.SERVLET_NAME, ""); //$NON-NLS-1$
+		config.setProperty(IJSFFacetInstallDataModelProperties.SERVLET_URL_PATTERNS, new String[0]);
+		return config;
 	}
 }
