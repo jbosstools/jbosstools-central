@@ -49,6 +49,7 @@ public class MissingRepositoryWarningComponent extends Composite {
 				
 				ConfigureMavenRepositoriesWizard wizard = new ConfigureMavenRepositoriesWizard(null, "redhat-techpreview-all-repository"); //$NON-NLS-1$
 				WizardDialog dialog = new WizardDialog(Display.getDefault().getActiveShell(), wizard);
+				wizard.init(null, null);
 				dialog.create();
 				dialog.open(); 
 			}
