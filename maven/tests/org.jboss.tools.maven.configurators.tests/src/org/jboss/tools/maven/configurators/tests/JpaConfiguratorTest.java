@@ -1,17 +1,11 @@
 package org.jboss.tools.maven.configurators.tests;
 
-import org.eclipse.core.resources.IProject;
-import org.eclipse.jpt.jpa.core.JpaFacet;
-import org.eclipse.jpt.jpa.core.JptJpaCorePlugin;
-import org.eclipse.jst.common.project.facet.core.JavaFacet;
-import org.eclipse.m2e.core.project.ResolverConfiguration;
-import org.eclipse.wst.common.project.facet.core.IFacetedProject;
-import org.eclipse.wst.common.project.facet.core.IProjectFacetVersion;
-import org.eclipse.wst.common.project.facet.core.ProjectFacetsManager;
-import org.junit.Test;
 
 @SuppressWarnings("restriction")
-public class JpaConfiguratorTest extends AbstractMavenConfiguratorTest {
+public class JpaConfiguratorTest { //extends AbstractMavenConfiguratorTest {
+
+	/*
+	 Commented until the new m2e-wtp features are available  
 
 	@Test
 	public void testSimpleJavaProjects() throws Exception {
@@ -61,4 +55,6 @@ public class JpaConfiguratorTest extends AbstractMavenConfiguratorTest {
 		
 		assertIsJpaProject(ejb, JpaFacet.VERSION_2_0);
 	}
+	
+	*/
 }

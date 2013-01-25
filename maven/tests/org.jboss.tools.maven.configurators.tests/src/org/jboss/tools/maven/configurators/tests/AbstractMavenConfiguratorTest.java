@@ -28,14 +28,15 @@ import org.eclipse.m2e.core.project.ResolverConfiguration;
 import org.eclipse.m2e.tests.common.AbstractMavenProjectTestCase;
 import org.eclipse.m2e.tests.common.WorkspaceHelpers;
 import org.eclipse.wst.common.project.facet.core.IFacetedProject;
+import org.eclipse.wst.common.project.facet.core.IProjectFacet;
 import org.eclipse.wst.common.project.facet.core.IProjectFacetVersion;
 import org.eclipse.wst.common.project.facet.core.ProjectFacetsManager;
 import org.jboss.tools.common.util.FileUtil;
-import org.jboss.tools.maven.jsf.configurators.JSFProjectConfigurator;
-import org.jboss.tools.maven.jsf.configurators.JSFUtils;
 
 public abstract class AbstractMavenConfiguratorTest extends
 		AbstractMavenProjectTestCase {
+
+	protected static IProjectFacet JSF_FACET = ProjectFacetsManager.getProjectFacet("jst.jsf"); //$NON-NLS-1$
 
 	protected String toString(File file) {
 		return FileUtil.readFile(file);
@@ -46,12 +47,12 @@ public abstract class AbstractMavenConfiguratorTest extends
 	}
 
 	protected void assertIsJSFProject(IProject project,
-			IProjectFacetVersion expectedJSFVersion) throws Exception {
+		IProjectFacetVersion expectedJSFVersion) throws Exception {
 		IFacetedProject facetedProject = ProjectFacetsManager.create(project);
 		assertNotNull(project.getName() + " is not a faceted project", facetedProject);
-		assertEquals("Unexpected JSF Version", expectedJSFVersion, facetedProject.getInstalledVersion(JSFProjectConfigurator.JSF_FACET));
+		assertEquals("Unexpected JSF Version", expectedJSFVersion, facetedProject.getInstalledVersion(JSF_FACET));
 		assertTrue("Java Facet is missing",	facetedProject.hasProjectFacet(JavaFacet.FACET));
-		assertTrue("faces-config.xml is missing", JSFUtils.getFacesconfig(project).exists());
+		//assertTrue("faces-config.xml is missing", JSFUtils.getFacesconfig(project).exists());
 	}
 
 	/**

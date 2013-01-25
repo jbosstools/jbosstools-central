@@ -10,10 +10,10 @@ import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.m2e.core.project.ResolverConfiguration;
 import org.eclipse.wst.common.project.facet.core.IFacetedProject;
 import org.eclipse.wst.common.project.facet.core.IProjectFacet;
+import org.eclipse.wst.common.project.facet.core.IProjectFacetVersion;
 import org.eclipse.wst.common.project.facet.core.ProjectFacetsManager;
 import org.jboss.tools.jst.web.kb.IKbProject;
 import org.jboss.tools.maven.core.MavenUtil;
-import org.jboss.tools.maven.jsf.configurators.JSFProjectConfigurator;
 import org.jboss.tools.seam.core.ISeamProject;
 import org.jboss.tools.seam.core.SeamCorePlugin;
 import org.jboss.tools.seam.internal.core.project.facet.ISeamFacetDataModelProperties;
@@ -22,18 +22,39 @@ import org.junit.Test;
 @SuppressWarnings("restriction")
 public class SeamConfiguratorTest extends AbstractMavenConfiguratorTest {
 
+	private static final IProjectFacetVersion JSF_FACET_VERSION_2_1;
+	private static final IProjectFacetVersion JSF_FACET_VERSION_2_0;
+	private static final IProjectFacetVersion JSF_FACET_VERSION_1_2;
+	private static final IProjectFacetVersion JSF_FACET_VERSION_1_1;
+	//protected static final IProjectFacet m2Facet;
+	//protected static final IProjectFacetVersion m2Version;
+	public static final String JSF_VERSION_2_1 = "2.1";
+
+	public static final String JSF_VERSION_2_0 = "2.0";
+	
+	public static final String JSF_VERSION_1_2 = "1.2";
+	
+	public static final String JSF_VERSION_1_1 = "1.1";
+	
+	static {
+		JSF_FACET_VERSION_2_1 = JSF_FACET.getVersion(JSF_VERSION_2_1); 
+		JSF_FACET_VERSION_2_0 = JSF_FACET.getVersion(JSF_VERSION_2_0); 
+		JSF_FACET_VERSION_1_2 = JSF_FACET.getVersion(JSF_VERSION_1_2); //$NON-NLS-1$
+		JSF_FACET_VERSION_1_1 = JSF_FACET.getVersion(JSF_VERSION_1_1); //$NON-NLS-1$
+	}
+	
 	private static final IProjectFacet SEAM_FACET = ProjectFacetsManager.getProjectFacet("jst.seam");
 	
 	@Test
 	public void testJBIDE9454_webXml_overwrite() throws Exception {
 		IProject project = importAndCheckSeamProject("seam-webxml");
-		assertIsJSFProject(project, JSFProjectConfigurator.JSF_FACET_VERSION_1_2);
+		assertIsJSFProject(project, JSF_FACET_VERSION_1_2);
 	}	
 	
 	@Test
 	public void testJBIDE6228_webXml_changed_richfaces() throws Exception {
 		IProject project = importAndCheckSeamProject("seamIntegration");
-		assertIsJSFProject(project, JSFProjectConfigurator.JSF_FACET_VERSION_1_2);
+		assertIsJSFProject(project, JSF_FACET_VERSION_1_2);
 	}
 	
 	protected IProject importAndCheckSeamProject(String projectName) throws Exception {
@@ -111,12 +132,12 @@ public class SeamConfiguratorTest extends AbstractMavenConfiguratorTest {
 		IProject project = importProject("projects/seam/violation/pom.xml");
 		waitForJobsToComplete();
 		assertNoErrors(project);
-		assertIsJSFProject(project, JSFProjectConfigurator.JSF_FACET_VERSION_1_2);
+		assertIsJSFProject(project, JSF_FACET_VERSION_1_2);
 		
 		updateProject(project, "add-seam.pom");
 		IFacetedProject fp = ProjectFacetsManager.create(project);
 		assertFalse("Seam facet was installed", fp.hasProjectFacet(SEAM_FACET));
-		assertIsJSFProject(project, JSFProjectConfigurator.JSF_FACET_VERSION_1_2);
+		assertIsJSFProject(project, JSF_FACET_VERSION_1_2);
 		assertHasError(project, "Seam 2.3 can not be installed as it conflicts with JavaServer Faces 1.2");
 	}
 	
@@ -127,7 +148,7 @@ public class SeamConfiguratorTest extends AbstractMavenConfiguratorTest {
 		waitForJobsToComplete();
 		IFacetedProject fp = ProjectFacetsManager.create(project);
 		assertFalse("Seam facet was installed", fp.hasProjectFacet(SEAM_FACET));
-		assertFalse("JSF facet was installed", fp.hasProjectFacet(JSFProjectConfigurator.JSF_FACET));
+		assertFalse("JSF facet was installed", fp.hasProjectFacet(JSF_FACET));
 		assertHasError(project, "Missing artifact org.jboss.seam:jboss-seam:jar:missing");
 	}
 	
