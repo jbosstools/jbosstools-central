@@ -10,12 +10,15 @@
  ************************************************************************************/
 package org.jboss.tools.maven.hibernate.libprov;
 
+import org.eclipse.core.resources.IWorkspace;
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.jpt.common.core.JptCommonCorePlugin;
+import org.eclipse.jpt.common.core.JptWorkspace;
 import org.eclipse.jpt.common.core.libval.LibraryValidator;
+import org.eclipse.jpt.common.core.libval.LibraryValidatorManager;
 import org.eclipse.jpt.jpa.core.libprov.JpaLibraryProviderInstallOperationConfig;
-import org.eclipse.jpt.jpa.core.platform.JpaPlatformDescription;
+import org.eclipse.jpt.jpa.core.platform.JpaPlatformConfig;
 import org.jboss.tools.maven.core.libprov.MavenLibraryProviderInstallOperationConfig;
 
 /**
@@ -24,13 +27,13 @@ import org.jboss.tools.maven.core.libprov.MavenLibraryProviderInstallOperationCo
  */
 public class MavenHibernateLibraryProviderInstallOperationConfig extends MavenLibraryProviderInstallOperationConfig implements JpaLibraryProviderInstallOperationConfig {
 
-	private JpaPlatformDescription jpaPlatformDescription;
+	private JpaPlatformConfig jpaPlatformDescription;
 	
-	public JpaPlatformDescription getJpaPlatform() {
+	public JpaPlatformConfig getJpaPlatformConfig() {
 		return jpaPlatformDescription;
 	}
 	
-	public void setJpaPlatform(JpaPlatformDescription jpaPlatform) {
+	public void setJpaPlatformConfig(JpaPlatformConfig jpaPlatform) {
 		this.jpaPlatformDescription = jpaPlatform;
 	}	
 	
@@ -40,11 +43,19 @@ public class MavenHibernateLibraryProviderInstallOperationConfig extends MavenLi
 		if (! status.isOK()) {
 			return status;
 		}
-		if (getJpaPlatform() != null) {
-			for (LibraryValidator libraryValidator : JptCommonCorePlugin.getLibraryValidators(this)) {
-				status = libraryValidator.validate(this);
-				if (! status.isOK()) {
-					return status;
+		if (getJpaPlatformConfig() != null) {
+			
+			IWorkspace workspace = ResourcesPlugin.getWorkspace();
+			JptWorkspace jptWorkspace = (JptWorkspace) workspace.getAdapter(JptWorkspace.class);
+			if (jptWorkspace != null) {
+				LibraryValidatorManager lvm = jptWorkspace.getLibraryValidatorManager();
+				if (lvm != null) {
+					for (LibraryValidator libraryValidator : lvm.getLibraryValidators(this)) {
+						status = libraryValidator.validate(this);
+						if (! status.isOK()) {
+							return status;
+						}
+					}
 				}
 			}
 		}

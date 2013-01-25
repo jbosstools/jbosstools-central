@@ -23,7 +23,7 @@ public class HibernateLibValidator implements LibraryValidator {
 	public IStatus validate(JptLibraryProviderInstallOperationConfig config) {
 		JpaLibraryProviderInstallOperationConfig jpaConfig = (JpaLibraryProviderInstallOperationConfig) config;
 		IStatus status;
-		if (jpaConfig.getJpaPlatform().getId().contains("hibernate")) {
+		if (jpaConfig.getJpaPlatformConfig().getId().contains("hibernate")) {
 			status = Status.OK_STATUS;
 		} else {
 			status = new Status(IStatus.ERROR, MavenCoreActivator.PLUGIN_ID, "This JPA implementation requires an Hibernate-based Platform");
