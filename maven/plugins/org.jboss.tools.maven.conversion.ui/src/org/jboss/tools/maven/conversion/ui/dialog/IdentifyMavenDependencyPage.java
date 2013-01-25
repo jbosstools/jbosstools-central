@@ -190,6 +190,7 @@ public class IdentifyMavenDependencyPage extends WizardPage {
 	        private void openSettingsRepositoriesWizard() {
 				ConfigureMavenRepositoriesWizard wizard = new ConfigureMavenRepositoriesWizard();
 				WizardDialog dialog = new WizardDialog(Display.getDefault().getActiveShell(), wizard);
+				wizard.init(null, null);
 				dialog.create();
 				dialog.open(); 
 			}

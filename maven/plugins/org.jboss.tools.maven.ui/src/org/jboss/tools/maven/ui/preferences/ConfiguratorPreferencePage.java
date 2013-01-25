@@ -187,6 +187,7 @@ public class ConfiguratorPreferencePage extends PreferencePage implements
 			public void widgetSelected(SelectionEvent e) {
 				ConfigureMavenRepositoriesWizard wizard = new ConfigureMavenRepositoriesWizard();
 				WizardDialog dialog = new WizardDialog(Display.getDefault().getActiveShell(), wizard);
+				wizard.init(null, null);
 				dialog.create();
 				dialog.open(); 
 			}

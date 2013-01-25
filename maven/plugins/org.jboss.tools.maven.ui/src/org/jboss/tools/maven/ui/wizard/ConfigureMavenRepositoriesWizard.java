@@ -55,7 +55,7 @@ public class ConfigureMavenRepositoriesWizard extends Wizard implements
 
 	private void initializeDefaultPageImageDescriptor() {
 		ImageDescriptor desc = Activator.imageDescriptorFromPlugin(Activator.PLUGIN_ID,
-						"icons/repo_wiz.gif"); //$NON-NLS-1$
+						"icons/MavenRepositoryWizBan.png"); //$NON-NLS-1$
 		setDefaultPageImageDescriptor(desc);
 	}
 	

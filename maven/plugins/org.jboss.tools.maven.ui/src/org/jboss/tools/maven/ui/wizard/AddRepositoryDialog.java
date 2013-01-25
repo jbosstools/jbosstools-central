@@ -118,6 +118,9 @@ public class AddRepositoryDialog extends TitleAreaDialog {
 		this.includedRepositories = includedRepositories;
 		this.maven = maven;
 		this.artifactKey = artifactKey;
+		ImageDescriptor desc = Activator.imageDescriptorFromPlugin(Activator.PLUGIN_ID,
+				"icons/MavenRepositoryWizBan.png"); //$NON-NLS-1$
+		setTitleImage(desc.createImage());
 	}
 
 	@Override

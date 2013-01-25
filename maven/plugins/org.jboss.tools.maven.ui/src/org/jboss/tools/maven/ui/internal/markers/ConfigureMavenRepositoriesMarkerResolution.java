@@ -47,6 +47,7 @@ public class ConfigureMavenRepositoriesMarkerResolution implements IMarkerResolu
 
 		ConfigureMavenRepositoriesWizard wizard = new ConfigureMavenRepositoriesWizard(artifactKey, getRepositoryProfileId());
 		WizardDialog dialog = new WizardDialog(Display.getDefault().getActiveShell(), wizard);
+		wizard.init(null, null);
 		dialog.create();
 		dialog.open(); 
 		

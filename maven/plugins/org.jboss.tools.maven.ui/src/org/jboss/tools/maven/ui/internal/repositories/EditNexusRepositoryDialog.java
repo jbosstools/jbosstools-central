@@ -10,7 +10,8 @@
  ************************************************************************************/
 package org.jboss.tools.maven.ui.internal.repositories;
 
-import org.eclipse.jface.dialogs.Dialog;
+import org.eclipse.jface.dialogs.TitleAreaDialog;
+import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
@@ -25,12 +26,13 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 import org.jboss.tools.maven.core.repositories.NexusRepository;
+import org.jboss.tools.maven.ui.Activator;
 
 /**
  * @author snjeza
  * 
  */
-public class EditNexusRepositoryDialog extends Dialog {
+public class EditNexusRepositoryDialog extends TitleAreaDialog {
 
 	private NexusRepository nexusRepository;
 	private String title;
@@ -47,6 +49,9 @@ public class EditNexusRepositoryDialog extends Dialog {
 		} else {
 			this.title = "Edit Repository";
 		}
+		ImageDescriptor desc = Activator.imageDescriptorFromPlugin(Activator.PLUGIN_ID,
+				"icons/NewRepositoryWizBan.png"); //$NON-NLS-1$
+		setTitleImage(desc.createImage());
 	}
 
 	@Override
