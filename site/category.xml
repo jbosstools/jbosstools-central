@@ -41,9 +41,6 @@
 	<feature url="features/org.jboss.tools.maven.seam.feature_0.0.0.jar" id="org.jboss.tools.maven.seam.feature" version="0.0.0">
 		<category name="AllFeatures"/>
 	</feature>
-	<feature url="features/org.jboss.tools.maven.jsf.feature_0.0.0.jar" id="org.jboss.tools.maven.jsf.feature" version="0.0.0">
-		<category name="AllFeatures"/>
-	</feature>
 	<feature url="features/org.jboss.tools.maven.cdi.feature_0.0.0.jar" id="org.jboss.tools.maven.cdi.feature" version="0.0.0">
 		<category name="AllFeatures"/>
 	</feature>
@@ -56,12 +53,6 @@
 	<feature url="features/org.jboss.tools.maven.project.examples.feature_0.0.0.jar" id="org.jboss.tools.maven.project.examples.feature" version="0.0.0">
 		<category name="AllFeatures"/>
 	</feature>
-	<feature url="features/org.jboss.tools.maven.jaxrs.feature_0.0.0.jar" id="org.jboss.tools.maven.jaxrs.feature" version="0.0.0">
-		<category name="AllFeatures"/>
-	</feature>
-	<feature url="features/org.jboss.tools.maven.jpa.feature_0.0.0.jar" id="org.jboss.tools.maven.jpa.feature" version="0.0.0">
-		<category name="AllFeatures"/>
-	</feature>    
 	<feature url="features/org.jboss.tools.maven.jbosspackaging.feature_0.0.0.jar" id="org.jboss.tools.maven.jbosspackaging.feature" version="0.0.0">
 		<category name="AllFeatures"/>
 	</feature>
@@ -87,9 +78,6 @@
 	<feature url="features/org.jboss.tools.maven.seam.feature.source_0.0.0.jar" id="org.jboss.tools.maven.seam.feature.source" version="0.0.0">
 		<category name="AllSources"/>
 	</feature>
-	<feature url="features/org.jboss.tools.maven.jsf.feature.source_0.0.0.jar" id="org.jboss.tools.maven.jsf.feature.source" version="0.0.0">
-		<category name="AllSources"/>
-	</feature>
 	<feature url="features/org.jboss.tools.maven.cdi.feature.source_0.0.0.jar" id="org.jboss.tools.maven.cdi.feature.source" version="0.0.0">
 		<category name="AllSources"/>
 	</feature>
@@ -102,12 +90,6 @@
 	<feature url="features/org.jboss.tools.maven.project.examples.feature.source_0.0.0.jar" id="org.jboss.tools.maven.project.examples.feature.source" version="0.0.0">
 		<category name="AllSources"/>
 	</feature>
-	<feature url="features/org.jboss.tools.maven.jaxrs.feature.source_0.0.0.jar" id="org.jboss.tools.maven.jaxrs.feature.source" version="0.0.0">
-		<category name="AllSources"/>
-	</feature>
-	<feature url="features/org.jboss.tools.maven.jpa.feature.source_0.0.0.jar" id="org.jboss.tools.maven.jpa.feature.source" version="0.0.0">
-		<category name="AllSources"/>
-	</feature>    
 	<feature url="features/org.jboss.tools.maven.jbosspackaging.feature.source_0.0.0.jar" id="org.jboss.tools.maven.jbosspackaging.feature.source" version="0.0.0">
 		<category name="AllSources"/>
 	</feature>
