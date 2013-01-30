@@ -19,7 +19,6 @@ import java.util.List;
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
-import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
@@ -53,7 +52,7 @@ public class ProjectUtil {
 	 * @return the number of projects that were refreshed
 	 * @throws CoreException
 	 *             in case of problem during refresh
-	 * @see IResource for depth values.
+	 * @see org.eclipse.core.resources.IResource for depth values.
 	 */
 	public static int refreshHierarchy(File basedir, int refreshDepth, IProgressMonitor monitor) throws CoreException {
 		try {

@@ -723,7 +723,7 @@ public class MavenCoreActivator extends Plugin {
 		org.apache.maven.model.Plugin plugin = new org.apache.maven.model.Plugin();
 		plugin.setGroupId("org.apache.maven.plugins"); //$NON-NLS-1$
 		plugin.setArtifactId("maven-compiler-plugin"); //$NON-NLS-1$
-		plugin.setVersion("2.5.1");
+		plugin.setVersion("3.0");
 		Xpp3Dom configuration = new Xpp3Dom( "configuration" ); //$NON-NLS-1$
 		Xpp3Dom source = new Xpp3Dom("source"); //$NON-NLS-1$
 		source.setValue(compilerLevel); //$NON-NLS-1$

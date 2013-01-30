@@ -4,7 +4,6 @@ import java.io.File;
 import java.util.List;
 
 import org.apache.maven.model.Model;
-import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IWorkspace;

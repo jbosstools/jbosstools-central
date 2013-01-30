@@ -2,8 +2,6 @@ package org.jboss.tools.central.editors;
 
 import java.util.HashMap;
 
-import org.eclipse.jface.viewers.ColumnViewer;
-import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
@@ -307,8 +305,8 @@ public abstract class ToolTip {
 	 * @return the area responsible for the tooltip creation or
 	 *         <code>null</code> this could be any object describing the area
 	 *         (e.g. the {@link Control} onto which the tooltip is bound to, a
-	 *         part of this area e.g. for {@link ColumnViewer} this could be a
-	 *         {@link ViewerCell})
+	 *         part of this area e.g. for {@link org.eclipse.jface.viewers.ColumnViewer} this could be a
+	 *         {@link org.eclipse.jface.viewers.ViewerCell})
 	 */
 	protected Object getToolTipArea(Event event) {
 		return control;
