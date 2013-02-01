@@ -18,7 +18,7 @@ import org.eclipse.osgi.util.NLS;
  *
  */
 public class Messages extends NLS {
-	private static final String BUNDLE_NAME = "org.jboss.tools.maven.jsf.messages"; //$NON-NLS-1$
+	private static final String BUNDLE_NAME = "org.jboss.tools.maven.portlet.messages"; //$NON-NLS-1$
 	public static String PortletProjectConfigurator_The_project_does_not_contain_the_Web_Module_facet;
 	static {
 		// initialize resource bundle
