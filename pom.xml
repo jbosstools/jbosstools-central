@@ -19,13 +19,5 @@
 		<module>central</module>
 		<module>site</module>
 	</modules>
-	<profiles>
-		<profile>
-			<id>bootstrap</id>
-			<modules>
-				<module>../jbosstools-portlet</module>
-			</modules>
-		</profile>
-	</profiles>
 </project>
 	
