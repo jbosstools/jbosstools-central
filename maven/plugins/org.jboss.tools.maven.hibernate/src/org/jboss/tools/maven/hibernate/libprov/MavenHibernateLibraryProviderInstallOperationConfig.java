@@ -17,8 +17,8 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.jpt.common.core.JptWorkspace;
 import org.eclipse.jpt.common.core.libval.LibraryValidator;
 import org.eclipse.jpt.common.core.libval.LibraryValidatorManager;
+import org.eclipse.jpt.jpa.core.JpaPlatform;
 import org.eclipse.jpt.jpa.core.libprov.JpaLibraryProviderInstallOperationConfig;
-import org.eclipse.jpt.jpa.core.platform.JpaPlatformConfig;
 import org.jboss.tools.maven.core.libprov.MavenLibraryProviderInstallOperationConfig;
 
 /**
@@ -27,13 +27,13 @@ import org.jboss.tools.maven.core.libprov.MavenLibraryProviderInstallOperationCo
  */
 public class MavenHibernateLibraryProviderInstallOperationConfig extends MavenLibraryProviderInstallOperationConfig implements JpaLibraryProviderInstallOperationConfig {
 
-	private JpaPlatformConfig jpaPlatformDescription;
+	private JpaPlatform.Config jpaPlatformDescription;
 	
-	public JpaPlatformConfig getJpaPlatformConfig() {
+	public JpaPlatform.Config getJpaPlatformConfig() {
 		return jpaPlatformDescription;
 	}
 	
-	public void setJpaPlatformConfig(JpaPlatformConfig jpaPlatform) {
+	public void setJpaPlatformConfig(JpaPlatform.Config jpaPlatform) {
 		this.jpaPlatformDescription = jpaPlatform;
 	}	
 	
