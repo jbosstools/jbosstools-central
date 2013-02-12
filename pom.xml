@@ -27,5 +27,14 @@
 			</modules>
 		</profile>
 	</profiles>
+
+	<!-- JBIDE-13428 temporary location for o.j.t.maven.{jaxrs,jsf,jpa} ==> o.e.m2e.wtp.{jaxrs,jsf,jpa} -->
+	<repositories>
+		<repository>
+			<id>m2e-wtp-kepler</id>
+			<url>http://download.eclipse.org/m2e-wtp/snapshots/kepler/</url>
+			<layout>p2</layout>
+		</repository>
+	</repositories>	
 </project>
 	
