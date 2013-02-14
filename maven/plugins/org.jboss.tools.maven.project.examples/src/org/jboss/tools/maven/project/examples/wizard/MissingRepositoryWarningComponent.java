@@ -18,7 +18,10 @@ import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.graphics.FontMetrics;
+import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
@@ -28,19 +31,21 @@ import org.jboss.tools.maven.ui.wizard.ConfigureMavenRepositoriesWizard;
 public class MissingRepositoryWarningComponent extends Composite {
 
 	private Link warninglink;
+	private Label warningImg;
+	private Image warningIcon;
 
-	public MissingRepositoryWarningComponent(Composite parent, boolean visibleInitially) {
+	public MissingRepositoryWarningComponent(Composite parent) {
 		super(parent, SWT.NORMAL);
 		
 		GridDataFactory.fillDefaults().align(SWT.FILL, SWT.FILL).grab(true, false).span(3, 1)
 		.applyTo(this);
 		GridLayoutFactory.fillDefaults().numColumns(2).applyTo(this);
 		
-		Label warningImg = new Label(this, SWT.CENTER | SWT.TOP);
-		Image warningIcon = JFaceResources.getImage(Dialog.DLG_IMG_MESSAGE_WARNING);
+		warningImg = new Label(this, SWT.CENTER | SWT.TOP);
+		warningIcon = JFaceResources.getImage(Dialog.DLG_IMG_MESSAGE_WARNING);
+		
 		GridDataFactory.fillDefaults().align(SWT.FILL, SWT.TOP).applyTo(warningImg);
-		warningImg.setImage(warningIcon);
-
+		
 		warninglink = new Link(this, SWT.NONE |  SWT.FILL);
 		GridDataFactory.fillDefaults().align(SWT.FILL, SWT.FILL).grab(true, false).applyTo(warninglink);
 		warninglink.addSelectionListener(new SelectionAdapter() {
@@ -54,18 +59,25 @@ public class MissingRepositoryWarningComponent extends Composite {
 				dialog.open(); 
 			}
 		});
+		GridData gd = (GridData) getLayoutData();
+		gd.widthHint = 650;
 		
-		setVisible(visibleInitially);
-	}
-	
-	@Override
-	public void dispose() {
-		super.dispose();
+		GC gc = new GC(this);
+		gc.setFont(getFont());
+		FontMetrics fontMetrics = gc.getFontMetrics();
+		gc.dispose();
+		gd = (GridData) getLayoutData();
+		gd.heightHint = fontMetrics.getHeight() * 3;
 	}
 	
 	public void setLinkText(String text) {
 		if (warninglink != null) {
 			warninglink.setText(text);
+			if (!text.isEmpty() ) {
+				warningImg.setImage(warningIcon);
+			} else {
+				warningImg.setImage(null);
+			}
 			getParent().layout(true, true);
 		}
 	}

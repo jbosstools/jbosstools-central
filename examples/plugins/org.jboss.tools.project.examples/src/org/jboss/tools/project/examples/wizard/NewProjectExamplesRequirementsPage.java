@@ -153,7 +153,7 @@ public class NewProjectExamplesRequirementsPage extends WizardPage implements IP
 				| SWT.V_SCROLL | SWT.BORDER);
 		Table table = tableViewer.getTable();
 		gd = new GridData(GridData.FILL_BOTH);
-		gd.heightHint = 200;
+		gd.heightHint = 150;
 		table.setLayoutData(gd);
 		table.setHeaderVisible(true);
 		table.setLinesVisible(true);

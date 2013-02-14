@@ -40,6 +40,7 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.wst.common.project.facet.core.IProjectFacetVersion;
@@ -266,14 +267,7 @@ public class NewProjectExamplesStacksRequirementsPage extends NewProjectExamples
 	
 	@Override
 	protected void setAdditionalControls(Composite composite) {
-		warningComponent = new MissingRepositoryWarningComponent(composite, false);
-		GridData data = new GridData();
-        data.minimumWidth = 1;
-        data.minimumHeight = 1;
-        data.horizontalAlignment = SWT.FILL;
-        data.verticalAlignment = SWT.FILL;
-        data.widthHint = 650;
-		warningComponent.setLayoutData(data);
+		warningComponent = new MissingRepositoryWarningComponent(composite);
 		
 		MavenCoreActivator.getDefault().registerMavenSettingsChangeListener(this);
 	}
@@ -411,19 +405,15 @@ public class NewProjectExamplesStacksRequirementsPage extends NewProjectExamples
 
 	protected void validateEnterpriseRepo() {
 		if (warningComponent != null) {
-			boolean isWarningLinkVisible = false;
+			warningComponent.setLinkText(""); //$NON-NLS-1$
 			if (isEnterpriseTargetRuntime()) {
 				if (enterpriseRepoStatus == null) {
 					enterpriseRepoStatus = MavenArtifactHelper.checkEnterpriseRequirementsAvailable(projectExample); 
 				}
-				isWarningLinkVisible = !enterpriseRepoStatus.isOK();
-				if (isWarningLinkVisible) {
+				if (!enterpriseRepoStatus.isOK()) {
 					warningComponent.setLinkText(enterpriseRepoStatus.getMessage());
-					//warninglink.setText(enterpriseRepoStatus.getMessage());
-					warningComponent.getParent().layout(true, true);
-				}
+				} 
 			}
-			warningComponent.setVisible(isWarningLinkVisible);
 		}
 	}
 
