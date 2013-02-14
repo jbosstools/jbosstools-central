@@ -165,9 +165,8 @@ public class ArchetypeExamplesWizardPage extends
 
 	@Override
 	protected void createAdvancedSettings(Composite composite, GridData gridData) {
-		// TODO Auto-generated method stub
 		super.createAdvancedSettings(composite, gridData);
-		warningComponent = new MissingRepositoryWarningComponent(composite, false);
+		warningComponent = new MissingRepositoryWarningComponent(composite);
 	}
 
 	public Archetype getArchetype() {
@@ -301,7 +300,6 @@ public class ArchetypeExamplesWizardPage extends
 			//Not initialized yet
 			return;
 		}
-		// TODO Auto-generated method stub
 		for(int i = 0; i < propertiesTable.getItemCount(); i++ ) {
 		      TableItem item = propertiesTable.getItem(i);
 		      String value = item.getText(VALUE_INDEX);
@@ -311,19 +309,16 @@ public class ArchetypeExamplesWizardPage extends
 		    		  || "yes".equalsIgnoreCase(value))
 		    		  ) {
 		    	  
-		    	boolean isWarningLinkVisible = false;
+		    	warningComponent.setLinkText(""); //$NON-NLS-1$
 				if (enterpriseRepoStatus == null) {
 					enterpriseRepoStatus = MavenArtifactHelper.checkEnterpriseRequirementsAvailable(projectExample); 
 				}
-				isWarningLinkVisible = !enterpriseRepoStatus.isOK();
-				if (isWarningLinkVisible) {
+				if (!enterpriseRepoStatus.isOK()) {
 					warningComponent.setLinkText(enterpriseRepoStatus.getMessage());
-				}
-				warningComponent.setVisible(isWarningLinkVisible);
-		    	return;
+				} 
+				return;
 		      }
 		}
-		warningComponent.setVisible(false);
 	}
 	
 	private Throwable getRootCause(Throwable ex) {
