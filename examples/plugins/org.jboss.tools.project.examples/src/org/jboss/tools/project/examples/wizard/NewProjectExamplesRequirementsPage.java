@@ -28,6 +28,7 @@ import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.wizard.IWizard;
 import org.eclipse.jface.wizard.IWizardPage;
+import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.mylyn.internal.discovery.core.model.BundleDiscoveryStrategy;
 import org.eclipse.mylyn.internal.discovery.core.model.ConnectorDescriptor;
@@ -62,6 +63,7 @@ import org.jboss.tools.runtime.core.RuntimeCoreActivator;
 import org.jboss.tools.runtime.core.model.DownloadRuntime;
 import org.jboss.tools.runtime.ui.RuntimeUIActivator;
 import org.jboss.tools.runtime.ui.download.DownloadRuntimeDialog;
+import org.jboss.tools.runtime.ui.internal.wizard.DownloadRuntimesWizard;
 
 public class NewProjectExamplesRequirementsPage extends WizardPage implements IProjectExamplesWizardPage {
 
@@ -302,7 +304,9 @@ public class NewProjectExamplesRequirementsPage extends WizardPage implements IP
 				ProjectFix fix = getSelectedProjectFix();
 				if (fix != null) {
 					List<DownloadRuntime> runtimes = getDownloadRuntimes(fix);
-					DownloadRuntimeDialog dialog = new DownloadRuntimeDialog(getShell(), runtimes);
+					//DownloadRuntimeDialog dialog = new DownloadRuntimeDialog(getShell(), runtimes);
+					//dialog.open();
+					WizardDialog dialog = new WizardDialog(getShell(), new DownloadRuntimesWizard(PlatformUI.getWorkbench().getModalDialogShellProvider().getShell(), runtimes));
 					dialog.open();
 					refreshFixes();
 				}
@@ -401,7 +405,9 @@ public class NewProjectExamplesRequirementsPage extends WizardPage implements IP
 		final String downloadId = fix.getProperties().get(ProjectFix.DOWNLOAD_ID);
 		if (downloadId != null) {
 			DownloadRuntime dr = RuntimeCoreActivator.getDefault().getDownloadRuntimes().get(downloadId);
-			return Collections.singletonList(dr);
+			if (dr != null) {
+				return Collections.singletonList(dr);
+			}
 		}
 		return null;
 	}
