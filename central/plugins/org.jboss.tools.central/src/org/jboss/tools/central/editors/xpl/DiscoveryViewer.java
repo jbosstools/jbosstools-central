@@ -123,6 +123,9 @@ import org.eclipse.ui.forms.IFormColors;
 import org.eclipse.ui.progress.WorkbenchJob;
 import org.eclipse.ui.statushandlers.StatusManager;
 import org.eclipse.ui.themes.IThemeManager;
+import org.jboss.tools.central.JBossCentralActivator;
+import org.jboss.tools.project.examples.ProjectExamplesActivator;
+import org.jboss.tools.project.examples.configurators.IJBossCentralConfigurator;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.Version;
 
@@ -985,6 +988,8 @@ public class DiscoveryViewer {
 					ConnectorDescriptorItemUi itemUi = new ConnectorDescriptorItemUi(connector,
 							categoryChildrenContainer, background);
 					itemUi.updateAvailability();
+					String siteUrl = connector.getSiteUrl();
+					connector.setSiteUrl(JBossCentralActivator.resolveExpression(siteUrl));
 					allConnectors.add(connector);
 				}
 			}

@@ -46,7 +46,7 @@ public class DefaultJBossCentralConfigurator implements
 
 	// see pom.xml for actual value -- this is passed it at build-time via Maven
 	private static final String JBOSS_DIRECTORY_URL;
-
+	
 	static {
 		ResourceBundle rb = ResourceBundle.getBundle("org.jboss.tools.project.examples.configurators.discovery"); //$NON-NLS-1$
 		String url = rb.getString("discovery.url").trim(); //$NON-NLS-1$

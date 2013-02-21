@@ -53,6 +53,8 @@ import org.eclipse.ui.menus.CommandContributionItem;
 import org.eclipse.ui.menus.CommandContributionItemParameter;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.eclipse.ui.services.IServiceLocator;
+import org.jboss.dmr.ModelNode;
+import org.jboss.dmr.ModelType;
 import org.jboss.tools.central.editors.JBossCentralEditor;
 import org.jboss.tools.central.editors.JBossCentralEditorInput;
 import org.jboss.tools.project.examples.model.ProjectExample;
@@ -471,4 +473,12 @@ public class JBossCentralActivator extends AbstractUIPlugin {
 		}
 	}
 
+	public static String resolveExpression(String s) {
+		if (s == null) {
+			return s;
+		}
+		ModelNode node = new ModelNode(ModelType.EXPRESSION).setExpression(s).resolve();
+		return node.asString();
+	}
+	
 }
