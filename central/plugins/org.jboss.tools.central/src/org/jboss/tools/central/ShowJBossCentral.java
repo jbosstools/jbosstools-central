@@ -24,10 +24,15 @@ import org.osgi.framework.Version;
  */
 public class ShowJBossCentral implements IStartup {
 
-	private static final String ORG_JBOSS_TOOLS_USAGE = "org.jboss.tools.usage";
+	private static final String ORG_JBOSS_TOOLS_CENTRAL_DONOTSHOW = "org.jboss.tools.central.donotshow"; //$NON-NLS-1$
+	private static final String ORG_JBOSS_TOOLS_USAGE = "org.jboss.tools.usage"; //$NON-NLS-1$
 
 	@Override
 	public void earlyStartup() {
+		String show = System.getProperty(ORG_JBOSS_TOOLS_CENTRAL_DONOTSHOW);
+		if (show != null && "true".equals(show)) {
+			return;
+		}
 		boolean showJBossCentral = JBossCentralActivator.getDefault()
 				.showJBossCentralOnStartup();
 		IEclipsePreferences prefs = JBossCentralActivator.getDefault()
