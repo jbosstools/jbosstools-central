@@ -27,6 +27,9 @@
       <import feature="org.jboss.tools.seam.feature" version="3.4.0" match="greaterOrEqual"/>
       <import feature="org.jboss.tools.runtime.core.feature" version="2.0.0" match="greaterOrEqual"/>
       <import feature="org.jboss.tools.runtime.seam.detector.feature" version="3.4.0" match="greaterOrEqual"/>
+      <import feature="org.eclipse.m2e.wtp.jsf.feature" version="0.17.0" match="greaterOrEqual"/>
+      <import feature="org.eclipse.m2e.wtp.jaxrs.feature" version="0.17.0" match="greaterOrEqual"/>
+      <import feature="org.eclipse.m2e.wtp.jpa.feature" version="0.17.0" match="greaterOrEqual"/>
    </requires>
 
 </feature>
