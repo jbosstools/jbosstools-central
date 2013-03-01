@@ -18,7 +18,7 @@ Tested by Red Hat.</description>
       
       <!-- use connectorCategory relevance value to sort from largest (80) to smallest (20) -->
 
-      <!-- JBIDE-13326 add a category to make Eclipse UI Juno SR1 Optimizations easily visible/available within Central -->
+      <!-- JBIDE-13326 add a category to make Eclipse UI Juno SR1 Optimizations easily visible/available within Central
       <connectorCategory
             description="Patches and Hot Fixes"
             id="org.jboss.tools.central.discovery.a.patches"
@@ -26,8 +26,8 @@ Tested by Red Hat.</description>
             relevance="99">
          <group id="org.jboss.tools.central.discovery.a.patches" /> 
       </connectorCategory>
-
-   <!-- TODO: https://issues.jboss.org/browse/JBIDE-13335 remove this connector when we move up to Juno SR2 -->
+      -->
+      <!-- JBIDE-13335 Only needed for Juno SR1 (JBT 4.0.0). Juno SR2 includes this fix
       <connectorDescriptor
             categoryId="org.jboss.tools.central.discovery.a.patches"
             groupId="org.jboss.tools.central.discovery.a.patches"
@@ -46,6 +46,7 @@ Tested by Red Hat.</description>
                url="http://wiki.eclipse.org/Platform_UI/Juno_Performance_Investigation">
          </overview>
       </connectorDescriptor>
+      -->
 
       <!-- a. Web and Mobile Development -->
 
