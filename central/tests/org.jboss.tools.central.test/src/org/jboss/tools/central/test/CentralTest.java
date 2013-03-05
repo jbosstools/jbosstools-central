@@ -12,6 +12,7 @@ package org.jboss.tools.central.test;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertEquals;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
@@ -143,6 +144,24 @@ public class CentralTest {
 				JBossCentralActivator.SHOW_JBOSS_CENTRAL_ON_STARTUP,
 				JBossCentralActivator.SHOW_JBOSS_CENTRAL_ON_STARTUP_DEFAULT_VALUE);
 	}
+	
+	@Test
+	public void testSiteUrl() {
+		System.setProperty("org.jboss.central.siteUrl", "http://download.jboss.org/jbosstools/updates/stable/kepler/central/core/");
+		assertEquals("x", JBossCentralActivator.resolveExpression("${org.jboss.central.siteUr:x}"));
+		assertEquals("http://download.jboss.org/jbosstools/updates/stable/kepler/central/core/",
+				JBossCentralActivator.resolveExpression("${org.jboss.central.siteUrl:x}"));
+		
+		
+		// -Djboss.base.url=http://download.jboss.org/jbosstools/updates/base -Djboss.m2e.url=m2e-wtp
+		System.setProperty("jboss.base.url", "http://download.jboss.org/jbosstools/updates/base");
+		System.setProperty("jboss.m2e.url", "m2e-wtp");
+		
+		assertEquals("http://download.jboss.org/jbosstools/updates/base/m2e/m2e-wtp", 
+				JBossCentralActivator.resolveExpression("${jboss.base.url}/m2e/${jboss.m2e.url}"));
+		// nested properties aren't supported by jboss-dmr 1.1.1.Final
+		// assertEquals(System.getProperty("os.name"), JBossCentralActivator.resolveExpression("${os.name:{blah}}"));
+	}
 
 	private boolean hasOpenEditor() {
 		IWorkbenchWindow[] windows = PlatformUI.getWorkbench()
@@ -175,6 +194,6 @@ public class CentralTest {
 		} catch (InterruptedException e) {
 			assertTrue("InterruptedException", false);
 		}
-}
+	}
 
 }
