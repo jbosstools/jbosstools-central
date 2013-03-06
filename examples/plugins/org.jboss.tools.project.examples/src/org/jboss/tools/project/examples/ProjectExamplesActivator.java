@@ -1157,6 +1157,11 @@ public class ProjectExamplesActivator extends AbstractUIPlugin {
 			IExtensionPoint extensionPoint = registry
 					.getExtensionPoint(CONFIGURATORS_EXTENSION_ID);
 			IExtension[] extensions = extensionPoint.getExtensions();
+			if (extensions.length > 1) {
+				for (int i = 1; i < extensions.length; i++) {
+					logIgnoredExtensionPoint(extensions[i]);
+				}
+			}
 			if (extensions.length > 0) {
 				IExtension extension = extensions[0];
 				IConfigurationElement[] configurationElements = extension
@@ -1166,7 +1171,7 @@ public class ProjectExamplesActivator extends AbstractUIPlugin {
 					if (CONFIGURATOR.equals(configurationElement.getName())) {
 						try {
 							configurator = (IJBossCentralConfigurator) configurationElement
-									.createExecutableExtension("class");
+									.createExecutableExtension("class"); //$NON-NLS-1$
 						} catch (CoreException e) {
 							ProjectExamplesActivator.log(e);
 							continue;
@@ -1181,6 +1186,26 @@ public class ProjectExamplesActivator extends AbstractUIPlugin {
 			}
 		}
 		return configurator;
+	}
+
+	private void logIgnoredExtensionPoint(IExtension extension) {
+		String className = null;
+		IConfigurationElement[] configurationElements = extension
+				.getConfigurationElements();
+		for (int j = 0; j < configurationElements.length; j++) {
+			IConfigurationElement configurationElement = configurationElements[j];
+			if (CONFIGURATOR.equals(configurationElement.getName())) {
+				className = configurationElement.getAttribute("class");
+			}
+		}
+		StringBuilder builder = new StringBuilder();
+		builder.append("The configurators extension point is ignored: classname=");
+		builder.append(className);
+		if (extension.getContributor() != null && extension.getContributor().getName() != null) {
+			builder.append(",pluginId=");
+			builder.append(extension.getContributor().getName());
+		}
+		log(builder.toString());
 	}
 
 	public static Dictionary<Object, Object> getEnvironment() {
