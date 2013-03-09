@@ -123,6 +123,7 @@ import org.eclipse.ui.forms.IFormColors;
 import org.eclipse.ui.progress.WorkbenchJob;
 import org.eclipse.ui.statushandlers.StatusManager;
 import org.eclipse.ui.themes.IThemeManager;
+import org.jboss.tools.central.internal.xpl.ExpressionResolver;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.Version;
 
@@ -985,6 +986,8 @@ public class DiscoveryViewer {
 					ConnectorDescriptorItemUi itemUi = new ConnectorDescriptorItemUi(connector,
 							categoryChildrenContainer, background);
 					itemUi.updateAvailability();
+					String siteUrl = connector.getSiteUrl();
+					connector.setSiteUrl(ExpressionResolver.DEFAULT_RESOLVER.resolve(siteUrl));
 					allConnectors.add(connector);
 				}
 			}
