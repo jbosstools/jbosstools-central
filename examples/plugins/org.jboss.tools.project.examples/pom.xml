@@ -11,20 +11,21 @@
 	<artifactId>org.jboss.tools.project.examples</artifactId>
 
 	<properties>
-		<!-- TODO: when moving to Kepler, use /development/kepler/ then later /stable/kepler/ -->
-		<jboss.discovery.directory.url>http://download.jboss.org/jbosstools/updates/stable/juno/jbosstools-directory.xml</jboss.discovery.directory.url>
+		<!-- TODO: when moving to Luna, use /development/luna/ then later /stable/luna/
+         TODO: when closer to release, switch this to /stable/kepler/ -->
+		<jboss.discovery.directory.url>http://download.jboss.org/jbosstools/updates/development/kepler/jbosstools-directory.xml</jboss.discovery.directory.url>
 	</properties>
 
 	<profiles>
 		<!-- _stable_branch jobs could use this profile but the above default (last 
 			stable milestone) is probably better -->
 		<profile>
-			<id>4.0.juno</id>
+			<id>4.1.kepler</id>
 			<activation>
 				<activeByDefault>false</activeByDefault>
 			</activation>
 			<properties>
-				<jboss.discovery.directory.url>http://download.jboss.org/jbosstools/updates/nightly/core/4.0.juno/jbosstools-directory.xml</jboss.discovery.directory.url>
+				<jboss.discovery.directory.url>http://download.jboss.org/jbosstools/updates/nightly/core/4.1.kepler/jbosstools-directory.xml</jboss.discovery.directory.url>
 			</properties>
 		</profile>
 
