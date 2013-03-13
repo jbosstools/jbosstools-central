@@ -725,7 +725,8 @@ public class GettingStartedPage extends AbstractJBossCentralPage {
 			
 			@Override
 			public void preferenceChange(PreferenceChangeEvent event) {
-				if (JBossCentralActivator.SHOW_JBOSS_CENTRAL_ON_STARTUP.equals(event.getKey())) {
+				if (JBossCentralActivator.SHOW_JBOSS_CENTRAL_ON_STARTUP.equals(event.getKey()) 
+						&& showOnStartup != null && !showOnStartup.isDisposed()) {
 					Object value = event.getNewValue();
 					if (value instanceof String) {
 						boolean newValue = new Boolean((String)value).booleanValue();

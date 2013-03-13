@@ -52,7 +52,6 @@ import org.eclipse.mylyn.commons.ui.SelectionProviderAdapter;
 import org.eclipse.mylyn.commons.ui.compatibility.CommonThemes;
 import org.eclipse.mylyn.commons.workbench.browser.BrowserUtil;
 import org.eclipse.mylyn.internal.discovery.core.model.AbstractDiscoverySource;
-import org.eclipse.mylyn.internal.discovery.core.model.BundleDiscoveryStrategy;
 import org.eclipse.mylyn.internal.discovery.core.model.ConnectorDescriptor;
 import org.eclipse.mylyn.internal.discovery.core.model.ConnectorDescriptorKind;
 import org.eclipse.mylyn.internal.discovery.core.model.ConnectorDiscovery;
@@ -123,6 +122,9 @@ import org.eclipse.ui.forms.IFormColors;
 import org.eclipse.ui.progress.WorkbenchJob;
 import org.eclipse.ui.statushandlers.StatusManager;
 import org.eclipse.ui.themes.IThemeManager;
+import org.jboss.tools.central.JBossCentralActivator;
+import org.jboss.tools.central.internal.discovery.JBossBundleDiscoveryStrategy;
+import org.jboss.tools.central.internal.discovery.JBossRemoteBundleDiscoveryStrategy;
 import org.jboss.tools.central.internal.xpl.ExpressionResolver;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.Version;
@@ -987,7 +989,11 @@ public class DiscoveryViewer {
 							categoryChildrenContainer, background);
 					itemUi.updateAvailability();
 					String siteUrl = connector.getSiteUrl();
-					connector.setSiteUrl(ExpressionResolver.DEFAULT_RESOLVER.resolve(siteUrl));
+					try {
+						connector.setSiteUrl(ExpressionResolver.DEFAULT_RESOLVER.resolve(siteUrl));
+					} catch (Exception e) {
+						JBossCentralActivator.log(e);
+					}
 					allConnectors.add(connector);
 				}
 			}
@@ -1495,11 +1501,11 @@ public class DiscoveryViewer {
 					ConnectorDiscovery connectorDiscovery = new ConnectorDiscovery();
 
 					// look for descriptors from installed bundles
-					connectorDiscovery.getDiscoveryStrategies().add(new BundleDiscoveryStrategy());
+					connectorDiscovery.getDiscoveryStrategies().add(new JBossBundleDiscoveryStrategy());
 
 					// look for remote descriptor
 					if (directoryUrl != null) {
-						RemoteBundleDiscoveryStrategy remoteDiscoveryStrategy = new RemoteBundleDiscoveryStrategy();
+						JBossRemoteBundleDiscoveryStrategy remoteDiscoveryStrategy = new JBossRemoteBundleDiscoveryStrategy();
 						remoteDiscoveryStrategy.setDirectoryUrl(directoryUrl);
 						connectorDiscovery.getDiscoveryStrategies().add(remoteDiscoveryStrategy);
 					}
