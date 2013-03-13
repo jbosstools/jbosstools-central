@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+
+  <extension
+         point="org.eclipse.mylyn.discovery.core.connectorDiscovery">
+
+      <connectorCategory
+            description="JBoss Central tests"
+            id="org.jboss.tools.central.discovery.test"
+            name="Web and Mobile Development"
+            relevance="80">
+         <group id="org.jboss.tools.central.discovery.test" /> 
+      </connectorCategory>
+
+      <connectorDescriptor
+            categoryId="org.jboss.tools.central.discovery.test"
+            groupId="org.jboss.tools.central.discovery.test"
+            description="JBoss Central Tests"
+            id="test.feature"
+            kind="task"
+            license="Free, EPL, Other"
+            name="Test 1"
+            provider="Red Hat"
+            siteUrl="${central.URL:http://download.jboss.org/jbosstools/updates/development/kepler/central/core/}">
+            <iu id="org.jboss.tools.central.test"/>
+         <icon
+               image32="images/jbosstools_icon32.png">
+         </icon>
+         <overview
+               url="http://jboss.org/tools/">
+         </overview>
+      </connectorDescriptor>
+
+      <connectorDescriptor
+            categoryId="org.jboss.tools.central.discovery.test"
+            groupId="org.jboss.tools.central.discovery.test"
+            description="JBoss Central Tests"
+            id="test.feature.invalid1"
+            kind="task"
+            license="Free, EPL, Other"
+            name="Test 2"
+            provider="Red Hat"
+            siteUrl="$central.URL:http://download.jboss.org/jbosstools/updates/development/kepler/central/core/}">
+            <iu id="org.jboss.tools.central.test"/>
+         <icon
+               image32="images/jbosstools_icon32.png">
+         </icon>
+         <overview
+               url="http://jboss.org/tools/">
+         </overview>
+      </connectorDescriptor>
+      
+      <connectorDescriptor
+            categoryId="org.jboss.tools.central.discovery.test"
+            groupId="org.jboss.tools.central.discovery.test"
+            description="JBoss Central Tests"
+            id="test.default.feature"
+            kind="task"
+            license="Free, EPL, Other"
+            name="Test 2"
+            provider="Red Hat"
+            siteUrl="${default.URL:http://download.jboss.org/jbosstools/updates/development/kepler/central/core/}">
+            <iu id="org.jboss.tools.central.test"/>
+         <icon
+               image32="images/jbosstools_icon32.png">
+         </icon>
+         <overview
+               url="http://jboss.org/tools/">
+         </overview>
+      </connectorDescriptor>
+      
+      <connectorDescriptor
+            categoryId="org.jboss.tools.central.discovery.test"
+            groupId="org.jboss.tools.central.discovery.test"
+            description="JBoss Central Tests"
+            id="test.feature.invalid2"
+            kind="task"
+            license="Free, EPL, Other"
+            name="Test 3"
+            provider="Red Hat"
+            siteUrl="${default.URL:invalidurl}">
+            <iu id="org.jboss.tools.central.test"/>
+         <icon
+               image32="images/jbosstools_icon32.png">
+         </icon>
+         <overview
+               url="http://jboss.org/tools/">
+         </overview>
+      </connectorDescriptor>
+      
+   </extension>
+  
+</plugin>
