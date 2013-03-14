@@ -17,6 +17,18 @@
             id="org.jboss.tools.maven.sourcelookup.containerType"
             description="JBoss Maven Source Container">
       </sourceContainerType>
+      <sourceContainerType
+            name="JBoss Java Project Source Container"
+            class="org.jboss.tools.maven.sourcelookup.containers.JBossJavaProjectSourceContainerType"
+            id="org.jboss.tools.sourcecontainer.containerType"
+            description="JBoss Java Project Source Container">
+      </sourceContainerType>
     </extension>
     
+    <extension
+         point="org.eclipse.jdt.core.classpathContainerInitializer">
+     <classpathContainerInitializer
+            class="org.jboss.tools.maven.sourcelookup.internal.search.JBossServerSearchInitializer"
+            id="org.jboss.tools.maven.sourcelookup.JBossServerJavaSearchInitializer"/>
+   </extension>
 </plugin>

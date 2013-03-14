@@ -9,6 +9,12 @@
             icon="$nl$/icons/jboss.gif"
             id="org.jboss.tools.maven.sourcelookup.containerPresentation">
       </sourceContainerPresentation>
+      <sourceContainerPresentation
+            browserClass="org.jboss.tools.maven.sourcelookup.ui.browsers.JBossJavaProjectSourceContainerBrowser"
+            containerTypeID="org.jboss.tools.sourcecontainer.containerType"
+            icon="$nl$/icons/jboss.gif"
+            id="org.jboss.tools.maven.sourcelookup.ui.browsers.JBossJavaProjectSourceContainerBrowser">
+      </sourceContainerPresentation>
    </extension>
    <extension
         point="org.eclipse.ui.preferencePages">
@@ -26,6 +32,12 @@
               class="org.jboss.tools.maven.sourcelookup.ui.actions.AttachSourcesActionDelegate"
               label="Attach Sources" style="push"/>
       </editorContribution>
+      <editorContribution id="org.jboss.tools.maven.sourcelookup.ui.attachSourcesContribution2"
+                          targetID="org.eclipse.jdt.ui.ClassFileEditorNoSource">
+         <action id="org.jboss.tools.maven.sourcelookup.ui.attachSourcesAction"
+              class="org.jboss.tools.maven.sourcelookup.ui.actions.AttachSourcesActionDelegate"
+              label="Attach Sources" style="push"/>
+      </editorContribution>
    </extension>
    
    <extension
@@ -33,5 +45,26 @@
       <startup
             class="org.jboss.tools.maven.sourcelookup.ui.Startup"></startup>
    </extension>
+   
+   <extension
+         point="org.eclipse.jdt.ui.javaElementFilters">
+      <filter
+            targetId="org.eclipse.jdt.ui.PackageExplorer"
+            name="%JBossServersProjectFilter.name"
+            enabled="true"
+            description="%JBossServersProjectFilter.desc"
+            class="org.jboss.tools.maven.sourcelookup.ui.internal.filter.JBossServersProjectFilter"
+            id="org.jboss.tools.maven.sourcelookup.ui.JBossServersProjectFilter1">
+      </filter>
+      <filter
+            targetId="org.eclipse.jdt.ui.ProjectsView"
+            name="%JBossServersProjectFilter.name"
+            enabled="true"
+            description="%JBossServersProjectFilter.desc"
+            class="org.jboss.tools.maven.sourcelookup.ui.internal.filter.JBossServersProjectFilter"
+            id="org.jboss.tools.maven.sourcelookup.ui.JBossServersProjectFilter2">
+      </filter>
+   </extension>
+   
    
 </plugin>
