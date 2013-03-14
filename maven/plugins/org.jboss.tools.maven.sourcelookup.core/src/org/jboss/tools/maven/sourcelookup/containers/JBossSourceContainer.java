@@ -15,6 +15,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.regex.Pattern;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipException;
 import java.util.zip.ZipFile;
@@ -74,7 +75,7 @@ public class JBossSourceContainer extends AbstractSourceContainer {
 	protected static File resolvedFile;
 	private String homePath;
 
-	private IFileIdentificationManager fileIdentificationManager;
+	private static IFileIdentificationManager fileIdentificationManager = new FileIdentificationManager();
 	
 	public JBossSourceContainer(ILaunchConfiguration configuration)
 			throws CoreException {
@@ -95,15 +96,13 @@ public class JBossSourceContainer extends AbstractSourceContainer {
 					SourceLookupActivator.PLUGIN_ID, "Invalid configuration");
 			throw new CoreException(status);
 		}
-		fileIdentificationManager = new FileIdentificationManager();
 	}
 
 	public JBossSourceContainer(String homePath) {
 		this.homePath = homePath;
-		fileIdentificationManager = new FileIdentificationManager();
 	}
 
-	private List<File> getJars() throws CoreException {
+	public List<File> getJars() throws CoreException {
 		if (jars != null) {
 			return jars;
 		}
@@ -116,7 +115,7 @@ public class JBossSourceContainer extends AbstractSourceContainer {
 		ServerBean serverBean = loader.getServerBean();
 		JBossServerType type = serverBean.getType();
 		String version = serverBean.getVersion();
-		if (JBossServerType.AS7.equals(type)) {
+		if (JBossServerType.AS7.equals(type) || JBossServerType.AS72.equals(type) || JBossServerType.EAP61.equals(type)) {
 			getAS7xJars();
 		}
 		else if (JBossServerType.AS.equals(type)) {
@@ -198,9 +197,36 @@ public class JBossSourceContainer extends AbstractSourceContainer {
 			if (file.isDirectory()) {
 				addJars(path.append(file.getName()), jars);
 			}
-			if (file.isFile()
-					&& file.getName().endsWith(".jar") && !jars.contains(file)) { //$NON-NLS-1$
-				jars.add(file);
+//			if (file.isFile()
+//					&& file.getName().endsWith(".jar") && !jars.contains(file)) { //$NON-NLS-1$
+//				jars.add(file);
+//			}
+			
+			
+			if (file.isFile() && file.getName().endsWith(".jar") && !jars.contains(file)) { //$NON-NLS-1$
+				boolean include = true;
+				String includeFilter = SourceLookupActivator.getDefault().getIncludePattern();
+				if (includeFilter != null && !includeFilter.isEmpty()) {
+					try {
+						include = Pattern.matches(includeFilter, file.getAbsolutePath());
+					} catch (Exception e) {
+						SourceLookupActivator.log(e);
+					}
+				}
+				if (include) {
+					boolean exclude = false;
+					String excludeFilter = SourceLookupActivator.getDefault().getExcludePattern();
+					if (excludeFilter != null && !excludeFilter.isEmpty()) {
+						try {
+							exclude = Pattern.matches(excludeFilter, file.getAbsolutePath());
+						} catch (Exception e) {
+							SourceLookupActivator.log(e);
+						}
+					}
+					if (!exclude) {
+						jars.add(file);
+					}
+				}
 			}
 		}
 	}
@@ -208,9 +234,9 @@ public class JBossSourceContainer extends AbstractSourceContainer {
 	public String getName() {
 		String name;
 		if (homePath != null) {
-			name = "JBoss Source Container (" + homePath + ")";
+			name = "JBoss Maven Source Container (" + homePath + ")";
 		} else {
-			name = "JBoss Source Container";
+			name = "JBoss Maven Source Container";
 		}
 		return name; //$NON-NLS-1$
 	}
@@ -224,7 +250,6 @@ public class JBossSourceContainer extends AbstractSourceContainer {
 			}
 		}
 		Object[] objects = new Object[0];
-		List<File> removeJars = new ArrayList<File>();
 		List<File> list = getJars();
 		Iterator<File> iterator = list.iterator();
 		ZipFile jar = null;
@@ -255,7 +280,7 @@ public class JBossSourceContainer extends AbstractSourceContainer {
 								objects = container.findSourceElements(name);
 								if (objects != null && objects.length > 0) {
 									sourceContainers.add(container);
-									removeJars.add(file);
+									iterator.remove();
 								}
 							}
 						} else {
@@ -264,7 +289,7 @@ public class JBossSourceContainer extends AbstractSourceContainer {
 							objects = container.findSourceElements(name);
 							if (objects != null && objects.length > 0) {
 								sourceContainers.add(container);
-								removeJars.add(file);
+								iterator.remove();
 							}
 						}
 						break;
@@ -285,9 +310,6 @@ public class JBossSourceContainer extends AbstractSourceContainer {
 					// ignore
 				}
 				jar = null;
-			}
-			for (File remove : removeJars) {
-				jars.remove(remove);
 			}
 		}
 		return objects;
