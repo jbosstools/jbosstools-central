@@ -16,7 +16,7 @@
 		<module>org.jboss.tools.central</module>
 		<module>org.jboss.tools.community.central</module>
 		<module>org.jboss.tools.central.themes</module>
-		<module>org.jboss.tools.central.discovery</module>
+		<!-- JBIDE-13804 moved to new repo, not part of Central <module>org.jboss.tools.central.discovery</module> -->
 	</modules>
 </project>
 	
