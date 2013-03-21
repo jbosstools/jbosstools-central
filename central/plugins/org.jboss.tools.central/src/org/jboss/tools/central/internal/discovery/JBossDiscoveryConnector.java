@@ -12,32 +12,31 @@ package org.jboss.tools.central.internal.discovery;
 
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.mylyn.internal.discovery.core.model.DiscoveryConnector;
 import org.eclipse.mylyn.internal.discovery.core.model.ValidationException;
+import org.eclipse.osgi.util.NLS;
 import org.jboss.tools.central.JBossCentralActivator;
+import org.jboss.tools.central.internal.xpl.ExpressionResolutionException;
 import org.jboss.tools.central.internal.xpl.ExpressionResolver;
 
 /**
- * 
- * (non-Javadoc)
- * @see org.eclipse.mylyn.internal.discovery.core.model.ConnectorDescriptor
- * 
+ * A description of a connector that resolves ${sysPropertyName:defaultValue} 
+ * expressions in siteUrl property
  * @author snjeza
- * 
  */
-public class DiscoveryConnector extends org.eclipse.mylyn.internal.discovery.core.model.DiscoveryConnector {
+public class JBossDiscoveryConnector extends DiscoveryConnector {
 
 	@Override
 	public void validate() throws ValidationException {
-		if (siteUrl != null) {
-			try {
-				siteUrl = ExpressionResolver.DEFAULT_RESOLVER.resolve(siteUrl);
-				super.validate();
-			} catch (Exception e) {
-				String message = "Invalid connectorDescriptor/@siteUrl: " + siteUrl;
-				IStatus status = new Status(IStatus.ERROR, JBossCentralActivator.PLUGIN_ID,
-						message, e);
-				JBossCentralActivator.getDefault().getLog().log(status);
-			}
+		try {
+			// Resolve expressions in siteUrl before executing siteUrl validation
+			siteUrl = ExpressionResolver.DEFAULT_RESOLVER.resolve(siteUrl);
+			// validate siteUrl with resolved expression 
+			super.validate();
+		} catch (ExpressionResolutionException e) {
+			// Translate runtime exception into validation exception to keep
+			// original processing algorithm for cDiscoveryConnectors
+			throw new ValidationException(NLS.bind("URL ''{0}'' use expression resolved with error: \"{1}\"", siteUrl,e.getMessage()));
 		}
 	}
 
