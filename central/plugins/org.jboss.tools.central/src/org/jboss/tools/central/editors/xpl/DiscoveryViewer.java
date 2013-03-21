@@ -125,6 +125,7 @@ import org.eclipse.ui.themes.IThemeManager;
 import org.jboss.tools.central.JBossCentralActivator;
 import org.jboss.tools.central.internal.discovery.JBossBundleDiscoveryStrategy;
 import org.jboss.tools.central.internal.discovery.JBossRemoteBundleDiscoveryStrategy;
+import org.jboss.tools.central.internal.xpl.ExpressionResolutionException;
 import org.jboss.tools.central.internal.xpl.ExpressionResolver;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.Version;
@@ -989,11 +990,6 @@ public class DiscoveryViewer {
 							categoryChildrenContainer, background);
 					itemUi.updateAvailability();
 					String siteUrl = connector.getSiteUrl();
-					try {
-						connector.setSiteUrl(ExpressionResolver.DEFAULT_RESOLVER.resolve(siteUrl));
-					} catch (Exception e) {
-						JBossCentralActivator.log(e);
-					}
 					allConnectors.add(connector);
 				}
 			}

@@ -8,6 +8,7 @@ import java.util.Properties;
 
 import junit.framework.Assert;
 
+import org.jboss.tools.central.internal.xpl.ExpressionResolutionException;
 import org.jboss.tools.central.internal.xpl.ExpressionResolver;
 import org.junit.Test;
 
@@ -33,8 +34,9 @@ public class ExpressionResolverTest {
     /**
      * Test that a valid expression to a system property reference which has
      * no definition throws an ISE
+     * @throws ExpressionResolutionException 
      */
-    @Test(expected = IllegalStateException.class)
+    @Test(expected = ExpressionResolutionException.class)
     public void testUnresolvedReference() {
         String value = "${no-such-system-property}";
         String resolved = resolver.resolve(value);
@@ -43,8 +45,9 @@ public class ExpressionResolverTest {
 
     /**
      * Test that a incomplete expression to a system property reference throws an ISE
+     * @throws ExpressionResolutionException 
      */
-    @Test(expected = IllegalStateException.class)
+    @Test(expected = ExpressionResolutionException.class)
     public void testIncompleteReference() {
         System.setProperty("test.property1", "test.property1.value");
         String value = "${test.property1";
@@ -54,6 +57,7 @@ public class ExpressionResolverTest {
 
     /**
      * Validate a single system property expression sees the system property value.
+     * @throws ExpressionResolutionException 
      */
     @Test
     public void testSystemPropertyRef() {
@@ -70,6 +74,7 @@ public class ExpressionResolverTest {
      * Test an expression that contains more than one system property name to
      * see that the second property value is used when the first property
      * is not defined.
+     * @throws ExpressionResolutionException 
      */
     @Test
     public void testSystemPropertyRefs() {
@@ -85,6 +90,7 @@ public class ExpressionResolverTest {
     /**
      * Validate that a system property expression for a property with no value
      * and a default provides sees the default value.
+     * @throws ExpressionResolutionException 
      */
     @Test
     public void testSystemPropertyRefDefault() {
@@ -94,6 +100,7 @@ public class ExpressionResolverTest {
 
     /** 
      * Validate that a property
+     * @throws ExpressionResolutionException 
      */
     @Test
     public void testRecursiveProperty() {
@@ -103,6 +110,7 @@ public class ExpressionResolverTest {
     
     /**
      * Validate that a environment variable reference is resolved.
+     * @throws ExpressionResolutionException 
      */
     @Test
     public void testSystemEnvVarRef() {
@@ -120,6 +128,7 @@ public class ExpressionResolverTest {
     /**
      * Validate that a environment variable reference is overriden by a
      * system property of the same name prefixed with "env.".
+     * @throws ExpressionResolutionException 
      */
     @Test
     public void testSystemEnvVarRefOverride() {
@@ -145,6 +154,7 @@ public class ExpressionResolverTest {
     
     /** 
      * Make sure to work with local configured properties
+     * @throws ExpressionResolutionException 
      */
     @Test
     public void testLocalProperties() {
@@ -163,6 +173,7 @@ public class ExpressionResolverTest {
 
     /** 
      * Make sure to work with local configured properties that delegates to system properties
+     * @throws ExpressionResolutionException 
      */
     @Test
     public void testLocalDelegatedToSystemProperties() {
@@ -180,6 +191,7 @@ public class ExpressionResolverTest {
     }
     /**
      * Make sure nesting works right
+     * @throws ExpressionResolutionException 
      */
     @Test
     public void testNesting() {
