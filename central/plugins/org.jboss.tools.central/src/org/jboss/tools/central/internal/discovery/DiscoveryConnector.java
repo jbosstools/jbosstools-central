@@ -18,8 +18,11 @@ import org.jboss.tools.central.internal.xpl.ExpressionResolver;
 
 /**
  * 
+ * (non-Javadoc)
+ * @see org.eclipse.mylyn.internal.discovery.core.model.ConnectorDescriptor
+ * 
  * @author snjeza
- *
+ * 
  */
 public class DiscoveryConnector extends org.eclipse.mylyn.internal.discovery.core.model.DiscoveryConnector {
 

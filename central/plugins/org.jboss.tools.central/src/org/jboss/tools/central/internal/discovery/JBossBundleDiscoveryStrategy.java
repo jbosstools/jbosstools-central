@@ -26,8 +26,12 @@ import org.eclipse.mylyn.internal.discovery.core.model.ValidationException;
 import org.eclipse.osgi.util.NLS;
 
 /**
- * snjeza
- *
+ * 
+ * (non-Javadoc)
+ * @see org.eclipse.mylyn.internal.discovery.core.model.BundleDiscoveryStrategy
+ * 
+ * @author snjeza
+ * 
  */
 public class JBossBundleDiscoveryStrategy extends BundleDiscoveryStrategy {
 

@@ -27,8 +27,11 @@ import org.eclipse.osgi.util.NLS;
 
 /**
  * 
+ * (non-Javadoc)
+ * @see org.eclipse.mylyn.internal.discovery.core.model.RemoteBundleDiscoveryStrategy
+ * 
  * @author snjeza
- *
+ * 
  */
 public class JBossRemoteBundleDiscoveryStrategy extends
 		RemoteBundleDiscoveryStrategy {
