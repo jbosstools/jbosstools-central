@@ -20,6 +20,8 @@ import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.ILaunchConfiguration;
+import org.eclipse.wst.server.core.ServerCore;
+import org.jboss.tools.maven.sourcelookup.internal.search.ServerLifecycleListener;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
@@ -37,13 +39,23 @@ public class SourceLookupActivator implements BundleActivator {
 	
 	private static final String MAVEN_PLUGIN_ID = "org.eclipse.m2e.core"; //$NON-NLS-1$
 	public static final String JBOSS_LAUNCH_SOURCE_PATH_COMPUTER_ID = "org.jboss.tools.maven.sourcelookup.SourcePathComputer"; //$NON-NLS-1$
-	public static final String AUTO_ADD_JBOSS_SOURCE_CONTAINER = "autoAddJBossSourceContainer";
+	public static final String AUTO_ADD_JBOSS_SOURCE_CONTAINER = "autoAddJBossSourceContainer"; //$NON-NLS-1$
 	public static final boolean AUTO_ADD_JBOSS_SOURCE_CONTAINER_DEFAULT = false;
 
+	public static final String INCLUDE_PATTERN = "includePattern"; //$NON-NLS-1$
+	public static final String EXCLUDE_PATTERN = "excludePattern"; //$NON-NLS-1$
+	
+	public static final String INCLUDE_PATTERN_DEFAULT = ".*\\.jar"; //$NON-NLS-1$
+	public static final String EXCLUDE_PATTERN_DEFAULT = ".*(jsf-impl-1\\.2|jsf-api-1\\.2|jpa-hibernate3).*"; //$NON-NLS-1$
+	
+	public static final String SEARCH_SERVERS = "searchServers"; //$NON-NLS-1$
+	public static final String SEARCH_SERVERS_VALUE = ""; //$NON-NLS-1$
+	
 	// The shared instance
 	private static SourceLookupActivator plugin;
 	
-	private SourcelookupLaunchConfigurationListener listener;
+	private SourcelookupLaunchConfigurationListener launchConfigurationListener;
+	private ServerLifecycleListener serverLifecycleListener;
 	private BundleContext context;
 	
 	/**
@@ -59,8 +71,11 @@ public class SourceLookupActivator implements BundleActivator {
 	public void start(BundleContext context) throws Exception {
 		this.context = context;
 		plugin = this;
-		listener = new SourcelookupLaunchConfigurationListener();
-		DebugPlugin.getDefault().getLaunchManager().addLaunchConfigurationListener(listener);
+		launchConfigurationListener = new SourcelookupLaunchConfigurationListener();
+		DebugPlugin.getDefault().getLaunchManager().addLaunchConfigurationListener(launchConfigurationListener);
+		serverLifecycleListener = new ServerLifecycleListener();
+		ServerCore.addRuntimeLifecycleListener(serverLifecycleListener);
+		ServerCore.addServerLifecycleListener(serverLifecycleListener);
 	}
 
 	/*
@@ -70,8 +85,12 @@ public class SourceLookupActivator implements BundleActivator {
 	public void stop(BundleContext context) throws Exception {
 		plugin = null;
 		this.context = null;
-		if (listener != null) {
-			DebugPlugin.getDefault().getLaunchManager().removeLaunchConfigurationListener(listener);
+		if (launchConfigurationListener != null) {
+			DebugPlugin.getDefault().getLaunchManager().removeLaunchConfigurationListener(launchConfigurationListener);
+		}
+		if (serverLifecycleListener != null) {
+			ServerCore.removeRuntimeLifecycleListener(serverLifecycleListener);
+			ServerCore.removeServerLifecycleListener(serverLifecycleListener);
 		}
 	}
 
@@ -123,6 +142,32 @@ public class SourceLookupActivator implements BundleActivator {
 		return getPreferences().getBoolean(AUTO_ADD_JBOSS_SOURCE_CONTAINER, AUTO_ADD_JBOSS_SOURCE_CONTAINER_DEFAULT);
 	}
 	
+	/**
+	 * @return the include pattern preference; 
+	 * a regular expression that serves to include libraries to the Java Search
+	 */
+	public String getIncludePattern() {
+		return getPreferences().get(INCLUDE_PATTERN, INCLUDE_PATTERN_DEFAULT);
+	}
+	
+	/**
+	 * @return the exclude pattern preference; 
+	 * a regular expression that serves to exclude libraries to the Java Search
+	 */
+	public String getExcludePattern() {
+		return getPreferences().get(EXCLUDE_PATTERN, EXCLUDE_PATTERN_DEFAULT);
+	}
+	
+	public String getSearchServers() {
+		return getPreferences().get(SEARCH_SERVERS, SEARCH_SERVERS_VALUE);
+	}
+	
+	/**
+	 * 
+	 * @param configuration
+	 * @return the ids of the servers that will be included in the Java Search
+	 * @throws CoreException
+	 */
 	public static boolean isJBossAsLaunchConfiguration(ILaunchConfiguration configuration) throws CoreException {
 		return AS7_LAUNCH_CONFIGURATION_ID
 				.equals(configuration.getType().getIdentifier()) ||
