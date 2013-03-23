@@ -22,7 +22,7 @@
             license="Free, EPL, Other"
             name="Test 1"
             provider="Red Hat"
-            siteUrl="${central.URL:http://download.jboss.org/jbosstools/updates/development/kepler/central/core/}">
+            siteUrl="${central.URL:http://unknown.org/core/}">
             <iu id="org.jboss.tools.central.test"/>
          <icon
                image32="images/jbosstools_icon32.png">
@@ -41,7 +41,7 @@
             license="Free, EPL, Other"
             name="Test 2"
             provider="Red Hat"
-            siteUrl="$central.URL:http://download.jboss.org/jbosstools/updates/development/kepler/central/core/}">
+            siteUrl="$central.URL:http://unknown.org/core/}">
             <iu id="org.jboss.tools.central.test"/>
          <icon
                image32="images/jbosstools_icon32.png">
@@ -60,7 +60,7 @@
             license="Free, EPL, Other"
             name="Test 2"
             provider="Red Hat"
-            siteUrl="${default.URL:http://download.jboss.org/jbosstools/updates/development/kepler/central/core/}">
+            siteUrl="${default.URL:http://unknown.org/core/}">
             <iu id="org.jboss.tools.central.test"/>
          <icon
                image32="images/jbosstools_icon32.png">

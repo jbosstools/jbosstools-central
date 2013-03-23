@@ -33,7 +33,7 @@ import org.eclipse.osgi.util.NLS;
  * @author eskimo
  *
  */
-public abstract class JBossDiscoveryExtensionProcessor {
+public abstract class ExpressionBasedDiscoveryExtensionProcessor {
 	protected void processExtensions(IProgressMonitor monitor, 
 			IExtension[] extensions,
 			List<DiscoveryConnector> connectors,
@@ -55,8 +55,8 @@ public abstract class JBossDiscoveryExtensionProcessor {
 					}
 					try {
 						if (ConnectorDiscoveryExtensionReader.CONNECTOR_DESCRIPTOR.equals(element.getName())) {
-							JBossDiscoveryConnector descriptor = extensionReader.readConnectorDescriptor(element,
-									JBossDiscoveryConnector.class);
+							ExpressionBasedDiscoveryConnector descriptor = extensionReader.readConnectorDescriptor(element,
+									ExpressionBasedDiscoveryConnector.class);
 							descriptor.setSource(discoverySource);
 							connectors.add(descriptor);
 						} else if (ConnectorDiscoveryExtensionReader.CONNECTOR_CATEGORY.equals(element.getName())) {

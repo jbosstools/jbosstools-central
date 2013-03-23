@@ -59,7 +59,6 @@ import org.eclipse.mylyn.internal.discovery.core.model.DiscoveryCategory;
 import org.eclipse.mylyn.internal.discovery.core.model.DiscoveryConnector;
 import org.eclipse.mylyn.internal.discovery.core.model.Icon;
 import org.eclipse.mylyn.internal.discovery.core.model.Overview;
-import org.eclipse.mylyn.internal.discovery.core.model.RemoteBundleDiscoveryStrategy;
 import org.eclipse.mylyn.internal.discovery.core.util.DiscoveryCategoryComparator;
 import org.eclipse.mylyn.internal.discovery.core.util.DiscoveryConnectorComparator;
 import org.eclipse.mylyn.internal.discovery.ui.DiscoveryImages;
@@ -122,11 +121,8 @@ import org.eclipse.ui.forms.IFormColors;
 import org.eclipse.ui.progress.WorkbenchJob;
 import org.eclipse.ui.statushandlers.StatusManager;
 import org.eclipse.ui.themes.IThemeManager;
-import org.jboss.tools.central.JBossCentralActivator;
-import org.jboss.tools.central.internal.discovery.JBossBundleDiscoveryStrategy;
-import org.jboss.tools.central.internal.discovery.JBossRemoteBundleDiscoveryStrategy;
-import org.jboss.tools.central.internal.xpl.ExpressionResolutionException;
-import org.jboss.tools.central.internal.xpl.ExpressionResolver;
+import org.jboss.tools.central.internal.discovery.ExpressionBasedBundleDiscoveryStrategy;
+import org.jboss.tools.central.internal.discovery.ExpressionBasedRemoteBundleDiscoveryStrategy;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.Version;
 
@@ -989,7 +985,6 @@ public class DiscoveryViewer {
 					ConnectorDescriptorItemUi itemUi = new ConnectorDescriptorItemUi(connector,
 							categoryChildrenContainer, background);
 					itemUi.updateAvailability();
-					String siteUrl = connector.getSiteUrl();
 					allConnectors.add(connector);
 				}
 			}
@@ -1497,11 +1492,11 @@ public class DiscoveryViewer {
 					ConnectorDiscovery connectorDiscovery = new ConnectorDiscovery();
 
 					// look for descriptors from installed bundles
-					connectorDiscovery.getDiscoveryStrategies().add(new JBossBundleDiscoveryStrategy());
+					connectorDiscovery.getDiscoveryStrategies().add(new ExpressionBasedBundleDiscoveryStrategy());
 
 					// look for remote descriptor
 					if (directoryUrl != null) {
-						JBossRemoteBundleDiscoveryStrategy remoteDiscoveryStrategy = new JBossRemoteBundleDiscoveryStrategy();
+						ExpressionBasedRemoteBundleDiscoveryStrategy remoteDiscoveryStrategy = new ExpressionBasedRemoteBundleDiscoveryStrategy();
 						remoteDiscoveryStrategy.setDirectoryUrl(directoryUrl);
 						connectorDiscovery.getDiscoveryStrategies().add(remoteDiscoveryStrategy);
 					}
