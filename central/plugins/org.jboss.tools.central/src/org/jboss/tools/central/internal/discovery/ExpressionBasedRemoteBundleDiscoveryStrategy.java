@@ -17,19 +17,20 @@ import org.eclipse.mylyn.internal.discovery.core.model.AbstractDiscoverySource;
 import org.eclipse.mylyn.internal.discovery.core.model.RemoteBundleDiscoveryStrategy;
 
 /**
- * (non-Javadoc)
- * @see org.eclipse.mylyn.internal.discovery.core.model.RemoteBundleDiscoveryStrategy
+ * A subclass of RemoteBundleDiscoveryStrategy to avoid validation fails when property expressions are used in connector description 
+ * this class only works when {@link ExpressionBasedDiscoveryConnector} is used when loading the connector descriptor
  * 
+ * @see org.eclipse.mylyn.internal.discovery.core.model.RemoteBundleDiscoveryStrategy
  * @author snjeza
  */
-public class JBossRemoteBundleDiscoveryStrategy extends
+public class ExpressionBasedRemoteBundleDiscoveryStrategy extends
 		RemoteBundleDiscoveryStrategy {
 
-	private JBossDiscoveryExtensionProcessor processor = new JBossDiscoveryExtensionProcessor() {
+	private ExpressionBasedDiscoveryExtensionProcessor processor = new ExpressionBasedDiscoveryExtensionProcessor() {
 		@Override
 		public AbstractDiscoverySource computeDiscoverySource(
 				IContributor contributor) {
-			return JBossRemoteBundleDiscoveryStrategy.this.computeDiscoverySource(contributor);
+			return ExpressionBasedRemoteBundleDiscoveryStrategy.this.computeDiscoverySource(contributor);
 		}
 	};
 

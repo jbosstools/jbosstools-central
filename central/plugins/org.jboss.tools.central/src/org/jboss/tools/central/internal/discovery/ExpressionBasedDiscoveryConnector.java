@@ -10,21 +10,18 @@
  ************************************************************************************/
 package org.jboss.tools.central.internal.discovery;
 
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Status;
 import org.eclipse.mylyn.internal.discovery.core.model.DiscoveryConnector;
 import org.eclipse.mylyn.internal.discovery.core.model.ValidationException;
 import org.eclipse.osgi.util.NLS;
-import org.jboss.tools.central.JBossCentralActivator;
 import org.jboss.tools.central.internal.xpl.ExpressionResolutionException;
 import org.jboss.tools.central.internal.xpl.ExpressionResolver;
 
 /**
- * A description of a connector that resolves ${sysPropertyName:defaultValue} 
+ * A subclass of a connector that resolves ${sysPropertyName:defaultValue} 
  * expressions in siteUrl property
  * @author snjeza
  */
-public class JBossDiscoveryConnector extends DiscoveryConnector {
+public class ExpressionBasedDiscoveryConnector extends DiscoveryConnector {
 
 	@Override
 	public void validate() throws ValidationException {
@@ -36,7 +33,7 @@ public class JBossDiscoveryConnector extends DiscoveryConnector {
 		} catch (ExpressionResolutionException e) {
 			// Translate runtime exception into validation exception to keep
 			// original processing algorithm for cDiscoveryConnectors
-			throw new ValidationException(NLS.bind("URL ''{0}'' use expression resolved with error: \"{1}\"", siteUrl,e.getMessage()));
+			throw new ValidationException(NLS.bind("Resolving expression in URL ''{0}'' failed with error: \"{1}\"", siteUrl,e.getMessage()));
 		}
 	}
 
