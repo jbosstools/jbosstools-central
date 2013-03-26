@@ -107,10 +107,17 @@ public class SeamProjectConfigurator extends AbstractProjectConfigurator {
 		m2Facet = ProjectFacetsManager.getProjectFacet("jboss.m2"); //$NON-NLS-1$
 		m2Version = m2Facet.getVersion("1.0"); //$NON-NLS-1$
 		ejbFacet = ProjectFacetsManager.getProjectFacet("jst.ejb"); //$NON-NLS-1$
-		portletFacet = ProjectFacetsManager.getProjectFacet("jboss.portlet"); //$NON-NLS-1$
-		jsfportletFacet = ProjectFacetsManager.getProjectFacet("jboss.jsfportlet"); //$NON-NLS-1$
-		seamPortletFacet = ProjectFacetsManager.getProjectFacet("jboss.seamportlet"); //$NON-NLS-1$
-		seamPortletVersion = seamPortletFacet.getVersion("1.0"); //$NON-NLS-1$
+		if (ProjectFacetsManager.isProjectFacetDefined("jboss.portlet")) {//$NON-NLS-1$
+			portletFacet = ProjectFacetsManager.getProjectFacet("jboss.portlet"); //$NON-NLS-1$
+			jsfportletFacet = ProjectFacetsManager.getProjectFacet("jboss.jsfportlet"); //$NON-NLS-1$
+			seamPortletFacet = ProjectFacetsManager.getProjectFacet("jboss.seamportlet"); //$NON-NLS-1$
+			seamPortletVersion = seamPortletFacet.getVersion("1.0"); //$NON-NLS-1$
+		} else {
+			portletFacet = null;
+			jsfportletFacet = null;
+			seamPortletFacet = null;
+			seamPortletVersion = null;
+		}
 	}
 	
 	@Override
@@ -341,6 +348,9 @@ public class SeamProjectConfigurator extends AbstractProjectConfigurator {
 				setModelProperty(model, prefs,ISeamFacetDataModelProperties.ENTITY_BEAN_PACKAGE_NAME);
 				setModelProperty(model, prefs,ISeamFacetDataModelProperties.WEB_CONTENTS_FOLDER);
 			}
+		}
+		if (portletFacet == null) {
+			return;
 		}
 		IPreferenceStore store = MavenSeamActivator.getDefault().getPreferenceStore();
 		boolean configureSeamPortlet = store.getBoolean(Activator.CONFIGURE_SEAMPORTLET);
