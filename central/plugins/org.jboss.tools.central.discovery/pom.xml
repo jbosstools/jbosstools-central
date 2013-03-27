@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion> 
+  <parent>
+    <groupId>org.jboss.tools.central</groupId>
+    <artifactId>discovery</artifactId>
+    <version>4.1.0.Alpha2-SNAPSHOT</version>
+  </parent>
+  <groupId>org.jboss.tools.central.plugins</groupId>
+  <artifactId>org.jboss.tools.central.discovery</artifactId> 
+  <version>1.2.0-SNAPSHOT</version>
+  <packaging>eclipse-plugin</packaging>
+<build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-antrun-plugin</artifactId>
+        <version>1.7</version>
+        <executions>
+          <execution>
+            <id>install</id>
+            <phase>install</phase>
+            <configuration>
+              <quiet>true</quiet>
+              <target>
+                <!-- called AFTER generating update site + zip to add in extra content -->
+                <!--
+                To test output, run maven in this folder:
+                  $ mvn install -DPREFIX=jbosstools -DBUILD_ALIAS=Alpha2 -DBUILD_ID=2012-11-29_12-55-00 -DBUILD_NUMBER=6969 -DUPDATE_SITE=... -DEXTRAS_SITE=... -DCENTRAL_SITE=...
+                  $ mvn install -DPREFIX=jbosstools -DBUILD_ALIAS=Alpha2 -DBUILD_ID=2012-11-29_12-55-00 -DBUILD_NUMBER=6969 -DUPDATE_SITE=... -DEXTRAS_SITE=... -DCENTRAL_SITE=...
+                -->
+                <ant antfile="build.xml" target="basic.build" dir="../../">
+                  <property name="output.dir" value="${basedir}" />
+                  <property name="project.artifactId" value="${project.artifactId}"/>
+                  <property name="PREFIX" value="jbosstools"/>
+                  <property name="VERSION" value="${project.version}" />
+                  <property name="BUILD_ALIAS" value="${BUILD_ALIAS}" />
+                  <property name="TARGET_PLATFORM_VERSION" value="${TARGET_PLATFORM_VERSION}"/>
+                  
+                  <!-- pass in from Jenkins:
+                  <property name="UPDATE_SITE" value="http://www.qa.jboss.com/binaries/RHDS/builds/staging/devstudio.product_trunk/all/"/>
+
+                  <property name="UPDATE_SITE" value="http://www.qa.jboss.com/binaries/RHDS/builds/staging/devstudio.product_70/all/"/>
+                  <property name="UPDATE_SITE" value="http://www.qa.jboss.com/binaries/RHDS/updates/development/7.0.0.Alpha1c.core/"/>
+
+                  <property name="UPDATE_SITE" value="http://download.jboss.org/jbosstools/builds/staging/_composite_/core/trunk/"/>
+                  <property name="UPDATE_SITE" value="http://download.jboss.org/jbosstools/updates/nightly/core/trunk/"/>
+
+                  <property name="UPDATE_SITE" value="http://download.jboss.org/jbosstools/builds/staging/_composite_/core/4.1.kepler/"/>
+                  <property name="UPDATE_SITE" value="http://download.jboss.org/jbosstools/updates/nightly/core/4.1.kepler/"/>
+                  <property name="UPDATE_SITE" value="http://download.jboss.org/jbosstools/updates/JBossTools-4.1.0.Alpha1c.core/"/>
+                  -->
+                  <property name="UPDATE_SITE" value="${UPDATE_SITE}"/>
+
+                  <!-- pass in from Jenkins:
+                  <property name="EXTRAS_SITE" value="https://devstudio.jboss.com/updates/7.0-staging/extras/4.30.1/"/>
+                  <property name="EXTRAS_SITE" value="http://download.jboss.org/jbosstools/updates/kepler/extras/4.30.1/"/>
+                  -->
+                  <property name="EXTRAS_SITE" value="${EXTRAS_SITE}"/>
+
+                  <!-- pass in from Jenkins:
+                  <property name="CENTRAL_SITE" value="https://devstudio.jboss.com/updates/7.0-staging/central/core/"/>
+                  <property name="CENTRAL_SITE" value="https://devstudio.jboss.com/updates/7.0-development/central/core/"/>
+
+                  <property name="CENTRAL_SITE" value="http://download.jboss.org/jbosstools/updates/development/kepler/central/core/"/>
+                  -->
+                  <property name="CENTRAL_SITE" value="${CENTRAL_SITE}"/>
+                </ant>
+              </target>
+            </configuration>
+            <goals>
+              <goal>run</goal>
+            </goals>
+          </execution>
+        </executions>
+        <dependencies>
+          <dependency>
+            <groupId>commons-net</groupId>
+            <artifactId>commons-net</artifactId>
+            <version>1.4.1</version>
+          </dependency>
+          <dependency>
+            <groupId>org.apache.ant</groupId>
+            <artifactId>ant</artifactId>
+            <version>1.7.1</version>
+          </dependency>
+          <dependency>
+            <groupId>org.apache.ant</groupId>
+            <artifactId>ant-nodeps</artifactId>
+            <version>1.7.1</version>
+          </dependency>
+          <dependency>
+            <groupId>org.apache.ant</groupId>
+            <artifactId>ant-trax</artifactId>
+            <version>1.7.1</version>
+          </dependency>
+          <dependency>
+            <groupId>org.apache.ant</groupId>
+            <artifactId>ant-commons-net</artifactId>
+            <version>1.7.1</version>
+          </dependency>
+          <dependency>
+            <groupId>org.apache.ant</groupId>
+            <artifactId>ant-apache-regexp</artifactId>
+            <version>1.7.1</version>
+          </dependency>
+          <dependency>
+            <groupId>ant-contrib</groupId>
+            <artifactId>ant-contrib</artifactId>
+            <version>1.0b3</version>
+          </dependency>
+        </dependencies>
+      </plugin>
+    </plugins>
+  </build>
+</project>
