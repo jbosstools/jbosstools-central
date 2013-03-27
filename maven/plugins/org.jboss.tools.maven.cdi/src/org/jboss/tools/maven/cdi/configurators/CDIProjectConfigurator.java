@@ -93,16 +93,18 @@ public class CDIProjectConfigurator extends AbstractProjectConfigurator {
 			return;
 		}
     	final IFacetedProject fproj = ProjectFacetsManager.create(project);
-		if (project.hasNature(CDICoreNature.NATURE_ID) 
-				&& (fproj == null || (fproj.hasProjectFacet(cdiFacet) && fproj.hasProjectFacet(m2Facet)))) {
-			//everything already installed. Since there's no support for version update -yet- we stop here
-			return;
-		}
-		String packaging = mavenProject.getPackaging();
+    	String packaging = mavenProject.getPackaging();
+    	boolean isJavaEEProject = "war".equals(packaging) || "ejb".equals(packaging);
+		
+        if ((!isJavaEEProject && project.hasNature(CDICoreNature.NATURE_ID)) 
+             || (fproj != null && (fproj.hasProjectFacet(cdiFacet) && fproj.hasProjectFacet(m2Facet)))) {
+            //CDI support already installed. Since there's no support for version update -yet- we stop here
+            return;
+        }
 	    String cdiVersion = getCDIVersion(project, mavenProject);
 	    if (cdiVersion != null) {
-	    	if ( (fproj != null) && ("war".equals(packaging) || "ejb".equals(packaging)) ) { //$NON-NLS-1$
-	    		installDefaultFacets(fproj, cdiVersion, monitor);
+	    	if ( fproj != null && isJavaEEProject ) {
+	    	   installDefaultFacets(fproj, cdiVersion, monitor);
 	    	}
 	    	CDIUtil.enableCDI(project, false, new NullProgressMonitor());
 	    }
@@ -113,7 +115,7 @@ public class CDIProjectConfigurator extends AbstractProjectConfigurator {
 	public void mavenProjectChanged(MavenProjectChangedEvent event,
 			IProgressMonitor monitor) throws CoreException {
 		IMavenProjectFacade facade = event.getMavenProject();
-	    if(facade != null) {
+	    if(event.getFlags() == MavenProjectChangedEvent.FLAG_DEPENDENCIES && facade != null) {
 	      IProject project = facade.getProject();
 	      if(isWTPProject(project)) {
 	        MavenProject mavenProject = facade.getMavenProject(monitor);

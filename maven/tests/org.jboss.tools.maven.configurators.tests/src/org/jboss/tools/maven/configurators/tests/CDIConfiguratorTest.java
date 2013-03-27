@@ -11,11 +11,15 @@
 package org.jboss.tools.maven.configurators.tests;
 
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IWorkspaceDescription;
+import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.wst.common.project.facet.core.IFacetedProject;
 import org.eclipse.wst.common.project.facet.core.IProjectFacet;
 import org.eclipse.wst.common.project.facet.core.IProjectFacetVersion;
 import org.eclipse.wst.common.project.facet.core.ProjectFacetsManager;
 import org.jboss.tools.cdi.core.CDICoreNature;
+import org.jboss.tools.cdi.core.CDIUtil;
 import org.junit.Test;
 
 @SuppressWarnings("restriction")
@@ -24,7 +28,7 @@ public class CDIConfiguratorTest extends AbstractMavenConfiguratorTest {
 	protected static final IProjectFacet MAVEN_FACET = ProjectFacetsManager.getProjectFacet("jboss.m2");
 	protected static final IProjectFacet CDI_FACET = ProjectFacetsManager.getProjectFacet("jst.cdi"); //$NON-NLS-1$
 	protected static final IProjectFacetVersion DEFAULT_CDI_VERSION = CDI_FACET.getVersion("1.0"); //$NON-NLS-1$
-	
+
 	@Test
 	public void testJBIDE11741_deltaSpikeDependency() throws Exception {
 		testCdiProject("deltaspike");
@@ -60,6 +64,30 @@ public class CDIConfiguratorTest extends AbstractMavenConfiguratorTest {
 
 		IFacetedProject facetedProject = ProjectFacetsManager.create(notCdiProject);
 		assertNull("CDI Facet should be missing ",facetedProject.getInstalledVersion(CDI_FACET));
+	}
+
+	@Test
+	public void testJBIDE13739_DisableCdi() throws Exception {
+		
+		String projectLocation = "projects/cdi/cdi";
+		IProject cdiProject = importProject(projectLocation+"/pom.xml");
+		waitForJobsToComplete();
+		assertIsCDIProject(cdiProject, DEFAULT_CDI_VERSION);
+		
+		IWorkspaceDescription description = workspace.getDescription();
+		description.setAutoBuilding(true);
+		workspace.setDescription(description);
+		
+		CDIUtil.disableCDI(cdiProject);
+		waitForJobsToComplete();
+		assertFalse("CDI nature should be missing after disabling CDI", cdiProject.hasNature(CDICoreNature.NATURE_ID));
+
+		updateProject(cdiProject);
+		waitForJobsToComplete();
+		assertFalse("CDI nature should be missing after updating the maven project", cdiProject.hasNature(CDICoreNature.NATURE_ID));
+		
+		description.setAutoBuilding(false);
+		workspace.setDescription(description);
 	}
 
 	
