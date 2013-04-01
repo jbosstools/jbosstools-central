@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>org.jboss.tools.maven</groupId>
+		<artifactId>tests</artifactId>
+		<version>1.5.0-SNAPSHOT</version>
+	</parent>
+	<groupId>org.jboss.tools.maven.tests</groupId>
+	<artifactId>org.jboss.tools.maven.sourcelookup.test</artifactId>
+	
+	<packaging>eclipse-test-plugin</packaging>
+
+    <properties>
+		<systemProperties>-Djbosstools.test.jboss.home.7.1.1=${requirementsDirectory}/jboss-as-7.1.1.Final </systemProperties>
+	</properties>
+   
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-dependency-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>install-jboss-as</id>
+						<phase>pre-integration-test</phase>
+						<goals>
+							<goal>unpack</goal>
+						</goals>
+						<configuration>
+							<artifactItems>
+								<artifactItem>
+									<groupId>org.jboss.as</groupId>
+									<artifactId>jboss-as-dist</artifactId>
+									<version>7.1.1.Final</version>
+									<type>zip</type>
+								</artifactItem>
+							</artifactItems>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.eclipse.tycho</groupId>
+				<artifactId>tycho-surefire-plugin</artifactId>
+				<version>${tychoVersion}</version>
+				<configuration>
+					<testSuite>org.jboss.tools.maven.sourcelookup.test</testSuite>
+					<testClass>org.jboss.tools.maven.sourcelookup.test.JBossSourceLookupAllTests</testClass>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+</project>
