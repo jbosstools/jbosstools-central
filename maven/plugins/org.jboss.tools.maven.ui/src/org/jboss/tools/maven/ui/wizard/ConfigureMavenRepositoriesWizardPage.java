@@ -813,8 +813,8 @@ public class ConfigureMavenRepositoriesWizardPage extends WizardPage implements 
 	private Set<RepositoryWrapper> getIncludedRepositories() {
 		Set<RepositoryWrapper> repositories = new TreeSet<RepositoryWrapper>();
         try {
-			List<Profile> activeProfiles = getActiveProfiles();
-			for (Profile profile:activeProfiles) {
+			List<Profile> profiles = getProfiles();
+			for (Profile profile:profiles) {
 				List<Repository> repos = profile.getRepositories();
 				for (Repository repository:repos) {
 					String profileId = profile.getId() == null ? "" : profile.getId();  //$NON-NLS-1$
@@ -874,26 +874,17 @@ public class ConfigureMavenRepositoriesWizardPage extends WizardPage implements 
 		repository.setLayout(LAYOUT_DEFAULT);
 		RepositoryPolicy releases = new RepositoryPolicy();
 		releases.setEnabled(true);
-		releases.setUpdatePolicy(POLICY_NEVER); //$NON-NLS-1$
+		releases.setUpdatePolicy(POLICY_NEVER);
 		repository.setReleases(releases);
 		RepositoryPolicy snapshots = new RepositoryPolicy();
 		snapshots.setEnabled(false);
-		snapshots.setUpdatePolicy(POLICY_NEVER); //$NON-NLS-1$
+		snapshots.setUpdatePolicy(POLICY_NEVER);
 		repository.setSnapshots(snapshots);
 		return repository;
 	}
 
-	private List<Profile> getActiveProfiles() throws CoreException {
-		Settings settings = maven.getSettings();
-		List<String> activeProfilesIds = settings.getActiveProfiles();
-		List<Profile> activeProfiles = new ArrayList<Profile>();
-		for (Profile profile : settings.getProfiles()) {
-			if ((profile.getActivation() != null && profile.getActivation().isActiveByDefault())
-					|| activeProfilesIds.contains(profile.getId())) {
-				activeProfiles.add(profile);
-			}
-		}
-		return activeProfiles;
+	private List<Profile> getProfiles() throws CoreException {
+		return maven.getSettings().getProfiles();
 	}
 	
 	private Button createButton(Composite parent, String text) {
@@ -1054,9 +1045,7 @@ public class ConfigureMavenRepositoriesWizardPage extends WizardPage implements 
 						indexManager.getWorkspaceIndex().updateIndex(true, monitor);
 					}
 
-					List<IMavenProjectFacade> facades = new ArrayList<IMavenProjectFacade>();
 					IProject[] projects = ResourcesPlugin.getWorkspace().getRoot().getProjects();
-					
 					if (projects != null && projects.length > 0) {
 						MavenUpdateRequest updateRequest = new MavenUpdateRequest(projects, mavenConfiguration.isOffline(),true);
 						MavenPlugin.getMavenProjectRegistry().refresh(updateRequest);
