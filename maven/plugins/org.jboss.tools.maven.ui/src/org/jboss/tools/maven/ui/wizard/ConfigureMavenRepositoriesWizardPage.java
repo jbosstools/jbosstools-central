@@ -60,8 +60,8 @@ import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IPageChangedListener;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.dialogs.PageChangedEvent;
+import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.viewers.ArrayContentProvider;
-import org.eclipse.jface.viewers.CellLabelProvider;
 import org.eclipse.jface.viewers.ColumnLayoutData;
 import org.eclipse.jface.viewers.ColumnViewerToolTipSupport;
 import org.eclipse.jface.viewers.ColumnWeightData;
@@ -70,6 +70,8 @@ import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
+import org.eclipse.jface.viewers.StyledCellLabelProvider;
+import org.eclipse.jface.viewers.StyledString;
 import org.eclipse.jface.viewers.TableLayout;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TableViewerColumn;
@@ -82,9 +84,9 @@ import org.eclipse.m2e.core.embedder.ArtifactKey;
 import org.eclipse.m2e.core.embedder.IMaven;
 import org.eclipse.m2e.core.embedder.IMavenConfiguration;
 import org.eclipse.m2e.core.internal.index.IndexManager;
-import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.project.MavenUpdateRequest;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.StyleRange;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -142,7 +144,7 @@ public class ConfigureMavenRepositoriesWizardPage extends WizardPage implements 
 	
 	private static final String RED_HAT_TECHPREVIEW_ALL_REPOSITORY_PROFILE_ID = RED_HAT_TECHPREVIEW_ALL_REPOSITORY_ID; 
 	
-	private static final String ERROR_TITLE = "Error";//$NON-NLS-1$
+	private static final String ERROR_TITLE = "Error";
 
 	private static final String SNAPSHOTS_ELEMENT = "snapshots"; //$NON-NLS-1$
 
@@ -179,13 +181,15 @@ public class ConfigureMavenRepositoriesWizardPage extends WizardPage implements 
 	private static final String UTF_8 = "UTF-8"; //$NON-NLS-1$
 	
 	private static final String PAGE_NAME = "org.jboss.tools.maven.ui.wizard.page"; //$NON-NLS-1$
-	private static final String ADD_REPOSITORY = " Add Repository..."; //$NON-NLS-1$
-	private static final String REMOVE_ALL = " Remove All "; //$NON-NLS-1$
-	private static final String REMOVE = " Remove "; //$NON-NLS-1$
+	private static final String ADD_REPOSITORY = " Add Repository...";
+	private static final String EDIT_REPOSITORY = " Edit Repository...";
+	private static final String REMOVE_ALL = " Remove All ";
+	private static final String REMOVE = " Remove ";
 
 	private Button removeButton;
 	private Button removeAllButton;
 	private Button addRepositoryButton;
+	private Button editRepositoryButton;
 	private IMaven maven;
 	private TableViewer includedRepositoriesViewer;
 	private Set<RepositoryWrapper> includedRepositories;
@@ -212,7 +216,7 @@ public class ConfigureMavenRepositoriesWizardPage extends WizardPage implements 
 
 	public ConfigureMavenRepositoriesWizardPage(ArtifactKey artifactKey, String profileId) {
 		super(PAGE_NAME);
-		setTitle("Configure Maven Repositories");//$NON-NLS-1$
+		setTitle("Configure Maven Repositories");
 		maven = MavenPlugin.getMaven();
 		this.artifactKey = artifactKey;
 		this.preSelectedProfileId = profileId;
@@ -231,7 +235,7 @@ public class ConfigureMavenRepositoriesWizardPage extends WizardPage implements 
 		userSettingsLabel.setLayoutData(gd);
 		
 		String userSettings = getUserSettings();
-	    userSettingsLabel.setText("User settings: " + userSettings);//$NON-NLS-1$
+	    userSettingsLabel.setText("User settings: " + userSettings);
 	    
 	    File settingsFile = new File(userSettings);
 		try {
@@ -311,7 +315,6 @@ public class ConfigureMavenRepositoriesWizardPage extends WizardPage implements 
         
         createButtons(repositoriesGroup);
         
-		
 		includedRepositories = getIncludedRepositories();
 		availableRepositories = getAvailableRepositories();
 		List<RepositoryWrapper> remove = new ArrayList<RepositoryWrapper>();
@@ -388,6 +391,16 @@ public class ConfigureMavenRepositoriesWizardPage extends WizardPage implements 
 		
         });
 		
+		editRepositoryButton.addSelectionListener(new SelectionAdapter() {
+
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				openEditRepositoryDialog();
+			}
+		
+        });
+
+		
 		Label separator= new Label(composite, SWT.SEPARATOR | SWT.HORIZONTAL);
 		separator.setVisible(false);
 		
@@ -410,6 +423,7 @@ public class ConfigureMavenRepositoriesWizardPage extends WizardPage implements 
         removeButton = createButton(buttonsComposite, REMOVE);
         removeAllButton = createButton(buttonsComposite, REMOVE_ALL);
         addRepositoryButton = createButton(buttonsComposite, ADD_REPOSITORY);
+        editRepositoryButton = createButton(buttonsComposite, EDIT_REPOSITORY);
 	}
 
 	private void createDefaultSettings() throws CoreException,
@@ -689,6 +703,9 @@ public class ConfigureMavenRepositoriesWizardPage extends WizardPage implements 
 			Node node = repositoryNodeList.item(i);
 			if (node.getNodeType() == Node.ELEMENT_NODE && name.equals(node.getNodeName())) {
 				String urlNode = getRepositoryUrl(node);
+				if (url != null && !url.endsWith(RepositoryWrapper.SEPARATOR)) {
+					url = url + RepositoryWrapper.SEPARATOR;
+				}
 				if (urlNode != null && urlNode.equals(url)) {
 					repository = node;
 					break;
@@ -800,6 +817,7 @@ public class ConfigureMavenRepositoriesWizardPage extends WizardPage implements 
 	private void configureButtons() {
 		removeAllButton.setEnabled(includedRepositories.size() > 0);
 		removeButton.setEnabled(selectedIncludedRepositories.size() > 0);
+		editRepositoryButton.setEnabled(selectedIncludedRepositories.size() == 1);
 	}
 
 	private void refreshRepositories() {
@@ -896,7 +914,7 @@ public class ConfigureMavenRepositoriesWizardPage extends WizardPage implements 
         return button;
 	}
 
-	class RepositoryLabelProvider extends CellLabelProvider {
+	class RepositoryLabelProvider extends StyledCellLabelProvider {
 		
 		public String getToolTipText(Object element) {
 			if (element instanceof RepositoryWrapper) {
@@ -932,8 +950,29 @@ public class ConfigureMavenRepositoriesWizardPage extends WizardPage implements 
 		public void update(ViewerCell cell) {
 			Object element = cell.getElement();
 			if (element instanceof RepositoryWrapper) {
-				cell.setText(((RepositoryWrapper) element).getDisplayName());
+				RepositoryWrapper wrapper = (RepositoryWrapper) element;
+				StyledString text = new StyledString();
+				String displayName;
+				if (isActive(wrapper)) {
+					displayName = wrapper.getDisplayName();
+				} else {
+					displayName = wrapper.getDisplayName() + " (Inactive)";
+				}
+				StyleRange styledRange = new StyleRange(0,
+						displayName.length(), null, null);
+				text.append(displayName, StyledString.DECORATIONS_STYLER);
+				cell.setText(text.toString());
+				if (isActive(wrapper)) {
+					styledRange.font = JFaceResources.getFontRegistry()
+							.get(JFaceResources.DEFAULT_FONT);
+				} else {
+					styledRange.font = JFaceResources.getFontRegistry()
+							.getItalic(JFaceResources.DEFAULT_FONT);
+				}
+				StyleRange[] range = { styledRange };
+				cell.setStyleRanges(range);
 			}
+			super.update(cell);
 		}
 	}
 
@@ -985,6 +1024,36 @@ public class ConfigureMavenRepositoriesWizardPage extends WizardPage implements 
 		return bytes;
 	}
 	
+	private boolean isActive(RepositoryWrapper wrapper) {
+		if (wrapper != null) {
+			String profileId = wrapper.getProfileId();
+			NodeList activeProfilesList = document
+					.getElementsByTagName(ACTIVE_PROFILES);
+			Element activeProfiles = null;
+			if (activeProfilesList.getLength() > 0) {
+				activeProfiles = (Element) activeProfilesList.item(0);
+			}
+			if (activeProfiles == null) {
+				return false;
+			}
+			NodeList activeProfileList = activeProfiles.getChildNodes();
+			for (int i = 0; i < activeProfileList.getLength(); i++) {
+				Node node = activeProfileList.item(i);
+				if (node.getNodeType() == Node.ELEMENT_NODE
+						&& ACTIVE_PROFILE.equals(node.getNodeName())) {
+					String id = node.getTextContent();
+					if (id != null) {
+						id = id.trim();
+					}
+					if (profileId.equals(id)) {
+						return true;
+					}
+				}
+			}
+		}
+		return false;
+	}
+
 	public boolean finishPage() {
 		String userSettings = getUserSettings();
 		File file = new File(userSettings);
@@ -1066,18 +1135,18 @@ public class ConfigureMavenRepositoriesWizardPage extends WizardPage implements 
 		}
 		StringBuilder builder = new StringBuilder();
 		if (repos.size() == 1) {
-			builder.append("Are you sure you want to delete the '"); //$NON-NLS-1$
+			builder.append("Are you sure you want to delete the '");
 			builder.append(repos.iterator().next().getRepository().getUrl());
-			builder.append("' repository?"); //$NON-NLS-1$
+			builder.append("' repository?");
 		} else {
-			builder.append("Are you sure you want to delete the following repositories:\n\n"); //$NON-NLS-1$
+			builder.append("Are you sure you want to delete the following repositories:\n\n");
 			for (RepositoryWrapper wrapper:repos) {
 				builder.append(wrapper.getRepository().getUrl());
 				builder.append("\n"); //$NON-NLS-1$
 			}
 			builder.append("\n"); //$NON-NLS-1$
 		}
-		return MessageDialog.openQuestion(getShell(), "Question?", builder.toString()); //$NON-NLS-1$
+		return MessageDialog.openQuestion(getShell(), "Question?", builder.toString()); 
 	}
 
 	@Override
@@ -1094,6 +1163,37 @@ public class ConfigureMavenRepositoriesWizardPage extends WizardPage implements 
 		}
 	}
 
+	private void openEditRepositoryDialog() {
+		if (selectedIncludedRepositories.size() != 1) {
+			return;
+		}
+		RepositoryWrapper selectedWrapper = selectedIncludedRepositories.iterator().next();
+		if (selectedWrapper == null || selectedWrapper.getProfileId() == null) {
+			return;
+		}
+		RepositoryWrapper editWrapper;
+		try {
+			editWrapper = selectedWrapper.clone();
+		} catch (CloneNotSupportedException e) {
+			Activator.log(e);
+			editWrapper = selectedWrapper;
+		}
+		AddRepositoryDialog dialog = new AddRepositoryDialog(getShell(), availableRepositories, 
+				includedRepositories, maven, artifactKey, editWrapper, isActive(editWrapper));
+		
+		dialog.setPreSelectedProfile(selectedWrapper.getProfileId());;
+		int ok = dialog.open();
+		if (ok == Window.OK) {
+			RepositoryWrapper wrapper = dialog.getRepositoryWrapper();
+			includedRepositories.remove(selectedWrapper);
+			removeRepository(selectedWrapper);
+			addRepository(wrapper, dialog.isActiveByDefault());
+			includedRepositories.add(wrapper);
+			setPageComplete(true);
+			refreshRepositories();
+		}
+	}
+	
 	private void openAddRepositoryDialog() {
 		AddRepositoryDialog dialog = new AddRepositoryDialog(getShell(), availableRepositories, includedRepositories, maven, artifactKey);
 		dialog.setPreSelectedProfile(preSelectedProfileId);
