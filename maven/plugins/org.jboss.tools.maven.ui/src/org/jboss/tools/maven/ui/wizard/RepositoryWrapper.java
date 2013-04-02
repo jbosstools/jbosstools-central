@@ -104,4 +104,16 @@ public class RepositoryWrapper implements Comparable<RepositoryWrapper> {
 		}
 		return s.compareTo(o.getDisplayName());
 	}
+
+	@Override
+	protected RepositoryWrapper clone() throws CloneNotSupportedException {
+		RepositoryWrapper wrapper;
+		if (repository != null) {
+			wrapper = new RepositoryWrapper(repository.clone());
+		} else {
+			wrapper = new RepositoryWrapper(repository);
+		}
+		wrapper.setProfileId(new String(profileId));
+		return wrapper;
+	}
 }
