@@ -66,7 +66,7 @@ public class ExpressionResolver {
      * @param expression the expression to resolve
      * @return the resolved string
      */
-    public String resolve(final String value) {
+    public String resolve(final String value) throws ExpressionResolutionException {
     	if(value==null) return null;
         final StringBuilder builder = new StringBuilder();
         final int len = value.length();
@@ -140,7 +140,7 @@ public class ExpressionResolver {
                                 state = DEFAULT;
                                 continue;
                             } else {
-                                throw new IllegalStateException("Failed to resolve expression: "+ value.substring(start - 2, i + 1));
+                                throw new ExpressionResolutionException("Failed to resolve expression: "+ value.substring(start - 2, i + 1));
                             }
                         }
                         default: {
@@ -175,7 +175,7 @@ public class ExpressionResolver {
                     continue;
                 }
                 default:
-                    throw new IllegalStateException("Unexpected char seen: "+ch);
+                    throw new ExpressionResolutionException("Unexpected char seen: "+ch);
             }
         }
         switch (state) {
@@ -190,7 +190,7 @@ public class ExpressionResolver {
             case GOT_OPEN_BRACE: {
                 // We had a reference that was not resolved, throw ISE
                 if (resolvedValue == null)
-                    throw new IllegalStateException("Incomplete expression: "+builder.toString());
+                    throw new ExpressionResolutionException("Incomplete expression: "+builder.toString());
                 break;
            }
         }

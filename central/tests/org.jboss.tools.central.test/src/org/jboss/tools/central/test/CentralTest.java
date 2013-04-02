@@ -51,7 +51,7 @@ import org.junit.Test;
 public class CentralTest {
 
 	private static JBossCentralEditor editor;
-	private static final String ORG_ECLIPSE_UI_INTERNAL_INTROVIEW = "org.eclipse.ui.internal.introview";
+	public static final String ORG_ECLIPSE_UI_INTERNAL_INTROVIEW = "org.eclipse.ui.internal.introview";
 
 
 	@BeforeClass
@@ -160,21 +160,26 @@ public class CentralTest {
 		return false;
 	}
 	
-	private void waitForJobs() {
-		
+	public static void waitForJobs() {
+
 		try {
-			PlatformUI.getWorkbench().getProgressService().busyCursorWhile(new IRunnableWithProgress() {
-				
-				@Override
-				public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
-					Job.getJobManager().join(JBossCentralActivator.JBOSS_CENTRAL_FAMILY, new NullProgressMonitor());
-				}
-			});
+			PlatformUI.getWorkbench().getProgressService()
+					.busyCursorWhile(new IRunnableWithProgress() {
+
+						@Override
+						public void run(IProgressMonitor monitor)
+								throws InvocationTargetException,
+								InterruptedException {
+							Job.getJobManager().join(
+									JBossCentralActivator.JBOSS_CENTRAL_FAMILY,
+									new NullProgressMonitor());
+						}
+					});
 		} catch (InvocationTargetException e) {
 			assertTrue("InvocationTargetException", false);
 		} catch (InterruptedException e) {
 			assertTrue("InterruptedException", false);
 		}
-}
+	}
 
 }

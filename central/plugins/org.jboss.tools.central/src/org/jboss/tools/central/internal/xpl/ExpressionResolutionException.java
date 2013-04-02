@@ -8,18 +8,18 @@
  * Contributors:
  *     JBoss by Red Hat - Initial implementation.
  ************************************************************************************/
-package org.jboss.tools.central;
+package org.jboss.tools.central.internal.xpl;
 
-import org.eclipse.osgi.util.NLS;
+/**
+ * Thrown to indicate that an attempt has been made to resolve
+ * expression ${sysPropertyName:defaultValue} in URL and it has
+ * failed to parse expression or to resolve it to actual value
+ * @author eskimo
+ */
+public class ExpressionResolutionException extends RuntimeException {
 
-public class Messages extends NLS {
-	private static final String BUNDLE_NAME = "org.jboss.tools.central.messages"; //$NON-NLS-1$
-	public static String DiscoveryViewer_Certification_Label0;
-	static {
-		// initialize resource bundle
-		NLS.initializeMessages(BUNDLE_NAME, Messages.class);
+	public ExpressionResolutionException(String message) {
+		super(message);
 	}
 
-	private Messages() {
-	}
 }
