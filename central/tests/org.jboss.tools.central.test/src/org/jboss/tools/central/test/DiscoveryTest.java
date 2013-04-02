@@ -13,18 +13,12 @@ package org.jboss.tools.central.test;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
-import static org.junit.Assert.fail;
 
-import java.io.ObjectInputStream.GetField;
 import java.lang.reflect.Field;
-import java.lang.reflect.Method;
-import java.net.URL;
 import java.util.List;
 
-import org.eclipse.jface.operation.IRunnableContext;
 import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IWorkbenchPage;
-import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.internal.WorkbenchWindow;
 import org.jboss.tools.central.JBossCentralActivator;
