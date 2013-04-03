@@ -30,6 +30,9 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.internal.WorkbenchWindow;
 import org.jboss.tools.central.JBossCentralActivator;
 import org.jboss.tools.central.ShowJBossCentral;
+import org.jboss.tools.central.actions.RefreshJBossBlogsHandler;
+import org.jboss.tools.central.actions.RefreshJBossNewsHandler;
+import org.jboss.tools.central.actions.RefreshJBossTutorialsHandler;
 import org.jboss.tools.central.editors.JBossCentralEditor;
 import org.jboss.tools.central.jobs.RefreshBlogsJob;
 import org.jboss.tools.central.jobs.RefreshNewsJob;
@@ -64,6 +67,9 @@ public class CentralTest {
 			page.hideView(welcomeView);
 		}
 		editor = JBossCentralActivator.getJBossCentralEditor(true);
+		new RefreshJBossTutorialsHandler().execute(null);
+		new RefreshJBossNewsHandler().execute(null);
+		new RefreshJBossBlogsHandler().execute(null);
 	}
 
 	@AfterClass
