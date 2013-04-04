@@ -35,6 +35,7 @@ import org.jboss.tools.central.actions.RefreshJBossNewsHandler;
 import org.jboss.tools.central.actions.RefreshJBossTutorialsHandler;
 import org.jboss.tools.central.editors.JBossCentralEditor;
 import org.jboss.tools.central.jobs.RefreshBlogsJob;
+import org.jboss.tools.central.jobs.RefreshBuzzJob;
 import org.jboss.tools.central.jobs.RefreshNewsJob;
 import org.jboss.tools.central.jobs.RefreshTutorialsJob;
 import org.jboss.tools.central.model.FeedsEntry;
@@ -118,6 +119,21 @@ public class CentralTest {
 				.getCacheFile().exists());
 	}
 
+
+	@Test
+	public void testBuzz() throws Exception {
+		waitForJobs();
+		List<FeedsEntry> buzz = RefreshBuzzJob.INSTANCE.getEntries();
+		assertFalse("No buzz found", buzz.isEmpty());
+	}
+
+	@Test
+	public void testCachingBuzz() throws Exception {
+		waitForJobs();
+		assertTrue("Buzz entries aren't cached", RefreshBuzzJob.INSTANCE
+				.getCacheFile().exists());
+	}
+	
 	@Test
 	public void testShowOnStartup() throws Exception {
 		EditorTestHelper.closeAllEditors();

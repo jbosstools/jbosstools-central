@@ -21,6 +21,9 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.core.runtime.preferences.IEclipsePreferences;
+import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener;
+import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent;
 import org.eclipse.jface.action.ControlContribution;
 import org.eclipse.jface.action.GroupMarker;
 import org.eclipse.jface.action.IToolBarManager;
@@ -40,10 +43,13 @@ import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
+import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Event;
@@ -87,12 +93,17 @@ public class JBossCentralEditor extends SharedHeaderFormEditor {
 	private Image gettingStartedImage;
 	private Image softwareImage;
 
+	private Composite settingsComposite;
+
 	private Composite toolbarComposite;
 
 	private Composite searchComposite;
 
+	static boolean useFefaultColors;
+	
 	public JBossCentralEditor() {
 		super();
+		useFefaultColors = true;
 	}
 
 	public void dispose() {
@@ -150,6 +161,7 @@ public class JBossCentralEditor extends SharedHeaderFormEditor {
 	@Override
 	protected void addPages() {
 		try {
+			//gettingStartedPage = new GettingStartedPage(this);
 			gettingStartedPage = new GettingStartedPage(this);
 			int index = addPage(gettingStartedPage);
 			if (gettingStartedImage == null) {
@@ -183,17 +195,26 @@ public class JBossCentralEditor extends SharedHeaderFormEditor {
 		final ScrolledForm form = headerForm.getForm();
 		//form.setText(JBOSS_CENTRAL);
 		new HeaderText(form);
-		form.setToolTipText(JBOSS_CENTRAL);
+		
+		form.setToolTipText("Welcome to JBoss");
 		form.setImage(getHeaderImage());
 		getToolkit().decorateFormHeading(form.getForm());
 		
 		final IToolBarManager toolbar = form.getToolBarManager();
+		ControlContribution settingsControl = new ControlContribution("Settings") {
+			@Override
+			protected Control createControl(Composite parent) {
+				return createSettingsControl(parent);
+			}
+		};
+		
 		ControlContribution searchControl = new ControlContribution("Search") {
 			@Override
 			protected Control createControl(Composite parent) {
 				return createSearchControl(parent);
 			}
 		};
+
 		toolbar.add(searchControl);
 		toolbar.add(new GroupMarker(COMMANDS_GROUP));
 		String[] commandIds = ProjectExamplesActivator.getDefault()
@@ -203,6 +224,7 @@ public class JBossCentralEditor extends SharedHeaderFormEditor {
 					.createContributionItem(getSite(), commandId);
 			toolbar.appendToGroup(COMMANDS_GROUP, item);
 		}
+		toolbar.add(settingsControl);
 
 		toolbar.update(true);
 		form.addDisposeListener(new DisposeListener() {
@@ -218,6 +240,62 @@ public class JBossCentralEditor extends SharedHeaderFormEditor {
 			}
 		});
 		form.layout(true, true);
+	}
+	
+	public Control createSettingsControl(Composite parent) {
+		
+		settingsComposite = getToolkit().createComposite(parent);
+		GridData gd = new GridData(SWT.BEGINNING, SWT.TOP, false, false);
+		gd.widthHint = 400;
+		settingsComposite.setLayoutData(gd);
+		settingsComposite.setBackground(null);
+		Color black = null;//Display.getDefault().getSystemColor(SWT.COLOR_BLACK);
+		settingsComposite.setBackground(black);
+	    GridLayout layout = new GridLayout(1, true);
+	    layout.horizontalSpacing = 30;
+	    settingsComposite.setLayout(layout);
+	    //GridDataFactory.fillDefaults().grab(true, true).applyTo(settingsComposite);
+		
+	    final Button showOnStartup = getToolkit().createButton(settingsComposite, "Show on Startup", SWT.CHECK);
+		showOnStartup.setLayoutData(new GridData(SWT.BEGINNING, SWT.TOP, false, false));
+		showOnStartup.setBackground(settingsComposite.getBackground());
+		showOnStartup.setSelection(JBossCentralActivator.getDefault().showJBossCentralOnStartup());
+		showOnStartup.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				IEclipsePreferences preferences = JBossCentralActivator.getDefault().getPreferences();
+				boolean showOnStartup = preferences.getBoolean(JBossCentralActivator.SHOW_JBOSS_CENTRAL_ON_STARTUP, JBossCentralActivator.SHOW_JBOSS_CENTRAL_ON_STARTUP_DEFAULT_VALUE);
+				preferences.putBoolean(JBossCentralActivator.SHOW_JBOSS_CENTRAL_ON_STARTUP, !showOnStartup);
+				JBossCentralActivator.getDefault().savePreferences();
+			}
+		
+		});
+
+		final IPreferenceChangeListener prefChangeListener = new IPreferenceChangeListener() {
+			@Override
+			public void preferenceChange(PreferenceChangeEvent event) {
+				if (JBossCentralActivator.SHOW_JBOSS_CENTRAL_ON_STARTUP.equals(event.getKey()) 
+						&& showOnStartup != null && !showOnStartup.isDisposed()) {
+					Object value = event.getNewValue();
+					if (value instanceof String && !showOnStartup.isDisposed()) {
+						boolean newValue = new Boolean((String)value).booleanValue();
+						showOnStartup.setSelection(newValue);
+					}
+				}
+			}
+		};
+		JBossCentralActivator.getDefault().getPreferences().addPreferenceChangeListener(prefChangeListener );
+		
+		settingsComposite.addDisposeListener(new DisposeListener() {
+			
+			@Override
+			public void widgetDisposed(DisposeEvent e) {
+				JBossCentralActivator.getDefault().getPreferences().removePreferenceChangeListener(prefChangeListener);
+				settingsComposite.removeDisposeListener(this);
+			}
+		});
+		
+		return settingsComposite;
 	}
 
 	protected Control createSearchControl(Composite parent) {
@@ -437,9 +515,17 @@ public class JBossCentralEditor extends SharedHeaderFormEditor {
 				titleViewer.setDocument(new Document());
 
 				titleLabel = titleViewer.getTextWidget();
-				titleLabel.setText(JBossCentralEditor.JBOSS_CENTRAL);
-				titleLabel.setForeground(heading.getForeground());
-				titleLabel.setFont(heading.getFont());
+				titleLabel.setText("Welcome to JBoss");
+				if (useFefaultColors) {
+					titleLabel.setForeground(heading.getForeground());
+				} else {
+					Color black = heading.getDisplay().getSystemColor(SWT.COLOR_BLACK);
+					titleLabel.setForeground(black);
+				}
+				
+				Font font = new Font(heading.getDisplay(),"Lucida Sans Unicode",14,SWT.NORMAL); 
+				//titleLabel.setFont(heading.getFont());
+				titleLabel.setFont(font);
 				titleLabel.addFocusListener(new FocusAdapter() {
 					public void focusLost(FocusEvent e) {
 						titleLabel.setSelection(0);
@@ -488,9 +574,10 @@ public class JBossCentralEditor extends SharedHeaderFormEditor {
 			int y = (titleLabel.getParent().getSize().y - size.y) / 2;
 			titleLabel.setBounds(busyLabel.getLocation().x + 20, y, size.x, size.y);
 			titleRegion.setBounds(5, 0, size.x + 40, size.y + 8 );
-			if (toolbarComposite != null && !toolbarComposite.isDisposed()) {
+			if (toolbarComposite != null && !toolbarComposite.isDisposed() && searchComposite != null && !searchComposite.isDisposed()) {
 				int formWidth = form.getSize().x;
 				int width = size.x + 40 + toolbarComposite.getSize().x;
+				
 				if (width > formWidth) {
 					searchComposite.setVisible(false);
 				} else{

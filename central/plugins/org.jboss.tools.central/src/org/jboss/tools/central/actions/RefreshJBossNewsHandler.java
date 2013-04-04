@@ -24,6 +24,7 @@ import org.jboss.tools.central.jobs.RefreshNewsJob;
  * @author snjeza
  *
  */
+@Deprecated
 public class RefreshJBossNewsHandler extends AbstractHandler {
 
 	@Override

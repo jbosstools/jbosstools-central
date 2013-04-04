@@ -18,6 +18,7 @@ import org.jboss.tools.project.examples.ProjectExamplesActivator;
  * @author snjeza
  *
  */
+@Deprecated
 public class OpenJBossBlogsHandler extends OpenWithBrowserHandler {
 
 	@Override

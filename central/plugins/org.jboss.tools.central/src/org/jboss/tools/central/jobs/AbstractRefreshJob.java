@@ -31,6 +31,7 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.jboss.tools.central.JBossCentralActivator;
 import org.jboss.tools.central.model.FeedsEntry;
+import org.jboss.tools.central.model.FeedsEntry.Type;
 import org.jboss.tools.project.examples.ProjectExamplesActivator;
 import org.jboss.tools.runtime.core.util.ECFTransport;
 
@@ -124,7 +125,7 @@ public abstract class AbstractRefreshJob extends Job {
 		}
 		title = StringEscapeUtils.escapeHtml(title);
 		String link;
-		if (entry.getLink() != null) {
+		if (entry.getUri() == null || entry.getUri().trim().isEmpty()) {
 			link = entry.getLink();
 		} else {
 			link = entry.getUri();
@@ -152,13 +153,28 @@ public abstract class AbstractRefreshJob extends Job {
 		} else {
 			date = entry.getPublishedDate();
 		}
-		String author = entry.getAuthor();
-		if (author != null) {
-			author = StringEscapeUtils.escapeHtml(author);
+		boolean isTwitterEntry = isTwitterEntry(entry);
+		FeedsEntry.Type type;
+		String author = entry.getAuthor() == null?"unknown author":entry.getAuthor(); 
+		if (isTwitterEntry) {
+			type= Type.TWITTER;
+			author=  author.replace("@twitter.com", "");
+		} else {
+			type = Type.BLOG;
 		}
+		
+//		if (author != null) {
+//			author = StringEscapeUtils.escapeHtml(author);
+//		}
 
 		// description = "&nbsp; " + description;
-		return new FeedsEntry(title, link, description, entry.getAuthor(), date);
+		return new FeedsEntry(title, link, description, author, date, type);
+	}
+
+	private boolean isTwitterEntry(SyndEntry entry) {
+		return entry.getUri() != null && 
+			   entry.getUri().contains("://twitter.com/") && 
+			   entry.getAuthor().contains("@twitter.com");
 	}
 
 	public Throwable getException() {

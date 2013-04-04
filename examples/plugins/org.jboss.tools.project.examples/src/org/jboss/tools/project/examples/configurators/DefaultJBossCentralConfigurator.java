@@ -59,10 +59,12 @@ public class DefaultJBossCentralConfigurator implements
 		}
 	}
 
-	private static final String TWITTER_LINK ="http://twitter.com/#!/jbosstools"; //$NON-NLS-1$
+	private static final String TWITTER_LINK ="http://twitter.com/jbosstools"; //$NON-NLS-1$
 	
 	private static final String BLOGS_URL = "http://planet.jboss.org/feeds/blogs"; //$NON-NLS-1$
-
+	
+	private static final String BUZZ_URL = "http://planet.jboss.org/feeds/buzz"; //$NON-NLS-1$
+	
 	private static final String NEWS_URL = "http://planet.jboss.org/feeds/news"; //$NON-NLS-1$
 
 	private Image headerImage;
@@ -70,8 +72,9 @@ public class DefaultJBossCentralConfigurator implements
 	@Override
 	public String[] getMainToolbarCommandIds() {
 		return new String[] {"org.jboss.tools.central.openJBossToolsHome",  //$NON-NLS-1$
-				"org.jboss.tools.central.favoriteAtEclipseMarketplace", //$NON-NLS-1$
-				"org.jboss.tools.central.preferences"}; //$NON-NLS-1$
+				"org.jboss.tools.central.favoriteAtEclipseMarketplace" //$NON-NLS-1$
+				//,"org.jboss.tools.central.preferences"
+				}; //$NON-NLS-1$
 	}
 
 	@Override
@@ -98,6 +101,11 @@ public class DefaultJBossCentralConfigurator implements
 	@Override
 	public String getNewsUrl() {
 		return NEWS_URL;
+	}
+	
+	@Override
+	public String getBuzzUrl() {
+		return BUZZ_URL;
 	}
 
 	@Override

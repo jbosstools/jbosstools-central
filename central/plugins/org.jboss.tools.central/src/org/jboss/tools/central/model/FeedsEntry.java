@@ -23,26 +23,42 @@ import com.ocpsoft.pretty.time.PrettyTime;
  *
  */
 public class FeedsEntry {
+	
+	public enum Type {
+		BLOG, TWITTER
+	}
+	
 	private String title;
 	private String link;
 	private String description;
 	private String author;
 	private Date date;
-
+	private Type type;
+	
 	public FeedsEntry() {
 	}
 
 	public FeedsEntry(String title, String link, String description,
 			String author, Date date) {
+		this(title, link, description, author, date, Type.BLOG);
+	}
+
+	public FeedsEntry(String title, String link, String description,
+			String author, Date date, Type type) {
 		this.title = title;
 		this.link = link;
 		this.description = description;
 		this.author = author;
 		this.date = date;
+		this.type = type;
 	}
 
 	public String getTitle() {
 		return title;
+	}
+
+	public FeedsEntry.Type getType() {
+		return type;
 	}
 
 	public void setTitle(String title) {
@@ -82,7 +98,7 @@ public class FeedsEntry {
 	}
 
 	public String getFormString(boolean escapeXml) {
-		StringBuffer buffer = new StringBuffer();
+		StringBuilder buffer = new StringBuilder();
 		buffer.append(JBossCentralActivator.FORM_START_TAG);
 		buffer.append("<img href=\"image\"/> ");
 		if (link != null && !link.isEmpty()) {
@@ -136,6 +152,46 @@ public class FeedsEntry {
 		return buffer.toString();
 	}
 
+	public String getShortString(boolean escapeXml) {
+		StringBuilder buffer = new StringBuilder();
+		buffer.append(JBossCentralActivator.FORM_START_TAG);
+		buffer.append("<img href=\"image\"/> ");
+		if (link != null && !link.isEmpty()) {
+			buffer.append("<a href=\"");
+			buffer.append(link);
+			buffer.append("\">");
+			buffer.append(escapeXml(title, escapeXml));
+			buffer.append("</a>");
+		} else {
+			buffer.append(escapeXml(title, escapeXml));
+		}
+		//buffer.append("<br/>");
+		boolean cr = false;
+		if (date != null) {
+			/*buffer.append("<span font=\"default\">");
+			buffer.append("posted ");
+			buffer.append("</span>");*/
+			buffer.append("<b>");
+			PrettyTime prettyTime = new PrettyTime(new Date());
+			buffer.append("&#160;" + prettyTime.format(date));
+			buffer.append("</b>");
+			cr = true;
+		}
+		if (author != null && !author.isEmpty() && !"(author unknown)".equalsIgnoreCase(author)) {
+			buffer.append(" ");
+			buffer.append("<span font=\"default\">");
+			buffer.append(" by");
+			buffer.append("</span>");
+			buffer.append(" ");
+			buffer.append("<span color=\"author\" font=\"author\">");
+			buffer.append(escapeXml(author, escapeXml));
+			buffer.append("</span>");
+			cr = true;
+		}
+		buffer.append(JBossCentralActivator.FORM_END_TAG);
+		return buffer.toString();
+	}
+
 	protected String escapeXml(String text, boolean escape) {
 		text = StringEscapeUtils.unescapeHtml(text);
 		if (escape) {
@@ -151,7 +207,7 @@ public class FeedsEntry {
 			return null;
 		}
 		boolean tagStarted = false;
-		StringBuffer buffer = new StringBuffer();
+		StringBuilder buffer = new StringBuilder();
 		for (char c:description.toCharArray()) {
 			if (c == '<') {
 				tagStarted = true;
@@ -165,10 +221,10 @@ public class FeedsEntry {
 			}
 		}
 		char[] chars = StringEscapeUtils.unescapeHtml(buffer.toString().trim()).toCharArray();
-		buffer = new StringBuffer();
+		buffer = new StringBuilder();
 		int i = 0;
 		for (char c:chars) {
-			if (i++ < 140) {
+			if (i++ < 180) {
 				buffer.append(c);
 			} else {
 				if ( (c == '_') ||

@@ -21,6 +21,7 @@ import org.jboss.tools.project.examples.ProjectExamplesActivator;
  * @author snjeza
  *
  */
+@Deprecated
 public class RefreshBlogsJob extends AbstractRefreshJob {
 
 	private static final String CACHE_FILE = "blogs.xml";

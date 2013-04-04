@@ -69,6 +69,12 @@
       </command>
 
       <command
+      		defaultHandler="org.jboss.tools.central.actions.OpenJBossBuzzHandler"
+            name="JBoss Buzz"
+            id="org.jboss.tools.central.openJBossBuzz">
+      </command>
+
+      <command
       		defaultHandler="org.jboss.tools.central.actions.RefreshJBossTutorialsHandler"
             name="Refresh"
             id="org.jboss.tools.central.refreshJBossTutorials">
@@ -82,6 +88,11 @@
       		defaultHandler="org.jboss.tools.central.actions.RefreshJBossNewsHandler"
             name="Refresh"
             id="org.jboss.tools.central.refreshJBossNews">
+      </command>
+      <command
+      		defaultHandler="org.jboss.tools.central.actions.RefreshJBossBuzzHandler"
+            name="Refresh"
+            id="org.jboss.tools.central.refreshJBossBuzz">
       </command>
       <command
       		defaultHandler="org.jboss.tools.central.actions.RefreshDiscoveryHandler"
@@ -133,6 +144,10 @@
       		name="Warning"
             id="org.jboss.tools.central.blogsWarning">
       </command>
+      <command
+      		name="Warning"
+            id="org.jboss.tools.central.buzzWarning">
+      </command>
 
    </extension>
 
@@ -151,11 +166,19 @@
             icon="icons/news.png">
       </image>
       <image
+            commandId="org.jboss.tools.central.openJBossBuzz"
+            icon="icons/buzz.gif">
+      </image>
+      <image
             commandId="org.jboss.tools.central.refreshJBossBlogs"
             icon="icons/refresh.gif">
       </image>
       <image
             commandId="org.jboss.tools.central.refreshJBossNews"
+            icon="icons/refresh.gif">
+      </image>
+      <image
+            commandId="org.jboss.tools.central.refreshJBossBuzz"
             icon="icons/refresh.gif">
       </image>
       <image

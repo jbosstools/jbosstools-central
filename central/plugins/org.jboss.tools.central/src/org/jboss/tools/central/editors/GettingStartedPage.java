@@ -1,5 +1,5 @@
 /*************************************************************************************
- * Copyright (c) 2008-2011 Red Hat, Inc. and others.
+ * Copyright (c) 2008-2013 Red Hat, Inc. and others.
  * All rights reserved. This program and the accompanying materials 
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -15,10 +15,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.apache.commons.lang.StringEscapeUtils;
 import org.eclipse.core.runtime.CoreException;
@@ -34,14 +32,12 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.IJobChangeEvent;
 import org.eclipse.core.runtime.jobs.IJobChangeListener;
 import org.eclipse.core.runtime.jobs.Job;
-import org.eclipse.core.runtime.preferences.IEclipsePreferences;
-import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener;
-import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IContributionItem;
 import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.layout.GridDataFactory;
+import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.JFaceColors;
 import org.eclipse.jface.resource.JFaceResources;
@@ -55,29 +51,30 @@ import org.eclipse.swt.events.ControlAdapter;
 import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
+import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
+import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.layout.RowLayout;
-import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.INewWizard;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.actions.ActionFactory.IWorkbenchAction;
-import org.eclipse.ui.forms.IFormColors;
+import org.eclipse.ui.forms.HyperlinkSettings;
 import org.eclipse.ui.forms.IManagedForm;
 import org.eclipse.ui.forms.editor.FormEditor;
-import org.eclipse.ui.forms.events.ExpansionAdapter;
-import org.eclipse.ui.forms.events.ExpansionEvent;
 import org.eclipse.ui.forms.events.HyperlinkAdapter;
 import org.eclipse.ui.forms.events.HyperlinkEvent;
 import org.eclipse.ui.forms.widgets.ExpandableComposite;
@@ -90,14 +87,11 @@ import org.eclipse.ui.forms.widgets.Section;
 import org.eclipse.ui.forms.widgets.TableWrapData;
 import org.eclipse.ui.forms.widgets.TableWrapLayout;
 import org.eclipse.ui.ide.IDEActionFactory;
-import org.eclipse.ui.internal.forms.widgets.FormFonts;
 import org.eclipse.ui.menus.CommandContributionItem;
 import org.eclipse.ui.part.PageBook;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.jboss.tools.central.JBossCentralActivator;
-import org.jboss.tools.central.jobs.AbstractRefreshJob;
-import org.jboss.tools.central.jobs.RefreshBlogsJob;
-import org.jboss.tools.central.jobs.RefreshNewsJob;
+import org.jboss.tools.central.jobs.RefreshBuzzJob;
 import org.jboss.tools.central.jobs.RefreshTutorialsJob;
 import org.jboss.tools.central.model.FeedsEntry;
 import org.jboss.tools.project.examples.ProjectExamplesActivator;
@@ -109,12 +103,12 @@ import org.osgi.framework.Bundle;
 /**
  * 
  * @author snjeza
+ * @author Fred Bricon
  *
  */
 public class GettingStartedPage extends AbstractJBossCentralPage {
 
-	private static final String NEWS_WARNING_ID = "org.jboss.tools.central.newsWarning";
-	private static final String BLOGS_WARNING_ID = "org.jboss.tools.central.blogsWarning";
+	private static final String BUZZ_WARNING_ID = "org.jboss.tools.central.buzzWarning";
 	
 	private static final String CLASS_ATTRIBUTE = "class";
 	public static final String ID = ID_PREFIX + "GettingStartedPage";
@@ -122,47 +116,43 @@ public class GettingStartedPage extends AbstractJBossCentralPage {
 	protected static final long TIME_DELAY = 2000L;
 	private IWorkbenchAction newWizardDropDownAction;
 	private ScrolledForm form;
-	private PageBook blogsPageBook;
-	private ScrolledComposite blogsScrollComposite;
-	private RefreshBlogsJobChangeListener refreshBlogsJobChangeListener;
-	private FormText blogsNoteText;
+	private PageBook buzzPageBook;
+	private ScrolledComposite buzzScrollComposite;
+	private RefreshBuzzJobChangeListener RefreshBuzzJobChangeListener;
+	private FormText buzzNoteText;
 	private FormText tutorialsNoteText;
-	private Composite blogsLoadingComposite;
+	private Composite buzzLoadingComposite;
 	private Composite tutorialsLoadingComposite;
-	private FormText blogsExceptionText;
+	private FormText buzzExceptionText;
 	private FormText tutorialsExceptionText;
-	private Composite blogsComposite;
+	private Composite buzzComposite;
 	private Composite tutorialsComposite;
+	private Composite comprehensiveTutorialComposite;
 	private FormToolkit toolkit;
 	private ScrolledComposite tutorialScrollComposite;
 	private PageBook tutorialPageBook;
 	private RefreshTutorialsJobChangeListener refreshTutorialsJobChangeListener;
-	private Section blogsSection;
+	private Section buzzSection;
 	private Section tutorialsSection;
 	private Section documentationSection;
 	private Section projectsSection;
+	private Section comprehensiveTutorialSection;
 	private Composite projectsComposite;
 	private Composite documentationComposite;
 	
-	private Set<ProjectExampleCategory> expandedCategories = new HashSet<ProjectExampleCategory>();
-	private Section newsSection;
-	private ScrolledComposite newsScrollComposite;
-	private PageBook newsPageBook;
-	private FormText newsNoteText;
-	private Composite newsLoadingComposite;
-	private FormText newsExceptionText;
-	private Composite newsComposite;
-	private RefreshNewsJobChangeListener refreshNewsJobChangeListener;
-	private Section settingsSection;
-	private Composite settingsComposite;
 	private Point oldSize;
-	private Font categoryFont;
-	private Action newsWarning;
-	private ToolBarManager newsToolBarManager;
-	private ToolBarManager blogsToolBarManager;
-	private Action blogsWarning;
+	private ToolBarManager buzzToolBarManager;
+	private Action buzzWarning;
 	private ToolBarManager tutorialsToolBarManager;
-	
+
+	HyperlinkSettings hyperlinkSettings;
+	private ScrolledComposite descriptionCompositeScroller;
+	private Label descriptionLabel;
+
+	protected ImageHyperlink highlightedLink;
+
+	private Composite descriptionComposite;
+
 	public GettingStartedPage(FormEditor editor) {
 		super(editor, ID, "Getting Started");
 	}
@@ -170,31 +160,36 @@ public class GettingStartedPage extends AbstractJBossCentralPage {
 	@Override
 	protected void createFormContent(IManagedForm managedForm) {
 		super.createFormContent(managedForm);
+
+		hyperlinkSettings = new HyperlinkSettings(getDisplay());
+		hyperlinkSettings.setHyperlinkUnderlineMode(HyperlinkSettings.UNDERLINE_NEVER);
+		
 		toolkit = managedForm.getToolkit();
 		form = managedForm.getForm();
 		
 		Composite body = form.getBody();
-	    GridLayout gridLayout = new GridLayout(2, true);
-	    gridLayout.horizontalSpacing = 7;
-	    body.setLayout(gridLayout);
-	    GridData gd = new GridData(SWT.FILL, SWT.FILL, true, true);
-	    body.setLayoutData(gd);
-	    toolkit.paintBordersFor(body);
+	    body.setLayout(new GridLayout(1,false));
 	    
-		Composite left = createComposite(toolkit, body);
-		createProjectsSection(toolkit, left);
-		createTutorialsSection(toolkit, left);
-		createDocumentationSection(toolkit, left);
-		createSettingsSection(toolkit, left);
-		toolkit.paintBordersFor(left);
-				
-		Composite right = createComposite(toolkit, body);
-		createNewsSection(toolkit, right);
-		createBlogsSection(toolkit, right);
-		toolkit.paintBordersFor(right);
-				
-		final ControlAdapter controlAdapter = new ControlAdapter() {
+	    //Project section
+		Composite top = createComposite(toolkit, body);
+		createProjectsSection(toolkit, top);
+		
+		//Quickstarts + tutorial   
+	    Composite middle = createComposite(toolkit, body);
+	    ((GridLayout)middle.getLayout()).makeColumnsEqualWidth = false;
+	    ((GridLayout)middle.getLayout()).numColumns = 2;
+	    GridDataFactory.fillDefaults().grab(true, false).applyTo(middle);
+	    createSamplesSection(toolkit, middle);
+		createComprehensiveTutorial(toolkit, middle);
 
+		//JBoss Buzz + Doc
+		Composite bottom = createComposite(toolkit, body);
+		bottom.setLayout(new GridLayout(2, false));
+		bottom.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
+		createBuzzSection(toolkit, bottom);
+		createDocumentationSection(toolkit, bottom);
+
+		final ControlAdapter controlAdapter = new ControlAdapter() {
 			@Override
 			public void controlResized(ControlEvent e) {
 				resize();
@@ -210,114 +205,72 @@ public class GettingStartedPage extends AbstractJBossCentralPage {
 				form.removeDisposeListener(this);
 			}
 		});
-		
-		resize();
-	    
 	}
 
-	private void createBlogsSection(FormToolkit toolkit, Composite parent) {
-		blogsSection = createSection(toolkit, parent, "Blogs", ExpandableComposite.TITLE_BAR|ExpandableComposite.EXPANDED|ExpandableComposite.TWISTIE);
-	    GridData gd = new GridData(SWT.FILL, SWT.FILL, true, false);
-	    blogsSection.setLayoutData(gd);
-		createBlogsToolbar(toolkit, blogsSection);
+	private void createComprehensiveTutorial(FormToolkit toolkit,	Composite parent) {
+		
+		comprehensiveTutorialSection = createSection(toolkit, parent, "Comprehensive Tutorial", ExpandableComposite.TITLE_BAR);
+		GridData gd = new GridData(SWT.FILL, SWT.TOP, true, true);
+		comprehensiveTutorialSection.setLayoutData(gd);
+		
+		comprehensiveTutorialComposite = toolkit.createComposite(comprehensiveTutorialSection);
+		GridLayout layout = new GridLayout();
+	    layout.horizontalSpacing = 10;
+	    comprehensiveTutorialComposite.setLayout(layout);
+	    ImageHyperlink thumb = toolkit.createImageHyperlink(comprehensiveTutorialComposite, SWT.NONE);
+	    Image ticketMonsterImage = JBossCentralActivator.getDefault().getImage("/icons/TicketMonster_thumbnail.png");;
+		thumb.setImage(ticketMonsterImage);
+		thumb.setHref("http://www.jboss.org/jdf/examples/get-started/");
+		thumb.addHyperlinkListener(new HyperlinkOpener());
+		thumb.setToolTipText("Open the Ticket Monster tutorial on the JBoss Developer Framework site");
+		GridDataFactory.fillDefaults().grab(true, true).applyTo(comprehensiveTutorialComposite);
+		comprehensiveTutorialSection.setClient(comprehensiveTutorialComposite);
+	}
+		
+
+	private void createBuzzSection(FormToolkit toolkit, Composite parent) {
+		buzzSection = createSection(toolkit, parent, "JBoss Buzz", ExpandableComposite.TITLE_BAR);
+		buzzSection.setLayout(new GridLayout(1, false));
+		buzzSection.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
+	    
+		createBuzzToolbar(toolkit, buzzSection);
 				
-		blogsScrollComposite = new ScrolledComposite(blogsSection, SWT.V_SCROLL);
-		gd =new GridData(SWT.FILL, SWT.FILL, true, false);
-		blogsScrollComposite.setLayoutData(gd);
-		blogsScrollComposite.setLayout(new GridLayout());
+		buzzScrollComposite = new ScrolledComposite(buzzSection, SWT.V_SCROLL);
+		buzzScrollComposite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, false));
+		buzzScrollComposite.setLayout(new GridLayout());
+		toolkit.adapt(buzzScrollComposite);
 		
-		blogsPageBook = new PageBook(blogsScrollComposite, SWT.WRAP);
-		gd =new GridData(SWT.FILL, SWT.FILL, true, false);
-	    blogsPageBook.setLayoutData(gd);
+		buzzPageBook = new PageBook(buzzScrollComposite, SWT.WRAP);
+	    buzzPageBook.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, true));
         
-        blogsScrollComposite.setContent(blogsPageBook);
-    	blogsScrollComposite.setExpandVertical(true);
-    	blogsScrollComposite.setExpandHorizontal(true);
-    	blogsScrollComposite.setAlwaysShowScrollBars(false);
+        buzzScrollComposite.setContent(buzzPageBook);
+    	buzzScrollComposite.setExpandVertical(true);
+    	buzzScrollComposite.setExpandHorizontal(true);
+    	buzzScrollComposite.setAlwaysShowScrollBars(false);
 
-    	blogsNoteText = createNoteText(toolkit, blogsPageBook);
-	    blogsLoadingComposite = createLoadingComposite(toolkit, blogsPageBook);	    
-	    blogsExceptionText = createExceptionText(toolkit, blogsPageBook);
+    	buzzNoteText = createNoteText(toolkit, buzzPageBook);
+	    buzzLoadingComposite = createLoadingComposite(toolkit, buzzPageBook);	    
+	    buzzExceptionText = createExceptionText(toolkit, buzzPageBook);
 		
-	    blogsComposite = toolkit.createComposite(blogsPageBook, SWT.NONE);	    
-		blogsComposite.setLayout(new TableWrapLayout());
-		GridDataFactory.fillDefaults().grab(true, false).applyTo(blogsComposite);
-
-		blogsSection.setClient(blogsScrollComposite);
-		blogsSection.addExpansionListener(new ExpansionAdapter() {
-
-			@Override
-			public void expansionStateChanged(ExpansionEvent e) {
-				resize(true);
-			}
-			
-		});
-		showLoading(blogsPageBook, blogsLoadingComposite, blogsScrollComposite);
-		blogsPageBook.pack(true);
-		RefreshBlogsJob job = RefreshBlogsJob.INSTANCE;
+	    buzzComposite = toolkit.createComposite(buzzPageBook, SWT.NONE);	    
+		buzzComposite.setLayout(new TableWrapLayout());
+		GridDataFactory.fillDefaults().grab(true, false).applyTo(buzzComposite);
+		buzzSection.setClient(buzzScrollComposite);
+		
+		showLoading(buzzPageBook, buzzLoadingComposite, buzzScrollComposite);
+		buzzPageBook.pack(true);
+		RefreshBuzzJob job = RefreshBuzzJob.INSTANCE;
 		job.setException(null);
 		if (job.getEntries().size() > 0) {
 			job.setNeedsRefresh(true);
-			refreshBlogs();
+			refreshBuzz();
 			job.setNeedsRefresh(false);
 		}
-		refreshBlogsJobChangeListener = new RefreshBlogsJobChangeListener();
-		job.addJobChangeListener(refreshBlogsJobChangeListener);
+		RefreshBuzzJobChangeListener = new RefreshBuzzJobChangeListener();
+		job.addJobChangeListener(RefreshBuzzJobChangeListener);
 		job.schedule();
 	}
 	
-	private void createNewsSection(FormToolkit toolkit, Composite parent) {
-		newsSection = createSection(toolkit, parent, "News", ExpandableComposite.TITLE_BAR|ExpandableComposite.EXPANDED|ExpandableComposite.TWISTIE);
-	    GridData gd = new GridData(SWT.FILL, SWT.FILL, true, false);
-	    newsSection.setLayoutData(gd);
-		createNewsToolbar(toolkit, newsSection);
-				
-		newsScrollComposite = new ScrolledComposite(newsSection, SWT.V_SCROLL);
-		gd =new GridData(SWT.FILL, SWT.FILL, true, false);
-		newsScrollComposite.setLayoutData(gd);
-		newsScrollComposite.setLayout(new GridLayout());
-		
-		newsPageBook = new PageBook(newsScrollComposite, SWT.WRAP);
-		gd =new GridData(SWT.FILL, SWT.FILL, true, false);
-	    newsPageBook.setLayoutData(gd);
-        
-        newsScrollComposite.setContent(newsPageBook);
-    	newsScrollComposite.setExpandVertical(true);
-    	newsScrollComposite.setExpandHorizontal(true);
-    	newsScrollComposite.setAlwaysShowScrollBars(false);
-
-    	newsNoteText = createNoteText(toolkit, newsPageBook);
-	    newsLoadingComposite = createLoadingComposite(toolkit, newsPageBook);	    
-	    newsExceptionText = createExceptionText(toolkit, newsPageBook);
-		
-	    newsComposite = toolkit.createComposite(newsPageBook, SWT.NONE);	    
-		newsComposite.setLayout(new TableWrapLayout());
-		GridDataFactory.fillDefaults().grab(true, false).applyTo(newsComposite);
-
-		newsSection.setClient(newsScrollComposite);
-		newsSection.addExpansionListener(new ExpansionAdapter() {
-
-			@Override
-			public void expansionStateChanged(ExpansionEvent e) {
-				resize(true);
-			}
-			
-		});
-		showLoading(newsPageBook, newsLoadingComposite, newsScrollComposite);
-		newsPageBook.pack(true);
-		AbstractRefreshJob job = RefreshNewsJob.INSTANCE;
-		job.setException(null);
-		if (job.getEntries().size() > 0) {
-			job.setNeedsRefresh(true);
-			refreshNews();
-			job.setNeedsRefresh(false);
-		}
-		refreshNewsJobChangeListener = new RefreshNewsJobChangeListener();
-		job.addJobChangeListener(refreshNewsJobChangeListener);
-		job.schedule();
-	}
-
-
 	private FormText createExceptionText(FormToolkit toolkit, Composite parent) {
 		FormText formText = toolkit.createFormText(parent, true);
 		GridData gd = new GridData(GridData.FILL, GridData.FILL, false, false);
@@ -341,7 +294,7 @@ public class GettingStartedPage extends AbstractJBossCentralPage {
 		return formText;
 	}
 
-	private void createBlogsToolbar(FormToolkit toolkit, Section section) {
+	private void createBuzzToolbar(FormToolkit toolkit, Section section) {
 		Composite headerComposite = toolkit.createComposite(section, SWT.NONE);
 	    RowLayout rowLayout = new RowLayout();
 	    rowLayout.marginTop = 0;
@@ -350,65 +303,34 @@ public class GettingStartedPage extends AbstractJBossCentralPage {
 	    headerComposite.setBackground(null);
 	    
 	    
-	    blogsToolBarManager = new ToolBarManager(SWT.FLAT | SWT.HORIZONTAL);
-		blogsToolBarManager.createControl(headerComposite);
+	    buzzToolBarManager = new ToolBarManager(SWT.FLAT | SWT.HORIZONTAL);
+		buzzToolBarManager.createControl(headerComposite);
 		
-		blogsWarning = new Action("Warning", JBossCentralActivator.getImageDescriptor("/icons/nwarning.gif")) {
-			
-		};
-		blogsWarning.setId(BLOGS_WARNING_ID);
-		blogsWarning.setActionDefinitionId(BLOGS_WARNING_ID);
+		buzzWarning = new Action("Warning", JBossCentralActivator.getImageDescriptor("/icons/nwarning.gif")) {};
+		buzzWarning.setId(BUZZ_WARNING_ID);
+		buzzWarning.setActionDefinitionId(BUZZ_WARNING_ID);
 
-		blogsToolBarManager.add(blogsWarning);
+		buzzToolBarManager.add(buzzWarning);
 		
-		setItemVisible(blogsToolBarManager, BLOGS_WARNING_ID, false);
+		setItemVisible(buzzToolBarManager, BUZZ_WARNING_ID, false);
 		
-		CommandContributionItem item = JBossCentralActivator.createContributionItem(getSite(), "org.jboss.tools.central.openJBossBlogs");
-		blogsToolBarManager.add(item);
-		
-		item = JBossCentralActivator.createContributionItem(getSite(), "org.jboss.tools.central.refreshJBossBlogs");
-		blogsToolBarManager.add(item);
+		CommandContributionItem item = JBossCentralActivator.createContributionItem(getSite(), "org.jboss.tools.central.openJBossBuzz");
+		buzzToolBarManager.add(item);
 
-	    blogsToolBarManager.update(true);
+		item = JBossCentralActivator.createContributionItem(getSite(), "org.jboss.tools.central.openJBossNews");
+		buzzToolBarManager.add(item);
+
+		item = JBossCentralActivator.createContributionItem(getSite(), "org.jboss.tools.central.openJBossToolsTwitter");
+		buzzToolBarManager.add(item);
+				
+		item = JBossCentralActivator.createContributionItem(getSite(), "org.jboss.tools.central.refreshJBossBuzz");
+		buzzToolBarManager.add(item);
+
+	    buzzToolBarManager.update(true);
 	    
 		section.setTextClient(headerComposite);
 	}
 	
-	private void createNewsToolbar(FormToolkit toolkit, Section section) {
-		Composite headerComposite = toolkit.createComposite(section, SWT.NONE);
-	    RowLayout rowLayout = new RowLayout();
-	    rowLayout.marginTop = 0;
-	    rowLayout.marginBottom = 0;
-	    headerComposite.setLayout(rowLayout);
-	    headerComposite.setBackground(null);
-	    
-	    newsToolBarManager = new ToolBarManager(SWT.FLAT | SWT.HORIZONTAL);
-		newsToolBarManager.createControl(headerComposite);
-		
-		newsWarning = new Action("Warning", JBossCentralActivator.getImageDescriptor("/icons/nwarning.gif")) {
-			
-		};
-		newsWarning.setId(NEWS_WARNING_ID);
-		newsWarning.setActionDefinitionId(NEWS_WARNING_ID);
-
-		newsToolBarManager.add(newsWarning);
-		
-		setItemVisible(newsToolBarManager, NEWS_WARNING_ID, false);
-		
-		CommandContributionItem item = JBossCentralActivator.createContributionItem(getSite(), "org.jboss.tools.central.openJBossNews");
-		newsToolBarManager.add(item);
-		
-		item = JBossCentralActivator.createContributionItem(getSite(), "org.jboss.tools.central.openJBossToolsTwitter");
-		newsToolBarManager.add(item);
-		
-		item = JBossCentralActivator.createContributionItem(getSite(), "org.jboss.tools.central.refreshJBossNews");
-		newsToolBarManager.add(item);
-
-	    newsToolBarManager.update(true);
-	    
-		section.setTextClient(headerComposite);
-	}
-
 	protected void setItemVisible(ToolBarManager toolBarManager, String id, boolean value) {
 		IContributionItem[] items = toolBarManager.getItems();
 		for (IContributionItem item:items)  {
@@ -417,17 +339,16 @@ public class GettingStartedPage extends AbstractJBossCentralPage {
 			}
 		}
 	}
-
 	
-	private void createTutorialsSection(FormToolkit toolkit, Composite parent) {
-		tutorialsSection = createSection(toolkit, parent, "Project Examples", ExpandableComposite.TITLE_BAR|ExpandableComposite.TWISTIE|ExpandableComposite.EXPANDED);
-	    GridData gd = new GridData(SWT.FILL, SWT.FILL, false, false);
+	private void createSamplesSection(FormToolkit toolkit, Composite parent) {
+		tutorialsSection = createSection(toolkit, parent, "Start from a sample", ExpandableComposite.TITLE_BAR);
+	    GridData gd = new GridData(SWT.FILL, SWT.TOP, true, false);
 	    tutorialsSection.setLayoutData(gd);
 	    
 	    createTutorialsToolbar(toolkit, tutorialsSection);
 		
 	    tutorialScrollComposite = new ScrolledComposite(tutorialsSection, SWT.V_SCROLL);
-		gd = new GridData(SWT.FILL, SWT.FILL, false, false);
+	    gd = new GridData(SWT.FILL, SWT.FILL, false, false);
 		tutorialScrollComposite.setLayoutData(gd);
 		tutorialScrollComposite.setLayout(new GridLayout());
 		toolkit.adapt(tutorialScrollComposite);
@@ -447,21 +368,13 @@ public class GettingStartedPage extends AbstractJBossCentralPage {
 
 	    tutorialsComposite = toolkit.createComposite(tutorialPageBook, SWT.NONE);	    
 		tutorialsComposite.setLayout(new GridLayout());
-		gd =new GridData(SWT.FILL, SWT.FILL, false, false);
+		gd =new GridData(SWT.FILL, SWT.FILL, true, false);
 		tutorialsComposite.setLayoutData(gd);
-				        
 	    tutorialsSection.setClient(tutorialScrollComposite);
-	    
-	    tutorialsSection.addExpansionListener(new ExpansionAdapter() {
-						
-			@Override
-			public void expansionStateChanged(ExpansionEvent e) {
-				resize(true);
-			}
-		});
-	    
-		showLoading(tutorialPageBook, tutorialsLoadingComposite, tutorialScrollComposite);
+
+	    showLoading(tutorialPageBook, tutorialsLoadingComposite, tutorialScrollComposite);
 		tutorialPageBook.pack(true);
+		
 		RefreshTutorialsJob refreshTutorialsJob = RefreshTutorialsJob.INSTANCE;
 		refreshTutorialsJobChangeListener = new RefreshTutorialsJobChangeListener();
 		refreshTutorialsJob.addJobChangeListener(refreshTutorialsJobChangeListener);
@@ -491,51 +404,45 @@ public class GettingStartedPage extends AbstractJBossCentralPage {
 		item = JBossCentralActivator.createContributionItem(getSite(), "org.jboss.tools.central.refreshJBossTutorials");
 		tutorialsToolBarManager.add(item);
 
-		//Action action = new DownloadRuntimeAction("Download and Install JBoss AS 7.0.1", JBossCentralActivator.imageDescriptorFromPlugin(JBossCentralActivator.PLUGIN_ID, "/icons/jbossas7.png"), "org.jboss.tools.runtime.core.as.701");
-		//toolBarManager.add(action);
-
 	    tutorialsToolBarManager.update(true);
 	    
 		section.setTextClient(headerComposite);
 	}
 	
 	public void createProjectsSection(FormToolkit toolkit, Composite parent) {
-		projectsSection = createSection(toolkit, parent, "Create Projects", ExpandableComposite.TITLE_BAR|ExpandableComposite.TWISTIE|ExpandableComposite.EXPANDED);
-		projectsSection.setText("Create Projects");
-	    projectsSection.setLayout(new GridLayout());
-	    GridData gd = new GridData(SWT.FILL, SWT.FILL, false, false);
-	    projectsSection.setLayoutData(gd);
+		projectsSection = createSection(toolkit, parent, "Start from scratch", ExpandableComposite.TITLE_BAR);
+		projectsSection.setText("Start from scratch");
+	    GridDataFactory.fillDefaults().grab(true, false).applyTo(projectsSection);
+
+	    //Create header / toolbar composite
+    	Composite headerComposite = toolkit.createComposite(projectsSection, SWT.NONE);
+    	RowLayout rowLayout = new RowLayout();
+    	rowLayout.marginTop = 0;
+    	rowLayout.marginBottom = 0;
+    	headerComposite.setLayout(rowLayout);
+    	headerComposite.setBackground(null);
+    	
+    	ToolBarManager toolBarManager = new ToolBarManager(SWT.FLAT | SWT.HORIZONTAL);
+    	toolBarManager.createControl(headerComposite);
+    	
+    	IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
+    	newWizardDropDownAction = IDEActionFactory.NEW_WIZARD_DROP_DOWN
+    			.create(window);
+    	toolBarManager.add(newWizardDropDownAction);
+    	toolBarManager.update(true);
+    	projectsSection.setTextClient(headerComposite);
+ 
+	    //Create 3 col container composite
+    	Composite scratchComposite = toolkit.createComposite(projectsSection, SWT.NONE);
+	    GridLayoutFactory.fillDefaults().numColumns(3).spacing(10, SWT.DEFAULT).applyTo(scratchComposite);
 	    
-	    Composite headerComposite = toolkit.createComposite(projectsSection, SWT.NONE);
-	    RowLayout rowLayout = new RowLayout();
-	    rowLayout.marginTop = 0;
-	    rowLayout.marginBottom = 0;
-	    headerComposite.setLayout(rowLayout);
-	    headerComposite.setBackground(null);
-	    
-	    ToolBarManager toolBarManager = new ToolBarManager(SWT.FLAT | SWT.HORIZONTAL);
-		toolBarManager.createControl(headerComposite);
-	
-	    IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
-		newWizardDropDownAction = IDEActionFactory.NEW_WIZARD_DROP_DOWN
-                .create(window);
-	    toolBarManager.add(newWizardDropDownAction);
-	    toolBarManager.update(true);
-	    
-		projectsSection.setTextClient(headerComposite);
-		projectsSection.addExpansionListener(new ExpansionAdapter() {
-			
-			@Override
-			public void expansionStateChanged(ExpansionEvent e) {
-				resize(true);
-			}
-		});
-		
-		projectsComposite = toolkit.createComposite(projectsSection);
-	    GridLayout layout = new GridLayout(2, true);
+	    //Create icons / wizard composite
+		projectsComposite = toolkit.createComposite(scratchComposite);
+		GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.FILL).applyTo(projectsComposite);
+	    GridLayout layout = new GridLayout(3, true);
 	    layout.horizontalSpacing = 10;
+	    layout.marginBottom = 10;
 	    projectsComposite.setLayout(layout);
-	    GridDataFactory.fillDefaults().grab(true, true).applyTo(projectsComposite);
 
 	    IExtensionRegistry extensionRegistry = Platform.getExtensionRegistry();
 	    IExtensionPoint extensionPoint = extensionRegistry.getExtensionPoint("org.eclipse.ui.newWizards");
@@ -559,18 +466,52 @@ public class GettingStartedPage extends AbstractJBossCentralPage {
 				createProjectLink(toolkit, projectsComposite, element);
 			}
 		}
-		
-		projectsSection.setClient(projectsComposite);
+	  
+	  //Create vertical separator composite
+	  Composite filler = createComposite(toolkit, scratchComposite);
+      Color grey = toolkit.getColors().createColor("grey", 194, 194, 194);
+      filler.setBackground(grey);
+      GridDataFactory.fillDefaults().grab(false, true).hint(1, SWT.DEFAULT).applyTo(filler);
+	    
+	  //Create project wizard description composite
+      descriptionCompositeScroller = new ScrolledComposite(scratchComposite, SWT.V_SCROLL);
+      descriptionCompositeScroller.setLayout(new FillLayout());
+      descriptionCompositeScroller.setAlwaysShowScrollBars(false);
+      descriptionComposite = createComposite(toolkit, descriptionCompositeScroller);
+      descriptionLabel = toolkit.createLabel(descriptionComposite, "", SWT.WRAP);
+      descriptionCompositeScroller.setExpandVertical(true);
+      descriptionCompositeScroller.setExpandHorizontal(true);
+      descriptionCompositeScroller.setContent(descriptionComposite);
+	  projectsSection.setClient(scratchComposite);
+	  resizedescriptionCompositeScroller();
 	}
 
+	private void setDescriptionLabel(String text) {
+		if (!text.equals(descriptionLabel.getText())) {
+			descriptionLabel.setText(text);
+			resizedescriptionCompositeScroller();
+		}
+	}
+	
+	private void resizedescriptionCompositeScroller() {
+		  if (projectsComposite == null || descriptionCompositeScroller==null) return;
+	      int total = form.getClientArea().width;
+	      int projectsSize = projectsComposite.getClientArea().width + 60;
+	      int width = total - projectsSize;
 
+	      GridDataFactory.fillDefaults().grab(true, true).hint(width, descriptionCompositeScroller.getClientArea().height).applyTo(descriptionCompositeScroller);
+ 		  GridDataFactory.fillDefaults().hint(descriptionCompositeScroller.getClientArea().width, SWT.DEFAULT).applyTo(descriptionLabel);
+		  recomputeScrollComposite(descriptionCompositeScroller, descriptionComposite);
+		  descriptionCompositeScroller.layout(true, true);
+	}
+	
 	private void createProjectLink(FormToolkit toolkit, Composite composite,
 			final IConfigurationElement element) {
 		if (element == null) {
 			return;
 		}
-		String name = element.getAttribute("name");
-		String id = element.getAttribute("id");
+		final String name = element.getAttribute("name");
+		final String id = element.getAttribute("id");
 		if (name == null || id == null) {
 			return;
 		}
@@ -584,7 +525,8 @@ public class GettingStartedPage extends AbstractJBossCentralPage {
 				image = JBossCentralActivator.getDefault().getImage(imageDescriptor);
 			}
 		}
-		ImageHyperlink link = toolkit.createImageHyperlink(composite, SWT.NONE);
+		final ImageHyperlink link = toolkit.createImageHyperlink(composite, SWT.NONE);
+		link.setUnderlined(false);
 	    link.setText(name);
 	    if (image != null) {
 	    	link.setImage(image);
@@ -611,6 +553,45 @@ public class GettingStartedPage extends AbstractJBossCentralPage {
 			}
 	    	
 	    });
+	    
+	    final Color originalColor = composite.getBackground();
+	    final Color blueish = toolkit.getColors().createColor("blue", 217, 230, 248);
+
+	    link.addListener(SWT.MouseEnter, new Listener() {
+			@Override
+			public void handleEvent(Event arg0) {
+				if (highlightedLink != null) {
+					highlightedLink.setBackground(originalColor);
+				}
+				setDescriptionLabel(getTemporaryHardCodedDescription(name));
+				highlightedLink = link;
+				highlightedLink.setBackground(blueish);
+			}
+
+			private String getTemporaryHardCodedDescription(String name) {
+				String description = "";
+				if ("HTML5 Project".equals(name)) {
+					description = name + " is a sample, deployable Maven 3 project to help you get started developing a Mobile HTML5 web application "
+							+ "on JBoss Enterprise Application Platform 6 or JBoss Application Server 7.1. "
+							+ "This project creates a pure HTML5 based front end which interacts with server side content through RESTful endpoints";
+				} else if ("OpenShift Application".equals(name)) {
+					description = "Create any kind of application and deploy it in the cloud using OpenShift from Red Hat";
+				} else if ("Java EE Web Project".equals(name)) {
+					description = name + " is a sample, deployable Maven 3 project to help you get your foot in the door developing with Java EE 6 "
+							+ "on JBoss Enterprise Application Platform 6 or JBoss Application Server 7.1. "
+							+ "This project is setup to allow you to create a compliant Java EE 6 application using JSF 2.0, CDI 1.0, EJB 3.1, JPA 2.0 and Bean Validation 1.0.";
+				} else if ("RichFaces Project".equals(name)) {
+					description = name + " is a sample, deployable Maven 3 project to help you get started developing a JSF 2.0 application with RichFaces "
+							+ "on JBoss Enterprise Application Platform 6 or JBoss Application Server 7.1. ";
+				} else if ("GWT Web Project".equals(name)) {
+					description = name + " is a sample, deployable Maven 3 project to help you get started developing a GWT application with Java EE 6 and Errai.";
+				} else if ("Spring MVC Project".equals(name)) {
+					description = name + " is a sample, deployable Maven 3 project to help you get started developing a Spring MVC application with Java EE persistence settings "
+							+ "(server bootstrapped JPA, JTA transaction management) for JBoss Enterprise Application Platform 6 or JBoss Application Server 7.1";
+				}
+				return (description.isEmpty())?name:description;
+			}
+		});
 	}
 
 	public static Object createExtension(final IConfigurationElement element) throws CoreException {
@@ -662,85 +643,31 @@ public class GettingStartedPage extends AbstractJBossCentralPage {
 	}
 	
 	public void createDocumentationSection(FormToolkit toolkit, Composite parent) {
-		documentationSection = createSection(toolkit, parent, "Documentation", ExpandableComposite.TITLE_BAR|ExpandableComposite.TWISTIE|ExpandableComposite.EXPANDED);
-	    GridData gd = new GridData(SWT.FILL, SWT.FILL, false, false);
-	    documentationSection.setLayoutData(gd);
-	    
+
+		documentationSection = createSection(toolkit, parent, "Other resources", SWT.NONE);
+		documentationSection.setLayout(new GridLayout(1, false));
+		documentationSection.setLayoutData(new GridData(SWT.RIGHT, SWT.TOP, false, false, 1, 1));
+		
 		documentationComposite = toolkit.createComposite(documentationSection);
-	    GridLayout layout = new GridLayout(2, true);
-	    layout.horizontalSpacing = 30;
+		GridData gd = new GridData(SWT.RIGHT, SWT.TOP, true, true, 1, 1);
+		documentationComposite.setLayoutData(gd);
+
+		GridLayout layout = new GridLayout(1, true);
 	    documentationComposite.setLayout(layout);
-	    GridDataFactory.fillDefaults().grab(true, true).applyTo(documentationComposite);
 	    
-		addHyperlink(toolkit, documentationComposite, "New and Noteworthy", "http://docs.jboss.org/tools/whatsnew/");
-		addHyperlink(toolkit, documentationComposite, "User Forum", "http://community.jboss.org/en/tools?view=discussions");
-		
-		addHyperlink(toolkit, documentationComposite, "Reference", "http://docs.jboss.org/tools/latest/");
+		addHyperlink(toolkit, documentationComposite, "JBoss developer website", "http://docs.jboss.org/tools/");
+		addHyperlink(toolkit, documentationComposite, "User Forum", "http://community.jboss.org/en/tools?view=discussions");		
 		addHyperlink(toolkit, documentationComposite, "Developer Forum", "http://community.jboss.org/en/tools/dev?view=discussions");
-		
-		addHyperlink(toolkit, documentationComposite, "FAQ", "http://www.jboss.org/tools/docs/faq");
-		addHyperlink(toolkit, documentationComposite, "Wiki", "http://community.jboss.org/wiki/JBossTools");
-		
-		addHyperlink(toolkit, documentationComposite, "Screencasts", "http://docs.jboss.org/tools/movies/");
-		addHyperlink(toolkit, documentationComposite, "Issue Tracker", "https://issues.jboss.org/browse/JBIDE");
-		
+		addHyperlink(toolkit, documentationComposite, "Product documentation", "http://docs.jboss.org/tools/latest/");
+		addHyperlink(toolkit, documentationComposite, "Videos", "http://docs.jboss.org/tools/movies/");
+
 		documentationSection.setClient(documentationComposite);
-		documentationSection.addExpansionListener(new ExpansionAdapter() {
-			
-			@Override
-			public void expansionStateChanged(ExpansionEvent e) {
-				resize(true);
-			}
-		});
 	}
 	
-	public void createSettingsSection(FormToolkit toolkit, Composite parent) {
-		settingsSection = createSection(toolkit, parent, "Settings", ExpandableComposite.TITLE_BAR|ExpandableComposite.TWISTIE|ExpandableComposite.EXPANDED);
-	    GridData gd = new GridData(SWT.FILL, SWT.FILL, false, false);
-	    settingsSection.setLayoutData(gd);
-	    
-		settingsComposite = toolkit.createComposite(settingsSection);
-	    GridLayout layout = new GridLayout(1, true);
-	    layout.horizontalSpacing = 30;
-	    settingsComposite.setLayout(layout);
-	    GridDataFactory.fillDefaults().grab(true, true).applyTo(settingsComposite);
-		
-	    final Button showOnStartup = toolkit.createButton(settingsComposite, "Show on Startup", SWT.CHECK);
-		showOnStartup.setLayoutData(new GridData(SWT.BEGINNING, SWT.BOTTOM, false, false));
-		showOnStartup.setBackground(settingsComposite.getBackground());
-		showOnStartup.setSelection(JBossCentralActivator.getDefault().showJBossCentralOnStartup());
-		showOnStartup.addSelectionListener(new SelectionAdapter() {
-
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				IEclipsePreferences preferences = JBossCentralActivator.getDefault().getPreferences();
-				boolean showOnStartup = preferences.getBoolean(JBossCentralActivator.SHOW_JBOSS_CENTRAL_ON_STARTUP, JBossCentralActivator.SHOW_JBOSS_CENTRAL_ON_STARTUP_DEFAULT_VALUE);
-				preferences.putBoolean(JBossCentralActivator.SHOW_JBOSS_CENTRAL_ON_STARTUP, !showOnStartup);
-				JBossCentralActivator.getDefault().savePreferences();
-			}
-		
-		});
-
-		JBossCentralActivator.getDefault().getPreferences().addPreferenceChangeListener(new IPreferenceChangeListener() {
-			
-			@Override
-			public void preferenceChange(PreferenceChangeEvent event) {
-				if (JBossCentralActivator.SHOW_JBOSS_CENTRAL_ON_STARTUP.equals(event.getKey()) 
-						&& showOnStartup != null && !showOnStartup.isDisposed()) {
-					Object value = event.getNewValue();
-					if (value instanceof String) {
-						boolean newValue = new Boolean((String)value).booleanValue();
-						showOnStartup.setSelection(newValue);
-					}
-				}
-			}
-		});
-		settingsSection.setClient(settingsComposite);
-	}
-
 	private void addHyperlink(FormToolkit toolkit, Composite composite, String text, final String url) {
 		Hyperlink link = toolkit.createHyperlink(composite,
 				text, SWT.NONE);
+		link.setUnderlined(false);
 		GridDataFactory.fillDefaults().applyTo(link);
 		link.addHyperlinkListener(new HyperlinkAdapter() {
 			public void linkActivated(HyperlinkEvent e) {
@@ -755,26 +682,19 @@ public class GettingStartedPage extends AbstractJBossCentralPage {
 			newWizardDropDownAction.dispose();
 			newWizardDropDownAction = null;
 		}
-		if (newsToolBarManager != null) {
-			newsToolBarManager.dispose();
-			newsToolBarManager = null;
-		}
-		if (blogsToolBarManager != null) {
-			blogsToolBarManager.dispose();
-			blogsToolBarManager = null;
+		if (buzzToolBarManager != null) {
+			buzzToolBarManager.dispose();
+			buzzToolBarManager = null;
 		}
 		if (tutorialsToolBarManager != null) {
 			tutorialsToolBarManager.dispose();
 			tutorialsToolBarManager = null;
 		}
-		if (refreshBlogsJobChangeListener != null) {
-			RefreshBlogsJob.INSTANCE.removeJobChangeListener(refreshBlogsJobChangeListener);
-			refreshBlogsJobChangeListener = null;
+		if (RefreshBuzzJobChangeListener != null) {
+			RefreshBuzzJob.INSTANCE.removeJobChangeListener(RefreshBuzzJobChangeListener);
+			RefreshBuzzJobChangeListener = null;
 		}
-		if (refreshNewsJobChangeListener != null) {
-			RefreshNewsJob.INSTANCE.removeJobChangeListener(refreshNewsJobChangeListener);
-			refreshNewsJobChangeListener = null;
-		}
+	
 		if (refreshTutorialsJobChangeListener != null) {
 			RefreshTutorialsJob.INSTANCE.removeJobChangeListener(refreshTutorialsJobChangeListener);
 			refreshTutorialsJobChangeListener = null;
@@ -795,7 +715,7 @@ public class GettingStartedPage extends AbstractJBossCentralPage {
 				setBusyIndicator(composite, true);
 				form.reflow(true);
 				form.redraw();
-				if (pageBook != tutorialPageBook) {
+				if (pageBook == tutorialPageBook) {
 					recomputeScrollComposite(scrolledComposite, pageBook);
 				}
 			}
@@ -803,13 +723,18 @@ public class GettingStartedPage extends AbstractJBossCentralPage {
 		return true;
 	}
 
-	private Image getFeedsImage() {
+	private Image getFeedsImage(FeedsEntry entry) {
+		if (FeedsEntry.Type.TWITTER.equals(entry.getType())) {
+			return JBossCentralActivator.getDefault().getImage("/icons/twitter-feed.png");
+		}
 		return JBossCentralActivator.getDefault().getImage("/icons/feedsLink.gif");
 	}
 	
-	private void recomputeScrollComposite(ScrolledComposite composite, PageBook pageBook) {
-		Rectangle r = composite.getClientArea();
-		composite.setMinSize(pageBook.computeSize(r.width, SWT.DEFAULT));
+	private void recomputeScrollComposite(ScrolledComposite scrolledComposite, Composite content) {
+		if (scrolledComposite != null && content != null) {
+			Rectangle r = scrolledComposite.getClientArea();
+			scrolledComposite.setMinSize(content.computeSize(r.width, SWT.DEFAULT));
+		}
 	}
 
 	public void showNote(final PageBook pageBook, final FormText noteText, final ScrolledComposite scrolledComposite) {
@@ -842,136 +767,103 @@ public class GettingStartedPage extends AbstractJBossCentralPage {
 		pageBook.showPage(exceptionText);
 	}
 
-	public void refreshBlogs() {
-		RefreshBlogsJob job = RefreshBlogsJob.INSTANCE;
+	public void refreshBuzz() {
+		RefreshBuzzJob job = RefreshBuzzJob.INSTANCE;
 		if (job.getState() == Job.NONE) {
+			List<FeedsEntry> entries = job.getEntries();
 			if (job.getException() != null) {
-				if (job.getEntries().size() <= 0) {
-					showException(blogsPageBook, blogsExceptionText,
-							job.getException());
+				if (entries != null && job.getEntries().isEmpty()) {
+					showException(buzzPageBook, buzzExceptionText,	job.getException());
 					return;
 				}
 			}
-			List<FeedsEntry> entries = job.getEntries();
-			if (entries == null || entries.size() == 0) {
-				showNote(blogsPageBook, blogsNoteText, blogsScrollComposite);
+			if (entries == null || entries.isEmpty()) {
+				showNote(buzzPageBook, buzzNoteText, buzzScrollComposite);
 				return;
 			}
 			if (job.needsRefresh()) {
-				showEntries(entries, blogsComposite, blogsPageBook, blogsScrollComposite);
+				showEntries(entries, buzzComposite, buzzPageBook, buzzScrollComposite);
 			}
 		}
 	}
-	
-	public void refreshNews() {
-		AbstractRefreshJob job = RefreshNewsJob.INSTANCE;
-		if (job.getState() == Job.NONE) {
-			if (job.getException() != null) {
-				if (job.getEntries().size() <= 0) {
-					showException(newsPageBook, newsExceptionText,
-						job.getException());
-					return;
-				}
-			}
-			List<FeedsEntry> entries = job.getEntries();
-			if (entries.size() == 0) {
-				showNote(newsPageBook, newsNoteText, newsScrollComposite);
-				return;
-			}
-			if (job.needsRefresh()) {
-				showEntries(entries, newsComposite, newsPageBook, newsScrollComposite);
-			}
-		}
-	}
-	
+		
 	public void refreshTutorials() {
 		RefreshTutorialsJob job = RefreshTutorialsJob.INSTANCE;
 		if (job.getException() != null) {
-			showException(tutorialPageBook, tutorialsExceptionText,
-					job.getException());
+			showException(tutorialPageBook, tutorialsExceptionText,	job.getException());
 			return;
 		}
-		Map<ProjectExampleCategory, List<ProjectExample>> categories = job
-				.getTutorialCategories();
-		if (categories == null || categories.size() == 0) {
-			showNote(tutorialPageBook, tutorialsNoteText,
-					tutorialScrollComposite);
+		Map<ProjectExampleCategory, List<ProjectExample>> categories = job.getTutorialCategories();
+		if (categories == null || categories.isEmpty()) {
+			showNote(tutorialPageBook, tutorialsNoteText, tutorialScrollComposite);
 			return;
 		}
 		showTutorials(categories);
 		resize(true);
 	}
 
-	private void showTutorials(
-			Map<ProjectExampleCategory, List<ProjectExample>> categories) {
+	private void showTutorials(Map<ProjectExampleCategory, List<ProjectExample>> categories) {
 		disposeChildren(tutorialsComposite);
-		List<ProjectExampleCategory> sortedCategories = new ArrayList<ProjectExampleCategory>(
-				categories.keySet());
+		List<ProjectExampleCategory> sortedCategories = new ArrayList<ProjectExampleCategory>(categories.keySet());
 		Collections.sort(sortedCategories);
+		
+		Color black = getDisplay().getSystemColor(SWT.COLOR_BLACK);
+		Font arial = new Font(getDisplay(),"Arial",10,SWT.BOLD); 
+
+		GridLayout gl = (GridLayout)tutorialsComposite.getLayout();
+		int maxCols = 4;
+		gl.makeColumnsEqualWidth = false;
+		gl.numColumns = sortedCategories.size() < maxCols ? sortedCategories.size() : maxCols; 
+		
+		int categoryHeight = 122;
 		for (final ProjectExampleCategory category : sortedCategories) {
-			int style = ExpandableComposite.TITLE_BAR
-					| ExpandableComposite.TWISTIE;
-			if (expandedCategories.contains(category)) {
-				style |= ExpandableComposite.EXPANDED;
-			}
-
-			final CategoryExpandableComposite categoryComposite = new CategoryExpandableComposite(
-					tutorialsComposite, toolkit.getOrientation(), style);
-
-			categoryComposite.setFont(getBoldFont(categoryComposite.getFont()));
-
-			categoryComposite.setTitleBarForeground(toolkit.getColors()
-					.getColor(IFormColors.TB_TOGGLE));
-			categoryComposite.setText(category.getName());
-
-			GridData gd = new GridData(SWT.FILL, SWT.FILL, false, false);
-			categoryComposite.setLayoutData(gd);
+			//Create category composite
+			final Composite categoryComposite = toolkit.createComposite(tutorialsComposite);
+			GridDataFactory.fillDefaults().grab(false, false).hint(SWT.DEFAULT, categoryHeight).applyTo(categoryComposite);
 			categoryComposite.setLayout(new GridLayout());
-			final Composite composite = toolkit
-					.createComposite(categoryComposite);
-			gd = new GridData(SWT.FILL, SWT.FILL, false, false);
-			composite.setLayoutData(gd);
-			composite.setLayout(new GridLayout(1, false));
-
-			categoryComposite.addExpansionListener(new ExpansionAdapter() {
-				public void expansionStateChanged(ExpansionEvent e) {
-					if (e.getState()) {
-						expandedCategories.add(category);
-					} else {
-						expandedCategories.remove(category);
-					}
-					resize(true);
-				}
-			});
-
-			displayTutorialLinks(categories.get(category), composite, true);
-			categoryComposite.setClient(composite);
+			
+			//Add black title
+			Label categoryName = toolkit.createLabel(categoryComposite, category.getName());
+			categoryName.setFont(arial);
+			if (!JBossCentralEditor.useFefaultColors) {
+				categoryName.setForeground(black);
+			}
+			//Add tooltip
 			String description = category.getDescription();
-			if (description != null && !description.isEmpty()
-					&& categoryComposite.getControl() != null
-					&& !categoryComposite.getControl().isDisposed()) {
-				final DescriptionToolTip toolTip = new DescriptionToolTip(
-						categoryComposite.getControl(), description);
+			if (description != null && !description.isEmpty()){
+				final DescriptionToolTip toolTip = new DescriptionToolTip(categoryName, description);
 				toolTip.activate();
 			}
+			
+			//Create vertical scroller
+			ScrolledComposite scroller = new ScrolledComposite(categoryComposite, SWT.V_SCROLL);
+	        GridData d = new GridData(GridData.FILL_BOTH);
+	        scroller.setLayoutData(d);
+			scroller.setMinHeight(categoryComposite.getSize().y);
+		    scroller.setExpandHorizontal(true);
+		    scroller.setExpandVertical(false);
+			
+			//Create scroller content
+			final Composite composite = toolkit.createComposite(scroller);
+			GridData d2 = new GridData(SWT.FILL, SWT.FILL, true, true);
+			composite.setLayoutData(d2);
+			composite.setLayout(new GridLayout());
+			
+			//Fill content with links
+			displayTutorialLinks(categories.get(category), composite, true);
+			
+			//Recompute size
+			scroller.setContent(composite);
+			
+			Point size = composite.computeSize(SWT.DEFAULT, SWT.DEFAULT);
+			scroller.setBackground(composite.getBackground());//Let's hide the scroller background 
+			composite.setSize(size);
+			
 		}
-
+		
 		tutorialPageBook.showPage(tutorialsComposite);
 		tutorialPageBook.layout(true, true);
 		form.reflow(true);
-		resize();
-	}
-
-  private Font getBoldFont(Font font) {
-		if (categoryFont != null) {
-			return categoryFont;
-		}
-		if (font == null || toolkit == null || toolkit.getColors() == null) {
-			return null;
-		}
-		categoryFont = FormFonts.getInstance().getBoldFont(toolkit.getColors().getDisplay(),
-				font);
-		return categoryFont;
 	}
 
 	private void hookTooltip(FormText tutorialText, ProjectExample tutorial) {
@@ -984,22 +876,14 @@ public class GettingStartedPage extends AbstractJBossCentralPage {
 
 	protected void configureTutorialText(FormText tutorialText, final ProjectExample tutorial) {
 		StringBuilder buffer = new StringBuilder();
+		tutorialText.setHyperlinkSettings(hyperlinkSettings);
 		buffer.append(JBossCentralActivator.FORM_START_TAG);
-		buffer.append("<img href=\"image\"/> ");
 		buffer.append("<a href=\"link\">");
 		buffer.append(tutorial.getShortDescription());
 		buffer.append("</a> ");
 		buffer.append(JBossCentralActivator.FORM_END_TAG);
 
 		tutorialText.setText(buffer.toString() , true, false);
-		
-		String iconPath = tutorial.getIconPath();
-		if (iconPath != null) {
-		  Image image = JBossCentralActivator.getDefault().getImage(iconPath);
-		  if (image != null) {
-		    tutorialText.setImage("image", image);
-		  }
-		}
 		
 		tutorialText.addHyperlinkListener(new HyperlinkAdapter() {
 			@Override
@@ -1014,7 +898,6 @@ public class GettingStartedPage extends AbstractJBossCentralPage {
 			}
 			
 		});
-
 	}
 
 	private void disposeChildren(Composite composite) {
@@ -1032,13 +915,12 @@ public class GettingStartedPage extends AbstractJBossCentralPage {
 	private void showEntries(List<FeedsEntry> entries, Composite composite, PageBook pageBook, ScrolledComposite scrollable) {
 		int i = 0;
 		disposeChildren(composite);
-		
+		pageBook.layout(true, true);
+		int h = scrollable.getClientArea().height;
 		for (final FeedsEntry entry:entries) {
-			if (i++ > JBossCentralActivator.MAX_FEEDS) {
-				return;
-			}
-			String text = entry.getFormString(false);
+			String text = entry.getShortString(false);
 			FormText formText = toolkit.createFormText(composite, true);
+			formText.setHyperlinkSettings(hyperlinkSettings);
 			TableWrapData td = new TableWrapData();
 			td.indent = 2;
 			formText.setLayoutData(td);
@@ -1046,7 +928,9 @@ public class GettingStartedPage extends AbstractJBossCentralPage {
 				formText.setText(text, true, true);
 			} catch(IllegalArgumentException se) {
 				try {
-					text = entry.getFormString(true);
+					//twitter truncates their tweet feed, leading to tweets containing unfinished escaped sequences
+					//like "blabla &amp..."
+					text = entry.getShortString(true);
 					formText.setText(text, true, true);
 				} catch (IllegalArgumentException se2) {
 					formText.dispose();
@@ -1057,37 +941,27 @@ public class GettingStartedPage extends AbstractJBossCentralPage {
 					} catch (Exception e1) {
 						JBossCentralActivator.log(se);
 					}
+					continue;
 				}
-				continue;
 			}
 			formText.setFont("default", JFaceResources.getDefaultFont());
 			formText.setFont("date", JFaceResources.getDefaultFont());
 			formText.setColor("date", JFaceColors.getHyperlinkText(getDisplay()));
 			formText.setFont("description", JFaceResources.getDefaultFont());
 			formText.setColor("author", JFaceColors.getHyperlinkText(getDisplay()));
-			formText.setImage("image", getFeedsImage());
+			formText.setImage("image", getFeedsImage(entry));
 			if (JBossCentralActivator.isInternalWebBrowserAvailable() && entry.getDescription() != null && !entry.getDescription().isEmpty()) {
 				ToolTip toolTip = new FeedsToolTip(formText, entry.getDate() + " " + entry.getDescription());
 				toolTip.activate();
 			}
-			formText.addHyperlinkListener(new HyperlinkAdapter() {
-
-				@Override
-				public void linkActivated(HyperlinkEvent e) {
-					Object link = e.data;
-					if (link instanceof String) {
-						Shell shell = PlatformUI.getWorkbench().getDisplay().getActiveShell();
-						JBossCentralActivator.openUrl((String) link, shell);
-					}
-				}
-			});
+			formText.addHyperlinkListener(new HyperlinkOpener());
+			
 			
 		}
 		pageBook.showPage(composite);
 		pageBook.layout(true, true);
 		form.reflow(true);
-		recomputeScrollComposite(scrollable, pageBook);
-		resize();
+		resize(true);
 	}
 
 	private void resize() {
@@ -1095,7 +969,10 @@ public class GettingStartedPage extends AbstractJBossCentralPage {
 	}
 	
 	protected void resize(boolean force) {
-		if (blogsSection == null) {
+		
+		resizedescriptionCompositeScroller();
+		
+		if (documentationSection == null) {
 			return;
 		}
 		Point size;
@@ -1105,74 +982,25 @@ public class GettingStartedPage extends AbstractJBossCentralPage {
 			return;
 		}
 		oldSize = size;
-		GridData gd;
-		int widthHint = size.x / 2 - 20;
-		gd = (GridData) newsSection.getLayoutData();
-		if (newsSection.isExpanded()) {
-			if (blogsSection.isExpanded()) {
-				gd.heightHint = size.y / 2 - 20;
-			} else {
-				gd.heightHint = size.y - 40;
-			}
-		} else {
-			gd.heightHint = 20;
-		}
-		gd.widthHint = widthHint;
-		gd.grabExcessVerticalSpace = false;
-
-		gd = (GridData) blogsSection.getLayoutData();
-		if (blogsSection.isExpanded()) {
-			if (newsSection.isExpanded()) {
-				gd.heightHint = size.y / 2 - 20;
-			} else {
-				gd.heightHint = size.y - 40;
-			}
-		} else {
-			gd.heightHint = 20;
-		}
-
-		gd.widthHint = widthHint;
-		gd.grabExcessVerticalSpace = false;
-
-		gd = (GridData) documentationSection.getLayoutData();
 		
-		gd.widthHint = widthHint;
+		int height = form.getClientArea().height - (projectsSection.getSize().y + tutorialsSection.getSize().y);
+		int width =  size.x - (documentationSection.getSize().y);
+		GridData gd = (GridData) buzzSection.getLayoutData();
+		gd.heightHint = height - 25;
+		gd.widthHint = width - 45;
 		gd.grabExcessVerticalSpace = false;
 
-		gd = (GridData) settingsSection.getLayoutData();
-		gd.widthHint = widthHint;
-		gd.grabExcessVerticalSpace = false;
+		Point computedSize = buzzPageBook.computeSize(gd.widthHint, SWT.DEFAULT);
 
-		gd = (GridData) projectsSection.getLayoutData();
-		
-		gd.widthHint = widthHint;
-		gd.grabExcessVerticalSpace = false;
+		buzzScrollComposite.setMinSize(gd.widthHint, computedSize.y);
 
-		gd = (GridData) tutorialsSection.getLayoutData();
-		Point computedSize = tutorialPageBook.computeSize(widthHint,
-				SWT.DEFAULT);
-
-		if (computedSize.y > (size.y / 3)) {
-			gd.heightHint = size.y / 3;
-		} else {
-			gd.heightHint = SWT.DEFAULT;
-		}
-		gd.widthHint = widthHint;
-		gd.grabExcessVerticalSpace = false;
-
-		computedSize = tutorialPageBook.computeSize(widthHint, SWT.DEFAULT);
-
-		tutorialScrollComposite.setMinSize(widthHint - 20, computedSize.y);
-
-		recomputeScrollComposite(blogsScrollComposite, blogsPageBook);
-		recomputeScrollComposite(newsScrollComposite, newsPageBook);
+		recomputeScrollComposite(buzzScrollComposite, buzzPageBook);
 
 		form.layout(true, true);
 		form.reflow(true);
-
 	}
 
-	private class RefreshBlogsJobChangeListener implements IJobChangeListener {
+	private class RefreshBuzzJobChangeListener implements IJobChangeListener {
 
 		@Override
 		public void aboutToRun(IJobChangeEvent event) {
@@ -1190,20 +1018,20 @@ public class GettingStartedPage extends AbstractJBossCentralPage {
 				
 				@Override
 				public void run() {
-					if (blogsLoadingComposite == null || blogsLoadingComposite.isDisposed()) {
+					if (buzzLoadingComposite == null || buzzLoadingComposite.isDisposed()) {
 						return;
 					}
-					setBusyIndicator(blogsLoadingComposite, false);
-					refreshBlogs();
-					setItemVisible(blogsToolBarManager, BLOGS_WARNING_ID, false);
-					RefreshBlogsJob job = RefreshBlogsJob.INSTANCE;
-					if (job.getEntries().size() > 0 && job.getException() != null) {
+					setBusyIndicator(buzzLoadingComposite, false);
+					refreshBuzz();
+					RefreshBuzzJob job = RefreshBuzzJob.INSTANCE;
+					setItemVisible(buzzToolBarManager, BUZZ_WARNING_ID, false);
+					if (!job.getEntries().isEmpty() && job.getException() != null) {
 						String tooltip = job.getException().getClass().getName() + ": " + job.getException().getLocalizedMessage();
-						blogsWarning.setToolTipText(tooltip);
-						setItemVisible(blogsToolBarManager, BLOGS_WARNING_ID, true);
-					} 
-					blogsToolBarManager.update(true);
-					blogsSection.layout(true, true);
+						buzzWarning.setToolTipText(tooltip);
+						setItemVisible(buzzToolBarManager, BUZZ_WARNING_ID, true);
+					}
+					buzzToolBarManager.update(true);
+					buzzSection.layout(true, true);
 				}
 			});
 			
@@ -1216,8 +1044,8 @@ public class GettingStartedPage extends AbstractJBossCentralPage {
 
 		@Override
 		public void scheduled(IJobChangeEvent event) {
-			if (RefreshBlogsJob.INSTANCE.getEntries().size() <= 0) {
-				showLoading(blogsPageBook, blogsLoadingComposite, blogsScrollComposite);
+			if (RefreshBuzzJob.INSTANCE.getEntries().size() <= 0) {
+				showLoading(buzzPageBook, buzzLoadingComposite, buzzScrollComposite);
 			}
 		}
 
@@ -1275,75 +1103,46 @@ public class GettingStartedPage extends AbstractJBossCentralPage {
 		
 	}
 	
-	private class RefreshNewsJobChangeListener implements IJobChangeListener {
-
-		@Override
-		public void aboutToRun(IJobChangeEvent event) {
-			
-		}
-
-		@Override
-		public void awake(IJobChangeEvent event) {
-			
-		}
-
-		@Override
-		public void done(IJobChangeEvent event) {
-			Display.getDefault().asyncExec(new Runnable() {
-				
-				@Override
-				public void run() {
-					if (newsLoadingComposite == null || newsLoadingComposite.isDisposed()) {
-						return;
-					}
-					setBusyIndicator(newsLoadingComposite, false);
-					refreshNews();
-					setItemVisible(newsToolBarManager, NEWS_WARNING_ID, false);
-					RefreshNewsJob job = RefreshNewsJob.INSTANCE;
-					if (job.getEntries().size() > 0 && job.getException() != null) {
-						String tooltip = job.getException().getClass().getName() + ": " + job.getException().getLocalizedMessage(); 
-						newsWarning.setToolTipText(tooltip);
-						setItemVisible(newsToolBarManager, NEWS_WARNING_ID, true);
-					} 
-					newsToolBarManager.update(true);
-					newsSection.layout(true, true);
-				}
+	@Override
+	protected Section createSection(FormToolkit toolkit, Composite parent,
+			String name, int style) {
+		final Section section = super.createSection(toolkit, parent, name, style);
+		final FormToolkit tk = toolkit;
+		if (!JBossCentralEditor.useFefaultColors) {
+			Composite separator = new Composite(section, style);
+		    separator.addListener(SWT.Paint, new Listener() {
+				public void handleEvent(Event e) {
+		           if (section.isDisposed()) {
+		        	   return;
+		           }
+			        GC gc = e.gc;
+			        Color grey = tk.getColors().createColor("grey", 194, 194, 194);
+			        gc.setBackground(grey);
+		        }
 			});
-			
+		    section.setSeparatorControl(separator);
+			Color black = getDisplay().getSystemColor(SWT.COLOR_BLACK);
+			section.setTitleBarForeground(black );
+		} else {
+			section.setSeparatorControl(toolkit.createCompositeSeparator(section));
 		}
-
-		@Override
-		public void running(IJobChangeEvent event) {
-			
-		}
-
-		@Override
-		public void scheduled(IJobChangeEvent event) {
-			if (RefreshNewsJob.INSTANCE.getEntries().size() <= 0) {
-				showLoading(newsPageBook, newsLoadingComposite, newsScrollComposite);
-			}
-		}
-
-		@Override
-		public void sleeping(IJobChangeEvent event) {
-			
-		}
-		
+		section.descriptionVerticalSpacing = 20;
+		section.setTitleBarBackground(section.getBackground());
+		section.setTitleBarBorderColor(section.getBackground());
+		Font font = new Font(getDisplay(),"Lucida Sans Unicode",12,SWT.NORMAL); 
+		section.setFont(font);
+		return section;
 	}
 	
-	private class CategoryExpandableComposite extends ExpandableComposite {
+	class HyperlinkOpener extends HyperlinkAdapter {
 
-		public CategoryExpandableComposite(Composite parent, int style,
-				int expansionStyle) {
-			super(parent, style, expansionStyle);
-			setMenu(tutorialsComposite.getMenu());
-			toolkit.adapt(this, true, true);
+		@Override
+		public void linkActivated(HyperlinkEvent e) {
+			Object link = (e.getHref() == null)?e.data:e.getHref();
+			if (link instanceof String) {
+				Shell shell = PlatformUI.getWorkbench().getDisplay().getActiveShell();
+				JBossCentralActivator.openUrl((String) link, shell);
+			}
 		}
-		
-		public Control getControl() {
-			return textLabel;
-		}
-		
 	}
-
 }

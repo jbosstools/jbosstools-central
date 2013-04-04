@@ -24,8 +24,11 @@ public interface IJBossCentralConfigurator {
 	String[] getMainToolbarCommandIds();
 	String getJBossDiscoveryDirectory();
 	String getTwitterLink();
+	@Deprecated
 	String getBlogsUrl();
+	@Deprecated
 	String getNewsUrl();
+	String getBuzzUrl();
 	List<String> getWizardIds();
 	Image getHeaderImage();
 

@@ -84,7 +84,7 @@
     <extension
         point="org.jboss.tools.project.examples.categories"
         name="Project Examples Categories">
-        <url>http://download.jboss.org/jbosstools/examples/project-examples-category-4.0.xml</url>
+        <url>http://download.jboss.org/jbosstools/examples/project-examples-category-4.1.xml</url>
     </extension>
    
     <extension

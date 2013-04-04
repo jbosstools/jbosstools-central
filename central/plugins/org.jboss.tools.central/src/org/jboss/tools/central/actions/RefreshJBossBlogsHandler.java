@@ -24,6 +24,7 @@ import org.jboss.tools.central.jobs.RefreshBlogsJob;
  * @author snjeza
  *
  */
+@Deprecated
 public class RefreshJBossBlogsHandler extends AbstractHandler {
 
 	@Override
