@@ -61,7 +61,15 @@ IFacetWizardPage {
 	private Combo packaging;
 	private Text description;
 	private Text name;
-	public static final IProjectFacet SEAM_FACET = ProjectFacetsManager.getProjectFacet(SEAM_FACET_ID);
+	public static final IProjectFacet SEAM_FACET;
+	
+	static {
+		if (ProjectFacetsManager.isProjectFacetDefined(SEAM_FACET_ID)) {
+			SEAM_FACET = ProjectFacetsManager.getProjectFacet(SEAM_FACET_ID);
+		} else  {
+			SEAM_FACET = null;
+		}
+	}
 	
 	public MavenFacetInstallPage() {
 		super(DataModelFactory.createDataModel(new AbstractDataModelProvider() {
@@ -151,7 +159,7 @@ IFacetWizardPage {
 			name.setText(projectName);
 			description = createField(composite, Messages.MavenFacetInstallPage_Description, IJBossMavenConstants.DESCRIPTION);
 
-			if (!mavenProjectExists && fpwc.hasProjectFacet(SEAM_FACET)) {
+			if (SEAM_FACET != null && !mavenProjectExists && fpwc.hasProjectFacet(SEAM_FACET)) {
 				Text seamVersion = createField(composite, Messages.MavenFacetInstallPage_Seam_Maven_version, IJBossMavenConstants.SEAM_MAVEN_VERSION);
 				IProjectFacetVersion seamFacetVersion = fpwc.getProjectFacetVersion(SEAM_FACET);
 				if ("2.0".equals(seamFacetVersion.getVersionString())) { //$NON-NLS-1$
