@@ -9,37 +9,28 @@
 	</parent>
 	<groupId>org.jboss.tools.maven.tests</groupId>
 	<artifactId>org.jboss.tools.maven.sourcelookup.test</artifactId>
-	
+
 	<packaging>eclipse-test-plugin</packaging>
 
-    <properties>
+	<properties>
 		<systemProperties>-Djbosstools.test.jboss.home.7.1.1=${requirementsDirectory}/jboss-as-7.1.1.Final </systemProperties>
 	</properties>
-   
+
 	<build>
 		<plugins>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-dependency-plugin</artifactId>
-				<executions>
-					<execution>
-						<id>install-jboss-as</id>
-						<phase>pre-integration-test</phase>
-						<goals>
-							<goal>unpack</goal>
-						</goals>
-						<configuration>
-							<artifactItems>
-								<artifactItem>
-									<groupId>org.jboss.as</groupId>
-									<artifactId>jboss-as-dist</artifactId>
-									<version>7.1.1.Final</version>
-									<type>zip</type>
-								</artifactItem>
-							</artifactItems>
-						</configuration>
-					</execution>
-				</executions>
+				<configuration>
+					<artifactItems>
+						<artifactItem>
+							<groupId>org.jboss.as</groupId>
+							<artifactId>jboss-as-dist</artifactId>
+							<version>7.1.1.Final</version>
+							<type>zip</type>
+						</artifactItem>
+					</artifactItems>
+				</configuration>
 			</plugin>
 			<plugin>
 				<groupId>org.eclipse.tycho</groupId>
@@ -52,4 +43,33 @@
 			</plugin>
 		</plugins>
 	</build>
+	<!-- Only unpack dependencies during CLI builds, not as part of an eclipse build -->
+	<profiles>
+		<profile>
+			<id>non-m2e</id>
+			<activation>
+				<property>
+					<name>!m2e.version</name>
+				</property>
+			</activation>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-dependency-plugin</artifactId>
+						<executions>
+							<execution>
+								<id>install-jboss-as</id>
+								<phase>pre-integration-test</phase>
+								<goals>
+									<goal>unpack</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
+
 </project>
