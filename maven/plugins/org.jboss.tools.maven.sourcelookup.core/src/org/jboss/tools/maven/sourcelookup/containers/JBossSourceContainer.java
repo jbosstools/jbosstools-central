@@ -224,7 +224,6 @@ public class JBossSourceContainer extends AbstractSourceContainer {
 			}
 		}
 		Object[] objects = new Object[0];
-		List<File> removeJars = new ArrayList<File>();
 		List<File> list = getJars();
 		Iterator<File> iterator = list.iterator();
 		ZipFile jar = null;
@@ -255,7 +254,7 @@ public class JBossSourceContainer extends AbstractSourceContainer {
 								objects = container.findSourceElements(name);
 								if (objects != null && objects.length > 0) {
 									sourceContainers.add(container);
-									removeJars.add(file);
+									iterator.remove();
 								}
 							}
 						} else {
@@ -264,7 +263,7 @@ public class JBossSourceContainer extends AbstractSourceContainer {
 							objects = container.findSourceElements(name);
 							if (objects != null && objects.length > 0) {
 								sourceContainers.add(container);
-								removeJars.add(file);
+								iterator.remove();
 							}
 						}
 						break;
@@ -285,9 +284,6 @@ public class JBossSourceContainer extends AbstractSourceContainer {
 					// ignore
 				}
 				jar = null;
-			}
-			for (File remove : removeJars) {
-				jars.remove(remove);
 			}
 		}
 		return objects;
