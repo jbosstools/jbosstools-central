@@ -17,7 +17,6 @@
 		<category name="AllFeatures"/>
 	</feature>
 	<feature url="features/org.jboss.tools.central.feature_0.0.0.jar" id="org.jboss.tools.central.feature" version="0.0.0"/>
-	<!-- JBIDE-13804 moved to new repo, not part of Central <feature url="features/org.jboss.tools.central.discovery.feature_0.0.0.jar" id="org.jboss.tools.central.discovery.feature" version="0.0.0"/> -->
 	<feature url="features/org.jboss.tools.central.themes.feature_0.0.0.jar" id="org.jboss.tools.central.themes.feature" version="0.0.0"/>
 	<feature url="features/org.jboss.tools.central.test.feature_0.0.0.jar" id="org.jboss.tools.central.test.feature" version="0.0.0">
 		<category name="AllFeatures"/>
@@ -27,7 +26,6 @@
 		<category name="AllSources"/>
 	</feature>
 	<feature url="features/org.jboss.tools.central.feature.source_0.0.0.jar" id="org.jboss.tools.central.feature.source" version="0.0.0"/>
-	<!-- JBIDE-13804 moved to new repo, not part of Central <feature url="features/org.jboss.tools.central.discovery.feature.source_0.0.0.jar" id="org.jboss.tools.central.discovery.feature.source" version="0.0.0"/> -->
 	<feature url="features/org.jboss.tools.central.themes.feature.source_0.0.0.jar" id="org.jboss.tools.central.themes.feature.source" version="0.0.0"/>
 	<feature url="features/org.jboss.tools.central.test.feature.source_0.0.0.jar" id="org.jboss.tools.central.test.feature.source" version="0.0.0">
 		<category name="AllSources"/>
