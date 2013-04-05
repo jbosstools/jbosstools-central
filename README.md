@@ -4,6 +4,10 @@
 
 JBoss Central contains the key components/extensions for driving the JBoss Central editor/view and the project examples plus it currently contains the Maven extensions JBoss Tools provides on top of m2e.
 
+Note:
+* The JBoss Central Discovery feature is no longer needed and has been deleted. 
+* The JBoss Central Discovery plugin has moved here: https://github.com/jbosstools/jbosstools-discovery/
+
 ## Install
 
 _JBoss Central_ is part of [JBoss Tools](http://jboss.org/tools) from
