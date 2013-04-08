@@ -1,5 +1,5 @@
 /*************************************************************************************
- * Copyright (c) 2012 Red Hat, Inc. and others.
+ * Copyright (c) 2012-2013 Red Hat, Inc. and others.
  * All rights reserved. This program and the accompanying materials 
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -30,6 +30,8 @@ import org.jboss.tools.maven.conversion.ui.dialog.ConvertToMavenDependencyWizard
 public abstract class AbstractReferenceConversionParticipant extends
 		AbstractProjectConversionParticipant {
 
+	public static final String REFERENCE_CONVERSION_SKIP_KEY = "org.jboss.tools.reference.conversion.skip";
+	
 	private DependencyCollector dependencyCollector;
 
 	public AbstractReferenceConversionParticipant(DependencyCollector dependencyCollector) {
@@ -38,7 +40,8 @@ public abstract class AbstractReferenceConversionParticipant extends
 	
 	@Override
 	public boolean accept(IProject project) throws CoreException {
-		return dependencyCollector != null && dependencyCollector.appliesTo(project);
+		return !Boolean.getBoolean(REFERENCE_CONVERSION_SKIP_KEY) 
+			&& dependencyCollector != null && dependencyCollector.appliesTo(project);
 	}
 
 	@Override

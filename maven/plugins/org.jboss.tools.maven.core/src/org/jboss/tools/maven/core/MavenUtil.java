@@ -1,5 +1,5 @@
 /*************************************************************************************
- * Copyright (c) 2012 Red Hat, Inc. and others.
+ * Copyright (c) 2012-2013 Red Hat, Inc. and others.
  * All rights reserved. This program and the accompanying materials 
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,6 +10,7 @@
  ************************************************************************************/
 package org.jboss.tools.maven.core;
 
+import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Parent;
 import org.apache.maven.project.MavenProject;
@@ -64,4 +65,18 @@ public class MavenUtil {
 		}
 		return model;
 	}
+	
+	public static Dependency createDependency(String groupId, String artifactId, String version) {
+		return createDependency(groupId, artifactId, version, null);
+	}
+
+	public static Dependency createDependency(String groupId, String artifactId, String version, String type) {
+		Dependency d = new Dependency();
+		d.setGroupId(groupId);
+		d.setArtifactId(artifactId);
+		d.setVersion(version);
+		d.setType(type);
+		return d;
+	}
+
 }

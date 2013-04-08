@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.5"?>
+<plugin>
+   <extension
+         point="org.eclipse.m2e.core.projectConversionParticipants">
+      <projectConversionParticipant
+            class="org.jboss.tools.maven.conversion.tests.DependencyAdderConversionParticipant"
+            id="org.jboss.tools.maven.conversion.tests.DependencyAdderConversionParticipant"
+            name="Mock dependency adder conversion participant"
+            nature="org.eclipse.wst.common.modulecore.ModuleCoreNature"
+            runsBefore="org.jboss.tools.maven.conversion.core.AppClientDependencyConversionParticipant">
+      </projectConversionParticipant>         
+    </extension>   
+    
+</plugin>

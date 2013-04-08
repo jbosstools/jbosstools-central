@@ -48,7 +48,14 @@
             id="org.jboss.tools.maven.conversion.ui.ModuleConversionParticipant"
             name="EAR conversion participant"
             nature="org.eclipse.wst.common.modulecore.ModuleCoreNature">
-      </projectConversionParticipant>   
+      </projectConversionParticipant>
+      <projectConversionParticipant
+            class="org.jboss.tools.maven.conversion.core.internal.AppClientDependencyConversionParticipant"
+            id="org.jboss.tools.maven.conversion.core.AppClientDependencyConversionParticipant"
+            name="Application-client dependency conversion participant"
+            nature="org.eclipse.wst.common.modulecore.ModuleCoreNature"
+            runsAfter="org.jboss.tools.maven.conversion.ui.ModuleConversionParticipant">
+      </projectConversionParticipant>         
     </extension>   
     
 </plugin>
