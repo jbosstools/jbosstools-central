@@ -116,7 +116,7 @@ public class JBossSourceContainer extends AbstractSourceContainer {
 		ServerBean serverBean = loader.getServerBean();
 		JBossServerType type = serverBean.getType();
 		String version = serverBean.getVersion();
-		if (JBossServerType.AS7.equals(type)) {
+		if (JBossServerType.AS7.equals(type) || JBossServerType.AS72.equals(type) || JBossServerType.EAP61.equals(type)) {	
 			getAS7xJars();
 		}
 		else if (JBossServerType.AS.equals(type)) {

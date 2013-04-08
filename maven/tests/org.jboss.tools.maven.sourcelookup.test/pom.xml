@@ -13,7 +13,7 @@
 	<packaging>eclipse-test-plugin</packaging>
 
 	<properties>
-		<systemProperties>-Djbosstools.test.jboss.home.7.1.1=${requirementsDirectory}/jboss-as-7.1.1.Final </systemProperties>
+		<systemProperties>-Djbosstools.test.jboss.home.7.1.1=${requirementsDirectory}/jboss-as-7.1.1.Final -Djbosstools.test.jboss.home.eap.6.1=${requirementsDirectory}/jboss-eap-6.1 -Dorg.jboss.tools.tests.skipPrivateRequirements=false </systemProperties>
 	</properties>
 
 	<build>
@@ -59,13 +59,33 @@
 						<artifactId>maven-dependency-plugin</artifactId>
 						<executions>
 							<execution>
-								<id>install-jboss-as</id>
+								<id>install-jboss-as-7.1.1</id>
 								<phase>pre-integration-test</phase>
 								<goals>
 									<goal>unpack</goal>
 								</goals>
 							</execution>
 						</executions>
+					</plugin>
+					<plugin>
+    					<groupId>com.googlecode.maven-download-plugin</groupId>
+    					<artifactId>maven-download-plugin</artifactId>
+    					<version>1.0.0</version>
+    					<configuration>
+                			<url>http://download.jboss.org/jbosseap/6/jboss-eap-6.1.0.Alpha/jboss-eap-6.1.0.Alpha.zip</url>
+                			<unpack>true</unpack>
+                			<outputDirectory>${requirementsDirectory}</outputDirectory>
+                			<md5>21ab4c71230ca9fd311c265be24b6505</md5>
+            			</configuration>
+    					<executions>
+        					<execution>
+            					<id>install-jboss-eap-6.1</id>
+            					<phase>pre-integration-test</phase>
+            					<goals>
+                					<goal>wget</goal>
+            					</goals>
+        					</execution>
+    					</executions>
 					</plugin>
 				</plugins>
 			</build>
