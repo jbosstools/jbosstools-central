@@ -48,6 +48,7 @@ import org.junit.Test;
  */
 public class SourceLookupTest {
 
+	private static final String WELD_BOOTSTRAP_JAVA = "org/jboss/weld/bootstrap/WeldBootstrap.java";
 	private static final String JBOSS_EAP_61 = "jboss-eap-6.1";
 	private static final String JBOSS_AS_7_1_1_FINAL = "jboss-as-7.1.1.Final";
 
@@ -96,28 +97,22 @@ public class SourceLookupTest {
 	
 	@Test
 	public void testSourceContainerAS711() throws Exception {
-		IServer server = getServerByName(JBOSS_AS_7_1_1_FINAL);
-		assertNotNull(server);
-		ILaunchConfiguration configuration = server.getLaunchConfiguration(true, null);
-		assertNotNull(configuration);
-		String sourcePathComputer = configuration.getAttribute(ISourcePathComputer.ATTR_SOURCE_PATH_COMPUTER_ID, (String)null);
-		assertEquals("The JBoss Maven Source Container is not added." , SourceLookupActivator.JBOSS_LAUNCH_SOURCE_PATH_COMPUTER_ID, sourcePathComputer);
-		ISourceContainer sourceContainer = new JBossSourceContainer(configuration);
-		String sourceName = "org/jboss/weld/bootstrap/WeldBootstrap.java";
-		Object source = sourceContainer.findSourceElements(sourceName);
-		assertNotNull("The '" + sourceName + "' entry is not found.", source);
+		assertServerHasSource(JBOSS_AS_7_1_1_FINAL,WELD_BOOTSTRAP_JAVA);	
 	}
 	
 	@Test
 	public void testSourceContainerEAP61() throws Exception {
-		IServer server = getServerByName(JBOSS_EAP_61);
+		assertServerHasSource(JBOSS_EAP_61,WELD_BOOTSTRAP_JAVA);
+	}
+	
+	private void assertServerHasSource(String serverName, String sourceName) throws Exception {
+		IServer server = getServerByName(serverName);
 		assertNotNull(server);
 		ILaunchConfiguration configuration = server.getLaunchConfiguration(true, null);
 		assertNotNull(configuration);
 		String sourcePathComputer = configuration.getAttribute(ISourcePathComputer.ATTR_SOURCE_PATH_COMPUTER_ID, (String)null);
 		assertEquals("The JBoss Maven Source Container is not added." , SourceLookupActivator.JBOSS_LAUNCH_SOURCE_PATH_COMPUTER_ID, sourcePathComputer);
 		ISourceContainer sourceContainer = new JBossSourceContainer(configuration);
-		String sourceName = "org/jboss/weld/bootstrap/WeldBootstrap.java";
 		Object source = sourceContainer.findSourceElements(sourceName);
 		assertNotNull("The '" + sourceName + "' entry is not found.", source);
 	}
