@@ -68,16 +68,17 @@ public abstract class AbstractMavenConversionTest extends
 
 	protected IMavenProjectFacade convert(IProject project) throws CoreException,
 			InterruptedException {
+		String packaging = "jar";
 		IProjectConversionEnabler enabler = MavenPlugin
 				.getProjectConversionManager().getConversionEnablerForProject(
 						project);
-		assertNotNull(project.getName() + " has no conversion enabler");
-		String[] types = enabler.getPackagingTypes(project);
-		if (types == null || types.length != 1) {
-			fail("no conversion type (packaging)  can be determined for "
-					+ project.getName());
+		if (enabler != null) {
+			String[] types = enabler.getPackagingTypes(project);
+			if (types != null && types.length > 0) {
+			  packaging = types[0];
+			}
 		}
-		return convert(project, types[0]);
+		return convert(project, packaging);
 	}
 
 	/**

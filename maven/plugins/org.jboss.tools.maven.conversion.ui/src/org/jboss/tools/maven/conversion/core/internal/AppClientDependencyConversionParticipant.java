@@ -34,12 +34,12 @@ public class AppClientDependencyConversionParticipant extends
 	@Override
 	public void convert(IProject project, Model model, IProgressMonitor monitor)
 			throws CoreException {
-		if (containsAppClient(model.getDependencies())) {
+		if (hasAppClientDependency(model.getDependencies())) {
 			setAcrPlugin(model);
 		}
 	}
 
-	private boolean containsAppClient(List<Dependency> deps) {
+	private boolean hasAppClientDependency(List<Dependency> deps) {
 		if (deps == null || deps.isEmpty()) {
 			return false;
 		}

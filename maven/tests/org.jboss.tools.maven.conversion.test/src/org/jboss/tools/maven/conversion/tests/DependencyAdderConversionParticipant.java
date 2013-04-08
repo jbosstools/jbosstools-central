@@ -14,6 +14,7 @@ package org.jboss.tools.maven.conversion.tests;
 import java.util.Arrays;
 import java.util.List;
 
+import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Model;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -28,7 +29,9 @@ import org.jboss.tools.maven.core.MavenUtil;
  */
 public class DependencyAdderConversionParticipant extends AbstractProjectConversionParticipant {
 
-  private static List<String> PROJECT_NAMES = Arrays.asList("JBIDE-13781-ear");	
+  private static List<String> PROJECT_NAMES = Arrays.asList("JBIDE-13781-ear", 
+		                                                     "JBIDE-13781-web",
+		                                                     "JBIDE-13781-java");	
 	
 	
   public boolean accept(IProject project) {
@@ -36,12 +39,21 @@ public class DependencyAdderConversionParticipant extends AbstractProjectConvers
   }
 
   public void convert(IProject project, Model model, IProgressMonitor monitor) {
-	  if ("JBIDE-13781-ear".equals(project.getName())) {
-		  setJBIDE13781ear(model);
+	  String name = project.getName();
+	  if ("JBIDE-13781-ear".equals(name) || 
+	      "JBIDE-13781-web".equals(name) ||
+	      "JBIDE-13781-java".equals(name)) {
+		  setJBIDE13781project(model);
 	  }
   }
 
-  private void setJBIDE13781ear(Model model) {
-	model.getDependencies().add(MavenUtil.createDependency("earClient", "earClient", "0.0.1-SNAPSHOT", "app-client"));
+  private void setJBIDE13781project(Model model) {
+    Dependency appClient = MavenUtil.createDependency("earClient", "earClient", "0.0.1-SNAPSHOT", "app-client"); 
+    for (Dependency d : model.getDependencies()) {
+    	if (d.getGroupId().equals(appClient.getGroupId()) && d.getArtifactId().equals(appClient.getArtifactId())) {
+    		return;
+    	}
+    }
+	model.getDependencies().add(appClient);
   }
 }

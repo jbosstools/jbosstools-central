@@ -51,10 +51,20 @@
       </projectConversionParticipant>
       <projectConversionParticipant
             class="org.jboss.tools.maven.conversion.core.internal.AppClientDependencyConversionParticipant"
-            id="org.jboss.tools.maven.conversion.core.AppClientDependencyConversionParticipant"
+            id="org.jboss.tools.maven.conversion.core.AppClientDependencyConversionParticipant1"
             name="Application-client dependency conversion participant"
             nature="org.eclipse.wst.common.modulecore.ModuleCoreNature"
             runsAfter="org.jboss.tools.maven.conversion.ui.ModuleConversionParticipant">
+      </projectConversionParticipant>         
+      
+      <!-- m2e"s single nature filter is too limiting. 
+      it forces us to create a different instance to cope with javanature AND moduleCorenature. Yuck-->
+      <projectConversionParticipant
+            class="org.jboss.tools.maven.conversion.core.internal.AppClientDependencyConversionParticipant"
+            id="org.jboss.tools.maven.conversion.core.AppClientDependencyConversionParticipant2"
+            name="Application-client dependency conversion participant"
+            nature="org.eclipse.jdt.core.javanature"
+            runsAfter="org.jboss.tools.maven.conversion.ui.ClasspathConversionParticipant">
       </projectConversionParticipant>         
     </extension>   
     

@@ -24,25 +24,39 @@ public class AppClientDependencyConversionParticipantTest extends
 		AbstractMavenConversionTest {
 
 	@Test
-	public void testAddMavenAcrPlugin() throws Exception {
+	public void testAddMavenAcrPluginToEar() throws Exception {
+		checkJBIDE13781_MavenAcrPlugin("JBIDE-13781-ear");
+	}
+
+	@Test
+	public void testAddMavenAcrPluginToWar() throws Exception {
+		checkJBIDE13781_MavenAcrPlugin("JBIDE-13781-web");
+	}
+
+	@Test
+	public void testAddMavenAcrPluginToPlainJava() throws Exception {
+		checkJBIDE13781_MavenAcrPlugin("JBIDE-13781-java");
+	}
+		
+	private void checkJBIDE13781_MavenAcrPlugin(String projectName) throws Exception {
 		IProject appClient = importProject("projects/conversion/JBIDE-13781/earClient/pom.xml");
 	
 		 //Import existing regular Eclipse project
-	    IProject ear = createExisting("JBIDE-13781-ear", "projects/conversion/JBIDE-13781/JBIDE-13781-ear/");
-	    assertTrue("JBIDE-13781-ear was not created!", ear.exists());
-	    assertNoErrors(ear);
-	    IMavenProjectFacade facadeEar; 
+	    IProject project = createExisting(projectName, "projects/conversion/JBIDE-13781/"+projectName);
+	    assertTrue(projectName+ " was not created!", project.exists());
+	    assertNoErrors(project);
+	    IMavenProjectFacade mavenFacade; 
 	    try {
 	    	System.setProperty(AbstractReferenceConversionParticipant.REFERENCE_CONVERSION_SKIP_KEY, "true");
-	    	facadeEar = convert(ear);
+	    	mavenFacade = convert(project);
 	    } finally {
 	    	System.clearProperty(AbstractReferenceConversionParticipant.REFERENCE_CONVERSION_SKIP_KEY);
 	    }
-	    List<Dependency> deps = facadeEar.getMavenProject().getDependencies();
+	    List<Dependency> deps = mavenFacade.getMavenProject().getDependencies();
 	    assertEquals(1, deps.size());
 	    assertEquals("app-client", deps.get(0).getType());
 	    
-	    Build build = facadeEar.getMavenProject().getModel().getBuild();
+	    Build build = mavenFacade.getMavenProject().getModel().getBuild();
 	    Plugin acrPlugin = build.getPluginsAsMap().get("org.apache.maven.plugins:maven-acr-plugin");
 	    assertNotNull("maven-acr-plugin is missing", acrPlugin);
 	    assertTrue("maven-acr-plugin not set as extension", acrPlugin.isExtensions());
