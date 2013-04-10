@@ -26,6 +26,12 @@
               class="org.jboss.tools.maven.sourcelookup.ui.actions.AttachSourcesActionDelegate"
               label="Attach Sources" style="push"/>
       </editorContribution>
+      <editorContribution id="org.jboss.tools.maven.sourcelookup.ui.attachSourcesContribution2"
+                     targetID="org.eclipse.jdt.ui.ClassFileEditorNoSource">
+        <action id="org.jboss.tools.maven.sourcelookup.ui.attachSourcesAction"
+             class="org.jboss.tools.maven.sourcelookup.ui.actions.AttachSourcesActionDelegate"
+             label="Attach Sources" style="push"/>
+      </editorContribution>
    </extension>
    
    <extension

@@ -62,10 +62,6 @@ public class AttachSourcesActionDelegate implements IEditorActionDelegate {
 	public void setActiveEditor(IAction action, IEditorPart targetEditor) {
 		if (targetEditor != null) {
 			try {
-				boolean isAuto = SourceLookupActivator.getDefault().isAutoAddSourceContainer();
-				if (!isAuto) {
-					return;
-				}
 				IClassFileEditorInput input = (IClassFileEditorInput) targetEditor.getEditorInput();
 				IJavaElement element = input.getClassFile();
 				while (element.getParent() != null) {

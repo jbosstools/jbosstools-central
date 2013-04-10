@@ -46,8 +46,13 @@ import org.junit.Test;
  * @author snjeza
  * 
  */
+@SuppressWarnings("restriction")
 public class SourceLookupTest {
 
+	private static final String TARGET_REQUIREMENTS = "/target/requirements/";
+	private static final String JBOSSTOOLS_TEST_JBOSS_HOME_7_1_1 = "jbosstools.test.jboss.home.7.1.1";
+	private static final String JBOSSTOOLS_TEST_JBOSS_HOME_EAP_6_1 = "jbosstools.test.jboss.home.eap.6.1";
+	private static final String DEVICE_C = "C:/";
 	private static final String WELD_BOOTSTRAP_JAVA = "org/jboss/weld/bootstrap/WeldBootstrap.java";
 	private static final String JBOSS_EAP_61 = "jboss-eap-6.1";
 	private static final String JBOSS_AS_7_1_1_FINAL = "jboss-as-7.1.1.Final";
@@ -61,9 +66,9 @@ public class SourceLookupTest {
 		SourceLookupActivator.getDefault().savePreferences();
 		IRuntimeDetectorDelegate delegate = getJBossASHandler();
 		List<RuntimeDefinition> runtimeDefinitions = new ArrayList<RuntimeDefinition>();
-		RuntimeDefinition runtimeDefinition = getRuntimDefinition(delegate, "jbosstools.test.jboss.home.7.1.1", JBOSS_AS_7_1_1_FINAL);
+		RuntimeDefinition runtimeDefinition = getRuntimDefinition(delegate, JBOSSTOOLS_TEST_JBOSS_HOME_7_1_1, JBOSS_AS_7_1_1_FINAL);
 		runtimeDefinitions.add(runtimeDefinition);
-		runtimeDefinition = getRuntimDefinition(delegate, "jbosstools.test.jboss.home.eap.6.1", JBOSS_EAP_61);
+		runtimeDefinition = getRuntimDefinition(delegate, JBOSSTOOLS_TEST_JBOSS_HOME_EAP_6_1, JBOSS_EAP_61);
 		runtimeDefinitions.add(runtimeDefinition);
 		delegate.initializeRuntimes(runtimeDefinitions);
 	}
@@ -81,10 +86,10 @@ public class SourceLookupTest {
 
 	private static RuntimeDefinition getRuntimDefinition(
 			IRuntimeDetectorDelegate delegate, String property, String directory) throws IOException {
-		String home = System.getProperty(property, "C:/" + directory);
+		String home = System.getProperty(property, DEVICE_C + directory);
 		File homeFile = new File(home);
 		if (!homeFile.exists()) {
-			homeFile = new File(FileLocator.getBundleFile(Platform.getBundle(Activator.PLUGIN_ID)), "/target/requirements/" + directory);
+			homeFile = new File(FileLocator.getBundleFile(Platform.getBundle(Activator.PLUGIN_ID)), TARGET_REQUIREMENTS + directory);
 		}
 		return delegate.getRuntimeDefinition(homeFile, new NullProgressMonitor());
 	}
