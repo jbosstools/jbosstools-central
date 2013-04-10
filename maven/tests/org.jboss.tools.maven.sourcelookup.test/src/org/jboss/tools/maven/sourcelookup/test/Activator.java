@@ -10,6 +10,9 @@
  ************************************************************************************/
 package org.jboss.tools.maven.sourcelookup.test;
 
+import org.eclipse.ui.internal.IPreferenceConstants;
+import org.eclipse.ui.internal.WorkbenchPlugin;
+import org.eclipse.ui.internal.util.PrefUtil;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 
@@ -37,6 +40,8 @@ public class Activator extends AbstractUIPlugin {
 	public void start(BundleContext context) throws Exception {
 		super.start(context);
 		plugin = this;
+		WorkbenchPlugin.getDefault().getPreferenceStore().setValue(IPreferenceConstants.WORKBENCH_SAVE_INTERVAL, 0);
+		PrefUtil.savePrefs();
 	}
 
 	/*

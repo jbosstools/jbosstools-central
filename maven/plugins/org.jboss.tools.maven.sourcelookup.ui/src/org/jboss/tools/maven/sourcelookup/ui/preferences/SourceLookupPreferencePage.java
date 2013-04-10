@@ -64,8 +64,7 @@ public class SourceLookupPreferencePage extends PreferencePage implements
 
 	@Override
 	protected void performApply() {
-		IEclipsePreferences preferences = SourceLookupActivator.getDefault()
-				.getPreferences();
+		IEclipsePreferences preferences = SourceLookupActivator.getPreferences();
 		preferences.putBoolean(
 				SourceLookupActivator.AUTO_ADD_JBOSS_SOURCE_CONTAINER,
 				autoAddButton.getSelection());
