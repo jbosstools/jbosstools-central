@@ -11,6 +11,7 @@
 package org.jboss.tools.central.test;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
@@ -26,6 +27,7 @@ import org.jboss.tools.central.editors.JBossCentralEditor;
 import org.jboss.tools.central.editors.SoftwarePage;
 import org.jboss.tools.central.editors.xpl.DiscoveryViewer;
 import org.jboss.tools.central.internal.discovery.ExpressionBasedDiscoveryConnector;
+import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -43,6 +45,8 @@ public class DiscoveryTest {
 	@BeforeClass
 	public static void init() throws Exception {
 		System.setProperty("central.URL", TEST_URL);
+		//Need to allow bundle discovery AND remote discovery hence :
+		System.setProperty("org.jboss.tools.central.allow.duplicate.connectors", Boolean.TRUE.toString());
 		final WorkbenchWindow window = (WorkbenchWindow) PlatformUI
 				.getWorkbench().getActiveWorkbenchWindow();
 		final IWorkbenchPage page = window.getActivePage();
@@ -57,17 +61,24 @@ public class DiscoveryTest {
 		SoftwarePage softwarePage = editor.getSoftwarePage();
 		discoveryViewer = softwarePage.getDiscoveryViewer();
 	}
+	
+	@AfterClass
+	public static void shutDown() {
+		System.clearProperty("org.jboss.tools.central.allow.duplicate.connectors");
+		System.clearProperty("central.URL");
+	}
 
 	@Test
 	public void testConnectors() throws Exception {
 		List<ExpressionBasedDiscoveryConnector> connectors = getConnectors();
 		assertNotNull(connectors);
+		assertNotEquals(0, connectors.size());
 	}
 
 	@Test
 	public void testDefaultConnector() throws Exception {
 		ExpressionBasedDiscoveryConnector connector = getConnector(DEFAULT_ID);
-		assertNotNull(connector);
+		assertNotNull("Connector "+DEFAULT_ID+ " not found", connector);
 		String siteUrl = connector.getSiteUrl();
 		assertEquals(siteUrl, DEFAULT_URL);
 	}
@@ -75,7 +86,7 @@ public class DiscoveryTest {
 	@Test
 	public void testCentralConnector() throws Exception {
 		ExpressionBasedDiscoveryConnector connector = getConnector(TEST_ID);
-		assertNotNull(connector);
+		assertNotNull("Connector "+TEST_ID+ " not found", connector);
 		String siteUrl = connector.getSiteUrl();
 		assertEquals(siteUrl, TEST_URL);
 	}

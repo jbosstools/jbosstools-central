@@ -9,20 +9,6 @@
 	</parent>
 	<groupId>org.jboss.tools.central.tests</groupId>
 	<artifactId>org.jboss.tools.central.test</artifactId>
-	
-	<packaging>eclipse-test-plugin</packaging>
 
-	<build>
-		<plugins>
-			<plugin>
-				<groupId>org.eclipse.tycho</groupId>
-				<artifactId>tycho-surefire-plugin</artifactId>
-				<version>${tychoVersion}</version>
-				<configuration>
-					<testSuite>org.jboss.tools.central.test</testSuite>
-					<testClass>org.jboss.tools.central.test.JBossCentralAllTests</testClass>
-				</configuration>
-			</plugin>
-		</plugins>
-	</build>
+	<packaging>eclipse-test-plugin</packaging>
 </project>

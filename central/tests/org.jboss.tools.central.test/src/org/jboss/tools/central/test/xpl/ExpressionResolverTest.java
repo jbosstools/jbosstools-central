@@ -50,9 +50,13 @@ public class ExpressionResolverTest {
     @Test(expected = ExpressionResolutionException.class)
     public void testIncompleteReference() {
         System.setProperty("test.property1", "test.property1.value");
-        String value = "${test.property1";
-        String resolved = resolver.resolve(value);
-        fail("Did not fail with ISE: "+resolved);
+        try {
+        	String value = "${test.property1";
+        	String resolved = resolver.resolve(value);
+        	fail("Did not fail with ISE: "+resolved);
+        } finally {
+            System.clearProperty("test.property1");
+        }
     }
 
     /**
@@ -64,7 +68,8 @@ public class ExpressionResolverTest {
         System.setProperty("test.property1", "test.property1.value");
         try {
             String value = "${test.property1}";
-            assertEquals("test.property1.value", resolver.resolve(value));
+            String result = resolver.resolve(value);
+            assertEquals("test.property1.value", result);
         } finally {
             System.clearProperty("test.property1");
         }

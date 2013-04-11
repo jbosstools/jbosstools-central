@@ -322,8 +322,10 @@ public class JBossCentralActivator extends AbstractUIPlugin {
 	}
 
 	public static JBossCentralEditor getJBossCentralEditor(boolean activate) {
-		final WorkbenchWindow window = (WorkbenchWindow) PlatformUI
-				.getWorkbench().getActiveWorkbenchWindow();
+		final WorkbenchWindow window = (WorkbenchWindow) PlatformUI.getWorkbench().getActiveWorkbenchWindow();
+		if (window == null) {
+			return null;
+		}
 		final IWorkbenchPage page = window.getActivePage();
 		if (activate) {
 			return openJBossCentralEditor(page);

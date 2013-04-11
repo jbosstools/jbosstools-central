@@ -11,22 +11,31 @@
 
 package org.jboss.tools.central.editors;
 
+import java.io.File;
+import java.io.InputStream;
+import java.lang.reflect.InvocationTargetException;
+import java.net.URI;
+import java.net.URL;
+import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.jar.JarFile;
+import java.util.zip.ZipEntry;
 
 import org.apache.commons.lang.StringEscapeUtils;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
-import org.eclipse.core.runtime.IContributor;
 import org.eclipse.core.runtime.IExtension;
 import org.eclipse.core.runtime.IExtensionPoint;
 import org.eclipse.core.runtime.IExtensionRegistry;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.InvalidRegistryObjectException;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.IJobChangeEvent;
@@ -36,14 +45,22 @@ import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IContributionItem;
 import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.dialogs.Dialog;
+import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
+import org.eclipse.jface.operation.IRunnableContext;
+import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.JFaceColors;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.wizard.WizardDialog;
+import org.eclipse.mylyn.internal.discovery.core.model.ConnectorDescriptor;
+import org.eclipse.mylyn.internal.discovery.core.model.ConnectorDiscovery;
+import org.eclipse.mylyn.internal.discovery.core.model.DiscoveryConnector;
+import org.eclipse.mylyn.internal.discovery.ui.DiscoveryUi;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.custom.ScrolledComposite;
@@ -89,8 +106,13 @@ import org.eclipse.ui.forms.widgets.TableWrapLayout;
 import org.eclipse.ui.ide.IDEActionFactory;
 import org.eclipse.ui.menus.CommandContributionItem;
 import org.eclipse.ui.part.PageBook;
-import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.jboss.tools.central.JBossCentralActivator;
+import org.jboss.tools.central.internal.discovery.ExpressionBasedBundleDiscoveryStrategy;
+import org.jboss.tools.central.internal.discovery.ExpressionBasedRemoteBundleDiscoveryStrategy;
+import org.jboss.tools.central.internal.discovery.wizards.ProxyWizard;
+import org.jboss.tools.central.internal.discovery.wizards.ProxyWizardManager;
+import org.jboss.tools.central.internal.discovery.wizards.ProxyWizardManager.ProxyWizardManagerListener;
+import org.jboss.tools.central.internal.discovery.wizards.ProxyWizardManager.UpdateEvent;
 import org.jboss.tools.central.jobs.RefreshBuzzJob;
 import org.jboss.tools.central.jobs.RefreshTutorialsJob;
 import org.jboss.tools.central.model.FeedsEntry;
@@ -106,7 +128,7 @@ import org.osgi.framework.Bundle;
  * @author Fred Bricon
  *
  */
-public class GettingStartedPage extends AbstractJBossCentralPage {
+public class GettingStartedPage extends AbstractJBossCentralPage implements ProxyWizardManagerListener {
 
 	private static final String BUZZ_WARNING_ID = "org.jboss.tools.central.buzzWarning";
 	
@@ -155,6 +177,8 @@ public class GettingStartedPage extends AbstractJBossCentralPage {
 
 	public GettingStartedPage(FormEditor editor) {
 		super(editor, ID, "Getting Started");
+		
+		ProxyWizardManager.INSTANCE.registerListener(this);
 	}
 
 	@Override
@@ -444,28 +468,7 @@ public class GettingStartedPage extends AbstractJBossCentralPage {
 	    layout.marginBottom = 10;
 	    projectsComposite.setLayout(layout);
 
-	    IExtensionRegistry extensionRegistry = Platform.getExtensionRegistry();
-	    IExtensionPoint extensionPoint = extensionRegistry.getExtensionPoint("org.eclipse.ui.newWizards");
-	    IExtension[] extensions = extensionPoint.getExtensions();
-	    
-	    List<String> sortedWizardIds = ProjectExamplesActivator.getDefault().getConfigurator().getWizardIds();
-	    
-	    Map<String, IConfigurationElement> wizards = new HashMap<String, IConfigurationElement>(sortedWizardIds.size());
-		for (IExtension extension : extensions) {
-			IConfigurationElement[] elements = extension.getConfigurationElements();
-			for (IConfigurationElement element : elements) {
-				String id = element.getAttribute("id");
-				if (sortedWizardIds.contains(id) && wizards.get(id) == null) {
-					wizards.put(id, element);
-				}
-			}
-		}
-		for (String wid : sortedWizardIds){
-			IConfigurationElement element = wizards.get(wid);
-			if (element != null) {
-				createProjectLink(toolkit, projectsComposite, element);
-			}
-		}
+
 	  
 	  //Create vertical separator composite
 	  Composite filler = createComposite(toolkit, scratchComposite);
@@ -484,6 +487,40 @@ public class GettingStartedPage extends AbstractJBossCentralPage {
       descriptionCompositeScroller.setContent(descriptionComposite);
 	  projectsSection.setClient(scratchComposite);
 	  resizedescriptionCompositeScroller();
+	  
+      List<ProxyWizard> proxyWizards = getProxyWizards();
+      addProxyWizardLinks(proxyWizards);
+	}
+
+	private void addProxyWizardLinks(List<ProxyWizard> proxyWizards) {
+		Map<String, IConfigurationElement> installedWizardIds = getInstalledWizardIds();
+		disposeChildren(projectsComposite);
+		for (ProxyWizard proxyWizard : proxyWizards){
+			createProjectLink(toolkit, projectsComposite, proxyWizard, installedWizardIds);
+		}
+	}
+
+	private Map<String, IConfigurationElement> getInstalledWizardIds() {
+	    IExtensionRegistry extensionRegistry = Platform.getExtensionRegistry();
+	    IExtensionPoint extensionPoint = extensionRegistry.getExtensionPoint("org.eclipse.ui.newWizards");
+	    IExtension[] extensions = extensionPoint.getExtensions();
+	    Map<String, IConfigurationElement> installedWizards = new HashMap<String, IConfigurationElement>(extensions.length);
+		for (IExtension extension : extensions) {
+			IConfigurationElement[] elements = extension.getConfigurationElements();
+			for (IConfigurationElement element : elements) {
+				boolean isProjectWizard=Boolean.parseBoolean(element.getAttribute("project"));
+				if (isProjectWizard) {
+					String id = element.getAttribute("id");
+					installedWizards.put(id, element);
+				}
+			}
+		}
+		return installedWizards;
+	}
+
+	private List<ProxyWizard> getProxyWizards() {
+		ProxyWizardManager proxyWizardManager = ProxyWizardManager.INSTANCE; //FIXME lookup global instance.
+		return proxyWizardManager.getProxyWizards(true, new NullProgressMonitor());
 	}
 
 	private void setDescriptionLabel(String text) {
@@ -505,31 +542,29 @@ public class GettingStartedPage extends AbstractJBossCentralPage {
 		  descriptionCompositeScroller.layout(true, true);
 	}
 	
-	private void createProjectLink(FormToolkit toolkit, Composite composite,
-			final IConfigurationElement element) {
-		if (element == null) {
-			return;
-		}
-		final String name = element.getAttribute("name");
-		final String id = element.getAttribute("id");
-		if (name == null || id == null) {
-			return;
-		}
-		String iconPath = element.getAttribute("icon");
+	private void  createProjectLink(FormToolkit toolkit,
+			Composite composite, final ProxyWizard proxyWizard,
+			final Map<String, IConfigurationElement> installedWizardIds) {
+		
+		final URL iconUrl = proxyWizard.getIconUrl();
 		Image image = null;
-		if (iconPath != null) {
-			IContributor contributor = element.getContributor();
-			String pluginId = contributor.getName();
-			ImageDescriptor imageDescriptor = AbstractUIPlugin.imageDescriptorFromPlugin(pluginId, iconPath);
-			if (imageDescriptor != null) {
-				image = JBossCentralActivator.getDefault().getImage(imageDescriptor);
-			}
+		if (iconUrl != null) {
+			image = createImageFromUrl(iconUrl);
 		}
 		final ImageHyperlink link = toolkit.createImageHyperlink(composite, SWT.NONE);
 		link.setUnderlined(false);
-	    link.setText(name);
+	    link.setText(proxyWizard.getLabel());
 	    if (image != null) {
 	    	link.setImage(image);
+	    	link.addDisposeListener(new DisposeListener() {
+				@Override
+				public void widgetDisposed(DisposeEvent e) {
+					if (link.getImage() != null) {
+						link.getImage().dispose();
+						link.setImage(null);
+					}
+				}
+			});
 	    }
 	    GridDataFactory.fillDefaults().grab(true, false).applyTo(link);
 	    link.addHyperlinkListener(new HyperlinkAdapter() {
@@ -537,18 +572,21 @@ public class GettingStartedPage extends AbstractJBossCentralPage {
 			@Override
 			public void linkActivated(HyperlinkEvent e) {
 				try {
-					Object object = createExtension(element);
-					if (object instanceof INewWizard) {
-				          INewWizard wizard = (INewWizard)object;
-				          ISelection selection = getSite().getSelectionProvider().getSelection();
-				          if (selection instanceof IStructuredSelection) {
-				        	  wizard.init(PlatformUI.getWorkbench(), (IStructuredSelection) selection);
-				          }
-				          WizardDialog dialog = new WizardDialog(getSite().getShell(), wizard);
-				          dialog.open();
+					IConfigurationElement element = installedWizardIds.get(proxyWizard.getWizardId());
+					if (element == null || proxyWizard.getWizardId().contains("NewGwtProjectWizard")) {
+						//Wizard not installed
+						installMissingWizard(proxyWizard.getRequiredComponentIds());
+					} else {
+						openWizard(element);
 					}
 				} catch (CoreException e1) {
 					JBossCentralActivator.log(e1);
+				} catch (InvocationTargetException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				} catch (InterruptedException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
 				}
 			}
 	    	
@@ -560,40 +598,140 @@ public class GettingStartedPage extends AbstractJBossCentralPage {
 	    link.addListener(SWT.MouseEnter, new Listener() {
 			@Override
 			public void handleEvent(Event arg0) {
-				if (highlightedLink != null) {
+				if (highlightedLink != null && !highlightedLink.isDisposed()) {
 					highlightedLink.setBackground(originalColor);
 				}
-				setDescriptionLabel(getTemporaryHardCodedDescription(name));
+				setDescriptionLabel(proxyWizard.getDescription());
 				highlightedLink = link;
 				highlightedLink.setBackground(blueish);
-			}
-
-			private String getTemporaryHardCodedDescription(String name) {
-				String description = "";
-				if ("HTML5 Project".equals(name)) {
-					description = name + " is a sample, deployable Maven 3 project to help you get started developing a Mobile HTML5 web application "
-							+ "on JBoss Enterprise Application Platform 6 or JBoss Application Server 7.1. "
-							+ "This project creates a pure HTML5 based front end which interacts with server side content through RESTful endpoints";
-				} else if ("OpenShift Application".equals(name)) {
-					description = "Create any kind of application and deploy it in the cloud using OpenShift from Red Hat";
-				} else if ("Java EE Web Project".equals(name)) {
-					description = name + " is a sample, deployable Maven 3 project to help you get your foot in the door developing with Java EE 6 "
-							+ "on JBoss Enterprise Application Platform 6 or JBoss Application Server 7.1. "
-							+ "This project is setup to allow you to create a compliant Java EE 6 application using JSF 2.0, CDI 1.0, EJB 3.1, JPA 2.0 and Bean Validation 1.0.";
-				} else if ("RichFaces Project".equals(name)) {
-					description = name + " is a sample, deployable Maven 3 project to help you get started developing a JSF 2.0 application with RichFaces "
-							+ "on JBoss Enterprise Application Platform 6 or JBoss Application Server 7.1. ";
-				} else if ("GWT Web Project".equals(name)) {
-					description = name + " is a sample, deployable Maven 3 project to help you get started developing a GWT application with Java EE 6 and Errai.";
-				} else if ("Spring MVC Project".equals(name)) {
-					description = name + " is a sample, deployable Maven 3 project to help you get started developing a Spring MVC application with Java EE persistence settings "
-							+ "(server bootstrapped JPA, JTA transaction management) for JBoss Enterprise Application Platform 6 or JBoss Application Server 7.1";
-				}
-				return (description.isEmpty())?name:description;
 			}
 		});
 	}
 
+	private Image createImageFromUrl(URL iconUrl) {
+
+		if (!iconUrl.getProtocol().equals("jar")) {
+			ImageDescriptor descriptor = ImageDescriptor.createFromURL(iconUrl);
+			return descriptor.createImage();
+		}
+		
+		//Load from jar:
+		Image image = null;
+		try {
+			String fileName = iconUrl.getFile();
+			if (fileName.contains("!")) {
+				String[] location = fileName.split("!");
+				fileName = location[0];
+				String imageName = URLDecoder.decode(location[1].substring(1), "utf-8");
+				File file = new File(new URI(fileName));
+				JarFile jarFile = null;
+				InputStream inputStream = null; 
+				try {
+					jarFile = new JarFile(file);
+					ZipEntry imageEntry = jarFile.getEntry(imageName);
+					if (imageEntry != null) {
+						inputStream = jarFile.getInputStream(imageEntry);
+						image = new Image(getDisplay(), inputStream);
+					} 
+				}finally {
+					try {
+						if (inputStream != null) {
+							inputStream.close();
+						}	
+					} catch (Exception e) {
+						//ignore
+					}
+					try {
+						if (jarFile != null) {
+							jarFile.close();
+						}
+					} catch (Exception e) {
+						//ignore
+				    }
+				}
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+		return image;
+	}
+
+	private void openWizard(IConfigurationElement element) throws CoreException {
+		Object object = createExtension(element);
+		if (object instanceof INewWizard) {
+	          INewWizard wizard = (INewWizard)object;
+	          ISelection selection = getSite().getSelectionProvider().getSelection();
+	          if (selection instanceof IStructuredSelection) {
+	        	  wizard.init(PlatformUI.getWorkbench(), (IStructuredSelection) selection);
+	          }
+	          WizardDialog dialog = new WizardDialog(getSite().getShell(), wizard);
+	          dialog.open();
+		}
+	}
+
+	@SuppressWarnings("restriction")
+	protected void installMissingWizard(final Collection<String> connectorIds) throws InvocationTargetException, InterruptedException {
+		
+		Shell shell = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();
+		if (!MessageDialog.openQuestion(shell, "Information", "The required features to use this wizard need to be installed. Do you want to proceed?")) {
+			return;
+		};
+
+		
+		final IStatus[] results = new IStatus[1];
+		final ConnectorDiscovery[] connectorDiscoveries = new ConnectorDiscovery[1];
+		
+		//TODO Refactor the connector installation b/w the software page & project examples
+		IRunnableWithProgress runnable = new IRunnableWithProgress() {
+			public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
+				connectorDiscoveries[0] = new ConnectorDiscovery();
+				// look for descriptors from installed bundles
+				connectorDiscoveries[0].getDiscoveryStrategies().add(new ExpressionBasedBundleDiscoveryStrategy());
+				ExpressionBasedRemoteBundleDiscoveryStrategy remoteDiscoveryStrategy = new ExpressionBasedRemoteBundleDiscoveryStrategy();
+				remoteDiscoveryStrategy.setDirectoryUrl(ProjectExamplesActivator.getDefault().getConfigurator().getJBossDiscoveryDirectory());
+				connectorDiscoveries[0].getDiscoveryStrategies().add(remoteDiscoveryStrategy);
+
+				connectorDiscoveries[0].setEnvironment(ProjectExamplesActivator.getEnvironment());
+				connectorDiscoveries[0].setVerifyUpdateSiteAvailability(true);
+				results[0] = connectorDiscoveries[0].performDiscovery(monitor);
+				if (monitor.isCanceled()) {
+					results[0] = Status.CANCEL_STATUS;
+				}
+			}
+		};
+		
+		IRunnableContext context = new ProgressMonitorDialog(shell);
+		context.run(true, true, runnable);
+		if (results[0] == null) {
+			return;
+		}
+		if (results[0].isOK()) {
+			List<DiscoveryConnector> connectors = connectorDiscoveries[0].getConnectors();
+			List<ConnectorDescriptor> installableConnectors = new ArrayList<ConnectorDescriptor>();
+			for (DiscoveryConnector connector:connectors) {
+				if (connectorIds.contains(connector.getId())) {
+					installableConnectors.add(connector);
+				}
+			}
+			DiscoveryUi.install(installableConnectors, context);
+		} else {
+			String message = results[0].toString();
+			switch (results[0].getSeverity()) {
+			case IStatus.ERROR:	
+				MessageDialog.openError(shell, "Error", message);
+				break;
+			case IStatus.WARNING:
+				MessageDialog.openWarning(shell, "Warning", message);
+				break;
+			case IStatus.INFO:
+				MessageDialog.openInformation(shell, "Information", message);
+				break;
+			}
+		}
+	}
+
+	
 	public static Object createExtension(final IConfigurationElement element) throws CoreException {
 		if (element == null) {
 			return null;
@@ -699,6 +837,9 @@ public class GettingStartedPage extends AbstractJBossCentralPage {
 			RefreshTutorialsJob.INSTANCE.removeJobChangeListener(refreshTutorialsJobChangeListener);
 			refreshTutorialsJobChangeListener = null;
 		}
+		
+		ProxyWizardManager.INSTANCE.unRegisterListener(this);
+		
 		super.dispose();
 	}
 
@@ -1145,4 +1286,20 @@ public class GettingStartedPage extends AbstractJBossCentralPage {
 			}
 		}
 	}
+
+	@Override
+	public void onProxyWizardUpdate(final UpdateEvent event) throws CoreException {
+		getDisplay().syncExec(new Runnable() {
+			@Override
+			public void run() {
+				if (projectsComposite.isDisposed()) {
+					return;
+				}
+				List<ProxyWizard> newWizards = event.getProxyWizards();
+				addProxyWizardLinks(newWizards);
+				projectsComposite.layout(true, true);
+			}
+		});
+	}
+
 }

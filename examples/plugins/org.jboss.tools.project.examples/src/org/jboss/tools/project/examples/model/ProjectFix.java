@@ -98,6 +98,8 @@ public class ProjectFix {
 		}
 		return fixable;
 	}
+	
+	@Deprecated
 	public void fix() {
 		if (SEAM_RUNTIME.equals(type)) {
 			Shell shell = getShell();

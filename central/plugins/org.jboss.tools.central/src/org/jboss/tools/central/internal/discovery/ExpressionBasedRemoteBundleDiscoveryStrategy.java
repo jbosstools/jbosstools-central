@@ -23,8 +23,7 @@ import org.eclipse.mylyn.internal.discovery.core.model.RemoteBundleDiscoveryStra
  * @see org.eclipse.mylyn.internal.discovery.core.model.RemoteBundleDiscoveryStrategy
  * @author snjeza
  */
-public class ExpressionBasedRemoteBundleDiscoveryStrategy extends
-		RemoteBundleDiscoveryStrategy {
+public class ExpressionBasedRemoteBundleDiscoveryStrategy extends RemoteBundleDiscoveryStrategy {
 
 	private ExpressionBasedDiscoveryExtensionProcessor processor = new ExpressionBasedDiscoveryExtensionProcessor() {
 		@Override

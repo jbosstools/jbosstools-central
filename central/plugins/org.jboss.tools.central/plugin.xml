@@ -2,6 +2,8 @@
 <?eclipse version="3.4"?>
 <plugin>
 
+   <extension-point id="proxyWizard" name="Proxy Wizard" schema="schemas/org.jboss.tools.central.proxyWizard.exsd"/>
+
    <extension
          point="org.eclipse.ui.editors">
       <editor
@@ -265,6 +267,7 @@
             name="Spring MVC Project"
             project="true">
       </wizard>
+      <!-- JBIDE-14445 : Remove GWT wizard  
       <wizard
             category="org.jboss.tools.central.ui.wizard.category"
             id="org.jboss.tools.central.wizards.NewGwtProjectWizard"
@@ -273,6 +276,7 @@
             name="GWT Web Project"
             project="true">
       </wizard>
+      -->
    </extension>
 
    <extension
