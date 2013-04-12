@@ -12,6 +12,7 @@ package org.jboss.tools.maven.sourcelookup.ui.preferences;
 
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.jface.preference.PreferencePage;
+import org.eclipse.jface.preference.RadioGroupFieldEditor;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -30,7 +31,9 @@ import org.jboss.tools.maven.sourcelookup.SourceLookupActivator;
 public class SourceLookupPreferencePage extends PreferencePage implements
 		IWorkbenchPreferencePage {
 
-	private Button autoAddButton;
+	private Button addContainerButton;
+	
+	private RadioGroupFieldEditor addSourceAttachmentEditor;
 
 	@Override
 	public void init(IWorkbench workbench) {
@@ -46,20 +49,29 @@ public class SourceLookupPreferencePage extends PreferencePage implements
 		composite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 		composite.setLayout(layout);
 
-		autoAddButton = new Button(composite, SWT.CHECK);
-		autoAddButton.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true,
+		addContainerButton = new Button(composite, SWT.CHECK);
+		addContainerButton.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true,
 				false));
-		autoAddButton.setSelection(SourceLookupActivator.getDefault()
+		addContainerButton.setSelection(SourceLookupActivator.getDefault()
 				.isAutoAddSourceContainer());
-		autoAddButton
+		addContainerButton
 				.setText("Automatically add the JBoss Maven source container to all JBoss AS launch configurations");
 
+		createSourceAttachementControls(composite);
 		return composite;
 	}
 
-	@Override
-	public void dispose() {
-		super.dispose();
+	private void createSourceAttachementControls(Composite parent) {
+		String name = SourceLookupActivator.AUTO_ADD_JBOSS_SOURCE_ATTACHMENT;
+		String label = "Automatically configure the Java Source Attachment";
+        String[][] namesAndValues = {
+                { "Always", SourceLookupActivator.AUTO_ADD_JBOSS_SOURCE_ATTACHMENT_ALWAYS },
+                { "Never", SourceLookupActivator.AUTO_ADD_JBOSS_SOURCE_ATTACHMENT_NEVER },
+                { "Prompt", SourceLookupActivator.AUTO_ADD_JBOSS_SOURCE_ATTACHMENT_PROMPT }, };
+		addSourceAttachmentEditor = new RadioGroupFieldEditor(name, label, 3, namesAndValues, parent, true);
+		addSourceAttachmentEditor.setPreferenceStore(SourceLookupActivator.getDefault().getPreferenceStore());
+		addSourceAttachmentEditor.setPage(this);
+		addSourceAttachmentEditor.load();
 	}
 
 	@Override
@@ -67,19 +79,23 @@ public class SourceLookupPreferencePage extends PreferencePage implements
 		IEclipsePreferences preferences = SourceLookupActivator.getPreferences();
 		preferences.putBoolean(
 				SourceLookupActivator.AUTO_ADD_JBOSS_SOURCE_CONTAINER,
-				autoAddButton.getSelection());
+				addContainerButton.getSelection());
+		addSourceAttachmentEditor.store();
 		SourceLookupActivator.getDefault().savePreferences();
 	}
 
 	@Override
 	protected void performDefaults() {
-		IEclipsePreferences preferences = SourceLookupActivator.getPreferences();
+		IEclipsePreferences preferences = SourceLookupActivator
+				.getPreferences();
 
-		autoAddButton
+		addContainerButton
 				.setSelection(SourceLookupActivator.AUTO_ADD_JBOSS_SOURCE_CONTAINER_DEFAULT);
 		preferences.putBoolean(
 				SourceLookupActivator.AUTO_ADD_JBOSS_SOURCE_CONTAINER,
 				SourceLookupActivator.AUTO_ADD_JBOSS_SOURCE_CONTAINER_DEFAULT);
+
+		addSourceAttachmentEditor.loadDefault();
 		super.performDefaults();
 	}
 

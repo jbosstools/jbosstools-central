@@ -20,6 +20,8 @@ import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.ILaunchConfiguration;
+import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.ui.preferences.ScopedPreferenceStore;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
@@ -37,14 +39,21 @@ public class SourceLookupActivator implements BundleActivator {
 	
 	private static final String MAVEN_PLUGIN_ID = "org.eclipse.m2e.core"; //$NON-NLS-1$
 	public static final String JBOSS_LAUNCH_SOURCE_PATH_COMPUTER_ID = "org.jboss.tools.maven.sourcelookup.SourcePathComputer"; //$NON-NLS-1$
-	public static final String AUTO_ADD_JBOSS_SOURCE_CONTAINER = "autoAddJBossSourceContainer";
+	public static final String AUTO_ADD_JBOSS_SOURCE_CONTAINER = "autoAddJBossSourceContainer"; //$NON-NLS-1$
 	public static final boolean AUTO_ADD_JBOSS_SOURCE_CONTAINER_DEFAULT = false;
+	public static final String AUTO_ADD_JBOSS_SOURCE_ATTACHMENT = "autoAddProjectSourceAttachment"; //$NON-NLS-1$
+	public static final String AUTO_ADD_JBOSS_SOURCE_ATTACHMENT_ALWAYS = "always"; //$NON-NLS-1$
+	public static final String AUTO_ADD_JBOSS_SOURCE_ATTACHMENT_NEVER = "never"; //$NON-NLS-1$
+	public static final String AUTO_ADD_JBOSS_SOURCE_ATTACHMENT_PROMPT = "prompt"; //$NON-NLS-1$
+	
+	public static final String AUTO_ADD_JBOSS_SOURCE_ATTACHMENT_DEFAULT = AUTO_ADD_JBOSS_SOURCE_ATTACHMENT_PROMPT;
 
 	// The shared instance
 	private static SourceLookupActivator plugin;
 	
 	private SourcelookupLaunchConfigurationListener listener;
 	private BundleContext context;
+	private IPreferenceStore preferenceStore;
 	
 	/**
 	 * The constructor
@@ -73,6 +82,7 @@ public class SourceLookupActivator implements BundleActivator {
 		if (listener != null) {
 			DebugPlugin.getDefault().getLaunchManager().removeLaunchConfigurationListener(listener);
 		}
+		savePreferences();
 	}
 
 	/**
@@ -129,5 +139,17 @@ public class SourceLookupActivator implements BundleActivator {
 				AS_LAUNCH_CONFIGURATION_ID
 				.equals(configuration.getType().getIdentifier());
 	}
+
+	public String getAutoAddSourceAttachment() {
+		return getPreferences().get(AUTO_ADD_JBOSS_SOURCE_ATTACHMENT, AUTO_ADD_JBOSS_SOURCE_ATTACHMENT_PROMPT);
+	}
+	
+	public IPreferenceStore getPreferenceStore() {
+        if (preferenceStore == null) {
+            preferenceStore = new ScopedPreferenceStore(InstanceScope.INSTANCE, PLUGIN_ID);
+        }
+        return preferenceStore;
+}
+
 	
 }
