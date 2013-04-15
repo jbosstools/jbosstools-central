@@ -970,8 +970,6 @@ public class GettingStartedPage extends AbstractJBossCentralPage {
 	
 	protected void resize(boolean force) {
 		
-		resizedescriptionCompositeScroller();
-		
 		if (documentationSection == null) {
 			return;
 		}
@@ -983,10 +981,12 @@ public class GettingStartedPage extends AbstractJBossCentralPage {
 		}
 		oldSize = size;
 		
+		resizedescriptionCompositeScroller();
+		
 		int height = form.getClientArea().height - (projectsSection.getSize().y + tutorialsSection.getSize().y);
-		int width =  size.x - (documentationSection.getSize().y);
+		int width =  size.x - (documentationSection.getSize().x);
 		GridData gd = (GridData) buzzSection.getLayoutData();
-		gd.heightHint = height - 25;
+		gd.heightHint = height - 35;
 		gd.widthHint = width - 45;
 		gd.grabExcessVerticalSpace = false;
 
