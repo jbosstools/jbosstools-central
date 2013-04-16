@@ -112,8 +112,11 @@ public class MavenFacetInstallDelegate implements IDelegate {
 					MavenCoreActivator.addMavenEarPlugin(build, project, config, null, earFacetVersion, false);
 					MavenCoreActivator.createMavenProject(project.getName(), monitor, model, true);
 				}
-				IProjectFacet seamFacet = ProjectFacetsManager.getProjectFacet(SEAM_FACET_ID);
-				if (!"pom".equals(packaging) && !fpwc.hasProjectFacet(seamFacet)) {
+				IProjectFacet seamFacet = null; 
+				if (ProjectFacetsManager.isProjectFacetDefined(SEAM_FACET_ID)) {
+					seamFacet = ProjectFacetsManager.getProjectFacet(SEAM_FACET_ID);
+				}
+				if (!"pom".equals(packaging) && (seamFacet == null || !fpwc.hasProjectFacet(seamFacet))) {
 					MavenCoreActivator.addCompilerPlugin(build.getPlugins(), project);
 				}
 
