@@ -11,6 +11,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.dialogs.MessageDialogWithToggle;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
@@ -47,6 +48,14 @@ public class NewProjectExamplesJob extends WorkspaceJob {
 			if (success) {
 				projects.add(selectedProject);
 			} else {
+				final String message = "Unable to download the '" + selectedProject.getName() + "' quickstart.";
+				Display.getDefault().syncExec(new Runnable() {
+					
+					@Override
+					public void run() {
+						MessageDialog.openError(getShell(), "Error",message); 
+					}
+				});
 				return Status.CANCEL_STATUS;
 			}
 		}
