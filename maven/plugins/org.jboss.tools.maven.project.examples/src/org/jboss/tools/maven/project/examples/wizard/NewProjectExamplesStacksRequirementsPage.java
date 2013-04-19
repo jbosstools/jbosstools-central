@@ -28,6 +28,7 @@ import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jface.dialogs.DialogSettings;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jst.j2ee.project.facet.IJ2EEFacetConstants;
+import org.eclipse.jst.j2ee.web.project.facet.WebFacetUtils;
 import org.eclipse.m2e.core.internal.MavenPluginActivator;
 import org.eclipse.m2e.core.ui.internal.M2EUIPluginActivator;
 import org.eclipse.swt.SWT;
@@ -333,20 +334,11 @@ public class NewProjectExamplesStacksRequirementsPage extends NewProjectExamples
 		if (serverTargetCombo == null || serverTargetCombo.isDisposed()) {
 			return;
 		}
-		//TODO read facet version from project example metadata
-		IProjectFacetVersion facetVersion;
-		try {
-			facetVersion = ProjectFacetsManager.getProjectFacet(
-					IJ2EEFacetConstants.DYNAMIC_WEB).getLatestVersion();
-		} catch (CoreException e) {
-			MavenProjectExamplesActivator.log(e);
-			return;
-		}
-			
 		int i =0, selectedRuntimeIdx = 0;
 		String lastUsedRuntime = dialogSettings.get(TARGET_RUNTIME);
 
-		serverRuntimes = getServerRuntimes(facetVersion);
+		//TODO read facet version from project example metadata
+		serverRuntimes = getServerRuntimes(WebFacetUtils.WEB_30);
 		serverTargetCombo.removeAll();
 		serverTargetCombo.add(Messages.ArchetypeExamplesWizardFirstPage_No_TargetRuntime);
 		for (Map.Entry<String, IRuntime> entry : serverRuntimes.entrySet()) {
