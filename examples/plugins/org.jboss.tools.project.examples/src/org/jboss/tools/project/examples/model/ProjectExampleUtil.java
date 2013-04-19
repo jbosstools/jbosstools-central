@@ -795,6 +795,7 @@ public class ProjectExampleUtil {
 				}
 				// file = File.createTempFile(prefix, suffix);
 				// file.deleteOnExit();
+				boolean fileAlreadyExists = file.exists();
 				file.getParentFile().mkdirs();
 				if (monitor.isCanceled()) {
 					return null;
@@ -805,6 +806,9 @@ public class ProjectExampleUtil {
 						url.toExternalForm(), destination, monitor);
 				if (!result.isOK()) {
 					ProjectExamplesActivator.getDefault().getLog().log(result);
+					if (!fileAlreadyExists && file.exists()) {
+						file.delete();
+					}
 					return null;
 				} else {
 					if (file.exists()) {

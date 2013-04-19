@@ -48,7 +48,7 @@ public class NewProjectExamplesJob extends WorkspaceJob {
 			if (success) {
 				projects.add(selectedProject);
 			} else {
-				final String message = "Unable to download the '" + selectedProject.getName() + "' quickstart.";
+				final String message = "Unable to download the '" + selectedProject.getName() + "' quickstart.\r\nPlease check your Internet connection and/or Proxy Settings";
 				Display.getDefault().syncExec(new Runnable() {
 					
 					@Override
