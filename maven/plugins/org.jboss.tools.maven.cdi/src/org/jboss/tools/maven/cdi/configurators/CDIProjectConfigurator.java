@@ -42,6 +42,7 @@ import org.jboss.tools.common.model.util.EclipseResourceUtil;
 import org.jboss.tools.maven.cdi.MavenCDIActivator;
 import org.jboss.tools.maven.core.IJBossMavenConstants;
 import org.jboss.tools.maven.core.ProjectUtil;
+import org.jboss.tools.maven.core.VersionUtil;
 import org.jboss.tools.maven.core.internal.project.facet.MavenFacetInstallDataModelProvider;
 import org.jboss.tools.maven.ui.Activator;
 
@@ -163,7 +164,7 @@ public class CDIProjectConfigurator extends AbstractProjectConfigurator {
 	}
 	
 	private IProjectFacetVersion getCdiFacetVersion(String cdiVersionString) {
-		String majorMinor = getMajorMinorVersion(cdiVersionString);
+		String majorMinor = VersionUtil.getMajorMinorVersion(cdiVersionString);
 		IProjectFacetVersion facetVersion; 
 		try {
 			facetVersion = cdiFacet.getVersion(majorMinor);
@@ -175,13 +176,7 @@ public class CDIProjectConfigurator extends AbstractProjectConfigurator {
 		return facetVersion;
 	}
 
-	private String getMajorMinorVersion(String versionString) {
-		String[] pointVersions = versionString.split("\\.");
-		if (pointVersions.length > 1) {
-			return pointVersions[0] + "." + pointVersions[1];
-		} 
-		return versionString;
-	}
+
 	
 	private String getCDIVersion(IProject project, MavenProject mavenProject) throws CoreException {
 		String version = Activator.getDefault().getDependencyVersion(mavenProject, CDI_API_GROUP_ID, CDI_API_ARTIFACT_ID);
