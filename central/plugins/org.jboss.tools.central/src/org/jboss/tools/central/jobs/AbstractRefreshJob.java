@@ -32,8 +32,8 @@ import org.eclipse.core.runtime.jobs.Job;
 import org.jboss.tools.central.JBossCentralActivator;
 import org.jboss.tools.central.model.FeedsEntry;
 import org.jboss.tools.central.model.FeedsEntry.Type;
+import org.jboss.tools.common.core.ecf.ECFTransport;
 import org.jboss.tools.project.examples.ProjectExamplesActivator;
-import org.jboss.tools.runtime.core.util.ECFTransport;
 
 import com.sun.syndication.feed.synd.SyndContent;
 import com.sun.syndication.feed.synd.SyndEntry;
