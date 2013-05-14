@@ -1,9 +1,29 @@
 package org.jboss.tools.maven.configurators.tests;
 
+import org.eclipse.core.resources.IProject;
+import org.eclipse.m2e.wtp.jsf.internal.MavenJSFConstants;
+import org.junit.Test;
+
 
 @SuppressWarnings("restriction")
-public class JSFConfiguratorTest { //extends AbstractMavenConfiguratorTest {
+public class JSFConfiguratorTest extends AbstractMavenConfiguratorTest {
 
+	@Test
+	public void testJBIDE13728_enableJsfWithSeamFaces() throws Exception {
+		IProject project = importProject("projects/jsf/jsf-seam/pom.xml");
+		waitForJobsToComplete();
+		assertNoErrors(project);
+		assertIsJSFProject(project, MavenJSFConstants.JSF_FACET_VERSION_2_0);
+	}
+
+	@Test
+	public void testJBIDE13728_enableJsfWithDeltaSpikeFaces() throws Exception {
+		IProject project = importProject("projects/jsf/jsf-deltaspike/pom.xml");
+		waitForJobsToComplete();
+		assertNoErrors(project);
+		assertIsJSFProject(project, MavenJSFConstants.JSF_FACET_VERSION_2_0);
+	}
+	
 	/*
 	 Commented until the new m2e-wtp features are available  
 

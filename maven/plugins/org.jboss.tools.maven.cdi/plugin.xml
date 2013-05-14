@@ -30,5 +30,16 @@
           name="%CDI_Project_configurator_JDT" 
           secondaryTo="org.eclipse.m2e.jdt.javaConfigurator"/>
     </extension>
+    <extension
+          point="org.eclipse.m2e.wtp.facetDetectors">
+       <facetDetector
+             id="org.jboss.tools.maven.cdi.wtp.ExtraJsfFacetDetector"
+             facetId="jst.jsf"
+             class="org.jboss.tools.maven.cdi.internal.wtp.ExtraJsfFacetDetector"
+             priority="50">
+       </facetDetector>
+    </extension>
+    
+    
     
 </plugin>
