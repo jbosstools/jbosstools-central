@@ -17,6 +17,7 @@ import org.junit.runners.Suite;
 @Suite.SuiteClasses({
 	SiteTest.class,
 	ProjectTest.class,
+	CheatSheetTest.class
 })
 
 @RunWith(Suite.class)

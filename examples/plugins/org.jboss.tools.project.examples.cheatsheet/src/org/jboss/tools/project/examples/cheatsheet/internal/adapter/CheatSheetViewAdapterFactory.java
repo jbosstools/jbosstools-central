@@ -27,7 +27,7 @@ import org.eclipse.ui.part.ShowInContext;
 import org.jboss.tools.project.examples.cheatsheet.Activator;
 
 /**
- * Show Cheat Sheet xml files in the Cheat Cheet View 
+ * Show Cheat Sheet xml files in the Cheat Sheet View 
  * 
  * @author snjeza
  *

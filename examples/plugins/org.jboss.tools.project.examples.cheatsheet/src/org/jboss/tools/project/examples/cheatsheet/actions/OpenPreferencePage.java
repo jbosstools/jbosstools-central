@@ -17,6 +17,7 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.cheatsheets.ICheatSheetAction;
 import org.eclipse.ui.cheatsheets.ICheatSheetManager;
 import org.eclipse.ui.internal.dialogs.WorkbenchPreferenceDialog;
+import org.jboss.tools.project.examples.cheatsheet.internal.util.CheatSheetUtil;
 
 /**
  * 
