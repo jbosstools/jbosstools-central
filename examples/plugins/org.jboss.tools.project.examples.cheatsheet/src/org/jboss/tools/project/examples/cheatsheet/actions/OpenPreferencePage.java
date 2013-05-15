@@ -17,6 +17,7 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.cheatsheets.ICheatSheetAction;
 import org.eclipse.ui.cheatsheets.ICheatSheetManager;
 import org.eclipse.ui.internal.dialogs.WorkbenchPreferenceDialog;
+import org.jboss.tools.project.examples.cheatsheet.internal.util.CheatSheetUtil;
 
 /**
  * 
@@ -43,7 +44,7 @@ public class OpenPreferencePage extends Action implements ICheatSheetAction {
 		Shell shell = PlatformUI.getWorkbench().getActiveWorkbenchWindow()
 				.getShell();
 		PreferenceDialog dialog = WorkbenchPreferenceDialog.createDialogOn(
-				shell, params[0]);
+				shell, CheatSheetUtil.replaceProjectName(params[0]));
 		dialog.open();
 	}
 

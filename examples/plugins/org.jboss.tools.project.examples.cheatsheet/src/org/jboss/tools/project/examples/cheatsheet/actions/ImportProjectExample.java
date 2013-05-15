@@ -1,5 +1,5 @@
 /*************************************************************************************
- * Copyright (c) 2008-2011 Red Hat, Inc. and others.
+ * Copyright (c) 2008-2013 Red Hat, Inc. and others.
  * All rights reserved. This program and the accompanying materials 
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -28,6 +28,7 @@ import org.eclipse.ui.cheatsheets.ICheatSheetManager;
 import org.jboss.tools.project.examples.Messages;
 import org.jboss.tools.project.examples.ProjectExamplesActivator;
 import org.jboss.tools.project.examples.cheatsheet.Activator;
+import org.jboss.tools.project.examples.cheatsheet.internal.util.CheatSheetUtil;
 import org.jboss.tools.project.examples.model.IImportProjectExample;
 import org.jboss.tools.project.examples.model.ProjectExample;
 
@@ -57,14 +58,14 @@ public class ImportProjectExample extends Action implements ICheatSheetAction {
 		}
 		
 		ProjectExample project = new ProjectExample();
-		project.setName(params[0]);
-		StringTokenizer tokenizer = new StringTokenizer(params[1],","); //$NON-NLS-1$
+		project.setName(CheatSheetUtil.replaceProjectName(params[0]));
+		StringTokenizer tokenizer = new StringTokenizer(CheatSheetUtil.replaceProjectName(params[1]),","); //$NON-NLS-1$
 		List<String> includedProjects = new ArrayList<String>();
 		while (tokenizer.hasMoreTokens()) {
 			includedProjects.add(tokenizer.nextToken().trim());
 		}
 		project.setIncludedProjects(includedProjects);
-		project.setUrl(params[2]);
+		project.setUrl(CheatSheetUtil.replaceProjectName(params[2]));
 		importProject(project);
 		
 	}

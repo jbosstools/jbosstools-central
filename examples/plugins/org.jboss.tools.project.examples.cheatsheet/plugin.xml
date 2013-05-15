@@ -62,4 +62,68 @@
       </startup>
    </extension> 
     
+   <extension
+         point="org.eclipse.ui.commands">
+      <command
+      		defaultHandler="org.jboss.tools.project.examples.cheatsheet.actions.OpenFileInEditorHandler"
+            name="Open File"
+            id="org.jboss.tools.project.examples.cheatsheet.openFileInEditor">
+        <commandParameter
+           id="path"
+           name="File Path"
+           optional="false">
+        </commandParameter>
+        <commandParameter
+           id="fromLine"
+           name="From Line"
+           optional="true">
+        </commandParameter>
+        <commandParameter
+           id="toLine"
+           name="To Line"
+           optional="true">
+        </commandParameter> 
+        <commandParameter
+           id="editorID"
+           name="Editor ID"
+           optional="true">
+        </commandParameter>  
+      </command>
+      <!--
+      <command
+      		defaultHandler="org.jboss.tools.project.examples.cheatsheet.actions.RunOnServerHandler"
+            name="Run On Server"
+            id="org.jboss.tools.project.examples.cheatsheet.runOnServer">
+        <commandParameter
+           id="projectName"
+           name="Project Name">
+        </commandParameter>
+        <commandParameter
+           id="path"
+           name="File Path"
+           optional="true">
+        </commandParameter>
+      </command>
+      <command
+      		defaultHandler="org.jboss.tools.project.examples.cheatsheet.actions.LaunchJUnitTestHandler"
+            name="Launch JUnit tests"
+            id="org.jboss.tools.project.examples.cheatsheet.launchJUnitTest">
+        <commandParameter
+           id="projectName"
+           name="Project Name">
+        </commandParameter>
+        <commandParameter
+           id="profile"
+           name="Maven Profile"
+           optional="true">
+        </commandParameter>
+        <commandParameter
+           id="mode"
+           name="Launch Mode"
+           optional="true">
+        </commandParameter>
+      </command>
+      -->
+   </extension>
+
 </plugin>
