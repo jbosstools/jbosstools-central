@@ -61,7 +61,7 @@ import org.eclipse.wst.server.core.IRuntime;
 import org.eclipse.wst.server.core.IServer;
 import org.eclipse.wst.server.core.ServerCore;
 import org.jboss.ide.eclipse.as.core.server.IJBossServerRuntime;
-import org.jboss.tools.common.core.ecf.ECFTransport;
+import org.jboss.tools.foundation.ecf.ECFTransportUtility;
 import org.jboss.tools.project.examples.Messages;
 import org.jboss.tools.project.examples.ProjectExamplesActivator;
 import org.w3c.dom.Document;
@@ -776,8 +776,7 @@ public class ProjectExampleUtil {
 				long urlModified = -1;
 				file = getFile(url);
 				try {
-					urlModified = ECFTransport.getInstance()
-							.getLastModified(url);
+					urlModified = new ECFTransportUtility().getLastModified(url);
 				} catch (CoreException e) {
 					if (file.exists()) {
 						return file;
@@ -802,7 +801,7 @@ public class ProjectExampleUtil {
 				}
 				BufferedOutputStream destination = new BufferedOutputStream(
 						new FileOutputStream(file));
-				IStatus result = getTransport().download(prefix,
+				IStatus result = new ECFTransportUtility().download(prefix,
 						url.toExternalForm(), destination, monitor);
 				if (!result.isOK()) {
 					ProjectExamplesActivator.getDefault().getLog().log(result);
@@ -830,10 +829,6 @@ public class ProjectExampleUtil {
 		String urlFile = url.getFile();
 		File file = new File(root, urlFile);
 		return file;
-	}
-
-	private static ECFTransport getTransport() {
-		return ECFTransport.getInstance();
 	}
 
 	public static Document getDocument() throws ParserConfigurationException {
