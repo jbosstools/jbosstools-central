@@ -19,6 +19,7 @@ import java.util.Dictionary;
 import java.util.Hashtable;
 import java.util.List;
 
+import org.apache.commons.io.FileUtils;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -194,7 +195,7 @@ public class ProxyWizardManager {
 			}
 			File f = files[--i];
 			if (!f.equals(currentCache)) {
-				delete(f);
+				FileUtils.deleteQuietly(f);
 			}
 		}
 	}
@@ -299,20 +300,4 @@ public class ProxyWizardManager {
 		}
 	}
 	
-	//FIXME move to utility class or use commons.io
-	private void delete(File file) {
-		if (file.exists()) {
-			if (file.isDirectory()) {
-				File[] children = file.listFiles();
-				if (children != null) {
-					for (File child : children) {
-						delete(child);
-					}
-				}
-			}
-			if (!file.delete()) {
-				System.err.println("failed to delete "+file);
-			}
-		}
-	}
 }
