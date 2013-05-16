@@ -11,6 +11,7 @@
 package org.jboss.tools.maven.sourcelookup.test;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
@@ -42,9 +43,12 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.jdt.core.IClassFile;
+import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IJavaProject;
+import org.eclipse.jdt.core.IPackageFragmentRoot;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaCore;
+import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.internal.ui.javaeditor.ClassFileEditor;
 import org.eclipse.jdt.internal.ui.javaeditor.EditorUtility;
 import org.eclipse.jface.text.IDocument;
@@ -53,11 +57,13 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
+import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.dialogs.IOverwriteQuery;
 import org.eclipse.ui.internal.wizards.datatransfer.ZipLeveledStructureProvider;
 import org.eclipse.ui.wizards.datatransfer.ImportOperation;
 import org.jboss.tools.maven.sourcelookup.SourceLookupActivator;
+import org.jboss.tools.maven.sourcelookup.ui.internal.util.SourceLookupUtil;
 import org.jboss.tools.test.util.JobUtils;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -88,6 +94,10 @@ public class OpenBinaryFile {
 		project = importTestProject(file);
 		project.build(IncrementalProjectBuilder.FULL_BUILD, null);
 		JobUtils.waitForIdle();
+		IEclipsePreferences preferences = SourceLookupActivator
+				.getPreferences();
+		preferences.put(SourceLookupActivator.AUTO_ADD_JBOSS_SOURCE_ATTACHMENT,
+				SourceLookupActivator.AUTO_ADD_JBOSS_SOURCE_ATTACHMENT_ALWAYS);
 	}
 	
 	@AfterClass 
@@ -100,6 +110,13 @@ public class OpenBinaryFile {
 	
 	@Test
 	public void testOpenFile() throws Exception {
+		IDocument document = getDocument();
+		String text = document.get();
+		assertEquals(268703, text.length());
+		closeAllEditors(false);
+	}
+
+	public IDocument getDocument() throws JavaModelException, PartInitException {
 		IJavaProject javaProject = JavaCore.create(project);
 		assertTrue(javaProject != null);
 		IType type = javaProject.findType(ORG_APACHE_COMMONS_LANG_STRING_UTILS);
@@ -118,9 +135,54 @@ public class OpenBinaryFile {
 		assertTrue(activeEditor instanceof ClassFileEditor);
 		ClassFileEditor editor = (ClassFileEditor) activeEditor;
 		IDocument document = editor.getDocumentProvider().getDocument(editor.getEditorInput());
+		return document;
+	}
+	
+	@Test
+	public void testInvalidAttachment() throws Exception {
+		invalidateAttachment();
+		IDocument document = getDocument();
 		String text = document.get();
 		assertEquals(268703, text.length());
 		closeAllEditors(false);
+	}
+
+	@Test
+	public void testPreference() throws Exception {
+		invalidateAttachment();
+		String oldValue = SourceLookupActivator.getDefault().getAutoAddSourceAttachment();
+		IEclipsePreferences preferences = SourceLookupActivator
+				.getPreferences();
+		try {
+			preferences.put(
+					SourceLookupActivator.AUTO_ADD_JBOSS_SOURCE_ATTACHMENT,
+					SourceLookupActivator.AUTO_ADD_JBOSS_SOURCE_ATTACHMENT_NEVER);
+			IDocument document = getDocument();
+			String text = document.get();
+			assertNotEquals(268703l, text.length());
+		} finally {
+			preferences.put(
+					SourceLookupActivator.AUTO_ADD_JBOSS_SOURCE_ATTACHMENT,
+					oldValue);
+			closeAllEditors(false);
+		}
+	}
+	
+	public void invalidateAttachment() throws JavaModelException {
+		IJavaProject javaProject = JavaCore.create(project);
+		assertTrue(javaProject != null);
+		IType type = javaProject.findType(ORG_APACHE_COMMONS_LANG_STRING_UTILS);
+		assertNotNull(type);
+		IClassFile classFile = type.getClassFile();
+		IJavaElement element = classFile;
+		while (element.getParent() != null) {
+			element = element.getParent();
+			if (element instanceof IPackageFragmentRoot) {
+				final IPackageFragmentRoot fragment = (IPackageFragmentRoot) element;
+				SourceLookupUtil.attachSource(fragment, new Path("/NON-EXISTING"));
+				break;
+			}
+		}
 	}
 	
 	private static void closeAllEditors(boolean save) {

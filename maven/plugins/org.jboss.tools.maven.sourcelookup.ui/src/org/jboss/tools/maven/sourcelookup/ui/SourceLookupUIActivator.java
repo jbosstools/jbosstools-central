@@ -75,4 +75,5 @@ public class SourceLookupUIActivator extends AbstractUIPlugin {
 		plugin.getLog().log(status);
 	}
 
+
 }

@@ -14,3 +14,8 @@ Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-Vendor: %BundleVendor
 Bundle-Localization: plugin
+Export-Package: org.jboss.tools.maven.sourcelookup.ui,
+ org.jboss.tools.maven.sourcelookup.ui.actions,
+ org.jboss.tools.maven.sourcelookup.ui.browsers,
+ org.jboss.tools.maven.sourcelookup.ui.internal.util; x-internal:=true,
+ org.jboss.tools.maven.sourcelookup.ui.preferences

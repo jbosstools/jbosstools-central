@@ -19,4 +19,9 @@
       </sourceContainerType>
     </extension>
     
+    <extension
+         point="org.eclipse.core.runtime.preferences">
+      <initializer class="org.jboss.tools.maven.sourcelookup.preferences.SourceLookupPreferencesInitializer"/>
+   </extension>
+    
 </plugin>

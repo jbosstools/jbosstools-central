@@ -14,24 +14,14 @@ import java.io.File;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.ResourcesPlugin;
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
-import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.jobs.IJobChangeEvent;
 import org.eclipse.core.runtime.jobs.IJobChangeListener;
 import org.eclipse.core.runtime.jobs.Job;
-import org.eclipse.jdt.core.ClasspathContainerInitializer;
-import org.eclipse.jdt.core.IClasspathContainer;
-import org.eclipse.jdt.core.IClasspathEntry;
 import org.eclipse.jdt.core.IJavaElement;
-import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IPackageFragmentRoot;
-import org.eclipse.jdt.core.JavaCore;
-import org.eclipse.jdt.internal.corext.util.JavaModelUtil;
 import org.eclipse.jdt.internal.ui.javaeditor.IClassFileEditorInput;
-import org.eclipse.jdt.internal.ui.wizards.buildpaths.BuildPathSupport;
-import org.eclipse.jdt.internal.ui.wizards.buildpaths.CPListElement;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.m2e.core.embedder.ArtifactKey;
@@ -42,6 +32,7 @@ import org.jboss.tools.maven.core.internal.identification.FileIdentificationMana
 import org.jboss.tools.maven.sourcelookup.SourceLookupActivator;
 import org.jboss.tools.maven.sourcelookup.containers.JBossSourceContainer;
 import org.jboss.tools.maven.sourcelookup.ui.SourceLookupUIActivator;
+import org.jboss.tools.maven.sourcelookup.ui.internal.util.SourceLookupUtil;
 
 /**
  * 
@@ -58,10 +49,17 @@ public class AttachSourcesActionDelegate implements IEditorActionDelegate {
 	public void selectionChanged(IAction action, ISelection selection) {
 	}
 
+	/**
+	 * adds a source attachment to a package fragment root when the Java editor opens a binary file
+	 */
 	@Override
 	public void setActiveEditor(IAction action, IEditorPart targetEditor) {
 		if (targetEditor != null) {
 			try {
+				String value = SourceLookupActivator.getDefault().getAutoAddSourceAttachment();
+				if (SourceLookupActivator.AUTO_ADD_JBOSS_SOURCE_ATTACHMENT_NEVER.equals(value)) {
+					return;
+				}
 				IClassFileEditorInput input = (IClassFileEditorInput) targetEditor.getEditorInput();
 				IJavaElement element = input.getClassFile();
 				while (element.getParent() != null) {
@@ -99,7 +97,7 @@ public class AttachSourcesActionDelegate implements IEditorActionDelegate {
 										public void done(IJobChangeEvent event) {
 											IPath sourcePath = JBossSourceContainer.getSourcePath(artifact);
 											if (sourcePath != null && sourcePath.toFile().exists()) {
-												attachSource(fragment, sourcePath);
+												SourceLookupUtil.attachSource(fragment, sourcePath);
 											}
 										}
 
@@ -113,7 +111,7 @@ public class AttachSourcesActionDelegate implements IEditorActionDelegate {
 									});
 									job.schedule();
 								} else {
-									attachSource(fragment, sourcePath);
+									SourceLookupUtil.attachSource(fragment, sourcePath);
 								}
 							}
 						}
@@ -122,53 +120,6 @@ public class AttachSourcesActionDelegate implements IEditorActionDelegate {
 			} catch (Exception e) {
 				SourceLookupUIActivator.log(e);
 			}
-		}
-	}
-
-	private void attachSource(IPackageFragmentRoot fragment, IPath newSourcePath) {
-		try {
-			if (fragment == null || fragment.getKind() != IPackageFragmentRoot.K_BINARY) {
-				return;
-			}
-			IPath containerPath = null;
-			IJavaProject jproject = fragment.getJavaProject();
-			IClasspathEntry entry = fragment.getRawClasspathEntry();
-			if (entry == null) {
-				entry = JavaCore.newLibraryEntry(fragment.getPath(), null, null);
-			} else {
-				if (entry.getEntryKind() == IClasspathEntry.CPE_CONTAINER) {
-					containerPath = entry.getPath();
-					ClasspathContainerInitializer initializer = JavaCore.getClasspathContainerInitializer(containerPath.segment(0));
-					IClasspathContainer container = JavaCore.getClasspathContainer(containerPath, jproject);
-					if (initializer == null || container == null) {
-						return;
-					}
-					IStatus status = initializer.getSourceAttachmentStatus(containerPath, jproject);
-					if (status.getCode() == ClasspathContainerInitializer.ATTRIBUTE_NOT_SUPPORTED) {
-						return;
-					}
-					if (status.getCode() == ClasspathContainerInitializer.ATTRIBUTE_READ_ONLY) {
-						return;
-					}
-					entry = JavaModelUtil.findEntryInContainer(container, fragment.getPath());
-					if (entry == null) {
-						return;
-					}
-				}
-			}
-			IClasspathEntry entry1;
-			CPListElement elem = CPListElement.createFromExisting(entry, null);
-			elem.setAttribute(CPListElement.SOURCEATTACHMENT, newSourcePath);
-			entry1 = elem.getClasspathEntry();
-			if (entry1.equals(entry)) {
-				return;
-			}
-			IClasspathEntry newEntry = entry1;
-			String[] changedAttributes = { CPListElement.SOURCEATTACHMENT };
-			BuildPathSupport.modifyClasspathEntry(null, newEntry, changedAttributes, jproject, containerPath,
-					 newEntry.getReferencingEntry() != null, new NullProgressMonitor());		
-		} catch (CoreException e) {
-			// ignore
 		}
 	}
 
