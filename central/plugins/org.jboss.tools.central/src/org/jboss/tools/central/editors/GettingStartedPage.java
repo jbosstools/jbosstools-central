@@ -573,7 +573,7 @@ public class GettingStartedPage extends AbstractJBossCentralPage implements Prox
 			public void linkActivated(HyperlinkEvent e) {
 				try {
 					IConfigurationElement element = installedWizardIds.get(proxyWizard.getWizardId());
-					if (element == null || proxyWizard.getWizardId().contains("NewGwtProjectWizard")) {
+					if (element == null) {
 						//Wizard not installed
 						installMissingWizard(proxyWizard.getRequiredComponentIds());
 					} else {
