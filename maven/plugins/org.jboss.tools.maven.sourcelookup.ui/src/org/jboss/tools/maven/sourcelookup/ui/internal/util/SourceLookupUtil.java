@@ -1,3 +1,13 @@
+/*************************************************************************************
+ * Copyright (c) 2012-2013 Red Hat, Inc. and others.
+ * All rights reserved. This program and the accompanying materials 
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ * 
+ * Contributors:
+ *     JBoss by Red Hat - Initial implementation.
+ ************************************************************************************/
 package org.jboss.tools.maven.sourcelookup.ui.internal.util;
 
 import org.eclipse.core.runtime.CoreException;
@@ -18,19 +28,15 @@ import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.MessageDialogWithToggle;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.window.Window;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.PlatformUI;
 import org.jboss.tools.maven.sourcelookup.SourceLookupActivator;
+import org.jboss.tools.maven.sourcelookup.ui.internal.Messages;
 
 public class SourceLookupUtil {
-
-	private static String FOUND_SOURCE_TITLE_TEMPLATE = "Found source jar for '${jarName}'"; 
-
-	private static String FOUND_SOURCE_MESSAGE_TEMPLATE = "'${jarName}' is missing a valid source attachement. Found a match at :\n${path}\n" +
-															"Do you want to use this as source for '${jarName}'?\n\n" +
-															"Warning: this will add a machine specific path to your classpath settings."; 
 
 	public static void attachSource(final IPackageFragmentRoot fragment, final IPath newSourcePath) {
 		try {
@@ -106,8 +112,8 @@ public class SourceLookupUtil {
 		if (MessageDialogWithToggle.NEVER.equals(value)) {
 			return false;
 		}
-		String title = FOUND_SOURCE_TITLE_TEMPLATE.replace("${jarName}", jarName);
-		String message = FOUND_SOURCE_MESSAGE_TEMPLATE.replace("${jarName}", jarName).replace("${path}", path);
+		String title = NLS.bind(Messages.SourceLookupUtil_Found_Source_Title, jarName);
+		String message = NLS.bind(Messages.SourceLookupUtil_Found_Source_Message, jarName, path);
 		Shell shell = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();
 		MessageDialogWithToggle dialog = MessageDialogWithToggle.openYesNoQuestion(shell,
 				title, message, null, false, store, key);
