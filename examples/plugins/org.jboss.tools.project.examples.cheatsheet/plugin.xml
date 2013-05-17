@@ -18,4 +18,48 @@
       </cheatsheet>
    </extension>
 
+   <extension
+         point="org.eclipse.core.runtime.adapters">
+      <factory
+            adaptableType="org.eclipse.ui.internal.cheatsheets.views.CheatSheetView"
+            class="org.jboss.tools.project.examples.cheatsheet.internal.adapter.CheatSheetViewAdapterFactory">
+         <adapter
+               type="org.eclipse.ui.part.IShowInTarget">
+         </adapter>
+      </factory>
+   </extension>
+   <extension
+         point="org.eclipse.ui.perspectiveExtensions">
+      <perspectiveExtension
+            targetID="org.eclipse.jdt.ui.JavaPerspective">
+         <showInPart
+               id="org.eclipse.ui.cheatsheets.views.CheatSheetView">
+         </showInPart>
+      </perspectiveExtension>
+      <perspectiveExtension
+            targetID="org.eclipse.pde.ui.PDEPerspective">
+         <showInPart
+               id="org.eclipse.ui.cheatsheets.views.CheatSheetView">
+         </showInPart>
+      </perspectiveExtension>
+      <perspectiveExtension
+            targetID="org.jboss.tools.common.ui.JBossPerspective">
+         <showInPart
+               id="org.eclipse.ui.cheatsheets.views.CheatSheetView">
+         </showInPart>
+      </perspectiveExtension>
+      <perspectiveExtension
+            targetID="org.eclipse.jst.j2ee.J2EEPerspective">
+         <showInPart
+               id="org.eclipse.ui.cheatsheets.views.CheatSheetView">
+         </showInPart>
+      </perspectiveExtension>
+   </extension>
+   
+   <extension
+         point="org.eclipse.ui.startup">
+      <startup class="org.jboss.tools.project.examples.cheatsheet.Startup">
+      </startup>
+   </extension> 
+    
 </plugin>
