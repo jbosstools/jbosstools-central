@@ -49,7 +49,7 @@ public class RunProjectExample extends Action implements ICheatSheetAction {
 			return;
 		}
 		
-		String params0 = CheatSheetUtil.replaceProjectName(params[0]);
+		String params0 = params[0];
 		String[] projectExample = params0.split("::"); //$NON-NLS-1$
 		if (projectExample == null || projectExample.length != 2 || projectExample[0] == null || projectExample[1] == null) {
 			Activator.log(NLS.bind(Messages.RunProjectExample_Invalid_project_example, params0));

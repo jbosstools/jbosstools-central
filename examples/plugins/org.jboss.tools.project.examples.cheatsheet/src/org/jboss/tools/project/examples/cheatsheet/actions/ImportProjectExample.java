@@ -58,14 +58,14 @@ public class ImportProjectExample extends Action implements ICheatSheetAction {
 		}
 		
 		ProjectExample project = new ProjectExample();
-		project.setName(CheatSheetUtil.replaceProjectName(params[0]));
-		StringTokenizer tokenizer = new StringTokenizer(CheatSheetUtil.replaceProjectName(params[1]),","); //$NON-NLS-1$
+		project.setName(params[0]);
+		StringTokenizer tokenizer = new StringTokenizer(params[1],","); //$NON-NLS-1$
 		List<String> includedProjects = new ArrayList<String>();
 		while (tokenizer.hasMoreTokens()) {
 			includedProjects.add(tokenizer.nextToken().trim());
 		}
 		project.setIncludedProjects(includedProjects);
-		project.setUrl(CheatSheetUtil.replaceProjectName(params[2]));
+		project.setUrl(params[2]);
 		importProject(project);
 		
 	}

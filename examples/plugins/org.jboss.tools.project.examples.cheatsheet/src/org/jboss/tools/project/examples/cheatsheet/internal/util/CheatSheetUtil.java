@@ -38,9 +38,13 @@ import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.osgi.util.NLS;
+import org.eclipse.pde.internal.ua.ui.editor.cheatsheet.comp.CompCSEditor;
+import org.eclipse.pde.internal.ua.ui.editor.cheatsheet.simple.SimpleCSEditor;
 import org.eclipse.ui.IActionBars;
+import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IEditorSite;
+import org.eclipse.ui.IFileEditorInput;
 import org.eclipse.ui.IViewSite;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchPart;
@@ -88,39 +92,42 @@ public class CheatSheetUtil {
 							file = new File(url.getFile());
 						}
 					}
-					if (file != null && file.exists()) {
-						IWorkspace workspace= ResourcesPlugin.getWorkspace();    
-						IPath location= Path.fromOSString(file.getAbsolutePath());
-						if (location != null) {
-							IFile iFile= workspace.getRoot().getFileForLocation(location);
-							if (iFile != null) {
-								return iFile.getProject();
-							}
-						}
-					}
+					return getProject(file);
 				} catch (MalformedURLException e) {
 					Activator.log(e);
 				}
 			}
 		}
-		return null;
-	}
-	
-	public static String replaceProjectName(String param) {
-		if (param == null) {
-			return null;
-		}
-		String replace = param;
-		IProject project = CheatSheetUtil.getProject();
-		if (project != null) {
-			String projectName = project.getName();
-			if (projectName != null) {
-				replace = param.replace("{project}", projectName); //$NON-NLS-1$
+		IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
+		if (page != null) {
+			IEditorPart activeEditor = page.getActiveEditor();
+			if (activeEditor instanceof SimpleCSEditor || activeEditor instanceof CompCSEditor) {
+				IEditorInput input = activeEditor.getEditorInput();
+				if (input instanceof IFileEditorInput) {
+					IFile file = ((IFileEditorInput)input).getFile();
+					if (file != null && file.exists()) {
+						return file.getProject();
+					}
+				}
 			}
 		}
-		return replace;
+		return null;
 	}
-	
+
+	public static IProject getProject(File file) {
+		if (file != null && file.exists()) {
+			IWorkspace workspace= ResourcesPlugin.getWorkspace();    
+			IPath location= Path.fromOSString(file.getAbsolutePath());
+			if (location != null) {
+				IFile iFile= workspace.getRoot().getFileForLocation(location);
+				if (iFile != null) {
+					return iFile.getProject();
+				}
+			}
+		}
+		return null;
+	}
+		
 	public static ITextEditor getTextEditor(IEditorPart editor) {
 		if (editor instanceof ITextEditor) {
 			return (ITextEditor) editor;
@@ -167,7 +174,7 @@ public class CheatSheetUtil {
 	}
 
 	public static void openFile(String pathName, String fromLine, String toLine, String editorID) {
-		String fileName = CheatSheetUtil.replaceProjectName(pathName);
+		String fileName = pathName;
 		IPath path = new Path(fileName);
 		IWorkspaceRoot workspaceRoot = ResourcesPlugin.getWorkspace().getRoot();
 		IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
@@ -211,13 +218,13 @@ public class CheatSheetUtil {
 
 	public static void runOnServer(String name, String path) {
 		IWorkspaceRoot wRoot = ResourcesPlugin.getWorkspace().getRoot();
-		String projectName = CheatSheetUtil.replaceProjectName(name);
+		String projectName = name;
 		IProject project = wRoot.getProject(projectName);
 		if (project == null || !project.isOpen()) {
 			return;
 		}
 		if (path != null) {
-			IFile file = wRoot.getFile(new Path(CheatSheetUtil.replaceProjectName(path)));
+			IFile file = wRoot.getFile(new Path(path));
 			if (file != null && file.exists()) {
 				try {
 					SingleDeployableFactory.makeDeployable(file.getFullPath());
@@ -256,7 +263,7 @@ public class CheatSheetUtil {
 	public static void launchJUnitTest(String projectName, String profile, String mode) {
 		IWorkspaceRoot workspaceRoot = ResourcesPlugin.getWorkspace().getRoot();
 
-		IProject project = workspaceRoot.getProject(CheatSheetUtil.replaceProjectName(projectName));
+		IProject project = workspaceRoot.getProject(projectName);
 		if (project == null || !project.isOpen()) {
 			IWorkbenchPage page = PlatformUI.getWorkbench()
 					.getActiveWorkbenchWindow().getActivePage();
@@ -270,7 +277,7 @@ public class CheatSheetUtil {
 			if (projectNode != null) {
 				String activeProfiles = projectNode.get(ACTIVE_PROFILES, null);
 				if (!profile.equals(activeProfiles)) {
-					projectNode.put(ACTIVE_PROFILES, CheatSheetUtil.replaceProjectName(profile));
+					projectNode.put(ACTIVE_PROFILES, profile);
 					try {
 						projectNode.flush();
 					} catch (BackingStoreException e) {

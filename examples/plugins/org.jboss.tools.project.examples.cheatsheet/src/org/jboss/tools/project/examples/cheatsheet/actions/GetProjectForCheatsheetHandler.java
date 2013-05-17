@@ -13,31 +13,29 @@ package org.jboss.tools.project.examples.cheatsheet.actions;
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
+import org.eclipse.core.resources.IProject;
 import org.jboss.tools.project.examples.cheatsheet.internal.util.CheatSheetUtil;
 
 /**
  * 
- * <p>Action that runs an application on a server.</p>
+ * <p>Action that return the curent project for cheatsheet.</p>
  * 
  * @author snjeza
  *
  */
-public class RunOnServerHandler extends AbstractHandler {
+public class GetProjectForCheatsheetHandler extends AbstractHandler {
 
-	private final static String PATH = "path"; //$NON-NLS-1$
-	private final static String PROJECT_NAME = "projectName"; //$NON-NLS-1$
-	
 	/**
 	 * Execution of the action
 	 * 
 	 */
 	public Object execute(ExecutionEvent event) throws ExecutionException {
-		
-		String path = event.getParameter(PATH);
-		String projectName = event.getParameter(PROJECT_NAME);
-		
-		CheatSheetUtil.runOnServer(projectName, path);
-		return null;
+				
+		IProject project = CheatSheetUtil.getProject();
+		if (project != null) {
+			return project.getName();
+		}
+		return ""; //$NON-NLS-1$
 	}
 
 }

@@ -44,7 +44,7 @@ public class OpenPreferencePage extends Action implements ICheatSheetAction {
 		Shell shell = PlatformUI.getWorkbench().getActiveWorkbenchWindow()
 				.getShell();
 		PreferenceDialog dialog = WorkbenchPreferenceDialog.createDialogOn(
-				shell, CheatSheetUtil.replaceProjectName(params[0]));
+				shell, params[0]);
 		dialog.open();
 	}
 
