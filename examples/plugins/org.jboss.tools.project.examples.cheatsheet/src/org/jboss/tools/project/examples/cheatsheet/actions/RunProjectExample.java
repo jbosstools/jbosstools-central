@@ -21,6 +21,7 @@ import org.eclipse.ui.cheatsheets.ICheatSheetManager;
 import org.jboss.tools.project.examples.ProjectExamplesActivator;
 import org.jboss.tools.project.examples.cheatsheet.Activator;
 import org.jboss.tools.project.examples.cheatsheet.Messages;
+import org.jboss.tools.project.examples.cheatsheet.internal.util.CheatSheetUtil;
 import org.jboss.tools.project.examples.model.ProjectExample;
 import org.jboss.tools.project.examples.model.ProjectExampleCategory;
 import org.jboss.tools.project.examples.model.ProjectExampleUtil;
@@ -48,9 +49,10 @@ public class RunProjectExample extends Action implements ICheatSheetAction {
 			return;
 		}
 		
-		String[] projectExample = params[0].split("::"); //$NON-NLS-1$
+		String params0 = params[0];
+		String[] projectExample = params0.split("::"); //$NON-NLS-1$
 		if (projectExample == null || projectExample.length != 2 || projectExample[0] == null || projectExample[1] == null) {
-			Activator.log(NLS.bind(Messages.RunProjectExample_Invalid_project_example, params[0]));
+			Activator.log(NLS.bind(Messages.RunProjectExample_Invalid_project_example, params0));
 			return;
 		}
 		List<ProjectExampleCategory> categories = ProjectExampleUtil.getProjects(new NullProgressMonitor());
