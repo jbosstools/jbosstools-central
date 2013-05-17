@@ -26,6 +26,7 @@ import java.util.Map;
 import java.util.jar.JarFile;
 import java.util.zip.ZipEntry;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
@@ -70,7 +71,6 @@ import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
-import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
@@ -172,9 +172,14 @@ public class GettingStartedPage extends AbstractJBossCentralPage implements Prox
 	private Label descriptionLabel;
 
 	protected ImageHyperlink highlightedLink;
-
+	protected Label highlightedCategory;
+	
 	private Composite descriptionComposite;
 
+	private Color blueish = null;
+
+	private Color grey = null;
+	
 	public GettingStartedPage(FormEditor editor) {
 		super(editor, ID, "Getting Started");
 		
@@ -190,7 +195,9 @@ public class GettingStartedPage extends AbstractJBossCentralPage implements Prox
 		
 		toolkit = managedForm.getToolkit();
 		form = managedForm.getForm();
-		
+		blueish = toolkit.getColors().createColor("blue", 217, 230, 248);
+		grey  = toolkit.getColors().createColor("grey", 194, 194, 194);
+	      
 		Composite body = form.getBody();
 	    body.setLayout(new GridLayout(1,false));
 	    
@@ -233,7 +240,7 @@ public class GettingStartedPage extends AbstractJBossCentralPage implements Prox
 
 	private void createComprehensiveTutorial(FormToolkit toolkit,	Composite parent) {
 		
-		comprehensiveTutorialSection = createSection(toolkit, parent, "Comprehensive Tutorial", ExpandableComposite.TITLE_BAR);
+		comprehensiveTutorialSection = createSection(toolkit, parent, "Tutorial", ExpandableComposite.TITLE_BAR);
 		GridData gd = new GridData(SWT.FILL, SWT.TOP, true, true);
 		comprehensiveTutorialSection.setLayoutData(gd);
 		
@@ -458,13 +465,13 @@ public class GettingStartedPage extends AbstractJBossCentralPage implements Prox
  
 	    //Create 3 col container composite
     	Composite scratchComposite = toolkit.createComposite(projectsSection, SWT.NONE);
-	    GridLayoutFactory.fillDefaults().numColumns(3).spacing(10, SWT.DEFAULT).applyTo(scratchComposite);
+	    GridLayoutFactory.fillDefaults().numColumns(3).spacing(5, SWT.DEFAULT).applyTo(scratchComposite);
 	    
 	    //Create icons / wizard composite
 		projectsComposite = toolkit.createComposite(scratchComposite);
 		GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.FILL).applyTo(projectsComposite);
-	    GridLayout layout = new GridLayout(3, true);
-	    layout.horizontalSpacing = 10;
+	    GridLayout layout = new GridLayout(2, true);
+	    layout.horizontalSpacing = 5;
 	    layout.marginBottom = 10;
 	    projectsComposite.setLayout(layout);
 
@@ -472,7 +479,6 @@ public class GettingStartedPage extends AbstractJBossCentralPage implements Prox
 	  
 	  //Create vertical separator composite
 	  Composite filler = createComposite(toolkit, scratchComposite);
-      Color grey = toolkit.getColors().createColor("grey", 194, 194, 194);
       filler.setBackground(grey);
       GridDataFactory.fillDefaults().grab(false, true).hint(1, SWT.DEFAULT).applyTo(filler);
 	    
@@ -582,19 +588,16 @@ public class GettingStartedPage extends AbstractJBossCentralPage implements Prox
 				} catch (CoreException e1) {
 					JBossCentralActivator.log(e1);
 				} catch (InvocationTargetException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
+					JBossCentralActivator.log(e1);
 				} catch (InterruptedException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
+					JBossCentralActivator.log(e1);
 				}
 			}
 	    	
 	    });
 	    
 	    final Color originalColor = composite.getBackground();
-	    final Color blueish = toolkit.getColors().createColor("blue", 217, 230, 248);
-
+	    
 	    link.addListener(SWT.MouseEnter, new Listener() {
 			@Override
 			public void handleEvent(Event arg0) {
@@ -634,13 +637,7 @@ public class GettingStartedPage extends AbstractJBossCentralPage implements Prox
 						image = new Image(getDisplay(), inputStream);
 					} 
 				}finally {
-					try {
-						if (inputStream != null) {
-							inputStream.close();
-						}	
-					} catch (Exception e) {
-						//ignore
-					}
+					IOUtils.closeQuietly(inputStream);
 					try {
 						if (jarFile != null) {
 							jarFile.close();
@@ -651,7 +648,7 @@ public class GettingStartedPage extends AbstractJBossCentralPage implements Prox
 				}
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			JBossCentralActivator.log(e);
 		}
 		
 		return image;
@@ -838,6 +835,10 @@ public class GettingStartedPage extends AbstractJBossCentralPage implements Prox
 			refreshTutorialsJobChangeListener = null;
 		}
 		
+		grey = null;
+		blueish = null;
+				
+		
 		ProxyWizardManager.INSTANCE.unRegisterListener(this);
 		
 		super.dispose();
@@ -943,68 +944,117 @@ public class GettingStartedPage extends AbstractJBossCentralPage implements Prox
 		resize(true);
 	}
 
-	private void showTutorials(Map<ProjectExampleCategory, List<ProjectExample>> categories) {
+	private void showTutorials(final Map<ProjectExampleCategory, List<ProjectExample>> categories) {
 		disposeChildren(tutorialsComposite);
+		//tutorialsComposite.setBackground(blueish);
+		GridLayout gl = (GridLayout)tutorialsComposite.getLayout();
+		gl.numColumns = 3;
+		gl.makeColumnsEqualWidth = false;
+		gl.horizontalSpacing = 0;
+		final Composite categoryComposite = toolkit.createComposite(tutorialsComposite);
+		int categoryHeight = 110;
+		GridDataFactory.fillDefaults().grab(false, false).hint(SWT.DEFAULT, categoryHeight).applyTo(categoryComposite);
+		GridLayout gl2 = new GridLayout();
+		gl2.marginRight = 0;
+		categoryComposite.setLayout(gl2);
+		
+		Composite filler = createComposite(toolkit, tutorialsComposite);
+	    filler.setBackground(grey);
+	    GridDataFactory.fillDefaults().grab(false, true).hint(1, SWT.DEFAULT).applyTo(filler);
+
+		final Composite categoryDetailComposite = toolkit.createComposite(tutorialsComposite);
+		GridDataFactory.fillDefaults().grab(false, false).hint(SWT.DEFAULT, categoryHeight).applyTo(categoryDetailComposite);
+		GridLayout gl3 = new GridLayout();
+		gl3.marginHeight = 0;
+		categoryDetailComposite.setLayout(gl3);
+		
 		List<ProjectExampleCategory> sortedCategories = new ArrayList<ProjectExampleCategory>(categories.keySet());
 		Collections.sort(sortedCategories);
-		
 		Color black = getDisplay().getSystemColor(SWT.COLOR_BLACK);
-		Font arial = new Font(getDisplay(),"Arial",10,SWT.BOLD); 
+		Font arial = new Font(getDisplay(),"Arial",10,SWT.NONE);
 
-		GridLayout gl = (GridLayout)tutorialsComposite.getLayout();
-		int maxCols = 4;
-		gl.makeColumnsEqualWidth = false;
-		gl.numColumns = sortedCategories.size() < maxCols ? sortedCategories.size() : maxCols; 
-		
-		int categoryHeight = 122;
+		final Color originalColor = categoryComposite.getBackground();
 		for (final ProjectExampleCategory category : sortedCategories) {
-			//Create category composite
-			final Composite categoryComposite = toolkit.createComposite(tutorialsComposite);
-			GridDataFactory.fillDefaults().grab(false, false).hint(SWT.DEFAULT, categoryHeight).applyTo(categoryComposite);
-			categoryComposite.setLayout(new GridLayout());
-			
-			//Add black title
-			Label categoryName = toolkit.createLabel(categoryComposite, category.getName());
+			final Label categoryName = toolkit.createLabel(categoryComposite, category.getName());
+			GridDataFactory.fillDefaults().grab(true, false).applyTo(categoryName);
 			categoryName.setFont(arial);
 			if (!JBossCentralEditor.useFefaultColors) {
 				categoryName.setForeground(black);
 			}
-			//Add tooltip
 			String description = category.getDescription();
 			if (description != null && !description.isEmpty()){
 				final DescriptionToolTip toolTip = new DescriptionToolTip(categoryName, description);
 				toolTip.activate();
 			}
 			
-			//Create vertical scroller
-			ScrolledComposite scroller = new ScrolledComposite(categoryComposite, SWT.V_SCROLL);
-	        GridData d = new GridData(GridData.FILL_BOTH);
-	        scroller.setLayoutData(d);
-			scroller.setMinHeight(categoryComposite.getSize().y);
-		    scroller.setExpandHorizontal(true);
-		    scroller.setExpandVertical(false);
-			
-			//Create scroller content
-			final Composite composite = toolkit.createComposite(scroller);
-			GridData d2 = new GridData(SWT.FILL, SWT.FILL, true, true);
-			composite.setLayoutData(d2);
-			composite.setLayout(new GridLayout());
-			
-			//Fill content with links
-			displayTutorialLinks(categories.get(category), composite, true);
-			
-			//Recompute size
-			scroller.setContent(composite);
-			
-			Point size = composite.computeSize(SWT.DEFAULT, SWT.DEFAULT);
-			scroller.setBackground(composite.getBackground());//Let's hide the scroller background 
-			composite.setSize(size);
-			
+			categoryName.addListener(SWT.MouseEnter, new Listener() {
+				@Override
+				public void handleEvent(Event e) {
+					selectCategory(categories, categoryDetailComposite,
+							category, categoryName, originalColor);
+				}
+			});
+		}
+
+		if (!sortedCategories.isEmpty()) {
+			selectCategory(categories, categoryDetailComposite, sortedCategories.get(0), (Label)categoryComposite.getChildren()[0], originalColor);
 		}
 		
 		tutorialPageBook.showPage(tutorialsComposite);
 		tutorialPageBook.layout(true, true);
 		form.reflow(true);
+	}
+
+	private void selectCategory(
+			final Map<ProjectExampleCategory, List<ProjectExample>> categories,
+			final Composite categoryDetailComposite,
+			final ProjectExampleCategory category,
+			final Label categoryName, final Color originalColor) {
+		if (highlightedCategory == categoryName) {
+			return;
+		}
+		if (highlightedCategory != null && !highlightedCategory.isDisposed()) {
+			highlightedCategory.setBackground(originalColor);
+		}
+		highlightedCategory = categoryName;
+		categoryName.setBackground(blueish);
+		toggleExamples(category, categories.get(category), categoryDetailComposite);
+	}
+
+	private void toggleExamples(ProjectExampleCategory category,	List<ProjectExample> examples, Composite categoryDetailComposite) {
+
+		disposeChildren(categoryDetailComposite);
+		//Create vertical scroller
+		ScrolledComposite scroller = new ScrolledComposite(categoryDetailComposite, SWT.V_SCROLL);
+        GridData d = new GridData(GridData.FILL_BOTH);
+        scroller.setLayoutData(d);
+		scroller.setMinWidth(170);
+	    scroller.setExpandHorizontal(true);
+	    scroller.setExpandVertical(false);
+		
+		//Create scroller content
+		final Composite composite = toolkit.createComposite(scroller);
+		GridData d2 = new GridData(SWT.FILL, SWT.FILL, true, true);
+		composite.setLayoutData(d2);
+		composite.setLayout(new GridLayout());
+		//composite.setBackground(blueish);
+		
+		//Fill content with links
+		displayTutorialLinks(examples, composite, true);
+		
+		//Recompute size
+		scroller.setContent(composite);
+		
+		Point size = composite.computeSize(SWT.DEFAULT, SWT.DEFAULT);
+		scroller.setBackground(composite.getBackground());//Let's hide the scroller background 
+		composite.setSize(size);
+		
+		categoryDetailComposite.pack(true);
+		tutorialsComposite.pack(true);
+		tutorialPageBook.pack(true);
+		tutorialPageBook.layout(true, true);
+		resize(true);
+		form.update();
 	}
 
 	private void hookTooltip(FormText tutorialText, ProjectExample tutorial) {
@@ -1248,7 +1298,6 @@ public class GettingStartedPage extends AbstractJBossCentralPage implements Prox
 	protected Section createSection(FormToolkit toolkit, Composite parent,
 			String name, int style) {
 		final Section section = super.createSection(toolkit, parent, name, style);
-		final FormToolkit tk = toolkit;
 		if (!JBossCentralEditor.useFefaultColors) {
 			Composite separator = new Composite(section, style);
 		    separator.addListener(SWT.Paint, new Listener() {
@@ -1256,9 +1305,7 @@ public class GettingStartedPage extends AbstractJBossCentralPage implements Prox
 		           if (section.isDisposed()) {
 		        	   return;
 		           }
-			        GC gc = e.gc;
-			        Color grey = tk.getColors().createColor("grey", 194, 194, 194);
-			        gc.setBackground(grey);
+			       e.gc.setBackground(grey);
 		        }
 			});
 		    section.setSeparatorControl(separator);
