@@ -17,7 +17,7 @@ import org.jboss.tools.project.examples.cheatsheet.internal.util.CheatSheetUtil;
 
 /**
  * 
- * <p>Action that launches JUnit test.</p>
+ * <p>Action that launches a JUnit test and selects a Maven profile optionally.</p>
  * 
  * @author snjeza
  *
@@ -31,6 +31,9 @@ public class LaunchJUnitTestHandler extends AbstractHandler {
 	/**
 	 * Execution of the action
 	 * 
+	 * @param projectName - project name
+	 * @param profile - Maven profile
+	 * @param mode - launch mode (run or debug)
 	 */
 	public Object execute(ExecutionEvent event) throws ExecutionException {
 		
@@ -38,7 +41,7 @@ public class LaunchJUnitTestHandler extends AbstractHandler {
 		String projectName = event.getParameter(PROJECT_NAME);
 		String mode = event.getParameter(MODE);
 		
-		CheatSheetUtil.launcJUnitTest(projectName, profile, mode);
+		CheatSheetUtil.launchJUnitTest(projectName, profile, mode);
 		return null;
 	}
 

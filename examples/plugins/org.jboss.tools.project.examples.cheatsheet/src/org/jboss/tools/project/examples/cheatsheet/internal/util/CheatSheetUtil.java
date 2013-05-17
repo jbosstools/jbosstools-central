@@ -246,7 +246,14 @@ public class CheatSheetUtil {
 		action.run();
 	}
 	
-	public static void launcJUnitTest(String projectName, String profile, String mode) {
+	/**
+	 * Launch a JUnit test and selects a Maven profile optionally
+	 * 
+	 * @param projectName - project name
+	 * @param profile - Maven profile
+	 * @param mode - mode
+	 */
+	public static void launchJUnitTest(String projectName, String profile, String mode) {
 		IWorkspaceRoot workspaceRoot = ResourcesPlugin.getWorkspace().getRoot();
 
 		IProject project = workspaceRoot.getProject(CheatSheetUtil.replaceProjectName(projectName));

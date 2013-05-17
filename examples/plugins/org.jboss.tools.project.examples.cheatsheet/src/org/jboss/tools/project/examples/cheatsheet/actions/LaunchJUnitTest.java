@@ -42,7 +42,7 @@ public class LaunchJUnitTest extends Action implements ICheatSheetAction {
 		if (params == null || params[0] == null) {
 			return;
 		}
-		CheatSheetUtil.launcJUnitTest(params[0], params[1], params[2]);
+		CheatSheetUtil.launchJUnitTest(params[0], params[1], params[2]);
 	}
 
 }
