@@ -44,7 +44,9 @@ public class InstalledProxyWizardDiscoveryStrategy extends BundleDiscoveryStrate
 			for (IConfigurationElement e : elements) {
 				if ("proxyWizard".equals(e.getName())) {
 					ProxyWizard proxyWizard = extensionReader.readProxyWizardElement(e, discoverySource);
-					proxyWizards.add(proxyWizard);
+					if (!proxyWizards.contains(proxyWizard)) {
+						proxyWizards.add(proxyWizard);
+					}
 				}
 			}
 		}

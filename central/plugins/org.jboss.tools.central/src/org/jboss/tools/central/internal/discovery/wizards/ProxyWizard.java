@@ -142,7 +142,7 @@ public class ProxyWizard implements Comparable<ProxyWizard> {
 			if (other.iconUrl != null) {
 				return false;
 			}
-		} else if (!iconUrl.equals(other.iconUrl)) {
+		} else if (!iconUrl.getPath().equals(other.iconUrl.getPath())) {
 			return false;
 		}
 		if (id == null) {

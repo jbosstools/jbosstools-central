@@ -51,7 +51,9 @@ public class RemoteProxyWizardDiscoveryStrategy extends
 			for (IConfigurationElement e : elements) {
 				if (PROXY_WIZARD_EXTENSION_POINT_NAME.equals(e.getName())) {
 					ProxyWizard proxyWizard = extensionReader.readProxyWizardElement(e, discoverySource);
-					proxyWizards.add(proxyWizard);
+					if (!proxyWizards.contains(proxyWizard)) {
+						proxyWizards.add(proxyWizard);
+					}
 				}
 			}
 		}
