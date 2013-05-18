@@ -15,6 +15,7 @@ import java.net.URL;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.PreferencePage;
+import org.eclipse.jface.preference.RadioGroupFieldEditor;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.ITreeContentProvider;
@@ -66,6 +67,8 @@ public class ProjectExamplesPreferencePage extends PreferencePage implements
 	private Button showProjectReadyWizard;
 	private Button showReadme;
 	private Button showQuickFix;
+	private RadioGroupFieldEditor showCheatSheetEditor;
+
 	
 	@Override
 	protected Control createContents(Composite parent) {
@@ -153,6 +156,8 @@ public class ProjectExamplesPreferencePage extends PreferencePage implements
 		showInvalidSites = new Button(composite,SWT.CHECK);
 		showInvalidSites.setText(Messages.ProjectExamplesPreferencePage_Show_invalid_sites);
 		showInvalidSites.setSelection(store.getBoolean(ProjectExamplesActivator.SHOW_INVALID_SITES));
+		
+		createShowCheatSheetControls(composite);
 		
 		Group sitesGroup = new Group(composite,SWT.NONE);
 		sitesGroup.setText(Messages.ProjectExamplesPreferencePage_Sites);
@@ -268,6 +273,19 @@ public class ProjectExamplesPreferencePage extends PreferencePage implements
 		
 		return composite;
 	}
+	
+	private void createShowCheatSheetControls(Composite parent) {
+		String name = ProjectExamplesActivator.SHOW_CHEATSHEETS;
+		String label = "Show included cheatsheet(s) when importing a new project";
+        String[][] namesAndValues = {
+                { "Always show", ProjectExamplesActivator.SHOW_CHEATSHEETS_ALWAYS },
+                { "Never show", ProjectExamplesActivator.SHOW_CHEATSHEETS_NEVER },
+                { "Prompt", ProjectExamplesActivator.SHOW_CHEATSHEETS_PROMPT }, };
+		showCheatSheetEditor = new RadioGroupFieldEditor(name, label, 3, namesAndValues, parent, true);
+		showCheatSheetEditor.setPreferenceStore(ProjectExamplesActivator.getDefault().getPreferenceStore());
+		showCheatSheetEditor.setPage(this);
+		showCheatSheetEditor.load();
+	}
 
 	protected void enableControls(Button outputDirectoryBrowse) {
 		outputDirectoryText.setEnabled(!isWorkspace.getSelection());
@@ -290,12 +308,15 @@ public class ProjectExamplesPreferencePage extends PreferencePage implements
 		outputDirectoryText.setText(""); //$NON-NLS-1$
 		sites.getUserSites().clear();
 		sites.getRuntimeSites().clear();
+		
+		showCheatSheetEditor.loadDefault();;
 		storePreferences();
 		super.performDefaults();
 	}
 
 	@Override
 	public boolean performOk() {
+		showCheatSheetEditor.store();
 		storePreferences(); 
 		return super.performOk();
 	}

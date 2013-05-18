@@ -14,6 +14,7 @@ import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
+import java.util.List;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
@@ -25,21 +26,58 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.content.IContentDescription;
+import org.eclipse.core.runtime.content.IContentType;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.core.runtime.preferences.IScopeContext;
 import org.eclipse.debug.core.ILaunchManager;
 import org.eclipse.jdt.junit.launcher.JUnitLaunchShortcut;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.action.IStatusLineManager;
+import org.eclipse.jface.dialogs.IDialogConstants;
+import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.jface.dialogs.MessageDialogWithToggle;
+import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IRegion;
+import org.eclipse.jface.viewers.ColumnLabelProvider;
+import org.eclipse.jface.viewers.ColumnLayoutData;
+import org.eclipse.jface.viewers.ColumnViewerEditor;
+import org.eclipse.jface.viewers.ColumnViewerEditorActivationEvent;
+import org.eclipse.jface.viewers.ColumnViewerEditorActivationStrategy;
+import org.eclipse.jface.viewers.ColumnWeightData;
+import org.eclipse.jface.viewers.FocusCellOwnerDrawHighlighter;
 import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.jface.viewers.ISelectionChangedListener;
+import org.eclipse.jface.viewers.IStructuredContentProvider;
+import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.jface.viewers.ITreeSelection;
+import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
+import org.eclipse.jface.viewers.TableLayout;
+import org.eclipse.jface.viewers.TableViewer;
+import org.eclipse.jface.viewers.TableViewerColumn;
+import org.eclipse.jface.viewers.TableViewerEditor;
+import org.eclipse.jface.viewers.TableViewerFocusCellManager;
+import org.eclipse.jface.viewers.Viewer;
+import org.eclipse.jface.viewers.ViewerCell;
+import org.eclipse.jface.window.Window;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.pde.internal.ua.ui.editor.cheatsheet.comp.CompCSEditor;
 import org.eclipse.pde.internal.ua.ui.editor.cheatsheet.simple.SimpleCSEditor;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Shell;
+import org.eclipse.swt.widgets.Table;
 import org.eclipse.ui.IActionBars;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
@@ -52,6 +90,7 @@ import org.eclipse.ui.IWorkbenchPartSite;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.ide.IDE;
+import org.eclipse.ui.internal.cheatsheets.state.DefaultStateManager;
 import org.eclipse.ui.internal.cheatsheets.views.CheatSheetView;
 import org.eclipse.ui.internal.cheatsheets.views.ViewUtilities;
 import org.eclipse.ui.part.MultiPageEditorPart;
@@ -63,6 +102,7 @@ import org.eclipse.wst.server.ui.actions.RunOnServerAction;
 import org.jboss.ide.eclipse.as.core.modules.SingleDeployableFactory;
 import org.jboss.ide.eclipse.as.core.util.ServerConverter;
 import org.jboss.tools.common.model.ui.editor.EditorPartWrapper;
+import org.jboss.tools.project.examples.ProjectExamplesActivator;
 import org.jboss.tools.project.examples.cheatsheet.Activator;
 import org.jboss.tools.project.examples.cheatsheet.Messages;
 import org.jboss.tools.project.examples.model.ProjectExampleUtil;
@@ -297,6 +337,264 @@ public class CheatSheetUtil {
 			mode = ILaunchManager.RUN_MODE;
 		}
 		launchShortcut.launch(selection, mode);
+	}
+	
+	public static boolean showCheatsheet(IFile file) {
+		try {
+			IContentDescription contentDescription = file.getContentDescription();
+			IContentType contentType = contentDescription.getContentType();
+			if (contentType != null && "org.eclipse.pde.simpleCheatSheet".equals(contentType.getId())) { //$NON-NLS-1$
+				CheatSheetView view = ViewUtilities.showCheatSheetView();
+				if (view == null) {
+					return false;
+				}
+				IPath filePath = file.getFullPath();
+				String id = filePath.lastSegment();
+				if (id == null) {
+					id = ""; //$NON-NLS-1$
+				}
+				URL url = file.getLocation().toFile().toURI().toURL();
+				view.getCheatSheetViewer().setInput(id, id, url, new DefaultStateManager(), false);
+				return true;
+			}
+		} catch (Exception e) {
+			Activator.log(e);
+		}
+		return false;
+	}
+
+	public static void showCheatsheet(final List<IFile> cheatsheets) {
+		if (cheatsheets == null || cheatsheets.size() == 0) {
+			return;
+		}
+		String value = ProjectExamplesActivator.getDefault().getShowCheatsheets();
+		if (ProjectExamplesActivator.SHOW_CHEATSHEETS_NEVER.equals(value)) {
+			return;
+		}
+		final IFile[] file = new IFile[1];
+		file[0] = cheatsheets.get(0);
+		if (ProjectExamplesActivator.SHOW_CHEATSHEETS_PROMPT.equals(value) || cheatsheets.size() > 0) {
+			Display.getDefault().syncExec(new Runnable() {
+				
+				public void run() {
+					file[0] = promptToShowCheatsheets(cheatsheets);
+				}
+
+			});
+		}
+		if (file[0] != null) {
+			Display.getDefault().asyncExec(new Runnable() {
+				
+				public void run() {
+					showCheatsheet(file[0]);
+				}
+			});
+			
+		}
+	}
+	
+	private static IFile promptToShowCheatsheets(List<IFile> cheatsheets) {
+		IPreferenceStore store = ProjectExamplesActivator.getDefault().getPreferenceStore();
+		String key = ProjectExamplesActivator.SHOW_CHEATSHEETS;
+		String value = store.getString(key);
+		if (MessageDialogWithToggle.ALWAYS.equals(value) && cheatsheets.size() == 1) {
+			return cheatsheets.get(0);
+		}
+		if (MessageDialogWithToggle.NEVER.equals(value)) {
+			return null;
+		}
+		Shell shell = PlatformUI.getWorkbench().getActiveWorkbenchWindow()
+				.getShell();
+		if (cheatsheets.size() == 1) {
+			String projectName = cheatsheets.get(0).getProject().getName();
+			String title = "Found cheatsheet";
+			String message = "Do you wish to open the cheatsheet for the '" + projectName + "' project?";
+			MessageDialogWithToggle dialog = MessageDialogWithToggle
+					.openYesNoQuestion(shell, title, message, null, false,
+							store, key);
+			int result = dialog.getReturnCode();
+			if (result == Window.CANCEL || result == SWT.DEFAULT) {
+				throw new OperationCanceledException();
+			}
+			if (dialog.getReturnCode() == IDialogConstants.YES_ID) {
+				return cheatsheets.get(0);
+			} 
+		} else {
+			int kind = MessageDialog.QUESTION;
+			String[] buttonLabels = new String[] { IDialogConstants.YES_LABEL,
+					IDialogConstants.NO_LABEL };
+			String title = "Found cheatsheets";
+			String message = "Please select the cheatsheet you want to show:";
+			MyMessageDialogWithToggle dialog = new MyMessageDialogWithToggle(shell, title, 
+					null, message, kind,
+					buttonLabels, 0, null, false, cheatsheets);	        
+	        dialog.setPrefStore(store); 
+	        dialog.setPrefKey(key);
+	        dialog.open();
+	        int result = dialog.getReturnCode();
+			if (result == Window.CANCEL || result == SWT.DEFAULT) {
+				throw new OperationCanceledException();
+			}
+			if (dialog.getReturnCode() == IDialogConstants.YES_ID) {
+				return dialog.getCheatsheet();
+			}
+		}
+		return null;
+	}
+	
+	private static class MyMessageDialogWithToggle extends MessageDialogWithToggle {
+
+		private List<IFile> cheatsheets;
+		private IFile selectedCheatsheet;
+
+		public MyMessageDialogWithToggle(Shell parentShell, String dialogTitle,
+				Image image, String message, int dialogImageType,
+				String[] dialogButtonLabels, int defaultIndex,
+				String toggleMessage, boolean toggleState, List<IFile> cheatsheets) {
+			super(parentShell, dialogTitle, image, message, 0 /*dialogImageType*/,
+					dialogButtonLabels, defaultIndex, toggleMessage, toggleState);
+			setShellStyle(getShellStyle() | SWT.SHEET);
+			this.cheatsheets = cheatsheets;
+			selectedCheatsheet = cheatsheets.get(0);
+		}
+
+		public IFile getCheatsheet() {
+			return selectedCheatsheet;
+		}
+
+		@Override
+		protected Control createCustomArea(Composite parent) {
+			Composite composite = new Composite(parent, SWT.NONE);
+	        GridLayout layout = new GridLayout();
+	        layout.marginHeight = 0;
+	        layout.marginWidth = 0;
+	        composite.setLayout(layout);
+	        GridData data = new GridData(GridData.FILL_BOTH);
+	        data.horizontalSpan = 2;
+	        composite.setLayoutData(data);
+	        TableViewer viewer = createCheatsheetViewer(composite, cheatsheets);
+	        viewer.addSelectionChangedListener(new ISelectionChangedListener() {
+				
+				public void selectionChanged(SelectionChangedEvent event) {
+					getButton(IDialogConstants.OK_ID).setEnabled(false);
+					ISelection sel = event.getSelection();
+					if (sel instanceof IStructuredSelection) {
+						Object object = ((IStructuredSelection) sel).getFirstElement();
+						if (object instanceof IFile) {
+							selectedCheatsheet = (IFile) object;
+							getButton(IDialogConstants.OK_ID).setEnabled(true);
+						}
+					}
+				}
+			});
+	        
+	        return composite;
+		}
+
+		@Override
+		protected void createButtonsForButtonBar(Composite parent) {
+			super.createButtonsForButtonBar(parent);
+			getButton(IDialogConstants.OK_ID).setEnabled(false);
+		}
+		
+	}
+	
+	private static TableViewer createCheatsheetViewer(Composite parent, final List<IFile> cheatsheets) {
+		final TableViewer viewer = new TableViewer(parent, SWT.SINGLE | SWT.FULL_SELECTION | SWT.H_SCROLL
+				| SWT.V_SCROLL | SWT.BORDER);
+		GridData gd = new GridData(GridData.FILL_BOTH);
+		gd.heightHint = 100;
+		gd.widthHint = 100;
+		viewer.getTable().setLayoutData(gd);
+		
+		Table table = viewer.getTable();
+		table.setHeaderVisible(true);
+		table.setLinesVisible(true);
+		table.setFont(parent.getFont());
+		
+		viewer.setContentProvider(new IStructuredContentProvider() {
+			
+			public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
+			}
+			public Object[] getElements(Object inputElement) {
+				return cheatsheets.toArray(new IFile[0]);
+			}
+			public void dispose() {
+			}
+		});
+		
+		String[] columnHeaders = {"Project", "Name"};
+		
+		for (int i = 0; i < columnHeaders.length; i++) {
+			TableViewerColumn column = new TableViewerColumn(viewer, SWT.NONE);
+			column.setLabelProvider(new CheatsheetLabelProvider(i));
+			column.getColumn().setText(columnHeaders[i]);
+			column.getColumn().setResizable(true);
+			column.getColumn().setMoveable(true);
+			
+		}
+		
+		ColumnLayoutData[] layouts= {
+				new ColumnWeightData(100,100),
+				new ColumnWeightData(60,60)
+			};
+		
+		TableLayout layout = new AutoResizeTableLayout(table);
+		for (int i = 0; i < layouts.length; i++) {
+			layout.addColumnData(layouts[i]);
+		}
+		
+		viewer.getTable().setLayout(layout);
+		
+		configureViewer(viewer);
+
+		viewer.setInput(cheatsheets);
+		
+		return viewer;
+	}
+
+	private static void configureViewer(final TableViewer viewer) {
+		TableViewerFocusCellManager focusCellManager = new TableViewerFocusCellManager(viewer, new FocusCellOwnerDrawHighlighter(viewer));
+		
+		ColumnViewerEditorActivationStrategy actSupport = new ColumnViewerEditorActivationStrategy(viewer) {
+			protected boolean isEditorActivationEvent(
+					ColumnViewerEditorActivationEvent event) {
+				ViewerCell cell = viewer.getColumnViewerEditor().getFocusCell();
+				if (cell != null && cell.getColumnIndex() == 1) {
+					return super.isEditorActivationEvent(event);
+				}
+				return event.eventType == ColumnViewerEditorActivationEvent.TRAVERSAL
+						|| event.eventType == ColumnViewerEditorActivationEvent.MOUSE_DOUBLE_CLICK_SELECTION
+						|| (event.eventType == ColumnViewerEditorActivationEvent.KEY_PRESSED && event.keyCode == SWT.CR)
+						|| event.eventType == ColumnViewerEditorActivationEvent.PROGRAMMATIC;
+			}
+		};
+		
+		TableViewerEditor.create(viewer, focusCellManager, actSupport, ColumnViewerEditor.TABBING_HORIZONTAL
+				| ColumnViewerEditor.TABBING_MOVE_TO_ROW_NEIGHBOR
+				| ColumnViewerEditor.TABBING_VERTICAL | ColumnViewerEditor.KEYBOARD_ACTIVATION);
+	}
+	
+	private static class CheatsheetLabelProvider extends ColumnLabelProvider {
+		private int columnIndex;
+
+		public CheatsheetLabelProvider(int i) {
+			this.columnIndex = i;
+		}
+
+		public String getText(Object element) {
+			if (element instanceof IFile) {
+				IFile file = (IFile) element;
+				switch (columnIndex) {
+				case 0:
+					return file.getProject().getName();
+				case 1:
+					return file.getName();
+				}
+			}
+			return null;
+		}
+
 	}
 
 }
