@@ -44,7 +44,7 @@ public class InstalledProxyWizardDiscoveryStrategy extends BundleDiscoveryStrate
 			for (IConfigurationElement e : elements) {
 				if ("proxyWizard".equals(e.getName())) {
 					ProxyWizard proxyWizard = extensionReader.readProxyWizardElement(e, discoverySource);
-					if (!proxyWizards.contains(proxyWizard)) {
+					if (!containsWizard(proxyWizard.getId(), proxyWizards)) {
 						proxyWizards.add(proxyWizard);
 					}
 				}
@@ -52,6 +52,15 @@ public class InstalledProxyWizardDiscoveryStrategy extends BundleDiscoveryStrate
 		}
 		
 		Collections.sort(proxyWizards);
+	}
+	
+	private boolean containsWizard(String id, List<ProxyWizard> proxyWizards) {
+		for (ProxyWizard p : proxyWizards) {
+			if (p.getId().equals(id)) {
+				return true;
+			}
+		}
+		return false;
 	}
 	
 	public List<ProxyWizard> getProxyWizards() {
