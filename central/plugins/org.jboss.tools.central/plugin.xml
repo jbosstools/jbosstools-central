@@ -292,4 +292,72 @@
 		</perspectiveExtension>
    </extension>
 
+   <!-- for offline access to the wizards -->	
+    <extension point="org.jboss.tools.central.proxyWizard">
+      <proxyWizard 
+          id="html5.wizard" 
+          description="%html5.wizard.description"
+          label="HTML5 Project"
+          priority="1"
+          iconPath="icons/html5.png"
+          wizardId="org.jboss.tools.central.wizards.NewHtml5ProjectWizard"
+          >
+      </proxyWizard>
+      <proxyWizard 
+          id="javaee.wizard" 
+          description="%javaeeweb.wizard.description"
+          label="JavaEE Web Project"
+          priority="5"
+          iconPath="icons/newwebprj_wiz.gif"
+          wizardId="org.jboss.tools.central.wizards.NewJavaeeWarProjectWizard"
+          >
+      </proxyWizard>
+      <proxyWizard 
+          id="richfaces.wizard" 
+          description="%richfaces.wizard.description"
+          label="Richfaces Project"
+          priority="4"
+          iconPath="icons/rf_logo.png"
+          wizardId="org.jboss.tools.central.wizards.NewRichfacesProjectWizard"
+          >
+      </proxyWizard>
+      <!--
+      <proxyWizard 
+          id="gwt.wizard" 
+          description="%gwt.wizard.description"
+          label="GWT Project"
+          priority="7"
+          iconPath="icons/new-gdt-project.png"
+          wizardId="org.jboss.tools.central.wizards.NewGwtProjectWizard"
+          >
+      </proxyWizard>
+      -->
+      <proxyWizard 
+          id="openshift.wizard" 
+          description="%openshift.wizard.description"
+          label="OpenShift Application"
+          priority="2"
+          iconPath="icons/openshift-logo-white-icon.png"
+          wizardId="org.jboss.ide.eclipse.as.openshift.express.ui.wizard.createNewApplicationWizard"
+          requiredComponentIds="org.jboss.tools.openshift.feature">
+      </proxyWizard>
+      <proxyWizard 
+          id="spring.wizard" 
+          description="%springmvc.wizard.description"
+          label="Spring Project"
+          priority="6"
+          iconPath="icons/spring_wiz.gif"
+          wizardId="org.jboss.tools.central.wizards.NewSpringMvcProjectWizard">
+      </proxyWizard>
+      <proxyWizard
+          id="maven.wizard" 
+          description="%maven.wizard.description"
+          label="Maven Project"
+          priority="5"
+          iconPath="icons/new_m2_project.gif"
+          wizardId="org.eclipse.m2e.core.wizards.Maven2ProjectWizard"
+          requiredComponentIds="org.eclipse.m2e.feature">
+      </proxyWizard>
+    </extension>		
+
 </plugin>
