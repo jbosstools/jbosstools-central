@@ -10,49 +10,40 @@
  ************************************************************************************/
 package org.jboss.tools.project.examples.test;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 import java.io.ByteArrayInputStream;
-import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.List;
 
 import org.eclipse.core.commands.Command;
 import org.eclipse.core.commands.IParameter;
-import org.eclipse.core.commands.IParameterValues;
 import org.eclipse.core.commands.Parameterization;
 import org.eclipse.core.commands.ParameterizedCommand;
-import org.eclipse.core.commands.common.NotDefinedException;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.resources.WorkspaceJob;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
-import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.jdt.internal.ui.actions.SelectionConverter;
 import org.eclipse.jdt.internal.ui.javaeditor.CompilationUnitEditor;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IFileEditorInput;
-import org.eclipse.ui.IFileEditorMapping;
-import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPage;
-import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.commands.ICommandService;
 import org.eclipse.ui.handlers.IHandlerService;
-import org.eclipse.ui.internal.cheatsheets.CheatSheetPlugin;
 import org.eclipse.ui.internal.cheatsheets.state.DefaultStateManager;
 import org.eclipse.ui.internal.cheatsheets.views.CheatSheetView;
 import org.eclipse.ui.internal.cheatsheets.views.ViewUtilities;
@@ -103,7 +94,7 @@ public class CheatSheetTest {
 		};
 		workspaceJob.setUser(true);
 		workspaceJob.schedule();
-		JobUtils.waitForIdle(ProjectExamplesUtil.IDLE_TIME);
+		workspaceJob.join();
 	}
 
 	private static void importProject(IProgressMonitor monitor) throws MalformedURLException, Exception {
@@ -134,10 +125,22 @@ public class CheatSheetTest {
 	
 	@Test
 	public void testAction() throws Exception {
+		JobUtils.waitForIdle();
 		IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();    
 		IProject project = root.getProject(KITCHENSINK);
 		assertTrue("The jboss-as-kitchensink project is not imported.", project.exists());
-		IFile file = project.getFile("cheatsheet.xml");
+		final IFile file = project.getFile("cheatsheet.xml");
+		Display.getDefault().syncExec(new Runnable() {
+			
+			@Override
+			public void run() {
+				testActionInNonUIThread(file);
+			}
+		});
+		
+	}
+
+	public void testActionInNonUIThread(IFile file) {
 		boolean delete = false;
 		CheatSheetView view = null;
 		try {
@@ -147,10 +150,18 @@ public class CheatSheetTest {
 			}
 			view = openCheatSheet(file);
 			testCommand();
-		} finally {
+		} catch (Exception e) {
+			ProjectExamplesActivator.log(e);
+			fail(e.getMessage());
+		}
+		finally {
 			getActivePage().hideView(view);
 			if (delete) {
-				file.delete(true, null);
+				try {
+					file.delete(true, null);
+				} catch (CoreException e) {
+					// ignore
+				}
 			}
 		}
 	}
@@ -162,7 +173,7 @@ public class CheatSheetTest {
  		Command openFile = commandService.getCommand("org.jboss.tools.project.examples.cheatsheet.openFileInEditor");
  		IParameter path = openFile.getParameter("path");
  
- 		Parameterization parm = new Parameterization(path, "/{project}/src/main/java/org/jboss/as/quickstarts/kitchensink/model/Member.java");
+ 		Parameterization parm = new Parameterization(path, "/jboss-as-kitchensink/src/main/java/org/jboss/as/quickstarts/kitchensink/model/Member.java");
  		ParameterizedCommand parmCommand = new ParameterizedCommand(
  				openFile, new Parameterization[] { parm });
  
@@ -177,6 +188,7 @@ public class CheatSheetTest {
 		IFileEditorInput fileEditorInput = (IFileEditorInput) input;
 		IFile file = fileEditorInput.getFile();
 		assertEquals("Incorrect file opened.",file.getFullPath().toString(), ("/jboss-as-kitchensink/src/main/java/org/jboss/as/quickstarts/kitchensink/model/Member.java"));
+		page.closeAllEditors(false);
 	}
 
 	private IWorkbenchPage getActivePage() {
