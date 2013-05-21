@@ -67,6 +67,8 @@ public class DefaultJBossCentralConfigurator implements
 	
 	private static final String NEWS_URL = "http://planet.jboss.org/feeds/news"; //$NON-NLS-1$
 
+	private static final String DOCUMENTATION_URL = "http://docs.jboss.org/tools/latest/"; //$NON-NLS-1$
+
 	private Image headerImage;
 
 	@Override
@@ -113,6 +115,11 @@ public class DefaultJBossCentralConfigurator implements
 		return WIZARD_IDS;
 	}
 
+	@Override
+	public String getDocumentationUrl() {
+		return DOCUMENTATION_URL;
+	}
+	
 	@Override
 	public Image getHeaderImage() {
 		if (headerImage == null) {

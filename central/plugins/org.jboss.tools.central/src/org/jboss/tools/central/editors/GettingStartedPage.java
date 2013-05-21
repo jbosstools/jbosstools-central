@@ -793,7 +793,7 @@ public class GettingStartedPage extends AbstractJBossCentralPage implements Prox
 		addHyperlink(toolkit, documentationComposite, "JBoss developer website", "http://docs.jboss.org/tools/");
 		addHyperlink(toolkit, documentationComposite, "User Forum", "http://community.jboss.org/en/tools?view=discussions");		
 		addHyperlink(toolkit, documentationComposite, "Developer Forum", "http://community.jboss.org/en/tools/dev?view=discussions");
-		addHyperlink(toolkit, documentationComposite, "Product documentation", "http://docs.jboss.org/tools/latest/");
+		addHyperlink(toolkit, documentationComposite, "Product documentation", ProjectExamplesActivator.getDefault().getConfigurator().getDocumentationUrl());
 		addHyperlink(toolkit, documentationComposite, "Videos", "http://docs.jboss.org/tools/movies/");
 
 		documentationSection.setClient(documentationComposite);

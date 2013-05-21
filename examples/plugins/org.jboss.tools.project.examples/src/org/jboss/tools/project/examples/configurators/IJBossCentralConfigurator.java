@@ -29,6 +29,7 @@ public interface IJBossCentralConfigurator {
 	@Deprecated
 	String getNewsUrl();
 	String getBuzzUrl();
+	String getDocumentationUrl();
 	List<String> getWizardIds();
 	Image getHeaderImage();
 
