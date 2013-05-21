@@ -15,7 +15,8 @@ Require-Bundle: org.eclipse.ui,
  org.jboss.tools.tests,
  org.eclipse.jdt.ui;bundle-version="3.9.0",
  org.eclipse.ui.editors;bundle-version="3.8.100",
- org.eclipse.jface.text;bundle-version="3.8.100"
+ org.eclipse.jface.text;bundle-version="3.8.100",
+ org.jboss.tools.as.runtimes.integration;bundle-version="2.4.100"
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ActivationPolicy: lazy
 Bundle-Vendor: %BundleVendor

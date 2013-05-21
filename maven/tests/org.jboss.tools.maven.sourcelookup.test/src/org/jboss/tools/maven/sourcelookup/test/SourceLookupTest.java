@@ -29,7 +29,6 @@ import org.eclipse.debug.core.sourcelookup.ISourceContainer;
 import org.eclipse.debug.core.sourcelookup.ISourcePathComputer;
 import org.eclipse.wst.server.core.IServer;
 import org.eclipse.wst.server.core.ServerCore;
-import org.jboss.ide.eclipse.as.core.runtime.JBossASHandler;
 import org.jboss.tools.maven.sourcelookup.SourceLookupActivator;
 import org.jboss.tools.maven.sourcelookup.containers.JBossSourceContainer;
 import org.jboss.tools.runtime.core.RuntimeCoreActivator;
@@ -77,7 +76,7 @@ public class SourceLookupTest {
 		Set<IRuntimeDetector> detectors = RuntimeCoreActivator.getDefault().getRuntimeDetectors();
 		for (IRuntimeDetector detector:detectors) {
 			IRuntimeDetectorDelegate delegate = ((RuntimeDetector)detector).getDelegate();
-			if (delegate instanceof JBossASHandler) {
+			if (delegate  != null && delegate.getClass().getName().endsWith("JBossASHandler")) {
 				return delegate;
 			}
 		}
