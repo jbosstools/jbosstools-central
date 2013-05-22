@@ -26,7 +26,7 @@ public class ProjectExamplesPreferencesInitializer extends
 
 	@Override
 	public void initializeDefaultPreferences() {
-		IEclipsePreferences node = DefaultScope.INSTANCE.getNode("org.jboss.tools.project.examples"); //$NON-NLS-1$
+		IEclipsePreferences node = DefaultScope.INSTANCE.getNode(ProjectExamplesActivator.PLUGIN_ID);
 		
 		node.putBoolean(
 				ProjectExamplesActivator.SHOW_EXPERIMENTAL_SITES,
@@ -51,6 +51,9 @@ public class ProjectExamplesPreferencesInitializer extends
 		node.putBoolean(
 				ProjectExamplesActivator.SHOW_RUNTIME_SITES,
 				ProjectExamplesActivator.SHOW_RUNTIME_SITES_VALUE);
+		node.put(
+				ProjectExamplesActivator.SHOW_CHEATSHEETS, 
+				ProjectExamplesActivator.SHOW_CHEATSHEETS_NEVER);
 	}
 
 }

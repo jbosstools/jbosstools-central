@@ -25,6 +25,7 @@ import org.eclipse.ui.internal.cheatsheets.views.ViewUtilities;
 import org.eclipse.ui.part.IShowInTarget;
 import org.eclipse.ui.part.ShowInContext;
 import org.jboss.tools.project.examples.cheatsheet.Activator;
+import org.jboss.tools.project.examples.cheatsheet.internal.util.CheatSheetUtil;
 
 /**
  * Show Cheat Sheet xml files in the Cheat Sheet View 
@@ -47,26 +48,7 @@ public class CheatSheetViewAdapterFactory implements IAdapterFactory {
 					Object object = selection.getFirstElement();
 					if (object instanceof IFile) {
 						IFile file = (IFile) object;
-						try {
-							IContentDescription contentDescription = file.getContentDescription();
-							IContentType contentType = contentDescription.getContentType();
-							if (contentType != null && "org.eclipse.pde.simpleCheatSheet".equals(contentType.getId())) { //$NON-NLS-1$
-								CheatSheetView view = ViewUtilities.showCheatSheetView();
-								if (view == null) {
-									return false;
-								}
-								IPath filePath = file.getFullPath();
-								String id = filePath.lastSegment();
-								if (id == null) {
-									id = ""; //$NON-NLS-1$
-								}
-								URL url = file.getLocation().toFile().toURI().toURL();
-								view.getCheatSheetViewer().setInput(id, id, url, new DefaultStateManager(), false);
-								return true;
-							}
-						} catch (Exception e) {
-							Activator.log(e);
-						}
+						CheatSheetUtil.showCheatsheet(file);
 					}
 				}
 				return false;
@@ -77,5 +59,6 @@ public class CheatSheetViewAdapterFactory implements IAdapterFactory {
 	public Class[] getAdapterList() {
 		return new Class[] {IShowInTarget.class};
 	}
+
 
 }
