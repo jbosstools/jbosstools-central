@@ -16,6 +16,8 @@ import java.util.List;
 
 import org.apache.maven.model.Resource;
 import org.apache.maven.project.MavenProject;
+import org.codehaus.plexus.util.StringUtils;
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ResourcesPlugin;
@@ -77,7 +79,7 @@ public class FixClasspathConfigurator extends AbstractProjectConfigurator {
 			for (IClasspathEntry entry:entries) {
 				if (entry.getEntryKind() == IClasspathEntry.CPE_LIBRARY) {
 					IPath entryPath = entry.getPath();
-					if (entryPath != null && path.equals(entryPath.toString())) {
+					if (entryPath != null && path.equals(entryPath.toPortableString())) {
 						exists = true;
 						break;
 					}
@@ -105,7 +107,7 @@ public class FixClasspathConfigurator extends AbstractProjectConfigurator {
 			relative = absolutePath.substring(basedir.getAbsolutePath()
 					.length() + 1);
 		} else {
-			return absolutePath;
+			return absolutePath.replace("\\", "/");//$NON-NLS-1$ 
 		}
 		relative = relative.replace("\\", "/").trim(); //$NON-NLS-1$ //$NON-NLS-2$
 		if (!relative.startsWith("/")) { //$NON-NLS-1$
@@ -130,12 +132,50 @@ public class FixClasspathConfigurator extends AbstractProjectConfigurator {
 	@Override
 	public void mavenProjectChanged(MavenProjectChangedEvent event,
 			IProgressMonitor monitor) throws CoreException {
+		if (event.getKind() != MavenProjectChangedEvent.KIND_CHANGED 
+				|| event.getFlags() != MavenProjectChangedEvent.FLAG_NONE) {
+			return;
+		}
 		IMavenProjectFacade facade = event.getMavenProject();
 		if (facade != null) {
-			IProject project = facade.getProject();
+			IMavenProjectFacade oldFacade = event.getOldMavenProject();
 			MavenProject mavenProject = facade.getMavenProject(monitor);
+			if (oldFacade != null) {
+				List<Resource> resources = mavenProject.getResources();
+				List<Resource> oldResources = oldFacade.getMavenProject(monitor).getResources();
+				List<Resource> testResources = mavenProject.getTestResources();
+				List<Resource> oldTestResources = oldFacade.getMavenProject(monitor).getTestResources();
+				if (areResourcesEqual(resources, oldResources)
+						&& areResourcesEqual(testResources, oldTestResources)) {
+					return;
+				}
+			}
+			IProject project = facade.getProject();
 			configureInternal(mavenProject, project, monitor);
 		}
 		super.mavenProjectChanged(event, monitor);
+	}
+
+	private boolean areResourcesEqual(List<Resource> resources,
+			List<Resource> other) {
+		if (resources == other) {
+			return true;
+		}
+		if (resources == null && other != null) {
+			return false;
+		}
+		if (resources.size() != other.size()) {
+			return false;
+		}
+		for (int i=0; i< resources.size() ; i++) {
+			Resource r1 =resources.get(i);
+			Resource r2 = other.get(i);
+			String path1 = StringUtils.defaultString(r1.getDirectory());
+			String path2 = StringUtils.defaultString(r2.getDirectory());
+			if (!path1.equals(path2)) {
+				return false; 
+			}
+		}
+		return true;
 	}
 }
