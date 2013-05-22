@@ -60,6 +60,8 @@ import org.eclipse.core.runtime.content.IContentType;
 import org.eclipse.core.runtime.jobs.IJobChangeEvent;
 import org.eclipse.core.runtime.jobs.IJobChangeListener;
 import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.core.runtime.preferences.DefaultScope;
+import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.jface.dialogs.IDialogConstants;
@@ -190,6 +192,11 @@ public class ProjectExamplesActivator extends AbstractUIPlugin {
 	public static final String JBOSS_DISCOVERY_DIRECTORY = "jboss.discovery.directory.url"; //$NON-NLS-1$
 	
 	private static final Object CONFIGURATOR = "configurator"; //$NON-NLS-1$
+
+	public static final String SHOW_CHEATSHEETS = "showCheatsheets"; //$NON-NLS-1$
+	public static final String SHOW_CHEATSHEETS_PROMPT = "prompt"; //$NON-NLS-1$
+	public static final String SHOW_CHEATSHEETS_NEVER = "never"; //$NON-NLS-1$
+	public static final String SHOW_CHEATSHEETS_ALWAYS = "always"; //$NON-NLS-1$
 
 	// The shared instance
 	private static ProjectExamplesActivator plugin;
@@ -1031,7 +1038,7 @@ public class ProjectExamplesActivator extends AbstractUIPlugin {
 	}
 	
 	public static void importProjectExamples(
-			final List<ProjectExample> selectedProjects, IWorkingSet[] workingSets, Map<String, Object> propertiesMap) {
+			final List<ProjectExample> selectedProjects, IWorkingSet[] workingSets, final Map<String, Object> propertiesMap) {
 		final NewProjectExamplesJob workspaceJob = new NewProjectExamplesJob(
 				Messages.NewProjectExamplesWizard_Downloading, selectedProjects, workingSets, propertiesMap);
 		workspaceJob.setUser(true);
@@ -1047,6 +1054,7 @@ public class ProjectExamplesActivator extends AbstractUIPlugin {
 
 			public void done(IJobChangeEvent event) {
 				if (!workspaceJob.getResult().isOK()) {
+					resetCheatSheet(propertiesMap);
 					return;
 				}
 				List<ProjectExample> projects = workspaceJob.getProjects();
@@ -1055,11 +1063,21 @@ public class ProjectExamplesActivator extends AbstractUIPlugin {
 					ProjectExamplesActivator.waitForBuildAndValidation
 							.schedule();
 					ProjectExamplesActivator.waitForBuildAndValidation.join();
+					resetCheatSheet(propertiesMap);
 				} catch (InterruptedException e) {
 					return;
 				}
 				if (projects != null && projects.size() > 0) {
 					ProjectExamplesActivator.showReadyWizard(projects);
+				}
+				
+			}
+
+			private void resetCheatSheet(Map<String, Object> propertiesMap) {
+				Object showCheatSheet = propertiesMap.get(ProjectExamplesActivator.SHOW_CHEATSHEETS);
+				if (showCheatSheet instanceof String) {
+					ProjectExamplesActivator.getDefault().getPreferenceStore().putValue(ProjectExamplesActivator.SHOW_CHEATSHEETS, 
+							(String) showCheatSheet);
 				}
 				
 			}
@@ -1248,5 +1266,9 @@ public class ProjectExamplesActivator extends AbstractUIPlugin {
 			buffer.append("..."); //$NON-NLS-1$
 		}
 		return buffer.toString();
+	}
+	
+	public String getShowCheatsheets() {
+		return getPreferenceStore().getString(SHOW_CHEATSHEETS);
 	}
 }

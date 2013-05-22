@@ -24,6 +24,8 @@ import java.util.Map;
 import java.util.Set;
 
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.preferences.DefaultScope;
+import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.jface.dialogs.TrayDialog;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.ISelection;
@@ -89,50 +91,59 @@ public class NewProjectExamplesWizard2 extends Wizard implements INewWizard {
 		final List<ProjectExample> selectedProjects = new ArrayList<ProjectExample>();
 		IWorkingSet[] workingSets = new IWorkingSet[0];
 		Map<String, Object> propertiesMap = new HashMap<String, Object>();
-		if (mainPage != null) {
-			if (mainPage.getSelection() == null || mainPage.getSelection().size() <= 0) {
-				return false;
-			}
-			IStructuredSelection selection = mainPage.getSelection();
-			Iterator iterator = selection.iterator();
-			while (iterator.hasNext()) {
-				Object object = iterator.next();
-				if (object instanceof ProjectExample) {
-					ProjectExample project = (ProjectExample) object;
-					selectedProjects.add(project);
-				}
-			}
-		} else {
-			if (projectExample == null) {
-				return false;
-			}
-			selectedProjects.add(projectExample);
-			
-		}
-		if (selectedProjects.size() > 0) {
-			projectExample = selectedProjects.get(0);
-		}
-		if (projectExample != null) {
-			if (!ProjectExamplesActivator.MAVEN_ARCHETYPE.equals(projectExample.getImportType())) {
-				workingSets = locationPage.getWorkingSets();
-			} else {
-				// 
-			}
-			String type = projectExample.getImportType();
-			for (IProjectExamplesWizardPage contributedPage:contributedPages) {
-				if (type == null || !type.equals(contributedPage.getProjectExampleType())) {
-					continue;
-				}
-				if (!contributedPage.finishPage()) {
+		String showCheatsheets = ProjectExamplesActivator.getDefault().getShowCheatsheets();
+		try {
+			ProjectExamplesActivator.getDefault().getPreferenceStore().putValue(ProjectExamplesActivator.SHOW_CHEATSHEETS, 
+					ProjectExamplesActivator.SHOW_CHEATSHEETS_NEVER);
+			if (mainPage != null) {
+				if (mainPage.getSelection() == null || mainPage.getSelection().size() <= 0) {
 					return false;
 				}
-				Map<String, Object> pMap = contributedPage.getPropertiesMap();
-				if (pMap != null) {
-					propertiesMap.putAll(pMap);
+				IStructuredSelection selection = mainPage.getSelection();
+				Iterator iterator = selection.iterator();
+				while (iterator.hasNext()) {
+					Object object = iterator.next();
+					if (object instanceof ProjectExample) {
+						ProjectExample project = (ProjectExample) object;
+						selectedProjects.add(project);
+					}
+				}
+			} else {
+				if (projectExample == null) {
+					return false;
+				}
+				selectedProjects.add(projectExample);
+				
+			}
+			if (selectedProjects.size() > 0) {
+				projectExample = selectedProjects.get(0);
+			}
+			if (projectExample != null) {
+				if (!ProjectExamplesActivator.MAVEN_ARCHETYPE.equals(projectExample.getImportType())) {
+					workingSets = locationPage.getWorkingSets();
+				} else {
+					// 
+				}
+				String type = projectExample.getImportType();
+				for (IProjectExamplesWizardPage contributedPage:contributedPages) {
+					if (type == null || !type.equals(contributedPage.getProjectExampleType())) {
+						continue;
+					}
+					if (!contributedPage.finishPage()) {
+						return false;
+					}
+					Map<String, Object> pMap = contributedPage.getPropertiesMap();
+					if (pMap != null) {
+						propertiesMap.putAll(pMap);
+					}
 				}
 			}
+			propertiesMap.put(ProjectExamplesActivator.SHOW_CHEATSHEETS, showCheatsheets);
+			ProjectExamplesActivator.importProjectExamples(selectedProjects, workingSets, propertiesMap);
+		} catch (Exception e) {
+			ProjectExamplesActivator.getDefault().getPreferenceStore().putValue(ProjectExamplesActivator.SHOW_CHEATSHEETS, 
+					showCheatsheets);
 		}
-		ProjectExamplesActivator.importProjectExamples(selectedProjects, workingSets, propertiesMap);
 		return true;
 	}
 
