@@ -67,6 +67,11 @@
            class="org.jboss.tools.project.examples.preferences.ProjectExamplesPreferencePage"
            id="org.jboss.tools.project.examples.preferences.projectExamplesPreferencePage"
            name="%Project_Examples"/>
+     <page
+           category="org.jboss.tools.project.examples.preferences.projectExamplesPreferencePage"
+           class="org.jboss.tools.project.examples.preferences.OfflineSupportPreferencePage"
+           id="org.jboss.tools.project.examples.preferences.offlineSupportPreferencePage"
+           name="%Offline_Support"/>
     </extension>
     
     <extension

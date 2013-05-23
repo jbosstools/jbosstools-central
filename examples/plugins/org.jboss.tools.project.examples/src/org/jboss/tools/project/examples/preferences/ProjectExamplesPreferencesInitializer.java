@@ -54,6 +54,15 @@ public class ProjectExamplesPreferencesInitializer extends
 		node.put(
 				ProjectExamplesActivator.SHOW_CHEATSHEETS, 
 				ProjectExamplesActivator.SHOW_CHEATSHEETS_NEVER);
+		node.putBoolean(
+				ProjectExamplesActivator.SHOW_RUNTIME_SITES,
+				ProjectExamplesActivator.SHOW_RUNTIME_SITES_VALUE);
+		node.put(
+				ProjectExamplesActivator.PROJECT_EXAMPLES_OFFLINE_DIRECTORY,
+				ProjectExamplesActivator.PROJECT_EXAMPLES_OFFLINE_DIRECTORY_VALUE);
+		node.putBoolean(
+				ProjectExamplesActivator.PROJECT_EXAMPLES_OFFLINE_ENABLED,
+				ProjectExamplesActivator.PROJECT_EXAMPLES_OFFLINE_ENABLED_VALUE);
 	}
 
 }

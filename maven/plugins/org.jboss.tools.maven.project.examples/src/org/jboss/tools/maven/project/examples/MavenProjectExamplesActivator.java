@@ -20,7 +20,9 @@ import org.eclipse.m2e.core.embedder.IMaven;
 import org.eclipse.m2e.core.project.MavenProjectInfo;
 import org.eclipse.m2e.core.project.ProjectImportConfiguration;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
+import org.jboss.tools.maven.project.examples.offline.MavenOfflinePropertyChangeListener;
 import org.jboss.tools.maven.project.examples.xpl.UpdateMavenProjectJob;
+import org.jboss.tools.project.examples.ProjectExamplesActivator;
 import org.osgi.framework.BundleContext;
 
 /**
@@ -33,6 +35,8 @@ public class MavenProjectExamplesActivator extends AbstractUIPlugin {
 
 	// The shared instance
 	private static MavenProjectExamplesActivator plugin;
+
+	private MavenOfflinePropertyChangeListener mavenOfflinePropertyChangeListener;
 	
 	/**
 	 * The constructor
@@ -47,6 +51,8 @@ public class MavenProjectExamplesActivator extends AbstractUIPlugin {
 	public void start(BundleContext context) throws Exception {
 		super.start(context);
 		plugin = this;
+		mavenOfflinePropertyChangeListener = new MavenOfflinePropertyChangeListener();
+		ProjectExamplesActivator.getDefault().getPreferenceStore().addPropertyChangeListener(mavenOfflinePropertyChangeListener);
 	}
 
 	/*
@@ -55,6 +61,8 @@ public class MavenProjectExamplesActivator extends AbstractUIPlugin {
 	 */
 	public void stop(BundleContext context) throws Exception {
 		plugin = null;
+		ProjectExamplesActivator.getDefault().getPreferenceStore().removePropertyChangeListener(mavenOfflinePropertyChangeListener);
+		mavenOfflinePropertyChangeListener = null;
 		super.stop(context);
 	}
 

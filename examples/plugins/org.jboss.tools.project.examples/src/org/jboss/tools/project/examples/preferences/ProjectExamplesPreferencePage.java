@@ -156,7 +156,7 @@ public class ProjectExamplesPreferencePage extends PreferencePage implements
 		showInvalidSites = new Button(composite,SWT.CHECK);
 		showInvalidSites.setText(Messages.ProjectExamplesPreferencePage_Show_invalid_sites);
 		showInvalidSites.setSelection(store.getBoolean(ProjectExamplesActivator.SHOW_INVALID_SITES));
-		
+
 		createShowCheatSheetControls(composite);
 		
 		Group sitesGroup = new Group(composite,SWT.NONE);

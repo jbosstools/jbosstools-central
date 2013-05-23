@@ -64,6 +64,7 @@ import org.jboss.ide.eclipse.as.core.server.IJBossServerRuntime;
 import org.jboss.tools.foundation.core.ecf.URLTransportUtility;
 import org.jboss.tools.project.examples.Messages;
 import org.jboss.tools.project.examples.ProjectExamplesActivator;
+import org.jboss.tools.project.examples.offline.OfflineUtil;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
@@ -770,9 +771,12 @@ public class ProjectExampleUtil {
 				return null;
 		} else {
 			try {
+				if (OfflineUtil.isOfflineEnabled()) {
+					return OfflineUtil.getOfflineFile(url);
+				}
 				if (monitor.isCanceled()) {
 					return null;
-				}
+				}						
 				long urlModified = -1;
 				file = getFile(url);
 				try {

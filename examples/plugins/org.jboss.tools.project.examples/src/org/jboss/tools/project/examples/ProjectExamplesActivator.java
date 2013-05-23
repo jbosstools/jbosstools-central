@@ -60,8 +60,6 @@ import org.eclipse.core.runtime.content.IContentType;
 import org.eclipse.core.runtime.jobs.IJobChangeEvent;
 import org.eclipse.core.runtime.jobs.IJobChangeListener;
 import org.eclipse.core.runtime.jobs.Job;
-import org.eclipse.core.runtime.preferences.DefaultScope;
-import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.jface.dialogs.IDialogConstants;
@@ -167,6 +165,7 @@ public class ProjectExamplesActivator extends AbstractUIPlugin {
 	public static final String PROJECT_EXAMPLES_DEFAULT = "projectExamplesDefaultLocation"; //$NON-NLS-1$
 	public static final boolean PROJECT_EXAMPLES_DEFAULT_VALUE = true;
 
+	
 	public static final String SHOW_PROJECT_READY_WIZARD = "showProjectRadyWizard"; //$NON-NLS-1$
 	public static final boolean SHOW_PROJECT_READY_WIZARD_VALUE = true;
 	
@@ -175,6 +174,11 @@ public class ProjectExamplesActivator extends AbstractUIPlugin {
 	
 	public static final String SHOW_QUICK_FIX = "showQuickFix"; //$NON-NLS-1$
 	public static final boolean SHOW_QUICK_FIX_VALUE = true;
+
+	public static final String PROJECT_EXAMPLES_OFFLINE_DIRECTORY = "projectExamplesOfflineDirectory"; //$NON-NLS-1$
+	public static final String PROJECT_EXAMPLES_OFFLINE_DIRECTORY_VALUE = new File( System.getProperty( "user.home" ), ".jbosstools/cache" ).getAbsolutePath(); //$NON-NLS-1$ //$NON-NLS-2$
+	public static final String PROJECT_EXAMPLES_OFFLINE_ENABLED = "projectExamplesOfflineEnabled";//$NON-NLS-1$
+	public static final boolean PROJECT_EXAMPLES_OFFLINE_ENABLED_VALUE = false;
 	
 	private static final String IMPORT_PROJECT_EXAMPLES_EXTENSION_ID = "org.jboss.tools.project.examples.importProjectExamples"; //$NON-NLS-1$
 	private static final String TYPE = "type"; //$NON-NLS-1$
@@ -231,7 +235,7 @@ public class ProjectExamplesActivator extends AbstractUIPlugin {
 	private ImportDefaultProjectExample defaultImportProjectExample;
 
 	private Map<String, List<ContributedPage>> contributedPages;
-	
+
 	/**
 	 * The constructor
 	 */
