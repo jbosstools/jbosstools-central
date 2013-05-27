@@ -18,6 +18,7 @@ import java.util.Comparator;
 import java.util.Dictionary;
 import java.util.Hashtable;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.apache.commons.io.FileUtils;
 import org.eclipse.core.runtime.CoreException;
@@ -43,7 +44,7 @@ public class ProxyWizardManager {
 
 	private List<ProxyWizard> proxyWizards;
 	
-	private List<ProxyWizardManagerListener> listeners = new ArrayList<ProxyWizardManager.ProxyWizardManagerListener>();
+	private List<ProxyWizardManagerListener> listeners = new CopyOnWriteArrayList<ProxyWizardManager.ProxyWizardManagerListener>();
 
 	private String discoveryUrl;
 
