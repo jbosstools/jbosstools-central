@@ -21,8 +21,6 @@ import java.util.List;
 
 import org.eclipse.mylyn.internal.discovery.core.model.DiscoveryCategory;
 import org.eclipse.mylyn.internal.discovery.core.model.DiscoveryConnector;
-import org.jboss.tools.central.internal.discovery.wizards.CachedProxyWizardDiscoveryStrategy;
-import org.jboss.tools.central.internal.discovery.wizards.ProxyWizard;
 import org.junit.Before;
 import org.junit.Test;
 

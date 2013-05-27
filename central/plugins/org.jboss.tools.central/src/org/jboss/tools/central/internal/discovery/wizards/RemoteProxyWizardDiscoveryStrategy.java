@@ -15,6 +15,7 @@ import java.util.Collections;
 import java.util.List;
 
 import org.eclipse.core.runtime.IConfigurationElement;
+import org.eclipse.core.runtime.IContributor;
 import org.eclipse.core.runtime.IExtension;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.mylyn.internal.discovery.core.model.AbstractDiscoverySource;
@@ -38,7 +39,7 @@ public class RemoteProxyWizardDiscoveryStrategy extends
 	
 	@Override
 	protected String[] getExtensionPointProviderBundleIds() {
-		return new String[]{JBossCentralActivator.PLUGIN_ID};
+        return new String[]{JBossCentralActivator.PLUGIN_ID};
 	}
 	
 	@Override
@@ -46,7 +47,11 @@ public class RemoteProxyWizardDiscoveryStrategy extends
 		ProxyWizardExtensionReader extensionReader = new ProxyWizardExtensionReader();
 		proxyWizards = new ArrayList<ProxyWizard>();
 		for (IExtension extension : extensions) {
-			AbstractDiscoverySource discoverySource = computeDiscoverySource(extension.getContributor());
+			IContributor contributor = extension.getContributor();
+			if (JBossCentralActivator.PLUGIN_ID.equals(contributor.getName())) {
+				continue;
+			}
+			AbstractDiscoverySource discoverySource = computeDiscoverySource(contributor);
 			IConfigurationElement[] elements = extension.getConfigurationElements();
 			for (IConfigurationElement e : elements) {
 				if (PROXY_WIZARD_EXTENSION_POINT_NAME.equals(e.getName())) {

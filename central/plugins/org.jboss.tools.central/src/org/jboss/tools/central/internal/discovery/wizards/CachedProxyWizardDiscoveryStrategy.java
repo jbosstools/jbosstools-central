@@ -38,7 +38,7 @@ public class CachedProxyWizardDiscoveryStrategy extends ExternalBundleDiscoveryS
 	
 	@Override
 	protected String[] getExtensionPointProviderBundleIds() {
-		return new String[]{JBossCentralActivator.PLUGIN_ID};
+        return new String[]{JBossCentralActivator.PLUGIN_ID};
 	}
 	
 	@Override
@@ -47,6 +47,9 @@ public class CachedProxyWizardDiscoveryStrategy extends ExternalBundleDiscoveryS
 		proxyWizards = new ArrayList<ProxyWizard>();
 		for (IExtension extension : extensions) {
 			IContributor contributor = extension.getContributor();
+			if (JBossCentralActivator.PLUGIN_ID.equals(contributor.getName())) {
+				continue;
+			}
 			AbstractDiscoverySource discoverySource = computeDiscoverySource(contributor);
 			IConfigurationElement[] elements = extension.getConfigurationElements();
 			for (IConfigurationElement e : elements) {
