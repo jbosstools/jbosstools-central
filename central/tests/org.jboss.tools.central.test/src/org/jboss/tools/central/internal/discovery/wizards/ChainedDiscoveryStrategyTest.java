@@ -26,9 +26,6 @@ import org.eclipse.core.runtime.MultiStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.mylyn.internal.discovery.core.model.AbstractDiscoveryStrategy;
 import org.jboss.tools.central.internal.discovery.ChainedDiscoveryStrategy;
-import org.jboss.tools.central.internal.discovery.wizards.ProxyWizard;
-import org.jboss.tools.central.internal.discovery.wizards.ProxyWizardDataCollector;
-import org.jboss.tools.central.internal.discovery.wizards.ProxyWizardDiscoveryStrategy;
 import org.junit.Test;
 
 public class ChainedDiscoveryStrategyTest {

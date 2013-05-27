@@ -146,6 +146,7 @@ public class DiscoveryRegistryStrategy extends RegistryStrategy {
 			jarFile.close();
 			return;
 		}
+		
 		contributorToJarFile.put(contributor.getName(), bundleFile);
 		contributorToDirectoryEntry.put(contributor.getName(), entry);
 
@@ -235,7 +236,7 @@ public class DiscoveryRegistryStrategy extends RegistryStrategy {
 	public Entry getDirectoryEntry(IContributor contributor) {
 		Entry entry = contributorToDirectoryEntry.get(contributor.getName());
 		if (entry == null) {
-			throw new IllegalArgumentException(contributor.getName());
+			throw new IllegalArgumentException(NLS.bind("{0} is not a known contributor in the discovery registry", contributor.getName()));
 		}
 		return entry;
 	}
