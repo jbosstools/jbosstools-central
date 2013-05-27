@@ -107,6 +107,7 @@ import org.eclipse.ui.ide.IDEActionFactory;
 import org.eclipse.ui.menus.CommandContributionItem;
 import org.eclipse.ui.part.PageBook;
 import org.jboss.tools.central.JBossCentralActivator;
+import org.jboss.tools.central.internal.ImageUtil;
 import org.jboss.tools.central.internal.discovery.ExpressionBasedBundleDiscoveryStrategy;
 import org.jboss.tools.central.internal.discovery.ExpressionBasedRemoteBundleDiscoveryStrategy;
 import org.jboss.tools.central.internal.discovery.wizards.ProxyWizard;
@@ -555,7 +556,7 @@ public class GettingStartedPage extends AbstractJBossCentralPage implements Prox
 		final URL iconUrl = proxyWizard.getIconUrl();
 		Image image = null;
 		if (iconUrl != null) {
-			image = createImageFromUrl(iconUrl);
+			image = ImageUtil.createImageFromUrl(getDisplay(), iconUrl);
 		}
 		final ImageHyperlink link = toolkit.createImageHyperlink(composite, SWT.NONE);
 		link.setUnderlined(false);
@@ -609,49 +610,6 @@ public class GettingStartedPage extends AbstractJBossCentralPage implements Prox
 				highlightedLink.setBackground(blueish);
 			}
 		});
-	}
-
-	private Image createImageFromUrl(URL iconUrl) {
-
-		if (!iconUrl.getProtocol().equals("jar")) {
-			ImageDescriptor descriptor = ImageDescriptor.createFromURL(iconUrl);
-			return descriptor.createImage();
-		}
-		
-		//Load from jar:
-		Image image = null;
-		try {
-			String fileName = iconUrl.getFile();
-			if (fileName.contains("!")) {
-				String[] location = fileName.split("!");
-				fileName = location[0];
-				String imageName = URLDecoder.decode(location[1].substring(1), "utf-8");
-				File file = new File(new URI(fileName));
-				JarFile jarFile = null;
-				InputStream inputStream = null; 
-				try {
-					jarFile = new JarFile(file);
-					ZipEntry imageEntry = jarFile.getEntry(imageName);
-					if (imageEntry != null) {
-						inputStream = jarFile.getInputStream(imageEntry);
-						image = new Image(getDisplay(), inputStream);
-					} 
-				}finally {
-					IOUtils.closeQuietly(inputStream);
-					try {
-						if (jarFile != null) {
-							jarFile.close();
-						}
-					} catch (Exception e) {
-						//ignore
-				    }
-				}
-			}
-		} catch (Exception e) {
-			JBossCentralActivator.log(e);
-		}
-		
-		return image;
 	}
 
 	private void openWizard(IConfigurationElement element) throws CoreException {

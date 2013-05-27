@@ -18,6 +18,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.MultiStatus;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.mylyn.commons.core.StatusHandler;
 import org.eclipse.mylyn.internal.discovery.core.DiscoveryCore;
 import org.eclipse.mylyn.internal.discovery.core.model.AbstractDiscoveryStrategy;
 import org.eclipse.mylyn.internal.discovery.core.model.DiscoveryCategory;
@@ -63,7 +64,6 @@ public class ChainedDiscoveryStrategy extends AbstractDiscoveryStrategy  {
 					break;
 				}
 			} catch (Exception e) {
-				System.err.println(e.getMessage());
 				status.add(new Status(IStatus.ERROR, DiscoveryCore.ID_PLUGIN, NLS.bind(
 						"Failed to get connectors from {0}", ds.getClass()
 								.getSimpleName()), e));		
@@ -71,6 +71,9 @@ public class ChainedDiscoveryStrategy extends AbstractDiscoveryStrategy  {
 		}
 		if (status.getChildren().length == strategies.size()) {
 			throw new CoreException(status);
+		}
+		if (status.getChildren().length > 0) {
+			StatusHandler.log(status);
 		}
 	}
 	

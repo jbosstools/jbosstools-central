@@ -21,8 +21,6 @@ import java.util.List;
 import org.apache.commons.io.FileUtils;
 import org.eclipse.mylyn.internal.discovery.core.model.DiscoveryCategory;
 import org.eclipse.mylyn.internal.discovery.core.model.DiscoveryConnector;
-import org.jboss.tools.central.internal.discovery.wizards.ProxyWizard;
-import org.jboss.tools.central.internal.discovery.wizards.RemoteProxyWizardDiscoveryStrategy;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -45,8 +43,11 @@ public class RemoteProxyWizardDiscoveryStrategyTest extends AbstractProxyWizardD
 	
 	@Test
 	public void testDiscovery() throws Exception {
-		File discoveryFile = createDirectoryXml();
-		strategy.setDirectoryUrl("file:"+discoveryFile.getAbsolutePath().replace("\\", "/"));
+		
+		int port = startServer();
+		
+		createRemoteResources(port);
+		strategy.setDirectoryUrl("http://localhost:"+port+"/directory.xml");
 		strategy.performDiscovery(null);
 		List<ProxyWizard> proxyWizards = strategy.getProxyWizards();
 		assertNotNull("no wizards were discovered", proxyWizards);
