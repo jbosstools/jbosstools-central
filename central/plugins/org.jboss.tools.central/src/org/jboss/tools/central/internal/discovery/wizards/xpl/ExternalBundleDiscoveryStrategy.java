@@ -218,14 +218,14 @@ public class ExternalBundleDiscoveryStrategy extends BundleDiscoveryStrategy {
 	}
 
 	/**
-	 * indicate how many times discovyer jar downloads should be attempted
+	 * indicate how many times discovery jar downloads should be attempted
 	 */
 	public int getMaxDiscoveryJarDownloadAttempts() {
 		return maxDiscoveryJarDownloadAttempts;
 	}
 
 	/**
-	 * indicate how many times discovyer jar downloads should be attempted
+	 * indicate how many times discovery jar downloads should be attempted
 	 * 
 	 * @param maxDiscoveryJarDownloadAttempts
 	 *            a number >= 1

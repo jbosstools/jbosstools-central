@@ -11,4 +11,19 @@
 	<artifactId>org.jboss.tools.central.test</artifactId>
 
 	<packaging>eclipse-test-plugin</packaging>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.eclipse.tycho</groupId>
+				<artifactId>tycho-surefire-plugin</artifactId>
+				<version>${tychoVersion}</version>
+				<configuration>
+                  <includes>
+                    <include>**/*Test.class</include>
+                  </includes>
+  				</configuration>
+			</plugin>
+		</plugins>
+	</build>
 </project>

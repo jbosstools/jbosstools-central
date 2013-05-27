@@ -227,7 +227,7 @@ public class ProxyWizardManager {
 				});
 				
 				//If folder contains both .rcache and *.jar, then it's a cache folder
-				return hasCache[0] && hasCache[1];
+				return /*hasCache[0] &&*/ hasCache[1];
 				
 				
 			}

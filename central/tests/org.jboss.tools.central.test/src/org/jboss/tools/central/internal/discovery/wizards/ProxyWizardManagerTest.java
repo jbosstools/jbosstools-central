@@ -14,6 +14,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 import java.io.File;
 import java.io.IOException;
@@ -25,9 +26,11 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.jobs.Job;
-import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.widgets.Display;
+import org.jboss.tools.central.internal.ImageUtil;
 import org.jboss.tools.central.internal.discovery.wizards.ProxyWizardManager.ProxyWizardManagerListener;
 import org.jboss.tools.central.internal.discovery.wizards.ProxyWizardManager.UpdateEvent;
 import org.junit.After;
@@ -56,10 +59,11 @@ public class ProxyWizardManagerTest extends AbstractProxyWizardDiscoveryTest imp
 	
 
 	@After
-	public void tearDown() {
+	public void tearDown() throws IOException {
 		pwm.setRootCacheFolderPath(null);
 		pwm.unRegisterListener(this);
 		monitor = null;
+		FileUtils.deleteDirectory(cacheFolder);
 		cacheFolder = null;
 	}
 	
@@ -75,14 +79,19 @@ public class ProxyWizardManagerTest extends AbstractProxyWizardDiscoveryTest imp
 	@Test
 	public void testLoadProxyWizardsFromRemote() throws Exception {
 
+		  int port = startServer();
+		  
+		  assertTrue("platform is not runing", Platform.isRunning());
+		
 		  assertEquals(1, cacheFolder.list().length);
 
-		  File discoveryFile = createDirectoryXml();
-		  pwm.setDiscoveryUrl("file:"+discoveryFile.getAbsolutePath().replace("\\", "/"));
+		  createRemoteResources(port);
+		  
+		  pwm.setDiscoveryUrl("http://localhost:"+port+"/directory.xml");
 			
 		  List<ProxyWizard> wizards = pwm.getProxyWizards(true, monitor);
-		  assertEquals("Cache was not loaded", 7, wizards.size());			
-		  waitForDownload(10*1000);
+		  assertEquals("Cache was not loaded", 7, wizards.size());		
+		  waitForDownload(MAX_WAIT_TIME);
 		  assertNotNull("Remote wizards were not broadcast", remoteWizards);
 		  assertEquals("Remote wizards were not loaded", 6, remoteWizards.size());			
 		  
@@ -167,10 +176,17 @@ public class ProxyWizardManagerTest extends AbstractProxyWizardDiscoveryTest imp
 			}
 		}
 	}
-		
+
+	public static Display getDisplay() {
+	      Display display = Display.getCurrent();
+	      //may be null if outside the UI thread
+	      if (display == null)
+	         display = Display.getDefault();
+	      return display;		
+	   }
+
 	private Image getImage(URL iconUrl) {
-		ImageDescriptor descriptor = ImageDescriptor.createFromURL(iconUrl);
-		return descriptor.createImage();
+		return ImageUtil.createImageFromUrl(getDisplay(), iconUrl);
 	}
 
 
