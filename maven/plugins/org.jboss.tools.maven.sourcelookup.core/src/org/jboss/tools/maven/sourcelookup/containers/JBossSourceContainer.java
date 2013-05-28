@@ -28,6 +28,7 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.jobs.IJobChangeListener;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.sourcelookup.ISourceContainer;
@@ -294,10 +295,15 @@ public class JBossSourceContainer extends AbstractSourceContainer {
 	}
 
 	public static Job downloadArtifact(File file, ArtifactKey artifact) {
+		return downloadArtifact(file, artifact, (IJobChangeListener[])null);
+	}
+
+	public static Job downloadArtifact(File file, ArtifactKey artifact, IJobChangeListener ... listeners) {
 		final ArtifactKey sourcesArtifact = new ArtifactKey(
 				artifact.getGroupId(), artifact.getArtifactId(),
 				artifact.getVersion(),
 				IdentificationUtil.getSourcesClassifier(artifact.getClassifier()));
+		//FIXME static variable, What The ...!!!
 		resolvedFile = null;
 		Job job = new Job("Downloading sources for " + file.getName()) {
 
@@ -311,11 +317,17 @@ public class JBossSourceContainer extends AbstractSourceContainer {
 				return Status.OK_STATUS;
 			}
 		};
-		job.setUser(true);
+		if (listeners != null && listeners.length > 0) {
+			for (IJobChangeListener listener : listeners) {
+				if (listener != null) {
+					job.addJobChangeListener(listener);
+				}
+			}
+		}
 		job.schedule();
 		return job;
 	}
-
+	
 	private static File download(ArtifactKey artifact, IProgressMonitor monitor)
 			throws CoreException {
 		if (monitor.isCanceled()) {
