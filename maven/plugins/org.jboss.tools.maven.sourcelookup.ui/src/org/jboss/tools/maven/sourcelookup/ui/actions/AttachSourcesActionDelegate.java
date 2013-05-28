@@ -13,18 +13,22 @@ package org.jboss.tools.maven.sourcelookup.ui.actions;
 import java.io.File;
 
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.jobs.IJobChangeEvent;
 import org.eclipse.core.runtime.jobs.IJobChangeListener;
 import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.core.runtime.jobs.JobChangeAdapter;
 import org.eclipse.jdt.core.IJavaElement;
+import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IPackageFragmentRoot;
 import org.eclipse.jdt.internal.ui.javaeditor.IClassFileEditorInput;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.m2e.core.embedder.ArtifactKey;
+import org.eclipse.m2e.core.internal.IMavenConstants;
 import org.eclipse.ui.IEditorActionDelegate;
 import org.eclipse.ui.IEditorPart;
 import org.jboss.tools.maven.core.identification.IFileIdentificationManager;
@@ -62,6 +66,12 @@ public class AttachSourcesActionDelegate implements IEditorActionDelegate {
 				}
 				IClassFileEditorInput input = (IClassFileEditorInput) targetEditor.getEditorInput();
 				IJavaElement element = input.getClassFile();
+				
+				boolean isMavenProject = isMavenProject(element.getJavaProject());
+				if (isMavenProject) {
+					return;
+				}
+				
 				while (element.getParent() != null) {
 					element = element.getParent();
 					if (element instanceof IPackageFragmentRoot) {
@@ -78,21 +88,7 @@ public class AttachSourcesActionDelegate implements IEditorActionDelegate {
 							if (artifact != null) {
 								IPath sourcePath = JBossSourceContainer.getSourcePath(artifact);
 								if (sourcePath == null || !sourcePath.toFile().exists()) {
-									Job job = JBossSourceContainer.downloadArtifact(file, artifact);
-									job.addJobChangeListener(new IJobChangeListener() {
-
-										@Override
-										public void sleeping(IJobChangeEvent event) {
-										}
-
-										@Override
-										public void scheduled(IJobChangeEvent event) {
-										}
-
-										@Override
-										public void running(IJobChangeEvent event) {
-										}
-
+									IJobChangeListener listener = new JobChangeAdapter() {
 										@Override
 										public void done(IJobChangeEvent event) {
 											IPath sourcePath = JBossSourceContainer.getSourcePath(artifact);
@@ -100,16 +96,8 @@ public class AttachSourcesActionDelegate implements IEditorActionDelegate {
 												SourceLookupUtil.attachSource(fragment, sourcePath);
 											}
 										}
-
-										@Override
-										public void awake(IJobChangeEvent event) {
-										}
-
-										@Override
-										public void aboutToRun(IJobChangeEvent event) {
-										}
-									});
-									job.schedule();
+									};
+									JBossSourceContainer.downloadArtifact(file, artifact, listener);
 								} else {
 									SourceLookupUtil.attachSource(fragment, sourcePath);
 								}
@@ -121,6 +109,18 @@ public class AttachSourcesActionDelegate implements IEditorActionDelegate {
 				SourceLookupUIActivator.log(e);
 			}
 		}
+	}
+
+	private boolean isMavenProject(IJavaProject javaProject) {
+		if (javaProject != null && javaProject.getProject() != null) {
+			IProject project = javaProject.getProject();
+			try {
+				return project.hasNature(IMavenConstants.NATURE_ID);
+			} catch (Exception e) {
+				SourceLookupUIActivator.log(e);
+			}
+		}
+		return false;
 	}
 
 }
