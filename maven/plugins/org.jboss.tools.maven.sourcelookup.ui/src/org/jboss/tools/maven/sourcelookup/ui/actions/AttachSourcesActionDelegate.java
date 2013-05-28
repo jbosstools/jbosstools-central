@@ -15,11 +15,11 @@ import java.io.File;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.jobs.IJobChangeEvent;
 import org.eclipse.core.runtime.jobs.IJobChangeListener;
-import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.core.runtime.jobs.JobChangeAdapter;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IJavaProject;
@@ -116,7 +116,7 @@ public class AttachSourcesActionDelegate implements IEditorActionDelegate {
 			IProject project = javaProject.getProject();
 			try {
 				return project.hasNature(IMavenConstants.NATURE_ID);
-			} catch (Exception e) {
+			} catch (CoreException e) {
 				SourceLookupUIActivator.log(e);
 			}
 		}
