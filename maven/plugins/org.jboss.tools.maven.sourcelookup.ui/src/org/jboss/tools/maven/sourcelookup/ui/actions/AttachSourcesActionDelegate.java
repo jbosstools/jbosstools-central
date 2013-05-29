@@ -48,6 +48,8 @@ import org.jboss.tools.maven.sourcelookup.ui.internal.util.SourceLookupUtil;
  */
 public class AttachSourcesActionDelegate implements IEditorActionDelegate {
 
+	private String lastIdentifiedFile;
+	
 	@Override
 	public void run(IAction action) {
 	}
@@ -86,6 +88,9 @@ public class AttachSourcesActionDelegate implements IEditorActionDelegate {
 						if (fragment.isArchive()) {
 							IFile iFile = ResourcesPlugin.getWorkspace().getRoot().getFile(fragment.getPath());
 							final File file = iFile == null || iFile.getLocation() == null ? fragment.getPath().toFile() : iFile.getLocation().toFile();
+							if (file.getAbsolutePath().equals(lastIdentifiedFile)) {
+								return;
+							}
 							final ArtifactKey[] result = new ArtifactKey[1];
 							Job identificationJob = new Job("Identify "+file.getName()) {
 								@Override
@@ -107,6 +112,7 @@ public class AttachSourcesActionDelegate implements IEditorActionDelegate {
 								}
 							});
 							identificationJob.schedule();
+							lastIdentifiedFile = file.getAbsolutePath();
 							break;
 						}
 					}
