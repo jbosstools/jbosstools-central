@@ -312,7 +312,8 @@ public class JBossSourceContainer extends AbstractSourceContainer {
 				try {
 					resolvedFile = download(sourcesArtifact, monitor);
 				} catch (CoreException e) {
-					SourceLookupActivator.log(e);
+					//We couldn't find sources, no need to make a fuss about it
+					SourceLookupActivator.logInfo(e.getLocalizedMessage());
 				}
 				return Status.OK_STATUS;
 			}

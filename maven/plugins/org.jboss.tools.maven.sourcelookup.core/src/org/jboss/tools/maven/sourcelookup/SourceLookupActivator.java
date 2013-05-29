@@ -99,10 +99,19 @@ public class SourceLookupActivator implements BundleActivator {
 		plugin.getLog().log(status);
 	}
 
+	public static void log(IStatus status) {
+		plugin.getLog().log(status);
+	}
+
+	public static void logInfo(String message) {
+		IStatus status = new Status(IStatus.INFO, PLUGIN_ID, message);
+		log(status);
+	}
+	
 	public static void log(Throwable e) {
 		IStatus status = new Status(IStatus.ERROR, PLUGIN_ID, e
 				.getLocalizedMessage(), e);
-		plugin.getLog().log(status);
+		log(status);
 	}
 
 	public ILog getLog() {
