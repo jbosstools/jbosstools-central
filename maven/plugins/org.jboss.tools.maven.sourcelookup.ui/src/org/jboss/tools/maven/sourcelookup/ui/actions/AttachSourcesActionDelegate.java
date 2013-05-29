@@ -17,9 +17,12 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
-import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.IJobChangeEvent;
 import org.eclipse.core.runtime.jobs.IJobChangeListener;
+import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.core.runtime.jobs.JobChangeAdapter;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IJavaProject;
@@ -82,31 +85,55 @@ public class AttachSourcesActionDelegate implements IEditorActionDelegate {
 						}
 						if (fragment.isArchive()) {
 							IFile iFile = ResourcesPlugin.getWorkspace().getRoot().getFile(fragment.getPath());
-							File file = iFile == null || iFile.getLocation() == null ? fragment.getPath().toFile() : iFile.getLocation().toFile();
-							IFileIdentificationManager identificationManager = new FileIdentificationManager();
-							final ArtifactKey artifact = identificationManager.identify(file, new NullProgressMonitor());
-							if (artifact != null) {
-								IPath sourcePath = JBossSourceContainer.getSourcePath(artifact);
-								if (sourcePath == null || !sourcePath.toFile().exists()) {
-									IJobChangeListener listener = new JobChangeAdapter() {
-										@Override
-										public void done(IJobChangeEvent event) {
-											IPath sourcePath = JBossSourceContainer.getSourcePath(artifact);
-											if (sourcePath != null && sourcePath.toFile().exists()) {
-												SourceLookupUtil.attachSource(fragment, sourcePath);
-											}
-										}
-									};
-									JBossSourceContainer.downloadArtifact(file, artifact, listener);
-								} else {
-									SourceLookupUtil.attachSource(fragment, sourcePath);
+							final File file = iFile == null || iFile.getLocation() == null ? fragment.getPath().toFile() : iFile.getLocation().toFile();
+							final ArtifactKey[] result = new ArtifactKey[1];
+							Job identificationJob = new Job("Identify "+file.getName()) {
+								@Override
+								protected IStatus run(IProgressMonitor monitor) {
+									IFileIdentificationManager identificationManager = new FileIdentificationManager();
+									IStatus status = Status.OK_STATUS;
+									try {
+										result[0] = identificationManager.identify(file, monitor);
+									} catch (CoreException e) {
+										status = new Status(IStatus.ERROR, SourceLookupUIActivator.PLUGIN_ID, "unable to identify "+file.getName(), e);
+									}
+									return status;
 								}
-							}
+							};
+							identificationJob.addJobChangeListener(new JobChangeAdapter() {
+								@Override
+								public void done(IJobChangeEvent event) {
+									postIdentification(fragment, file, result[0]);
+								}
+							});
+							identificationJob.schedule();
+							break;
 						}
 					}
 				}
 			} catch (Exception e) {
 				SourceLookupUIActivator.log(e);
+			}
+		}
+	}
+
+	private void postIdentification(final IPackageFragmentRoot fragment,
+			File file, final ArtifactKey artifact) {
+		if (artifact != null) {
+			IPath sourcePath = JBossSourceContainer.getSourcePath(artifact);
+			if (sourcePath == null || !sourcePath.toFile().exists()) {
+				IJobChangeListener listener = new JobChangeAdapter() {
+					@Override
+					public void done(IJobChangeEvent event) {
+						IPath sourcePath = JBossSourceContainer.getSourcePath(artifact);
+						if (sourcePath != null && sourcePath.toFile().exists()) {
+							SourceLookupUtil.attachSource(fragment, sourcePath);
+						}
+					}
+				};
+				JBossSourceContainer.downloadArtifact(file, artifact, listener);
+			} else {
+				SourceLookupUtil.attachSource(fragment, sourcePath);
 			}
 		}
 	}
