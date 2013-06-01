@@ -126,7 +126,7 @@
       -->
       <command
       		defaultHandler="org.jboss.tools.project.examples.cheatsheet.actions.GetProjectForCheatsheetHandler"
-            name="Launch JUnit tests"
+            name="Get current project"
             id="org.jboss.tools.project.examples.cheatsheet.getProjectForCheatsheet">
       </command>
    </extension>
