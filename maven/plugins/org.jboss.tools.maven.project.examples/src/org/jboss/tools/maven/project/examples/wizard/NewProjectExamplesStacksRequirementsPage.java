@@ -187,12 +187,12 @@ public class NewProjectExamplesStacksRequirementsPage extends NewProjectExamples
 			try {
 				mavenArchetype = createArchetypeModel(projectExample.getArchetypeModel(), version);
 				
-				wizardContext.setProperty(MavenProjectConstants.ARCHETYPE_MODEL, mavenArchetype);
 			} catch (CloneNotSupportedException e) {
 				e.printStackTrace();
 			}
 		}
 		
+		wizardContext.setProperty(MavenProjectConstants.ARCHETYPE_MODEL, mavenArchetype);
 		if (mavenArchetype != null) {
 			description.append("\r\n").append("\r\n") //$NON-NLS-1$ //$NON-NLS-2$
 			.append("Project based on the ") //$NON-NLS-1$

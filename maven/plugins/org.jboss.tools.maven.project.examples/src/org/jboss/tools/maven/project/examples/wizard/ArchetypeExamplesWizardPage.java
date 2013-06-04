@@ -127,6 +127,10 @@ public class ArchetypeExamplesWizardPage extends
 		archetype.setVersion(archetypeModel.getArchetypeVersion());
 		archetype.setRepository(archetypeModel.getArchetypeRepository());
 		
+		if (areEqual(archetype, this.archetype) && initialized) {
+			return;
+		}
+		
 		//Since we set archetypeChanged=false later on, we need to do the equivalent of 
 		//MavenProjectWizardArchetypeParametersPage.loadArchetypeDescriptor(), 
 		//as we don't have the guarantee archetypeModel holds ALL the required properties
