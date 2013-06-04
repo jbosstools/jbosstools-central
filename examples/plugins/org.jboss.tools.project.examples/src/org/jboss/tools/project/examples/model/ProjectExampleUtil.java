@@ -61,7 +61,7 @@ import org.eclipse.wst.server.core.IRuntime;
 import org.eclipse.wst.server.core.IServer;
 import org.eclipse.wst.server.core.ServerCore;
 import org.jboss.ide.eclipse.as.core.server.IJBossServerRuntime;
-import org.jboss.tools.foundation.ecf.ECFTransportUtility;
+import org.jboss.tools.foundation.ecf.URLTransportUtility;
 import org.jboss.tools.project.examples.Messages;
 import org.jboss.tools.project.examples.ProjectExamplesActivator;
 import org.w3c.dom.Document;
@@ -776,7 +776,7 @@ public class ProjectExampleUtil {
 				long urlModified = -1;
 				file = getFile(url);
 				try {
-					urlModified = new ECFTransportUtility().getLastModified(url);
+					urlModified = new URLTransportUtility().getLastModified(url);
 				} catch (CoreException e) {
 					if (file.exists()) {
 						return file;
@@ -801,7 +801,7 @@ public class ProjectExampleUtil {
 				}
 				BufferedOutputStream destination = new BufferedOutputStream(
 						new FileOutputStream(file));
-				IStatus result = new ECFTransportUtility().download(prefix,
+				IStatus result = new URLTransportUtility().download(prefix,
 						url.toExternalForm(), destination, monitor);
 				if (!result.isOK()) {
 					ProjectExamplesActivator.getDefault().getLog().log(result);
