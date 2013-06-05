@@ -306,7 +306,7 @@
       <proxyWizard 
           id="javaee.wizard" 
           description="%javaeeweb.wizard.description"
-          label="JavaEE Web Project"
+          label="Java EE Web Project"
           priority="5"
           iconPath="icons/newwebprj_wiz.gif"
           wizardId="org.jboss.tools.central.wizards.NewJavaeeWarProjectWizard"
