@@ -29,3 +29,7 @@ Require-Bundle: org.eclipse.ui;bundle-version="3.7.0",
  org.eclipse.pde.ua.ui;bundle-version="1.0.300"
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Bundle-ActivationPolicy: lazy
+Export-Package: org.jboss.tools.project.examples.cheatsheet,
+ org.jboss.tools.project.examples.cheatsheet.actions,
+ org.jboss.tools.project.examples.cheatsheet.internal.adapter,
+ org.jboss.tools.project.examples.cheatsheet.internal.util
