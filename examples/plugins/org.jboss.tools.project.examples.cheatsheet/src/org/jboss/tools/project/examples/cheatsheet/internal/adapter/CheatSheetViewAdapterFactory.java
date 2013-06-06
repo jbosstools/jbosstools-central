@@ -10,31 +10,23 @@
  ************************************************************************************/
 package org.jboss.tools.project.examples.cheatsheet.internal.adapter;
 
-import java.net.URL;
-
-import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.IAdapterFactory;
-import org.eclipse.core.runtime.IPath;
-import org.eclipse.core.runtime.content.IContentDescription;
-import org.eclipse.core.runtime.content.IContentType;
 import org.eclipse.jface.viewers.ISelection;
-import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.ui.internal.cheatsheets.state.DefaultStateManager;
-import org.eclipse.ui.internal.cheatsheets.views.CheatSheetView;
-import org.eclipse.ui.internal.cheatsheets.views.ViewUtilities;
 import org.eclipse.ui.part.IShowInTarget;
 import org.eclipse.ui.part.ShowInContext;
 import org.jboss.tools.project.examples.cheatsheet.Activator;
-import org.jboss.tools.project.examples.cheatsheet.internal.util.CheatSheetUtil;
 
 /**
- * Show Cheat Sheet xml files in the Cheat Sheet View 
+ * Shows cheatsheet xml files in the Cheat Sheets View 
  * 
  * @author snjeza
  *
  */
 public class CheatSheetViewAdapterFactory implements IAdapterFactory {
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.core.runtime.IAdapterFactory#getAdapter(java.lang.Object, java.lang.Class)
+	 */
 	public Object getAdapter(Object adaptableObject, Class adapterType) {
 		return new IShowInTarget() {
 			
@@ -43,14 +35,7 @@ public class CheatSheetViewAdapterFactory implements IAdapterFactory {
 					return false;
 				}
 				ISelection sel = context.getSelection();
-				if (sel instanceof IStructuredSelection) {
-					IStructuredSelection selection = (IStructuredSelection) sel;
-					Object object = selection.getFirstElement();
-					if (object instanceof IFile) {
-						IFile file = (IFile) object;
-						CheatSheetUtil.showCheatsheet(file);
-					}
-				}
+				Activator.showCheatsheet(sel);
 				return false;
 			}
 		};
@@ -59,6 +44,5 @@ public class CheatSheetViewAdapterFactory implements IAdapterFactory {
 	public Class[] getAdapterList() {
 		return new Class[] {IShowInTarget.class};
 	}
-
 
 }

@@ -20,13 +20,17 @@ import org.eclipse.core.resources.IResourceChangeEvent;
 import org.eclipse.core.resources.IResourceChangeListener;
 import org.eclipse.core.resources.IResourceDelta;
 import org.eclipse.core.resources.IResourceDeltaVisitor;
+import org.eclipse.core.resources.IResourceVisitor;
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.content.IContentDescription;
 import org.eclipse.core.runtime.content.IContentType;
+import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.jboss.tools.project.examples.ProjectExamplesActivator;
 import org.jboss.tools.project.examples.cheatsheet.internal.util.CheatSheetUtil;
@@ -41,7 +45,9 @@ public class Activator extends AbstractUIPlugin {
 
 	private static final String CHEATSHEET_XML = "cheatsheet.xml"; //$NON-NLS-1$
 
-	// The plug-in ID
+	/**
+	 * The plug-in ID
+	 */
 	public static final String PLUGIN_ID = "org.jboss.tools.project.examples.cheatsheet"; //$NON-NLS-1$
 
 	// The shared instance
@@ -108,20 +114,6 @@ public class Activator extends AbstractUIPlugin {
 			}
 		}
 
-		public boolean isCheatcheet(IFile file) {
-			String fileName = file.getName().toLowerCase();
-			boolean candidate = CHEATSHEET_XML.equals(fileName) || DOT_CHEATSHEET_XML.equals(fileName);
-			if (candidate) {
-				try {
-					IContentDescription contentDescription = file.getContentDescription();
-					IContentType contentType = contentDescription.getContentType();
-					return (contentType != null && "org.eclipse.pde.simpleCheatSheet".equals(contentType.getId())); //$NON-NLS-1$
-				} catch (CoreException e) {
-					// ignore
-				}
-			}
-			return false;
-		}
 	};
 	
 	/**
@@ -130,8 +122,7 @@ public class Activator extends AbstractUIPlugin {
 	public Activator() {
 	}
 
-	/*
-	 * (non-Javadoc)
+	/* (non-Javadoc)
 	 * @see org.eclipse.ui.plugin.AbstractUIPlugin#start(org.osgi.framework.BundleContext)
 	 */
 	public void start(BundleContext context) throws Exception {
@@ -140,8 +131,7 @@ public class Activator extends AbstractUIPlugin {
 		ResourcesPlugin.getWorkspace().addResourceChangeListener(listener, IResourceChangeEvent.POST_CHANGE);
 	}
 
-	/*
-	 * (non-Javadoc)
+	/* (non-Javadoc)
 	 * @see org.eclipse.ui.plugin.AbstractUIPlugin#stop(org.osgi.framework.BundleContext)
 	 */
 	public void stop(BundleContext context) throws Exception {
@@ -151,6 +141,27 @@ public class Activator extends AbstractUIPlugin {
 	}
 
 	/**
+	 * checks if a file is a cheatsheet
+	 * 
+	 * @param file
+	 * @return
+	 */
+	public static boolean isCheatcheet(IFile file) {
+		String fileName = file.getName().toLowerCase();
+		boolean candidate = CHEATSHEET_XML.equals(fileName) || DOT_CHEATSHEET_XML.equals(fileName);
+		if (candidate) {
+			try {
+				IContentDescription contentDescription = file.getContentDescription();
+				IContentType contentType = contentDescription.getContentType();
+				return (contentType != null && "org.eclipse.pde.simpleCheatSheet".equals(contentType.getId())); //$NON-NLS-1$
+			} catch (CoreException e) {
+				// ignore
+			}
+		}
+		return false;
+	}
+	
+	/**
 	 * Returns the shared instance
 	 *
 	 * @return the shared instance
@@ -159,14 +170,71 @@ public class Activator extends AbstractUIPlugin {
 		return plugin;
 	}
 
+	/**
+	 * logs an exception
+	 * 
+	 * @param e
+	 */
 	public static void log(Throwable e) {
 		IStatus status = new Status(IStatus.ERROR, PLUGIN_ID, e
 				.getLocalizedMessage(), e);
 		plugin.getLog().log(status);
 	}
 	
+	/**
+	 * logs a message
+	 * 
+	 * @param message
+	 */
 	public static void log(String message) {
 		IStatus status = new Status(IStatus.WARNING, PLUGIN_ID,message);
 		plugin.getLog().log(status);
 	}
+	
+	/**
+	 * shows a cheatsheet
+	 * 
+	 * @param selection
+	 */
+	public static void showCheatsheet(ISelection selection) {
+		if (selection instanceof IStructuredSelection) {
+			IStructuredSelection structuredSelection = (IStructuredSelection) selection;
+			Object object = structuredSelection.getFirstElement();
+			if (object instanceof IFile) {
+				IFile file = (IFile) object;
+				CheatSheetUtil.showCheatsheet(file);
+			} else if (object instanceof IAdaptable) {
+				IProject project = (IProject) ((IAdaptable)object).getAdapter(IProject.class);
+				if (project == null) {
+					return;
+				}
+				
+				final List<IFile> cheatsheets = new ArrayList<IFile>();
+				try {
+					project.accept(new IResourceVisitor() {
+						
+						public boolean visit(IResource resource) throws CoreException {
+							if (resource instanceof IProject) {
+								return true;
+							}
+							if (resource instanceof IFile) {
+								IFile file = (IFile) resource;
+								if (Activator.isCheatcheet(file)) {
+									cheatsheets.add(file);
+								}
+								return false;
+							}
+							return false;
+						}
+					});
+				} catch (CoreException e) {
+					Activator.log(e);
+				}
+				if (cheatsheets.size() > 0) {
+					CheatSheetUtil.showCheatsheet(cheatsheets.get(0));
+				}
+			}
+		}
+	}
+
 }

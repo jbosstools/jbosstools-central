@@ -12,6 +12,7 @@ package org.jboss.tools.project.examples.test;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -36,19 +37,25 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jdt.internal.ui.javaeditor.CompilationUnitEditor;
+import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IFileEditorInput;
+import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.commands.ICommandService;
 import org.eclipse.ui.handlers.IHandlerService;
+import org.eclipse.ui.internal.cheatsheets.ICheatSheetResource;
 import org.eclipse.ui.internal.cheatsheets.state.DefaultStateManager;
 import org.eclipse.ui.internal.cheatsheets.views.CheatSheetView;
 import org.eclipse.ui.internal.cheatsheets.views.ViewUtilities;
 import org.jboss.tools.project.examples.Messages;
 import org.jboss.tools.project.examples.ProjectExamplesActivator;
+import org.jboss.tools.project.examples.cheatsheet.Activator;
+import org.jboss.tools.project.examples.cheatsheet.internal.adapter.CheatSheetViewAdapterFactory;
 import org.jboss.tools.project.examples.model.IImportProjectExample;
 import org.jboss.tools.project.examples.model.ProjectExample;
 import org.jboss.tools.project.examples.model.ProjectExampleCategory;
@@ -140,7 +147,58 @@ public class CheatSheetTest {
 		
 	}
 
-	public void testActionInNonUIThread(IFile file) {
+	@Test
+	public void testShowInView() {
+		JobUtils.waitForIdle();
+		IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();    
+		IProject project = root.getProject(KITCHENSINK);
+		assertTrue("The jboss-as-kitchensink project is not imported.", project.exists());
+		final IFile file = project.getFile("cheatsheet.xml");
+		Display.getDefault().syncExec(new Runnable() {
+			
+			@Override
+			public void run() {
+				testShowInViewInNonUIThread(file);
+			}
+		});
+	}
+
+	private void testShowInViewInNonUIThread(IFile file) {
+		boolean delete = false;
+		IViewPart view = null;
+		try {
+			if (!file.exists()) {
+				createCheatSheet(file);
+				delete = true;
+			}
+			view = getActivePage().findView(ICheatSheetResource.CHEAT_SHEET_VIEW_ID);
+			if (view != null) {
+				getActivePage().hideView(view);
+			}
+			view = getActivePage().findView(ICheatSheetResource.CHEAT_SHEET_VIEW_ID);
+			assertNull("Cannot hide the Cheat Sheets view", view);
+			IProject project = file.getProject();
+			ISelection sel = new StructuredSelection(project);
+			Activator.showCheatsheet(sel);
+			view = getActivePage().findView(ICheatSheetResource.CHEAT_SHEET_VIEW_ID);
+			assertNotNull("The Cheat Sheets view is not open.", view);
+		} catch (Exception e) {
+			ProjectExamplesActivator.log(e);
+			fail(e.getMessage());
+		}
+		finally {
+			getActivePage().hideView(view);
+			if (delete) {
+				try {
+					file.delete(true, null);
+				} catch (CoreException e) {
+					// ignore
+				}
+			}
+		}
+	}
+
+	private void testActionInNonUIThread(IFile file) {
 		boolean delete = false;
 		CheatSheetView view = null;
 		try {
