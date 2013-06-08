@@ -61,7 +61,7 @@ import org.eclipse.wst.server.core.IRuntime;
 import org.eclipse.wst.server.core.IServer;
 import org.eclipse.wst.server.core.ServerCore;
 import org.jboss.ide.eclipse.as.core.server.IJBossServerRuntime;
-import org.jboss.tools.common.core.ecf.ECFTransport;
+import org.jboss.tools.foundation.ecf.URLTransportUtility;
 import org.jboss.tools.project.examples.Messages;
 import org.jboss.tools.project.examples.ProjectExamplesActivator;
 import org.w3c.dom.Document;
@@ -776,7 +776,7 @@ public class ProjectExampleUtil {
 				long urlModified = -1;
 				file = getFile(url);
 				try {
-					urlModified = ECFTransport.getInstance()
+					urlModified = new URLTransportUtility()
 							.getLastModified(url);
 				} catch (CoreException e) {
 					if (file.exists()) {
@@ -832,8 +832,8 @@ public class ProjectExampleUtil {
 		return file;
 	}
 
-	private static ECFTransport getTransport() {
-		return ECFTransport.getInstance();
+	private static URLTransportUtility getTransport() {
+		return new URLTransportUtility();
 	}
 
 	public static Document getDocument() throws ParserConfigurationException {
