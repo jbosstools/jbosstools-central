@@ -137,33 +137,27 @@ public class ImportMavenProjectExampleDelegate extends AbstractImportMavenProjec
 		}
 		IPreferenceStore store = Activator.getDefault().getPreferenceStore();
 		boolean configureSeam = store.getBoolean(Activator.CONFIGURE_SEAM);
-		boolean configureJSF = store.getBoolean(Activator.CONFIGURE_JSF);
 		boolean configurePortlet = store.getBoolean(Activator.CONFIGURE_PORTLET);
 		boolean configureJSFPortlet = store.getBoolean(Activator.CONFIGURE_JSFPORTLET);
 		boolean configureSeamPortlet = store.getBoolean(Activator.CONFIGURE_SEAMPORTLET);
 		boolean configureCDI = store.getBoolean(Activator.CONFIGURE_CDI);
 		boolean configureHibernate = store.getBoolean(Activator.CONFIGURE_HIBERNATE);
-		boolean configureJaxRs = store.getBoolean(Activator.CONFIGURE_JAXRS);
 		List<String> projectNames;
 		try {
 			store.setValue(Activator.CONFIGURE_SEAM, false);
-			store.setValue(Activator.CONFIGURE_JSF, false);
 			store.setValue(Activator.CONFIGURE_PORTLET, false);
 			store.setValue(Activator.CONFIGURE_JSFPORTLET, false);
 			store.setValue(Activator.CONFIGURE_SEAMPORTLET, false);
 			store.setValue(Activator.CONFIGURE_CDI, false);
 			store.setValue(Activator.CONFIGURE_HIBERNATE, false);
-			store.setValue(Activator.CONFIGURE_JAXRS, false);
 			projectNames = importMavenProjects(destination, projectDescription, monitor);
 		} finally {
 			store.setValue(Activator.CONFIGURE_SEAM, configureSeam);
-			store.setValue(Activator.CONFIGURE_JSF, configureJSF);
 			store.setValue(Activator.CONFIGURE_PORTLET, configurePortlet);
 			store.setValue(Activator.CONFIGURE_JSFPORTLET, configureJSFPortlet);
 			store.setValue(Activator.CONFIGURE_SEAMPORTLET, configureSeamPortlet);
 			store.setValue(Activator.CONFIGURE_CDI, configureCDI);
 			store.setValue(Activator.CONFIGURE_HIBERNATE, configureHibernate);
-			store.setValue(Activator.CONFIGURE_JAXRS, configureJaxRs);
 		}
 		new OpenMavenConsoleAction().run();
 		

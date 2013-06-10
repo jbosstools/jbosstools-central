@@ -11,6 +11,8 @@
 
 package org.jboss.tools.maven.project.examples;
 
+import static org.jboss.tools.maven.core.ProjectUtil.toIProjects;
+import static org.jboss.tools.maven.core.ProjectUtil.updateOutOfDateMavenProjects;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -20,6 +22,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -28,8 +31,6 @@ import org.eclipse.m2e.core.embedder.MavenModelManager;
 import org.eclipse.m2e.core.project.LocalProjectScanner;
 import org.eclipse.m2e.core.project.MavenProjectInfo;
 import org.eclipse.m2e.core.project.ProjectImportConfiguration;
-import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Shell;
 import org.jboss.tools.project.examples.ProjectExamplesActivator;
 import org.jboss.tools.project.examples.model.ProjectExample;
 
@@ -83,7 +84,12 @@ public class ImportMavenArchetypeProjectExampleDelegate extends AbstractImportMa
 				return false;
 			}
 		}
-		MavenProjectExamplesActivator.updateMavenConfiguration(projectName, includedProjects, monitor);
+		List<IProject> iprojects = toIProjects(includedProjects);
+		
+		//If maven projects are out of date, we trigger an project update.
+		//Now we don't need to join() on the updateJob, since this update is just meant for 
+		//m2e to get rid of the nasty out of date markers. No need to block import for that.
+		updateOutOfDateMavenProjects(iprojects , monitor);
 		return true;
 	}
 
@@ -102,9 +108,4 @@ public class ImportMavenArchetypeProjectExampleDelegate extends AbstractImportMa
 			}
 		}.collectProjects(projects);
 	}
-
-	private static Shell getActiveShell() {
-		return Display.getDefault().getActiveShell();
-	}
-
 }
