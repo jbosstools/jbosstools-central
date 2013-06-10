@@ -33,6 +33,7 @@ import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.jobs.IJobChangeEvent;
 import org.eclipse.core.runtime.jobs.IJobChangeListener;
 import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.core.runtime.jobs.JobChangeAdapter;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.DialogSettings;
 import org.eclipse.jface.dialogs.IDialogSettings;
@@ -353,6 +354,7 @@ public class IdentifyMavenDependencyPage extends WizardPage {
 						if (newDep != null && (d == null || !getKey(newDep).equals(getKey(d)))) {
 							resolve(projectDep, newDep);
 						}
+						refresh(projectDep);
 					}
 				}
 			}
@@ -526,17 +528,7 @@ public class IdentifyMavenDependencyPage extends WizardPage {
 						job = new DependencyResolutionJob("Resolve the Maven dependency for "+projectDep.getPath());
 					}
 					
-					job.addJobChangeListener(new IJobChangeListener() {
-						
-						@Override
-						public void sleeping(IJobChangeEvent event) {
-							//refreshUI();
-						}
-						
-						@Override
-						public void scheduled(IJobChangeEvent event) {
-							//refreshUI();
-						}
+					job.addJobChangeListener(new JobChangeAdapter() {
 						
 						@Override
 						public void running(IJobChangeEvent event) {
@@ -551,16 +543,6 @@ public class IdentifyMavenDependencyPage extends WizardPage {
 								dependencyResolution.put(getKey(d), job.isResolvable());
 							}
 							refreshUI();
-						}
-						
-						@Override
-						public void awake(IJobChangeEvent event) {
-							//refreshUI();							
-						}
-						
-						@Override
-						public void aboutToRun(IJobChangeEvent event) {
-							//refreshUI();
 						}
 						
 						private void refreshUI() {
@@ -672,7 +654,15 @@ public class IdentifyMavenDependencyPage extends WizardPage {
 				if (d == null) {
 					return "Unidentified dependency";
 				}
-				return IdentifyMavenDependencyPage.getKey(d);
+				
+				StringBuilder label = new StringBuilder(IdentifyMavenDependencyPage.getKey(d));
+				if (StringUtils.isNotBlank(d.getScope()) && !"compile".equals(d.getScope())) {
+					label.append(" [").append(d.getScope()).append("]");
+				}
+				if (d.isOptional() && ("compile".equals(d.getScope()) || "runtime".equals(d.getScope()))) {
+					label.append(" (optional)");
+				}
+				return label.toString();
 			}
 			
 			@Override
