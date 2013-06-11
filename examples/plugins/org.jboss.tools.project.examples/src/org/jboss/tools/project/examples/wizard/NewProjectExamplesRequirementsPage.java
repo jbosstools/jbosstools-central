@@ -62,7 +62,6 @@ import org.jboss.tools.project.examples.model.ProjectFix;
 import org.jboss.tools.runtime.core.RuntimeCoreActivator;
 import org.jboss.tools.runtime.core.model.DownloadRuntime;
 import org.jboss.tools.runtime.ui.RuntimeUIActivator;
-import org.jboss.tools.runtime.ui.download.DownloadRuntimeDialog;
 import org.jboss.tools.runtime.ui.internal.wizard.DownloadRuntimesWizard;
 
 public class NewProjectExamplesRequirementsPage extends WizardPage implements IProjectExamplesWizardPage {
@@ -90,6 +89,10 @@ public class NewProjectExamplesRequirementsPage extends WizardPage implements IP
 		setTitleAndDescription(projectExample);
         checkboxOn = RuntimeUIActivator.imageDescriptorFromPlugin(RuntimeUIActivator.PLUGIN_ID, "/icons/xpl/complete_tsk.gif").createImage();
 		checkboxOff = RuntimeUIActivator.imageDescriptorFromPlugin(RuntimeUIActivator.PLUGIN_ID, "/icons/xpl/incomplete_tsk.gif").createImage();
+	}
+
+	public NewProjectExamplesRequirementsPage() {
+		this(null);
 	}
 
 	protected void setTitleAndDescription(ProjectExample projectExample) {
@@ -120,13 +123,6 @@ public class NewProjectExamplesRequirementsPage extends WizardPage implements IP
 	        	}
 	        }
 		}
-	}
-
-	public NewProjectExamplesRequirementsPage() {
-		super(PAGE_NAME);
-        setTitleAndDescription(null);
-        checkboxOn = RuntimeUIActivator.imageDescriptorFromPlugin(RuntimeUIActivator.PLUGIN_ID, "/icons/xpl/complete_tsk.gif").createImage();
-		checkboxOff = RuntimeUIActivator.imageDescriptorFromPlugin(RuntimeUIActivator.PLUGIN_ID, "/icons/xpl/incomplete_tsk.gif").createImage();
 	}
 
 	@Override
