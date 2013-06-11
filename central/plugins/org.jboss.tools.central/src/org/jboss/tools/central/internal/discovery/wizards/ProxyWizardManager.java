@@ -12,7 +12,6 @@ package org.jboss.tools.central.internal.discovery.wizards;
 
 import java.io.File;
 import java.io.FileFilter;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Dictionary;

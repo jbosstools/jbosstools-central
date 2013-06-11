@@ -32,7 +32,7 @@ import org.eclipse.core.runtime.jobs.Job;
 import org.jboss.tools.central.JBossCentralActivator;
 import org.jboss.tools.central.model.FeedsEntry;
 import org.jboss.tools.central.model.FeedsEntry.Type;
-import org.jboss.tools.foundation.ecf.URLTransportUtility;
+import org.jboss.tools.foundation.core.ecf.URLTransportUtility;
 import org.jboss.tools.project.examples.ProjectExamplesActivator;
 
 import com.sun.syndication.feed.synd.SyndContent;

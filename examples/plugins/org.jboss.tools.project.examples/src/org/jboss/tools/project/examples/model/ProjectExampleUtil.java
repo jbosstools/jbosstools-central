@@ -61,7 +61,7 @@ import org.eclipse.wst.server.core.IRuntime;
 import org.eclipse.wst.server.core.IServer;
 import org.eclipse.wst.server.core.ServerCore;
 import org.jboss.ide.eclipse.as.core.server.IJBossServerRuntime;
-import org.jboss.tools.foundation.ecf.URLTransportUtility;
+import org.jboss.tools.foundation.core.ecf.URLTransportUtility;
 import org.jboss.tools.project.examples.Messages;
 import org.jboss.tools.project.examples.ProjectExamplesActivator;
 import org.w3c.dom.Document;
