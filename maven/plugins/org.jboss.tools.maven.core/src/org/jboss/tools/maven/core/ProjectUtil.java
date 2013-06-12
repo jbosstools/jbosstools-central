@@ -231,7 +231,7 @@ public class ProjectUtil {
 	 */
 	public static boolean hasOutOfDateMavenMarker(IProject project)
 			throws CoreException {
-		if (project != null && project.isAccessible() && project.hasNature(IMavenConstants.NATURE_ID)) {
+		if (project == null || !project.isAccessible() || !project.hasNature(IMavenConstants.NATURE_ID)) {
 			return false;
 		}
 		IMarker[] markers = project.findMarkers(IMavenConstants.MARKER_CONFIGURATION_ID, true, IResource.DEPTH_ZERO);
