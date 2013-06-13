@@ -18,6 +18,7 @@ import static org.junit.Assert.fail;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -286,44 +287,63 @@ public class CheatSheetTest {
 
 	@Test
 	public void testOpenNonMavenProject() throws Exception {
-		CheatSheetView view = (CheatSheetView) getActivePage().findView(ICheatSheetResource.CHEAT_SHEET_VIEW_ID);
-		if (view != null) {
-			getActivePage().hideView(view);
-		}
-		IPreferenceStore store = ProjectExamplesActivator.getDefault().getPreferenceStore();
-		IProject project = null;
-		String oldValue = ProjectExamplesActivator.getDefault().getShowCheatsheets();
-		IWorkspace workspace = ResourcesPlugin.getWorkspace();
-		try {
-			store.putValue(ProjectExamplesActivator.SHOW_CHEATSHEETS,
-					ProjectExamplesActivator.SHOW_CHEATSHEETS_ALWAYS);
+		
+		Display.getDefault().syncExec(new Runnable() {
 			
-			String projectName = CHEATSHEET_HELLOWORLD_PROJECT;
-			IProjectDescription description = workspace.newProjectDescription(projectName);
-			Bundle bundle = Platform.getBundle(TEST_PLUGIN_ID);
-			String zipLocation = FileLocator.resolve(bundle.getEntry(CHEATSHEET_HELLOWORLD_ZIP)).getFile();
-			
-			File file = new File(zipLocation);
-			
-			String dest = Platform.getConfigurationLocation().getURL().getFile();
-			File destination = new File(dest);
-			ProjectExamplesActivator.extractZipFile(file, destination, new NullProgressMonitor());
-			description.setName(projectName);
-			description.setLocation(new Path(dest).append(projectName));
-			project = workspace.getRoot().getProject(projectName);
-			project.create(description, null);
-			JobUtils.waitForIdle(1000);
-			project.open(null);
-			JobUtils.waitForIdle(1000);
-			view = (CheatSheetView) getActivePage().findView(
-					ICheatSheetResource.CHEAT_SHEET_VIEW_ID);
-			assertTrue("A cheatsheet is not opened.", view != null);
-		} finally {
-			if (project != null) {
-				project.delete(true, true, null);
+			@Override
+			public void run() {
+		
+				CheatSheetView view = (CheatSheetView) getActivePage().findView(ICheatSheetResource.CHEAT_SHEET_VIEW_ID);
+				if (view != null) {
+					getActivePage().hideView(view);
+				}
+				IPreferenceStore store = ProjectExamplesActivator.getDefault().getPreferenceStore();
+				IProject project = null;
+				String oldValue = ProjectExamplesActivator.getDefault().getShowCheatsheets();
+				IWorkspace workspace = ResourcesPlugin.getWorkspace();
+				try {
+					store.putValue(ProjectExamplesActivator.SHOW_CHEATSHEETS,
+							ProjectExamplesActivator.SHOW_CHEATSHEETS_ALWAYS);
+					
+					String projectName = CHEATSHEET_HELLOWORLD_PROJECT;
+					IProjectDescription description = workspace.newProjectDescription(projectName);
+					Bundle bundle = Platform.getBundle(TEST_PLUGIN_ID);
+					String zipLocation = FileLocator.resolve(bundle.getEntry(CHEATSHEET_HELLOWORLD_ZIP)).getFile();
+					
+					File file = new File(zipLocation);
+					
+					String dest = Platform.getConfigurationLocation().getURL().getFile();
+					File destination = new File(dest);
+					ProjectExamplesActivator.extractZipFile(file, destination, new NullProgressMonitor());
+					description.setName(projectName);
+					description.setLocation(new Path(dest).append(projectName));
+					project = workspace.getRoot().getProject(projectName);
+					project.create(description, null);
+					JobUtils.waitForIdle(1000);
+					project.open(null);
+					JobUtils.waitForIdle(1000);
+					view = (CheatSheetView) getActivePage().findView(
+							ICheatSheetResource.CHEAT_SHEET_VIEW_ID);
+					assertTrue("A cheatsheet is not opened.", view != null);
+				} catch (Exception e) {
+					e.printStackTrace();
+					fail(e.getMessage());
+				} finally {
+					if (project != null) {
+						try {
+							project.delete(true, true, null);
+						} catch (CoreException e) {
+							e.printStackTrace();
+						}
+					}
+					store.putValue(ProjectExamplesActivator.SHOW_CHEATSHEETS, oldValue);
+				}
+				
+				
+				
 			}
-			store.putValue(ProjectExamplesActivator.SHOW_CHEATSHEETS, oldValue);
-		}
+		});
+		
 
 	}
 		
