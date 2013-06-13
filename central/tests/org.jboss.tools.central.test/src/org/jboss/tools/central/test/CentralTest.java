@@ -30,13 +30,10 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.internal.WorkbenchWindow;
 import org.jboss.tools.central.JBossCentralActivator;
 import org.jboss.tools.central.ShowJBossCentral;
-import org.jboss.tools.central.actions.RefreshJBossBlogsHandler;
-import org.jboss.tools.central.actions.RefreshJBossNewsHandler;
+import org.jboss.tools.central.actions.RefreshJBossBuzzHandler;
 import org.jboss.tools.central.actions.RefreshJBossTutorialsHandler;
 import org.jboss.tools.central.editors.JBossCentralEditor;
-import org.jboss.tools.central.jobs.RefreshBlogsJob;
 import org.jboss.tools.central.jobs.RefreshBuzzJob;
-import org.jboss.tools.central.jobs.RefreshNewsJob;
 import org.jboss.tools.central.jobs.RefreshTutorialsJob;
 import org.jboss.tools.central.model.FeedsEntry;
 import org.jboss.tools.project.examples.model.ProjectExample;
@@ -69,8 +66,7 @@ public class CentralTest {
 		}
 		editor = JBossCentralActivator.getJBossCentralEditor(true);
 		new RefreshJBossTutorialsHandler().execute(null);
-		new RefreshJBossNewsHandler().execute(null);
-		new RefreshJBossBlogsHandler().execute(null);
+		new RefreshJBossBuzzHandler().execute(null);
 	}
 
 	@AfterClass
@@ -90,35 +86,6 @@ public class CentralTest {
 				.getTutorialCategories();
 		assertTrue("No one tutorial is found", categories.size() > 0);
 	}
-
-	@Test
-	public void testNews() throws Exception {
-		waitForJobs();
-		List<FeedsEntry> news = RefreshNewsJob.INSTANCE.getEntries();
-		assertTrue("No one news is found", news.size() >= 0);
-	}
-
-	@Test
-	public void testBlogs() throws Exception {
-		waitForJobs();
-		List<FeedsEntry> blogs = RefreshBlogsJob.INSTANCE.getEntries();
-		assertTrue("No one blog is found", blogs.size() >= 0);
-	}
-
-	@Test
-	public void testCachingBlogs() throws Exception {
-		waitForJobs();
-		assertTrue("Blog entries aren't cached", RefreshBlogsJob.INSTANCE
-				.getCacheFile().exists());
-	}
-
-	@Test
-	public void testCachingNews() throws Exception {
-		waitForJobs();
-		assertTrue("News entries aren't cached", RefreshNewsJob.INSTANCE
-				.getCacheFile().exists());
-	}
-
 
 	@Test
 	public void testBuzz() throws Exception {
