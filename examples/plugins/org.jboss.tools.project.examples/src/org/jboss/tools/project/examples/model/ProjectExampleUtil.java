@@ -100,6 +100,8 @@ public class ProjectExampleUtil {
 
 	private static final String PROJECT_EXAMPLES_CATEGORIES_EXTENSION_ID = "org.jboss.tools.project.examples.categories"; //$NON-NLS-1$
 
+	private static final int TIME_OUT = 2*1000;
+
 	private static String URL_EXT = URL;
 
 	private static String EXPERIMENTAL_EXT = "experimental"; //$NON-NLS-1$
@@ -806,7 +808,7 @@ public class ProjectExampleUtil {
 				BufferedOutputStream destination = new BufferedOutputStream(
 						new FileOutputStream(file));
 				IStatus result = new URLTransportUtility().download(prefix,
-						url.toExternalForm(), destination, monitor);
+						url.toExternalForm(), destination, TIME_OUT, monitor);
 				if (!result.isOK()) {
 					ProjectExamplesActivator.getDefault().getLog().log(result);
 					if (!fileAlreadyExists && file.exists()) {

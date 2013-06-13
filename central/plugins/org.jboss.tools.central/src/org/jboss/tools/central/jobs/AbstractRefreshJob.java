@@ -49,6 +49,7 @@ import com.sun.syndication.io.XmlReader;
  */
 public abstract class AbstractRefreshJob extends Job {
 
+	private static final int TIME_OUT = 2*1000; //2 sec
 	protected List<FeedsEntry> entries = new ArrayList<FeedsEntry>();
 	protected Throwable exception;
 	protected long cacheModified;
@@ -215,7 +216,7 @@ public abstract class AbstractRefreshJob extends Job {
 				tempFile.deleteOnExit();
 				OutputStream destination = new FileOutputStream(tempFile);
 				IStatus status = new URLTransportUtility().download(
-						cacheFile.getName(), urlString, destination, 5*100, monitor);
+						cacheFile.getName(), urlString, destination, TIME_OUT, monitor);
 				URL url = getURL();
 				if (monitor.isCanceled()) {
 					return getValidEntries(monitor);
