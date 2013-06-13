@@ -62,8 +62,6 @@ public class Activator extends AbstractUIPlugin {
 				return;
 			}
 			final List<IFile> cheatsheets = new ArrayList<IFile>();
-			final Boolean[] createdProject = new Boolean[1];
-			createdProject[0] = false;
 			try {
 				delta.accept(new IResourceDeltaVisitor() {
 				    public boolean visit(IResourceDelta delta) throws CoreException {
@@ -85,17 +83,6 @@ public class Activator extends AbstractUIPlugin {
 				        		return false;
 				        	}
 				        }
-				        if (resource instanceof IFile && delta.getKind() == IResourceDelta.ADDED) {
-				        	if (isCheatcheet((IFile) resource)) {
-				        		cheatsheets.add((IFile) resource);
-				        		//if we know we created (imported) the project, we can stop scanning
-				        		return createdProject[0]?false:true;
-				        	} else //check we're in the middle of an import 
-				        		if (((IFile) resource).equals(resource.getProject().getFile(".project"))) { //$NON-NLS-1$
- 				        		  createdProject[0] = true;
-				        		  return true;
-				        	}
-				        }
 
 				        return false;
 				    }
@@ -103,7 +90,7 @@ public class Activator extends AbstractUIPlugin {
 			} catch (CoreException e) {
 				Activator.log(e);
 			}
-			if (createdProject[0] && cheatsheets.size() > 0) {
+			if (cheatsheets.size() > 0) {
 				CheatSheetUtil.showCheatsheet(cheatsheets);
 			}
 		}

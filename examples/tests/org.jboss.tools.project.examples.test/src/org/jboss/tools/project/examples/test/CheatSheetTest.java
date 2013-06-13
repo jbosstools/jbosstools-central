@@ -16,6 +16,7 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import java.io.ByteArrayInputStream;
+import java.io.File;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -27,15 +28,24 @@ import org.eclipse.core.commands.Parameterization;
 import org.eclipse.core.commands.ParameterizedCommand;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IProjectDescription;
+import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.resources.WorkspaceJob;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.FileLocator;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.core.runtime.Path;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jdt.internal.ui.javaeditor.CompilationUnitEditor;
+import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.osgi.service.datalocation.Location;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
@@ -44,6 +54,7 @@ import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.commands.ICommandService;
 import org.eclipse.ui.handlers.IHandlerService;
+import org.eclipse.ui.internal.cheatsheets.ICheatSheetResource;
 import org.eclipse.ui.internal.cheatsheets.state.DefaultStateManager;
 import org.eclipse.ui.internal.cheatsheets.views.CheatSheetView;
 import org.eclipse.ui.internal.cheatsheets.views.ViewUtilities;
@@ -57,6 +68,7 @@ import org.jboss.tools.test.util.JobUtils;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.osgi.framework.Bundle;
 
 /**
  * 
@@ -65,9 +77,15 @@ import org.junit.Test;
  */
 public class CheatSheetTest {
 
+	private static final String TEST_PLUGIN_ID = "org.jboss.tools.project.examples.test";
+	private static final String CHEATSHEET_HELLOWORLD_PROJECT = "cheatsheet-helloworld";
+	private static final String CHEATSHEET_HELLOWORLD_LOCATION = "resources/cheatsheet-helloworld";
+	private static final String RESOURCES = "resources";
+	private static final String CHEATSHEET_HELLOWORLD_ZIP = "resources/cheatsheet-helloworld.zip";
+	
 	private static final String WEB_APPLICATIONS = "Web Applications";
 	private static final String KITCHENSINK = "jboss-as-kitchensink";
-
+	
 	@BeforeClass
 	public static void init() throws Exception {
 		importKitchensink();
@@ -213,4 +231,47 @@ public class CheatSheetTest {
 		file.create(source, true, null);
 	}
 
+	@Test
+	public void testOpenNonMavenProject() throws Exception {
+		CheatSheetView view = (CheatSheetView) getActivePage().findView(ICheatSheetResource.CHEAT_SHEET_VIEW_ID);
+		if (view != null) {
+			getActivePage().hideView(view);
+		}
+		IPreferenceStore store = ProjectExamplesActivator.getDefault().getPreferenceStore();
+		IProject project = null;
+		String oldValue = ProjectExamplesActivator.getDefault().getShowCheatsheets();
+		IWorkspace workspace = ResourcesPlugin.getWorkspace();
+		try {
+			store.putValue(ProjectExamplesActivator.SHOW_CHEATSHEETS,
+					ProjectExamplesActivator.SHOW_CHEATSHEETS_ALWAYS);
+			
+			String projectName = CHEATSHEET_HELLOWORLD_PROJECT;
+			IProjectDescription description = workspace.newProjectDescription(projectName);
+			Bundle bundle = Platform.getBundle(TEST_PLUGIN_ID);
+			String zipLocation = FileLocator.resolve(bundle.getEntry(CHEATSHEET_HELLOWORLD_ZIP)).getFile();
+			
+			File file = new File(zipLocation);
+			
+			String dest = Platform.getConfigurationLocation().getURL().getFile();
+			File destination = new File(dest);
+			ProjectExamplesActivator.extractZipFile(file, destination, new NullProgressMonitor());
+			description.setName(projectName);
+			description.setLocation(new Path(dest).append(projectName));
+			project = workspace.getRoot().getProject(projectName);
+			project.create(description, null);
+			JobUtils.waitForIdle(1000);
+			project.open(null);
+			JobUtils.waitForIdle(1000);
+			view = (CheatSheetView) getActivePage().findView(
+					ICheatSheetResource.CHEAT_SHEET_VIEW_ID);
+			assertTrue("A cheatsheet is not opened.", view != null);
+		} finally {
+			if (project != null) {
+				project.delete(true, true, null);
+			}
+			store.putValue(ProjectExamplesActivator.SHOW_CHEATSHEETS, oldValue);
+		}
+
+	}
+		
 }
