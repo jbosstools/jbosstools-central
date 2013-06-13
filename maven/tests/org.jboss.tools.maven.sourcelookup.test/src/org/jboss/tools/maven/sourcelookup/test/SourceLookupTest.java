@@ -18,7 +18,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.NullProgressMonitor;
@@ -73,12 +72,9 @@ public class SourceLookupTest {
 	}
 
 	private static IRuntimeDetectorDelegate getJBossASHandler() {
-		Set<IRuntimeDetector> detectors = RuntimeCoreActivator.getDefault().getRuntimeDetectors();
-		for (IRuntimeDetector detector:detectors) {
-			IRuntimeDetectorDelegate delegate = ((RuntimeDetector)detector).getDelegate();
-			if (delegate  != null && delegate.getClass().getName().endsWith("JBossASHandler")) {
-				return delegate;
-			}
+		IRuntimeDetector rtdet = RuntimeCoreActivator.getDefault().findRuntimeDetector("org.jboss.tools.runtime.handlers.JBossASHandler");
+		if (rtdet instanceof RuntimeDetector) {
+			return ((RuntimeDetector)rtdet).getDelegate();
 		}
 		return null;
 	}
