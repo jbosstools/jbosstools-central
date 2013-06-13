@@ -39,7 +39,7 @@ import org.junit.Test;
 
 public class ProxyWizardManagerTest extends AbstractProxyWizardDiscoveryTest implements ProxyWizardManagerListener {
 
-	private static final long MAX_WAIT_TIME = 5*1000;
+	private static final long MAX_WAIT_TIME = 10*1000;
 	private ProxyWizardManager pwm;
 	private NullProgressMonitor monitor;
 	private List<ProxyWizard> remoteWizards;
