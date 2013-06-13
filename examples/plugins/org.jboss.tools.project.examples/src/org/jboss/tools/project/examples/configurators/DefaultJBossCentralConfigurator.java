@@ -67,7 +67,7 @@ public class DefaultJBossCentralConfigurator implements
 	
 	private static final String NEWS_URL = "http://planet.jboss.org/feeds/news"; //$NON-NLS-1$
 
-	private static final String DOCUMENTATION_URL = "http://docs.jboss.org/tools/latest/"; //$NON-NLS-1$
+	private static final String DOCUMENTATION_URL = "http://www.jboss.org/tools/docs/reference"; //$NON-NLS-1$
 
 	private Image headerImage;
 
