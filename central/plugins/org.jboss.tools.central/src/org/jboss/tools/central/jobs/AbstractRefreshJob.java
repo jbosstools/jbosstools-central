@@ -215,7 +215,7 @@ public abstract class AbstractRefreshJob extends Job {
 				tempFile.deleteOnExit();
 				OutputStream destination = new FileOutputStream(tempFile);
 				IStatus status = new URLTransportUtility().download(
-						cacheFile.getName(), urlString, destination, monitor);
+						cacheFile.getName(), urlString, destination, 5*100, monitor);
 				URL url = getURL();
 				if (monitor.isCanceled()) {
 					return getValidEntries(monitor);

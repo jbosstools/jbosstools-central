@@ -1,6 +1,7 @@
 package org.jboss.tools.maven.project.examples;
 
 import java.io.File;
+import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 
 import org.apache.maven.model.Model;
@@ -14,15 +15,20 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.jface.dialogs.ProgressMonitorDialog;
+import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.embedder.IMaven;
 import org.eclipse.m2e.core.project.MavenProjectInfo;
 import org.eclipse.m2e.core.project.ProjectImportConfiguration;
+import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
+import org.jboss.jdf.stacks.model.Stacks;
 import org.jboss.tools.maven.project.examples.offline.MavenOfflinePropertyChangeListener;
 import org.jboss.tools.maven.project.examples.xpl.UpdateMavenProjectJob;
 import org.jboss.tools.project.examples.ProjectExamplesActivator;
+import org.jboss.tools.stacks.core.model.StacksManager;
 import org.osgi.framework.BundleContext;
 
 /**
@@ -38,6 +44,52 @@ public class MavenProjectExamplesActivator extends AbstractUIPlugin {
 
 	private MavenOfflinePropertyChangeListener mavenOfflinePropertyChangeListener;
 	
+	private Stacks stacks; 
+	
+	private long lastUpdate;
+	
+	private static long DEFAULT_CACHE_TIMEOUT = 60 * 60 * 1000;// 1 hour
+	
+	/**
+	 * Returns a cached {@link Stacks} model. Cache is evicted after 60 minutes.
+	 * Be aware Stacks updates occur within a {@link ProgressMonitorDialog}. 
+	 * 
+	 * @provisional this method can be removed without warning 
+	 */
+	public synchronized Stacks getCachedStacks() {
+		if (System.currentTimeMillis() - lastUpdate > DEFAULT_CACHE_TIMEOUT) {
+			stacks = null;
+		}
+		
+		if (stacks == null) {
+		    final Stacks[] s = new Stacks[1];
+		    ProgressMonitorDialog progressDialog = new ProgressMonitorDialog(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell());  
+		    try {  
+		        progressDialog.run(true, true, new IRunnableWithProgress() {  
+
+		        @Override  
+		        public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {  
+		            monitor.beginTask("Getting stacks data", 100);  
+		            try {  
+		            	s[0] = new StacksManager().getStacks(monitor); 
+		            } catch (Exception e) {  
+		                e.printStackTrace();  
+		            }  
+		            monitor.done();   
+		        }  
+		     });
+		        
+	        } catch (InvocationTargetException ex) {
+	            ex.printStackTrace();
+	        } catch (InterruptedException ex) {
+	            ex.printStackTrace();
+	        }
+		    stacks = s[0];
+		    lastUpdate = System.currentTimeMillis();
+		} 
+		return stacks;
+	}
+
 	/**
 	 * The constructor
 	 */
@@ -63,6 +115,7 @@ public class MavenProjectExamplesActivator extends AbstractUIPlugin {
 		plugin = null;
 		ProjectExamplesActivator.getDefault().getPreferenceStore().removePropertyChangeListener(mavenOfflinePropertyChangeListener);
 		mavenOfflinePropertyChangeListener = null;
+		stacks = null;
 		super.stop(context);
 	}
 

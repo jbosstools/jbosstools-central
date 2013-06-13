@@ -10,8 +10,7 @@
  ************************************************************************************/
 package org.jboss.tools.maven.project.examples.wizard;
 
-import static org.jboss.tools.maven.project.examples.stacks.StacksUtil.createArchetypeModel;
-import static org.jboss.tools.maven.project.examples.stacks.StacksUtil.getArchetype;
+import static org.jboss.tools.stacks.core.model.StacksUtil.getArchetype;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -23,7 +22,6 @@ import java.util.Map;
 import java.util.Set;
 
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jface.dialogs.DialogSettings;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jst.j2ee.web.project.facet.WebFacetUtils;
@@ -53,15 +51,15 @@ import org.jboss.jdf.stacks.model.Runtime;
 import org.jboss.jdf.stacks.model.Stacks;
 import org.jboss.tools.maven.core.MavenCoreActivator;
 import org.jboss.tools.maven.core.settings.MavenSettingsChangeListener;
+import org.jboss.tools.maven.project.examples.MavenProjectExamplesActivator;
 import org.jboss.tools.maven.project.examples.Messages;
-import org.jboss.tools.maven.project.examples.stacks.StacksManager;
-import org.jboss.tools.maven.project.examples.stacks.StacksUtil;
 import org.jboss.tools.maven.project.examples.utils.MavenArtifactHelper;
 import org.jboss.tools.project.examples.model.ArchetypeModel;
 import org.jboss.tools.project.examples.model.ProjectExample;
 import org.jboss.tools.project.examples.model.ProjectFix;
 import org.jboss.tools.project.examples.wizard.NewProjectExamplesRequirementsPage;
 import org.jboss.tools.runtime.core.model.DownloadRuntime;
+import org.jboss.tools.stacks.core.model.StacksUtil;
 
 public class NewProjectExamplesStacksRequirementsPage extends NewProjectExamplesRequirementsPage implements MavenSettingsChangeListener {
 
@@ -94,13 +92,19 @@ public class NewProjectExamplesStacksRequirementsPage extends NewProjectExamples
 	public NewProjectExamplesStacksRequirementsPage(ProjectExample projectExample) {
 		super(PAGE_NAME, projectExample);
 	    fieldsWithHistory = new HashMap<String, List<Combo>>();
-	    stacks = new StacksManager().getStacks(new NullProgressMonitor());
+	    stacks = MavenProjectExamplesActivator.getDefault().getCachedStacks();
 	    initDialogSettings();
 	}
 
 	@Override
 	public String getProjectExampleType() {
 		return "mavenArchetype"; //$NON-NLS-1$
+	}
+	
+	@Override
+	public void createControl(Composite parent) {
+		super.createControl(parent);
+			
 	}
 	
 	@Override
@@ -202,6 +206,15 @@ public class NewProjectExamplesStacksRequirementsPage extends NewProjectExamples
 		setDescriptionText(description.toString());
 		
 		
+	}
+
+	private ArchetypeModel createArchetypeModel(ArchetypeModel archetypeModel, ArchetypeVersion archetypeVersion) throws CloneNotSupportedException {
+		ArchetypeModel a = (ArchetypeModel) archetypeModel.clone(); 
+		a.setArchetypeArtifactId(archetypeVersion.getArchetype().getArtifactId());
+		a.setArchetypeGroupId(archetypeVersion.getArchetype().getGroupId());
+		a.setArchetypeVersion(archetypeVersion.getVersion());
+		a.setArchetypeRepository(archetypeVersion.getRepositoryURL());
+		return a;
 	}
 
 	@Override
