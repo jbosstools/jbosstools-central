@@ -1230,21 +1230,6 @@ public class ProjectExamplesActivator extends AbstractUIPlugin {
 		log(builder.toString());
 	}
 
-	public static Dictionary<Object, Object> getEnvironment() {
-		Dictionary<Object, Object> environment = new Hashtable<Object, Object>(
-				System.getProperties());
-		Bundle bundle = Platform.getBundle("org.jboss.tools.central"); //$NON-NLS-1$
-		Version version = bundle.getVersion();
-		environment.put("org.jboss.tools.central.version", version.toString()); //$NON-NLS-1$
-		environment.put(
-				"org.jboss.tools.central.version.major", version.getMajor()); //$NON-NLS-1$
-		environment.put(
-				"org.jboss.tools.central.version.minor", version.getMinor()); //$NON-NLS-1$
-		environment.put(
-				"org.jboss.tools.central.version.micro", version.getMicro()); //$NON-NLS-1$
-		return environment;
-	}
-	
 	public static String getShortDescription(String description) {
 		if (description.length() <= DESCRIPTION_LENGTH) {
 			return description;

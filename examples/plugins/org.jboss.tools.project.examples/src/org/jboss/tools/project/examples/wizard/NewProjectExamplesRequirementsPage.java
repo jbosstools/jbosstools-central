@@ -67,6 +67,11 @@ import org.eclipse.ui.browser.IWorkbenchBrowserSupport;
 import org.eclipse.ui.dialogs.PreferencesUtil;
 import org.jboss.tools.project.examples.Messages;
 import org.jboss.tools.project.examples.ProjectExamplesActivator;
+import org.jboss.tools.project.examples.internal.discovery.ChainedDiscoveryStrategy;
+import org.jboss.tools.project.examples.internal.discovery.DiscoveryUtil;
+import org.jboss.tools.project.examples.internal.discovery.ExpressionBasedBundleDiscoveryStrategy;
+import org.jboss.tools.project.examples.internal.discovery.ExpressionBasedRemoteBundleDiscoveryStrategy;
+import org.jboss.tools.project.examples.internal.discovery.ChainedDiscoveryStrategy.DiscoveryConnectorCollector;
 import org.jboss.tools.project.examples.model.ProjectExample;
 import org.jboss.tools.project.examples.model.ProjectFix;
 import org.jboss.tools.runtime.core.RuntimeCoreActivator;
@@ -488,17 +493,8 @@ public class NewProjectExamplesRequirementsPage extends WizardPage implements IP
 		final ConnectorDiscovery[] connectorDiscoveries = new ConnectorDiscovery[1];
 		IRunnableWithProgress runnable = new IRunnableWithProgress() {
 			public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
-				connectorDiscoveries[0] = new ConnectorDiscovery();
-
-				// look for descriptors from installed bundles
-				connectorDiscoveries[0].getDiscoveryStrategies().add(new BundleDiscoveryStrategy());
-
-				RemoteBundleDiscoveryStrategy remoteDiscoveryStrategy = new RemoteBundleDiscoveryStrategy();
-				remoteDiscoveryStrategy.setDirectoryUrl(ProjectExamplesActivator.getDefault().getConfigurator().getJBossDiscoveryDirectory());
-				connectorDiscoveries[0].getDiscoveryStrategies().add(remoteDiscoveryStrategy);
-
-				connectorDiscoveries[0].setEnvironment(ProjectExamplesActivator.getEnvironment());
-				connectorDiscoveries[0].setVerifyUpdateSiteAvailability(true);
+				ConnectorDiscovery connectorDiscovery = DiscoveryUtil.createConnectorDiscovery();
+				connectorDiscoveries[0] = connectorDiscovery;
 				results[0] = connectorDiscoveries[0].performDiscovery(monitor);
 				if (monitor.isCanceled()) {
 					results[0] = Status.CANCEL_STATUS;
@@ -666,4 +662,5 @@ public class NewProjectExamplesRequirementsPage extends WizardPage implements IP
 	public String getPageType() {
 		return "requirement";
 	}
+
 }

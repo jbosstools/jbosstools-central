@@ -8,13 +8,13 @@
  * Contributors:
  *     JBoss by Red Hat - Initial implementation.
  ************************************************************************************/
-package org.jboss.tools.central.internal.discovery;
+package org.jboss.tools.project.examples.internal.discovery;
 
 import org.eclipse.mylyn.internal.discovery.core.model.DiscoveryConnector;
 import org.eclipse.mylyn.internal.discovery.core.model.ValidationException;
 import org.eclipse.osgi.util.NLS;
-import org.jboss.tools.central.internal.xpl.ExpressionResolutionException;
-import org.jboss.tools.central.internal.xpl.ExpressionResolver;
+import org.jboss.tools.project.examples.internal.xpl.ExpressionResolutionException;
+import org.jboss.tools.project.examples.internal.xpl.ExpressionResolver;
 
 /**
  * A subclass of a connector that resolves ${sysPropertyName:defaultValue} 

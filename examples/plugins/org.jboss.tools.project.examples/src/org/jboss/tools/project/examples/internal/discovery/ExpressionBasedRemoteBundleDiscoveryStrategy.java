@@ -8,28 +8,28 @@
  * Contributors:
  *     JBoss by Red Hat - Initial implementation.
  ************************************************************************************/
-package org.jboss.tools.central.internal.discovery;
+package org.jboss.tools.project.examples.internal.discovery;
 
 import org.eclipse.core.runtime.IContributor;
 import org.eclipse.core.runtime.IExtension;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.mylyn.internal.discovery.core.model.AbstractDiscoverySource;
-import org.eclipse.mylyn.internal.discovery.core.model.BundleDiscoveryStrategy;
+import org.eclipse.mylyn.internal.discovery.core.model.RemoteBundleDiscoveryStrategy;
 
 /**
- * A subclass of BundleDiscoveryStrategy to avoid validation fails when property expressions are used in connector description 
+ * A subclass of RemoteBundleDiscoveryStrategy to avoid validation fails when property expressions are used in connector description 
  * this class only works when {@link ExpressionBasedDiscoveryConnector} is used when loading the connector descriptor
  * 
- * @see org.eclipse.mylyn.internal.discovery.core.model.BundleDiscoveryStrategy
+ * @see org.eclipse.mylyn.internal.discovery.core.model.RemoteBundleDiscoveryStrategy
  * @author snjeza
  */
-public class ExpressionBasedBundleDiscoveryStrategy extends BundleDiscoveryStrategy {
+public class ExpressionBasedRemoteBundleDiscoveryStrategy extends RemoteBundleDiscoveryStrategy {
 
 	private ExpressionBasedDiscoveryExtensionProcessor processor = new ExpressionBasedDiscoveryExtensionProcessor() {
 		@Override
 		public AbstractDiscoverySource computeDiscoverySource(
 				IContributor contributor) {
-			return ExpressionBasedBundleDiscoveryStrategy.this.computeDiscoverySource(contributor);
+			return ExpressionBasedRemoteBundleDiscoveryStrategy.this.computeDiscoverySource(contributor);
 		}
 	};
 

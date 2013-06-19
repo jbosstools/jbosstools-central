@@ -26,7 +26,8 @@ import org.jboss.tools.central.JBossCentralActivator;
 import org.jboss.tools.central.editors.JBossCentralEditor;
 import org.jboss.tools.central.editors.SoftwarePage;
 import org.jboss.tools.central.editors.xpl.DiscoveryViewer;
-import org.jboss.tools.central.internal.discovery.ExpressionBasedDiscoveryConnector;
+import org.jboss.tools.project.examples.internal.discovery.ChainedDiscoveryStrategy.DiscoveryConnectorCollector;
+import org.jboss.tools.project.examples.internal.discovery.ExpressionBasedDiscoveryConnector;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -46,7 +47,7 @@ public class DiscoveryTest {
 	public static void init() throws Exception {
 		System.setProperty("central.URL", TEST_URL);
 		//Need to allow bundle discovery AND remote discovery hence :
-		System.setProperty("org.jboss.tools.central.allow.duplicate.connectors", Boolean.TRUE.toString());
+		System.setProperty(DiscoveryConnectorCollector.ALLOW_DUPLICATE_DISCOVERY_CONNECTORS_KEY, Boolean.TRUE.toString());
 		final WorkbenchWindow window = (WorkbenchWindow) PlatformUI
 				.getWorkbench().getActiveWorkbenchWindow();
 		final IWorkbenchPage page = window.getActivePage();
@@ -64,7 +65,7 @@ public class DiscoveryTest {
 	
 	@AfterClass
 	public static void shutDown() {
-		System.clearProperty("org.jboss.tools.central.allow.duplicate.connectors");
+		System.clearProperty(DiscoveryConnectorCollector.ALLOW_DUPLICATE_DISCOVERY_CONNECTORS_KEY);
 		System.clearProperty("central.URL");
 	}
 

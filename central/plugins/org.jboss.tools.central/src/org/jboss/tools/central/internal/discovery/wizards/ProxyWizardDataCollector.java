@@ -14,7 +14,7 @@ import java.util.Collections;
 import java.util.List;
 
 import org.eclipse.mylyn.internal.discovery.core.model.AbstractDiscoveryStrategy;
-import org.jboss.tools.central.internal.discovery.ChainedDiscoveryStrategy.DataCollector;
+import org.jboss.tools.project.examples.internal.discovery.ChainedDiscoveryStrategy.DataCollector;
 
 /**
  * Collects {@link ProxyWizard}s discovered by {@link ProxyWizardDiscoveryStrategy}s
