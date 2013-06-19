@@ -44,6 +44,7 @@ import org.eclipse.mylyn.internal.discovery.core.model.DirectoryParser;
 import org.eclipse.mylyn.internal.discovery.core.util.WebUtil;
 import org.eclipse.mylyn.internal.discovery.core.util.WebUtil.TextContentProcessor;
 import org.eclipse.osgi.util.NLS;
+import org.jboss.tools.project.examples.ProjectExamplesActivator;
 
 /**
  * 
@@ -79,7 +80,7 @@ public class RemoteExternalBundleDiscoveryStrategy extends ExternalBundleDiscove
 		final int totalTicks = 100000;
 		final int ticksTenPercent = totalTicks / 10;
 
-		monitor.beginTask("remote discovery", totalTicks);
+		monitor.beginTask("Remote discovery", totalTicks);
 
 		Directory directory;
 
@@ -301,6 +302,32 @@ public class RemoteExternalBundleDiscoveryStrategy extends ExternalBundleDiscove
 
 	public void setDirectoryUrl(String directoryUrl) {
 		this.directoryUrl = directoryUrl;
+	}
+	
+	@Override
+	public File getStorageFolder() throws CoreException {
+		File storageFolder = super.getStorageFolder();
+		if (storageFolder == null) {
+			try {
+				storageFolder = createTempFolder();
+			} catch (IOException e) {
+				throw new CoreException(new Status(IStatus.ERROR,
+						ProjectExamplesActivator.PLUGIN_ID,
+						"IO failure: cannot create temporary storage folder", e)); //$NON-NLS-1$
+			}				
+			setStorageFolder(storageFolder);
+		}
+		return storageFolder;
+	}
+
+	private File createTempFolder() throws IOException {
+		File temporaryStorage = null;
+		temporaryStorage = File.createTempFile(RemoteExternalBundleDiscoveryStrategy.class.getSimpleName(), ".tmp");//$NON-NLS-1$
+		if (!temporaryStorage.delete() ||
+				!temporaryStorage.mkdirs()) {
+			throw new IOException("Can't create temporary directory"); //$NON-NLS-1$
+		}
+		return temporaryStorage;
 	}
 
 }
