@@ -8,7 +8,7 @@
  * Contributors:
  *     JBoss by Red Hat - Initial implementation.
  ************************************************************************************/
-package org.jboss.tools.central.internal.discovery;
+package org.jboss.tools.project.examples.internal.discovery;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,7 +25,8 @@ import org.eclipse.mylyn.internal.discovery.core.model.DiscoveryCategory;
 import org.eclipse.mylyn.internal.discovery.core.model.DiscoveryCertification;
 import org.eclipse.mylyn.internal.discovery.core.model.DiscoveryConnector;
 import org.eclipse.osgi.util.NLS;
-import org.jboss.tools.central.JBossCentralActivator;
+import org.jboss.tools.project.examples.ProjectExamplesActivator;
+
 
 /**
  * 
@@ -53,7 +54,7 @@ public class ChainedDiscoveryStrategy extends AbstractDiscoveryStrategy  {
 			throw new IllegalStateException("At least one AbstractDiscoveryStrategy must be added");
 		}
 		
-		MultiStatus status = new MultiStatus(JBossCentralActivator.PLUGIN_ID, 0,
+		MultiStatus status = new MultiStatus(ProjectExamplesActivator.PLUGIN_ID, 0,
 				"All attempts to discover connectors have failed", null);
 		
 		for (AbstractDiscoveryStrategy ds : strategies) {
@@ -113,6 +114,43 @@ public class ChainedDiscoveryStrategy extends AbstractDiscoveryStrategy  {
 		 */
 		boolean isComplete();
 		
+	}
+	
+	public final static class DiscoveryConnectorCollector implements DataCollector {
+		
+		/**
+		 * Use for testing purposes only
+		 */
+		public static String ALLOW_DUPLICATE_DISCOVERY_CONNECTORS_KEY = "org.jboss.tools.discovery.allow.duplicate.connectors";//$NON-NLS-1$
+		
+		private boolean isComplete;
+		
+		private boolean allowDuplicates;
+
+		/**
+		 * Creates a new DiscoveryConnectorCollector instance which allows duplicate connectors if the <code>org.jboss.tools.discovery.allow.duplicate.connectors</code> system property exists and is set to true 
+		 */
+		public DiscoveryConnectorCollector() {
+			this(Boolean.getBoolean(ALLOW_DUPLICATE_DISCOVERY_CONNECTORS_KEY));
+		}		
+		
+		/**
+		 * Creates a new DiscoveryConnectorCollector instance. If <code>allowDuplicates</code> is true, duplicate connectors can be collected. 
+		 */
+		public DiscoveryConnectorCollector(boolean allowDuplicates) {
+			this.allowDuplicates = allowDuplicates;
+		}
+		
+		@Override
+		public boolean isComplete() {
+			return isComplete && !allowDuplicates;
+		}
+
+		@Override
+		public void collectData(AbstractDiscoveryStrategy ds) {
+			List<DiscoveryConnector> collected = ds.getConnectors();
+			isComplete = (collected != null && !collected.isEmpty());
+		}		
 	}
 	
 }

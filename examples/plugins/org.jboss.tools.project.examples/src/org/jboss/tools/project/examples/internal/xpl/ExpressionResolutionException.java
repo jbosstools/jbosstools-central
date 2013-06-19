@@ -8,7 +8,7 @@
  * Contributors:
  *     JBoss by Red Hat - Initial implementation.
  ************************************************************************************/
-package org.jboss.tools.central.internal.xpl;
+package org.jboss.tools.project.examples.internal.xpl;
 
 /**
  * Thrown to indicate that an attempt has been made to resolve

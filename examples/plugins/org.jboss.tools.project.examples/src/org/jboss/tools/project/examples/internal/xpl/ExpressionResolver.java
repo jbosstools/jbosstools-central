@@ -19,7 +19,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.jboss.tools.central.internal.xpl;
+package org.jboss.tools.project.examples.internal.xpl;
 
 import java.io.File;
 import java.util.Properties;

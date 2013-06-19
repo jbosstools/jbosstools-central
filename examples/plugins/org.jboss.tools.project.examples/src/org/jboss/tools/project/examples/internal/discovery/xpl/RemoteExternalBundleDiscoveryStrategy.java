@@ -9,7 +9,7 @@
  *     Tasktop Technologies - initial API and implementation
  *     Red Hat - file based remote connectors
  *******************************************************************************/
-package org.jboss.tools.central.internal.discovery.wizards.xpl;
+package org.jboss.tools.project.examples.internal.discovery.xpl;
 
 import java.io.File;
 import java.io.IOException;
