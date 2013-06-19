@@ -63,9 +63,7 @@ public class ExternalBundleDiscoveryStrategy extends BundleDiscoveryStrategy {
 
 	private boolean deleteStorageFolderOnFailure;
 	
-	private boolean unzipJars;
-
-	public File getStorageFolder() {
+	public File getStorageFolder() throws CoreException {
 		return storageFolder;
 	}
 
@@ -155,13 +153,14 @@ public class ExternalBundleDiscoveryStrategy extends BundleDiscoveryStrategy {
 		File registryCacheFolder = null;
 		try {
 			registryCacheFolder = new File(storageFolder, ".rcache"); //$NON-NLS-1$
-			if (!registryCacheFolder.exists() && !registryCacheFolder.mkdirs()) {
+			if (!registryCacheFolder.exists() 
+					&& !registryCacheFolder.mkdirs()) {
 				throw new IOException();
 			}
 		} catch (IOException e) {
 			throw new CoreException(new Status(IStatus.ERROR,
 					DiscoveryCore.ID_PLUGIN,
-					"IO failure: cannot create temporary registry area", e));
+					"IO failure: cannot create temporary registry area", e)); //$NON-NLS-1$
 		}
 		return registryCacheFolder;
 	}
