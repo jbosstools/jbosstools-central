@@ -8,8 +8,8 @@ import java.util.Properties;
 
 import junit.framework.Assert;
 
-import org.jboss.tools.central.internal.xpl.ExpressionResolutionException;
-import org.jboss.tools.central.internal.xpl.ExpressionResolver;
+import org.jboss.tools.project.examples.internal.xpl.ExpressionResolutionException;
+import org.jboss.tools.project.examples.internal.xpl.ExpressionResolver;
 import org.junit.Test;
 
 public class ExpressionResolverTest {

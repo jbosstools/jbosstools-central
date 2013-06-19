@@ -100,8 +100,6 @@ import org.eclipse.ui.menus.CommandContributionItem;
 import org.eclipse.ui.part.PageBook;
 import org.jboss.tools.central.JBossCentralActivator;
 import org.jboss.tools.central.internal.ImageUtil;
-import org.jboss.tools.central.internal.discovery.ExpressionBasedBundleDiscoveryStrategy;
-import org.jboss.tools.central.internal.discovery.ExpressionBasedRemoteBundleDiscoveryStrategy;
 import org.jboss.tools.central.internal.discovery.wizards.ProxyWizard;
 import org.jboss.tools.central.internal.discovery.wizards.ProxyWizardManager;
 import org.jboss.tools.central.internal.discovery.wizards.ProxyWizardManager.ProxyWizardManagerListener;
@@ -110,6 +108,7 @@ import org.jboss.tools.central.jobs.RefreshBuzzJob;
 import org.jboss.tools.central.jobs.RefreshTutorialsJob;
 import org.jboss.tools.central.model.FeedsEntry;
 import org.jboss.tools.project.examples.ProjectExamplesActivator;
+import org.jboss.tools.project.examples.internal.discovery.DiscoveryUtil;
 import org.jboss.tools.project.examples.model.ProjectExample;
 import org.jboss.tools.project.examples.model.ProjectExampleCategory;
 import org.jboss.tools.project.examples.wizard.NewProjectExamplesWizard2;
@@ -629,18 +628,10 @@ public class GettingStartedPage extends AbstractJBossCentralPage implements Prox
 		final IStatus[] results = new IStatus[1];
 		final ConnectorDiscovery[] connectorDiscoveries = new ConnectorDiscovery[1];
 		
-		//TODO Refactor the connector installation b/w the software page & project examples
 		IRunnableWithProgress runnable = new IRunnableWithProgress() {
 			public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
-				connectorDiscoveries[0] = new ConnectorDiscovery();
-				// look for descriptors from installed bundles
-				connectorDiscoveries[0].getDiscoveryStrategies().add(new ExpressionBasedBundleDiscoveryStrategy());
-				ExpressionBasedRemoteBundleDiscoveryStrategy remoteDiscoveryStrategy = new ExpressionBasedRemoteBundleDiscoveryStrategy();
-				remoteDiscoveryStrategy.setDirectoryUrl(ProjectExamplesActivator.getDefault().getConfigurator().getJBossDiscoveryDirectory());
-				connectorDiscoveries[0].getDiscoveryStrategies().add(remoteDiscoveryStrategy);
-
-				connectorDiscoveries[0].setEnvironment(ProjectExamplesActivator.getEnvironment());
-				connectorDiscoveries[0].setVerifyUpdateSiteAvailability(true);
+				connectorDiscoveries[0] = DiscoveryUtil.createConnectorDiscovery();
+				connectorDiscoveries[0].setEnvironment(JBossCentralActivator.getEnvironment());
 				results[0] = connectorDiscoveries[0].performDiscovery(monitor);
 				if (monitor.isCanceled()) {
 					results[0] = Status.CANCEL_STATUS;

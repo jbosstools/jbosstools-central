@@ -25,8 +25,8 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.mylyn.internal.discovery.core.model.ConnectorDiscovery;
 import org.jboss.tools.central.JBossCentralActivator;
-import org.jboss.tools.central.internal.discovery.ChainedDiscoveryStrategy;
 import org.jboss.tools.project.examples.ProjectExamplesActivator;
+import org.jboss.tools.project.examples.internal.discovery.ChainedDiscoveryStrategy;
 
 
 /**
