@@ -321,8 +321,7 @@ public class RemoteExternalBundleDiscoveryStrategy extends ExternalBundleDiscove
 	}
 
 	private File createTempFolder() throws IOException {
-		File temporaryStorage = null;
-		temporaryStorage = File.createTempFile(RemoteExternalBundleDiscoveryStrategy.class.getSimpleName(), ".tmp");//$NON-NLS-1$
+		File temporaryStorage = File.createTempFile(RemoteExternalBundleDiscoveryStrategy.class.getSimpleName(), ".tmp");//$NON-NLS-1$
 		if (!temporaryStorage.delete() ||
 				!temporaryStorage.mkdirs()) {
 			throw new IOException("Can't create temporary directory"); //$NON-NLS-1$

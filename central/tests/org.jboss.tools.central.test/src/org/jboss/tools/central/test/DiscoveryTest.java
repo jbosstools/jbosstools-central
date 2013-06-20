@@ -128,7 +128,7 @@ public class DiscoveryTest {
 	public void testLocalDiscovery() throws Exception {
 		String url = discoveryViewer.getDirectoryUrl();
 		try  {
-			discoveryViewer.setDirectoryUrl("file:/"+new File("test-resources", "directory.xml").getAbsolutePath().toString().replace('\\', '/'));
+			discoveryViewer.setDirectoryUrl("file:/"+new File("test-resources", "directory.xml").getAbsolutePath().replace('\\', '/'));
 			discoveryViewer.updateDiscovery();
 			assertNotNull("Couldn't find connector from local discovery", getConnector("test.local.discovery"));
 			
