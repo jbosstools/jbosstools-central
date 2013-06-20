@@ -15,6 +15,7 @@ import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
+import java.io.File;
 import java.lang.reflect.Field;
 import java.util.List;
 
@@ -123,4 +124,18 @@ public class DiscoveryTest {
 		 List<ExpressionBasedDiscoveryConnector> connectors = (List<ExpressionBasedDiscoveryConnector>) field.get(discoveryViewer);
 		 return connectors;
 	}
+	
+	public void testLocalDiscovery() throws Exception {
+		String url = discoveryViewer.getDirectoryUrl();
+		try  {
+			discoveryViewer.setDirectoryUrl("file:/"+new File("test-resources", "directory.xml").getAbsolutePath().replace('\\', '/'));
+			discoveryViewer.updateDiscovery();
+			assertNotNull("Couldn't find connector from local discovery", getConnector("test.local.discovery"));
+			
+		} finally {
+			discoveryViewer.setDirectoryUrl(url);
+		}
+		
+	}
+	
 }

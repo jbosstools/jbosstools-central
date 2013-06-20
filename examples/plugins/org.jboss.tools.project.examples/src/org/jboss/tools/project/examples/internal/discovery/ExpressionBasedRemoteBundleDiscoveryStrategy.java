@@ -14,7 +14,7 @@ import org.eclipse.core.runtime.IContributor;
 import org.eclipse.core.runtime.IExtension;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.mylyn.internal.discovery.core.model.AbstractDiscoverySource;
-import org.eclipse.mylyn.internal.discovery.core.model.RemoteBundleDiscoveryStrategy;
+import org.jboss.tools.project.examples.internal.discovery.xpl.RemoteExternalBundleDiscoveryStrategy;
 
 /**
  * A subclass of RemoteBundleDiscoveryStrategy to avoid validation fails when property expressions are used in connector description 
@@ -23,7 +23,7 @@ import org.eclipse.mylyn.internal.discovery.core.model.RemoteBundleDiscoveryStra
  * @see org.eclipse.mylyn.internal.discovery.core.model.RemoteBundleDiscoveryStrategy
  * @author snjeza
  */
-public class ExpressionBasedRemoteBundleDiscoveryStrategy extends RemoteBundleDiscoveryStrategy {
+public class ExpressionBasedRemoteBundleDiscoveryStrategy extends RemoteExternalBundleDiscoveryStrategy {
 
 	private ExpressionBasedDiscoveryExtensionProcessor processor = new ExpressionBasedDiscoveryExtensionProcessor() {
 		@Override
