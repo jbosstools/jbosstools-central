@@ -70,7 +70,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.osgi.framework.Bundle;
 
-public class OpenBinaryFile {
+public class OpenBinaryFileTest {
 	
 	private static final String ORG_APACHE_COMMONS_LANG_STRING_UTILS = "org.apache.commons.lang.StringUtils";
 
@@ -91,7 +91,7 @@ public class OpenBinaryFile {
 	@BeforeClass
 	public static void init() throws Exception {
 		File file = getProjectFile();
-		project = importTestProject(file);
+		project = importTestProject(PROJECT_NAME, file);
 		project.build(IncrementalProjectBuilder.FULL_BUILD, null);
 		JobUtils.waitForIdle();
 		IEclipsePreferences preferences = SourceLookupActivator
@@ -140,7 +140,7 @@ public class OpenBinaryFile {
 	
 	@Test
 	public void testInvalidAttachment() throws Exception {
-		invalidateAttachment();
+		invalidateAttachment("/NON-EXISTING");
 		IDocument document = getDocument();
 		String text = document.get();
 		assertEquals(268703, text.length());
@@ -149,7 +149,7 @@ public class OpenBinaryFile {
 
 	@Test
 	public void testPreference() throws Exception {
-		invalidateAttachment();
+		invalidateAttachment("/NON-EXISTING");
 		String oldValue = SourceLookupActivator.getDefault().getAutoAddSourceAttachment();
 		IEclipsePreferences preferences = SourceLookupActivator
 				.getPreferences();
@@ -167,8 +167,18 @@ public class OpenBinaryFile {
 			closeAllEditors(false);
 		}
 	}
-	
-	public void invalidateAttachment() throws JavaModelException {
+
+	@Test
+	public void testJBIDE14990_InvalidExistingAttachment() throws Exception {
+		invalidateAttachment("/" + PROJECT_NAME +"/lib/commons-lang-2.6.jar");
+		IDocument document = getDocument();
+		String text = document.get();
+		assertEquals(268703, text.length());
+		closeAllEditors(false);
+	}
+
+
+	public void invalidateAttachment(String path) throws JavaModelException {
 		IJavaProject javaProject = JavaCore.create(project);
 		assertTrue(javaProject != null);
 		IType type = javaProject.findType(ORG_APACHE_COMMONS_LANG_STRING_UTILS);
@@ -179,12 +189,12 @@ public class OpenBinaryFile {
 			element = element.getParent();
 			if (element instanceof IPackageFragmentRoot) {
 				final IPackageFragmentRoot fragment = (IPackageFragmentRoot) element;
-				SourceLookupUtil.attachSource(fragment, new Path("/NON-EXISTING"));
+				SourceLookupUtil.attachSource(fragment, new Path(path));
 				break;
 			}
 		}
 	}
-	
+
 	private static void closeAllEditors(boolean save) {
 		IWorkbenchWindow[] windows = PlatformUI.getWorkbench().getWorkbenchWindows();
 		for (IWorkbenchWindow window:windows) {
@@ -195,10 +205,9 @@ public class OpenBinaryFile {
 		}
 	}
 
-	public static IProject importTestProject(File file) throws CoreException,
+	public static IProject importTestProject(String projectName, File file) throws CoreException,
 			ZipException, IOException, InvocationTargetException,
 			InterruptedException {
-		final String projectName = PROJECT_NAME;
 		IWorkspace workspace = ResourcesPlugin.getWorkspace();
 		IProject project = workspace.getRoot().getProject(projectName);
 		createProject(project, new NullProgressMonitor());
@@ -241,8 +250,13 @@ public class OpenBinaryFile {
 
 	public static File getProjectFile() throws IOException,
 			FileNotFoundException {
+		return getProjectFile("projects/test13848.zip");
+	}
+
+	public static File getProjectFile(String projectPath) throws IOException,
+			FileNotFoundException {
 		Bundle bundle = Platform.getBundle(Activator.PLUGIN_ID);
-		URL url = bundle.getEntry("projects/test13848.zip");
+		URL url = bundle.getEntry(projectPath);
 		InputStream in = null;
 		OutputStream out = null;
 		File file = null;

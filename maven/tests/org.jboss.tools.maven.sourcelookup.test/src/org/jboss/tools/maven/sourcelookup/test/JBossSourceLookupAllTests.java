@@ -17,7 +17,7 @@ import org.junit.runners.Suite;
 
 @Suite.SuiteClasses({
 	SourceLookupTest.class,
-	OpenBinaryFile.class
+	OpenBinaryFileTest.class
 })
 
 @RunWith(Suite.class)

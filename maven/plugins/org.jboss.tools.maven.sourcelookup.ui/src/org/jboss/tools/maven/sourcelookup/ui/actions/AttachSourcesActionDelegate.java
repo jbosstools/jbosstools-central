@@ -11,7 +11,12 @@
 package org.jboss.tools.maven.sourcelookup.ui.actions;
 
 import java.io.File;
+import java.io.IOException;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipException;
+import java.util.zip.ZipFile;
 
+import org.codehaus.plexus.util.IOUtil;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.ResourcesPlugin;
@@ -24,8 +29,10 @@ import org.eclipse.core.runtime.jobs.IJobChangeEvent;
 import org.eclipse.core.runtime.jobs.IJobChangeListener;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.core.runtime.jobs.JobChangeAdapter;
+import org.eclipse.jdt.core.IClassFile;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IJavaProject;
+import org.eclipse.jdt.core.IPackageFragment;
 import org.eclipse.jdt.core.IPackageFragmentRoot;
 import org.eclipse.jdt.internal.ui.javaeditor.IClassFileEditorInput;
 import org.eclipse.jface.action.IAction;
@@ -71,19 +78,27 @@ public class AttachSourcesActionDelegate implements IEditorActionDelegate {
 				}
 				IClassFileEditorInput input = (IClassFileEditorInput) targetEditor.getEditorInput();
 				IJavaElement element = input.getClassFile();
-				
+				String className = element.getElementName(); 
 				boolean isMavenProject = isMavenProject(element.getJavaProject());
-				if (isMavenProject) {
-					return;
-				}
-				
+				String packagePath = null;
 				while (element.getParent() != null) {
-					element = element.getParent();
+					if (element instanceof IPackageFragment) {
+						packagePath = element.getElementName().replace(".", "/")+"/"+className.replace(".class", ".java");
+					} else 
 					if (element instanceof IPackageFragmentRoot) {
 						final IPackageFragmentRoot fragment = (IPackageFragmentRoot) element;
+						
 						IPath attachmentPath = fragment.getSourceAttachmentPath();
-						if (attachmentPath != null && !attachmentPath.isEmpty() && attachmentPath.toFile().exists()) {
+						if ((attachmentPath == null || attachmentPath.isEmpty()) && isMavenProject) {
+							//Let m2e do its stuff for missing attachments only
 							break;
+						} 
+						
+						if (attachmentPath != null && !attachmentPath.isEmpty()) {
+							File attachementSource = attachmentPath.toFile();
+							if (attachementSource.exists() && hasSource(attachementSource, packagePath)) {
+								break;
+							}
 						}
 						if (fragment.isArchive()) {
 							IFile iFile = ResourcesPlugin.getWorkspace().getRoot().getFile(fragment.getPath());
@@ -116,11 +131,37 @@ public class AttachSourcesActionDelegate implements IEditorActionDelegate {
 							break;
 						}
 					}
+					element = element.getParent();
 				}
 			} catch (Exception e) {
 				SourceLookupUIActivator.log(e);
 			}
 		}
+	}
+
+	private boolean hasSource(File attachementSource, String className) {
+		if (className == null) {
+			return false;
+		}
+		if (attachementSource.isDirectory()) {
+			return new File(attachementSource, className).exists();
+		}
+		//we assume it's a jar :
+		ZipFile jar = null;
+		try {
+			jar = new ZipFile(attachementSource);
+			ZipEntry entry = jar.getEntry(className);//$NON-NLS-1$
+			return entry != null;
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				if (jar != null) jar.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+		return false;
 	}
 
 	private void postIdentification(final IPackageFragmentRoot fragment,
