@@ -200,7 +200,7 @@ public class OfflineSupportPreferencePage extends PreferencePage implements
 
 		Label reqs = new Label(goOfflineGroup, SWT.WRAP);
 		GridDataFactory.fillDefaults().span(2, 1).applyTo(reqs);
-		reqs.setText("The following command generates an offline cache usable by the project examples.\nGroovy 2.x must be set in your path"); //$NON-NLS-1$
+		reqs.setText("The following command generates an offline cache usable by the project examples.\nGroovy 2.1.x must be set in your path"); //$NON-NLS-1$
 		//Add link to http://groovy.codehaus.org/Installing+Groovy
 		final StyledText text = new StyledText(goOfflineGroup, SWT.WRAP | SWT.V_SCROLL);
 		GridDataFactory.fillDefaults().grab(true, false).hint(90, 250).applyTo(text);
