@@ -36,7 +36,6 @@ public class MissingRepositoryWarningComponent extends Composite {
 
 	public MissingRepositoryWarningComponent(Composite parent) {
 		super(parent, SWT.NORMAL);
-		
 		GridDataFactory.fillDefaults().align(SWT.FILL, SWT.FILL).grab(true, false).span(3, 1)
 		.applyTo(this);
 		GridLayoutFactory.fillDefaults().numColumns(2).applyTo(this);
@@ -46,7 +45,7 @@ public class MissingRepositoryWarningComponent extends Composite {
 		
 		GridDataFactory.fillDefaults().align(SWT.FILL, SWT.TOP).applyTo(warningImg);
 		
-		warninglink = new Link(this, SWT.NONE |  SWT.FILL);
+		warninglink = new Link(this, SWT.NONE |  SWT.FILL | SWT.WRAP);
 		GridDataFactory.fillDefaults().align(SWT.FILL, SWT.FILL).grab(true, false).applyTo(warninglink);
 		warninglink.addSelectionListener(new SelectionAdapter() {
 			@Override
