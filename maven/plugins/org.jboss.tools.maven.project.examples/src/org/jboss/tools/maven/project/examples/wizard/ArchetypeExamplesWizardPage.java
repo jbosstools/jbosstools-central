@@ -40,7 +40,9 @@ import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.m2e.core.MavenPlugin;
+import org.eclipse.m2e.core.embedder.ICallable;
 import org.eclipse.m2e.core.embedder.IMaven;
+import org.eclipse.m2e.core.embedder.IMavenExecutionContext;
 import org.eclipse.m2e.core.internal.IMavenConstants;
 import org.eclipse.m2e.core.internal.MavenPluginActivator;
 import org.eclipse.m2e.core.project.ProjectImportConfiguration;
@@ -368,11 +370,41 @@ public class ArchetypeExamplesWizardPage extends
 			public void run(final IProgressMonitor monitor)
 					throws CoreException {
 				
-				MavenPlugin.getProjectConfigurationManager().createArchetypeProject(
-						project, location, archetype,
-						groupId, artifactId, version, javaPackage, properties,
-						configuration, monitor);
+				MavenPlugin.getMaven().execute(new ICallable<Void>() {
+				      public Void call(IMavenExecutionContext context, IProgressMonitor monitor) throws CoreException {
+				    	  
+				    	  ensureArchetyperCacheIsLoaded(archetype);
+				    	  
+				    	  MavenPlugin.getProjectConfigurationManager().createArchetypeProjects(
+				    			  location, archetype,
+				    			  groupId, artifactId, version, javaPackage, properties,
+				    			  configuration, monitor);
+				    	  return null;
+				      }
+				    }, monitor);
+				  
 			}
+
+            //Need to call ArchetypeArtifactManager#exists(...) to populate internal archetyper cache for offline use
+            //This is absolutely f*** up but we're using an oooold version of that archetyper
+            private void ensureArchetyperCacheIsLoaded(Archetype archetype) throws CoreException {
+                IMaven maven = MavenPlugin.getMaven();
+
+                ArrayList<ArtifactRepository> repos = new ArrayList<ArtifactRepository>();
+                repos.addAll(maven.getArtifactRepositories());     
+
+                ArtifactRepository archetypeRepository = null;
+                if(StringUtils.isNotBlank(archetype.getRepository())) {
+                    archetypeRepository = maven.createArtifactRepository(
+                    archetype.getArtifactId() + "-repo", archetype.getRepository().trim()); //$NON-NLS-1$
+                    repos.add(0, archetypeRepository);//If the archetype doesn't exist locally, this will be the first remote repo to be searched.
+                }
+
+                @SuppressWarnings("restriction")
+                ArchetypeArtifactManager aam = MavenPluginActivator.getDefault().getArchetypeArtifactManager();
+                aam.exists(archetype.getGroupId(), archetype.getArtifactId(), archetype.getVersion(),
+                		archetypeRepository, maven.getLocalRepository(), repos);
+            }
 		};
 		
 		final IRunnableWithProgress op = new IRunnableWithProgress() {
@@ -389,23 +421,19 @@ public class ArchetypeExamplesWizardPage extends
 
 		IPreferenceStore store = Activator.getDefault().getPreferenceStore();
 		boolean configureSeam = store.getBoolean(Activator.CONFIGURE_SEAM);
-		boolean configureJSF = store.getBoolean(Activator.CONFIGURE_JSF);
 		boolean configurePortlet = store.getBoolean(Activator.CONFIGURE_PORTLET);
 		boolean configureJSFPortlet = store.getBoolean(Activator.CONFIGURE_JSFPORTLET);
 		boolean configureSeamPortlet = store.getBoolean(Activator.CONFIGURE_SEAMPORTLET);
 		boolean configureCDI = store.getBoolean(Activator.CONFIGURE_CDI);
 		boolean configureHibernate = store.getBoolean(Activator.CONFIGURE_HIBERNATE);
-		boolean configureJaxRs = store.getBoolean(Activator.CONFIGURE_JAXRS);
 		
 		try {
 			store.setValue(Activator.CONFIGURE_SEAM, false);
-			store.setValue(Activator.CONFIGURE_JSF, false);
 			store.setValue(Activator.CONFIGURE_PORTLET, false);
 			store.setValue(Activator.CONFIGURE_JSFPORTLET, false);
 			store.setValue(Activator.CONFIGURE_SEAMPORTLET, false);
 			store.setValue(Activator.CONFIGURE_CDI, false);
 			store.setValue(Activator.CONFIGURE_HIBERNATE, false);
-			store.setValue(Activator.CONFIGURE_JAXRS, false);
 			getContainer().run(true, false, op);
 		} catch (InterruptedException e) {
 			ProjectExamplesActivator.log(e);
@@ -422,13 +450,11 @@ public class ArchetypeExamplesWizardPage extends
 			return true;
 		} finally {
 			store.setValue(Activator.CONFIGURE_SEAM, configureSeam);
-			store.setValue(Activator.CONFIGURE_JSF, configureJSF);
 			store.setValue(Activator.CONFIGURE_PORTLET, configurePortlet);
 			store.setValue(Activator.CONFIGURE_JSFPORTLET, configureJSFPortlet);
 			store.setValue(Activator.CONFIGURE_SEAMPORTLET, configureSeamPortlet);
 			store.setValue(Activator.CONFIGURE_CDI, configureCDI);
 			store.setValue(Activator.CONFIGURE_HIBERNATE, configureHibernate);
-			store.setValue(Activator.CONFIGURE_JAXRS, configureJaxRs);
 		}
 
 		return true;
