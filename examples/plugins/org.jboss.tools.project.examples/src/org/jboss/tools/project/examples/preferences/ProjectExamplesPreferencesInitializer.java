@@ -53,7 +53,7 @@ public class ProjectExamplesPreferencesInitializer extends
 				ProjectExamplesActivator.SHOW_RUNTIME_SITES_VALUE);
 		node.put(
 				ProjectExamplesActivator.SHOW_CHEATSHEETS, 
-				ProjectExamplesActivator.SHOW_CHEATSHEETS_NEVER);
+				ProjectExamplesActivator.SHOW_CHEATSHEETS_PROMPT);
 		node.putBoolean(
 				ProjectExamplesActivator.SHOW_RUNTIME_SITES,
 				ProjectExamplesActivator.SHOW_RUNTIME_SITES_VALUE);
