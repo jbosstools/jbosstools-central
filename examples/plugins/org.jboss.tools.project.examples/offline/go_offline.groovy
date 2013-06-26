@@ -19,17 +19,20 @@ import static groovy.io.FileType.*
 import com.beust.jcommander.*
 import org.jboss.jdf.stacks.client.StacksClient
 import org.jboss.jdf.stacks.model.*
+import java.util.concurrent.TimeUnit
 
 class GoOfflineScript {
   @Parameter(description = "<descriptor url list>")
-  def descriptors = ["http://download.jboss.org/jbosstools/examples/project-examples-maven-4.1.Alpha2.xml", 
-                     "http://download.jboss.org/jbosstools/examples/project-examples-community-4.1.Alpha2.xml"];
+  def descriptors = [];
 
   @Parameter(names =["-c", "--clean"], description = "Clean offline directory")
   boolean clean = false
 
   @Parameter(names =["-q", "--quiet"], description = "Quiet mode (reduced console output)")
   boolean quiet = false
+
+  @Parameter(names =["-e", "--enterprise"], description = "Cache enterprise dependency")
+  boolean enterprise = false
 
   @Parameter(names =["-od", "--offline-dir"], description = "Base offline directory")
   File offlineDir = new File("offline")
@@ -46,6 +49,8 @@ class GoOfflineScript {
   @Parameter(names = ["-h", "--help"], description = "This help", help = true)
   boolean help;
 
+  def buildErrors = [:]
+
   public static main(args) {
     def script = new GoOfflineScript() 
     def cmd = new JCommander();
@@ -61,7 +66,8 @@ class GoOfflineScript {
     if (script.help) {
       cmd.usage(); 
       return
-    } 
+    }
+    println "Quiet mode : "+script.quiet 
     script.goOffline()
   }
 
@@ -83,16 +89,22 @@ class GoOfflineScript {
 
     //This is the directory where examples will be unzipped to be built
     def workDir = new File(offlineDir, "workDir")
+    workDir.mkdirs() 
+
+    def allArchetypeProjects= []
 
     descriptors.each { descriptorUrl -> 
-      downloadExamples(descriptorUrl, downloadDir, workDir)
+      def archetypeProjects = downloadExamples(descriptorUrl, downloadDir, workDir)
+      if (archetypeProjects) allArchetypeProjects.addAll archetypeProjects
     }
 
     def mavenRepoDir = new File(offlineDir, ".m2/repository")
 
     buildExamplesDir(workDir, mavenRepoDir)
 
-    buildArchetypesFromStacks(workDir, mavenRepoDir)
+    buildArchetypesFromExamples(allArchetypeProjects, workDir, mavenRepoDir)
+
+    //buildArchetypesFromStacks(workDir, mavenRepoDir)
 
     /*FIXME add interactive support
     boolean copyCache = false
@@ -107,7 +119,17 @@ class GoOfflineScript {
     */   
     long elapsed = System.currentTimeMillis() -start
 
-    println "Script executed in $elapsed ms"
+    def duration = String.format("%d min, %d sec", 
+        TimeUnit.MILLISECONDS.toMinutes(elapsed),
+        TimeUnit.MILLISECONDS.toSeconds(elapsed) - 
+        TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(elapsed))
+    );
+
+
+    println "Script executed in $duration with ${buildErrors.size()} error(s)"
+      buildErrors.each {
+        println it.key
+      }
   }
 
 
@@ -129,15 +151,22 @@ class GoOfflineScript {
     def projects = root.project
   
     if (projects.size() == 0) {
-      return
+      return null
     }
   
+    def archetypeProjects = [] as java.util.concurrent.CopyOnWriteArrayList
+
     withPool(4) {
       projects.eachParallel { p ->
+        if ("mavenArchetype" == p.importType.text()) {
+             archetypeProjects << p
+             return archetypeProjects
+        }
         String sUrl = p.url?.text().trim()
         if (!sUrl) {
-          return
+             return archetypeProjects
         }
+        
         URL url = new URL(sUrl) 
         def zip = new File(downloadArea, url.getFile())
         //println "Starting download of $url" 
@@ -147,17 +176,42 @@ class GoOfflineScript {
 
           println "Downloaded $url ($totalSize) to $zip"  
         }
+        
         if ("maven" == p.importType.text()) {
           def ant = new AntBuilder()   // create an antbuilder
           ant.unzip(  src: zip, dest: new File(workDir, zip.getName()),  overwrite:"false")
         }
       }
     }
+
+    archetypeProjects
   }
 
   def buildExamplesDir(workDir, localRepo) {
     workDir.eachFileMatch DIRECTORIES, ~/.*\.zip/, { unzipped ->
          execMavenGoOffline(unzipped, localRepo)    
+    }
+  }
+
+
+  def buildArchetypesFromExamples(projects, workDir, localRepo) {
+    def archetypes= projects.findAll{!(it.stacksId.text())}
+
+    archetypes.each{p ->
+      File folder = new File(workDir, p.mavenArchetype.archetypeArtifactId.text())
+      if (folder.exists()) {
+        folder.deleteDir()
+      }
+      folder.mkdirs()
+      
+      def appName = "myapp"
+      execMavenArchetypeBuild (p.mavenArchetype.archetypeGroupId.text(), p.mavenArchetype.archetypeArtifactId.text(), p.mavenArchetype.archetypeVersion.text(), folder, localRepo, appName)
+      execMavenGoOffline(new File(folder, appName), localRepo) 
+      if (enterprise){
+        appName += "-enterprise"
+        execMavenArchetypeBuild (p.mavenArchetype.archetypeGroupId.text(), p.mavenArchetype.archetypeArtifactId.text(), p.mavenArchetype.archetypeVersion.text(), folder, localRepo, appName)
+        execMavenGoOffline(new File(folder, appName), localRepo) 
+      }
     }
   }
 
@@ -169,13 +223,21 @@ class GoOfflineScript {
         folder.deleteDir()
       }
       folder.mkdirs()
-      execMavenArchetypeBuild (a.groupId, a.artifactId, a.recommendedVersion, folder, localRepo)
-      execMavenGoOffline(new File(folder, "myapp"), localRepo) 
+
+      def appName = "myapp"
+      execMavenArchetypeBuild (a.groupId, a.artifactId, a.recommendedVersion, folder, localRepo, appName)
+      execMavenGoOffline(new File(folder, appName), localRepo) 
+
+      if (enterprise){
+        appName += "-enterprise"
+        execMavenArchetypeBuild (a.groupId, a.artifactId, a.recommendedVersion, folder, localRepo, appName)
+        execMavenGoOffline(new File(folder, appName), localRepo) 
+      } 
+
     }
   }
 
   def execMavenGoOffline (def directory, def localRepo) {
-    def ant = new AntBuilder()
     def pom = new File(directory, "pom.xml")
     if (!pom.exists()) {
        if (!quiet) println "$pom can't be found. Skipping maven build"
@@ -184,28 +246,54 @@ class GoOfflineScript {
 
     def pomModel = new XmlSlurper(false,false).parse(pom)    
     def profiles = pomModel?.profiles?.profile?.id.collect{ it.text()}.join(",")   
-    if (!quiet) println "Building ${pomModel.groupId}:${pomModel.artifactId}:${pomModel.version} " + profiles?:"with profiles $profiles"
 
-    //Spit everything to the current console
-    if (!quiet) {
-      ant.project.getBuildListeners().each{ 
-        it.setOutputPrintStream(System.out) 
-      } 
+    //errai has borked profiles
+    if (pomModel.name.text().toLowerCase().contains("errai")) {
+      profiles = profiles.replace(",arq-jbossas-managed","").replace(",arq-jbossas-remote","")
     }
+
+     //"arq-jbossas-remote" can't be combined with other arquillian profiles, it would bork dependency resolution
+     //so we execute 2 builds. with and without arq-jbossas-remote
+     if (profiles.contains("arq-jbossas-remote")) {
+       execMavenGoOfflineForProfiles (directory, localRepo, pomModel, profiles.replace(",arq-jbossas-remote",""))
+       execMavenGoOfflineForProfiles (directory, localRepo, pomModel, "arq-jbossas-remote")
+     } else {
+       execMavenGoOfflineForProfiles (directory, localRepo, pomModel, profiles)
+     }
+        
+
+  }
+
+  def execMavenGoOfflineForProfiles (def directory, def localRepo, def pomModel, def profiles) {
+    def ant = new AntBuilder()
+
+    println "Building ${pomModel.groupId}:${pomModel.artifactId}:${pomModel.version} " + profiles?:"with profiles $profiles"
+
     //remove [exec] prefixes
     def logger = ant.project.buildListeners.find { it instanceof org.apache.tools.ant.DefaultLogger }
     logger.emacsMode = true
-    
+        
     ant.exec(errorproperty: "cmdErr",
              resultproperty:"cmdExit",
              failonerror: "false",
              dir: directory,
              executable: getMavenExec()) {
-                //arg(value:"--quiet")
-                arg(value:"dependency:go-offline") 
+                arg(value:"-B")
+                if (quiet) arg(value:"-q") 
+                arg(value:"clean") 
+                if ("pom" != pomModel.packaging.text()) arg(value:"dependency:go-offline")
+                arg(value:"verify") 
+                arg(value:"-DskipTests=true")
                 if (profiles)  arg(value:"-P$profiles")
                 if (localRepo) arg(value:"-Dmaven.repo.local=${localRepo.absolutePath}")
+                arg(value:"-Dversion.jboss.as=7.1.1.Final")//For broken aerogear archetype
              }
+
+
+      if(ant.project.properties.cmdExit != "0"){
+        buildErrors["Project $directory failed to build"] = ant.project.properties.cmdErr
+      }
+      ant.project.properties.cmdExit
   }
 
   String getMavenExec()  {
@@ -216,33 +304,35 @@ class GoOfflineScript {
     mvnFileName
   }
 
-  def execMavenArchetypeBuild (groupId, artifactId, version, directory, localRepo) {
+  def execMavenArchetypeBuild (groupId, artifactId, version, directory, localRepo, appName) {
     def ant = new AntBuilder()
-    //Spit everything to the current console
-    if (!quiet)  {
-      ant.project.getBuildListeners().each{ 
-        it.setOutputPrintStream(System.out) 
-      } 
-    }
     //remove [exec] prefixes
     def logger = ant.project.buildListeners.find { it instanceof org.apache.tools.ant.DefaultLogger }
     logger.emacsMode = true
-    
+
     ant.exec(errorproperty: "cmdErr",
              resultproperty:"cmdExit",
              failonerror: "false",
              dir: directory,
              executable: getMavenExec()) {
                 arg(value:"archetype:generate") 
-                //arg(value:"--quiet") 
+                if (quiet) arg(value:"-q") 
+                arg(value:"-B") 
                 arg(value:"-DarchetypeGroupId=${groupId}") 
                 arg(value:"-DarchetypeArtifactId=${artifactId}") 
                 arg(value:"-DarchetypeVersion=${version}") 
                 arg(value:"-DgroupId=foo.bar") 
-                arg(value:"-DartifactId=myapp") 
+                arg(value:"-DartifactId=${appName}") 
                 arg(value:"-DinteractiveMode=false")
                 arg(value:"-Dversion=1.0.0-SNAPSHOT") 
+                if (appName.endsWith("-ent")) arg(value:"-Denterprise=true")
                 if (localRepo) arg(value:"-Dmaven.repo.local=${localRepo.absolutePath}")
-             }        
+             }   
+
+      if(ant.project.properties.cmdExit != "0"){
+        buildErrors["Failed to generate project ${appName} from archetype ${groupId}:${artifactId}:${version}"] = ant.project.properties.cmdErr
+      }
+      ant.project.properties.cmdExit
   }
+
 }
