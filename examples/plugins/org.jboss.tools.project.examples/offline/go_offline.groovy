@@ -104,7 +104,7 @@ class GoOfflineScript {
 
     buildArchetypesFromExamples(allArchetypeProjects, workDir, mavenRepoDir)
 
-    //buildArchetypesFromStacks(workDir, mavenRepoDir)
+    buildArchetypesFromStacks(workDir, mavenRepoDir)
 
     /*FIXME add interactive support
     boolean copyCache = false
