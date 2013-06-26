@@ -110,7 +110,7 @@ public class MavenDependencyMarkerResolutionGenerator implements
 		ArtifactKey key = null;
 		if (message.startsWith(MISSING_ARTIFACT_PREFIX)) {
 			String keyString = message.substring(MISSING_ARTIFACT_PREFIX.length());
-			key = extractKey(key, keyString);
+			key = extractKey(keyString);
 		}
 		return key;
 	}
@@ -129,13 +129,14 @@ public class MavenDependencyMarkerResolutionGenerator implements
 		if (start > -1) {
 			int from = text.length()+start;
 			String keyString = message.substring(from, message.indexOf(" ", from));
-			key = extractKey(key, keyString);
+			key = extractKey(keyString);
 		}
 		return key;
 	}
 
-	private ArtifactKey extractKey(ArtifactKey key, String keyString) {
+	private ArtifactKey extractKey(String keyString) {
 		String[] keyAsArray = keyString.trim().split(":"); //$NON-NLS-1$
+		ArtifactKey key=null;
 		if (keyAsArray.length >= 3) {
 			String groupId 	  = keyAsArray[0];
 			String artifactId = keyAsArray[1];
