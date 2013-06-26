@@ -47,6 +47,8 @@ import org.junit.Test;
 @SuppressWarnings("restriction")
 public class SourceLookupTest {
 
+	private static final String JAVAX_FACES_CONTEXT_FACESCONTEXT = "javax.faces.context.FacesContext";
+	
 	private static final String TARGET_REQUIREMENTS = "/target/requirements/";
 	private static final String JBOSSTOOLS_TEST_JBOSS_HOME_7_1_1 = "jbosstools.test.jboss.home.7.1.1";
 	private static final String JBOSSTOOLS_TEST_JBOSS_HOME_EAP_6_1 = "jbosstools.test.jboss.home.eap.6.1";
@@ -151,5 +153,4 @@ public class SourceLookupTest {
 		}
 		return null;
 	}
-	
 }

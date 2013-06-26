@@ -13,6 +13,8 @@ package org.jboss.tools.maven.sourcelookup.containers;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.debug.core.sourcelookup.ISourceContainer;
 import org.eclipse.debug.core.sourcelookup.containers.AbstractSourceContainerTypeDelegate;
+import org.eclipse.wst.server.core.IRuntime;
+import org.eclipse.wst.server.core.ServerCore;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -24,14 +26,25 @@ import org.w3c.dom.Node;
  */
 public class JBossSourceContainerType extends AbstractSourceContainerTypeDelegate {
 
+	private static final String RUNTIME_ID_ATTRIBUTE = "runtimeId"; //$NON-NLS-1$
+	private static final String HOMEPATH_ATTRIBUTE = "homepath"; //$NON-NLS-1$
+	private static final String JBOSSAS_ELEMENT = "jbossas"; //$NON-NLS-1$
+	private static final String RUNTIME_TYPE_ID_ATTRIBUTE = "runtimeTypeId"; //$NON-NLS-1$
+	
 	/* (non-Javadoc)
 	 * @see org.eclipse.debug.internal.core.sourcelookup.ISourceContainerType#getMemento(org.eclipse.debug.internal.core.sourcelookup.ISourceContainer)
 	 */
 	public String getMemento(ISourceContainer container) throws CoreException {
 		JBossSourceContainer jbossSourceContainer = (JBossSourceContainer)container;
 		Document document = newDocument();
-		Element element = document.createElement("jbossas"); //$NON-NLS-1$
-		element.setAttribute("homepath", jbossSourceContainer.getHomePath()); //$NON-NLS-1$
+		Element element = document.createElement(JBOSSAS_ELEMENT);
+		if (jbossSourceContainer.getHomePath() != null && !jbossSourceContainer.getHomePath().isEmpty()) {
+			element.setAttribute(HOMEPATH_ATTRIBUTE, jbossSourceContainer.getHomePath()); 
+		}
+		if (jbossSourceContainer.getRuntime() != null) {
+			element.setAttribute(RUNTIME_ID_ATTRIBUTE, jbossSourceContainer.getRuntime().getId());
+			element.setAttribute(RUNTIME_TYPE_ID_ATTRIBUTE, jbossSourceContainer.getRuntime().getRuntimeType().getId());
+		}
 		document.appendChild(element);
 		return serializeDocument(document);
 	}
@@ -43,12 +56,21 @@ public class JBossSourceContainerType extends AbstractSourceContainerTypeDelegat
 		Node node = parseDocument(memento);
 		if (node.getNodeType() == Node.ELEMENT_NODE) {
 			Element element = (Element)node;
-			if ("jbossas".equals(element.getNodeName())) { //$NON-NLS-1$
-				String homePath = element.getAttribute("homepath"); //$NON-NLS-1$
+			if (JBOSSAS_ELEMENT.equals(element.getNodeName())) {
+				String homePath = element.getAttribute(HOMEPATH_ATTRIBUTE); 
 				if (homePath == null || homePath.length() == 0) {
-					abort("Exception occurred during source lookup", null); 
+					String runtimeId = element.getAttribute(RUNTIME_ID_ATTRIBUTE);
+					String runtimeTypeId = element.getAttribute(RUNTIME_TYPE_ID_ATTRIBUTE);
+					IRuntime[] runtimes = ServerCore.getRuntimes();
+					for (IRuntime runtime:runtimes) {
+						if (runtimeId != null && runtimeId.equals(runtime.getId()) &&
+								runtimeTypeId != null && runtimeTypeId.equals(runtime.getRuntimeType().getId())	) {
+							return new JBossSourceContainer(runtime);
+						}
+					}
+				} else {
+					return new JBossSourceContainer(homePath);
 				}
-				return new JBossSourceContainer(homePath);
 			} 
 			abort("Unable to restore source lookup path - expecting typeId attribute.", null); 
 		}

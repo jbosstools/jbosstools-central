@@ -22,6 +22,12 @@
     <extension
          point="org.eclipse.core.runtime.preferences">
       <initializer class="org.jboss.tools.maven.sourcelookup.preferences.SourceLookupPreferencesInitializer"/>
-   </extension>
+    </extension>
     
+    <extension
+         point="org.eclipse.jdt.core.classpathContainerInitializer">
+     <classpathContainerInitializer
+            class="org.jboss.tools.maven.sourcelookup.internal.search.JBossServerSearchInitializer"
+            id="org.jboss.tools.maven.sourcelookup.JBossServerJavaSearchInitializer"/>
+   </extension>
 </plugin>
