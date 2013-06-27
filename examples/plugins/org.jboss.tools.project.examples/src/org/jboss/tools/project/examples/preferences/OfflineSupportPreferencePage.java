@@ -270,7 +270,7 @@ public class OfflineSupportPreferencePage extends PreferencePage implements
 	    instructions.setText("The script will create an offline/ directory under the current directory.\n"
 	    		+ "It will attempt to download and build all project examples, populating a clean local maven repository.\n\n"
 	    		+ "- Make sure you copy the contents of offline/.jbosstools/cache to the final offline directory\n"
-	    		+ "- Copy the contents offline/.m2e/repository to your local maven repository location.");
+	    		+ "- Copy the contents offline/.m2/repository to your local maven repository location.");
 	}
 	
 	private Collection<String> getDescriptors(Collection<IProjectExampleSite> pluginSites) {
