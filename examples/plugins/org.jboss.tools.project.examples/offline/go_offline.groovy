@@ -92,17 +92,17 @@ class GoOfflineScript {
     workDir.mkdirs() 
 
     def allArchetypeProjects= []
-
+    /*
     descriptors.each { descriptorUrl -> 
       def archetypeProjects = downloadExamples(descriptorUrl, downloadDir, workDir)
       if (archetypeProjects) allArchetypeProjects.addAll archetypeProjects
     }
-
+    */
     def mavenRepoDir = new File(offlineDir, ".m2/repository")
 
-    buildExamplesDir(workDir, mavenRepoDir)
+    //buildExamplesDir(workDir, mavenRepoDir)
 
-    buildArchetypesFromExamples(allArchetypeProjects, workDir, mavenRepoDir)
+    //buildArchetypesFromExamples(allArchetypeProjects, workDir, mavenRepoDir)
 
     buildArchetypesFromStacks(workDir, mavenRepoDir)
 
@@ -218,6 +218,9 @@ class GoOfflineScript {
   def buildArchetypesFromStacks(workDir, localRepo) {
     Stacks stacks = new StacksClient().getStacks();
     stacks.getAvailableArchetypes().each { a ->
+
+      if (!a.artifactId.contains("html5")) return
+
       File folder = new File(workDir, a.artifactId)
       if (folder.exists()) {
         folder.deleteDir()
@@ -325,7 +328,7 @@ class GoOfflineScript {
                 arg(value:"-DartifactId=${appName}") 
                 arg(value:"-DinteractiveMode=false")
                 arg(value:"-Dversion=1.0.0-SNAPSHOT") 
-                if (appName.endsWith("-ent")) arg(value:"-Denterprise=true")
+                if (appName.endsWith("-enterprise")) arg(value:"-Denterprise=true")
                 if (localRepo) arg(value:"-Dmaven.repo.local=${localRepo.absolutePath}")
              }   
 
