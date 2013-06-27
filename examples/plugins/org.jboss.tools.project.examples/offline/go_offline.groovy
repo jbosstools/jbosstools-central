@@ -225,7 +225,7 @@ class GoOfflineScript {
       }
       folder.mkdirs()
 
-      def appName = "myapp"
+      def appName = "my-${a.artifactId}"
       execMavenArchetypeBuild (a.groupId, a.artifactId, a.recommendedVersion, folder, localRepo, appName)
       execMavenGoOffline(new File(folder, appName), localRepo) 
 
@@ -287,7 +287,12 @@ class GoOfflineScript {
                 arg(value:"-DskipTests=true")
                 if (profiles)  arg(value:"-P$profiles")
                 if (localRepo) arg(value:"-Dmaven.repo.local=${localRepo.absolutePath}")
-                arg(value:"-Dversion.jboss.as=7.1.1.Final")//For broken aerogear archetype
+                if(directory.toString().contains("jboss-html5-mobile-archetype")) {
+                   arg(value:"-Dversion.jboss.as=7.1.1.Final")//For broken aerogear archetype
+                }
+                if(directory.toString().contains("jboss-as-kitchensink-html5-mobile.zip")) {
+                   arg(value:"-Dversion.org.jboss.as=7.1.1.Final")//For broken html5 quickstart
+                }                
              }
 
 
