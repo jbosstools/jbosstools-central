@@ -81,16 +81,7 @@
             name="Refresh"
             id="org.jboss.tools.central.refreshJBossTutorials">
       </command>
-      <command
-      		defaultHandler="org.jboss.tools.central.actions.RefreshJBossBlogsHandler"
-            name="Refresh"
-            id="org.jboss.tools.central.refreshJBossBlogs">
-      </command>
-      <command
-      		defaultHandler="org.jboss.tools.central.actions.RefreshJBossNewsHandler"
-            name="Refresh"
-            id="org.jboss.tools.central.refreshJBossNews">
-      </command>
+      
       <command
       		defaultHandler="org.jboss.tools.central.actions.RefreshJBossBuzzHandler"
             name="Refresh"
@@ -170,14 +161,6 @@
       <image
             commandId="org.jboss.tools.central.openJBossBuzz"
             icon="icons/buzz.gif">
-      </image>
-      <image
-            commandId="org.jboss.tools.central.refreshJBossBlogs"
-            icon="icons/refresh.gif">
-      </image>
-      <image
-            commandId="org.jboss.tools.central.refreshJBossNews"
-            icon="icons/refresh.gif">
       </image>
       <image
             commandId="org.jboss.tools.central.refreshJBossBuzz"
