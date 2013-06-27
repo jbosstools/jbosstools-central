@@ -12,10 +12,14 @@ package org.jboss.tools.project.examples.fixes;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.StringTokenizer;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
@@ -43,11 +47,13 @@ import org.eclipse.wst.server.core.ServerCore;
 import org.jboss.ide.eclipse.as.core.server.IJBossServerConstants;
 import org.jboss.ide.eclipse.as.core.server.IJBossServerRuntime;
 import org.jboss.ide.eclipse.as.core.util.IJBossRuntimeResourceConstants;
+import org.jboss.tools.as.runtimes.integration.util.RuntimeMatcher;
 import org.jboss.tools.portlet.core.internal.PortletRuntimeComponentProvider;
 import org.jboss.tools.project.examples.Messages;
 import org.jboss.tools.project.examples.ProjectExamplesActivator;
 import org.jboss.tools.project.examples.model.ProjectExample;
 import org.jboss.tools.project.examples.model.ProjectFix;
+import org.jboss.tools.runtime.core.model.DownloadRuntime;
 
 /**
  * 
@@ -66,6 +72,56 @@ public class WTPRuntimeFix implements ProjectExamplesFix {
 	private static final String PORTLET = "portlet"; //$NON-NLS-1$
 	private static final String REQUIRED_COMPONENTS = "required-components"; //$NON-NLS-1$
 	private static final IPath ESB_SERVER_SUPPLIED_CONTAINER_PATH = new Path("org.jboss.esb.runtime.classpath/server.supplied"); //$NON-NLS-1$
+
+	private static final Pattern RUNTIMES_PATTERN = Pattern.compile("[A-Za-z0-9._-]*(\\{[-A-Za-z0-9._:,\\(\\[\\]\\)]+\\})?"); //$NON-NLS-1$
+
+	
+	static List<String> parseRuntimeKeys(String allRuntimeKeys) {
+		if (allRuntimeKeys == null || allRuntimeKeys.trim().isEmpty()) {
+			return Collections.emptyList();
+		}
+		List<String> runtimeKeys = new ArrayList<String>();
+		Matcher m = RUNTIMES_PATTERN.matcher(allRuntimeKeys);
+		while (m.find()) {
+			String group = m.group(0);
+			if (!group.isEmpty()) {
+				runtimeKeys.add(group);
+			}
+		}
+		return runtimeKeys;
+	}
+	
+	public static IRuntime[] getRuntimesFromPattern(String allRuntimeIds) {
+		List<String> runtimeIds = parseRuntimeKeys(allRuntimeIds);
+		if (runtimeIds.isEmpty()) {
+			return new IRuntime[0];
+		}
+		RuntimeMatcher runtimeMatcher = new RuntimeMatcher();
+		List<IRuntime> runtimes = new ArrayList<IRuntime>(runtimeIds.size());
+		for (String key : runtimeIds) {
+			for (IRuntime r : runtimeMatcher.findExistingRuntimes(key)){
+			   runtimes.add(r);
+			}
+		}
+		IRuntime[] aRuntimes = new IRuntime[runtimes.size()];
+		return runtimes.toArray(aRuntimes );
+	}
+
+	public static DownloadRuntime[] getDownloadRuntimesFromPattern(String allDownloadRuntimeIds, IProgressMonitor monitor) {
+		List<String> runtimeIds = parseRuntimeKeys(allDownloadRuntimeIds);
+		if (runtimeIds.isEmpty()) {
+			return new DownloadRuntime[0];
+		}
+		RuntimeMatcher runtimeMatcher = new RuntimeMatcher();
+		List<DownloadRuntime> runtimes = new ArrayList<DownloadRuntime>(runtimeIds.size());
+		for (String key : runtimeIds) {
+			for (DownloadRuntime dr : runtimeMatcher.findDownloadRuntimes(key, monitor)){
+			   runtimes.add(dr);
+			}
+		}
+		DownloadRuntime[] aRuntimes = new DownloadRuntime[runtimes.size()];
+		return runtimes.toArray(aRuntimes );
+	}
 
 	public boolean canFix(ProjectExample project, ProjectFix fix) {
 		if (!ProjectFix.WTP_RUNTIME.equals(fix.getType())) {
@@ -184,45 +240,27 @@ public class WTPRuntimeFix implements ProjectExamplesFix {
 			ProjectExamplesActivator.log(NLS.bind(Messages.WTPRuntimeFix_Invalid_WTP_runtime_fix, project.getName()));
 			return null;
 		}
-		StringTokenizer tokenizer = new StringTokenizer(allowedTypes, ","); //$NON-NLS-1$
-		while (tokenizer.hasMoreTokens()) {
-			String allowedType = tokenizer.nextToken().trim();
-			if (allowedType.length() <= 0) {
+
+		IRuntime[] runtimes;
+		if (ProjectFix.ANY.equals(allowedTypes)) {
+			runtimes = ServerCore.getRuntimes();
+		} else {
+			runtimes = getRuntimesFromPattern(allowedTypes);			
+		}
+		
+		for (IRuntime runtime:runtimes) {
+			// https://issues.jboss.org/browse/JBIDE-10131
+			IServer server = getServer(runtime);
+			if (server == null) {
 				continue;
 			}
-			IRuntime[] runtimes = ServerCore.getRuntimes();
-			if (runtimes.length > 0
-					&& ProjectFix.ANY.equals(allowedType)) {
-				for (IRuntime runtime:runtimes) {
-					// https://issues.jboss.org/browse/JBIDE-10131
-					IServer server = getServer(runtime);
-					if (server == null) {
-						continue;
-					}
-					IRuntime componentPresent = isComponentPresent(fix, runtime);
-					if (componentPresent != null) {
-						return isComponentPresent(fix, runtime);
-					}
-				}
-				return null;
-			}
-			for (int i = 0; i < runtimes.length; i++) {
-				IRuntime runtime = runtimes[i];
-				// https://issues.jboss.org/browse/JBIDE-10131
-				IServer server = getServer(runtime);
-				if (server == null) {
-					continue;
-				}
-				IRuntimeType runtimeType = runtime.getRuntimeType();
-				if (runtimeType != null && runtimeType.getId().equals(allowedType)) {
-					IRuntime componentPresent = isComponentPresent(fix, runtime);
-					if (componentPresent != null) {
-						return componentPresent;
-					}
-				}
+			IRuntime componentPresent = isComponentPresent(fix, runtime);
+			if (componentPresent != null) {
+				return isComponentPresent(fix, runtime);
 			}
 		}
 		return null;
+
 	}
 
 	private IServer getServer(IRuntime runtime) {
@@ -376,24 +414,14 @@ public class WTPRuntimeFix implements ProjectExamplesFix {
 			if (runtimes.length > 0) {
 				for (ProjectFix fix : fixes) {
 					if (ProjectFix.WTP_RUNTIME.equals(fix.getType())) {
-						
 						String allowedTypes = fix.getProperties().get(ProjectFix.ALLOWED_TYPES);
 						if (allowedTypes == null) {
 							continue;
 						}
-						
-						StringTokenizer tokenizer = new StringTokenizer(allowedTypes, ","); //$NON-NLS-1$
-						while (tokenizer.hasMoreTokens()) {
-							String allowedType = tokenizer.nextToken().trim();
-							if (allowedType.length() <= 0) {
-								continue;
-							}
-							for (IRuntime runtime:runtimes) {
-								IRuntimeType runtimeType = runtime.getRuntimeType();
-								if (runtimeType != null && (ProjectFix.ANY.equals(allowedType) || runtimeType.getId().equals(allowedType))) {
-									targetedRuntimes.add(runtimeType);
-								}
-							}
+						if (ProjectFix.ANY.equals(allowedTypes)) {
+						  targetedRuntimes.addAll(toRuntimeTypes(runtimes));
+						} else {
+						  targetedRuntimes.addAll(toRuntimeTypes(getRuntimesFromPattern(allowedTypes)));
 						}
 					}
 				}
@@ -401,6 +429,19 @@ public class WTPRuntimeFix implements ProjectExamplesFix {
 		}
 		return targetedRuntimes;
 	}
-	
+
+	static Collection<IRuntimeType> toRuntimeTypes(IRuntime[] runtimes) {
+		if (runtimes == null || runtimes.length == 0) {
+			return Collections.emptyList();
+		}
+		List<IRuntimeType> runtimesTypes = new ArrayList<IRuntimeType>(runtimes.length);
+		for (IRuntime r : runtimes) {
+			IRuntimeType rt = r.getRuntimeType();
+			if (rt != null) {
+				runtimesTypes.add(rt);
+			}
+		}
+		return runtimesTypes;
+	}
 	
 }

@@ -13,6 +13,7 @@ package org.jboss.tools.project.examples.wizard;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -22,6 +23,7 @@ import java.util.Set;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.MessageDialog;
@@ -40,11 +42,9 @@ import org.eclipse.jface.wizard.IWizard;
 import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.jface.wizard.WizardPage;
-import org.eclipse.mylyn.internal.discovery.core.model.BundleDiscoveryStrategy;
 import org.eclipse.mylyn.internal.discovery.core.model.ConnectorDescriptor;
 import org.eclipse.mylyn.internal.discovery.core.model.ConnectorDiscovery;
 import org.eclipse.mylyn.internal.discovery.core.model.DiscoveryConnector;
-import org.eclipse.mylyn.internal.discovery.core.model.RemoteBundleDiscoveryStrategy;
 import org.eclipse.mylyn.internal.discovery.ui.DiscoveryUi;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -67,11 +67,8 @@ import org.eclipse.ui.browser.IWorkbenchBrowserSupport;
 import org.eclipse.ui.dialogs.PreferencesUtil;
 import org.jboss.tools.project.examples.Messages;
 import org.jboss.tools.project.examples.ProjectExamplesActivator;
-import org.jboss.tools.project.examples.internal.discovery.ChainedDiscoveryStrategy;
+import org.jboss.tools.project.examples.fixes.WTPRuntimeFix;
 import org.jboss.tools.project.examples.internal.discovery.DiscoveryUtil;
-import org.jboss.tools.project.examples.internal.discovery.ExpressionBasedBundleDiscoveryStrategy;
-import org.jboss.tools.project.examples.internal.discovery.ExpressionBasedRemoteBundleDiscoveryStrategy;
-import org.jboss.tools.project.examples.internal.discovery.ChainedDiscoveryStrategy.DiscoveryConnectorCollector;
 import org.jboss.tools.project.examples.model.ProjectExample;
 import org.jboss.tools.project.examples.model.ProjectFix;
 import org.jboss.tools.runtime.core.RuntimeCoreActivator;
@@ -413,6 +410,18 @@ public class NewProjectExamplesRequirementsPage extends WizardPage implements IP
 	}
 
 	protected List<DownloadRuntime> getDownloadRuntimes(ProjectFix fix) {
+		if (ProjectFix.WTP_RUNTIME.equals(fix.getType())) {
+			IProgressMonitor monitor = new NullProgressMonitor();
+			String allDownloadRuntimeIds = fix.getProperties().get(ProjectFix.ALLOWED_TYPES);
+			if (allDownloadRuntimeIds != null && !ProjectFix.ANY.equals(allDownloadRuntimeIds)) {
+				DownloadRuntime[] downloadableRuntimes = WTPRuntimeFix.getDownloadRuntimesFromPattern(allDownloadRuntimeIds, monitor);
+				if (downloadableRuntimes != null && downloadableRuntimes.length > 0) {
+					return Arrays.asList(downloadableRuntimes);
+				}
+			}
+		}
+		
+        //Fall back on legacy stuff		
 		final String downloadId = fix.getProperties().get(ProjectFix.DOWNLOAD_ID);
 		if (downloadId != null) {
 			DownloadRuntime dr = RuntimeCoreActivator.getDefault().getDownloadRuntimes().get(downloadId);

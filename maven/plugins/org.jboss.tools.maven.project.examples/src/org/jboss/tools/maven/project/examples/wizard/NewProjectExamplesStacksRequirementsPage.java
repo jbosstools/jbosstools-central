@@ -21,7 +21,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jface.dialogs.DialogSettings;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jst.j2ee.web.project.facet.WebFacetUtils;
@@ -49,6 +51,7 @@ import org.jboss.ide.eclipse.as.core.util.RuntimeUtils;
 import org.jboss.jdf.stacks.model.ArchetypeVersion;
 import org.jboss.jdf.stacks.model.Runtime;
 import org.jboss.jdf.stacks.model.Stacks;
+import org.jboss.tools.as.runtimes.integration.util.RuntimeMatcher;
 import org.jboss.tools.maven.core.MavenCoreActivator;
 import org.jboss.tools.maven.core.settings.MavenSettingsChangeListener;
 import org.jboss.tools.maven.project.examples.MavenProjectExamplesActivator;
@@ -58,6 +61,7 @@ import org.jboss.tools.project.examples.model.ArchetypeModel;
 import org.jboss.tools.project.examples.model.ProjectExample;
 import org.jboss.tools.project.examples.model.ProjectFix;
 import org.jboss.tools.project.examples.wizard.NewProjectExamplesRequirementsPage;
+import org.jboss.tools.runtime.core.RuntimeCoreActivator;
 import org.jboss.tools.runtime.core.model.DownloadRuntime;
 import org.jboss.tools.stacks.core.model.StacksUtil;
 
@@ -369,13 +373,17 @@ public class NewProjectExamplesStacksRequirementsPage extends NewProjectExamples
 			if (stacksRuntimes != null && !stacksRuntimes.isEmpty()) {
 				List<DownloadRuntime> downloadableRuntimes = new ArrayList<DownloadRuntime>(stacksRuntimes.size());
 				for (Runtime r : stacksRuntimes) {
-					DownloadRuntime dr = new DownloadRuntime(r.getId(),
-							r.getName(), 
-							r.getVersion(), 
-							r.getDownloadUrl());
-					dr.setDisclaimer(!StacksUtil.isEnterprise(r));
-					dr.setHumanUrl(r.getUrl());
-					downloadableRuntimes.add(dr);
+					DownloadRuntime dr = RuntimeCoreActivator.getDefault().findDownloadRuntime(r.getId());
+					if (dr == null){
+						String downloadUrl = StacksUtil.isEnterprise(r)?null:r.getUrl();
+						dr = new DownloadRuntime(r.getId(),
+								r.getName(), 
+								r.getVersion(), 
+								downloadUrl);
+						dr.setDisclaimer(!StacksUtil.isEnterprise(r));
+						dr.setHumanUrl(r.getUrl());
+                    } 
+                    downloadableRuntimes.add(dr);
 				}
 				return downloadableRuntimes;
 			}

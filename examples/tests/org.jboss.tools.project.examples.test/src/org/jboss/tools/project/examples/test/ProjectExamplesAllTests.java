@@ -10,6 +10,7 @@
  ************************************************************************************/
 package org.jboss.tools.project.examples.test;
 
+import org.jboss.tools.project.examples.fixes.WTPRuntimeFixTest;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 
@@ -17,7 +18,8 @@ import org.junit.runners.Suite;
 @Suite.SuiteClasses({
 	SiteTest.class,
 	ProjectTest.class,
-	CheatSheetTest.class
+	CheatSheetTest.class,
+	WTPRuntimeFixTest.class,
 })
 
 @RunWith(Suite.class)
