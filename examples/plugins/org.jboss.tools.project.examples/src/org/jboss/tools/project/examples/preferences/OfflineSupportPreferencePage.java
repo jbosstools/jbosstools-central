@@ -11,13 +11,17 @@
 package org.jboss.tools.project.examples.preferences;
 
 import java.io.File;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.PreferencePage;
@@ -39,9 +43,17 @@ import org.eclipse.swt.widgets.DirectoryDialog;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Link;
+import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
+import org.eclipse.ui.PartInitException;
+import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.browser.IWebBrowser;
+import org.eclipse.ui.browser.IWorkbenchBrowserSupport;
+import org.eclipse.ui.internal.browser.WebBrowserPreference;
+import org.eclipse.ui.internal.browser.WorkbenchBrowserSupport;
 import org.jboss.tools.project.examples.Messages;
 import org.jboss.tools.project.examples.ProjectExamplesActivator;
 import org.jboss.tools.project.examples.internal.offline.ExtractScriptJob;
@@ -190,6 +202,7 @@ public class OfflineSupportPreferencePage extends PreferencePage implements
 		enableControls();
 	}
 
+	@SuppressWarnings("nls")
 	private void createGoOfflineGroup(Composite composite) {
 		Group goOfflineGroup = new Group(composite, SWT.NONE);
 		GridLayout layout2 = new GridLayout(2, false);
@@ -198,10 +211,30 @@ public class OfflineSupportPreferencePage extends PreferencePage implements
 		goOfflineGroup.setLayoutData(gd2);
 		goOfflineGroup.setText("Prepare offline data");	 //$NON-NLS-1$
 
-		Label reqs = new Label(goOfflineGroup, SWT.WRAP);
-		GridDataFactory.fillDefaults().span(2, 1).applyTo(reqs);
-		reqs.setText("The following command generates an offline cache usable by the project examples.\nGroovy 2.1.x must be set in your path"); //$NON-NLS-1$
-		//Add link to http://groovy.codehaus.org/Installing+Groovy
+		Label description = new Label(goOfflineGroup, SWT.WRAP);
+		GridDataFactory.fillDefaults().span(2, 1).applyTo(description);
+		description.setText("The following command generates an offline cache usable by the project examples.\n Pre-requisites :\n");
+		
+		Link groovylink = new Link(goOfflineGroup, SWT.WRAP);
+		GridDataFactory.fillDefaults().span(2, 1).applyTo(groovylink);
+		groovylink.setText(" - <a>Groovy 2.1.x</a> must be set in your path");
+		groovylink.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				openUrl("http://groovy.codehaus.org/Installing+Groovy");
+			}
+		});
+		
+		Link reposlink = new Link(goOfflineGroup, SWT.WRAP);
+		GridDataFactory.fillDefaults().span(2, 1).applyTo(reposlink);
+		reposlink.setText(" - the JBoss Public and Red Hat Maven repositories must be <a>configured in your settings.xml</a>"); //$NON-NLS-1$
+		reposlink.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				openUrl("http://community.jboss.org/wiki/SettingUpTheJBossEnterpriseRepositories");
+			}
+		});
+				
 		final StyledText text = new StyledText(goOfflineGroup, SWT.WRAP | SWT.V_SCROLL);
 		GridDataFactory.fillDefaults().grab(true, false).hint(90, 250).applyTo(text);
 		text.setEditable(false);
@@ -213,7 +246,8 @@ public class OfflineSupportPreferencePage extends PreferencePage implements
 		                        .append("\" ") //$NON-NLS-1$
 		                        .append(StringUtils.join(categories, " ")) //$NON-NLS-1$
 		                        .append(" ") //$NON-NLS-1$
-		                        .append(StringUtils.join(descriptors, " ")); //$NON-NLS-1$
+		                        .append(StringUtils.join(descriptors, " "))//$NON-NLS-1$
+		                        .append(" -q -e"); //$NON-NLS-1$
 		 
 		text.setText(command.toString());
 		
@@ -294,4 +328,57 @@ public class OfflineSupportPreferencePage extends PreferencePage implements
 		}
 		return null;
 	}
+	
+	//FIXME duplicated code from JBossCentralActivator. Surely there must be some built-in stuff doing that alread somewhere.
+
+	public static void openUrl(String location) {
+		URL url = null;
+		boolean asExternal = true;
+		Shell shell = PlatformUI.getWorkbench().getDisplay().getActiveShell();
+		try {
+			if (location != null) {
+				url = new URL(location);
+			}
+
+			if (WebBrowserPreference.getBrowserChoice() == WebBrowserPreference.EXTERNAL
+					|| asExternal) {
+				IWorkbenchBrowserSupport support = PlatformUI.getWorkbench()
+						.getBrowserSupport();
+				support.getExternalBrowser().openURL(url);
+			} else {
+				IWebBrowser browser = null;
+				int flags;
+				if (WorkbenchBrowserSupport.getInstance()
+						.isInternalWebBrowserAvailable()) {
+					flags = IWorkbenchBrowserSupport.AS_EDITOR
+							| IWorkbenchBrowserSupport.LOCATION_BAR
+							| IWorkbenchBrowserSupport.NAVIGATION_BAR;
+				} else {
+					flags = IWorkbenchBrowserSupport.AS_EXTERNAL
+							| IWorkbenchBrowserSupport.LOCATION_BAR
+							| IWorkbenchBrowserSupport.NAVIGATION_BAR;
+				}
+
+				String generatedId = ProjectExamplesActivator.PLUGIN_ID
+						+ System.currentTimeMillis();
+				browser = WorkbenchBrowserSupport.getInstance().createBrowser(
+						flags, generatedId, null, null);
+				browser.openURL(url);
+			}
+		} catch (PartInitException e) {
+			Status status = new Status(IStatus.ERROR,
+					ProjectExamplesActivator.PLUGIN_ID,
+					"Browser initialization failed");
+			ProjectExamplesActivator.getDefault().getLog().log(status);
+			MessageDialog
+					.openError(shell, "Open Location", status.getMessage());
+		} catch (MalformedURLException e) {
+			Status status = new Status(IStatus.ERROR,
+					ProjectExamplesActivator.PLUGIN_ID, "Invalid URL");
+			ProjectExamplesActivator.getDefault().getLog().log(status);
+			MessageDialog
+					.openError(shell, "Open Location", status.getMessage());
+		}
+	}
+
 }
