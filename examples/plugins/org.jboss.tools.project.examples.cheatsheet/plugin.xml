@@ -17,51 +17,42 @@
          </description>
       </cheatsheet>
    </extension>
-
-   <extension
-         point="org.eclipse.core.runtime.adapters">
-      <factory
-            adaptableType="org.eclipse.ui.internal.cheatsheets.views.CheatSheetView"
-            class="org.jboss.tools.project.examples.cheatsheet.internal.adapter.CheatSheetViewAdapterFactory">
-         <adapter
-               type="org.eclipse.ui.part.IShowInTarget">
-         </adapter>
-      </factory>
-   </extension>
-   <extension
-         point="org.eclipse.ui.perspectiveExtensions">
-      <perspectiveExtension
-            targetID="org.eclipse.jdt.ui.JavaPerspective">
-         <showInPart
-               id="org.eclipse.ui.cheatsheets.views.CheatSheetView">
-         </showInPart>
-      </perspectiveExtension>
-      <perspectiveExtension
-            targetID="org.eclipse.pde.ui.PDEPerspective">
-         <showInPart
-               id="org.eclipse.ui.cheatsheets.views.CheatSheetView">
-         </showInPart>
-      </perspectiveExtension>
-      <perspectiveExtension
-            targetID="org.jboss.tools.common.ui.JBossPerspective">
-         <showInPart
-               id="org.eclipse.ui.cheatsheets.views.CheatSheetView">
-         </showInPart>
-      </perspectiveExtension>
-      <perspectiveExtension
-            targetID="org.eclipse.jst.j2ee.J2EEPerspective">
-         <showInPart
-               id="org.eclipse.ui.cheatsheets.views.CheatSheetView">
-         </showInPart>
-      </perspectiveExtension>
+ 
+   <extension point="org.eclipse.core.expressions.propertyTesters">
+      <propertyTester
+            class="org.jboss.tools.project.examples.cheatsheet.internal.commands.CheatSheetPropertyTester"
+            id="org.jboss.tools.project.examples.cheatsheet.internal.commands.cheatSheetPropertyTester"
+            namespace="org.jboss.tools.project.examples.cheatsheet"
+            properties="isCheatSheet"
+            type="java.lang.Object">
+      </propertyTester>
    </extension>
    
    <extension
-         point="org.eclipse.ui.startup">
-      <startup class="org.jboss.tools.project.examples.cheatsheet.Startup">
-      </startup>
-   </extension> 
-    
+         point="org.eclipse.ui.menus">
+      <menuContribution locationURI="popup:org.eclipse.ui.popup.any?after=group.open">
+         <command
+               commandId="org.jboss.tools.project.examples.cheatsheet.OpenInCheatSheetsView"
+               style="push">
+           <visibleWhen>
+					<with
+						variable="selection">
+						<iterate ifEmpty="false">
+						  <and>
+							<adapt type="org.eclipse.core.resources.IResource">
+								<test
+								  property="org.jboss.tools.project.examples.cheatsheet.isCheatSheet" 
+								  value="true" forcePluginActivation="true"/>
+							</adapt>
+						  </and>
+						</iterate>
+						<count value="1"/>
+					</with>
+			</visibleWhen>
+         </command>
+      </menuContribution>
+   </extension>
+   
    <extension
          point="org.eclipse.ui.commands">
       <command
@@ -88,6 +79,11 @@
            name="Editor ID"
            optional="true">
         </commandParameter>  
+      </command>
+      <command
+      		defaultHandler="org.jboss.tools.project.examples.cheatsheet.actions.OpenInCheatSheetsView"
+            name="Open In Cheat Sheets view"
+            id="org.jboss.tools.project.examples.cheatsheet.OpenInCheatSheetsView">
       </command>
       <!--
       <command
