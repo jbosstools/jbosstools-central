@@ -75,8 +75,8 @@ public class WTPRuntimeFix implements ProjectExamplesFix {
 
 	private static final Pattern RUNTIMES_PATTERN = Pattern.compile("[A-Za-z0-9._-]*(\\{[-A-Za-z0-9._:,\\(\\[\\]\\)]+\\})?"); //$NON-NLS-1$
 
-	
-	static List<String> parseRuntimeKeys(String allRuntimeKeys) {
+	/** Not an API. Public for testing purposes only. */
+	public static List<String> parseRuntimeKeys(String allRuntimeKeys) {
 		if (allRuntimeKeys == null || allRuntimeKeys.trim().isEmpty()) {
 			return Collections.emptyList();
 		}
