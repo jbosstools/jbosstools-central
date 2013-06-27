@@ -139,6 +139,9 @@ public class Activator extends AbstractUIPlugin {
 		if (candidate) {
 			try {
 				IContentDescription contentDescription = file.getContentDescription();
+				if (contentDescription == null) {
+					return false;
+				}
 				IContentType contentType = contentDescription.getContentType();
 				return (contentType != null && "org.eclipse.pde.simpleCheatSheet".equals(contentType.getId())); //$NON-NLS-1$
 			} catch (CoreException e) {
