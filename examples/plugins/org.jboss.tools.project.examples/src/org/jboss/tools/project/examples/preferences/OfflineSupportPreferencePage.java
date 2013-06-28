@@ -127,6 +127,9 @@ public class OfflineSupportPreferencePage extends PreferencePage implements
 				setMessage("The offline directory is empty, make sure you run the offline script", WARNING); //$NON-NLS-1$
 			} else if (offlineDir.listFiles().length == 0) {
 				setMessage("The offline directory does not exist, make sure you run the offline script", WARNING); //$NON-NLS-1$
+			} else {
+				setMessage(null);
+				setErrorMessage(null);				
 			}
 		} else {
 			setMessage(null);
