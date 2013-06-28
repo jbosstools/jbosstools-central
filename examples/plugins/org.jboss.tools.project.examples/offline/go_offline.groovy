@@ -49,6 +49,8 @@ class GoOfflineScript {
   @Parameter(names = ["-h", "--help"], description = "This help", help = true)
   boolean help;
 
+  boolean forceMavenResourcePluginResolution = true //on some OS/maven combos, m-r-p:2.5 is not resolved. It should.
+
   def buildErrors = [:]
 
   public static main(args) {
@@ -117,6 +119,15 @@ class GoOfflineScript {
       FileUtils.copyDirectory(mavenRepoDir, localMavenRepoDir)
     } 
     */   
+
+    println 'Cleaning up installed artifacts created from archetypes'
+    if (mavenRepoDir) {
+      def installedArtifactfolder = new File(mavenRepoDir, "org/jbosstoolsofflineexamples")
+      if (installedArtifactfolder.exists() && installedArtifactfolder.isDirectory()) {
+        installedArtifactfolder.deleteDir()
+      }
+    }
+
     long elapsed = System.currentTimeMillis() -start
 
     def duration = String.format("%d min, %d sec", 
@@ -166,7 +177,7 @@ class GoOfflineScript {
         if (!sUrl) {
              return archetypeProjects
         }
-        
+
         URL url = new URL(sUrl) 
         def zip = new File(downloadArea, url.getFile())
         //println "Starting download of $url" 
@@ -238,10 +249,24 @@ class GoOfflineScript {
     }
   }
 
-  def execMavenGoOffline (def directory, def localRepo) {
+  def execMavenGoOffline (def rootDirectory, def localRepo) {
+    def directory = rootDirectory
     def pom = new File(directory, "pom.xml")
+
     if (!pom.exists()) {
-       if (!quiet) println "$pom can't be found. Skipping maven build"
+       //GateIn examples have their pom.xml one folder down
+      rootDirectory.traverse(maxDepth:1) {
+        if (it.isDirectory()) {
+          pom = new File(it, "pom.xml")
+          if (pom.exists()) {
+            directory = it
+            return groovy.io.FileVisitResult.TERMINATE
+          } 
+        }
+      }
+    }
+    if (!pom.exists()) {
+       println "${directory}/pom.xml can't be found. Skipping maven build"
        return
     }
 
@@ -273,7 +298,15 @@ class GoOfflineScript {
     //remove [exec] prefixes
     def logger = ant.project.buildListeners.find { it instanceof org.apache.tools.ant.DefaultLogger }
     logger.emacsMode = true
-        
+    
+    def ultimateGoal = "install"
+
+    if (pomModel.groupId.text() == "org.jboss.resteasy.examples" && pomModel.artifactId.text() == "simple") {
+      //this example has non-skippable ITs, and they fail because jetty is not properly configured!!!
+      //So we don't go the whole 9 yards
+      ultimateGoal = "package"
+    }
+
     ant.exec(errorproperty: "cmdErr",
              resultproperty:"cmdExit",
              failonerror: "false",
@@ -283,7 +316,8 @@ class GoOfflineScript {
                 if (quiet) arg(value:"-q") 
                 arg(value:"clean") 
                 if ("pom" != pomModel.packaging.text()) arg(value:"dependency:go-offline")
-                arg(value:"verify") 
+                if (forceMavenResourcePluginResolution) arg(value:"org.apache.maven.plugins:maven-resources-plugin:2.5:resources") 
+                arg(value:ultimateGoal) 
                 arg(value:"-DskipTests=true")
                 if (profiles)  arg(value:"-P$profiles")
                 if (localRepo) arg(value:"-Dmaven.repo.local=${localRepo.absolutePath}")
@@ -295,9 +329,18 @@ class GoOfflineScript {
                 }                
              }
 
+      if (localRepo) {
+        def installedArtifactfolder = new File(localRepo, pomModel.groupId.text().replace('.',File.separator)+File.separator+pomModel.artifactId.text()+File.separator+pomModel.version.text())
+        if (installedArtifactfolder.exists() && installedArtifactfolder.isDirectory()) {
+          installedArtifactfolder.deleteDir()
+        }
+      }
+
 
       if(ant.project.properties.cmdExit != "0"){
         buildErrors["Project $directory failed to build"] = ant.project.properties.cmdErr
+      } else {
+        forceMavenResourcePluginResolution = false
       }
       ant.project.properties.cmdExit
   }
@@ -327,7 +370,7 @@ class GoOfflineScript {
                 arg(value:"-DarchetypeGroupId=${groupId}") 
                 arg(value:"-DarchetypeArtifactId=${artifactId}") 
                 arg(value:"-DarchetypeVersion=${version}") 
-                arg(value:"-DgroupId=foo.bar") 
+                arg(value:"-DgroupId=org.jbosstoolsofflineexamples") 
                 arg(value:"-DartifactId=${appName}") 
                 arg(value:"-DinteractiveMode=false")
                 arg(value:"-Dversion=1.0.0-SNAPSHOT") 
