@@ -30,6 +30,7 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.ui.PlatformUI;
 import org.jboss.tools.central.internal.ImageUtil;
 import org.jboss.tools.central.internal.discovery.wizards.ProxyWizardManager.ProxyWizardManagerListener;
 import org.jboss.tools.central.internal.discovery.wizards.ProxyWizardManager.UpdateEvent;
@@ -39,7 +40,7 @@ import org.junit.Test;
 
 public class ProxyWizardManagerTest extends AbstractProxyWizardDiscoveryTest implements ProxyWizardManagerListener {
 
-	private static final long MAX_WAIT_TIME = 10*1000;
+	private static final long MAX_WAIT_TIME = 60*1000;
 	private ProxyWizardManager pwm;
 	private NullProgressMonitor monitor;
 	private List<ProxyWizard> remoteWizards;
@@ -124,14 +125,28 @@ public class ProxyWizardManagerTest extends AbstractProxyWizardDiscoveryTest imp
           boolean timeout = (System.currentTimeMillis() - start ) > limit;
           assertFalse("Timeout while waiting for completion of job: " + job, timeout);
           job.wakeUp();
-          try {
-            Thread.sleep(100);
-          } catch(InterruptedException e) {
-            // ignore and keep waiting
-          }
+          delay(100);
         } 
       }
 
+	public static void delay(long waitTimeMillis) {
+		Display display = Display.getCurrent();
+		if(PlatformUI.isWorkbenchRunning() && display!= null) {
+			long endTimeMillis = System.currentTimeMillis() + waitTimeMillis;
+			while (System.currentTimeMillis() < endTimeMillis) {
+				if (!display.readAndDispatch())
+					display.sleep();
+			}
+			display.update();
+		} else { // Otherwise, perform a simple sleep.
+			try {
+				Thread.sleep(waitTimeMillis);
+			} catch (InterruptedException e) {
+				// Ignored.
+			}
+		}
+	}
+	
 	private Job getProxyWizardUpdateJob() {
       Job[] jobs = Job.getJobManager().find(null);
       for(int i = 0; i < jobs.length; i++ ) {

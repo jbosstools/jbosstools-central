@@ -217,7 +217,16 @@ public class CheatSheetTest {
 		CheatSheetView view = null;
 		try {
 			if (!file.exists()) {
-				createCheatSheet(file);
+				IPreferenceStore store = ProjectExamplesActivator.getDefault().getPreferenceStore();
+				String oldValue = ProjectExamplesActivator.getDefault().getShowCheatsheets();
+				try {
+					store.putValue(ProjectExamplesActivator.SHOW_CHEATSHEETS,
+							ProjectExamplesActivator.SHOW_CHEATSHEETS_NEVER);
+					createCheatSheet(file);
+				} finally {
+					store.putValue(ProjectExamplesActivator.SHOW_CHEATSHEETS,
+							oldValue);
+				}
 				delete = true;
 			}
 			view = openCheatSheet(file);
