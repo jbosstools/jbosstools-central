@@ -1,5 +1,8 @@
 package org.jboss.tools.maven.project.examples;
 
+import static org.jboss.tools.maven.project.examples.Messages.MavenProjectExamplesActivator_Downloading_Examples_Wizards_Metadata;
+import static org.jboss.tools.maven.project.examples.Messages.MavenProjectExamplesActivator_Error_Retrieving_Stacks_MetaData;
+
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
@@ -29,6 +32,7 @@ import org.jboss.tools.maven.project.examples.offline.MavenOfflinePropertyChange
 import org.jboss.tools.maven.project.examples.xpl.UpdateMavenProjectJob;
 import org.jboss.tools.project.examples.ProjectExamplesActivator;
 import org.jboss.tools.stacks.core.model.StacksManager;
+import org.jboss.tools.stacks.core.model.StacksManager.StacksType;
 import org.osgi.framework.BundleContext;
 
 /**
@@ -68,24 +72,29 @@ public class MavenProjectExamplesActivator extends AbstractUIPlugin {
 		        progressDialog.run(true, true, new IRunnableWithProgress() {  
 
 		        @Override  
-		        public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {  
-		            monitor.beginTask("Getting stacks data", 100);  
+		        public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
+		            monitor.beginTask(MavenProjectExamplesActivator_Downloading_Examples_Wizards_Metadata, 100);  
 		            try {  
-		            	s[0] = new StacksManager().getStacks(monitor); 
+		            	Stacks[] result = new StacksManager().getStacks(MavenProjectExamplesActivator_Downloading_Examples_Wizards_Metadata, monitor, StacksType.STACKS_TYPE);
+		            	if(result != null && result.length > 0) {
+		            		s[0] = result[0]; 
+		            	}
 		            } catch (Exception e) {  
-		                e.printStackTrace();  
+		                log(e, MavenProjectExamplesActivator_Error_Retrieving_Stacks_MetaData);  
 		            }  
 		            monitor.done();   
 		        }  
 		     });
 		        
 	        } catch (InvocationTargetException ex) {
-	            ex.printStackTrace();
+	            log(ex, MavenProjectExamplesActivator_Error_Retrieving_Stacks_MetaData);  
 	        } catch (InterruptedException ex) {
-	            ex.printStackTrace();
+	            //Ignore
 	        }
-		    stacks = s[0];
-		    lastUpdate = System.currentTimeMillis();
+		    if (s[0] != null) {
+		    	stacks = s[0];
+		    	lastUpdate = System.currentTimeMillis();		    	
+		    }
 		} 
 		return stacks;
 	}
@@ -177,7 +186,7 @@ public class MavenProjectExamplesActivator extends AbstractUIPlugin {
 	}
 
 	public static ImageDescriptor getNewWizardImageDescriptor() {
-		return AbstractUIPlugin.imageDescriptorFromPlugin(PLUGIN_ID, "icons/new_wiz.png");
+		return AbstractUIPlugin.imageDescriptorFromPlugin(PLUGIN_ID, "icons/new_wiz.png"); //$NON-NLS-1$
 	}
 	
 	public static void updateMavenConfiguration(String projectName, List<String> includedProjects,final IProgressMonitor monitor) {
