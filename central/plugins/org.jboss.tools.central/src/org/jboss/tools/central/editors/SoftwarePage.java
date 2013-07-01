@@ -15,7 +15,7 @@ import java.util.Dictionary;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.jobs.IJobChangeEvent;
-import org.eclipse.core.runtime.jobs.IJobChangeListener;
+import org.eclipse.core.runtime.jobs.JobChangeAdapter;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.operation.IRunnableContext;
@@ -321,17 +321,7 @@ public class SoftwarePage extends AbstractJBossCentralPage implements IRunnableC
 		return discoveryViewer;
 	}
 
-	private class RefreshJobChangeListener implements IJobChangeListener {
-
-		@Override
-		public void aboutToRun(IJobChangeEvent event) {
-			
-		}
-
-		@Override
-		public void awake(IJobChangeEvent event) {
-			
-		}
+	private class RefreshJobChangeListener extends JobChangeAdapter {
 
 		@Override
 		public void done(IJobChangeEvent event) {
@@ -347,20 +337,10 @@ public class SoftwarePage extends AbstractJBossCentralPage implements IRunnableC
 		}
 
 		@Override
-		public void running(IJobChangeEvent event) {
-			
-		}
-
-		@Override
 		public void scheduled(IJobChangeEvent event) {
 			showLoading();
 		}
 
-		@Override
-		public void sleeping(IJobChangeEvent event) {
-			
-		}
-		
 	}
 	
 	private class InstallAction extends Action {

@@ -33,8 +33,8 @@ import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.IJobChangeEvent;
-import org.eclipse.core.runtime.jobs.IJobChangeListener;
 import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.core.runtime.jobs.JobChangeAdapter;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IContributionItem;
 import org.eclipse.jface.action.ToolBarManager;
@@ -1132,17 +1132,7 @@ public class GettingStartedPage extends AbstractJBossCentralPage implements Prox
 		form.reflow(true);
 	}
 
-	private class RefreshBuzzJobChangeListener implements IJobChangeListener {
-
-		@Override
-		public void aboutToRun(IJobChangeEvent event) {
-			
-		}
-
-		@Override
-		public void awake(IJobChangeEvent event) {
-			
-		}
+	private class RefreshBuzzJobChangeListener extends JobChangeAdapter {
 
 		@Override
 		public void done(IJobChangeEvent event) {
@@ -1170,35 +1160,15 @@ public class GettingStartedPage extends AbstractJBossCentralPage implements Prox
 		}
 
 		@Override
-		public void running(IJobChangeEvent event) {
-			
-		}
-
-		@Override
 		public void scheduled(IJobChangeEvent event) {
 			if (RefreshBuzzJob.INSTANCE.getEntries().size() <= 0) {
 				showLoading(buzzPageBook, buzzLoadingComposite, buzzScrollComposite);
 			}
 		}
-
-		@Override
-		public void sleeping(IJobChangeEvent event) {
-			
-		}
 		
 	}
 	
-	private class RefreshTutorialsJobChangeListener implements IJobChangeListener {
-
-		@Override
-		public void aboutToRun(IJobChangeEvent event) {
-			
-		}
-
-		@Override
-		public void awake(IJobChangeEvent event) {
-			
-		}
+	private class RefreshTutorialsJobChangeListener extends JobChangeAdapter {
 
 		@Override
 		public void done(IJobChangeEvent event) {
@@ -1218,19 +1188,9 @@ public class GettingStartedPage extends AbstractJBossCentralPage implements Prox
 		}
 
 		@Override
-		public void running(IJobChangeEvent event) {
-			
-		}
-
-		@Override
 		public void scheduled(IJobChangeEvent event) {
 			RefreshTutorialsJob.INSTANCE.setException(null);
 			showLoading(tutorialPageBook, tutorialsLoadingComposite, tutorialScrollComposite);
-		}
-
-		@Override
-		public void sleeping(IJobChangeEvent event) {
-			
 		}
 		
 	}

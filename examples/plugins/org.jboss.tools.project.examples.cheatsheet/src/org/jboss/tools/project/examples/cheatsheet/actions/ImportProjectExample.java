@@ -21,14 +21,13 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.IJobChangeEvent;
-import org.eclipse.core.runtime.jobs.IJobChangeListener;
+import org.eclipse.core.runtime.jobs.JobChangeAdapter;
 import org.eclipse.jface.action.Action;
 import org.eclipse.ui.cheatsheets.ICheatSheetAction;
 import org.eclipse.ui.cheatsheets.ICheatSheetManager;
 import org.jboss.tools.project.examples.Messages;
 import org.jboss.tools.project.examples.ProjectExamplesActivator;
 import org.jboss.tools.project.examples.cheatsheet.Activator;
-import org.jboss.tools.project.examples.cheatsheet.internal.util.CheatSheetUtil;
 import org.jboss.tools.project.examples.model.IImportProjectExample;
 import org.jboss.tools.project.examples.model.ProjectExample;
 
@@ -95,15 +94,7 @@ public class ImportProjectExample extends Action implements ICheatSheetAction {
 		};
 		workspaceJob.setUser(true);
 		
-		workspaceJob.addJobChangeListener(new IJobChangeListener() {
-
-			public void aboutToRun(IJobChangeEvent event) {
-
-			}
-
-			public void awake(IJobChangeEvent event) {
-
-			}
+		workspaceJob.addJobChangeListener(new JobChangeAdapter() {
 
 			public void done(IJobChangeEvent event) {
 				try {
@@ -119,19 +110,6 @@ public class ImportProjectExample extends Action implements ICheatSheetAction {
 				ProjectExamplesActivator.showReadyWizard(projects);
 				
 			}
-
-			public void running(IJobChangeEvent event) {
-
-			}
-
-			public void scheduled(IJobChangeEvent event) {
-
-			}
-
-			public void sleeping(IJobChangeEvent event) {
-
-			}
-
 		});
 		workspaceJob.schedule();
 	}

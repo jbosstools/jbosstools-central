@@ -67,7 +67,7 @@ import org.eclipse.ui.internal.forms.widgets.FormHeading;
 import org.eclipse.ui.internal.forms.widgets.TitleRegion;
 import org.eclipse.ui.menus.CommandContributionItem;
 import org.jboss.tools.central.JBossCentralActivator;
-import org.jboss.tools.central.actions.OpenJBossBlogsHandler;
+import org.jboss.tools.central.actions.OpenWithBrowserHandler;
 import org.jboss.tools.central.editors.xpl.TextSearchControl;
 import org.jboss.tools.project.examples.ProjectExamplesActivator;
 
@@ -341,7 +341,7 @@ public class JBossCentralEditor extends SharedHeaderFormEditor {
 							.getInitialMessage());
 				} else {
 					try {
-						StringBuffer url = new StringBuffer();
+						final StringBuffer url = new StringBuffer();
 						String initialMessage = searchControl
 								.getInitialMessage();
 						if (JBossCentralActivator.SEARCH_RED_HAT_CUSTOMER_PORTAL
@@ -357,12 +357,11 @@ public class JBossCentralEditor extends SharedHeaderFormEditor {
 							url.append(URLEncoder.encode(
 									searchControl.getText(), UTF_8_ENCODING));
 						}
-						final String location = url.toString();
-						AbstractHandler handler = new OpenJBossBlogsHandler() {
+						AbstractHandler handler = new OpenWithBrowserHandler() {
 
 							@Override
 							public String getLocation() {
-								return location;
+								return url.toString();
 							}
 
 						};

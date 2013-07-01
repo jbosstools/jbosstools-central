@@ -22,11 +22,9 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Dictionary;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -58,8 +56,8 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.content.IContentType;
 import org.eclipse.core.runtime.jobs.IJobChangeEvent;
-import org.eclipse.core.runtime.jobs.IJobChangeListener;
 import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.core.runtime.jobs.JobChangeAdapter;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.jface.dialogs.IDialogConstants;
@@ -123,9 +121,7 @@ import org.jboss.tools.project.examples.wizard.ContributedPage;
 import org.jboss.tools.project.examples.wizard.ImportDefaultProjectExample;
 import org.jboss.tools.project.examples.wizard.NewProjectExamplesJob;
 import org.jboss.tools.project.examples.wizard.ProjectReadyWizard;
-import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
-import org.osgi.framework.Version;
 
 /**
  * The activator class controls the plug-in life cycle
@@ -1046,15 +1042,7 @@ public class ProjectExamplesActivator extends AbstractUIPlugin {
 		final NewProjectExamplesJob workspaceJob = new NewProjectExamplesJob(
 				Messages.NewProjectExamplesWizard_Downloading, selectedProjects, workingSets, propertiesMap);
 		workspaceJob.setUser(true);
-		workspaceJob.addJobChangeListener(new IJobChangeListener() {
-
-			public void aboutToRun(IJobChangeEvent event) {
-
-			}
-
-			public void awake(IJobChangeEvent event) {
-
-			}
+		workspaceJob.addJobChangeListener(new JobChangeAdapter() {
 
 			public void done(IJobChangeEvent event) {
 				if (!workspaceJob.getResult().isOK()) {
@@ -1084,18 +1072,6 @@ public class ProjectExamplesActivator extends AbstractUIPlugin {
 							(String) showCheatSheet);
 				}
 				
-			}
-
-			public void running(IJobChangeEvent event) {
-
-			}
-
-			public void scheduled(IJobChangeEvent event) {
-
-			}
-
-			public void sleeping(IJobChangeEvent event) {
-
 			}
 
 		});
