@@ -14,7 +14,9 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.wst.common.emfworkbench.integration,
  org.eclipse.jpt.common.core;bundle-version="1.3.0",
  org.eclipse.jpt.jpa.core;bundle-version="3.3.0",
- org.hibernate.eclipse.console
+ org.hibernate.eclipse.console,
+ org.eclipse.debug.core;bundle-version="3.8.0",
+ org.jboss.tools.hibernate.jpt.core;bundle-version="3.7.0"
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-Localization: plugin
