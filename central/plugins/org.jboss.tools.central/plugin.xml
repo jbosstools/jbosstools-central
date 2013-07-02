@@ -57,19 +57,7 @@
             name="JBoss Tools Home"
             id="org.jboss.tools.central.openJBossToolsHome">
       </command>
-
-      <command
-      		defaultHandler="org.jboss.tools.central.actions.OpenJBossBlogsHandler"
-            name="Blogs"
-            id="org.jboss.tools.central.openJBossBlogs">
-      </command>
-
-      <command
-      		defaultHandler="org.jboss.tools.central.actions.OpenJBossNewsHandler"
-            name="News"
-            id="org.jboss.tools.central.openJBossNews">
-      </command>
-
+      
       <command
       		defaultHandler="org.jboss.tools.central.actions.OpenJBossBuzzHandler"
             name="JBoss Buzz"
@@ -149,14 +137,6 @@
       <image
             commandId="org.jboss.tools.central.openJBossToolsHome"
             icon="icons/jbosstools_icon16.png">
-      </image>
-      <image
-            commandId="org.jboss.tools.central.openJBossBlogs"
-            icon="icons/blogs.gif">
-      </image>
-      <image
-            commandId="org.jboss.tools.central.openJBossNews"
-            icon="icons/news.png">
       </image>
       <image
             commandId="org.jboss.tools.central.openJBossBuzz"
