@@ -1,5 +1,5 @@
 /*************************************************************************************
- * Copyright (c) 2008-2011 Red Hat, Inc. and others.
+ * Copyright (c) 2008-2013 Red Hat, Inc. and others.
  * All rights reserved. This program and the accompanying materials 
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -18,15 +18,26 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.ProjectScope;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.preferences.IScopeContext;
+import org.eclipse.debug.core.ILaunchConfiguration;
+import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.jpt.common.core.resource.xml.JptXmlResource;
+import org.eclipse.jpt.jpa.core.internal.resource.persistence.PersistenceXmlResourceProvider;
+import org.eclipse.jpt.jpa.core.resource.persistence.XmlPersistence;
+import org.eclipse.jpt.jpa.core.resource.persistence.XmlPersistenceUnit;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.project.MavenProjectChangedEvent;
 import org.eclipse.m2e.core.project.configurator.AbstractProjectConfigurator;
 import org.eclipse.m2e.core.project.configurator.ProjectConfigurationRequest;
 import org.hibernate.eclipse.console.properties.HibernatePropertiesConstants;
+import org.hibernate.eclipse.console.utils.LaunchHelper;
 import org.hibernate.eclipse.console.utils.ProjectUtils;
+import org.hibernate.eclipse.launch.IConsoleConfigurationLaunchConstants;
+import org.jboss.tools.maven.hibernate.MavenHibernateActivator;
 import org.jboss.tools.maven.ui.Activator;
 import org.osgi.service.prefs.Preferences;
 
@@ -61,14 +72,63 @@ public class HibernateProjectConfigurator extends AbstractProjectConfigurator {
 			Preferences node = scope.getNode(HibernatePropertiesConstants.HIBERNATE_CONSOLE_NODE);
 			if (node != null) {
 				boolean enabled = node.getBoolean(HibernatePropertiesConstants.HIBERNATE3_ENABLED, false);
-				if (enabled) {
-					return;
+				if (!enabled) {
+					ProjectUtils.toggleHibernateOnProject(project, true, ""); //$NON-NLS-1$
 				}
 			}
-			ProjectUtils.toggleHibernateOnProject(project, true, ""); //$NON-NLS-1$
+			String persistenceUnitName = getMainPersistenceUnit(project);
+			if (persistenceUnitName != null) {
+				configureHibernateLaunchConfigurations(project, persistenceUnitName);
+			}
+			
 		}
 	}
 
+
+	private void configureHibernateLaunchConfigurations(IProject project, String persistenceUnitName) throws CoreException {
+		if (!project.hasNature(HibernatePropertiesConstants.HIBERNATE_NATURE) || persistenceUnitName == null) {
+			return;
+		}
+		ILaunchConfiguration[] launchConfigs = LaunchHelper.findProjectRelatedHibernateLaunchConfigs(project.getName());
+		if (launchConfigs != null && launchConfigs.length > 0) {
+			for (ILaunchConfiguration lc : launchConfigs) {
+				ILaunchConfigurationWorkingCopy wc = lc.getWorkingCopy();
+				try {
+					String configurationFactory = wc.getAttribute(IConsoleConfigurationLaunchConstants.CONFIGURATION_FACTORY, "");
+					if ("JPA".equals(configurationFactory)) {
+						if (wc.getAttribute(IConsoleConfigurationLaunchConstants.PERSISTENCE_UNIT_NAME,"").isEmpty()) {
+							wc.setAttribute(IConsoleConfigurationLaunchConstants.PERSISTENCE_UNIT_NAME, persistenceUnitName);
+							wc.doSave();
+						}
+					}
+				} catch (CoreException e) {
+					IStatus status = new Status(IStatus.ERROR, MavenHibernateActivator.PLUGIN_ID, e.getLocalizedMessage(), e);
+					MavenHibernateActivator.getDefault().getLog().log(status );
+				}
+			}
+		}
+		
+	}
+
+	private String getMainPersistenceUnit(IProject project) {
+		PersistenceXmlResourceProvider defaultXmlResourceProvider = PersistenceXmlResourceProvider.getDefaultXmlResourceProvider(project);
+		if (defaultXmlResourceProvider == null) {
+			return null;
+		}
+		final JptXmlResource resource = defaultXmlResourceProvider.getXmlResource();
+		if (resource == null) {
+			return null;
+		}
+		XmlPersistence persistence = (XmlPersistence) resource.getRootObject();					
+		
+		if (persistence != null && persistence.getPersistenceUnits() != null && !persistence.getPersistenceUnits().isEmpty()) {
+			XmlPersistenceUnit persistenceUnit = persistence.getPersistenceUnits().get(0);
+			if (persistenceUnit != null) {
+				return persistenceUnit.getName();
+			}
+		}
+		return null;
+	}
 
 	@Override
 	public void mavenProjectChanged(MavenProjectChangedEvent event,
