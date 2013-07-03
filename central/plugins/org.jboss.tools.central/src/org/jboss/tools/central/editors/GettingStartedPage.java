@@ -839,10 +839,18 @@ public class GettingStartedPage extends AbstractJBossCentralPage implements Prox
 	
 	private void showException(PageBook pageBook, FormText exceptionText, Throwable e) {
 		JBossCentralActivator.log(e);
-		String message = StringEscapeUtils.escapeXml(e.getMessage());
+		
+		StringBuilder message = new StringBuilder("An error occurred");
+		if(e.getMessage()!=null) {
+			message.append(": " + StringEscapeUtils.escapeXml(e.getMessage()));
+		} else if (e.getClass().getCanonicalName()!=null) {
+			message.append(": " + e.getClass().getCanonicalName());
+		}
+		message.append(". Open the Error Log view for more details");
+		
 		String text = JBossCentralActivator.FORM_START_TAG +
 				"<img href=\"image\"/> " + 
-				message +
+				message.toString() +
 				JBossCentralActivator.FORM_END_TAG;
 		exceptionText.setText(text, true, false);
 		Image image = JFaceResources.getImage(Dialog.DLG_IMG_MESSAGE_WARNING);
