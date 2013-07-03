@@ -33,11 +33,7 @@ Require-Bundle: org.eclipse.ui,
  org.jboss.tools.maven.jdt,
  org.eclipse.ui.ide,
  org.eclipse.m2e.wtp;bundle-version="1.0.0",
- org.eclipse.m2e.wtp.jsf;bundle-version="1.0.0",
- org.hibernate.eclipse.console,
- org.eclipse.debug.core,
- org.eclipse.m2e.wtp.jpa;bundle-version="1.0.0",
- org.jboss.tools.hibernate.jpt.core;bundle-version="3.7.0"
+ org.eclipse.m2e.wtp.jsf;bundle-version="1.0.0"
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Eclipse-RegisterBuddy: org.apache.log4j
