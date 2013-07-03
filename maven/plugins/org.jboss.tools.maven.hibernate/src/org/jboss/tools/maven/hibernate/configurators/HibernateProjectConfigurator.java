@@ -75,12 +75,11 @@ public class HibernateProjectConfigurator extends AbstractProjectConfigurator {
 				if (!enabled) {
 					ProjectUtils.toggleHibernateOnProject(project, true, ""); //$NON-NLS-1$
 				}
+				String persistenceUnitName = getMainPersistenceUnit(project);
+				if (persistenceUnitName != null) {
+					configureHibernateLaunchConfigurations(project, persistenceUnitName);
+				}
 			}
-			String persistenceUnitName = getMainPersistenceUnit(project);
-			if (persistenceUnitName != null) {
-				configureHibernateLaunchConfigurations(project, persistenceUnitName);
-			}
-			
 		}
 	}
 
