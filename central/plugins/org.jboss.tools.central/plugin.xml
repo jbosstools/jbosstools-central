@@ -65,6 +65,12 @@
       </command>
 
       <command
+      		defaultHandler="org.jboss.tools.central.actions.OpenJBossNewsHandler"
+            name="News"
+            id="org.jboss.tools.central.openJBossNews">
+      </command>
+      
+      <command
       		defaultHandler="org.jboss.tools.central.actions.RefreshJBossTutorialsHandler"
             name="Refresh"
             id="org.jboss.tools.central.refreshJBossTutorials">
@@ -142,6 +148,10 @@
             commandId="org.jboss.tools.central.openJBossBuzz"
             icon="icons/buzz.gif">
       </image>
+      <image
+            commandId="org.jboss.tools.central.openJBossNews"
+            icon="icons/news.png">
+      </image>      
       <image
             commandId="org.jboss.tools.central.refreshJBossBuzz"
             icon="icons/refresh.gif">
