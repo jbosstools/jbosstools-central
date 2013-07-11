@@ -276,7 +276,7 @@ public class ProjectExamplesPreferencePage extends PreferencePage implements
 	
 	private void createShowCheatSheetControls(Composite parent) {
 		String name = ProjectExamplesActivator.SHOW_CHEATSHEETS;
-		String label = "Show included cheatsheet(s) when importing a new project";
+		String label = "Show included cheat sheet(s) when importing a new project";
         String[][] namesAndValues = {
                 { "Always show", ProjectExamplesActivator.SHOW_CHEATSHEETS_ALWAYS },
                 { "Never show", ProjectExamplesActivator.SHOW_CHEATSHEETS_NEVER },
