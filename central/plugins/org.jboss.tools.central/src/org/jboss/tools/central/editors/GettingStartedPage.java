@@ -340,9 +340,6 @@ public class GettingStartedPage extends AbstractJBossCentralPage implements Prox
 		CommandContributionItem item = JBossCentralActivator.createContributionItem(getSite(), "org.jboss.tools.central.openJBossBuzz");
 		buzzToolBarManager.add(item);
 
-		item = JBossCentralActivator.createContributionItem(getSite(), "org.jboss.tools.central.openJBossNews");
-		buzzToolBarManager.add(item);
-
 		item = JBossCentralActivator.createContributionItem(getSite(), "org.jboss.tools.central.openJBossToolsTwitter");
 		buzzToolBarManager.add(item);
 				
