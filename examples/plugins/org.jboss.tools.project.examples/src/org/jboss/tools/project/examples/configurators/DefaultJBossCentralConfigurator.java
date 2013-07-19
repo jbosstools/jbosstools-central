@@ -43,7 +43,7 @@ public class DefaultJBossCentralConfigurator implements
 	
 	// TODO: when moving to Luna, use /development/luna/ then later /stable/luna/
   // TODO: when closer to release, switch this to /stable/kepler/
-	private static final String JBOSS_DIRECTORY_URL_DEFAULT = "http://download.jboss.org/jbosstools/updates/development/kepler/jbosstools-directory.xml"; //$NON-NLS-1$
+	private static final String JBOSS_DIRECTORY_URL_DEFAULT = "http://download.jboss.org/jbosstools/updates/stable/kepler/jbosstools-directory.xml"; //$NON-NLS-1$
 
 	// see pom.xml for actual value -- this is passed it at build-time via Maven
 	private static final String JBOSS_DIRECTORY_URL;
