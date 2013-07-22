@@ -12,8 +12,9 @@
 
 	<properties>
 		<!-- TODO: when moving to Luna, use /development/luna/ then later /stable/luna/
-         TODO: when closer to release, switch this to /stable/kepler/ -->
-		<jboss.discovery.directory.url>http://download.jboss.org/jbosstools/updates/development/kepler/jbosstools-directory.xml</jboss.discovery.directory.url>
+         TODO: when closer to release, switch this to /stable/kepler/ 
+         SEE ALSO examples/plugins/org.jboss.tools.project.examples/src/org/jboss/tools/project/examples/configurators/DefaultJBossCentralConfigurator.java -->
+		<jboss.discovery.directory.url>http://download.jboss.org/jbosstools/updates/stable/kepler/jbosstools-directory.xml</jboss.discovery.directory.url>
 	</properties>
 
 	<profiles>
