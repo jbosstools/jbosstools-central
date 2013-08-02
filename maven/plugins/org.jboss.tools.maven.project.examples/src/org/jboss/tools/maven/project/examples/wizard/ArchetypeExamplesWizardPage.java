@@ -420,20 +420,7 @@ public class ArchetypeExamplesWizardPage extends
 		};
 
 		IPreferenceStore store = Activator.getDefault().getPreferenceStore();
-		boolean configureSeam = store.getBoolean(Activator.CONFIGURE_SEAM);
-		boolean configurePortlet = store.getBoolean(Activator.CONFIGURE_PORTLET);
-		boolean configureJSFPortlet = store.getBoolean(Activator.CONFIGURE_JSFPORTLET);
-		boolean configureSeamPortlet = store.getBoolean(Activator.CONFIGURE_SEAMPORTLET);
-		boolean configureCDI = store.getBoolean(Activator.CONFIGURE_CDI);
-		boolean configureHibernate = store.getBoolean(Activator.CONFIGURE_HIBERNATE);
-		
 		try {
-			store.setValue(Activator.CONFIGURE_SEAM, false);
-			store.setValue(Activator.CONFIGURE_PORTLET, false);
-			store.setValue(Activator.CONFIGURE_JSFPORTLET, false);
-			store.setValue(Activator.CONFIGURE_SEAMPORTLET, false);
-			store.setValue(Activator.CONFIGURE_CDI, false);
-			store.setValue(Activator.CONFIGURE_HIBERNATE, false);
 			getContainer().run(true, false, op);
 		} catch (InterruptedException e) {
 			ProjectExamplesActivator.log(e);
@@ -448,13 +435,6 @@ public class ArchetypeExamplesWizardPage extends
 			}
 			MessageDialog.openError(getShell(), "Error", message);
 			return true;
-		} finally {
-			store.setValue(Activator.CONFIGURE_SEAM, configureSeam);
-			store.setValue(Activator.CONFIGURE_PORTLET, configurePortlet);
-			store.setValue(Activator.CONFIGURE_JSFPORTLET, configureJSFPortlet);
-			store.setValue(Activator.CONFIGURE_SEAMPORTLET, configureSeamPortlet);
-			store.setValue(Activator.CONFIGURE_CDI, configureCDI);
-			store.setValue(Activator.CONFIGURE_HIBERNATE, configureHibernate);
 		}
 
 		return true;
