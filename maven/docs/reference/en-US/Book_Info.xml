@@ -13,8 +13,6 @@
    
   <edition>5.0.0</edition>
    
-  <pubsnumber>5</pubsnumber>
-   
   <abstract>
     <para>
       The Maven Tools Reference Guide explains how to utilize Maven from within the JBoss Developer Studio.
