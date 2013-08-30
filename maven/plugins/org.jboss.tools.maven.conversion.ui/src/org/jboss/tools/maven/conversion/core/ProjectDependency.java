@@ -36,5 +36,13 @@ public abstract class ProjectDependency {
 	 */
 	public abstract IPath getPath();
 	
+	@Override
+	public String toString() {
+		IPath p = getPath();
+		if (p != null) {
+			return p.lastSegment();
+		}
+		return super.toString();
+	}
 	
 }

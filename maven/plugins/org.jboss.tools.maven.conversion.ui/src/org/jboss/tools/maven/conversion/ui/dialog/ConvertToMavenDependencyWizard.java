@@ -1,5 +1,5 @@
 /*************************************************************************************
- * Copyright (c) 2012 Red Hat, Inc. and others.
+ * Copyright (c) 2012-2013 Red Hat, Inc. and others.
  * All rights reserved. This program and the accompanying materials 
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -34,9 +34,9 @@ public class ConvertToMavenDependencyWizard extends Wizard {
 	private List<ProjectDependency> entries;
 
 	private IdentifyMavenDependencyPage identificationPage;
-	
+
 	private List<Dependency> dependencies;
-	
+
 	public ConvertToMavenDependencyWizard(IProject project, List<ProjectDependency> projectDependencies) {
 		this.project = project;
 		this.entries = projectDependencies;
@@ -49,7 +49,6 @@ public class ConvertToMavenDependencyWizard extends Wizard {
 		setWindowTitle(title);
 	}
 
-
 	@Override
 	public void addPages() {
 		identificationPage = new IdentifyMavenDependencyPage(project, entries);
@@ -61,7 +60,6 @@ public class ConvertToMavenDependencyWizard extends Wizard {
 		identificationPage.cancel();
 		return super.performCancel();
 	}
-	
 	
 	@SuppressWarnings("restriction")
 	@Override
@@ -101,5 +99,12 @@ public class ConvertToMavenDependencyWizard extends Wizard {
 	public List<Dependency> getDependencies() {
 		return dependencies;
 	}
-	
+
+	@Override
+	public void dispose() {
+		dependencies = null;
+		entries = null;
+		project = null;
+		super.dispose();
+	}
 }

@@ -17,6 +17,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.maven.model.Dependency;
@@ -43,11 +44,16 @@ import org.eclipse.jface.viewers.CheckStateChangedEvent;
 import org.eclipse.jface.viewers.CheckboxTableViewer;
 import org.eclipse.jface.viewers.ColumnLabelProvider;
 import org.eclipse.jface.viewers.ICheckStateListener;
+import org.eclipse.jface.viewers.ICheckStateProvider;
 import org.eclipse.jface.viewers.TableViewerColumn;
+import org.eclipse.jface.viewers.Viewer;
+import org.eclipse.jface.viewers.ViewerFilter;
 import org.eclipse.jface.window.Window;
 import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.ModifyEvent;
+import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
@@ -63,7 +69,10 @@ import org.eclipse.swt.widgets.Link;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
+import org.eclipse.swt.widgets.Text;
+import org.eclipse.ui.dialogs.PatternFilter;
 import org.eclipse.ui.dialogs.PreferencesUtil;
+import org.eclipse.ui.internal.ide.StringMatcher;
 import org.jboss.tools.maven.conversion.core.ProjectDependency;
 import org.jboss.tools.maven.conversion.core.ProjectDependency.DependencyKind;
 import org.jboss.tools.maven.conversion.ui.dialog.xpl.ConversionUtils;
@@ -86,11 +95,13 @@ public class IdentifyMavenDependencyPage extends WizardPage {
 
 	private Map<ProjectDependency, Dependency> dependencyMap;
 
+	private Map<ProjectDependency, Boolean> dependencyCheckStateMap;
+	
 	private Map<ProjectDependency, IdentificationJob> identificationJobs;
 
 	private List<ProjectDependency> initialEntries;
 
-	private Map<String, Boolean> dependencyResolution = new ConcurrentHashMap<String, Boolean>();
+	private Map<String, Boolean> dependencyResolution;
 
 	private IProject project;
 	
@@ -117,6 +128,8 @@ public class IdentifyMavenDependencyPage extends WizardPage {
 
 	private IDialogSettings dialogSettings;
 
+	private Text filterText;
+
 	private static String MESSAGE = "Identify existing project references as Maven dependencies. Double-click on a Maven dependency to edit its details";
 
 
@@ -124,14 +137,17 @@ public class IdentifyMavenDependencyPage extends WizardPage {
 		super("");
 		this.project = project;
 		initialEntries = Collections.unmodifiableList(entries);
-		initDependencyMap();
+		dependencyResolution = new ConcurrentHashMap<String, Boolean>();
+		initDependencyMaps();
 		initDialogSettings();
 	}
 
-	private void initDependencyMap() {
+	private void initDependencyMaps() {
 		dependencyMap = new LinkedHashMap<ProjectDependency, Dependency>(initialEntries.size());
+		dependencyCheckStateMap = new LinkedHashMap<ProjectDependency, Boolean>(initialEntries.size());
 		for (ProjectDependency entry : initialEntries) {
-				dependencyMap.put(entry, null);
+			dependencyMap.put(entry, null);
+			dependencyCheckStateMap.put(entry, Boolean.TRUE);
 		}
 	}
 	
@@ -155,7 +171,6 @@ public class IdentifyMavenDependencyPage extends WizardPage {
 	}
 
 	public void dispose() {
-		
 		dialogSettings.put("isDeleteJars", isDeleteJars());
 		if (jarImage != null) jarImage.dispose();
 		if (okImage != null) okImage.dispose();
@@ -163,6 +178,9 @@ public class IdentifyMavenDependencyPage extends WizardPage {
 		if (failedImage != null) failedImage.dispose();
 		if (loadingImage != null) loadingImage.dispose();
 		if (unresolvedImage != null) unresolvedImage.dispose();
+		dependencyMap = null;
+		initialEntries = null;
+		dependencyResolution = null;
 	}
 	
 	
@@ -264,6 +282,12 @@ public class IdentifyMavenDependencyPage extends WizardPage {
     
 	private void displayDependenciesTable(Composite container) {
 		
+		//Let users filter installed softwares
+		filterText = new Text(container, SWT.BORDER | SWT.SEARCH | SWT.ICON_CANCEL);
+		filterText.setLayoutData(GridDataFactory.fillDefaults().span(3, 1).create());
+		filterText.setMessage("Filter dependencies");
+		filterText.setFocus();//Steal focus, consistent with org.eclipse.ui.internal.about.AboutPluginsPage
+		
 		GridData gd = new GridData(SWT.FILL, SWT.FILL, true, true, 2, 4);
 		gd.heightHint = 500;
 		gd.widthHint = 545;
@@ -287,7 +311,7 @@ public class IdentifyMavenDependencyPage extends WizardPage {
 			@SuppressWarnings("unchecked")
 			public String getText(Object element) {
 				ProjectDependency projectDependency = (ProjectDependency) element;
-				return projectDependency.getPath().lastSegment();
+				return getLabel(projectDependency);
 			}
 			
 			@Override
@@ -326,9 +350,30 @@ public class IdentifyMavenDependencyPage extends WizardPage {
 		dependenciesViewer.setContentProvider(ArrayContentProvider.getInstance());
 		dependenciesViewer.addCheckStateListener(new ICheckStateListener() {
 			public void checkStateChanged(CheckStateChangedEvent event) {
+				dependencyCheckStateMap.put((ProjectDependency)event.getElement(), event.getChecked());
 				refresh();
 			}
 		});
+		
+		
+		ICheckStateProvider checkStateProvider = new ICheckStateProvider() {
+			
+			@Override
+			public boolean isGrayed(Object element) {
+				return false;
+			}
+			
+			@Override
+			public boolean isChecked(Object element) {
+				Boolean checked = null;
+				if (element instanceof ProjectDependency) {
+					 checked = dependencyCheckStateMap.get((ProjectDependency)element); 
+				}
+				return checked != null && checked.booleanValue();
+			}
+		};
+		
+		dependenciesViewer.setCheckStateProvider(checkStateProvider);
 		dependenciesViewer.setInput(dependencyMap.keySet());
 		dependenciesViewer.setAllChecked(true);
 
@@ -360,7 +405,17 @@ public class IdentifyMavenDependencyPage extends WizardPage {
 
 		});
 		
-		
+		final DependencyPatternFilter filter = new DependencyPatternFilter();
+		filterText.addModifyListener(new ModifyListener() {
+			public void modifyText(ModifyEvent e) {
+				if (filterText != null && !filterText.isDisposed()) {
+					filter.setPattern(filterText.getText());
+					dependenciesViewer.refresh();
+				}
+			}
+		});
+		dependenciesViewer.addFilter(filter);
+
 		addSelectionButton(container, "Select All", true);
 		addSelectionButton(container, "Deselect All", false);
 		addIdentifyButton(container, "Identify dependencies");
@@ -393,10 +448,13 @@ public class IdentifyMavenDependencyPage extends WizardPage {
 		button.setText(label);
 		button.addSelectionListener(new SelectionListener() {
 			public void widgetSelected(SelectionEvent e) {
-				dependenciesViewer.setAllChecked(ischecked);
+				for (TableItem item : dependenciesViewer.getTable().getItems()) {
+					ProjectDependency pd = (ProjectDependency)item.getData();
+					dependencyCheckStateMap.put(pd, ischecked);
+					item.setChecked(ischecked);
+				}
 				refresh();
 			}
-
 			public void widgetDefaultSelected(SelectionEvent e) {
 
 			}
@@ -478,7 +536,6 @@ public class IdentifyMavenDependencyPage extends WizardPage {
 		} 
 		setVisible(warningImg, false);
 		setVisible(warningLink, false);
-
 	}
 
 	private void setVisible(Control control, boolean visible) {
@@ -565,10 +622,15 @@ public class IdentifyMavenDependencyPage extends WizardPage {
 		StringBuilder sb = new StringBuilder();
 		sb.append(StringUtils.defaultString(d.getGroupId())).append(":");
 		sb.append(StringUtils.defaultString(d.getArtifactId())).append(":");
-		sb.append(StringUtils.defaultString(d.getVersion()));
+		sb.append(StringUtils.defaultString(d.getVersion())).append(":");
 		if (StringUtils.isNotEmpty(d.getClassifier())) {
-			sb.append(":").append(d.getClassifier());
+			sb.append(d.getClassifier()).append(":");
 		}
+		String type = d.getType();
+		if (type == null || type.isEmpty()) {
+			type = "jar";
+		}
+		sb.append(type);
 		return sb.toString();
 	}
 
@@ -613,14 +675,11 @@ public class IdentifyMavenDependencyPage extends WizardPage {
 	}
 
 	public List<ProjectDependency> getCheckedProjectDependencies() {
-		if (dependenciesViewer == null || dependenciesViewer.getTable().isDisposed()) {
-			return Collections.emptyList();
-		}
-		Object[] selection = dependenciesViewer.getCheckedElements();
-		List<ProjectDependency> selectedDeps = new ArrayList<ProjectDependency>(selection.length);
-		for (Object o : selection) {
-			ProjectDependency projectDep = (ProjectDependency) o;
-			selectedDeps.add(projectDep);
+		List<ProjectDependency> selectedDeps = new ArrayList<ProjectDependency>(dependencyCheckStateMap.size());
+		for (Entry<ProjectDependency, Boolean> entry : dependencyCheckStateMap.entrySet()) {
+			if (entry.getValue() != null && entry.getValue()) {
+				selectedDeps.add(entry.getKey());
+			}
 		}
 		return selectedDeps;
 	}
@@ -715,5 +774,42 @@ public class IdentifyMavenDependencyPage extends WizardPage {
 			}
 		}
 		return resources.toArray(new IResource[0]);
+	}
+
+	private String getLabel(ProjectDependency projectDependency) {
+		return projectDependency.getPath().lastSegment();
+	}
+
+	class DependencyPatternFilter extends ViewerFilter {
+
+		private StringMatcher matcher;
+
+		public void setPattern(String searchPattern) {
+			if (searchPattern == null || searchPattern.length() == 0) {
+				this.matcher = null;
+			} else {
+				String pattern = "*" + searchPattern + "*"; //$NON-NLS-1$//$NON-NLS-2$
+				this.matcher = new StringMatcher(pattern, true, false);
+			}
+		}
+
+		@Override
+		public boolean select(Viewer viewer, Object parentElement, Object element) {
+			if (matcher == null) {
+				return true;
+			}
+			boolean match = false;
+			if (element instanceof ProjectDependency) {
+				ProjectDependency pd = (ProjectDependency) element;
+				match = matcher.match(getLabel(pd));
+				if (!match) {
+					Dependency d = dependencyMap.get(pd);
+					if (d!= null) {
+						match = matcher.match(d.getGroupId()+":"+d.getArtifactId());
+					}
+				}
+			}
+			return match;
+		}
 	}
 }

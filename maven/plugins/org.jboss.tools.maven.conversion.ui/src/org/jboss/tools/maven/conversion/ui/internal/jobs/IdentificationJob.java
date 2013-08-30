@@ -100,9 +100,12 @@ public abstract class IdentificationJob extends Job {
 		String version = dependency.getVersion();
 		String type = dependency.getType();
 		
-		if (groupId == null || artifactId == null || version == null || type == null ) {
+		if (groupId == null || artifactId == null || version == null ) {
 			//unresolvable
 			return;
+		}
+		if (type == null) {
+			type = "jar";
 		}
 		String classifier = dependency.getClassifier();
 		IMaven maven = MavenPlugin.getMaven();

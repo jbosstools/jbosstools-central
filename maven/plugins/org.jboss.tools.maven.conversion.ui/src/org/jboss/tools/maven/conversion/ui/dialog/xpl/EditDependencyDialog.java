@@ -181,7 +181,7 @@ public class EditDependencyDialog extends SelectionStatusDialog  {
     dependency.setGroupId(groupId);
     dependency.setType(type);
     dependency.setVersion(version);
-    dependency.setScope(scope);
+    dependency.setScope("compile".equals(scope)?"":scope);
     dependency.setClassifier(classifier);
     dependency.setSystemPath(system);
     boolean optional = optionalButton.getSelection();
