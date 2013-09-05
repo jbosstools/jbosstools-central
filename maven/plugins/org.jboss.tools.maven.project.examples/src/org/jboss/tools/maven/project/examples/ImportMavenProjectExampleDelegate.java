@@ -72,7 +72,7 @@ public class ImportMavenProjectExampleDelegate extends AbstractImportMavenProjec
 			if (existingProjects.size() > 0) {
 				Display.getDefault().syncExec(new Runnable() {
 					public void run() {
-						String title = "Overwrite";
+						String title = existingProjects.size() > 1 ? "Warning: Projects already exist" : "Warning: Project already exists" ;
 						String msg = getMessage(destination, existingProjects);
 						confirm = MessageDialog.openQuestion(getActiveShell(),
 							title, msg);
@@ -365,11 +365,11 @@ public class ImportMavenProjectExampleDelegate extends AbstractImportMavenProjec
 		if (projects.size() > 0) {
 			StringBuilder builder = new StringBuilder();
 			if (projects.size() == 1) {
-				builder.append("\nThere is the '" + projects.get(0).getName() + 
-						"' project on the destination location:\n\n");
-				builder.append("Would you like to overwrite it?");
+				builder.append("\nThe '" + projects.get(0).getName() + 
+						"' project already exist at '" + destination.getAbsolutePath() + "'.\n\n");
+				builder.append("Would you like to overwrite this project?");
 			} else {
-				builder.append("\nThere are the following projects on the destination location:\n\n");
+				builder.append("\nThe following projects already exist at '" + destination.getAbsolutePath() + "'.\n\n");
 				for (IProject project : projects) {
 					builder.append(project.getName());
 					builder.append("\n"); //$NON-NLS-1$
@@ -377,6 +377,7 @@ public class ImportMavenProjectExampleDelegate extends AbstractImportMavenProjec
 				builder.append("\n"); //$NON-NLS-1$
 				builder.append("Would you like to overwrite them?");
 			}
+			builder.append("\n\nThis cannot be undone.");
 			return builder.toString();
 		}
 		return null;
