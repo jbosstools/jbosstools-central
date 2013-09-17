@@ -211,12 +211,8 @@ public class RemoteExternalBundleDiscoveryStrategy extends ExternalBundleDiscove
 												bundleUrl)));
 						continue;
 					}
-					String lastPathElement = bundleUrl.lastIndexOf('/') == -1 ? bundleUrl
-							: bundleUrl.substring(bundleUrl.lastIndexOf('/'));
 					File target = File
-							.createTempFile(
-									lastPathElement.replaceAll(
-											"^[a-zA-Z0-9_.]", "_") + "_", ".jar", this.downloadStorage); //$NON-NLS-1$//$NON-NLS-2$//$NON-NLS-3$//$NON-NLS-4$
+							.createTempFile(getFileNameFor(bundleUrl) + "_", ".jar", this.downloadStorage); //$NON-NLS-1$//$NON-NLS-2$//$NON-NLS-3$//$NON-NLS-4$
 
 					if (monitor.isCanceled()) {
 						break;
@@ -245,6 +241,18 @@ public class RemoteExternalBundleDiscoveryStrategy extends ExternalBundleDiscove
 				}
 			}
 			return this;
+		}
+
+		//Copied from http://git.eclipse.org/c/mylyn/org.eclipse.mylyn.commons.git/commit/?id=9d3ecc1be8ab17136e7c81581dccca1b26fb24cc
+		private String getFileNameFor(String bundleUrl) throws IOException {
+			//TODO delegate to WebUtil.getFileNameFor() once a fixed Mylyn version is available 
+			if (bundleUrl.charAt(bundleUrl.length() - 1) == '/') {
+			   bundleUrl = bundleUrl.substring(0, bundleUrl.length() - 1);
+			}
+			if (bundleUrl.lastIndexOf('/') != -1) {
+			   bundleUrl = bundleUrl.substring(bundleUrl.lastIndexOf('/') + 1);
+			}
+			return bundleUrl.replaceAll("[^a-zA-Z0-9_\\.]", "_"); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 	}
 
