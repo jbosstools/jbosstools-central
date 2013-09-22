@@ -10,10 +10,19 @@
  ************************************************************************************/
 package org.jboss.tools.central;
 
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IStartup;
+import org.eclipse.ui.IWorkbenchWindow;
+import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.progress.UIJob;
+import org.jboss.tools.central.internal.discovery.JBossCentralDiscoveryUi;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.Version;
 
@@ -29,6 +38,7 @@ public class ShowJBossCentral implements IStartup {
 
 	@Override
 	public void earlyStartup() {
+		registerDropTarget();
 		boolean doNotShow = Boolean.getBoolean(ORG_JBOSS_TOOLS_CENTRAL_DONOTSHOW);
 		if (doNotShow) {
 			return;
@@ -73,6 +83,26 @@ public class ShowJBossCentral implements IStartup {
 				JBossCentralActivator.getJBossCentralEditor(false);
 			}
 		});
+	}
+
+	private void registerDropTarget() {
+		UIJob registerJob = new UIJob(Display.getDefault(), "JBoss Central DND initialization") {
+			{
+				setPriority(Job.DECORATE);
+			}
+
+			@Override
+			public IStatus runInUIThread(IProgressMonitor monitor) {
+				IWorkbenchWindow[] workbenchWindows = PlatformUI.getWorkbench().getWorkbenchWindows();
+				for (IWorkbenchWindow window : workbenchWindows) {
+					Shell shell = window.getShell();
+					JBossCentralDiscoveryUi.initDropTarget(shell);
+				}
+				return Status.OK_STATUS;
+			}
+
+		};
+		registerJob.schedule();
 	}
 
 	protected void saveVersion(IEclipsePreferences prefs, Bundle bundle, String preference) {
