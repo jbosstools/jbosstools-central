@@ -69,6 +69,7 @@ import org.eclipse.ui.menus.CommandContributionItem;
 import org.jboss.tools.central.JBossCentralActivator;
 import org.jboss.tools.central.actions.OpenJBossBlogsHandler;
 import org.jboss.tools.central.editors.xpl.TextSearchControl;
+import org.jboss.tools.central.internal.discovery.JBossCentralDiscoveryUi;
 import org.jboss.tools.project.examples.ProjectExamplesActivator;
 
 /**
@@ -242,6 +243,13 @@ public class JBossCentralEditor extends SharedHeaderFormEditor {
 		form.layout(true, true);
 	}
 	
+	@Override
+	protected Composite createPageContainer(Composite parent) {
+		Composite composite = super.createPageContainer(parent);
+		JBossCentralDiscoveryUi.initDropTarget(parent);
+		return composite;
+	}
+
 	public Control createSettingsControl(Composite parent) {
 		
 		settingsComposite = getToolkit().createComposite(parent);
