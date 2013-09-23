@@ -11,6 +11,7 @@
 	<artifactId>central.maven.examples.site</artifactId>
 	<name>central.maven.examples.site</name>
 	<packaging>eclipse-repository</packaging>
+	<version>4.1.0-SNAPSHOT</version>
 
 	<properties>
 		<update.site.description>Snapshots</update.site.description>
