@@ -74,7 +74,8 @@ import org.jboss.tools.project.examples.model.ProjectFix;
 import org.jboss.tools.runtime.core.RuntimeCoreActivator;
 import org.jboss.tools.runtime.core.model.DownloadRuntime;
 import org.jboss.tools.runtime.ui.RuntimeUIActivator;
-import org.jboss.tools.runtime.ui.internal.wizard.DownloadRuntimesWizard;
+import org.jboss.tools.runtime.ui.RuntimeSharedImages;
+import org.jboss.tools.runtime.ui.wizard.DownloadRuntimesTaskWizard;
 
 public class NewProjectExamplesRequirementsPage extends WizardPage implements IProjectExamplesWizardPage {
 
@@ -99,8 +100,8 @@ public class NewProjectExamplesRequirementsPage extends WizardPage implements IP
 		super(pageName);
 		this.projectExample = projectExample;
 		setTitleAndDescription(projectExample);
-        checkboxOn = RuntimeUIActivator.imageDescriptorFromPlugin(RuntimeUIActivator.PLUGIN_ID, "/icons/xpl/complete_tsk.gif").createImage();
-		checkboxOff = RuntimeUIActivator.imageDescriptorFromPlugin(RuntimeUIActivator.PLUGIN_ID, "/icons/xpl/incomplete_tsk.gif").createImage();
+		checkboxOn =  RuntimeUIActivator.sharedImages().image(RuntimeSharedImages.CHECKBOX_ON_KEY);
+		checkboxOff = RuntimeUIActivator.sharedImages().image(RuntimeSharedImages.CHECKBOX_OFF_KEY);
 	}
 
 	public NewProjectExamplesRequirementsPage() {
@@ -314,7 +315,7 @@ public class NewProjectExamplesRequirementsPage extends WizardPage implements IP
 					List<DownloadRuntime> runtimes = getDownloadRuntimes(fix);
 					//DownloadRuntimeDialog dialog = new DownloadRuntimeDialog(getShell(), runtimes);
 					//dialog.open();
-					WizardDialog dialog = new WizardDialog(getShell(), new DownloadRuntimesWizard(PlatformUI.getWorkbench().getModalDialogShellProvider().getShell(), runtimes));
+					WizardDialog dialog = new WizardDialog(getShell(), new DownloadRuntimesTaskWizard(runtimes));
 					dialog.open();
 					refreshFixes();
 				}
