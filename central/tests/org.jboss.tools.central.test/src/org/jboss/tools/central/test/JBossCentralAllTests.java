@@ -10,14 +10,12 @@
  ************************************************************************************/
 package org.jboss.tools.central.test;
 
-import org.jboss.tools.central.test.xpl.ExpressionResolverTest;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 
 
 @Suite.SuiteClasses({
 	CentralTest.class,
-	ExpressionResolverTest.class,
 	DiscoveryTest.class,
 })
 

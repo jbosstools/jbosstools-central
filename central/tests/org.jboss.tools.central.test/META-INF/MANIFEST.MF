@@ -22,7 +22,8 @@ Require-Bundle: org.eclipse.ui;bundle-version="3.7.0",
  org.apache.commons.io;bundle-version="2.0.0",
  org.jboss.tools.central,
  org.eclipse.jetty.server;bundle-version="8.0.0",
- org.eclipse.jetty.util;bundle-version="8.0.0"
+ org.eclipse.jetty.util;bundle-version="8.0.0",
+ org.jboss.tools.foundation.core;bundle-version="1.1.0"
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-Localization: plugin

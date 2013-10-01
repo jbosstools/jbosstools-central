@@ -13,8 +13,8 @@ package org.jboss.tools.project.examples.internal.discovery;
 import org.eclipse.mylyn.internal.discovery.core.model.DiscoveryConnector;
 import org.eclipse.mylyn.internal.discovery.core.model.ValidationException;
 import org.eclipse.osgi.util.NLS;
-import org.jboss.tools.project.examples.internal.xpl.ExpressionResolutionException;
-import org.jboss.tools.project.examples.internal.xpl.ExpressionResolver;
+import org.jboss.tools.foundation.core.expressions.ExpressionResolutionException;
+import org.jboss.tools.foundation.core.expressions.ExpressionResolver;
 
 /**
  * A subclass of a connector that resolves ${sysPropertyName:defaultValue} 
@@ -27,7 +27,7 @@ public class ExpressionBasedDiscoveryConnector extends DiscoveryConnector {
 	public void validate() throws ValidationException {
 		try {
 			// Resolve expressions in siteUrl before executing siteUrl validation
-			siteUrl = ExpressionResolver.DEFAULT_RESOLVER.resolve(siteUrl);
+			siteUrl = new ExpressionResolver().resolve(siteUrl);
 			// validate siteUrl with resolved expression 
 			super.validate();
 		} catch (ExpressionResolutionException e) {
