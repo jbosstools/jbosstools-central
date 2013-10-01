@@ -57,7 +57,6 @@ import org.eclipse.ui.ide.IDE;
 import org.eclipse.ui.internal.ide.IDEInternalWorkbenchImages;
 import org.eclipse.ui.internal.ide.IDEWorkbenchPlugin;
 import org.eclipse.ui.internal.views.markers.MarkerSupportInternalUtilities;
-import org.eclipse.ui.progress.IWorkbenchSiteProgressService;
 import org.eclipse.ui.statushandlers.IStatusAdapterConstants;
 import org.eclipse.ui.statushandlers.StatusAdapter;
 import org.eclipse.ui.statushandlers.StatusManager;
@@ -241,7 +240,7 @@ public class MarkerDialog extends TitleAreaDialog {
 
 	private void openQuickFixWizard(final IMarker selected)
 			throws ExecutionException {
-		final Map resolutions = new LinkedHashMap();
+		final Map<IMarkerResolution, Collection<IMarker>> resolutions = new LinkedHashMap<IMarkerResolution, Collection<IMarker>>();
 
 		IRunnableWithProgress resolutionsRunnable = new IRunnableWithProgress() {
 			public void run(IProgressMonitor monitor) {
@@ -260,14 +259,14 @@ public class MarkerDialog extends TitleAreaDialog {
 					if (markerResolution instanceof WorkbenchMarkerResolution) {
 						IMarker[] other = ((WorkbenchMarkerResolution) markerResolution)
 								.findOtherMarkers(allMarkers);
-						Collection markers = new ArrayList();
+						Collection<IMarker> markers = new ArrayList<IMarker>(other.length+1);
 						markers.add(selected);
 						for (int j = 0; j < other.length; j++) {
 							markers.add(other[j]);
 						}
 						resolutions.put(markerResolution, markers);
 					} else {
-						Collection markers = new ArrayList();
+						Collection<IMarker> markers = new ArrayList<IMarker>();
 						markers.add(selected);
 						resolutions.put(markerResolution, markers);
 					}
@@ -277,19 +276,12 @@ public class MarkerDialog extends TitleAreaDialog {
 			}
 		};
 
-		Object service = null;
-
 		IRunnableContext context = new ProgressMonitorDialog(PlatformUI
 				.getWorkbench().getActiveWorkbenchWindow().getShell());
 
 		try {
-			if (service == null) {
-				PlatformUI.getWorkbench().getProgressService().runInUI(context,
-						resolutionsRunnable, null);
-			} else {
-				((IWorkbenchSiteProgressService) service).runInUI(context,
-						resolutionsRunnable, null);
-			}
+			PlatformUI.getWorkbench().getProgressService().runInUI(context,
+					resolutionsRunnable, null);
 		} catch (InvocationTargetException exception) {
 			throw new ExecutionException(exception.getLocalizedMessage(),
 					exception);
