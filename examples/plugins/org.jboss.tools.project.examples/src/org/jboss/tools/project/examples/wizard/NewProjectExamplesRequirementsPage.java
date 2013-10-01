@@ -631,17 +631,6 @@ public class NewProjectExamplesRequirementsPage extends WizardPage implements IP
 	}
 
 	@Override
-	public void dispose() {
-		if (checkboxOff != null) {
-			checkboxOff.dispose();
-		}
-		if (checkboxOn != null) {
-			checkboxOn.dispose();
-		}
-		super.dispose();
-	}
-
-	@Override
 	public void onWizardContextChange(String key, Object value) {
 		// TODO Auto-generated method stub
 	}
