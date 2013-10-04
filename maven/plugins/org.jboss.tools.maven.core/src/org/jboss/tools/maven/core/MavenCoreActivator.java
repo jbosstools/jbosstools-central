@@ -74,6 +74,7 @@ import org.eclipse.wst.common.componentcore.resources.IVirtualComponent;
 import org.eclipse.wst.common.componentcore.resources.IVirtualFolder;
 import org.eclipse.wst.common.frameworks.datamodel.IDataModel;
 import org.eclipse.wst.common.project.facet.core.IProjectFacetVersion;
+import org.jboss.tools.maven.core.internal.resolution.ArtifactResolutionService;
 import org.jboss.tools.maven.core.repositories.RemoteRepositoryManager;
 import org.jboss.tools.maven.core.settings.MavenSettingsChangeListener;
 import org.osgi.framework.BundleContext;
@@ -107,6 +108,8 @@ public class MavenCoreActivator extends Plugin {
 	private static MavenCoreActivator plugin;
 
 	private static PomResourceImpl resource;
+
+	private  IArtifactResolutionService artifactResolutionService;
 	
 	private RemoteRepositoryManager repositoryManager;
 
@@ -134,6 +137,7 @@ public class MavenCoreActivator extends Plugin {
 	 * @see org.eclipse.ui.plugin.AbstractUIPlugin#stop(org.osgi.framework.BundleContext)
 	 */
 	public void stop(BundleContext context) throws Exception {
+		artifactResolutionService = null;
 		plugin = null;
 		mavenSettingsListeners.clear();
 		super.stop(context);
@@ -790,5 +794,15 @@ public class MavenCoreActivator extends Plugin {
 	
 	public void unregisterMavenSettingsChangeListener(MavenSettingsChangeListener listener) {
 		mavenSettingsListeners.remove(listener);
+	}
+
+	/**
+	 * @since 1.5.2
+	 */
+	public IArtifactResolutionService getArtifactResolutionService() {
+		if (artifactResolutionService == null) {
+			artifactResolutionService = new ArtifactResolutionService();
+		}
+		return artifactResolutionService;
 	}
 }

@@ -10,34 +10,22 @@
  ************************************************************************************/
 package org.jboss.tools.maven.project.examples.utils;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.repository.internal.MavenRepositorySystemSession;
-import org.codehaus.plexus.DefaultPlexusContainer;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.m2e.core.MavenPlugin;
-import org.eclipse.m2e.core.embedder.IMaven;
 import org.eclipse.osgi.util.NLS;
+import org.jboss.tools.maven.core.IArtifactResolutionService;
+import org.jboss.tools.maven.core.MavenCoreActivator;
 import org.jboss.tools.maven.project.examples.MavenProjectExamplesActivator;
 import org.jboss.tools.maven.project.examples.Messages;
 import org.jboss.tools.maven.project.examples.xpl.DependencyKey;
 import org.jboss.tools.project.examples.model.ProjectExample;
-import org.sonatype.aether.RepositorySystem;
-import org.sonatype.aether.repository.LocalRepository;
-import org.sonatype.aether.repository.RemoteRepository;
-import org.sonatype.aether.resolution.VersionRangeRequest;
-import org.sonatype.aether.resolution.VersionRangeResolutionException;
-import org.sonatype.aether.resolution.VersionRangeResult;
-import org.sonatype.aether.util.artifact.DefaultArtifact;
-import org.sonatype.aether.version.Version;
 
 public class MavenArtifactHelper {
 
@@ -56,29 +44,33 @@ public class MavenArtifactHelper {
 
 	/**
 	 * Checks if an artifact can be resolved
+	 * 
+	 * @deprecated use {@link IArtifactResolutionService#isResolved(String, List, org.eclipse.core.runtime.IProgressMonitor)}
 	 * @param dependencyKey
 	 * @return true is the dependencyKey can be resolved to an artifact.
 	 */
+	@Deprecated
 	public static boolean isArtifactAvailable(String dependencyKey) {
-		DependencyKey key = DependencyKey.fromPortableString(dependencyKey);
-		return isArtifactAvailable(key);
+		try {
+			IArtifactResolutionService resolutionService = MavenCoreActivator.getDefault().getArtifactResolutionService();
+			List<ArtifactRepository> repos = MavenPlugin.getMaven().getArtifactRepositories();
+			return resolutionService.isResolved(dependencyKey, repos, new NullProgressMonitor());
+		} catch (CoreException e) {
+			MavenProjectExamplesActivator.log(e);
+		}
+		return false;
 	}
 
+
+	/**
+	 * Checks if an artifact can be resolved
+	 * 
+	 * @deprecated use {@link IArtifactResolutionService#isResolved(String, List, org.eclipse.core.runtime.IProgressMonitor)}
+	 * @param dependencyKey
+	 * @return true is the dependencyKey can be resolved to an artifact.
+	 */
 	public static boolean isArtifactAvailable(DependencyKey key) {
-		boolean isRepoAvailable = false;
-		try {
-			IMaven maven = MavenPlugin.getMaven();
-			ArrayList<ArtifactRepository> repos = new ArrayList<ArtifactRepository>();
-			repos.addAll(maven.getArtifactRepositories());
-			IProgressMonitor nullProgressMonitor = new NullProgressMonitor();
-			Artifact a = MavenPlugin.getMaven().resolve(
-					key.getGroupId(), key.getArtifactId(), key.getVersion(),
-					key.getType(), key.getClassifier(), repos, nullProgressMonitor);
-			isRepoAvailable = a != null && a.isResolved();
-		} catch (CoreException e) {
-			System.err.println(e.getLocalizedMessage());
-		}
-		return isRepoAvailable;
+		return isArtifactAvailable(key.toPortableString());
 	}
 
 	
@@ -90,13 +82,27 @@ public class MavenArtifactHelper {
 		}
 		if (project != null) {
 			Set<String> requirements = project.getEssentialEnterpriseDependencyGavs();
-			if (requirements != null) {
+			if (requirements != null && !requirements.isEmpty()) {
+				IArtifactResolutionService resolutionService = MavenCoreActivator.getDefault().getArtifactResolutionService();
+				List<ArtifactRepository> repos;
+				try {
+					repos = MavenPlugin.getMaven().getArtifactRepositories();
+				} catch (CoreException e1) {
+					return new Status(IStatus.ERROR, 
+							MavenProjectExamplesActivator.PLUGIN_ID, 
+							"Can't load maven repositories");
+				}
 				for (String gav : requirements) {
-					DependencyKey key = DependencyKey.fromPortableString(gav);
-					if (!isArtifactAvailable(key)) {
+					boolean isResolved = false;
+					try {
+						isResolved = resolutionService.isResolved(gav, repos, new NullProgressMonitor());
+					} catch (CoreException e) {
+						MavenProjectExamplesActivator.log(e);
+					}
+					if (!isResolved) {
 						return new Status(IStatus.ERROR, 
-								   MavenProjectExamplesActivator.PLUGIN_ID, 
-								   NLS.bind(Messages.ArchetypeExamplesWizardFirstPage_Unresolved_WFK_Repo, key));
+								MavenProjectExamplesActivator.PLUGIN_ID, 
+								NLS.bind(Messages.ArchetypeExamplesWizardFirstPage_Unresolved_WFK_Repo, gav));
 					}
 				}
 			}
@@ -105,43 +111,16 @@ public class MavenArtifactHelper {
 	}
 	
 	private static boolean redHatArtifactExists(String coords) {
-		RepositorySystem system;
 		try {
-			system = new DefaultPlexusContainer()
-					.lookup(RepositorySystem.class);
-		} catch (Exception e) {
-			MavenProjectExamplesActivator.log(e);
-			return false;
-		}
-		MavenRepositorySystemSession session = new MavenRepositorySystemSession();
-		IMaven maven = MavenPlugin.getMaven();
-		String localRepoHome = maven.getLocalRepositoryPath();
-		LocalRepository localRepo = new LocalRepository(localRepoHome);
-		session.setLocalRepositoryManager(system.newLocalRepositoryManager(localRepo));
-		
-		VersionRangeRequest rangeRequest = new VersionRangeRequest();
-		rangeRequest.setArtifact( new DefaultArtifact(coords));
-		
-		List<ArtifactRepository> repos = new ArrayList<ArtifactRepository>();
-	    try {
-			repos.addAll(maven.getArtifactRepositories(false));
-		} catch (CoreException e) {
-			MavenProjectExamplesActivator.log(e);
-			return false;
-		}
-		for (ArtifactRepository repo : repos) {
-			RemoteRepository remoteRepo = new RemoteRepository(repo.getId(), "default", repo.getUrl()); //$NON-NLS-1$
-			rangeRequest.addRepository(remoteRepo);
-		}
-		try {
-			VersionRangeResult result = system.resolveVersionRange(	session, rangeRequest);
-			List<Version> versions = result.getVersions();
-			for (Version version:versions) {
+			IArtifactResolutionService resolutionService = MavenCoreActivator.getDefault().getArtifactResolutionService();
+			List<ArtifactRepository> repositories = MavenPlugin.getMaven().getArtifactRepositories();
+			List<String> availableVersions = resolutionService.getAvailableReleasedVersions(coords, repositories , new NullProgressMonitor());
+			for (String version:availableVersions) {
 				if (version != null && version.toString().contains("redhat")) { //$NON-NLS-1$
 					return true;
 				}
 			}
-		} catch (VersionRangeResolutionException e) {
+		} catch (CoreException e) {
 			MavenProjectExamplesActivator.log(e);
 		}
 		return false;
