@@ -4,21 +4,22 @@ import java.io.File;
 import java.io.FileFilter;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
+import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.repository.RepositorySystem;
-import org.apache.maven.repository.internal.MavenRepositorySystemSession;
 import org.apache.maven.settings.Profile;
 import org.apache.maven.settings.Repository;
 import org.apache.maven.settings.Settings;
-import org.codehaus.plexus.DefaultPlexusContainer;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
@@ -54,14 +55,9 @@ import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
+import org.jboss.tools.maven.core.IArtifactResolutionService;
+import org.jboss.tools.maven.core.MavenCoreActivator;
 import org.jboss.tools.maven.ui.Activator;
-import org.sonatype.aether.artifact.Artifact;
-import org.sonatype.aether.repository.LocalRepository;
-import org.sonatype.aether.repository.RemoteRepository;
-import org.sonatype.aether.resolution.ArtifactRequest;
-import org.sonatype.aether.resolution.ArtifactResolutionException;
-import org.sonatype.aether.resolution.ArtifactResult;
-import org.sonatype.aether.util.artifact.DefaultArtifact;
 
 public class AddRepositoryDialog extends TitleAreaDialog {
 
@@ -396,50 +392,15 @@ public class AddRepositoryDialog extends TitleAreaDialog {
 	}
 
 	private boolean resolveArtifact(String id, String url) {
-		
-		org.sonatype.aether.RepositorySystem system;
 		try {
-			system = new DefaultPlexusContainer()
-					.lookup(org.sonatype.aether.RepositorySystem.class);
-		} catch (Exception e) {
+			List<ArtifactRepository> repos = new ArrayList<ArtifactRepository>();
+			repos.add(MavenPlugin.getMaven().createArtifactRepository(id, url));
+			repos.addAll(MavenPlugin.getMaven().getArtifactRepositories());
+			IArtifactResolutionService artifactResolutionService = MavenCoreActivator.getDefault().getArtifactResolutionService();
+			return artifactResolutionService.isResolved(coords, repos, new NullProgressMonitor());
+		} catch (CoreException e) {
 			Activator.log(e);
-			return false;
 		}
-		MavenRepositorySystemSession session = new MavenRepositorySystemSession();
-		IMaven maven = MavenPlugin.getMaven();
-		String localRepoHome = maven.getLocalRepositoryPath();
-		LocalRepository localRepo = new LocalRepository(localRepoHome);
-		session.setLocalRepositoryManager(system.newLocalRepositoryManager(localRepo));
-
-		ArtifactRequest artifactRequest = new ArtifactRequest();
-		artifactRequest.setArtifact(new DefaultArtifact(getCoords()));
-
-		RemoteRepository centralRepo = new RemoteRepository( "central", "default", "http://repo1.maven.org/maven2/" );  //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$
-		artifactRequest.addRepository(centralRepo);
-		RemoteRepository remoteRepo = new RemoteRepository(id,
-				"default", url); //$NON-NLS-1$
-		artifactRequest.addRepository(remoteRepo);
-		for (RepositoryWrapper wrapper : includedRepositories) {
-			Repository repo = wrapper.getRepository();
-			if (repo == null) {
-				continue;
-			}
-			remoteRepo = new RemoteRepository(repo.getId(),
-					"default", repo.getUrl()); //$NON-NLS-1$
-			artifactRequest.addRepository(remoteRepo);
-		}
-
-		try {
-			ArtifactResult artifactResult = system.resolveArtifact(session,
-					artifactRequest);
-			Artifact artifact = artifactResult.getArtifact();
-			return artifact != null;
-		} catch (ArtifactResolutionException e) {
-			if (Activator.getDefault().isDebugging()) {
-				Activator.log(e);
-			}
-		}
-		
 		return false;
 	}
 

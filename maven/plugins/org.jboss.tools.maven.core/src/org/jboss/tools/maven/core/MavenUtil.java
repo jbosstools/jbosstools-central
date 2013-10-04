@@ -13,6 +13,8 @@ package org.jboss.tools.maven.core;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.repository.ArtifactRepository;
@@ -23,6 +25,9 @@ import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Parent;
 import org.apache.maven.project.MavenProject;
+import org.apache.maven.repository.RepositorySystem;
+import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
+import org.codehaus.plexus.util.StringUtils;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
@@ -32,6 +37,7 @@ import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.embedder.MavenModelManager;
 import org.eclipse.m2e.core.internal.IMavenConstants;
+import org.eclipse.m2e.core.internal.MavenPluginActivator;
 import org.eclipse.m2e.core.internal.embedder.MavenImpl;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 
@@ -175,5 +181,59 @@ public class MavenUtil {
 			//TODO look inside the artifact jar if pom isn't available
 		}
 		return null;
+	}
+	
+	/**
+	 * Creates an {@link Artifact} from "portable" coordinates.
+	 * @param coordinates Expected format is &lt;groupId&gt;:&lt;artifactId&gt;[:&lt;type&gt;[:&lt;classifier&gt;]]:&lt;version&gt;
+	 * @return an {@link Artifact} built with the coordinates parameter
+	 * @since 1.5.2
+	 */
+	@SuppressWarnings("nls")
+	public static Artifact createArtifact(String coordinates) {
+	        Pattern p = Pattern.compile( "([^: ]+):([^: ]+)(:([^: ]*)(:([^: ]+))?)?:([^: ]+)" );
+		Matcher m = p.matcher(coordinates);
+		if (!m.matches()) {
+			throw new IllegalArgumentException(
+					"Bad artifact coordinates "
+							+ coordinates
+							+ ", expected format is <groupId>:<artifactId>[:<type>[:<classifier>]]:<version>");
+		}
+		String groupId = m.group(1);
+		String artifactId = m.group(2);
+		String type = StringUtils.defaultString(m.group(4), "jar");
+		String classifier = StringUtils.defaultString(m.group(6), "");
+		String version = m.group(7);
+
+		return createArtifact(groupId, artifactId, version, type, classifier);
+	}
+
+
+	/**
+	 * Creates an {@link Artifact} from discrete maven coordinates.
+	 * 
+	 * @return an {@link Artifact} built with the coordinate parameters
+	 * @since 1.5.2
+	 */
+	public static Artifact createArtifact(String groupId, String artifactId, String version, String type, String classifier) {
+		return getRepositorySystem().createArtifactWithClassifier(groupId,
+				artifactId, version, type ==  null?"jar":type, classifier); //$NON-NLS-1$
+	}
+	
+
+	/**
+	 * Looks up a {@link RepositorySystem} from Maven's Plexus container.
+	 * 
+	 * @since 1.5.2
+	 */
+	public static RepositorySystem getRepositorySystem() {
+		RepositorySystem repositorySystem;
+		try {
+			repositorySystem = MavenPluginActivator.getDefault().getPlexusContainer()
+					.lookup(RepositorySystem.class);
+		} catch (ComponentLookupException e) {
+			throw new RuntimeException(e);
+		}
+		return repositorySystem;
 	}
 }
