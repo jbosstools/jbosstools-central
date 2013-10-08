@@ -18,3 +18,4 @@ Bundle-Localization: plugin
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-Vendor: %Bundle-Vendor
+Export-Package: org.jboss.tools.maven.cdi.internal;x-friends:="org.jboss.tools.maven.configurators.tests"

@@ -40,6 +40,7 @@ import org.jboss.tools.cdi.core.CDICoreNature;
 import org.jboss.tools.cdi.core.CDIUtil;
 import org.jboss.tools.common.model.util.EclipseResourceUtil;
 import org.jboss.tools.maven.cdi.MavenCDIActivator;
+import org.jboss.tools.maven.cdi.internal.BeansXmlQuickPeek;
 import org.jboss.tools.maven.core.IJBossMavenConstants;
 import org.jboss.tools.maven.core.ProjectUtil;
 import org.jboss.tools.maven.core.VersionUtil;
@@ -73,7 +74,7 @@ public class CDIProjectConfigurator extends AbstractProjectConfigurator {
 		ejbFacet = ProjectFacetsManager.getProjectFacet("jst.ejb"); //$NON-NLS-1$
 		ejbVersion = ejbFacet.getVersion("3.0");  //$NON-NLS-1$
 		cdiFacet = ProjectFacetsManager.getProjectFacet("jst.cdi"); //$NON-NLS-1$
-		DEFAULT_CDI_VERSION = cdiFacet.getDefaultVersion().getVersionString();
+		DEFAULT_CDI_VERSION = "1.0";
 		m2Facet = ProjectFacetsManager.getProjectFacet("jboss.m2"); //$NON-NLS-1$
 		m2Version = m2Facet.getVersion("1.0"); //$NON-NLS-1$
 	}
@@ -184,7 +185,18 @@ public class CDIProjectConfigurator extends AbstractProjectConfigurator {
 			version = inferCdiVersionFromDependencies(mavenProject);
 		}
 		if (version == null) {
-			version = (hasBeansXml(project))?DEFAULT_CDI_VERSION:null;
+			IFile beansXml = getBeansXml(project);
+			if (beansXml != null) {
+				try {
+					BeansXmlQuickPeek quickPeek = new BeansXmlQuickPeek(beansXml);
+					version = quickPeek.getVersion();
+				} catch (Exception e) {
+					MavenCDIActivator.log(e);
+				}
+				if (version == null) {
+					version = DEFAULT_CDI_VERSION;
+				}
+			}
 		}
 	    return version;
 	}
@@ -216,12 +228,14 @@ public class CDIProjectConfigurator extends AbstractProjectConfigurator {
 			|| artifact.getGroupId().startsWith("org.apache.deltaspike.");
 	}
 
-	private boolean hasBeansXml(IProject project) throws CoreException {
+	
+	private IFile getBeansXml(IProject project) throws CoreException {
+		//Can't use CDIUtil.getBeansXml(project) as it requires a Faceted project up-front (for non web projects)
 		IFacetedProject facetedProject = ProjectFacetsManager.create(project);
 		if(facetedProject!=null && facetedProject.hasProjectFacet(dynamicWebFacet)) {
 			IFile beansXml = ProjectUtil.getWebResourceFile(project, "WEB-INF/beans.xml");
 			if (beansXml != null && beansXml.exists()) {
-				return true;
+				return beansXml;
 			}
 		} 
 		if(project.hasNature(JavaCore.NATURE_ID)) {
@@ -230,10 +244,10 @@ public class CDIProjectConfigurator extends AbstractProjectConfigurator {
 			for (IFolder src : sources) {
 				IFile beansXml = src.getFile(beansPath);
 				if(beansXml!=null && beansXml.exists()) {
-					return true;
+					return beansXml;
 				}
 			}
 		}
-		return false;
+		return null;
 	}	
 }
