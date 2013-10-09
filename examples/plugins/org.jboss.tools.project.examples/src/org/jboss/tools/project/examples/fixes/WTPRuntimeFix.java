@@ -206,12 +206,13 @@ public class WTPRuntimeFix implements ProjectExamplesFix {
 				IClasspathEntry[] entries = javaProject.getRawClasspath();
 				IClasspathEntry[] newEntries = new IClasspathEntry[entries.length];
 				boolean changed = false;
+				IRuntimeType rt = runtime.getRuntimeType();
 				for (int i = 0; i < entries.length; i++) {
 					IClasspathEntry entry = entries[i];
 					if (entry.getEntryKind() == IClasspathEntry.CPE_CONTAINER) {
 						IPath path = entry.getPath();
-						if (new Path(RuntimeClasspathContainer.SERVER_CONTAINER).isPrefixOf(path)) {
-							RuntimeClasspathProviderWrapper rcpw = JavaServerPlugin.findRuntimeClasspathProvider(runtime.getRuntimeType());
+						if (rt != null && new Path(RuntimeClasspathContainer.SERVER_CONTAINER).isPrefixOf(path)) {
+							RuntimeClasspathProviderWrapper rcpw = JavaServerPlugin.findRuntimeClasspathProvider(rt);
 							IPath serverContainerPath = new Path(RuntimeClasspathContainer.SERVER_CONTAINER)
 								.append(rcpw.getId()).append(runtime.getId());
 							newEntries[i] = JavaCore.newContainerEntry(serverContainerPath);
