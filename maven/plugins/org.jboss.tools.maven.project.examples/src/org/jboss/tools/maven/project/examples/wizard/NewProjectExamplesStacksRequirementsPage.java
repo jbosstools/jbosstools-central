@@ -21,9 +21,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jface.dialogs.DialogSettings;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jst.j2ee.web.project.facet.WebFacetUtils;
@@ -51,11 +49,11 @@ import org.jboss.ide.eclipse.as.core.util.RuntimeUtils;
 import org.jboss.jdf.stacks.model.ArchetypeVersion;
 import org.jboss.jdf.stacks.model.Runtime;
 import org.jboss.jdf.stacks.model.Stacks;
-import org.jboss.tools.as.runtimes.integration.util.RuntimeMatcher;
 import org.jboss.tools.maven.core.MavenCoreActivator;
 import org.jboss.tools.maven.core.settings.MavenSettingsChangeListener;
 import org.jboss.tools.maven.project.examples.MavenProjectExamplesActivator;
 import org.jboss.tools.maven.project.examples.Messages;
+import org.jboss.tools.maven.project.examples.internal.stacks.StacksArchetypeUtil;
 import org.jboss.tools.maven.project.examples.utils.MavenArtifactHelper;
 import org.jboss.tools.project.examples.model.ArchetypeModel;
 import org.jboss.tools.project.examples.model.ProjectExample;
@@ -73,7 +71,7 @@ public class NewProjectExamplesStacksRequirementsPage extends NewProjectExamples
 
 	private MissingRepositoryWarningComponent warningComponent;
 	
-	private IStatus enterpriseRepoStatus;
+	private Map<ArchetypeVersion, IStatus> enterpriseRepoStatusMap = new HashMap<ArchetypeVersion, IStatus>();
 
 	private org.jboss.jdf.stacks.model.Archetype stacksArchetype;   
 
@@ -88,6 +86,8 @@ public class NewProjectExamplesStacksRequirementsPage extends NewProjectExamples
 	private Combo serverTargetCombo;
 
 	private Map<String, IRuntime> serverRuntimes;
+
+	private String stacksType;
 
 	public NewProjectExamplesStacksRequirementsPage() {
 		this(null);
@@ -108,22 +108,18 @@ public class NewProjectExamplesStacksRequirementsPage extends NewProjectExamples
 	@Override
 	public void createControl(Composite parent) {
 		super.createControl(parent);
-			
 	}
 	
 	@Override
 	public void setProjectExample(ProjectExample projectExample) {
 		super.setProjectExample(projectExample);
 		if (projectExample != null) {
-			String stacksId = projectExample.getStacksId();
-			stacksArchetype = getArchetype(stacksId, stacks);
-			setArchetypeVersion();
-			boolean hasBlank = stacksArchetype!=null && null != stacksArchetype.getBlank();
-			if (useBlankArchetype != null) {
-				useBlankArchetype.setVisible(hasBlank);
-				((GridData) useBlankArchetype.getLayoutData()).exclude = !hasBlank;
-				useBlankArchetype.getParent().layout(true, true);
+			stacksType = projectExample.getStacksType();
+			if (stacksType == null) {
+				String stacksId = projectExample.getStacksId();
+				stacksArchetype = getArchetype(stacksId, stacks);
 			}
+			setArchetypeVersion();
 			
 			wizardContext.setProperty(MavenProjectConstants.ENTERPRISE_TARGET, isEnterpriseTargetRuntime());
 
@@ -132,34 +128,26 @@ public class NewProjectExamplesStacksRequirementsPage extends NewProjectExamples
 	}
 
 	private void setArchetypeVersion() {
-
+		version = null;
 		ArchetypeModel mavenArchetype = null;
 		StringBuilder description = new StringBuilder();
 		
-		if (stacksArchetype == null) {
+		if (stacksType == null && stacksArchetype == null) {
 			description.append(projectExample.getDescription());
-			mavenArchetype = projectExample.getArchetypeModel();
 		} else {
-			org.jboss.jdf.stacks.model.Archetype a;
+			
+			boolean useBlank = useBlankArchetype != null && !useBlankArchetype.isDisposed() && useBlankArchetype.getSelection();
+			IRuntime wtpRuntime = getSelectedRuntime();
 	
-			if (useBlankArchetype != null && useBlankArchetype.getSelection()) {
-				a = stacksArchetype.getBlank();
-				
-			} else {
-				a = stacksArchetype;
-			}
-	
-			version = null;
-			//get selected runtime from combo
-			if (serverTargetCombo != null && !serverTargetCombo.isDisposed()) {
-				String wtpServerId = serverTargetCombo.getText();
-				IRuntime wtpRuntime = serverRuntimes.get(wtpServerId);
+			org.jboss.jdf.stacks.model.Archetype stArch = null;
+			if (stacksType == null) {
+				stArch = useBlank && stacksArchetype.getBlank() != null ?stacksArchetype.getBlank():stacksArchetype;
 				if (wtpRuntime != null && wtpRuntime.getRuntimeType() != null) {
 					String wtpRuntimeId = wtpRuntime.getRuntimeType().getId();
 					//System.err.println(wtpRuntimeId);
 					Runtime stacksRuntime = StacksUtil.getRuntimeFromWtpId(stacks, wtpRuntimeId );
 					if (stacksRuntime != null) {
-						List<ArchetypeVersion> compatibleVersions = StacksUtil.getCompatibleArchetypeVersions(a, stacksRuntime);
+						List<ArchetypeVersion> compatibleVersions = StacksUtil.getCompatibleArchetypeVersions(stArch, stacksRuntime);
 						if (compatibleVersions != null && !compatibleVersions.isEmpty()) {
 							version = compatibleVersions.get(0);
 						}
@@ -167,17 +155,21 @@ public class NewProjectExamplesStacksRequirementsPage extends NewProjectExamples
 						//No stacks runtime matching that server id
 					}
 				}
+			} else {
+				version = new StacksArchetypeUtil().getArchetype(stacksType, useBlank, wtpRuntime, stacks);
+				if (version != null) {
+					stArch = version.getArchetype();
+				}
 			}
-			//contains wtp runtime id
 			
-			if (version == null) {
-				version = StacksUtil.getDefaultArchetypeVersion(a, stacks);
+			if (version == null && stArch != null) {
+				version = StacksUtil.getDefaultArchetypeVersion(stArch, stacks);
 			}
 			
 			String exampleDescription = projectExample.getDescription();
 			if (exampleDescription == null || exampleDescription.trim().isEmpty()) {
 				//Fall back on archetype description
-				String archetypeDescription = version.getArchetype().getDescription();
+				String archetypeDescription = version == null? null : version.getArchetype().getDescription();
 				if (archetypeDescription == null || archetypeDescription.trim().isEmpty()) {
 					description.append("No description available"); //$NON-NLS-1$
 				} else {
@@ -188,11 +180,17 @@ public class NewProjectExamplesStacksRequirementsPage extends NewProjectExamples
 			}
 			
 			try {
-				mavenArchetype = createArchetypeModel(projectExample.getArchetypeModel(), version);
-				
+				if (version != null) {
+					mavenArchetype = createArchetypeModel(projectExample.getArchetypeModel(), version);
+				}
 			} catch (CloneNotSupportedException e) {
 				e.printStackTrace();
 			}
+		}
+		
+		
+		if (mavenArchetype == null) {
+			mavenArchetype = projectExample.getArchetypeModel();
 		}
 		
 		wizardContext.setProperty(MavenProjectConstants.ARCHETYPE_MODEL, mavenArchetype);
@@ -208,10 +206,17 @@ public class NewProjectExamplesStacksRequirementsPage extends NewProjectExamples
 		}
 		
 		setDescriptionText(description.toString());
-		
-		
 	}
 
+	
+	private IRuntime getSelectedRuntime() {
+		if (serverTargetCombo != null && !serverTargetCombo.isDisposed()) {
+			String wtpServerId = serverTargetCombo.getText();
+			return serverRuntimes.get(wtpServerId);
+		}
+		return null;
+	}
+	
 	private ArchetypeModel createArchetypeModel(ArchetypeModel archetypeModel, ArchetypeVersion archetypeVersion) throws CloneNotSupportedException {
 		ArchetypeModel a = (ArchetypeModel) archetypeModel.clone(); 
 		a.setArchetypeArtifactId(archetypeVersion.getArchetype().getArtifactId());
@@ -236,6 +241,7 @@ public class NewProjectExamplesStacksRequirementsPage extends NewProjectExamples
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				setArchetypeVersion();
+				validateEnterpriseRepo();
 			}
 			
 			@Override
@@ -415,12 +421,21 @@ public class NewProjectExamplesStacksRequirementsPage extends NewProjectExamples
 		if (warningComponent != null) {
 			warningComponent.setLinkText(""); //$NON-NLS-1$
 			if (isEnterpriseTargetRuntime()) {
+				IStatus enterpriseRepoStatus = enterpriseRepoStatusMap.get(version);
 				if (enterpriseRepoStatus == null) {
-					enterpriseRepoStatus = MavenArtifactHelper.checkEnterpriseRequirementsAvailable(projectExample); 
+					if (StacksArchetypeUtil.getRequiredDependencies(version) == null) {
+						enterpriseRepoStatus = MavenArtifactHelper.checkEnterpriseRequirementsAvailable(projectExample); 
+					} else {
+						enterpriseRepoStatus = MavenArtifactHelper.checkRequirementsAvailable(version);
+					}
+					enterpriseRepoStatusMap.put(version, enterpriseRepoStatus);
 				}
-				if (!enterpriseRepoStatus.isOK()) {
+				if (enterpriseRepoStatus.isOK()) {
+					warningComponent.setRepositoryUrls(null);
+				} else {
+					warningComponent.setRepositoryUrls(StacksArchetypeUtil.getAdditionalRepositories(version));
 					warningComponent.setLinkText(enterpriseRepoStatus.getMessage());
-				} 
+				}
 			}
 		}
 	}
@@ -437,7 +452,7 @@ public class NewProjectExamplesStacksRequirementsPage extends NewProjectExamples
 			ServerCore.removeRuntimeLifecycleListener(listener);
 			listener = null;
 		}
-		
+		enterpriseRepoStatusMap.clear();
 		MavenCoreActivator.getDefault().unregisterMavenSettingsChangeListener(this);
 	    saveInputHistory();
 
@@ -536,7 +551,7 @@ public class NewProjectExamplesStacksRequirementsPage extends NewProjectExamples
 	public void onSettingsChanged() {
 		Display.getDefault().asyncExec( new Runnable() {  public void run() { 
 			//Reset previous status
-			enterpriseRepoStatus = null;
+			enterpriseRepoStatusMap = null;
 			validateEnterpriseRepo();
 		} });
 	}

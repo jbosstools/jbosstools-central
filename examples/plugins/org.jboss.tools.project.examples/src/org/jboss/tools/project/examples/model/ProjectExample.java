@@ -60,6 +60,7 @@ public class ProjectExample implements ProjectModelElement,
 	private String iconPath;
 	private String sourceLocation;
 	private String stacksId;
+	private String stacksType;
 	public ProjectExample() {
 		name = ""; //$NON-NLS-1$
 		shortDescription = ""; //$NON-NLS-1$
@@ -385,6 +386,20 @@ public class ProjectExample implements ProjectModelElement,
 
 	public void setHeadLine(String headLine) {
 		this.headLine = headLine;
+	}
+
+	/**
+	 * @since 1.5.3
+	 */
+	public void setStacksType(String stacksType) {
+		this.stacksType = stacksType;
+	}
+
+	/**
+	 * @since 1.5.3
+	 */
+	public String getStacksType() {
+		return stacksType;
 	}
 
 }

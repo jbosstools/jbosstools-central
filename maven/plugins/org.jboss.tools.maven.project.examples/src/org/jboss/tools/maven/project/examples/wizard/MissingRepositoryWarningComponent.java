@@ -10,6 +10,8 @@
  ************************************************************************************/
 package org.jboss.tools.maven.project.examples.wizard;
 
+import java.util.Map;
+
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
@@ -34,6 +36,8 @@ public class MissingRepositoryWarningComponent extends Composite {
 	private Label warningImg;
 	private Image warningIcon;
 
+	private Map<String, String> repositoryUrls;
+	
 	public MissingRepositoryWarningComponent(Composite parent) {
 		super(parent, SWT.NORMAL);
 		GridDataFactory.fillDefaults().align(SWT.FILL, SWT.FILL).grab(true, false).span(3, 1)
@@ -50,8 +54,13 @@ public class MissingRepositoryWarningComponent extends Composite {
 		warninglink.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				
-				ConfigureMavenRepositoriesWizard wizard = new ConfigureMavenRepositoriesWizard(null, "redhat-techpreview-all-repository"); //$NON-NLS-1$
+				ConfigureMavenRepositoriesWizard wizard;
+				if (repositoryUrls != null && !repositoryUrls.isEmpty()) {
+					wizard = new ConfigureMavenRepositoriesWizard();
+					wizard.addPreconfiguredRepositories(repositoryUrls); 
+				} else {
+					wizard = new ConfigureMavenRepositoriesWizard(null, "redhat-techpreview-all-repository"); //$NON-NLS-1$
+				}
 				WizardDialog dialog = new WizardDialog(Display.getDefault().getActiveShell(), wizard);
 				wizard.init(null, null);
 				dialog.create();
@@ -59,14 +68,13 @@ public class MissingRepositoryWarningComponent extends Composite {
 			}
 		});
 		GridData gd = (GridData) getLayoutData();
-		gd.widthHint = 650;
-		
+		gd.widthHint = 600;
 		GC gc = new GC(this);
 		gc.setFont(getFont());
 		FontMetrics fontMetrics = gc.getFontMetrics();
 		gc.dispose();
 		gd = (GridData) getLayoutData();
-		gd.heightHint = fontMetrics.getHeight() * 3;
+		gd.heightHint = fontMetrics.getHeight() * 6;
 	}
 	
 	public void setLinkText(String text) {
@@ -79,5 +87,13 @@ public class MissingRepositoryWarningComponent extends Composite {
 			}
 			getParent().layout(true, true);
 		}
+	}
+
+
+	/**
+	 * @since 1.5.3
+	 */
+	public void setRepositoryUrls(Map<String, String> repositoryUrls) {
+		this.repositoryUrls = repositoryUrls;
 	}
 }
