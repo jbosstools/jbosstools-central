@@ -13,6 +13,7 @@ public class Messages extends NLS {
 	public static String ArchetypeExamplesWizardFirstPage_Title;
 	public static String ArchetypeExamplesWizardFirstPage_Unresolved_Enterprise_Repo;
 	public static String ArchetypeExamplesWizardFirstPage_Unresolved_WFK_Repo;
+	public static String ArchetypeExamplesWizardFirstPage_Unresolved_Essential_Dependency;
 	public static String ArchetypeExamplesWizardFirstPage_Error_Package;
 	public static String MavenProjectExamplesActivator_Downloading_Examples_Wizards_Metadata;
 	public static String MavenProjectExamplesActivator_Error_Retrieving_Stacks_MetaData;
