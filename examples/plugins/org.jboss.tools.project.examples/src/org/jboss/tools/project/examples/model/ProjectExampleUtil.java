@@ -481,10 +481,15 @@ public class ProjectExampleUtil {
 									}
 								} else if (nodeName.equals("essentialEnterpriseDependencies")) { //$NON-NLS-1$
 									parseEssentialEnterpriseDependencies(project, child);
-								} else if (nodeName.equals("stacksId")) { //$NON-NLS-1$
+								} else if (nodeName.equals("stacksId")) { /** deprecated *///$NON-NLS-1$
 									String stacksId = getContent(child); 
 									if (stacksId != null) {
 										project.setStacksId(stacksId);
+									}
+								} else if (nodeName.equals("stacksType")) { //$NON-NLS-1$
+									String stacksType = getContent(child); 
+									if (stacksType != null) {
+										project.setStacksType(stacksType);
 									}
 								} else if (nodeName.equals("headLine")) { //$NON-NLS-1$
 									String headLine = getContent(child); 

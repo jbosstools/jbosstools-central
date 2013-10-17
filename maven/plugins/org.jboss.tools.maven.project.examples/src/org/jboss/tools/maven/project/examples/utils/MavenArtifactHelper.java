@@ -20,10 +20,12 @@ import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.osgi.util.NLS;
+import org.jboss.jdf.stacks.model.ArchetypeVersion;
 import org.jboss.tools.maven.core.IArtifactResolutionService;
 import org.jboss.tools.maven.core.MavenCoreActivator;
 import org.jboss.tools.maven.project.examples.MavenProjectExamplesActivator;
 import org.jboss.tools.maven.project.examples.Messages;
+import org.jboss.tools.maven.project.examples.internal.stacks.StacksArchetypeUtil;
 import org.jboss.tools.maven.project.examples.xpl.DependencyKey;
 import org.jboss.tools.project.examples.model.ProjectExample;
 
@@ -105,6 +107,42 @@ public class MavenArtifactHelper {
 								NLS.bind(Messages.ArchetypeExamplesWizardFirstPage_Unresolved_WFK_Repo, gav));
 					}
 				}
+			}
+		}
+		return Status.OK_STATUS;
+	}
+	
+	/**
+	 * @since 1.5.3
+	 */
+	public static IStatus checkRequirementsAvailable(ArchetypeVersion archetypeVersion) {
+		if (archetypeVersion == null) {
+			return Status.OK_STATUS;
+		}
+		Set<String> requirements = StacksArchetypeUtil.getRequiredDependencies(archetypeVersion);
+		if (requirements == null || requirements.isEmpty()) {
+			return Status.OK_STATUS;
+		}
+		IArtifactResolutionService resolutionService = MavenCoreActivator.getDefault().getArtifactResolutionService();
+		List<ArtifactRepository> repos;
+		try {
+			repos = MavenPlugin.getMaven().getArtifactRepositories();
+		} catch (CoreException e1) {
+			return new Status(IStatus.ERROR, 
+					MavenProjectExamplesActivator.PLUGIN_ID, 
+					"Can't load maven repositories");
+		}
+		for (String gav : requirements) {
+			boolean isResolved = false;
+			try {
+				isResolved = resolutionService.isResolved(gav, repos, new NullProgressMonitor());
+			} catch (CoreException e) {
+				MavenProjectExamplesActivator.log(e);
+			}
+			if (!isResolved) {
+				return new Status(IStatus.ERROR, 
+						MavenProjectExamplesActivator.PLUGIN_ID, 
+						NLS.bind(Messages.ArchetypeExamplesWizardFirstPage_Unresolved_Essential_Dependency, gav));
 			}
 		}
 		return Status.OK_STATUS;

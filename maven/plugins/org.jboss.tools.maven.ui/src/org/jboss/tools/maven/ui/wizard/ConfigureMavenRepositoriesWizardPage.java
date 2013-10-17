@@ -21,10 +21,13 @@ import java.io.InputStream;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
+import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Scanner;
 import java.util.Set;
 import java.util.TreeSet;
@@ -43,6 +46,7 @@ import org.apache.maven.settings.Profile;
 import org.apache.maven.settings.Repository;
 import org.apache.maven.settings.RepositoryPolicy;
 import org.apache.maven.settings.Settings;
+import org.codehaus.plexus.util.StringUtils;
 import org.eclipse.compare.CompareConfiguration;
 import org.eclipse.compare.IEncodedStreamContentAccessor;
 import org.eclipse.compare.ITypedElement;
@@ -209,6 +213,8 @@ public class ConfigureMavenRepositoriesWizardPage extends WizardPage implements 
 	private ArtifactKey artifactKey;
 
 	private String preSelectedProfileId;
+
+	private Map<String, String> preconfiguredRepositoryUrls;
 
 	public ConfigureMavenRepositoriesWizardPage(ArtifactKey artifactKey) {
 		this(artifactKey, null);
@@ -409,10 +415,94 @@ public class ConfigureMavenRepositoriesWizardPage extends WizardPage implements 
 		
 		createPreviewer(composite);
 		
+		RepositoryWrapper[] newRepos = createPreselectedRepositories();
+		
+		setPageComplete(newRepos.length > 0);
+
 		refreshRepositories();
-		setPageComplete(false);
+		
+		includedRepositoriesViewer.setSelection(new StructuredSelection(newRepos));
 	}
 
+	private RepositoryWrapper[] createPreselectedRepositories() {
+		if (preconfiguredRepositoryUrls == null || preconfiguredRepositoryUrls.isEmpty()) {
+			return new RepositoryWrapper[0];
+		}
+		Set<RepositoryWrapper> allRepos = new HashSet<RepositoryWrapper>();
+		allRepos.addAll(availableRepositories);
+		allRepos.addAll(includedRepositories);
+		
+		List<RepositoryWrapper> newRepos = new ArrayList<RepositoryWrapper>();
+		
+		for (Map.Entry<String, String> entry : preconfiguredRepositoryUrls.entrySet()) {
+			String repoId = entry.getKey();
+			try {
+				URL url = new URL(entry.getValue()); 
+			} catch (Exception e) {
+				Activator.log(e);
+				continue;
+			}
+			RepositoryWrapper preconfiguredRepository = null;
+			String preConfUrl = entry.getValue();
+			for (RepositoryWrapper repo : allRepos) {
+				if (preConfUrl .equals(repo.getRepository().getUrl())) {
+					preconfiguredRepository = repo;
+					break;
+				}
+			}
+			if(preconfiguredRepository == null) {
+				Repository r = getDefaultRepository();
+				String name = StringUtils.capitaliseAllWords(repoId.replace("redhat", "Red Hat").replace("-", " "));
+				if (!name.endsWith(" Repository")) {
+					name += " Repository";
+				}
+				r.setName(getUniqueName(name, allRepos));
+				r.setUrl(preConfUrl);
+				String id = getUniqueProfileId(repoId, allRepos);
+				r.setId(id);
+				preconfiguredRepository = new RepositoryWrapper(r, id);
+			}
+			includedRepositories.add(preconfiguredRepository);
+			removeRepository(preconfiguredRepository);
+			availableRepositories.remove(preconfiguredRepository);
+			addRepository(preconfiguredRepository, true);
+			newRepos.add(preconfiguredRepository);
+		}
+		RepositoryWrapper[] result = new RepositoryWrapper[newRepos.size()];
+		newRepos.toArray(result);
+		return result;
+	}
+
+	private String getUniqueName(String name, Collection<RepositoryWrapper> repos) {
+		return getUniqueName(name, 1, repos);
+	}
+
+	private String getUniqueName(String name, int iteration, Collection<RepositoryWrapper> repos) {
+		String candidateName = (iteration > 1)? name + " (" + iteration + ")" : name;
+		for (RepositoryWrapper rw : repos) {
+			if (candidateName.equals(rw.getRepository().getName())) {
+				return getUniqueName(candidateName, ++iteration, repos);
+			}
+		}
+		return candidateName;
+	}
+
+
+	private String getUniqueProfileId(String profileId, Collection<RepositoryWrapper> repos) {
+		return getUniqueProfileId(profileId, 1, repos);
+	}
+
+	private String getUniqueProfileId(String profileId, int iteration, Collection<RepositoryWrapper> repos) {
+		String candidateId = (iteration > 1)? profileId + "-" + iteration : profileId;
+		for (RepositoryWrapper rw : repos) {
+			if (candidateId.equals(rw.getProfileId()) || candidateId.equals(rw.getRepository().getId())) {
+				return getUniqueProfileId(candidateId, ++iteration, repos);
+			}
+		}
+		return candidateId;
+	}
+
+	
 	protected void createButtons(Composite parent) {
 		GridData gd;
 		Composite buttonsComposite = new Composite(parent, SWT.NONE);
@@ -1152,14 +1242,18 @@ public class ConfigureMavenRepositoriesWizardPage extends WizardPage implements 
 	@Override
 	public void pageChanged(PageChangedEvent event) {
 		//When page is selected, if a profileId was preselected, then open the "Add Repository..." dialog 
-		if ( this.equals(event.getSelectedPage()) && preSelectedProfileId != null) {
-			for (RepositoryWrapper repo : availableRepositories) {
-				if (preSelectedProfileId.equals(repo.getProfileId())){
-					openAddRepositoryDialog();
-					break;
+		if ( this.equals(event.getSelectedPage())) {
+			if (preSelectedProfileId == null) {
+				openEditRepositoryDialog();
+			} else {
+				for (RepositoryWrapper repo : availableRepositories) {
+					if (preSelectedProfileId.equals(repo.getProfileId())){
+						openAddRepositoryDialog();
+						break;
+					}
 				}
+				preSelectedProfileId = null;
 			}
-			preSelectedProfileId = null;
 		}
 	}
 
@@ -1206,6 +1300,15 @@ public class ConfigureMavenRepositoriesWizardPage extends WizardPage implements 
 			setPageComplete(true);
 			refreshRepositories();
 		}
+	}
+
+
+	/**
+	 * @since 1.5.3
+	 */
+	public void addPreconfiguredRepositories(
+			Map<String, String> preconfiguredRepositories) {
+				this.preconfiguredRepositoryUrls = preconfiguredRepositories;
 	}
 	
 }

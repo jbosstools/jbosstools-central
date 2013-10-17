@@ -10,6 +10,8 @@
  ************************************************************************************/
 package org.jboss.tools.maven.ui.wizard;
 
+import java.util.Map;
+
 import org.eclipse.jface.dialogs.IPageChangeProvider;
 import org.eclipse.jface.dialogs.IPageChangedListener;
 import org.eclipse.jface.resource.ImageDescriptor;
@@ -33,6 +35,7 @@ public class ConfigureMavenRepositoriesWizard extends Wizard implements
 	private ConfigureMavenRepositoriesWizardPage page;
 	private ArtifactKey artifactKey;
 	private String preSelectedProfileId;
+	private Map<String, String> preconfiguredRepositoryUrls;
 
 	public ConfigureMavenRepositoriesWizard() {
 		super();
@@ -67,6 +70,7 @@ public class ConfigureMavenRepositoriesWizard extends Wizard implements
 	@Override
 	public void addPages() {
 		page = new ConfigureMavenRepositoriesWizardPage(artifactKey, preSelectedProfileId);
+		page.addPreconfiguredRepositories(preconfiguredRepositoryUrls);
 		addPage(page);
 	}
 	
@@ -90,5 +94,12 @@ public class ConfigureMavenRepositoriesWizard extends Wizard implements
 			}
 		} 
 		super.dispose();
+	}
+
+	/**
+	 * @since 1.5.3
+	 */
+	public void addPreconfiguredRepositories(Map<String, String> repositoryUrls) {
+		this.preconfiguredRepositoryUrls = repositoryUrls;
 	}
 }
