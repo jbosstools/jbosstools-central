@@ -112,4 +112,5 @@ public class AbstractJBossCentralPage extends FormPage {
 			}
 		}
 	}
+	
 }
