@@ -31,7 +31,10 @@ import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.browser.Browser;
+import org.eclipse.swt.dnd.DND;
+import org.eclipse.swt.dnd.DropTarget;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IEditorInput;
@@ -55,6 +58,7 @@ import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.eclipse.ui.services.IServiceLocator;
 import org.jboss.tools.central.editors.JBossCentralEditor;
 import org.jboss.tools.central.editors.JBossCentralEditorInput;
+import org.jboss.tools.central.internal.dnd.JBossCentralDropTarget;
 import org.jboss.tools.project.examples.model.ProjectExample;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
@@ -68,6 +72,8 @@ import org.osgi.service.prefs.BackingStoreException;
 public class JBossCentralActivator extends AbstractUIPlugin {
 
 	public static final Object JBOSS_CENTRAL_FAMILY = new Object();
+	
+	private static final String MPC_CORE_PLUGIN_ID = "org.eclipse.epp.mpc.core"; //$NON-NLS-1$
 
 	public static final String ID = "id";
 
@@ -470,6 +476,36 @@ public class JBossCentralActivator extends AbstractUIPlugin {
 		} finally {
 			if (shell != null)
 				shell.dispose();
+		}
+	}
+	
+	/**
+	 * Registers DropTarget on the main Eclipse shell.
+	 * If there is the MPC client or some other plugin has already added DropTarget to the main Eclipse shell, 
+	 * the target is registered on the JBoss Central editor.
+	 * 
+	 * @param control
+	 * @since 1.2.2
+	 */
+	public static void initDropTarget(Control control) {
+		if (control == null) {
+			return;
+		}
+		Object dropTarget = control.getData(DND.DROP_TARGET_KEY);
+		if (dropTarget != null) {
+			Object object = ((DropTarget)dropTarget).getData(JBossCentralDropTarget.JBOSS_DROP_TARGET_ID);
+			if (JBossCentralDropTarget.JBOSS_DROP_TARGET.equals(object)) {
+				return;
+			}
+		}
+		boolean mpcExists = Platform.getBundle(MPC_CORE_PLUGIN_ID) != null;
+		
+		if (!(control instanceof Shell) || !mpcExists) {
+			if (control.getData(DND.DROP_TARGET_KEY) != null) {
+				JBossCentralActivator.log("Cannot initialize JBoss DND");
+				return;
+			}
+			new JBossCentralDropTarget(control);
 		}
 	}
 

@@ -8,7 +8,7 @@
  * Contributors:
  *     Tasktop Technologies - initial API and implementation
  *******************************************************************************/
-package org.jboss.tools.central.internal.discovery.xpl;
+package org.jboss.tools.project.examples.internal.discovery;
 
 import java.lang.reflect.InvocationTargetException;
 import java.net.MalformedURLException;
@@ -70,6 +70,8 @@ import org.eclipse.swt.widgets.Display;
  * @author David Green
  * @author Steffen Pingel
  * @author snjeza - adding the P2 remediation operation
+ * 
+ * @since 1.5.3
  */
 public class PrepareInstallProfileJob extends AbstractInstallJob {
 

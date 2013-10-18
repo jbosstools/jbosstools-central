@@ -40,8 +40,8 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.PlatformUI;
 import org.jboss.tools.central.JBossCentralActivator;
-import org.jboss.tools.central.internal.discovery.JBossCentralDiscoveryUi;
 import org.jboss.tools.project.examples.internal.discovery.DiscoveryUtil;
+import org.jboss.tools.project.examples.internal.discovery.JBossDiscoveryUi;
 
 /**
  * 
@@ -146,7 +146,7 @@ public class JBossCentralDropTarget {
 					notFoundConnectors.remove(connector.getId());
 				} 
 			}
-			Set<String> installedFeatures = JBossCentralDiscoveryUi.createInstallJob(installableConnectors).getInstalledFeatures(new NullProgressMonitor());
+			Set<String> installedFeatures = JBossDiscoveryUi.createInstallJob(installableConnectors).getInstalledFeatures(new NullProgressMonitor());
 			Set<ConnectorDescriptor> installedConnectors = new HashSet<ConnectorDescriptor>();
 			Iterator<ConnectorDescriptor> iter = installableConnectors.iterator();
 			while (iter.hasNext()) {
@@ -185,7 +185,7 @@ public class JBossCentralDropTarget {
 				}
 			}
 			if (continueInstallation) {
-				JBossCentralDiscoveryUi.install(installableConnectors, dialog);
+				JBossDiscoveryUi.install(installableConnectors, dialog);
 			}
 		} else {
 			String message = results[0].toString();
