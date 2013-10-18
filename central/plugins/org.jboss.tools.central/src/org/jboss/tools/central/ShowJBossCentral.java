@@ -22,7 +22,6 @@ import org.eclipse.ui.IStartup;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.progress.UIJob;
-import org.jboss.tools.central.internal.discovery.JBossCentralDiscoveryUi;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.Version;
 
@@ -96,7 +95,7 @@ public class ShowJBossCentral implements IStartup {
 				IWorkbenchWindow[] workbenchWindows = PlatformUI.getWorkbench().getWorkbenchWindows();
 				for (IWorkbenchWindow window : workbenchWindows) {
 					Shell shell = window.getShell();
-					JBossCentralDiscoveryUi.initDropTarget(shell);
+					JBossCentralActivator.initDropTarget(shell);
 				}
 				return Status.OK_STATUS;
 			}

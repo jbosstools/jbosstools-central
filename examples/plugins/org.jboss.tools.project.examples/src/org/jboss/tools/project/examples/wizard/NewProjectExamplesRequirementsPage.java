@@ -69,6 +69,7 @@ import org.jboss.tools.project.examples.Messages;
 import org.jboss.tools.project.examples.ProjectExamplesActivator;
 import org.jboss.tools.project.examples.fixes.WTPRuntimeFix;
 import org.jboss.tools.project.examples.internal.discovery.DiscoveryUtil;
+import org.jboss.tools.project.examples.internal.discovery.JBossDiscoveryUi;
 import org.jboss.tools.project.examples.model.ProjectExample;
 import org.jboss.tools.project.examples.model.ProjectFix;
 import org.jboss.tools.runtime.core.RuntimeCoreActivator;
@@ -523,7 +524,7 @@ public class NewProjectExamplesRequirementsPage extends WizardPage implements IP
 					installableConnectors.add(connector);
 				}
 			}
-			DiscoveryUi.install(installableConnectors, getWizard().getContainer());
+			JBossDiscoveryUi.install(installableConnectors, getWizard().getContainer());
 		} else {
 			String message = results[0].toString();
 			switch (results[0].getSeverity()) {
