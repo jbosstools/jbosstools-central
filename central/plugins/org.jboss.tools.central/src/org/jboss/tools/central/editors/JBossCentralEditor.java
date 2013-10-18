@@ -69,8 +69,8 @@ import org.eclipse.ui.menus.CommandContributionItem;
 import org.jboss.tools.central.JBossCentralActivator;
 import org.jboss.tools.central.actions.OpenWithBrowserHandler;
 import org.jboss.tools.central.editors.xpl.TextSearchControl;
-import org.jboss.tools.central.internal.discovery.JBossCentralDiscoveryUi;
 import org.jboss.tools.project.examples.ProjectExamplesActivator;
+import org.jboss.tools.project.examples.internal.discovery.JBossDiscoveryUi;
 
 /**
  * 
@@ -246,7 +246,7 @@ public class JBossCentralEditor extends SharedHeaderFormEditor {
 	@Override
 	protected Composite createPageContainer(Composite parent) {
 		Composite composite = super.createPageContainer(parent);
-		JBossCentralDiscoveryUi.initDropTarget(parent);
+		JBossCentralActivator.initDropTarget(parent);
 		return composite;
 	}
 

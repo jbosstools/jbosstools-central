@@ -8,14 +8,13 @@
  * Contributors:
  *     JBoss by Red Hat - Initial implementation.
  ************************************************************************************/
-package org.jboss.tools.central.internal.discovery;
+package org.jboss.tools.project.examples.internal.discovery;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jface.operation.IRunnableContext;
@@ -26,24 +25,18 @@ import org.eclipse.mylyn.internal.discovery.ui.AbstractInstallJob;
 import org.eclipse.mylyn.internal.discovery.ui.DiscoveryUi;
 import org.eclipse.mylyn.internal.discovery.ui.wizards.Messages;
 import org.eclipse.osgi.util.NLS;
-import org.eclipse.swt.dnd.DND;
-import org.eclipse.swt.dnd.DropTarget;
-import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.preferences.ScopedPreferenceStore;
 import org.eclipse.ui.statushandlers.StatusManager;
-import org.jboss.tools.central.JBossCentralActivator;
-import org.jboss.tools.central.internal.discovery.xpl.PrepareInstallProfileJob;
-import org.jboss.tools.central.internal.dnd.JBossCentralDropTarget;
+import org.jboss.tools.project.examples.ProjectExamplesActivator;
 
 /**
  * 
  * Based on org.eclipse.mylyn.internal.discovery.ui.DiscoveryUi
  * 
  * @author snjeza
- *
+ * @since 1.5.3
  */
-public class JBossCentralDiscoveryUi {
+public class JBossDiscoveryUi {
 	
 	private static final String MPC_CORE_PLUGIN_ID = "org.eclipse.epp.mpc.core"; //$NON-NLS-1$
 
@@ -56,7 +49,7 @@ public class JBossCentralDiscoveryUi {
 			new DiscoveryFeedbackJob(descriptors).schedule();
 			recordInstalled(descriptors);
 		} catch (InvocationTargetException e) {
-			IStatus status = new Status(IStatus.ERROR, JBossCentralActivator.PLUGIN_ID, NLS.bind(
+			IStatus status = new Status(IStatus.ERROR, ProjectExamplesActivator.PLUGIN_ID, NLS.bind(
 					Messages.ConnectorDiscoveryWizard_installProblems, new Object[] { e.getCause().getMessage() }),
 					e.getCause());
 			StatusManager.getManager().handle(status, StatusManager.SHOW | StatusManager.BLOCK | StatusManager.LOG);
@@ -89,32 +82,4 @@ public class JBossCentralDiscoveryUi {
 		}
 	}
 
-	/**
-	 * Registers DropTarget on the main Eclipse shell.
-	 * If there is the MPC client or some other plugin has already added DropTarget to the main Eclipse shell, 
-	 * the target is registered on the JBoss Central editor.
-	 * 
-	 * @param control
-	 */
-	public static void initDropTarget(Control control) {
-		if (control == null) {
-			return;
-		}
-		Object dropTarget = control.getData(DND.DROP_TARGET_KEY);
-		if (dropTarget != null) {
-			Object object = ((DropTarget)dropTarget).getData(JBossCentralDropTarget.JBOSS_DROP_TARGET_ID);
-			if (JBossCentralDropTarget.JBOSS_DROP_TARGET.equals(object)) {
-				return;
-			}
-		}
-		boolean mpcExists = Platform.getBundle(MPC_CORE_PLUGIN_ID) != null;
-		
-		if (!(control instanceof Shell) || !mpcExists) {
-			if (control.getData(DND.DROP_TARGET_KEY) != null) {
-				JBossCentralActivator.log("Cannot initialize JBoss DND");
-				return;
-			}
-			new JBossCentralDropTarget(control);
-		}
-	}
 }
