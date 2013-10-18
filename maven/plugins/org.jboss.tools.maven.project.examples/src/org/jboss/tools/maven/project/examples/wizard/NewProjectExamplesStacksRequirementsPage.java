@@ -140,9 +140,19 @@ public class NewProjectExamplesStacksRequirementsPage extends NewProjectExamples
 			IRuntime wtpRuntime = getSelectedRuntime();
 	
 			org.jboss.jdf.stacks.model.Archetype stArch = null;
-			if (stacksType == null) {
-				stArch = useBlank && stacksArchetype.getBlank() != null ?stacksArchetype.getBlank():stacksArchetype;
-				if (wtpRuntime != null && wtpRuntime.getRuntimeType() != null) {
+			if (stacksType != null) {
+				version = new StacksArchetypeUtil().getArchetype(stacksType, useBlank, wtpRuntime, stacks);
+				if (version != null) {
+					stArch = version.getArchetype();
+				}
+			}
+			
+			if (stArch == null) {
+				String stacksId = projectExample.getStacksId();
+				stacksArchetype = getArchetype(stacksId, stacks);
+				
+				stArch = useBlank && stacksArchetype != null && stacksArchetype.getBlank() != null ?stacksArchetype.getBlank():stacksArchetype;
+				if (stArch != null && wtpRuntime != null && wtpRuntime.getRuntimeType() != null) {
 					String wtpRuntimeId = wtpRuntime.getRuntimeType().getId();
 					//System.err.println(wtpRuntimeId);
 					Runtime stacksRuntime = StacksUtil.getRuntimeFromWtpId(stacks, wtpRuntimeId );
@@ -154,11 +164,6 @@ public class NewProjectExamplesStacksRequirementsPage extends NewProjectExamples
 					} else {
 						//No stacks runtime matching that server id
 					}
-				}
-			} else {
-				version = new StacksArchetypeUtil().getArchetype(stacksType, useBlank, wtpRuntime, stacks);
-				if (version != null) {
-					stArch = version.getArchetype();
 				}
 			}
 			
