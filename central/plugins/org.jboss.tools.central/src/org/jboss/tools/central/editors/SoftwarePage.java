@@ -27,7 +27,6 @@ import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerFilter;
 import org.eclipse.mylyn.commons.core.DelegatingProgressMonitor;
 import org.eclipse.mylyn.internal.discovery.core.model.DiscoveryConnector;
-import org.eclipse.mylyn.internal.discovery.ui.DiscoveryUi;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ControlAdapter;
 import org.eclipse.swt.events.ControlEvent;
@@ -57,6 +56,7 @@ import org.jboss.tools.central.JBossCentralActivator;
 import org.jboss.tools.central.editors.xpl.DiscoveryViewer;
 import org.jboss.tools.central.jobs.RefreshDiscoveryJob;
 import org.jboss.tools.project.examples.ProjectExamplesActivator;
+import org.jboss.tools.project.examples.internal.discovery.JBossDiscoveryUi;
 
 /**
  * 
@@ -382,7 +382,7 @@ public class SoftwarePage extends AbstractJBossCentralPage implements IRunnableC
 				if (installButton != null) {
 					installButton.setEnabled(false);
 				}
-				DiscoveryUi.install(discoveryViewer.getInstallableConnectors(), SoftwarePage.this);
+				JBossDiscoveryUi.install(discoveryViewer.getInstallableConnectors(), SoftwarePage.this);
 			} finally {
 				if (shell != null) {
 					shell.setCursor(cursor);

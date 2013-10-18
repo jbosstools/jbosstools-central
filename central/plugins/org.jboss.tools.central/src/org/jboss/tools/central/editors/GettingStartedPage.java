@@ -53,7 +53,6 @@ import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.mylyn.internal.discovery.core.model.ConnectorDescriptor;
 import org.eclipse.mylyn.internal.discovery.core.model.ConnectorDiscovery;
 import org.eclipse.mylyn.internal.discovery.core.model.DiscoveryConnector;
-import org.eclipse.mylyn.internal.discovery.ui.DiscoveryUi;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.custom.ScrolledComposite;
@@ -109,6 +108,7 @@ import org.jboss.tools.central.jobs.RefreshTutorialsJob;
 import org.jboss.tools.central.model.FeedsEntry;
 import org.jboss.tools.project.examples.ProjectExamplesActivator;
 import org.jboss.tools.project.examples.internal.discovery.DiscoveryUtil;
+import org.jboss.tools.project.examples.internal.discovery.JBossDiscoveryUi;
 import org.jboss.tools.project.examples.model.ProjectExample;
 import org.jboss.tools.project.examples.model.ProjectExampleCategory;
 import org.jboss.tools.project.examples.wizard.NewProjectExamplesWizard2;
@@ -664,7 +664,7 @@ public class GettingStartedPage extends AbstractJBossCentralPage implements Prox
 					installableConnectors.add(connector);
 				}
 			}
-			DiscoveryUi.install(installableConnectors, context);
+			JBossDiscoveryUi.install(installableConnectors, context);
 		} else {
 			String message = results[0].toString();
 			switch (results[0].getSeverity()) {
