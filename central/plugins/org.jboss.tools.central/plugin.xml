@@ -29,22 +29,38 @@
            id="org.jboss.tools.central.preferences.JBossCentralPreferencePage"
            name="JBoss Central"/>
    </extension>
-
-   <extension point="org.eclipse.ui.actionSets">
-		<actionSet
-				id="org.jboss.tools.central"
-				label="JBoss Central"
-				visible="true">
-			<action
-					class="org.jboss.tools.central.actions.ShowJBossCentralHandler"
-					icon="icons/jboss.png"
-					id="org.jboss.tools.central.actions.ShowJBossCentralHandler"
-					label="JBoss Central"
-					toolbarPath="org.eclipse.ui.workbench.help/group.application"
-					menubarPath="help/group.intro"
-					tooltip="JBoss Central" />
-		</actionSet>
-   </extension>
+	<extension
+		point="org.eclipse.ui.menus">
+    <menuContribution
+          locationURI="toolbar:org.eclipse.ui.main.toolbar?after=org.eclipse.ui.workbench.help">
+       <toolbar
+             id="org.jboss.tools.central.toolbar">
+          <command
+                commandId="org.jboss.tools.central.show"
+                disabledIcon="$nl$/icons/jboss.png"
+                icon="$nl$/icons/jboss.png"
+                id="org.jboss.tools.central.actions.ShowJBossCentralHandler"
+                style="push"
+                label="%jboss.central.menu.name"
+                tooltip="%jboss.central.menu.name">
+              <visibleWhen checkEnabled="false" />
+          </command>
+       </toolbar>
+    </menuContribution>
+	<menuContribution
+          locationURI="menu:help?before=group.intro">
+       <command
+             commandId="org.jboss.tools.central.show"
+             disabledIcon="$nl$/icons/jboss.png"
+             icon="$nl$/icons/jboss.png"
+             id="org.jboss.tools.central.actions.ShowJBossCentralHandler"
+             label="%jboss.central.menu.name"
+             style="push"
+             tooltip="%jboss.central.menu.name">
+           <visibleWhen checkEnabled="false" />
+       </command>
+    </menuContribution>
+</extension>
    <extension
          point="org.eclipse.ui.commands">
       <command
