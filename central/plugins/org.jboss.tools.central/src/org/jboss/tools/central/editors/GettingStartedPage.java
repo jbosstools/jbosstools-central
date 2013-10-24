@@ -233,8 +233,9 @@ public class GettingStartedPage extends AbstractJBossCentralPage implements Prox
 	private void createComprehensiveTutorial(FormToolkit toolkit,	Composite parent) {
 		
 		comprehensiveTutorialSection = createSection(toolkit, parent, "Tutorial", ExpandableComposite.TITLE_BAR);
-		GridData gd = new GridData(SWT.FILL, SWT.TOP, true, true);
-		comprehensiveTutorialSection.setLayoutData(gd);
+		comprehensiveTutorialSection.setLayout(new GridLayout(1, false));
+		comprehensiveTutorialSection.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
+		addEmptyToolBarForAlignment(comprehensiveTutorialSection);
 		
 		comprehensiveTutorialComposite = toolkit.createComposite(comprehensiveTutorialSection);
 		GridLayout layout = new GridLayout();
@@ -248,6 +249,17 @@ public class GettingStartedPage extends AbstractJBossCentralPage implements Prox
 		thumb.setToolTipText("Open the Ticket Monster tutorial on the JBoss Developer Framework site");
 		GridDataFactory.fillDefaults().grab(true, true).applyTo(comprehensiveTutorialComposite);
 		comprehensiveTutorialSection.setClient(comprehensiveTutorialComposite);
+	}
+
+	private void addEmptyToolBarForAlignment(Section section) {
+		Composite blankHeaderComposite = toolkit.createComposite(section, SWT.NONE);
+	    RowLayout rowLayout = new RowLayout();
+	    rowLayout.marginTop = 0;
+	    rowLayout.marginBottom = 0;
+	    blankHeaderComposite.setLayout(rowLayout);
+	    ToolBarManager toolBarManager = new ToolBarManager(SWT.FLAT | SWT.HORIZONTAL);
+	    toolBarManager.createControl(blankHeaderComposite);
+	    section.setTextClient(blankHeaderComposite);
 	}
 		
 
@@ -365,7 +377,7 @@ public class GettingStartedPage extends AbstractJBossCentralPage implements Prox
 	
 	private void createSamplesSection(FormToolkit toolkit, Composite parent) {
 		tutorialsSection = createSection(toolkit, parent, "Start from a sample", ExpandableComposite.TITLE_BAR);
-	    GridData gd = new GridData(SWT.FILL, SWT.TOP, true, false);
+	    GridData gd = new GridData(SWT.FILL, SWT.TOP, true, true);
 	    tutorialsSection.setLayoutData(gd);
 	    
 	    createTutorialsToolbar(toolkit, tutorialsSection);
@@ -720,9 +732,11 @@ public class GettingStartedPage extends AbstractJBossCentralPage implements Prox
 	
 	public void createDocumentationSection(FormToolkit toolkit, Composite parent) {
 
-		documentationSection = createSection(toolkit, parent, "Other resources", SWT.NONE);
+		documentationSection = createSection(toolkit, parent, "Other resources", ExpandableComposite.TITLE_BAR);
 		documentationSection.setLayout(new GridLayout(1, false));
-		documentationSection.setLayoutData(new GridData(SWT.RIGHT, SWT.TOP, false, false, 1, 1));
+		documentationSection.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
+
+		addEmptyToolBarForAlignment(documentationSection);
 		
 		documentationComposite = toolkit.createComposite(documentationSection);
 		GridData gd = new GridData(SWT.RIGHT, SWT.TOP, true, true, 1, 1);
