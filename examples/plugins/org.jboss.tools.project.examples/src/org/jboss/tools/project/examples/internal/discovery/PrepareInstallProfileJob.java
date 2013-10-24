@@ -8,7 +8,7 @@
  * Contributors:
  *     Tasktop Technologies - initial API and implementation
  *******************************************************************************/
-package org.jboss.tools.central.internal.discovery.xpl;
+package org.jboss.tools.project.examples.internal.discovery;
 
 import java.lang.reflect.InvocationTargetException;
 import java.net.MalformedURLException;
