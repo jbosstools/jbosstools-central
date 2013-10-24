@@ -45,7 +45,6 @@ import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.mylyn.internal.discovery.core.model.ConnectorDescriptor;
 import org.eclipse.mylyn.internal.discovery.core.model.ConnectorDiscovery;
 import org.eclipse.mylyn.internal.discovery.core.model.DiscoveryConnector;
-import org.eclipse.mylyn.internal.discovery.ui.DiscoveryUi;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -56,6 +55,7 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Link;
@@ -65,6 +65,9 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.browser.IWorkbenchBrowserSupport;
 import org.eclipse.ui.dialogs.PreferencesUtil;
+import org.eclipse.wst.server.core.IServer;
+import org.eclipse.wst.server.core.IServerLifecycleListener;
+import org.eclipse.wst.server.core.ServerCore;
 import org.jboss.tools.project.examples.Messages;
 import org.jboss.tools.project.examples.ProjectExamplesActivator;
 import org.jboss.tools.project.examples.fixes.WTPRuntimeFix;
@@ -91,6 +94,34 @@ public class NewProjectExamplesRequirementsPage extends WizardPage implements IP
 	private Image checkboxOn;
 	private Image checkboxOff;
 	private Link link;
+	private IServerLifecycleListener serverListener = new IServerLifecycleListener() {
+
+		private void refreshInUIThread() {
+			Display.getDefault().asyncExec(new Runnable() {
+				
+				@Override
+				public void run() {
+					refreshFixes();
+				}
+			});
+		}
+
+		@Override
+		public void serverAdded(IServer server) {
+			refreshInUIThread();
+		}
+
+		@Override
+		public void serverChanged(IServer server) {
+			refreshInUIThread();
+		}
+
+		@Override
+		public void serverRemoved(IServer server) {
+			refreshInUIThread();
+		}
+
+	};
 	
 	public NewProjectExamplesRequirementsPage(ProjectExample projectExample) {
 		this(PAGE_NAME, projectExample);
@@ -195,7 +226,7 @@ public class NewProjectExamplesRequirementsPage extends WizardPage implements IP
 		if (projectExample != null) {
 			setProjectExample(projectExample);
 		}
-		
+		ServerCore.addServerLifecycleListener(serverListener);
 	}
 
 	protected void setDescriptionArea(Composite composite) {
@@ -632,6 +663,7 @@ public class NewProjectExamplesRequirementsPage extends WizardPage implements IP
 
 	@Override
 	public void dispose() {
+		ServerCore.removeServerLifecycleListener(serverListener);
 		if (checkboxOff != null) {
 			checkboxOff.dispose();
 		}
