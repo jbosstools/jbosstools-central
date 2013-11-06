@@ -109,7 +109,13 @@ public class JBossCentralDropTarget {
 	
 	public JBossCentralDropTarget(final Control control) {
 		final DropTarget target = new DropTarget(control, DND.DROP_MOVE | DND.DROP_COPY | DND.DROP_LINK);
-		target.setTransfer(new Transfer[] { URLTransfer.getInstance() });
+		Transfer[] transfers;
+		if (LinuxURLTransfer.isLinuxGTK()) {
+			transfers = new Transfer[] { URLTransfer.getInstance(), LinuxURLTransfer.getInstance() };
+		} else {
+			transfers = new Transfer[] { URLTransfer.getInstance() };
+		}
+		target.setTransfer(transfers);
 		target.setData(JBOSS_DROP_TARGET_ID, JBOSS_DROP_TARGET);
 		target.addDropListener(listener);
 	}
