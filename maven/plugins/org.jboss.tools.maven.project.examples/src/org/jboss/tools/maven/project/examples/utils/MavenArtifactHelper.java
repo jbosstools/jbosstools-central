@@ -77,11 +77,24 @@ public class MavenArtifactHelper {
 
 	
 	public static IStatus checkEnterpriseRequirementsAvailable(ProjectExample project) {
-		if (!isEnterpriseRepositoryAvailable()) {
-			return new Status(IStatus.ERROR, 
-					   MavenProjectExamplesActivator.PLUGIN_ID, 
-					   NLS.bind(Messages.ArchetypeExamplesWizardFirstPage_Unresolved_Enterprise_Repo, JBOSS_SPEC));
+		IStatus status = Status.OK_STATUS;
+		if (project != null) {
+			status = checkRequirementsAvailable(project);
+			if (status.isOK()) {
+				if (!isEnterpriseRepositoryAvailable()) {
+					status = new Status(IStatus.ERROR, 
+							MavenProjectExamplesActivator.PLUGIN_ID, 
+							NLS.bind(Messages.ArchetypeExamplesWizardFirstPage_Unresolved_Enterprise_Repo, JBOSS_SPEC));
+				}
+			}
 		}
+		return status;
+	}
+	
+	/**
+	 * @since 1.5.4
+	 */	
+	public static IStatus checkRequirementsAvailable(ProjectExample project) {
 		if (project != null) {
 			Set<String> requirements = project.getEssentialEnterpriseDependencyGavs();
 			if (requirements != null && !requirements.isEmpty()) {
@@ -104,13 +117,13 @@ public class MavenArtifactHelper {
 					if (!isResolved) {
 						return new Status(IStatus.ERROR, 
 								MavenProjectExamplesActivator.PLUGIN_ID, 
-								NLS.bind(Messages.ArchetypeExamplesWizardFirstPage_Unresolved_WFK_Repo, gav));
+								NLS.bind(Messages.ArchetypeExamplesWizardFirstPage_Unresolved_Essential_Dependency, gav));
 					}
 				}
 			}
 		}
 		return Status.OK_STATUS;
-	}
+	}	
 	
 	/**
 	 * @since 1.5.3
