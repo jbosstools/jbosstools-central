@@ -50,7 +50,6 @@ import org.jboss.jdf.stacks.model.ArchetypeVersion;
 import org.jboss.jdf.stacks.model.Runtime;
 import org.jboss.jdf.stacks.model.Stacks;
 import org.jboss.tools.maven.core.MavenCoreActivator;
-import org.jboss.tools.maven.core.settings.MavenSettingsChangeListener;
 import org.jboss.tools.maven.project.examples.MavenProjectExamplesActivator;
 import org.jboss.tools.maven.project.examples.Messages;
 import org.jboss.tools.maven.project.examples.internal.stacks.StacksArchetypeUtil;
@@ -58,19 +57,16 @@ import org.jboss.tools.maven.project.examples.utils.MavenArtifactHelper;
 import org.jboss.tools.project.examples.model.ArchetypeModel;
 import org.jboss.tools.project.examples.model.ProjectExample;
 import org.jboss.tools.project.examples.model.ProjectFix;
-import org.jboss.tools.project.examples.wizard.NewProjectExamplesRequirementsPage;
 import org.jboss.tools.runtime.core.RuntimeCoreActivator;
 import org.jboss.tools.runtime.core.model.DownloadRuntime;
 import org.jboss.tools.stacks.core.model.StacksUtil;
 
-public class NewProjectExamplesStacksRequirementsPage extends NewProjectExamplesRequirementsPage implements MavenSettingsChangeListener {
+public class NewProjectExamplesStacksRequirementsPage extends MavenExamplesRequirementsPage {
 
 	private static final String PAGE_NAME = "org.jboss.tools.project.examples.stacksrequirements"; //$NON-NLS-1$
 
 	private static final String TARGET_RUNTIME = "targetRuntime"; //$NON-NLS-1$
 
-	private MissingRepositoryWarningComponent warningComponent;
-	
 	private Map<ArchetypeVersion, IStatus> enterpriseRepoStatusMap = new HashMap<ArchetypeVersion, IStatus>();
 
 	private org.jboss.jdf.stacks.model.Archetype stacksArchetype;   
@@ -111,9 +107,9 @@ public class NewProjectExamplesStacksRequirementsPage extends NewProjectExamples
 	}
 	
 	@Override
-	public void setProjectExample(ProjectExample projectExample) {
-		super.setProjectExample(projectExample);
-		if (projectExample != null) {
+	public void setProjectExample(ProjectExample example) {
+		if (example != null) {
+			projectExample = example;
 			stacksType = projectExample.getStacksType();
 			if (stacksType == null) {
 				String stacksId = projectExample.getStacksId();
@@ -123,7 +119,7 @@ public class NewProjectExamplesStacksRequirementsPage extends NewProjectExamples
 			
 			wizardContext.setProperty(MavenProjectConstants.ENTERPRISE_TARGET, isEnterpriseTargetRuntime());
 
-			validateEnterpriseRepo();
+			super.setProjectExample(projectExample);
 		}
 	}
 
@@ -290,13 +286,6 @@ public class NewProjectExamplesStacksRequirementsPage extends NewProjectExamples
 	}
 	
 	@Override
-	protected void setAdditionalControls(Composite composite) {
-		warningComponent = new MissingRepositoryWarningComponent(composite);
-		
-		MavenCoreActivator.getDefault().registerMavenSettingsChangeListener(this);
-	}
-	
-	@Override
 	public void setVisible(boolean visible) {
 		if (visible) {
 		  if (useBlankArchetype != null) {
@@ -422,6 +411,7 @@ public class NewProjectExamplesStacksRequirementsPage extends NewProjectExamples
 		return runtimesMap;
 	}
 
+	@Override
 	protected void validateEnterpriseRepo() {
 		if (warningComponent != null) {
 			warningComponent.setLinkText(""); //$NON-NLS-1$
