@@ -18,6 +18,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
+import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
@@ -116,6 +117,37 @@ public class JBossCentralDropTarget {
 			transfers = new Transfer[] { URLTransfer.getInstance() };
 		}
 		target.setTransfer(transfers);
+		addListener(target);
+	}
+	
+	public JBossCentralDropTarget(DropTarget target) {
+		Assert.isNotNull(target);
+		boolean hasUrlTransfer = false;
+		Transfer[] transfers = target.getTransfer();
+		for (Transfer transfer : transfers) {
+			if (transfer instanceof URLTransfer) {
+				hasUrlTransfer = true;
+				break;
+			}
+		}
+		if (!hasUrlTransfer) {
+			Transfer[] newTransfers;
+			if (LinuxURLTransfer.isLinuxGTK()) {
+				newTransfers = new Transfer[transfers.length + 2];
+				System.arraycopy(transfers, 0, newTransfers, 0, transfers.length);
+				newTransfers[transfers.length] = URLTransfer.getInstance();
+				newTransfers[transfers.length + 1] = LinuxURLTransfer.getInstance();
+			} else {
+				newTransfers = new Transfer[transfers.length + 1];
+				System.arraycopy(transfers, 0, newTransfers, 0, transfers.length);
+				newTransfers[transfers.length] = URLTransfer.getInstance();
+			}
+			target.setTransfer(newTransfers);
+		}
+		addListener(target);
+	}
+	
+	public void addListener(DropTarget target) {
 		target.setData(JBOSS_DROP_TARGET_ID, JBOSS_DROP_TARGET);
 		target.addDropListener(listener);
 	}

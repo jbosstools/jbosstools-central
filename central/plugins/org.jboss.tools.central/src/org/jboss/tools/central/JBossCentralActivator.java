@@ -493,20 +493,24 @@ public class JBossCentralActivator extends AbstractUIPlugin {
 		}
 		Object dropTarget = control.getData(DND.DROP_TARGET_KEY);
 		if (dropTarget != null) {
+			if ( !(dropTarget instanceof DropTarget)) {
+				JBossCentralActivator.log("Cannot initialize JBoss DND");
+				return;
+			}
 			Object object = ((DropTarget)dropTarget).getData(JBossCentralDropTarget.JBOSS_DROP_TARGET_ID);
 			if (JBossCentralDropTarget.JBOSS_DROP_TARGET.equals(object)) {
 				return;
 			}
+			new JBossCentralDropTarget((DropTarget)dropTarget);
+			return;
 		}
 		boolean mpcExists = Platform.getBundle(MPC_CORE_PLUGIN_ID) != null;
 		
-		if (!(control instanceof Shell) || !mpcExists) {
-			if (control.getData(DND.DROP_TARGET_KEY) != null) {
+		if ((control instanceof Shell) && mpcExists) {
 				JBossCentralActivator.log("Cannot initialize JBoss DND");
 				return;
-			}
-			new JBossCentralDropTarget(control);
 		}
+		new JBossCentralDropTarget(control);
 	}
 
 }
