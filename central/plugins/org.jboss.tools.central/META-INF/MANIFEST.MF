@@ -31,7 +31,9 @@ Require-Bundle: org.eclipse.ui;bundle-version="3.7.0",
  org.eclipse.equinox.p2.operations;bundle-version="2.3.0",
  org.eclipse.equinox.p2.metadata;bundle-version="2.2.0",
  org.eclipse.equinox.p2.repository;bundle-version="2.3.0",
- org.eclipse.equinox.p2.director;bundle-version="2.3.0"
+ org.eclipse.equinox.p2.director;bundle-version="2.3.0",
+ org.eclipse.e4.ui.model.workbench;bundle-version="1.0.0",
+ org.eclipse.e4.ui.workbench;bundle-version="1.0.0"
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-Localization: plugin
