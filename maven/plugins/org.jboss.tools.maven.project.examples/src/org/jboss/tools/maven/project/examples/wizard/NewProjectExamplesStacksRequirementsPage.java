@@ -21,7 +21,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.jobs.IJobChangeEvent;
+import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.core.runtime.jobs.JobChangeAdapter;
 import org.eclipse.jface.dialogs.DialogSettings;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jst.j2ee.web.project.facet.WebFacetUtils;
@@ -85,6 +90,10 @@ public class NewProjectExamplesStacksRequirementsPage extends MavenExamplesRequi
 
 	private String stacksType;
 
+	private Job job;
+	
+	private boolean exampleInitialized;
+
 	public NewProjectExamplesStacksRequirementsPage() {
 		this(null);
 	}
@@ -108,8 +117,10 @@ public class NewProjectExamplesStacksRequirementsPage extends MavenExamplesRequi
 	
 	@Override
 	public void setProjectExample(ProjectExample example) {
+		exampleInitialized = false;
 		if (example != null) {
 			projectExample = example;
+			super.setProjectExample(projectExample);
 			stacksType = projectExample.getStacksType();
 			if (stacksType == null) {
 				String stacksId = projectExample.getStacksId();
@@ -119,8 +130,10 @@ public class NewProjectExamplesStacksRequirementsPage extends MavenExamplesRequi
 			setArchetypeVersion();
 			
 			wizardContext.setProperty(MavenProjectConstants.ENTERPRISE_TARGET, isEnterpriseTargetRuntime());
-
-			super.setProjectExample(projectExample);
+			
+			exampleInitialized = true;
+			
+			validateEnterpriseRepo();			
 		}
 	}
 
@@ -307,6 +320,7 @@ public class NewProjectExamplesStacksRequirementsPage extends MavenExamplesRequi
           
 		  wizardContext.setProperty(MavenProjectConstants.ENTERPRISE_TARGET, isEnterpriseTargetRuntime());
 		}
+		
 		super.setVisible(visible);
 	}
 	
@@ -419,28 +433,68 @@ public class NewProjectExamplesStacksRequirementsPage extends MavenExamplesRequi
 
 	@Override
 	protected void validateEnterpriseRepo() {
-		if (warningComponent != null) {
+		if (exampleInitialized && warningComponent != null) {
 			warningComponent.setLinkText(""); //$NON-NLS-1$
-			if (isEnterpriseTargetRuntime()) {
-				IStatus enterpriseRepoStatus = enterpriseRepoStatusMap.get(version);
-				if (enterpriseRepoStatus == null) {
-					if (StacksArchetypeUtil.getRequiredDependencies(version) == null) {
-						enterpriseRepoStatus = MavenArtifactHelper.checkEnterpriseRequirementsAvailable(projectExample); 
-					} else {
-						enterpriseRepoStatus = MavenArtifactHelper.checkRequirementsAvailable(version);
-					}
-					enterpriseRepoStatusMap.put(version, enterpriseRepoStatus);
-				}
-				if (enterpriseRepoStatus.isOK()) {
-					warningComponent.setRepositoryUrls(null);
-				} else {
-					warningComponent.setRepositoryUrls(StacksArchetypeUtil.getAdditionalRepositories(version));
-					warningComponent.setLinkText(enterpriseRepoStatus.getMessage());
-				}
+			if (!isEnterpriseTargetRuntime()) {
+				return;
 			}
+
+			warningComponent.setLinkText(Messages.NewProjectExamplesStacksRequirementsPage_Checking_Enterprise_Maven_Repo_Availability, false); 
+			IStatus enterpriseRepoStatus = enterpriseRepoStatusMap.get(version);
+			if (enterpriseRepoStatus != null) {
+				updateWarningComponent(enterpriseRepoStatus);
+				return;
+			}
+			
+			final IStatus[] checkResult = new IStatus[1]; 
+			
+			stopMavenRepoCheckJob();
+			
+			job = new Job(Messages.NewProjectExamplesStacksRequirementsPage_Check_Maven_Repo_Job) {
+				
+				@Override
+				protected IStatus run(IProgressMonitor monitor) {
+					if (StacksArchetypeUtil.getRequiredDependencies(version) == null) {
+						checkResult[0] = MavenArtifactHelper.checkEnterpriseRequirementsAvailable(projectExample); 
+					} else {
+						checkResult[0] = MavenArtifactHelper.checkRequirementsAvailable(version);
+					}
+					return Status.OK_STATUS;
+				}
+			};
+			
+			job.addJobChangeListener(new JobChangeAdapter() {
+				public void done(IJobChangeEvent event) {
+					enterpriseRepoStatusMap.put(version, checkResult[0]);
+					final IStatus status = event.getResult().isOK()?checkResult[0]:event.getResult();
+					Display.getDefault().syncExec( new Runnable() {  public void run() { 
+						updateWarningComponent(status);
+					} });
+				};
+			});
+			
+			job.schedule();
 		}
 	}
 
+	private void stopMavenRepoCheckJob() {
+		if (job != null) {
+			job.cancel();
+		}		
+	}
+
+	private void updateWarningComponent(IStatus status) {
+		if (status == null || status.isOK()) {
+			warningComponent.setRepositoryUrls(null);
+			warningComponent.setLinkText(""); //$NON-NLS-1$
+		} else {
+			warningComponent.setRepositoryUrls(StacksArchetypeUtil.getAdditionalRepositories(version));
+			warningComponent.setLinkText(status.getMessage());
+		}
+		wizardContext.setProperty(MavenProjectConstants.ENTERPRISE_REPO_STATUS, status);
+	}
+	
+	
 	@Override
 	public void dispose() {
 		if (dialogSettings != null && serverRuntimes != null && serverTargetCombo != null) {
@@ -453,6 +507,8 @@ public class NewProjectExamplesStacksRequirementsPage extends MavenExamplesRequi
 			ServerCore.removeRuntimeLifecycleListener(listener);
 			listener = null;
 		}
+		stopMavenRepoCheckJob();
+		job = null;
 		enterpriseRepoStatusMap.clear();
 		MavenCoreActivator.getDefault().unregisterMavenSettingsChangeListener(this);
 	    saveInputHistory();
@@ -550,11 +606,9 @@ public class NewProjectExamplesStacksRequirementsPage extends MavenExamplesRequi
 
 	@Override
 	public void onSettingsChanged() {
-		Display.getDefault().asyncExec( new Runnable() {  public void run() { 
-			//Reset previous status
-			enterpriseRepoStatusMap = null;
-			validateEnterpriseRepo();
-		} });
+		//Reset previous status
+		enterpriseRepoStatusMap.clear();
+		validateEnterpriseRepo();
 	}
 
 }

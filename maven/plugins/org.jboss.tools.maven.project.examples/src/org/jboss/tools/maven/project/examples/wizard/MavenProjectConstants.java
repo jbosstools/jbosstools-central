@@ -13,6 +13,11 @@ public final class MavenProjectConstants {
 	public static final String MAVEN_MODEL = "mavenModel";
 	
 	public static final String ARCHETYPE_MODEL = "archetypeModel";
+
+	/**
+	 * @since 1.5.4
+	 */
+	public static final String ENTERPRISE_REPO_STATUS = "enterpriseRepoStatus";
 	
 	private MavenProjectConstants(){
 	}

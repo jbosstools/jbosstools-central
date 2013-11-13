@@ -295,31 +295,33 @@ public class ArchetypeExamplesWizardPage extends
 
 	@Override
 	protected void validate() {
-		checkEnterpriseProperty();
+		if (getControl() != null && getControl().isVisible()) {
+			checkEnterpriseProperty();
+		}
 		super.validate();
 	}
 	
 	private void checkEnterpriseProperty() {
-		if (warningComponent == null) {
+		if (warningComponent == null || warningComponent.isDisposed() || propertiesTable.isDisposed()) {
 			//Not initialized yet
 			return;
 		}
 		for(int i = 0; i < propertiesTable.getItemCount(); i++ ) {
 		      TableItem item = propertiesTable.getItem(i);
 		      String value = item.getText(VALUE_INDEX);
-		      if (item.getText(KEY_INDEX).equals("enterprise")  //$NON-NLS-1$
-		    		  && (Boolean.TRUE.toString().equalsIgnoreCase(value)
+		      if (item.getText(KEY_INDEX).equals("enterprise")) {  //$NON-NLS-1$
+		       warningComponent.setLinkText(""); //$NON-NLS-1$
+		       if ( (Boolean.TRUE.toString().equalsIgnoreCase(value)
 		    		  || "y".equalsIgnoreCase(value)
 		    		  || "yes".equalsIgnoreCase(value))
 		    		  ) {
-		    	  
-		    	warningComponent.setLinkText(""); //$NON-NLS-1$
 				if (enterpriseRepoStatus == null) {
 					enterpriseRepoStatus = MavenArtifactHelper.checkEnterpriseRequirementsAvailable(projectExample); 
 				}
 				if (!enterpriseRepoStatus.isOK()) {
 					warningComponent.setLinkText(enterpriseRepoStatus.getMessage());
 				} 
+		       }
 				return;
 		      }
 		}
@@ -498,7 +500,11 @@ public class ArchetypeExamplesWizardPage extends
 				enterprise = (Boolean)value;
 			}
 			updateArchetypeProperty(MavenProjectConstants.ENTERPRISE_TARGET, enterprise.toString());
-		} else if (MavenProjectConstants.ARCHETYPE_MODEL.equals(key)) {
+			checkEnterpriseProperty();
+		} else if (MavenProjectConstants.ENTERPRISE_REPO_STATUS.equals(key)) {
+			enterpriseRepoStatus = (IStatus) value;
+			checkEnterpriseProperty();
+	    } else if (MavenProjectConstants.ARCHETYPE_MODEL.equals(key)) {
 			if (value instanceof ArchetypeModel) {
 				archetypeModel = (ArchetypeModel)value;
 				if (getControl() != null) {
