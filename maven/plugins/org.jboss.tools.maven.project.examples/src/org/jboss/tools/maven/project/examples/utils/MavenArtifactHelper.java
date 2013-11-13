@@ -10,11 +10,14 @@
  ************************************************************************************/
 package org.jboss.tools.maven.project.examples.utils;
 
+import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Status;
@@ -32,7 +35,13 @@ import org.jboss.tools.project.examples.model.ProjectExample;
 public class MavenArtifactHelper {
 
 	private static final String JBOSS_SPEC = "org.jboss.spec:jboss-javaee-web-6.0"; //$NON-NLS-1$
-	
+
+	private static final String[] JBOSS_SPEC_VERSIONS = new String[]{
+															JBOSS_SPEC+":pom:3.0.2.Final-redhat-5",//EAP 6.2.0 //$NON-NLS-1$ 
+															JBOSS_SPEC+":pom:3.0.2.Final-redhat-4",//EAP 6.1.1 //$NON-NLS-1$ 
+															JBOSS_SPEC+":pom:3.0.2.Final-redhat-3",//EAP 6.1.0 //$NON-NLS-1$
+		                                                };
+
 	private static final String COORDS = JBOSS_SPEC+":[0,)"; //$NON-NLS-1$
 	/**
 	 * Checks if the EAP repository is available
@@ -41,6 +50,23 @@ public class MavenArtifactHelper {
 	 */
 	public static boolean isEnterpriseRepositoryAvailable() {
 		boolean isRepoAvailable = redHatArtifactExists(COORDS);
+		//JBIDE-15295 : Since EAP 6.1, zipped maven repos are missing maven artifact metadata so we can't search for a version range
+		//Falling back to hard-coded version resolution
+		if (!isRepoAvailable) {
+			IArtifactResolutionService resolutionService = MavenCoreActivator.getDefault().getArtifactResolutionService();
+			List<ArtifactRepository> repos;
+			try {
+				repos = MavenPlugin.getMaven().getArtifactRepositories();
+				Iterator<String> ite = Arrays.asList(JBOSS_SPEC_VERSIONS).iterator();
+				IProgressMonitor npm =  new NullProgressMonitor();
+				while(ite.hasNext() && !isRepoAvailable) {
+					String gav =  ite.next();
+					isRepoAvailable = resolutionService.isResolved(gav, repos, npm);
+				}
+			} catch (CoreException e) {
+				MavenProjectExamplesActivator.log(e);
+			}
+		}
 		return isRepoAvailable;
 	}
 

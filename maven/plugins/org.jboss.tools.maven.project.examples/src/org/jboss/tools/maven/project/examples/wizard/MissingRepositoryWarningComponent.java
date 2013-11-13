@@ -78,17 +78,22 @@ public class MissingRepositoryWarningComponent extends Composite {
 	}
 	
 	public void setLinkText(String text) {
-		if (warninglink != null) {
+		setLinkText(text, true);
+	}
+
+	public void setLinkText(String text, boolean showWarning) {
+		if (warninglink != null && !warninglink.isDisposed()) {
 			warninglink.setText(text);
-			if (!text.isEmpty() ) {
+			if (showWarning && !text.isEmpty() ) {
 				warningImg.setImage(warningIcon);
+				warningImg.setVisible(true);
 			} else {
-				warningImg.setImage(null);
+				//warningImg.setImage(null);
+				warningImg.setVisible(false);
 			}
 			getParent().layout(true, true);
 		}
-	}
-
+	}	
 
 	/**
 	 * @since 1.5.3
