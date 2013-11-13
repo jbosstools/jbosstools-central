@@ -17,6 +17,8 @@ public class Messages extends NLS {
 	public static String ArchetypeExamplesWizardFirstPage_Error_Package;
 	public static String MavenProjectExamplesActivator_Downloading_Examples_Wizards_Metadata;
 	public static String MavenProjectExamplesActivator_Error_Retrieving_Stacks_MetaData;
+	public static String NewProjectExamplesStacksRequirementsPage_Check_Maven_Repo_Job;
+	public static String NewProjectExamplesStacksRequirementsPage_Checking_Enterprise_Maven_Repo_Availability;
 	static {
 		// initialize resource bundle
 		NLS.initializeMessages(BUNDLE_NAME, Messages.class);
