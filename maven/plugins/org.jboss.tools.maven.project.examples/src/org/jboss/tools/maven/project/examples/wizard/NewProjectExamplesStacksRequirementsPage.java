@@ -115,6 +115,7 @@ public class NewProjectExamplesStacksRequirementsPage extends MavenExamplesRequi
 				String stacksId = projectExample.getStacksId();
 				stacksArchetype = getArchetype(stacksId, stacks);
 			}
+
 			setArchetypeVersion();
 			
 			wizardContext.setProperty(MavenProjectConstants.ENTERPRISE_TARGET, isEnterpriseTargetRuntime());
@@ -128,6 +129,10 @@ public class NewProjectExamplesStacksRequirementsPage extends MavenExamplesRequi
 		ArchetypeModel mavenArchetype = null;
 		StringBuilder description = new StringBuilder();
 		
+		StacksArchetypeUtil stacksArchetypeUtil = new StacksArchetypeUtil();
+		if (useBlankArchetype != null) {
+			useBlankArchetype.setVisible(false);
+		}
 		if (stacksType == null && stacksArchetype == null) {
 			description.append(projectExample.getDescription());
 		} else {
@@ -137,7 +142,7 @@ public class NewProjectExamplesStacksRequirementsPage extends MavenExamplesRequi
 	
 			org.jboss.jdf.stacks.model.Archetype stArch = null;
 			if (stacksType != null) {
-				version = new StacksArchetypeUtil().getArchetype(stacksType, useBlank, wtpRuntime, stacks);
+				version = stacksArchetypeUtil.getArchetype(stacksType, useBlank, wtpRuntime, stacks);
 				if (version != null) {
 					stArch = version.getArchetype();
 				}
@@ -150,7 +155,6 @@ public class NewProjectExamplesStacksRequirementsPage extends MavenExamplesRequi
 				stArch = useBlank && stacksArchetype != null && stacksArchetype.getBlank() != null ?stacksArchetype.getBlank():stacksArchetype;
 				if (stArch != null && wtpRuntime != null && wtpRuntime.getRuntimeType() != null) {
 					String wtpRuntimeId = wtpRuntime.getRuntimeType().getId();
-					//System.err.println(wtpRuntimeId);
 					Runtime stacksRuntime = StacksUtil.getRuntimeFromWtpId(stacks, wtpRuntimeId );
 					if (stacksRuntime != null) {
 						List<ArchetypeVersion> compatibleVersions = StacksUtil.getCompatibleArchetypeVersions(stArch, stacksRuntime);
@@ -183,6 +187,10 @@ public class NewProjectExamplesStacksRequirementsPage extends MavenExamplesRequi
 			try {
 				if (version != null) {
 					mavenArchetype = createArchetypeModel(projectExample.getArchetypeModel(), version);
+					boolean hasBlank = stacksArchetypeUtil.hasBlankArchetype(version, wtpRuntime, stacks);
+					if (useBlankArchetype != null) {
+						useBlankArchetype.setVisible(hasBlank);
+					}
 				}
 			} catch (CloneNotSupportedException e) {
 				e.printStackTrace();
@@ -209,7 +217,6 @@ public class NewProjectExamplesStacksRequirementsPage extends MavenExamplesRequi
 		setDescriptionText(description.toString());
 	}
 
-	
 	private IRuntime getSelectedRuntime() {
 		if (serverTargetCombo != null && !serverTargetCombo.isDisposed()) {
 			String wtpServerId = serverTargetCombo.getText();
@@ -235,7 +242,6 @@ public class NewProjectExamplesStacksRequirementsPage extends MavenExamplesRequi
 		gd.verticalAlignment = SWT.TOP;
 		
 		useBlankArchetype.setLayoutData(gd);
-		
 		useBlankArchetype.setText("Create a blank project"); //$NON-NLS-1$
 		useBlankArchetype.addSelectionListener(new SelectionListener() {
 			
