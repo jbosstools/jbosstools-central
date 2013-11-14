@@ -11,6 +11,7 @@
 package org.jboss.tools.maven.examples.test;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
@@ -206,6 +207,24 @@ public class StacksArchetypeUtilTest {
 		assertEquals("1.0.1", archetypeEar.getVersion());
 	}
 
+	
+	@Test
+	public void testBlankArchetype() {
+
+		ArchetypeVersion archetypeWeb = stacksArchetypeUtil.getArchetype("javaee-web", false, null, stacks);
+		assertTrue(stacksArchetypeUtil.hasBlankArchetype(archetypeWeb, null, stacks));
+		
+		ArchetypeVersion archetypeEar = stacksArchetypeUtil.getArchetype("javaee-ear", false, null, stacks);
+		assertTrue(stacksArchetypeUtil.hasBlankArchetype(archetypeEar, null, stacks));
+
+		ArchetypeVersion archetypeRichfaces = stacksArchetypeUtil.getArchetype("richfaces-kitchensink", false, null, stacks);
+		assertFalse(stacksArchetypeUtil.hasBlankArchetype(archetypeRichfaces, null, stacks));
+
+		ArchetypeVersion archetypeErrai = stacksArchetypeUtil.getArchetype("errai-kitchensink", false, null, stacks);
+		assertFalse(stacksArchetypeUtil.hasBlankArchetype(archetypeErrai, null, stacks));
+
+	}	
+	
 	private org.eclipse.wst.server.core.IRuntime createRuntime(String id) {
 		org.eclipse.wst.server.core.IRuntime runtime = mock(org.eclipse.wst.server.core.IRuntime.class);
 		when(runtime.getId()).thenReturn(id);

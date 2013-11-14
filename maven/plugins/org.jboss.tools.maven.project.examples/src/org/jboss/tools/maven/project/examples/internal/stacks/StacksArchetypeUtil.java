@@ -188,8 +188,7 @@ public class StacksArchetypeUtil {
 				}
 				score += envScore;
 			}
-			boolean isArchetypeBlank = Boolean.parseBoolean(""+labels.get(ARCHETYPE_IS_BLANK)); 
-			if (isBlank == isArchetypeBlank) {
+			if (isBlank == isBlank(archetype)) {
 				score++;
 			}			
 			matchingArchetypes.put(archetype, score);
@@ -278,4 +277,28 @@ public class StacksArchetypeUtil {
 		return null;
 	}
 
+	public boolean hasBlankArchetype(ArchetypeVersion archetype,
+			IRuntime runtime, Stacks stacks) {
+		if (archetype == null) {
+			return false;
+		}
+		if (isBlank(archetype)) {
+			return true;
+		}
+		Properties labels = archetype.getLabels();
+		String type = labels.getProperty(ARCHETYPE_TYPE);
+		if (type == null) {
+			return archetype.getArchetype().getBlank() != null || archetype.getArchetype().getArtifactId().contains("-blank");
+		}
+		ArchetypeVersion candidate = getArchetype(type, true, runtime, stacks);
+		
+		return isBlank(candidate);
+	}
+
+	private boolean isBlank(ArchetypeVersion archetype){
+		Properties labels = archetype.getLabels();
+		boolean isArchetypeBlank = Boolean.parseBoolean(""+labels.get(ARCHETYPE_IS_BLANK)); 
+		return isArchetypeBlank;
+	}
+	
 }
