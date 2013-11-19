@@ -441,7 +441,7 @@ Tested by Red Hat.</description>
             license="Commercial"
             name="JRebel"
             provider="zeroturnaround.org"
-            siteUrl="http://www.zeroturnaround.com/update-site/">
+            siteUrl="http://update.zeroturnaround.com/update-site-jboss/">
             <iu id="org.zeroturnaround.eclipse.feature"/>
             <iu id="org.zeroturnaround.eclipse.wtp.feature"/>
             <iu id="org.zeroturnaround.eclipse.m2e.feature"/>
@@ -449,7 +449,7 @@ Tested by Red Hat.</description>
                image32="images/jrebel_32.png">
          </icon>
          <overview
-               url="http://update.zeroturnaround.com/update-site-jboss/">
+               url="http://zeroturnaround.com/software/jrebel/">
          </overview>
       </connectorDescriptor>
       
