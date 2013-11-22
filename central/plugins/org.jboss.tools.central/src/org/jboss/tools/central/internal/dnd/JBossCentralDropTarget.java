@@ -122,6 +122,10 @@ public class JBossCentralDropTarget {
 	
 	public JBossCentralDropTarget(DropTarget target) {
 		Assert.isNotNull(target);
+		Object object = ((DropTarget)target).getData(JBossCentralDropTarget.JBOSS_DROP_TARGET_ID);
+		if (JBossCentralDropTarget.JBOSS_DROP_TARGET.equals(object)) {
+			return;
+		}
 		boolean hasUrlTransfer = false;
 		Transfer[] transfers = target.getTransfer();
 		for (Transfer transfer : transfers) {
@@ -130,18 +134,26 @@ public class JBossCentralDropTarget {
 				break;
 			}
 		}
+		Transfer[] newTransfers = null;
 		if (!hasUrlTransfer) {
-			Transfer[] newTransfers;
 			if (LinuxURLTransfer.isLinuxGTK()) {
 				newTransfers = new Transfer[transfers.length + 2];
-				System.arraycopy(transfers, 0, newTransfers, 0, transfers.length);
-				newTransfers[transfers.length] = URLTransfer.getInstance();
-				newTransfers[transfers.length + 1] = LinuxURLTransfer.getInstance();
+				System.arraycopy(transfers, 0, newTransfers, 2, transfers.length);
+				newTransfers[0] = URLTransfer.getInstance();
+				newTransfers[1] = LinuxURLTransfer.getInstance();
 			} else {
 				newTransfers = new Transfer[transfers.length + 1];
-				System.arraycopy(transfers, 0, newTransfers, 0, transfers.length);
-				newTransfers[transfers.length] = URLTransfer.getInstance();
+				System.arraycopy(transfers, 0, newTransfers, 1, transfers.length);
+				newTransfers[0] = URLTransfer.getInstance();
 			}
+		} else {
+			if (LinuxURLTransfer.isLinuxGTK()) {
+				newTransfers = new Transfer[transfers.length + 1];
+				System.arraycopy(transfers, 0, newTransfers, 1, transfers.length);
+				newTransfers[1] = LinuxURLTransfer.getInstance();
+			}
+		}
+		if (newTransfers != null) {
 			target.setTransfer(newTransfers);
 		}
 		addListener(target);
