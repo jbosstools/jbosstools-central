@@ -10,11 +10,14 @@
  ************************************************************************************/
 package org.jboss.tools.central.internal.dnd;
 
+import java.lang.reflect.Field;
+
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.swt.dnd.ByteArrayTransfer;
 import org.eclipse.swt.dnd.HTMLTransfer;
 import org.eclipse.swt.dnd.Transfer;
 import org.eclipse.swt.dnd.TransferData;
+import org.jboss.tools.central.JBossCentralActivator;
 
 /**
  * The <code>LinuxURLTransfer</code> class fixes dropping a URL from Chrome into Eclipse on Linux
@@ -77,16 +80,37 @@ public class LinuxURLTransfer extends ByteArrayTransfer {
 	 * @see Transfer#javaToNative
 	 */
 	public Object nativeToJava(TransferData transferData) {
+		if (transferData == null) {
+			return null;
+		}
 		Object object = null;
 		if (isLinuxGTK()) {
+			Class<? extends TransferData> clazz = null;
+			Field typeField = null;
 			try {
-				transferData.type = TEXT_HTML_ID;
-				object = HTMLTransfer.getInstance().nativeToJava(transferData);
-			} finally {
-				transferData.type = URI_LIST_ID;
-			}
+				clazz = transferData.getClass();
+				typeField = clazz.getDeclaredField("type");
+				if (setType(typeField,transferData, TEXT_HTML_ID)) {
+					object = HTMLTransfer.getInstance().nativeToJava(transferData);
+					setType(typeField, transferData, URI_LIST_ID);
+				}
+			} catch (Exception e) {
+				JBossCentralActivator.log("Can not convert data to URL : "+e.getLocalizedMessage());
+			} 
 		}
 		return object;
+	}
+
+	private boolean setType(Field typeField, TransferData transferData, int type)
+			throws NoSuchFieldException, IllegalAccessException {
+		if (typeField.getType().equals(int.class)) {
+			typeField.setInt(transferData, type);
+			return true;
+		} else if (typeField.getType().equals(long.class)) {
+			typeField.setLong(transferData, (long) type);
+			return true;
+		}
+		return false;
 	}
 	
 	protected int[] getTypeIds(){
