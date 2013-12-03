@@ -435,7 +435,10 @@ public class NewProjectExamplesStacksRequirementsPage extends MavenExamplesRequi
 	protected void validateEnterpriseRepo() {
 		if (exampleInitialized && warningComponent != null) {
 			warningComponent.setLinkText(""); //$NON-NLS-1$
-			if (!isEnterpriseTargetRuntime()) {
+			
+			final Set<String> reqDeps = StacksArchetypeUtil.getRequiredDependencies(version);
+			
+			if (!isEnterpriseTargetRuntime() && (reqDeps == null || reqDeps.isEmpty())) {
 				return;
 			}
 
@@ -454,7 +457,7 @@ public class NewProjectExamplesStacksRequirementsPage extends MavenExamplesRequi
 				
 				@Override
 				protected IStatus run(IProgressMonitor monitor) {
-					if (StacksArchetypeUtil.getRequiredDependencies(version) == null) {
+					if (reqDeps == null || reqDeps.isEmpty()) {
 						checkResult[0] = MavenArtifactHelper.checkEnterpriseRequirementsAvailable(projectExample); 
 					} else {
 						checkResult[0] = MavenArtifactHelper.checkRequirementsAvailable(version);
