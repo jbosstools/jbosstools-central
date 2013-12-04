@@ -52,6 +52,8 @@ public class EditDependencyDialog extends SelectionStatusDialog  {
   protected Button optionalButton;
 
   private Dependency dependency;
+  
+  private boolean restrictedModification;
 
 /**
    * 
@@ -77,13 +79,16 @@ public class EditDependencyDialog extends SelectionStatusDialog  {
     Label groupIdLabel = new Label(composite, SWT.NONE);
     groupIdLabel.setText(Messages.EditDependencyDialog_groupId_label);
 
+    boolean enabled = !restrictedModification;
+    
     groupIdText = new Text(composite, SWT.BORDER);
     GridData gd_groupIdText = new GridData(SWT.FILL, SWT.CENTER, true, false, 2, 1);
     gd_groupIdText.horizontalIndent = 4;
     groupIdText.setLayoutData(gd_groupIdText);
     //ProposalUtil.addGroupIdProposal(project, groupIdText, Packaging.ALL);
     M2EUIUtils.addRequiredDecoration(groupIdText);
-
+	groupIdText.setEnabled(enabled );
+    
     Label artifactIdLabel = new Label(composite, SWT.NONE);
     artifactIdLabel.setText("Artifact Id");
 
@@ -93,7 +98,7 @@ public class EditDependencyDialog extends SelectionStatusDialog  {
     artifactIdText.setLayoutData(gd_artifactIdText);
     //ProposalUtil.addArtifactIdProposal(project, groupIdText, artifactIdText, Packaging.ALL);
     M2EUIUtils.addRequiredDecoration(artifactIdText);
-
+    artifactIdText.setEnabled(enabled);
     Label versionLabel = new Label(composite, SWT.NONE);
     versionLabel.setText(Messages.EditDependencyDialog_version_label);
 
@@ -102,6 +107,7 @@ public class EditDependencyDialog extends SelectionStatusDialog  {
     versionTextData.horizontalIndent = 4;
     versionTextData.widthHint = 200;
     versionText.setLayoutData(versionTextData);
+    versionText.setEnabled(enabled);
     //ProposalUtil.addVersionProposal(project, mavenproject, groupIdText, artifactIdText, versionText, Packaging.ALL);
 
     Label classifierLabel = new Label(composite, SWT.NONE);
@@ -114,7 +120,8 @@ public class EditDependencyDialog extends SelectionStatusDialog  {
     classifierText.setLayoutData(gd_classifierText);
     //ProposalUtil
     //    .addClassifierProposal(project, groupIdText, artifactIdText, versionText, classifierText, Packaging.ALL);
-
+    classifierText.setEnabled(enabled);
+    
     Label typeLabel = new Label(composite, SWT.NONE);
     typeLabel.setText(Messages.EditDependencyDialog_type_label);
 
@@ -124,7 +131,9 @@ public class EditDependencyDialog extends SelectionStatusDialog  {
     gd_typeText.horizontalIndent = 4;
     gd_typeText.widthHint = 120;
     typeCombo.setLayoutData(gd_typeText);
-
+    typeCombo.setEnabled(enabled);
+    
+    
     Label scopeLabel = new Label(composite, SWT.NONE);
     scopeLabel.setText(Messages.EditDependencyDialog_scope_label);
 
@@ -143,7 +152,8 @@ public class EditDependencyDialog extends SelectionStatusDialog  {
     gd_systemPathText.horizontalIndent = 4;
     gd_systemPathText.widthHint = 200;
     systemPathText.setLayoutData(gd_systemPathText);
-
+    systemPathText.setEnabled(enabled);
+    
 //    selectSystemPathButton = new Button(composite, SWT.NONE);
 //    selectSystemPathButton.setText("Select...");
 
@@ -154,7 +164,8 @@ public class EditDependencyDialog extends SelectionStatusDialog  {
     GridData gd_optionalButton = new GridData(SWT.LEFT, SWT.TOP, false, false, 2, 1);
     gd_optionalButton.horizontalIndent = 4;
     optionalButton.setLayoutData(gd_optionalButton);
-
+    optionalButton.setEnabled(enabled);
+    
     composite.setTabList(new Control[] {groupIdText, artifactIdText, versionText, classifierText, typeCombo,
         scopeCombo, systemPathText, /*selectSystemPathButton,*/optionalButton});
 
@@ -228,6 +239,14 @@ public class EditDependencyDialog extends SelectionStatusDialog  {
   */
   public Dependency getDependency() {
 	return dependency;
+  }
+
+  public boolean isRestrictedModification() {
+	return restrictedModification;
+  }
+	
+  public void setRestrictedModification(boolean restrictModification) {
+	this.restrictedModification = restrictModification;
   }
 
 }

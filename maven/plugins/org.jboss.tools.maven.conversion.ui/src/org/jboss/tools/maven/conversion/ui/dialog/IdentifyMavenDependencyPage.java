@@ -12,8 +12,10 @@ package org.jboss.tools.maven.conversion.ui.dialog;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -34,6 +36,10 @@ import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.jobs.IJobChangeEvent;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.core.runtime.jobs.JobChangeAdapter;
+import org.eclipse.jface.action.Action;
+import org.eclipse.jface.action.IMenuListener;
+import org.eclipse.jface.action.IMenuManager;
+import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.DialogSettings;
 import org.eclipse.jface.dialogs.IDialogSettings;
@@ -43,11 +49,14 @@ import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.CheckStateChangedEvent;
 import org.eclipse.jface.viewers.CheckboxTableViewer;
 import org.eclipse.jface.viewers.ColumnLabelProvider;
+import org.eclipse.jface.viewers.ColumnViewerToolTipSupport;
 import org.eclipse.jface.viewers.ICheckStateListener;
 import org.eclipse.jface.viewers.ICheckStateProvider;
+import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.TableViewerColumn;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerFilter;
+import org.eclipse.jface.window.ToolTip;
 import org.eclipse.jface.window.Window;
 import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.jface.wizard.WizardPage;
@@ -70,7 +79,6 @@ import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Text;
-import org.eclipse.ui.dialogs.PatternFilter;
 import org.eclipse.ui.dialogs.PreferencesUtil;
 import org.eclipse.ui.internal.ide.StringMatcher;
 import org.jboss.tools.maven.conversion.core.ProjectDependency;
@@ -90,6 +98,8 @@ import org.jboss.tools.maven.core.internal.identification.FileIdentificationMana
 import org.jboss.tools.maven.ui.wizard.ConfigureMavenRepositoriesWizard;
 
 public class IdentifyMavenDependencyPage extends WizardPage {
+
+	private static final String MULTIPLE_DEPENDENCIES_TEXT = "Multiple dependencies";
 
 	private static final int DEPENDENCY_COLUMN = 2;
 
@@ -288,7 +298,7 @@ public class IdentifyMavenDependencyPage extends WizardPage {
 		filterText.setMessage("Filter dependencies");
 		filterText.setFocus();//Steal focus, consistent with org.eclipse.ui.internal.about.AboutPluginsPage
 		
-		GridData gd = new GridData(SWT.FILL, SWT.FILL, true, true, 2, 4);
+		GridData gd = new GridData(SWT.FILL, SWT.FILL, true, true, 2, 5);
 		gd.heightHint = 500;
 		gd.widthHint = 545;
 
@@ -341,7 +351,9 @@ public class IdentifyMavenDependencyPage extends WizardPage {
 				return img;
 			}
 		});
-
+		ColumnViewerToolTipSupport.enableFor(dependenciesViewer, ToolTip.NO_RECREATE); 
+		
+		
 		TableViewerColumn dependencyColumn = new TableViewerColumn(dependenciesViewer, SWT.NONE);
 		dependencyColumn.getColumn().setText("Maven Dependency");
 		dependencyColumn.getColumn().setWidth(270);
@@ -384,27 +396,12 @@ public class IdentifyMavenDependencyPage extends WizardPage {
 				if (columnIndex == DEPENDENCY_COLUMN) {
 					ProjectDependency projectDep = (ProjectDependency) item.getData();
 					
-					IdentificationJob job = identificationJobs.get(projectDep);
-					if (Job.RUNNING == job.getState()) {
-						return;
-					}
-					
-					Dependency d= dependencyMap.get(projectDep);
-					EditDependencyDialog editDependencyDialog = new EditDependencyDialog(getShell());
-					editDependencyDialog.setDependency(d);
-					if(editDependencyDialog.open() == Window.OK) {
-						Dependency newDep = editDependencyDialog.getDependency();
-						dependencyMap.put(projectDep,newDep);
-						if (newDep != null && (d == null || !getKey(newDep).equals(getKey(d)))) {
-							resolve(projectDep, newDep);
-						}
-						refresh(projectDep);
-					}
+					openDependencyDetails(projectDep);
 				}
 			}
 
 		});
-		
+
 		final DependencyPatternFilter filter = new DependencyPatternFilter();
 		filterText.addModifyListener(new ModifyListener() {
 			public void modifyText(ModifyEvent e) {
@@ -416,12 +413,147 @@ public class IdentifyMavenDependencyPage extends WizardPage {
 		});
 		dependenciesViewer.addFilter(filter);
 
+		addSelectionMenus();
+		
 		addSelectionButton(container, "Select All", true);
 		addSelectionButton(container, "Deselect All", false);
+		addEditButton(container, "Edit ...");
 		addIdentifyButton(container, "Identify dependencies");
 		addStopButton(container, "Stop identification");
 	}
 
+	private void addSelectionMenus() {
+		MenuManager manager = new MenuManager();
+		manager.setRemoveAllWhenShown(true);
+		manager.addMenuListener(new IMenuListener() {
+			
+			@Override
+			public void menuAboutToShow(IMenuManager manager) {
+			
+				if (dependenciesViewer.getSelection().isEmpty()) {
+					return;
+	            }
+
+	            if (dependenciesViewer.getSelection() instanceof IStructuredSelection) {
+	            	final IStructuredSelection selection = (IStructuredSelection) dependenciesViewer.getSelection();
+	            	boolean showSelect = false;
+	            	boolean showUnSelect = false;
+	            	
+	                Iterator<ProjectDependency> iterator = selection.iterator();
+					while(iterator.hasNext()) {
+						if (dependenciesViewer.getChecked(iterator.next())) {
+							showUnSelect = true;
+						} else {
+							showSelect = true;
+						}
+	                }
+	                if (showSelect) {
+	                	manager.add(new Action() {
+	                		
+	                		@Override
+	                		public String getText() {
+	                			return "Select";
+	                		}
+	                		
+	                		@Override
+	                		public void run() {
+	                			select(selection.toList(), true);			
+	                		}
+	                	});
+	                }
+	                if (showUnSelect) {
+	                	manager.add(new Action() {
+	                		
+	                		@Override
+	                		public String getText() {
+	                			return "Deselect";
+	                		}
+	                		
+	                		@Override
+	                		public void run() {
+	                			select(selection.toList(), false);			
+	                		}
+	                	});
+	                }
+                	manager.add(new Action() {
+                		
+                		@Override
+                		public String getText() {
+                			return "Edit...";
+                		}
+                		
+                		@Override
+                		public void run() {
+                			//Yuuuck!
+                			openDependencyDetails(((List<ProjectDependency>)selection.toList()).toArray(new ProjectDependency[selection.size()]));
+                		}
+                	});
+	            }
+			}
+		});
+		dependenciesViewer.getControl().setMenu(manager.createContextMenu(dependenciesViewer.getControl()));
+	}
+
+
+	protected void openDependencyDetails(ProjectDependency ... selectedDeps) {
+		if (selectedDeps.length == 0) {
+			return;
+		}
+		boolean multipleSelection = selectedDeps.length > 1; 
+
+		Dependency editedDep;
+
+		if (multipleSelection) {
+			editedDep = new  Dependency();
+			editedDep.setGroupId(MULTIPLE_DEPENDENCIES_TEXT);
+			editedDep.setArtifactId(MULTIPLE_DEPENDENCIES_TEXT);
+
+			String defaultScope = null;
+			//Keep scope if all selected dependencies use the same one
+			for (ProjectDependency pd : selectedDeps) {
+				Dependency d = dependencyMap.get(pd);
+				if (d != null) {
+					if (defaultScope != null && !defaultScope.equals(d.getScope())){
+						//heterogenous scope, stop here
+						defaultScope = null;
+						break;
+					}
+					defaultScope = d.getScope();
+				}
+			}
+			
+			editedDep.setScope(defaultScope);
+			
+		} else {
+			editedDep = dependencyMap.get(selectedDeps[0]);
+		}
+		
+		EditDependencyDialog editDependencyDialog = new EditDependencyDialog(getShell());
+		editDependencyDialog.setDependency(editedDep);
+		editDependencyDialog.setRestrictedModification(multipleSelection);
+		if(editDependencyDialog.open() == Window.OK) {
+			Dependency newDep = editDependencyDialog.getDependency();
+			if (multipleSelection) {
+				//Update scope/optional and refresh each row
+				for (ProjectDependency pd : selectedDeps) {
+					Dependency updatedDep = dependencyMap.get(pd);
+					if (updatedDep != null) {
+						updatedDep.setScope(newDep.getScope());
+					}
+					refresh(pd);
+				}
+				
+			}	else {
+				dependencyMap.put(selectedDeps[0],newDep);
+				//Only re-resolved if dependency changed and refresh row
+				if (newDep != null && (editedDep == null || !getKey(newDep).equals(getKey(editedDep)))) {
+					resolve(selectedDeps[0], newDep);
+				}
+				refresh(selectedDeps[0]);
+			}
+		}
+
+	}
 
 	private void resolve(ProjectDependency projectDependency, Dependency d) {
 		if (d != null) {
@@ -448,12 +580,11 @@ public class IdentifyMavenDependencyPage extends WizardPage {
 		button.setText(label);
 		button.addSelectionListener(new SelectionListener() {
 			public void widgetSelected(SelectionEvent e) {
+				Collection<ProjectDependency> selection = new ArrayList<ProjectDependency>(dependenciesViewer.getTable().getItems().length);
 				for (TableItem item : dependenciesViewer.getTable().getItems()) {
-					ProjectDependency pd = (ProjectDependency)item.getData();
-					dependencyCheckStateMap.put(pd, ischecked);
-					item.setChecked(ischecked);
+					selection.add((ProjectDependency)item.getData());
 				}
-				refresh();
+				select(selection, ischecked);
 			}
 			public void widgetDefaultSelected(SelectionEvent e) {
 
@@ -463,6 +594,44 @@ public class IdentifyMavenDependencyPage extends WizardPage {
 		return button;
 	}
 
+	private void select(Collection<ProjectDependency> selection, final boolean ischecked) {
+		for (ProjectDependency pd : selection) {
+			dependencyCheckStateMap.put(pd, ischecked);
+			dependenciesViewer.setChecked(pd, ischecked);
+		}
+		refresh();
+	}
+	
+	private Button addEditButton(Composite container, String label) {
+		Button button = new Button(container, SWT.NONE);
+		button.setLayoutData(new GridData(SWT.FILL, SWT.UP, false, false, 1, 1));
+		button.setText(label);
+		button.addSelectionListener(new SelectionListener() {
+			public void widgetSelected(SelectionEvent e) {
+				TableItem[] selection = dependenciesViewer.getTable().getSelection();
+				
+				List<ProjectDependency> selectedDeps = new ArrayList<ProjectDependency>(selection.length);
+				
+				for (TableItem item : selection) {
+				  ProjectDependency projectDep = (ProjectDependency) item.getData();
+  				  IdentificationJob job = identificationJobs.get(projectDep);
+				  if (Job.RUNNING == job.getState()) {
+					return;
+				  }
+				  selectedDeps.add(projectDep);
+				}
+
+				ProjectDependency[] pdArray = new ProjectDependency[selectedDeps.size()];
+				openDependencyDetails(selectedDeps.toArray(pdArray ));
+			}
+			public void widgetDefaultSelected(SelectionEvent e) {
+
+			}
+		});
+
+		return button;
+	}	
+	
 	private void addStopButton(Composite container, String label) {
 		stopButton = new Button(container, SWT.NONE);
 		stopButton.setLayoutData(new GridData(SWT.FILL, SWT.UP, false, false, 1, 1));
