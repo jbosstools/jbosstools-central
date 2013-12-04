@@ -7,13 +7,8 @@
     Provides information about the use of <application>Maven</application> within the <application>JBoss Developer Studio</application>.
   </subtitle>
    
-  <productname>JBoss Developer Studio</productname>
-   
-  <productnumber>6.0</productnumber>
-   
-  <edition>6.0.0</edition>
-   
-  <pubsnumber>1</pubsnumber>
+	<productname>Red Hat JBoss Developer Studio</productname>
+	<productnumber>7.1</productnumber>
    
   <abstract>
     <para>
