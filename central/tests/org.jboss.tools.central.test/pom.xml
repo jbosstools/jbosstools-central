@@ -22,6 +22,16 @@
                   <includes>
                     <include>**/*Test.class</include>
                   </includes>
+				  <dependencies>
+					<dependency>
+						<type>eclipse-feature</type>
+						<artifactId>org.eclipse.e4.rcp</artifactId>
+						<version>0.0.0</version>
+					</dependency>
+				  </dependencies>
+				  <environmentVariables>
+					<SWT_GTK3>0</SWT_GTK3>
+				  </environmentVariables>
   				</configuration>
 			</plugin>
 		</plugins>
