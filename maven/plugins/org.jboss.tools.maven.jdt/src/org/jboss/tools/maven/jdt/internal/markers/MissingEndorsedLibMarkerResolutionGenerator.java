@@ -19,6 +19,7 @@ import org.apache.maven.model.PluginExecution;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.internal.IMavenConstants;
@@ -56,9 +57,10 @@ public class MissingEndorsedLibMarkerResolutionGenerator implements	IMarkerResol
 	public IMarkerResolution[] getResolutions(IMarker marker) {
 		String phase;
 		try {
-			phase = getPhaseToExecute(marker);
+			IProgressMonitor monitor = new NullProgressMonitor();
+			phase = getPhaseToExecute(marker, monitor);
 			if (phase != null) {
-				IMavenProjectFacade facade = getMavenProjectFacade(marker);
+				IMavenProjectFacade facade = getMavenProjectFacade(marker, monitor);
 				return new IMarkerResolution[]{new ExecuteDependencyCopyMarkerResolution(facade, phase)};
 			}
 		} catch (CoreException e) {
@@ -69,15 +71,15 @@ public class MissingEndorsedLibMarkerResolutionGenerator implements	IMarkerResol
 
 	public boolean hasResolutions(IMarker marker) {
 		try {
-			return null != getPhaseToExecute(marker);
+			return null != getPhaseToExecute(marker, new NullProgressMonitor());
 		} catch (CoreException e) {
 			MavenJdtActivator.log(e);
 		}
 		return false;
 	}
 
-	private String getPhaseToExecute(IMavenProjectFacade facade, String absolutePath) {
-		Plugin p = facade.getMavenProject().getPlugin("org.apache.maven.plugins:maven-dependency-plugin");
+	private String getPhaseToExecute(IMavenProjectFacade facade, String absolutePath, IProgressMonitor monitor) throws CoreException {
+		Plugin p = facade.getMavenProject(monitor).getPlugin("org.apache.maven.plugins:maven-dependency-plugin");
 		if (p != null) {
 			for (PluginExecution pe : p.getExecutions()) {
 				String phase = pe.getPhase();
@@ -93,21 +95,21 @@ public class MissingEndorsedLibMarkerResolutionGenerator implements	IMarkerResol
 	}
 
 	
-	private String getPhaseToExecute(IMarker marker) throws CoreException {
+	private String getPhaseToExecute(IMarker marker, IProgressMonitor monitor) throws CoreException {
 		String phase = null;
-		IMavenProjectFacade facade = getMavenProjectFacade(marker);
+		IMavenProjectFacade facade = getMavenProjectFacade(marker, monitor);
 		if (facade != null) {
 			String path = (String) marker.getAttribute("outputDirectory");
-			phase = getPhaseToExecute(facade, path);
+			phase = getPhaseToExecute(facade, path, monitor);
 		}
 		return phase;
 	}
 
-	private IMavenProjectFacade getMavenProjectFacade(IMarker marker) {
+	private IMavenProjectFacade getMavenProjectFacade(IMarker marker, IProgressMonitor monitor) {
 		IProject project = (marker.getResource() == null)?null:marker.getResource().getProject();
 		try {
 			if (project != null && project.isAccessible() && project.hasNature(IMavenConstants.NATURE_ID)) {
-				IMavenProjectFacade facade = MavenPlugin.getMavenProjectRegistry().create(project, new NullProgressMonitor());
+				IMavenProjectFacade facade = MavenPlugin.getMavenProjectRegistry().create(project, monitor);
 				return facade;
 			}
 		} catch (CoreException e) {
