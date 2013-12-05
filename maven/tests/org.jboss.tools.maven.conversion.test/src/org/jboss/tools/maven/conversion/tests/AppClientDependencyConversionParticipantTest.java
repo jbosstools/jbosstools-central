@@ -16,6 +16,7 @@ import org.apache.maven.model.Build;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Plugin;
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.jboss.tools.maven.conversion.ui.internal.AbstractReferenceConversionParticipant;
 import org.junit.Test;
@@ -52,11 +53,11 @@ public class AppClientDependencyConversionParticipantTest extends
 	    } finally {
 	    	System.clearProperty(AbstractReferenceConversionParticipant.REFERENCE_CONVERSION_SKIP_KEY);
 	    }
-	    List<Dependency> deps = mavenFacade.getMavenProject().getDependencies();
+	    List<Dependency> deps = mavenFacade.getMavenProject(monitor).getDependencies();
 	    assertEquals(1, deps.size());
 	    assertEquals("app-client", deps.get(0).getType());
 	    
-	    Build build = mavenFacade.getMavenProject().getModel().getBuild();
+	    Build build = mavenFacade.getMavenProject(monitor).getModel().getBuild();
 	    Plugin acrPlugin = build.getPluginsAsMap().get("org.apache.maven.plugins:maven-acr-plugin");
 	    assertNotNull("maven-acr-plugin is missing", acrPlugin);
 	    assertTrue("maven-acr-plugin not set as extension", acrPlugin.isExtensions());
