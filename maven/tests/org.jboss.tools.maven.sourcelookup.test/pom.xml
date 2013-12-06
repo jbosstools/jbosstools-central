@@ -32,15 +32,6 @@
 					</artifactItems>
 				</configuration>
 			</plugin>
-			<plugin>
-				<groupId>org.eclipse.tycho</groupId>
-				<artifactId>tycho-surefire-plugin</artifactId>
-				<version>${tychoVersion}</version>
-				<configuration>
-					<testSuite>org.jboss.tools.maven.sourcelookup.test</testSuite>
-					<testClass>org.jboss.tools.maven.sourcelookup.test.JBossSourceLookupAllTests</testClass>
-				</configuration>
-			</plugin>
 		</plugins>
 	</build>
 	<!-- Only unpack dependencies during CLI builds, not as part of an eclipse build -->
