@@ -1027,7 +1027,11 @@ public class DiscoveryViewer {
 			return null;
 		}
 		String regex = filterText.replace("\\", "\\\\").replace("?", ".").replace("*", ".*?"); //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$
-		return Pattern.compile(regex, Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
+		try {
+			return Pattern.compile(regex, Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
+		} catch (Exception e) {
+			return null;
+		}
 	}
 
 	private void createRefreshJob() {
@@ -1045,7 +1049,7 @@ public class DiscoveryViewer {
 					previousFilterText = text;
 					filterPattern = createPattern(previousFilterText);
 					if (clearFilterTextControl != null) {
-						clearFilterTextControl.setVisible(filterPattern != null);
+						clearFilterTextControl.setVisible(previousFilterText != null && !previousFilterText.isEmpty());
 					}
 					createBodyContents();
 				}
@@ -1084,7 +1088,14 @@ public class DiscoveryViewer {
 	}
 
 	private boolean filterMatches(String text) {
-		return text != null && filterPattern.matcher(text).find();
+		boolean match = previousFilterText == null || previousFilterText.isEmpty();
+		if (text != null && !match && previousFilterText != null) {
+			match = text.toLowerCase().contains(previousFilterText.toLowerCase());
+			if (!match && filterPattern != null) {
+				match = filterPattern.matcher(text).find();
+			}
+		}
+		return text != null && match;
 	}
 
 	private void filterTextChanged() {
@@ -1339,7 +1350,7 @@ public class DiscoveryViewer {
 		if (!showInstalled && descriptor.isInstalled()) {
 			return true;
 		}
-		if (filterPattern != null) {
+		if (previousFilterText != null && !previousFilterText.isEmpty()) {
 			if (!(filterMatches(descriptor.getName()) || filterMatches(descriptor.getDescription())
 					|| filterMatches(descriptor.getProvider()) || filterMatches(descriptor.getLicense()))) {
 				return true;
