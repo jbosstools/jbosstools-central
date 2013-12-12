@@ -107,10 +107,9 @@ public class CentralTest {
 		assertTrue("The Show On Startup property isn't set by default",
 				JBossCentralActivator.getDefault().showJBossCentralOnStartup());
 		new ShowJBossCentral().earlyStartup();
-		JobUtils.delay(1000);
-
 		waitForJobs();
-
+		JobUtils.delay(1000);
+		
 		assertTrue("The JBoss Central editor isn't open by default",
 				hasOpenEditor());
 		IEclipsePreferences prefs = JBossCentralActivator.getDefault()
