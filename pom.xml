@@ -21,19 +21,5 @@
 		<module>central</module>
 		<module>site</module>
 	</modules>
-	<build>
-	  <plugins>
-		<plugin>
-			<groupId>org.eclipse.tycho</groupId>
-			<artifactId>tycho-surefire-plugin</artifactId>
-			<version>${tychoVersion}</version>
-			<configuration>
-				<environmentVariables>
-					<SWT_GTK3>0</SWT_GTK3>
-				</environmentVariables>
-			</configuration>
-		</plugin>
-	  </plugins>
-    </build>
 </project>
 	
