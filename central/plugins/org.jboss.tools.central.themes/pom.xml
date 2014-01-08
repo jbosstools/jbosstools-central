@@ -4,10 +4,9 @@
 	<parent>
 		<groupId>org.jboss.tools.central</groupId>
 		<artifactId>plugins</artifactId>
-		<version>1.2.2-SNAPSHOT</version>
+		<version>1.2.3-SNAPSHOT</version>
 	</parent>
 	<groupId>org.jboss.tools.central.plugins</groupId>
 	<artifactId>org.jboss.tools.central.themes</artifactId> 
-	<version>1.2.2-SNAPSHOT</version>
 	<packaging>eclipse-plugin</packaging>
 </project>

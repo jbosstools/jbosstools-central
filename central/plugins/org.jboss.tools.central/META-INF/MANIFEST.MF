@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: %BundleName
 Bundle-SymbolicName: org.jboss.tools.central; singleton:=true
-Bundle-Version: 1.2.2.qualifier
+Bundle-Version: 1.2.3.qualifier
 Bundle-Activator: org.jboss.tools.central.JBossCentralActivator
 Require-Bundle: org.eclipse.ui;bundle-version="3.7.0",
  org.eclipse.core.runtime;bundle-version="3.7.0",
@@ -40,12 +40,9 @@ Bundle-Localization: plugin
 Bundle-Vendor: %BundleVendor
 Bundle-ClassPath: lib/ocpsoft-pretty-time-1.0.7.jar,
  .
-Export-Package: org.jboss.tools.central,
- org.jboss.tools.central.actions,
- org.jboss.tools.central.editors,
- org.jboss.tools.central.editors.xpl,
- org.jboss.tools.central.internal;x-friends:="org.jboss.tools.central.test",
- org.jboss.tools.central.internal.discovery.wizards;x-friends:="org.jboss.tools.central.test",
- org.jboss.tools.central.jobs,
- org.jboss.tools.central.model,
- org.jboss.tools.central.preferences
+Export-Package: org.jboss.tools.central,org.jboss.tools.central.action
+ s,org.jboss.tools.central.editors,org.jboss.tools.central.editors.xpl
+ ,org.jboss.tools.central.internal;x-friends:="org.jboss.tools.central
+ .test",org.jboss.tools.central.internal.discovery.wizards;x-friends:=
+ "org.jboss.tools.central.test",org.jboss.tools.central.jobs,org.jboss
+ .tools.central.model,org.jboss.tools.central.preferences
