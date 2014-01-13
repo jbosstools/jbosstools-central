@@ -28,14 +28,6 @@
           secondaryTo="org.maven.ide.eclipse.configuration.wtp.configurator"/>
     </extension>
     
-    <extension point="org.eclipse.m2e.core.projectConfigurators">
-      <configurator 
-          id="org.jboss.tools.maven.seam.configurator.fixClasspathConfigurator"
-          class="org.jboss.tools.maven.seam.configurators.FixClasspathConfigurator"
-          name="%Fix_classpath" 
-          secondaryTo="org.eclipse.m2e.jdt.javaConfigurator"/>
-    </extension>
-    
     <extension
          point="org.eclipse.ui.ide.markerSupport">
       <markerTypeCategory
