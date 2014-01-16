@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>org.jboss.tools</groupId>
 		<artifactId>parent</artifactId>
-		<version>4.2.0.Alpha1-SNAPSHOT</version>
+		<version>4.2.0.Alpha2-SNAPSHOT</version>
 	</parent>
 	<groupId>org.jboss.tools</groupId>
 	<artifactId>central.maven.examples</artifactId>
@@ -21,5 +21,43 @@
 		<module>central</module>
 		<module>site</module>
 	</modules>
+
+	<repositories>
+		<repository>
+			<id>jbosstools-base</id>
+			<layout>p2</layout>
+			<url>${jbosstools-base-site}</url>
+		</repository>
+		<repository>
+			<id>jbosstools-javaee</id>
+			<layout>p2</layout>
+			<url>${jbosstools-javaee-site}</url>
+		</repository>
+		<repository>
+			<id>jbosstools-portlet</id>
+			<layout>p2</layout>
+			<url>${jbosstools-portlet-site}</url>
+		</repository>
+		<!-- Transitive dependencies -->
+		<repository>
+			<id>jbosstools-jst</id>
+			<layout>p2</layout>
+			<url>${jbosstools-jst-site}</url>
+		</repository>
+		<repository>
+			<id>jbosstools-hibernate</id>
+			<layout>p2</layout>
+			<url>${jbosstools-hibernate-site}</url>
+		</repository>
+		<repository>
+			<id>jbosstools-server</id>
+			<layout>p2</layout>
+			<url>${jbosstools-server-site}</url>
+		</repository>
+		<repository>
+			<id>jbosstools-vpe</id>
+			<layout>p2</layout>
+			<url>${jbosstools-vpe-site}</url>
+		</repository>
+	</repositories>
 </project>
-	
