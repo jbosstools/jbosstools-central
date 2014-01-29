@@ -880,7 +880,7 @@ public class DiscoveryViewer {
 				Link link = new Link(container, SWT.WRAP);
 
 				link.setFont(container.getFont());
-				link.setText("There are no matching plug-ins.  Please <a>clear the filter text</a> or try again later");
+				link.setText("There are no matching plug-ins.  Please <a>clear the filter text</a> or try again later.");
 				link.addListener(SWT.Selection, new Listener() {
 					public void handleEvent(Event event) {
 						clearFilterText();
