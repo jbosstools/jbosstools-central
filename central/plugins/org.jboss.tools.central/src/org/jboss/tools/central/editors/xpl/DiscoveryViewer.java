@@ -880,7 +880,7 @@ public class DiscoveryViewer {
 				Link link = new Link(container, SWT.WRAP);
 
 				link.setFont(container.getFont());
-				link.setText("There are no matching plugins.  Please <a>clear the filter text</a> or try again later");
+				link.setText("There are no matching plug-ins.  Please <a>clear the filter text</a> or try again later");
 				link.addListener(SWT.Selection, new Listener() {
 					public void handleEvent(Event event) {
 						clearFilterText();
@@ -892,9 +892,9 @@ public class DiscoveryViewer {
 				Label helpText = new Label(container, SWT.WRAP);
 				helpText.setFont(container.getFont());
 				if (atLeastOneKindFiltered) {
-					helpText.setText("There are no available plugins of the selected type. Please select another plugin type or try again later.");
+					helpText.setText("There are no available plug-ins of the selected type. Please select another plug-in type or try again later.");
 				} else {
-					helpText.setText("Sorry, all available plugins from JBoss Central are already installed. More gets added over time, try again later.");
+					helpText.setText("Sorry, all available plug-ins from JBoss Central are already installed. More gets added over time, try again later.");
 				}
 				helpTextControl = helpText;
 			}
