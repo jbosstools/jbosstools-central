@@ -609,9 +609,11 @@ public class NewProjectExamplesStacksRequirementsPage extends MavenExamplesRequi
 
 	@Override
 	public void onSettingsChanged() {
-		//Reset previous status
-		enterpriseRepoStatusMap.clear();
-		validateEnterpriseRepo();
+        Display.getDefault().asyncExec( new Runnable() {  public void run() { 
+			//Reset previous status
+			enterpriseRepoStatusMap.clear();
+			validateEnterpriseRepo();
+        }});
 	}
 
 }
