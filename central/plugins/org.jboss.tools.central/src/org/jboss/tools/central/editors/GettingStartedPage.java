@@ -39,12 +39,14 @@ import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IContributionItem;
 import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.dialogs.Dialog;
+import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.operation.IRunnableContext;
 import org.eclipse.jface.operation.IRunnableWithProgress;
+import org.eclipse.jface.preference.PreferenceDialog;
 import org.eclipse.jface.resource.JFaceColors;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.viewers.ISelection;
@@ -60,6 +62,8 @@ import org.eclipse.swt.events.ControlAdapter;
 import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.Image;
@@ -74,12 +78,14 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Link;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.INewWizard;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.actions.ActionFactory.IWorkbenchAction;
+import org.eclipse.ui.dialogs.PreferencesUtil;
 import org.eclipse.ui.forms.HyperlinkSettings;
 import org.eclipse.ui.forms.IManagedForm;
 import org.eclipse.ui.forms.editor.FormEditor;
@@ -106,6 +112,8 @@ import org.jboss.tools.central.internal.discovery.wizards.ProxyWizardManager.Upd
 import org.jboss.tools.central.jobs.RefreshBuzzJob;
 import org.jboss.tools.central.jobs.RefreshTutorialsJob;
 import org.jboss.tools.central.model.FeedsEntry;
+import org.jboss.tools.central.wizards.AbstractJBossCentralProjectWizard;
+import org.jboss.tools.central.wizards.ErrorPage;
 import org.jboss.tools.project.examples.ProjectExamplesActivator;
 import org.jboss.tools.project.examples.internal.discovery.DiscoveryUtil;
 import org.jboss.tools.project.examples.internal.discovery.JBossDiscoveryUi;
@@ -626,6 +634,12 @@ public class GettingStartedPage extends AbstractJBossCentralPage implements Prox
 	          ISelection selection = getSite().getSelectionProvider().getSelection();
 	          if (selection instanceof IStructuredSelection) {
 	        	  wizard.init(PlatformUI.getWorkbench(), (IStructuredSelection) selection);
+	          }
+	          if (wizard instanceof AbstractJBossCentralProjectWizard) {
+	        	  if ( ((AbstractJBossCentralProjectWizard)wizard).getProjectExample() == null) {
+	        		  new WizardLoadingErrorDialog(getDisplay().getActiveShell()).open();
+	        		  return;
+	        	  }
 	          }
 	          WizardDialog dialog = new WizardDialog(getSite().getShell(), wizard);
 	          dialog.open();
@@ -1316,4 +1330,32 @@ public class GettingStartedPage extends AbstractJBossCentralPage implements Prox
 		});
 	}
 
+private class WizardLoadingErrorDialog extends MessageDialog {
+		
+		public WizardLoadingErrorDialog(Shell parentShell) {
+			super(parentShell, "Failed to load Wizard", null,
+					"Wizard metadata could not be loaded.",
+					MessageDialog.ERROR, 
+					new String[] { IDialogConstants.OK_LABEL }, 0);
+		}
+
+		@Override
+		protected Control createCustomArea(Composite parent) {
+			Link link = ErrorPage.getLink(parent);
+			link.addSelectionListener(new SelectionAdapter() {
+
+				@Override
+				public void widgetSelected(SelectionEvent e) {
+					close();
+					PreferenceDialog preferenceDialog = PreferencesUtil
+							.createPreferenceDialogOn(getShell(), "org.eclipse.ui.net.NetPreferences", null, null);
+					preferenceDialog.open();
+				}
+
+			});
+			new Label(parent, SWT.NONE);
+			return link;
+		}
+
+	}
 }
