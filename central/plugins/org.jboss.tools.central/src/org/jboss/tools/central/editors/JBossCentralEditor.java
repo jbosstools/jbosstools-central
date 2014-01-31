@@ -266,7 +266,7 @@ public class JBossCentralEditor extends SharedHeaderFormEditor {
 		
 	    final Button showOnStartup = getToolkit().createButton(settingsComposite, "Show on Startup", SWT.CHECK);
 		showOnStartup.setLayoutData(new GridData(SWT.BEGINNING, SWT.TOP, false, false));
-		showOnStartup.setBackground(settingsComposite.getBackground());
+		showOnStartup.setBackground(null);
 		showOnStartup.setSelection(JBossCentralActivator.getDefault().showJBossCentralOnStartup());
 		showOnStartup.addSelectionListener(new SelectionAdapter() {
 			@Override
