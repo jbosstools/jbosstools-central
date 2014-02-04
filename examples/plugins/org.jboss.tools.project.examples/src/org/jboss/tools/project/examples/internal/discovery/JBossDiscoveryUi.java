@@ -27,7 +27,10 @@ import org.eclipse.mylyn.internal.discovery.ui.wizards.Messages;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.ui.preferences.ScopedPreferenceStore;
 import org.eclipse.ui.statushandlers.StatusManager;
+import org.jboss.tools.foundation.core.FoundationCorePlugin;
+import org.jboss.tools.foundation.core.usage.IUsageTracker;
 import org.jboss.tools.project.examples.ProjectExamplesActivator;
+import org.osgi.framework.ServiceReference;
 
 /**
  * 
@@ -72,14 +75,16 @@ public class JBossDiscoveryUi {
 				sb.append(","); //$NON-NLS-1$
 			}
 			sb.append(descriptor.getId());
+			FoundationCorePlugin.getDefault().getUsageTrackerService().sendLiveEvent(IUsageTracker.CATEGORY_CENTRAL, IUsageTracker.ACTION_INSTALLED_SOFTWARE, descriptor.getId());
 		}
 		ScopedPreferenceStore store = new ScopedPreferenceStore(new InstanceScope(), DiscoveryUi.ID_PLUGIN);
 		store.putValue(DiscoveryUi.PREF_LAST_INSTALLED, sb.toString());
 		try {
 			store.save();
 		} catch (IOException e) {
-			// ignore
+			ProjectExamplesActivator.log(e);
 		}
+		
 	}
 
 }
