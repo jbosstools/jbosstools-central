@@ -259,9 +259,13 @@ public class GettingStartedPage extends AbstractJBossCentralPage implements Prox
 	    blankHeaderComposite.setLayout(rowLayout);
 	    ToolBarManager toolBarManager = new ToolBarManager(SWT.FLAT | SWT.HORIZONTAL);
 	    toolBarManager.createControl(blankHeaderComposite);
+	    //JBIDE-15718 : fugly hack to make the toolbar size properly on Mac
+	    Action a = new Action("", JBossCentralActivator.getImageDescriptor("/icons/1x16.gif")) {};
+	    a.setEnabled(false);
+	    toolBarManager.add(a);
+	    toolBarManager.update(true);
 	    section.setTextClient(blankHeaderComposite);
 	}
-		
 
 	private void createBuzzSection(FormToolkit toolkit, Composite parent) {
 		buzzSection = createSection(toolkit, parent, "JBoss Buzz", ExpandableComposite.TITLE_BAR);
