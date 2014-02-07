@@ -17,7 +17,7 @@ import org.apache.commons.io.FileUtils
 import static groovyx.gpars.GParsPool.*
 import static groovy.io.FileType.*
 import com.beust.jcommander.*
-import org.jboss.jdf.stacks.client.StacksClient
+import org.jboss.jdf.stacks.client.*
 import org.jboss.jdf.stacks.model.*
 import java.util.concurrent.TimeUnit
 
@@ -227,7 +227,8 @@ class GoOfflineScript {
   }
 
   def buildArchetypesFromStacks(workDir, localRepo) {
-    Stacks stacks = new StacksClient().getStacks();
+    def config = new DefaultStacksClientConfiguration(cacheRefreshPeriodSeconds:1)
+    Stacks stacks = new StacksClient(config).getStacks();
     stacks.getAvailableArchetypes().each { a ->
 
       File folder = new File(workDir, a.artifactId)
@@ -271,7 +272,7 @@ class GoOfflineScript {
     }
 
     def pomModel = new XmlSlurper(false,false).parse(pom)    
-    def profiles = pomModel?.profiles?.profile?.id.collect{ it.text()}.join(",")   
+    def profiles = pomModel?.profiles?.profile?.id.collect{ it.text()}.findAll{!it.startsWith("aerogearci")}.join(",")   
 
     //errai has borked profiles
     if (pomModel.name.text().toLowerCase().contains("errai")) {
