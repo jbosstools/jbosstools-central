@@ -497,7 +497,7 @@ public class AddRepositoryDialog extends TitleAreaDialog {
 					urlString = urlString + RepositoryWrapper.SEPARATOR;
 				}
 				for (RepositoryWrapper wrapper:includedRepositories) {
-					if (urlString.equals(wrapper.getRepository().getUrl())) {
+					if (urlString.equals(wrapper.getRepository().getUrl()) && editWrapper != null && !wrapper.getRepository().equals(editWrapper.getRepository())) {
 						urlExistsTextDecoration.show();
 					}
 				}
@@ -535,9 +535,9 @@ public class AddRepositoryDialog extends TitleAreaDialog {
 	}
 
 	protected void updateRepository(Repository repository) {
-		idText.setText(repository.getId());
-		nameText.setText(repository.getName());
-		urlText.setText(repository.getUrl());
+		idText.setText(repository.getId() == null ? "" : repository.getId()); //$NON-NLS-1$
+		nameText.setText(repository.getName() == null ? "" : repository.getName()); //$NON-NLS-1$
+		urlText.setText(repository.getUrl() == null ? "" : repository.getUrl()); //$NON-NLS-1$
 	}
 
 	private Image getJBossImage() {
