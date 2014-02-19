@@ -10,7 +10,10 @@
  ************************************************************************************/
 package org.jboss.tools.central.internal.dnd;
 
+import java.io.File;
 import java.lang.reflect.InvocationTargetException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -18,10 +21,13 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
+import org.eclipse.core.filesystem.EFS;
+import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
@@ -39,7 +45,10 @@ import org.eclipse.swt.dnd.URLTransfer;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
+import org.eclipse.ui.IWorkbenchPage;
+import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.ide.IDE;
 import org.jboss.tools.central.JBossCentralActivator;
 import org.jboss.tools.project.examples.internal.discovery.DiscoveryUtil;
 import org.jboss.tools.project.examples.internal.discovery.JBossDiscoveryUi;
@@ -96,6 +105,33 @@ public class JBossCentralDropTarget {
 						}
 					});
 					
+				} else {
+					if (event.data instanceof String) {
+						String[] urls = ((String)event.data).split(System.getProperty("line.separator")); //$NON-NLS-1$
+						for (String fn:urls) {
+							String file;
+							try {
+								URL u = new URL(fn);
+								file = u.getFile();
+							} catch (MalformedURLException e1) {
+								file = fn;
+							}
+							if (new File(file).exists()) {
+								final IFileStore fileStore = EFS.getLocalFileSystem().getStore(new Path(file));
+								Display.getCurrent().asyncExec(new Runnable() {
+									@Override
+									public void run() {
+										IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
+										try {
+											IDE.openEditorOnFileStore(page, fileStore);
+										} catch (PartInitException e) {
+											// silently ignore problems opening the editor
+										}
+									}
+								});
+							}
+						}
+					}
 				}
 			}
 		}
