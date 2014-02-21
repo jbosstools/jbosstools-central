@@ -11,36 +11,12 @@
 	<artifactId>org.jboss.tools.project.examples</artifactId>
 
 	<properties>
-		<!-- TODO: when moving to Luna, use /development/luna/ then later /stable/luna/
-         TODO: when closer to release, switch this to /stable/kepler/ 
+		<!-- This value should be configured at build-time via commandline (eg., in Jenkins via a job parameter)
+         JBIDE-16642 TODO: when closer to release, switch this to /stable/luna/ 
          SEE ALSO examples/plugins/org.jboss.tools.project.examples/src/org/jboss/tools/project/examples/configurators/DefaultJBossCentralConfigurator.java -->
-		<jboss.discovery.directory.url>http://download.jboss.org/jbosstools/updates/development/kepler/jbosstools-directory.xml</jboss.discovery.directory.url>
+		<jboss.discovery.directory.url>http://download.jboss.org/jbosstools/updates/development/luna/jbosstools-directory.xml</jboss.discovery.directory.url>
 	</properties>
 
-	<profiles>
-		<!-- _stable_branch jobs could use this profile but the above default (last 
-			stable milestone) is probably better -->
-		<profile>
-			<id>4.1.kepler</id>
-			<activation>
-				<activeByDefault>false</activeByDefault>
-			</activation>
-			<properties>
-				<jboss.discovery.directory.url>http://download.jboss.org/jbosstools/updates/nightly/core/4.1.kepler/jbosstools-directory.xml</jboss.discovery.directory.url>
-			</properties>
-		</profile>
-
-		<!-- _trunk jobs should use this profile -->
-		<profile>
-			<id>trunk</id>
-			<activation>
-				<activeByDefault>false</activeByDefault>
-			</activation>
-			<properties>
-				<jboss.discovery.directory.url>http://download.jboss.org/jbosstools/updates/nightly/core/trunk/jbosstools-directory.xml</jboss.discovery.directory.url>
-			</properties>
-		</profile>
-	</profiles>
 	<packaging>eclipse-plugin</packaging>
 	<build>
 		<resources>
