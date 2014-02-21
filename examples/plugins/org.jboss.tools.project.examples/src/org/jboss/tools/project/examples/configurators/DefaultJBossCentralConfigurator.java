@@ -41,10 +41,10 @@ public class DefaultJBossCentralConfigurator implements
 	    WIZARD_IDS = Collections.unmodifiableList(wizardIds);
 	}
 	
-  // TODO: when moving to Luna, use /development/luna/ then later /stable/luna/
-  // TODO: when closer to release, switch this to /stable/kepler/
-  // SEE ALSO examples/plugins/org.jboss.tools.project.examples/pom.xml
-	private static final String JBOSS_DIRECTORY_URL_DEFAULT = "http://download.jboss.org/jbosstools/updates/development/kepler/jbosstools-directory.xml"; //$NON-NLS-1$
+	// This value should be configured at build-time via commandline (eg., in Jenkins via a job parameter)
+	// JBIDE-16642 TODO: when closer to release, switch this to /stable/luna/
+	// SEE ALSO examples/plugins/org.jboss.tools.project.examples/pom.xml
+	private static final String JBOSS_DIRECTORY_URL_DEFAULT = "http://download.jboss.org/jbosstools/updates/development/luna/jbosstools-directory.xml"; //$NON-NLS-1$
 
 	// see pom.xml for actual value -- this is passed it at build-time via Maven
 	private static final String JBOSS_DIRECTORY_URL;
