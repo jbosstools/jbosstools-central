@@ -319,13 +319,7 @@ public class DiscoveryViewer {
 
 		protected boolean maybeModifySelection(boolean selected) {
 			if (selected) {
-				if (connector.isInstalled()) {
-					MessageDialog.openWarning(shellProvider.getShell(),
-							Messages.DiscoveryViewer_Install_Connector_Title,
-							NLS.bind(Messages.DiscoveryViewer_Already_installed_Error, connector.getName()));
-					return false;
-				}
-				if (!connector.isInstallable()) {
+				if (!connector.isInstalled() && !connector.isInstallable()) {
 					if (connector.getInstallMessage() != null) {
 						MessageDialog.openInformation(shellProvider.getShell(),
 								Messages.DiscoveryViewer_Install_Connector_Title, connector.getInstallMessage());
@@ -420,6 +414,7 @@ public class DiscoveryViewer {
 	private static Boolean useNativeSearchField;
 
 	private final List<ConnectorDescriptor> installableConnectors = new ArrayList<ConnectorDescriptor>();
+	private final List<ConnectorDescriptor> installedConnectors = new ArrayList<ConnectorDescriptor>();
 
 	private volatile ConnectorDiscovery discovery;
 
@@ -1140,6 +1135,10 @@ public class DiscoveryViewer {
 	public List<ConnectorDescriptor> getInstallableConnectors() {
 		return installableConnectors;
 	}
+	
+	public List<ConnectorDescriptor> getInstalledConnectors() {
+		return this.installedConnectors;
+	}
 
 	public IStructuredSelection getSelection() {
 		return (IStructuredSelection) selectionProvider.getSelection();
@@ -1406,10 +1405,18 @@ public class DiscoveryViewer {
 
 	private void modifySelectionInternal(final DiscoveryConnector connector, boolean selected) {
 		connector.setSelected(selected);
-		if (selected) {
-			installableConnectors.add(connector);
-		} else {
-			installableConnectors.remove(connector);
+		if (connector.isInstalled()) {
+			if (selected) {
+				this.installedConnectors.add(connector);
+			} else {
+				this.installedConnectors.remove(connector);
+			}
+		} else if (connector.isInstallable()) {
+			if (selected) {
+				installableConnectors.add(connector);
+			} else {
+				installableConnectors.remove(connector);
+			}
 		}
 	}
 
