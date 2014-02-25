@@ -625,13 +625,10 @@ public class MavenProjectWizardArchetypeParametersPage extends AbstractMavenWiza
    */
   public static ArtifactRepository getArchetypeRepository(Archetype archetype) throws CoreException {
     String repoUrl = archetype.getRepository();
-    if (repoUrl == null || repoUrl.trim().length() == 0) {
-      RemoteCatalogFactory catalogFactory = MavenPluginActivator.getDefault().getArchetypeManager().findParentCatalogFactory(archetype, RemoteCatalogFactory.class);
-      if (catalogFactory != null ) {
-        repoUrl = catalogFactory.getRepositoryUrl();
-      }
+    if (repoUrl == null || repoUrl.trim().isEmpty()) {
+    	return null;
     }
-    return repoUrl == null?null:MavenPlugin.getMaven().createArtifactRepository(archetype.getArtifactId()+"-repo", repoUrl); //$NON-NLS-1$
+    return MavenPlugin.getMaven().createArtifactRepository(archetype.getArtifactId()+"-repo", repoUrl); //$NON-NLS-1$
   }
 
 
