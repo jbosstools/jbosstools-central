@@ -438,7 +438,11 @@ public class NewProjectExamplesStacksRequirementsPage extends MavenExamplesRequi
 			
 			final Set<String> reqDeps = StacksArchetypeUtil.getRequiredDependencies(version);
 			
-			if (!isEnterpriseTargetRuntime() && (reqDeps == null || reqDeps.isEmpty())) {
+			if (reqDeps == null || reqDeps.isEmpty()) {
+				return;
+			}
+
+			if (!isEnterpriseTargetRuntime() && Boolean.TRUE.equals(wizardContext.getProperty(MavenProjectConstants.HAS_ENTERPRISE_PROPERTY))) {
 				return;
 			}
 
@@ -457,11 +461,7 @@ public class NewProjectExamplesStacksRequirementsPage extends MavenExamplesRequi
 				
 				@Override
 				protected IStatus run(IProgressMonitor monitor) {
-					if (reqDeps == null || reqDeps.isEmpty()) {
-						checkResult[0] = MavenArtifactHelper.checkEnterpriseRequirementsAvailable(projectExample); 
-					} else {
-						checkResult[0] = MavenArtifactHelper.checkRequirementsAvailable(version);
-					}
+					checkResult[0] = MavenArtifactHelper.checkRequirementsAvailable(version);
 					return Status.OK_STATUS;
 				}
 			};
@@ -609,11 +609,23 @@ public class NewProjectExamplesStacksRequirementsPage extends MavenExamplesRequi
 
 	@Override
 	public void onSettingsChanged() {
+		resetRepoValidation();
+	}
+
+	@Override
+	public void onWizardContextChange(String key, Object value) {
+		if (MavenProjectConstants.HAS_ENTERPRISE_PROPERTY.equals(key)) {
+			resetRepoValidation();
+		} else {
+			super.onWizardContextChange(key, value);
+		}
+	}
+
+	private void resetRepoValidation() {
         Display.getDefault().asyncExec( new Runnable() {  public void run() { 
 			//Reset previous status
 			enterpriseRepoStatusMap.clear();
 			validateEnterpriseRepo();
         }});
 	}
-
 }

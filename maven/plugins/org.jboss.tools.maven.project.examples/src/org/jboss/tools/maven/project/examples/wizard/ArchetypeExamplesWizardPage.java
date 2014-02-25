@@ -137,6 +137,7 @@ public class ArchetypeExamplesWizardPage extends
 		//This really is an extra-safe guard, as I believe we'll probably always
 		//redefine all required properties in project-examples-maven-xxx.xml
 		Properties defaultRequiredProperties = getRequiredProperties(archetype, archetypeModel.getArchetypeRepository());
+			
 		Properties properties = new Properties();
 		
 		for (Object key : defaultRequiredProperties.keySet()) {
@@ -161,7 +162,9 @@ public class ArchetypeExamplesWizardPage extends
 		if (propertiesTable != null) {
 			initialized = true;
 		}
-		
+
+		context.setProperty(MavenProjectConstants.HAS_ENTERPRISE_PROPERTY, defaultRequiredProperties.containsKey(MavenProjectConstants.ENTERPRISE_TARGET));
+
 		Object enterpriseValue = context.getProperty(MavenProjectConstants.ENTERPRISE_TARGET);
 		Boolean enterprise = (enterpriseValue instanceof Boolean)?(Boolean)enterpriseValue:Boolean.FALSE;
 		updateArchetypeProperty(MavenProjectConstants.ENTERPRISE_TARGET, enterprise.toString());
@@ -316,7 +319,7 @@ public class ArchetypeExamplesWizardPage extends
 		    		  || "yes".equalsIgnoreCase(value))
 		    		  ) {
 				if (enterpriseRepoStatus == null) {
-					enterpriseRepoStatus = MavenArtifactHelper.checkEnterpriseRequirementsAvailable(projectExample); 
+					enterpriseRepoStatus = MavenArtifactHelper.checkRequirementsAvailable(projectExample); 
 				}
 				if (!enterpriseRepoStatus.isOK()) {
 					warningComponent.setLinkText(enterpriseRepoStatus.getMessage());

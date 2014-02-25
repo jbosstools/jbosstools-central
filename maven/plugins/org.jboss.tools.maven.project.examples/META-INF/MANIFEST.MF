@@ -26,4 +26,5 @@ Require-Bundle: org.eclipse.ui,
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-Vendor: %Bundle-Vendor
-Export-Package: org.jboss.tools.maven.project.examples.internal.stacks;x-friends:="org.jboss.tools.maven.examples.test"
+Export-Package: org.jboss.tools.maven.project.examples.internal.stacks;x-friends:="org.jboss.tools.maven.examples.test",
+ org.jboss.tools.maven.project.examples.utils;x-friends:="org.jboss.tools.maven.examples.test"

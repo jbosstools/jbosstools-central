@@ -47,7 +47,9 @@ public class MavenArtifactHelper {
 	 * Checks if the EAP repository is available
 	 * 
 	 * @return true if org.jboss.spec:jboss-javaee-web-6.0:pom:*redhat* can be resolved
+	 * @deprecated
 	 */
+	@Deprecated
 	public static boolean isEnterpriseRepositoryAvailable() {
 		boolean isRepoAvailable = redHatArtifactExists(COORDS);
 		//JBIDE-15295 : Since EAP 6.1, zipped maven repos are missing maven artifact metadata so we can't search for a version range
@@ -102,6 +104,7 @@ public class MavenArtifactHelper {
 	}
 
 	
+	@Deprecated
 	public static IStatus checkEnterpriseRequirementsAvailable(ProjectExample project) {
 		IStatus status = Status.OK_STATUS;
 		if (project != null) {
