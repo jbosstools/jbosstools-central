@@ -18,6 +18,8 @@ public final class MavenProjectConstants {
 	 * @since 1.5.4
 	 */
 	public static final String ENTERPRISE_REPO_STATUS = "enterpriseRepoStatus";
+
+	public static final String HAS_ENTERPRISE_PROPERTY = "hasEnterpriseProperty";
 	
 	private MavenProjectConstants(){
 	}
