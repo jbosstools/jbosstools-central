@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: %Bundle-Name
 Bundle-SymbolicName: org.jboss.tools.maven.ui; singleton:=true
-Bundle-Version: 1.5.4.qualifier
+Bundle-Version: 1.5.5.qualifier
 Bundle-Localization: plugin
 Bundle-Activator: org.jboss.tools.maven.ui.Activator
 Require-Bundle: org.eclipse.ui,
@@ -23,9 +23,8 @@ Require-Bundle: org.eclipse.ui,
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-Vendor: %Bundle-Vendor
-Export-Package: org.jboss.tools.maven.ui,
- org.jboss.tools.maven.ui.internal.libprov,
- org.jboss.tools.maven.ui.internal.markers;x-friends:="org.jboss.tools.maven.common.test",
- org.jboss.tools.maven.ui.internal.project.facet,
- org.jboss.tools.maven.ui.preferences,
- org.jboss.tools.maven.ui.wizard
+Export-Package: org.jboss.tools.maven.ui,org.jboss.tools.maven.ui.inte
+ rnal.libprov,org.jboss.tools.maven.ui.internal.markers;x-friends:="or
+ g.jboss.tools.maven.common.test",org.jboss.tools.maven.ui.internal.pr
+ oject.facet,org.jboss.tools.maven.ui.preferences,org.jboss.tools.mave
+ n.ui.wizard

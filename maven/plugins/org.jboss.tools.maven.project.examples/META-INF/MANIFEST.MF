@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: %Bundle-Name
 Bundle-SymbolicName: org.jboss.tools.maven.project.examples;singleton:=true
-Bundle-Version: 1.5.4.qualifier
+Bundle-Version: 1.5.5.qualifier
 Bundle-Activator: org.jboss.tools.maven.project.examples.MavenProjectExamplesActivator
 Bundle-Localization: plugin
 Require-Bundle: org.eclipse.ui,
@@ -26,5 +26,7 @@ Require-Bundle: org.eclipse.ui,
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-Vendor: %Bundle-Vendor
-Export-Package: org.jboss.tools.maven.project.examples.internal.stacks;x-friends:="org.jboss.tools.maven.examples.test",
- org.jboss.tools.maven.project.examples.utils;x-friends:="org.jboss.tools.maven.examples.test"
+Export-Package: org.jboss.tools.maven.project.examples.internal.stacks
+ ;x-friends:="org.jboss.tools.maven.examples.test",org.jboss.tools.mav
+ en.project.examples.utils;x-friends:="org.jboss.tools.maven.examples.
+ test"

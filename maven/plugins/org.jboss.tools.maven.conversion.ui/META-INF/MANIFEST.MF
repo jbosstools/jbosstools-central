@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: %BundleName
 Bundle-SymbolicName: org.jboss.tools.maven.conversion.ui;singleton:=true
-Bundle-Version: 1.5.4.qualifier
+Bundle-Version: 1.5.5.qualifier
 Bundle-Activator: org.jboss.tools.maven.conversion.ui.internal.MavenDependencyConversionActivator
 Require-Bundle: org.eclipse.ui;bundle-version="3.7.0",
  org.eclipse.core.runtime;bundle-version="3.7.0",
@@ -21,10 +21,10 @@ Require-Bundle: org.eclipse.ui;bundle-version="3.7.0",
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-Vendor: %BundleVendor
 Bundle-Localization: plugin
-Export-Package: org.jboss.tools.maven.conversion.core,
- org.jboss.tools.maven.conversion.ui,
- org.jboss.tools.maven.conversion.ui.dialog,
- org.jboss.tools.maven.conversion.ui.handlers,
- org.jboss.tools.maven.conversion.ui.internal;x-friends:="org.jboss.tools.maven.conversion.test",
- org.jboss.tools.maven.conversion.ui.internal.jobs;x-friends:="org.jboss.tools.maven.conversion.test"
+Export-Package: org.jboss.tools.maven.conversion.core,org.jboss.tools.
+ maven.conversion.ui,org.jboss.tools.maven.conversion.ui.dialog,org.jb
+ oss.tools.maven.conversion.ui.handlers,org.jboss.tools.maven.conversi
+ on.ui.internal;x-friends:="org.jboss.tools.maven.conversion.test",org
+ .jboss.tools.maven.conversion.ui.internal.jobs;x-friends:="org.jboss.
+ tools.maven.conversion.test"
 Bundle-ActivationPolicy: lazy

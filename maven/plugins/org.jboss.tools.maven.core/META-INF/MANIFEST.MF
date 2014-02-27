@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: %Bundle-Name
 Bundle-SymbolicName: org.jboss.tools.maven.core; singleton:=true
-Bundle-Version: 1.5.4.qualifier
+Bundle-Version: 1.5.5.qualifier
 Bundle-Localization: plugin
 Bundle-Activator: org.jboss.tools.maven.core.MavenCoreActivator
 Require-Bundle: org.eclipse.core.runtime,
@@ -30,14 +30,12 @@ Require-Bundle: org.eclipse.core.runtime,
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-Vendor: %Bundle-Vendor
-Export-Package: org.jboss.tools.maven.core,
- org.jboss.tools.maven.core.identification,
- org.jboss.tools.maven.core.internal.identification;x-friends:="org.jboss.tools.maven.common.test",
- org.jboss.tools.maven.core.internal.project.facet,
- org.jboss.tools.maven.core.libprov,
- org.jboss.tools.maven.core.repositories,
- org.jboss.tools.maven.core.settings,
- org.jboss.tools.maven.core.xpl
+Export-Package: org.jboss.tools.maven.core,org.jboss.tools.maven.core.
+ identification,org.jboss.tools.maven.core.internal.identification;x-f
+ riends:="org.jboss.tools.maven.common.test",org.jboss.tools.maven.cor
+ e.internal.project.facet,org.jboss.tools.maven.core.libprov,org.jboss
+ .tools.maven.core.repositories,org.jboss.tools.maven.core.settings,or
+ g.jboss.tools.maven.core.xpl
 Bundle-ClassPath: lib/nexus-indexer-lucene-rest-api-client.jar,
  lib/jboss-dmr-1.1.1.Final.jar,
  .
