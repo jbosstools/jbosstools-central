@@ -1493,6 +1493,32 @@
          environment: web-ee6,
          isBlank: true,      
      }
+
+  
+   - &jboss-html5-mobile-archetype-previous-wfk
+     id: jboss-html5-mobile-archetype-previous-wfk
+     archetype: *jboss-html5-mobile-archetype-wfk
+     version: 1.2.3
+     repositoryURL:
+     labels: {
+         additionalRepositories:  ["http://maven.repository.redhat.com/techpreview/all/", "http://jboss-developer.github.io/temp-maven-repo/"],
+         type: html5-mobile, 
+         target: product,
+         environment: web-ee6,
+     }
+  
+   - &jboss-html5-mobile-blank-archetype-previous-wfk
+     id: jboss-html5-mobile-blank-archetype-previous-wfk
+     archetype: *jboss-html5-mobile-blank-archetype-wfk
+     version: 1.2.3
+     repositoryURL:
+     labels: {
+         additionalRepositories:  ["http://maven.repository.redhat.com/techpreview/all/", "http://jboss-developer.github.io/temp-maven-repo/"],
+         type: html5-mobile, 
+         target: product,
+         environment: web-ee6,
+         isBlank: true,      
+     }
   
      #######################
      #   Java EE 6 Webapp  #
@@ -1694,6 +1720,8 @@
       - *jboss-javaee6-webapp-ear-blank-archetype-last
       - *jboss-html5-mobile-archetype-last
       - *jboss-html5-mobile-blank-archetype-last
+      - *jboss-html5-mobile-archetype-previous-wfk
+      - *jboss-html5-mobile-blank-archetype-previous-wfk
       - *richfaces-archetype-kitchensink-423final2
       - *jboss-errai-kitchensink-archetype-211final
      labels: {
