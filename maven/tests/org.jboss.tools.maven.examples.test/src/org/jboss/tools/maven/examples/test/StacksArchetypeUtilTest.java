@@ -33,7 +33,6 @@ import org.eclipse.jst.j2ee.project.facet.IJ2EEFacetConstants;
 import org.eclipse.wst.common.project.facet.core.IProjectFacetVersion;
 import org.eclipse.wst.common.project.facet.core.runtime.IRuntime;
 import org.eclipse.wst.server.core.IRuntimeType;
-import org.jboss.ide.eclipse.as.core.util.IJBossToolingConstants;
 import org.jboss.jdf.stacks.model.ArchetypeVersion;
 import org.jboss.jdf.stacks.model.Stacks;
 import org.jboss.tools.maven.project.examples.internal.stacks.StacksArchetypeUtil;
@@ -45,6 +44,10 @@ import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 
 public class StacksArchetypeUtilTest {
+
+	private static final String EAP60 = "org.jboss.ide.eclipse.as.runtime.eap.60";
+	private static final String EAP61 = "org.jboss.ide.eclipse.as.runtime.eap.61";
+	private static final String EAP62 = "org.jboss.ide.eclipse.as.runtime.eap.62";
 
 	private static final class FacetVersionSupportAnswer implements
 			Answer<Boolean> {
@@ -84,7 +87,9 @@ public class StacksArchetypeUtilTest {
 	private Set<org.eclipse.wst.common.project.facet.core.runtime.IRuntime> createMockFacetedRuntimes() {
 
 		Set<org.eclipse.wst.common.project.facet.core.runtime.IRuntime> frs = new HashSet<IRuntime>();
-		frs.add(createMockFacetedRuntime("eap6", FULL_EE6_FACET_VERSIONS));
+		frs.add(createMockFacetedRuntime(EAP60, FULL_EE6_FACET_VERSIONS));
+		frs.add(createMockFacetedRuntime(EAP61, FULL_EE6_FACET_VERSIONS));
+		frs.add(createMockFacetedRuntime(EAP62, FULL_EE6_FACET_VERSIONS));
 		frs.add(createMockFacetedRuntime("jbossas7", FULL_EE6_FACET_VERSIONS));
 		frs.add(createMockFacetedRuntime("tomcat7", WEB_EE6_FACET_VERSIONS));
 		frs.add(createMockFacetedRuntime("tomcat6", Arrays.asList(IJ2EEFacetConstants.DYNAMIC_WEB_25)));
@@ -107,7 +112,7 @@ public class StacksArchetypeUtilTest {
 	
 	@Test
 	public void testGetArchetype() {
-		org.eclipse.wst.server.core.IRuntime eap6 = createRuntime("eap6");
+		org.eclipse.wst.server.core.IRuntime eap6 = createRuntime(EAP60);
 		
 		//No matching archetype
 		assertNull(stacksArchetypeUtil.getArchetype("unknown", false, null, "web-ee7", stacks));
@@ -115,11 +120,11 @@ public class StacksArchetypeUtilTest {
 		//Get matching product archetype
 		ArchetypeVersion archetype = stacksArchetypeUtil.getArchetype("javaee-web", false, eap6, stacks);
 		assertNotNull(archetype);
-		assertEquals("jboss-javaee6-webapp-archetype-eap",archetype.getArchetype().getId());
+		assertEquals("jboss-javaee6-webapp-archetype",archetype.getArchetype().getId());
 
 		//Default to latest non-blank for product 
 		ArchetypeVersion archetype2 = stacksArchetypeUtil.getArchetype("javaee-web", false, "product", "full-ee999", stacks);
-		assertSame(archetype2, archetype);
+		assertEquals("jboss-javaee6-webapp-archetype-eap",archetype2.getArchetype().getId());
 		
 		//Default to latest blank for product
 		ArchetypeVersion archetypeBlank = stacksArchetypeUtil.getArchetype("javaee-web", true, "product", "web-ee7", stacks);
@@ -224,16 +229,34 @@ public class StacksArchetypeUtilTest {
 		assertFalse(stacksArchetypeUtil.hasBlankArchetype(archetypeErrai, null, stacks));
 
 	}	
+
+	@Test
+	public void testJBIDE16292_getArchetypeMatchingRuntime() {
+		org.eclipse.wst.server.core.IRuntime eap6 = createRuntime(EAP60);
+		ArchetypeVersion oldMobile = stacksArchetypeUtil.getArchetype("html5-mobile", false, eap6, stacks);
+		assertNotNull(oldMobile);
+		assertEquals("jboss-html5-mobile-archetype-wfk",oldMobile.getArchetype().getId());
+		assertEquals("1.2.3", oldMobile.getVersion());
+		
+		org.eclipse.wst.server.core.IRuntime eap61 = createRuntime(EAP61);
+		ArchetypeVersion communityMobile = stacksArchetypeUtil.getArchetype("html5-mobile", false, eap61, stacks);
+		assertNotNull(communityMobile);
+		assertEquals("jboss-html5-mobile-archetype",communityMobile.getArchetype().getId());
+		assertEquals("7.1.3.Final", communityMobile.getVersion());
+		
+		org.eclipse.wst.server.core.IRuntime eap62 = createRuntime(EAP62);
+		ArchetypeVersion newMobile = stacksArchetypeUtil.getArchetype("html5-mobile", false, eap62, stacks);
+		assertNotNull(newMobile);
+		assertEquals("jboss-html5-mobile-archetype-wfk",newMobile.getArchetype().getId());
+		assertEquals("2.4.0-build-1", newMobile.getVersion());
+		
+	}
 	
 	private org.eclipse.wst.server.core.IRuntime createRuntime(String id) {
 		org.eclipse.wst.server.core.IRuntime runtime = mock(org.eclipse.wst.server.core.IRuntime.class);
 		when(runtime.getId()).thenReturn(id);
 		IRuntimeType runtimeType = mock(IRuntimeType.class);
-		if (id.startsWith("eap")) {
-			when(runtimeType.getId()).thenReturn(IJBossToolingConstants.EAP_RUNTIME_PREFIX+id);
-		} else {
-			when(runtimeType.getId()).thenReturn(id);
-		}
+		when(runtimeType.getId()).thenReturn(id);
 		when(runtime.getRuntimeType()).thenReturn(runtimeType);
 		return runtime;
 	}

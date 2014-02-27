@@ -31,6 +31,7 @@ import org.eclipse.wst.common.project.facet.core.runtime.RuntimeManager;
 import org.eclipse.wst.server.core.IRuntime;
 import org.jboss.ide.eclipse.as.core.util.RuntimeUtils;
 import org.jboss.jdf.stacks.model.ArchetypeVersion;
+import org.jboss.jdf.stacks.model.Runtime;
 import org.jboss.jdf.stacks.model.Stacks;
 import org.jboss.tools.maven.project.examples.MavenProjectExamplesActivator;
 
@@ -138,9 +139,11 @@ public class StacksArchetypeUtil {
 		if (archetypeType == null) {
 			throw new IllegalArgumentException("Archetype type cannot be null");
 		}
+		
 		String targetProduct = RuntimeUtils.isEAP(runtime)?TARGET_PRODUCT:TARGET_COMMUNITY;
 		String environment = getEnvironment(runtime);
-		return getArchetype(archetypeType, isBlank, targetProduct, environment, stacks);
+		String runtimeTypeId = (runtime == null || runtime.getRuntimeType() == null) ? null : runtime.getRuntimeType().getId();
+		return getArchetype(archetypeType, isBlank, targetProduct, environment, runtimeTypeId, stacks);
 	}
 	
 
@@ -148,18 +151,25 @@ public class StacksArchetypeUtil {
 	 * Looks for the stacks archetype matching best the given requirements (isBlank, targetProduct, environment)
 	 */
 	public ArchetypeVersion getArchetype(String archetypeType, boolean isBlank, String targetProduct, String environment, Stacks stacks) {
+		return getArchetype(archetypeType, isBlank, targetProduct, environment, null, stacks);
+	}
+
+	/**
+	 * Looks for the stacks archetype matching best the given requirements (isBlank, targetProduct, environment)
+	 */
+	public ArchetypeVersion getArchetype(String archetypeType, boolean isBlank, String targetProduct, String environment, String serverId, Stacks stacks) {
 		if (archetypeType == null) {
 			throw new IllegalArgumentException("Archetype type cannot be null");
 		}
 		
-		Map<ArchetypeVersion, Integer> matchingArchetypes = getBestMatchingArchetype(archetypeType, isBlank, targetProduct, environment, stacks);
+		Map<ArchetypeVersion, Integer> matchingArchetypes = getBestMatchingArchetype(archetypeType, isBlank, targetProduct, environment, serverId, stacks);
 		if (!matchingArchetypes.isEmpty()) {
 			return matchingArchetypes.keySet().iterator().next();
 		}
 		return null;
 	}
-	
-	private Map<ArchetypeVersion, Integer> getBestMatchingArchetype(String archetypeType, boolean isBlank, String targetProduct /*community or product*/, String environment /* *-ee6 or *-ee7 */, Stacks stacks) {
+
+	private Map<ArchetypeVersion, Integer> getBestMatchingArchetype(String archetypeType, boolean isBlank, String targetProduct /*community or product*/, String environment /* *-ee6 or *-ee7 */, String serverId, Stacks stacks) {
 		Map<ArchetypeVersion, Integer> matchingArchetypes = new HashMap<ArchetypeVersion, Integer>();
 		if (targetProduct == null) {
 			targetProduct = TARGET_COMMUNITY;
@@ -194,6 +204,18 @@ public class StacksArchetypeUtil {
 			matchingArchetypes.put(archetype, score);
 		}
 
+		if (serverId != null) {
+			Runtime rt = getRuntimeFromWtp(stacks, serverId);
+			if (rt != null && rt.getArchetypes() != null) {
+				for (ArchetypeVersion a : rt.getArchetypes()) {
+					//Archetypes belonging to the selected wtp runtime get an extra bonus
+					if (matchingArchetypes.containsKey(a)) {
+						matchingArchetypes.put(a, (matchingArchetypes.get(a))+3);
+					}
+				}
+			}
+		}
+		
 		//Yuck!
 		List<Entry<ArchetypeVersion, Integer>> entries = new ArrayList<Map.Entry<ArchetypeVersion,Integer>>(matchingArchetypes.entrySet());
 		//Sort higher scores first, then higher versions of identical archetypes first
@@ -221,6 +243,18 @@ public class StacksArchetypeUtil {
 		return result;
 	}
 	
+	private Runtime getRuntimeFromWtp(Stacks stacks, String wtpRuntimeId) {
+		if (wtpRuntimeId != null) {
+			for (Runtime runtime : stacks.getAvailableRuntimes()) {
+				Properties p = runtime.getLabels();
+				if (p != null && wtpRuntimeId.equals(p.get("wtp-runtime-type"))) { //$NON-NLS-1$
+					return runtime;
+				}
+			}
+		}
+		return null;
+	}
+
 	/**
 	 * Returns a map of additional Maven repositories defined on a given stacks archetype.
 	 * <ul><li>The key corresponds to the repository id or profile id</li>
