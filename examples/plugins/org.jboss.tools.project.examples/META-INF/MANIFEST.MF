@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: %BundleName
 Bundle-SymbolicName: org.jboss.tools.project.examples;singleton:=true
-Bundle-Version: 1.5.3.qualifier
+Bundle-Version: 1.5.4.qualifier
 Bundle-Activator: org.jboss.tools.project.examples.ProjectExamplesActivator
 Bundle-Vendor: %BundleVendor
 Require-Bundle: org.eclipse.ui,
@@ -50,18 +50,15 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.equinox.p2.metadata.repository;bundle-version="1.2.100"
 Bundle-ActivationPolicy: lazy
 Bundle-Localization: plugin
-Export-Package: org.jboss.tools.project.examples,
- org.jboss.tools.project.examples.actions,
- org.jboss.tools.project.examples.configurators,
- org.jboss.tools.project.examples.dialog,
- org.jboss.tools.project.examples.dialog.xpl,
- org.jboss.tools.project.examples.fixes,
- org.jboss.tools.project.examples.internal.discovery;x-friends:="org.jboss.tools.central",
- org.jboss.tools.project.examples.internal.discovery.xpl;x-internal:=true,
- org.jboss.tools.project.examples.internal.xpl;x-internal:=true,
- org.jboss.tools.project.examples.model,
- org.jboss.tools.project.examples.preferences,
- org.jboss.tools.project.examples.runtimes,
- org.jboss.tools.project.examples.wizard
+Export-Package: org.jboss.tools.project.examples,org.jboss.tools.proje
+ ct.examples.actions,org.jboss.tools.project.examples.configurators,or
+ g.jboss.tools.project.examples.dialog,org.jboss.tools.project.example
+ s.dialog.xpl,org.jboss.tools.project.examples.fixes,org.jboss.tools.p
+ roject.examples.internal.discovery;x-friends:="org.jboss.tools.centra
+ l",org.jboss.tools.project.examples.internal.discovery.xpl;x-internal
+ :=true,org.jboss.tools.project.examples.internal.xpl;x-internal:=true
+ ,org.jboss.tools.project.examples.model,org.jboss.tools.project.examp
+ les.preferences,org.jboss.tools.project.examples.runtimes,org.jboss.t
+ ools.project.examples.wizard
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 
