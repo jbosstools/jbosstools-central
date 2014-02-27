@@ -10,9 +10,21 @@
  ************************************************************************************/
 package org.jboss.tools.maven.profiles.ui;
 
+import java.io.IOException;
+
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.jface.bindings.Binding;
+import org.eclipse.jface.bindings.BindingManager;
+import org.eclipse.jface.bindings.keys.KeyBinding;
+import org.eclipse.ui.IWorkbench;
+import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.keys.IBindingService;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
+import org.jboss.tools.maven.profiles.ui.internal.M2eProfilePropertyTester;
 import org.osgi.framework.BundleContext;
 
 /**
@@ -24,18 +36,55 @@ public class Activator extends AbstractUIPlugin {
 	// The shared instance
 	private static Activator plugin;
 	
-	/**
-	 * The constructor
-	 */
-	public Activator() {
-	}
-
 	/*
 	 * (non-Javadoc)
 	 * @see org.eclipse.ui.plugin.AbstractUIPlugin#start(org.osgi.framework.BundleContext)
 	 */
 	public void start(BundleContext context) throws Exception {
 		super.start(context);
+		
+		if (M2eProfilePropertyTester.isConflicting()) {
+			
+			Job job = new Job("Deactivate JBoss Maven Profile Management Key Binding") {
+				
+				@Override
+				protected IStatus run(IProgressMonitor monitor) {
+					final IWorkbench workbench = PlatformUI.getWorkbench();
+					final BindingManager bindingManager= (BindingManager) workbench.getService(BindingManager.class);
+					final IBindingService bindingService= (IBindingService) workbench.getService(IBindingService.class);
+
+					Binding[] aBindings = bindingManager.getBindings();
+
+					boolean dirty = false;
+					
+					for (Binding b : aBindings) {
+						if (b instanceof KeyBinding && b.getParameterizedCommand() != null 
+								&& "org.jboss.tools.maven.ui.commands.selectMavenProfileCommand".equals(b.getParameterizedCommand().getId())
+								) {
+							log("Found org.eclipse.m2e.profiles.ui, removing conflicting binding for org.jboss.tools.maven.ui.commands.selectMavenProfileCommand");
+							bindingManager.removeBinding(b);
+							dirty = true;
+							break;
+						}
+					}
+					if (dirty) {
+					 workbench.getDisplay().syncExec(new Runnable() {
+						 public void run() {
+					          try {
+					        	bindingService.savePreferences(bindingManager.getActiveScheme(), bindingManager.getBindings());
+					          } catch (IOException e) {
+					            throw new RuntimeException(e);
+					          }
+					        }
+					      });
+					}
+					return Status.OK_STATUS;
+				}
+			};
+			job.setUser(false);
+			job.schedule(2000);
+			
+		}
 		plugin = this;
 	}
 
@@ -63,7 +112,7 @@ public class Activator extends AbstractUIPlugin {
 	}
 
 	public static void log(String message) {
-		IStatus status = new Status(IStatus.ERROR, PLUGIN_ID, message);
+		IStatus status = new Status(IStatus.INFO, PLUGIN_ID, message);
 		getDefault().getLog().log(status);
 	}
 

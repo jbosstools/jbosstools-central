@@ -28,6 +28,18 @@
        </key>
     </extension>
    
+
+   <extension point="org.eclipse.core.expressions.propertyTesters">
+      <propertyTester
+            class="org.jboss.tools.maven.profiles.ui.internal.M2eProfilePropertyTester"
+            id="org.jboss.tools.maven.profiles.ui.internal.M2eProfilePropertyTester"
+            namespace="org.jboss.tools.maven.profiles"
+            properties="hasConflict"
+            type="java.lang.Object">
+      </propertyTester>
+   </extension>
+  
+   
    <extension point="org.eclipse.ui.popupMenus">
         <objectContribution id="org.jboss.tools.maven.ui.profiles.selectFromProject"
                           objectClass="org.eclipse.core.resources.IProject"
@@ -42,6 +54,9 @@
          <visibility>
            <and>
              <objectState name="open" value="true"/>
+             <not>
+             	<pluginState id="org.eclipse.m2e.profiles.ui" value="installed"/>
+             </not>
              <objectState name="nature" value="org.eclipse.m2e.core.maven2Nature"/>
            </and>
          </visibility>
@@ -58,7 +73,12 @@
                  menubarPath="org.eclipse.m2e.core.fileMenu/open"
                  enablesFor="+"/>
          <visibility>
+           <and>
             <objectState name="name" value="pom.xml"/>
+             <not>
+             	<pluginState id="org.eclipse.m2e.profiles.ui" value="installed"/>
+             </not>
+           </and>
          </visibility>
       </objectContribution>
       
@@ -72,6 +92,11 @@
                  definitionId="org.jboss.tools.maven.ui.commands.selectMavenProfileCommand"
                  menubarPath="org.eclipse.m2e.core.workingSetMenu/open"
                  enablesFor="+"/>
+         <visibility>
+             <not>
+             	<pluginState id="org.eclipse.m2e.profiles.ui" value="installed"/>
+             </not>
+         </visibility>
       </objectContribution>
       
   </extension> 
@@ -86,6 +111,11 @@
                    icon="icons/maven-profiles.gif"
                    id="org.jboss.tools.maven.ui.toolbars.selectMavenProfilesCommand"
                    tooltip="%Select_Maven_Profiles_Cmd">
+                   <visibleWhen>
+                      <test
+						  property="org.jboss.tools.maven.profiles.hasConflict" 
+						  value="false" forcePluginActivation="true"/> 
+                   </visibleWhen>
              </command>
           </toolbar>
        </menuContribution>
