@@ -2,7 +2,7 @@
 <feature
       id="org.jboss.tools.community.central.feature"
       label="%featureName"
-      version="1.2.3.qualifier"
+      version="1.2.4.qualifier"
       provider-name="%providerName"
       plugin="org.jboss.tools.community.central">
 
