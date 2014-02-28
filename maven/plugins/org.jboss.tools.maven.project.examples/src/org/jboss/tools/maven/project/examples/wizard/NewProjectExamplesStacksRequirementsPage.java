@@ -90,7 +90,7 @@ public class NewProjectExamplesStacksRequirementsPage extends MavenExamplesRequi
 
 	private String stacksType;
 
-	private Job job;
+	private EnterpriseRepoCheckJob job;
 	
 	private boolean exampleInitialized;
 
@@ -433,6 +433,7 @@ public class NewProjectExamplesStacksRequirementsPage extends MavenExamplesRequi
 
 	@Override
 	protected void validateEnterpriseRepo() {
+		stopMavenRepoCheckJob();
 		if (exampleInitialized && warningComponent != null) {
 			warningComponent.setLinkText(""); //$NON-NLS-1$
 			
@@ -441,7 +442,6 @@ public class NewProjectExamplesStacksRequirementsPage extends MavenExamplesRequi
 			if (reqDeps == null || reqDeps.isEmpty()) {
 				return;
 			}
-
 			if (!isEnterpriseTargetRuntime() && Boolean.TRUE.equals(wizardContext.getProperty(MavenProjectConstants.HAS_ENTERPRISE_PROPERTY))) {
 				return;
 			}
@@ -453,24 +453,17 @@ public class NewProjectExamplesStacksRequirementsPage extends MavenExamplesRequi
 				return;
 			}
 			
-			final IStatus[] checkResult = new IStatus[1]; 
-			
-			stopMavenRepoCheckJob();
-			
-			job = new Job(Messages.NewProjectExamplesStacksRequirementsPage_Check_Maven_Repo_Job) {
-				
-				@Override
-				protected IStatus run(IProgressMonitor monitor) {
-					checkResult[0] = MavenArtifactHelper.checkRequirementsAvailable(version);
-					return Status.OK_STATUS;
-				}
-			};
+			job = new EnterpriseRepoCheckJob();
 			
 			job.addJobChangeListener(new JobChangeAdapter() {
+
 				public void done(IJobChangeEvent event) {
-					enterpriseRepoStatusMap.put(version, checkResult[0]);
-					final IStatus status = event.getResult().isOK()?checkResult[0]:event.getResult();
-					Display.getDefault().syncExec( new Runnable() {  public void run() { 
+					if (job.isCancelled()) {
+						return;
+					}
+					enterpriseRepoStatusMap.put(version, job.getCheckResult());
+					final IStatus status = event.getResult().isOK()?job.getCheckResult():event.getResult();
+					Display.getDefault().syncExec( new Runnable() {  public void run() {
 						updateWarningComponent(status);
 					} });
 				};
@@ -628,4 +621,36 @@ public class NewProjectExamplesStacksRequirementsPage extends MavenExamplesRequi
 			validateEnterpriseRepo();
         }});
 	}
+
+	public class EnterpriseRepoCheckJob extends Job {
+
+		private boolean cancelled;
+
+		private IStatus checkResult;
+
+		public EnterpriseRepoCheckJob() {
+			super(Messages.NewProjectExamplesStacksRequirementsPage_Check_Maven_Repo_Job);
+		}
+
+		@Override
+		protected IStatus run(IProgressMonitor monitor) {
+			checkResult = MavenArtifactHelper.checkRequirementsAvailable(version);
+			return Status.OK_STATUS;
+		}
+
+		@Override
+		protected void canceling() {
+			cancelled = true;
+			super.canceling();
+		}
+
+		boolean isCancelled() {
+			return cancelled;
+		}
+
+		IStatus getCheckResult() {
+			return checkResult;
+		}
+	}
+
 }
