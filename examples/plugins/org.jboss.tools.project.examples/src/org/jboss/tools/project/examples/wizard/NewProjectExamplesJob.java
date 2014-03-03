@@ -28,6 +28,8 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.IWorkingSet;
 import org.eclipse.ui.PlatformUI;
+import org.jboss.tools.foundation.core.FoundationCorePlugin;
+import org.jboss.tools.foundation.core.usage.IUsageTracker;
 import org.jboss.tools.project.examples.Messages;
 import org.jboss.tools.project.examples.ProjectExamplesActivator;
 import org.jboss.tools.project.examples.model.IImportProjectExample;
@@ -57,6 +59,7 @@ public class NewProjectExamplesJob extends WorkspaceJob {
 					selectedProject, monitor);
 			if (success) {
 				projects.add(selectedProject);
+				FoundationCorePlugin.getDefault().getUsageTrackerService().sendLiveEvent(IUsageTracker.CATEGORY_CENTRAL, IUsageTracker.ACTION_INSTALLED_EXAMPLE, selectedProject.getName());
 			} else {
 				final String message = "Unable to download the '" + selectedProject.getName() + "' quickstart.\r\nPlease check your Internet connection and/or Proxy Settings";
 				Display.getDefault().syncExec(new Runnable() {
