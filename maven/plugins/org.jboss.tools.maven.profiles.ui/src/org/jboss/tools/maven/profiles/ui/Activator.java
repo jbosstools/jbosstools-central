@@ -55,22 +55,21 @@ public class Activator extends AbstractUIPlugin {
 
 					Binding[] aBindings = bindingManager.getBindings();
 
-					boolean dirty = false;
-					
+					final Binding[] conflictedBinding = new Binding[1];
 					for (Binding b : aBindings) {
 						if (b instanceof KeyBinding && b.getParameterizedCommand() != null 
 								&& "org.jboss.tools.maven.ui.commands.selectMavenProfileCommand".equals(b.getParameterizedCommand().getId())
 								) {
-							log("Found org.eclipse.m2e.profiles.ui, removing conflicting binding for org.jboss.tools.maven.ui.commands.selectMavenProfileCommand");
-							bindingManager.removeBinding(b);
-							dirty = true;
+							conflictedBinding[0] = b;
 							break;
 						}
 					}
-					if (dirty) {
-					 workbench.getDisplay().syncExec(new Runnable() {
+					if (conflictedBinding[0] != null) {
+					 workbench.getDisplay().asyncExec(new Runnable() {
 						 public void run() {
 					          try {
+								log("Found org.eclipse.m2e.profiles.ui, removing conflicting binding for org.jboss.tools.maven.ui.commands.selectMavenProfileCommand");
+								bindingManager.removeBinding(conflictedBinding[0]);
 					        	bindingService.savePreferences(bindingManager.getActiveScheme(), bindingManager.getBindings());
 					          } catch (IOException e) {
 					            throw new RuntimeException(e);
