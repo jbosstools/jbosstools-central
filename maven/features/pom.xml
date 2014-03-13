@@ -21,7 +21,6 @@
 		<module>org.jboss.tools.maven.project.examples.feature</module>
 		<module>org.jboss.tools.maven.test.feature</module>
 		<module>org.jboss.tools.maven.jbosspackaging.feature</module>	
-		<module>org.jboss.tools.maven.profiles.feature</module>
 		<module>org.jboss.tools.maven.gwt.feature</module>
 		<module>org.jboss.tools.maven.sourcelookup.feature</module>
 		<module>org.jboss.tools.maven.jdt.feature</module>
