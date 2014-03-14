@@ -16,6 +16,5 @@
 	<plugin id="org.jboss.tools.maven.common.test" download-size="0" install-size="0" version="0.0.0" />
 	<plugin id="org.jboss.tools.maven.configurators.tests" download-size="0" install-size="0" version="0.0.0" />
 	<plugin id="org.jboss.tools.maven.conversion.test" download-size="0" install-size="0" version="0.0.0" />
-	<plugin id="org.jboss.tools.maven.profiles.test" download-size="0" install-size="0" version="0.0.0" />
 	<plugin id="org.jboss.tools.maven.sourcelookup.test" download-size="0" install-size="0" version="0.0.0" />
 </feature>
