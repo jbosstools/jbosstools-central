@@ -102,7 +102,6 @@ public class ConvertToMavenDependencyWizard extends Wizard {
 
 	@Override
 	public void dispose() {
-		dependencies = null;
 		entries = null;
 		project = null;
 		super.dispose();
