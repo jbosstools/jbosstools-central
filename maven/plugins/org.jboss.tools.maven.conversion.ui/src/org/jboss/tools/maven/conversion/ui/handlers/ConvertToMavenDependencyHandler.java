@@ -29,6 +29,7 @@ import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.m2e.jdt.internal.MavenClasspathHelpers;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.handlers.HandlerUtil;
+import org.jboss.tools.maven.conversion.ui.dialog.ConversionWizardDialog;
 import org.jboss.tools.maven.conversion.ui.dialog.ConvertToMavenDependencyWizard;
 
 /**
@@ -59,7 +60,7 @@ public class ConvertToMavenDependencyHandler extends AbstractHandler {
                                                                    null 
                                                                    ); 
 
-    WizardDialog dialog = new WizardDialog(window.getShell(), wizard);
+    WizardDialog dialog = new ConversionWizardDialog(window.getShell(), wizard);
 	dialog.open();
     return null;
   }

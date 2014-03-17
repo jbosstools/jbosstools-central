@@ -1,5 +1,5 @@
 /*************************************************************************************
- * Copyright (c) 2012-2013 Red Hat, Inc. and others.
+ * Copyright (c) 2012-2014 Red Hat, Inc. and others.
  * All rights reserved. This program and the accompanying materials 
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -25,6 +25,7 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.PlatformUI;
 import org.jboss.tools.maven.conversion.core.DependencyCollector;
 import org.jboss.tools.maven.conversion.core.ProjectDependency;
+import org.jboss.tools.maven.conversion.ui.dialog.ConversionWizardDialog;
 import org.jboss.tools.maven.conversion.ui.dialog.ConvertToMavenDependencyWizard;
 
 public abstract class AbstractReferenceConversionParticipant extends
@@ -58,7 +59,8 @@ public abstract class AbstractReferenceConversionParticipant extends
 				@Override
 				public void run() {
 					Shell shell = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();
-					WizardDialog dialog = new WizardDialog(shell, conversionWizard);
+					WizardDialog dialog = new ConversionWizardDialog(shell, conversionWizard);
+					
 					if (dialog.open() == Window.OK) {
 						List<Dependency> dependencies = conversionWizard.getDependencies();
 						if (dependencies != null && !dependencies.isEmpty()) {
