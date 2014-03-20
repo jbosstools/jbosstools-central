@@ -79,7 +79,7 @@ public class AttachSourcesActionDelegate implements IEditorActionDelegate {
 				IClassFileEditorInput input = (IClassFileEditorInput) targetEditor.getEditorInput();
 				IJavaElement element = input.getClassFile();
 				String className = element.getElementName(); 
-				boolean isMavenProject = isMavenProject(element.getJavaProject());
+				final boolean isMavenProject = isMavenProject(element.getJavaProject());
 				String packagePath = null;
 				while (element.getParent() != null) {
 					if (element instanceof IPackageFragment) {
@@ -89,10 +89,6 @@ public class AttachSourcesActionDelegate implements IEditorActionDelegate {
 						final IPackageFragmentRoot fragment = (IPackageFragmentRoot) element;
 						
 						IPath attachmentPath = fragment.getSourceAttachmentPath();
-						if ((attachmentPath == null || attachmentPath.isEmpty()) && isMavenProject) {
-							//Let m2e do its stuff for missing attachments only
-							break;
-						} 
 						
 						if (attachmentPath != null && !attachmentPath.isEmpty()) {
 							File attachementSource = attachmentPath.toFile();
@@ -120,10 +116,11 @@ public class AttachSourcesActionDelegate implements IEditorActionDelegate {
 									return status;
 								}
 							};
+							
 							identificationJob.addJobChangeListener(new JobChangeAdapter() {
 								@Override
 								public void done(IJobChangeEvent event) {
-									postIdentification(fragment, file, result[0]);
+									postIdentification(fragment, file, result[0], !isMavenProject);
 								}
 							});
 							identificationJob.schedule();
@@ -164,8 +161,7 @@ public class AttachSourcesActionDelegate implements IEditorActionDelegate {
 		return false;
 	}
 
-	private void postIdentification(final IPackageFragmentRoot fragment,
-			File file, final ArtifactKey artifact) {
+	private void postIdentification(final IPackageFragmentRoot fragment, File file, final ArtifactKey artifact, final boolean displayDialog) {
 		if (artifact != null) {
 			IPath sourcePath = JBossSourceContainer.getSourcePath(artifact);
 			if (sourcePath == null || !sourcePath.toFile().exists()) {
@@ -174,13 +170,13 @@ public class AttachSourcesActionDelegate implements IEditorActionDelegate {
 					public void done(IJobChangeEvent event) {
 						IPath sourcePath = JBossSourceContainer.getSourcePath(artifact);
 						if (sourcePath != null && sourcePath.toFile().exists()) {
-							SourceLookupUtil.attachSource(fragment, sourcePath);
+							SourceLookupUtil.attachSource(fragment, sourcePath, displayDialog);
 						}
 					}
 				};
 				JBossSourceContainer.downloadArtifact(file, artifact, listener);
 			} else {
-				SourceLookupUtil.attachSource(fragment, sourcePath);
+				SourceLookupUtil.attachSource(fragment, sourcePath, displayDialog);
 			}
 		}
 	}

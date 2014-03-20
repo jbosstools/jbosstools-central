@@ -39,6 +39,10 @@ import org.jboss.tools.maven.sourcelookup.ui.internal.Messages;
 public class SourceLookupUtil {
 
 	public static void attachSource(final IPackageFragmentRoot fragment, final IPath newSourcePath) {
+		attachSource(fragment, newSourcePath, true);
+	}
+	
+	public static void attachSource(final IPackageFragmentRoot fragment, final IPath newSourcePath, boolean displayDialog) {
 		try {
 			if (fragment == null || fragment.getKind() != IPackageFragmentRoot.K_BINARY) {
 				return;
@@ -47,7 +51,7 @@ public class SourceLookupUtil {
 			if (SourceLookupActivator.AUTO_ADD_JBOSS_SOURCE_ATTACHMENT_NEVER.equals(value)) {
 				return;
 			}
-			if (SourceLookupActivator.AUTO_ADD_JBOSS_SOURCE_ATTACHMENT_PROMPT.equals(value)) {
+			if (displayDialog && SourceLookupActivator.AUTO_ADD_JBOSS_SOURCE_ATTACHMENT_PROMPT.equals(value)) {
 				final boolean[] attach = new boolean[1];
 				Display.getDefault().syncExec(new Runnable() {
 					
