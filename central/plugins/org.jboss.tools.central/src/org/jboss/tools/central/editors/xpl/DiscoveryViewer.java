@@ -385,6 +385,15 @@ public class DiscoveryViewer {
 //				}
 			}
 		}
+		
+		private void select(boolean select) {
+			if (!checkbox.isDisposed()) {
+				if (checkbox.isEnabled() && checkbox.isVisible()) {
+					checkbox.setSelection(select);
+					maybeModifySelection(select);
+				}
+			}
+		}
 	}
 
 	// e3.5 replace with SWT.ICON_CANCEL
@@ -490,6 +499,8 @@ public class DiscoveryViewer {
 	private boolean showInstalledFilterEnabled;
 
 	private boolean showInstalled;
+	
+	private List<ConnectorDescriptorItemUi> itemsUi = new ArrayList<DiscoveryViewer.ConnectorDescriptorItemUi>();
 
 	public DiscoveryViewer(IShellProvider shellProvider, IRunnableContext context) {
 		this.shellProvider = shellProvider;
@@ -504,6 +515,18 @@ public class DiscoveryViewer {
 		setComplete(false);
 	}
 
+	public void selectAll() {
+		for(ConnectorDescriptorItemUi itemUi:itemsUi) {
+			itemUi.select(true);
+		}
+	}
+	
+	public void deselectAll() {
+		for(ConnectorDescriptorItemUi itemUi:itemsUi) {
+			itemUi.select(false);
+		}
+	}
+	
 	public void addSelectionChangedListener(ISelectionChangedListener listener) {
 		selectionProvider.addSelectionChangedListener(listener);
 	}
@@ -989,6 +1012,7 @@ public class DiscoveryViewer {
 
 					ConnectorDescriptorItemUi itemUi = new ConnectorDescriptorItemUi(connector,
 							categoryChildrenContainer, background);
+					itemsUi.add(itemUi);
 					itemUi.updateAvailability();
 					allConnectors.add(connector);
 				}

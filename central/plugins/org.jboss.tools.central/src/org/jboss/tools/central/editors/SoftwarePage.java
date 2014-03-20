@@ -78,8 +78,10 @@ public class SoftwarePage extends AbstractJBossCentralPage implements IRunnableC
 	private DiscoveryViewer discoveryViewer;
 	private RefreshJobChangeListener refreshJobChangeListener;
 	private InstallAction installAction;
-
+	
 	private Button installButton;
+	private Button selectAllButton;
+	private Button deselectAllButton;
 
 	private ToolBarManager toolBarManager;
 	
@@ -184,7 +186,11 @@ public class SoftwarePage extends AbstractJBossCentralPage implements IRunnableC
 			}
 	    });
 
-	    installButton = toolkit.createButton(featureComposite, "Install", SWT.PUSH);
+	    Composite buttonComposite = toolkit.createComposite(featureComposite);
+	    gd = new GridData(SWT.FILL, SWT.FILL, false, false);
+		buttonComposite.setLayoutData(gd);
+		buttonComposite.setLayout(new GridLayout(3, false));
+	    installButton = toolkit.createButton(buttonComposite, "Install", SWT.PUSH);
 	    installButton.setEnabled(false);
 	    installButton.setImage(JBossCentralActivator.getDefault().getImage(ICON_INSTALL));
 	    installButton.addSelectionListener(new SelectionListener() {
@@ -192,6 +198,38 @@ public class SoftwarePage extends AbstractJBossCentralPage implements IRunnableC
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				installAction.run();
+			}
+			
+			@Override
+			public void widgetDefaultSelected(SelectionEvent e) {
+				
+			}
+		});
+	    selectAllButton = toolkit.createButton(buttonComposite, "Select All", SWT.PUSH);
+	    selectAllButton.setEnabled(true);
+	    selectAllButton.addSelectionListener(new SelectionListener() {
+			
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				if (discoveryViewer != null && !discoveryViewer.getControl().isDisposed()) {
+					discoveryViewer.selectAll();
+				}
+			}
+			
+			@Override
+			public void widgetDefaultSelected(SelectionEvent e) {
+				
+			}
+		});
+	    deselectAllButton = toolkit.createButton(buttonComposite, "Deselect All", SWT.PUSH);
+	    deselectAllButton.setEnabled(true);
+	    deselectAllButton.addSelectionListener(new SelectionListener() {
+			
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				if (discoveryViewer != null && !discoveryViewer.getControl().isDisposed()) {
+					discoveryViewer.deselectAll();
+				}
 			}
 			
 			@Override
@@ -342,7 +380,7 @@ public class SoftwarePage extends AbstractJBossCentralPage implements IRunnableC
 		}
 
 	}
-	
+
 	private class InstallAction extends Action {
 
 		public InstallAction() {
