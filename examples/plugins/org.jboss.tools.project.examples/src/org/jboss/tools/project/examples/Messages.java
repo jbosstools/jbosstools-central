@@ -99,6 +99,7 @@ public class Messages extends NLS {
 	public static String Sites_Runtime_sites;
 	public static String InvalideSite;
 	public static String WTPRuntimeFix_Invalid_WTP_runtime_fix;
+	public static String UsageEventTypeInstallLabelDescription;
 	static {
 		// initialize resource bundle
 		NLS.initializeMessages(BUNDLE_NAME, Messages.class);

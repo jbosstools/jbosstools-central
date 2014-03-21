@@ -121,6 +121,8 @@ import org.jboss.tools.project.examples.wizard.ContributedPage;
 import org.jboss.tools.project.examples.wizard.ImportDefaultProjectExample;
 import org.jboss.tools.project.examples.wizard.NewProjectExamplesJob;
 import org.jboss.tools.project.examples.wizard.ProjectReadyWizard;
+import org.jboss.tools.usage.event.UsageEventType;
+import org.jboss.tools.usage.event.UsageReporter;
 import org.osgi.framework.BundleContext;
 
 /**
@@ -232,6 +234,10 @@ public class ProjectExamplesActivator extends AbstractUIPlugin {
 
 	private Map<String, List<ContributedPage>> contributedPages;
 
+	private static final String COMPONENT_NAME = "central";
+	private static final String INSTALL_ACTION = "install";
+	private UsageEventType installEventType;
+
 	/**
 	 * The constructor
 	 */
@@ -249,6 +255,13 @@ public class ProjectExamplesActivator extends AbstractUIPlugin {
 		super.start(context);
 		ProjectExamplesActivator.context = context;
 		plugin = this;
+
+		installEventType = new UsageEventType(COMPONENT_NAME, UsageEventType.getVersion(this), null, INSTALL_ACTION, Messages.UsageEventTypeInstallLabelDescription);
+		UsageReporter.getInstance().registerEvent(installEventType);
+	}
+
+	public UsageEventType getInstallEventType() {
+		return installEventType;
 	}
 
 	/*
