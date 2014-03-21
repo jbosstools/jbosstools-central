@@ -28,6 +28,8 @@ import org.eclipse.osgi.util.NLS;
 import org.eclipse.ui.preferences.ScopedPreferenceStore;
 import org.eclipse.ui.statushandlers.StatusManager;
 import org.jboss.tools.project.examples.ProjectExamplesActivator;
+import org.jboss.tools.usage.event.UsageEventType;
+import org.jboss.tools.usage.event.UsageReporter;
 
 /**
  * 
@@ -68,6 +70,9 @@ public class JBossDiscoveryUi {
 	private static void recordInstalled(List<ConnectorDescriptor> descriptors) {
 		StringBuilder sb = new StringBuilder();
 		for (ConnectorDescriptor descriptor : descriptors) {
+			UsageEventType eventType = ProjectExamplesActivator.getDefault().getInstallEventType();
+			UsageReporter.getInstance().trackEvent(eventType.event(descriptor.getId()));
+
 			if (sb.length() > 0) {
 				sb.append(","); //$NON-NLS-1$
 			}
