@@ -49,10 +49,9 @@ public class DescriptionToolTip extends ToolTip {
 		GridData gd = new GridData(SWT.FILL, SWT.FILL, true, true);
 		gd.widthHint = 300;
 		composite.setLayoutData(gd);
-		composite.setBackground(parent.getDisplay().getSystemColor(
-				SWT.COLOR_INFO_BACKGROUND));
-		Text text = new Text(composite,
-				SWT.READ_ONLY | SWT.MULTI | SWT.WRAP);
+		composite.setBackground(parent.getDisplay().getSystemColor(SWT.COLOR_INFO_BACKGROUND));
+		composite.setForeground(parent.getDisplay().getSystemColor(SWT.COLOR_INFO_FOREGROUND));
+		Text text = new Text(composite, SWT.READ_ONLY | SWT.MULTI | SWT.WRAP);
 		gd = new GridData(SWT.FILL, SWT.FILL, true, true);
 		GC gc = new GC(parent);
 		gd.heightHint = Dialog.convertHeightInCharsToPixels(gc
@@ -60,6 +59,7 @@ public class DescriptionToolTip extends ToolTip {
 		gc.dispose();
 		text.setLayoutData(gd);
 		text.setBackground(parent.getDisplay().getSystemColor(SWT.COLOR_INFO_BACKGROUND));
+		text.setForeground(parent.getDisplay().getSystemColor(SWT.COLOR_INFO_FOREGROUND));
 		text.setText(description);
 		
 		return composite;
