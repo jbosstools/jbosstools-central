@@ -75,11 +75,11 @@ import org.eclipse.swt.widgets.Display;
  */
 public class PrepareInstallProfileJob extends AbstractInstallJob {
 
-	private final List<ConnectorDescriptor> installableConnectors;
+	protected final List<ConnectorDescriptor> installableConnectors;
 
-	private final ProvisioningUI provisioningUI;
+	protected final ProvisioningUI provisioningUI;
 
-	private Set<URI> repositoryLocations;
+	protected Set<URI> repositoryLocations;
 
 	public PrepareInstallProfileJob(List<ConnectorDescriptor> installableConnectors) {
 		if (installableConnectors == null) {
@@ -89,6 +89,7 @@ public class PrepareInstallProfileJob extends AbstractInstallJob {
 		this.provisioningUI = ProvisioningUI.getDefaultUI();
 	}
 
+	@Override
 	public void run(IProgressMonitor progressMonitor) throws InvocationTargetException, InterruptedException {
 		if (installableConnectors.isEmpty()) {
 			throw new IllegalArgumentException();
@@ -187,13 +188,13 @@ public class PrepareInstallProfileJob extends AbstractInstallJob {
 		}
 	}
 
-	private void checkCancelled(IProgressMonitor monitor) {
+	protected void checkCancelled(IProgressMonitor monitor) {
 		if (monitor.isCanceled()) {
 			throw new OperationCanceledException();
 		}
 	}
 
-	private UninstallOperation resolveUninstall(IProgressMonitor monitor, final IInstallableUnit[] ius,
+	protected UninstallOperation resolveUninstall(IProgressMonitor monitor, final IInstallableUnit[] ius,
 			URI[] repositories) throws CoreException {
 		final UninstallOperation uninstallOperation = provisioningUI.getUninstallOperation(Arrays.asList(ius),
 				repositories);
