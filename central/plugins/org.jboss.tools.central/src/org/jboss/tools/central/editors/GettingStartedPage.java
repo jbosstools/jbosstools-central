@@ -307,12 +307,6 @@ public class GettingStartedPage extends AbstractJBossCentralPage implements Prox
 		showLoading(buzzPageBook, buzzLoadingComposite, buzzScrollComposite);
 		buzzPageBook.pack(true);
 		RefreshBuzzJob job = RefreshBuzzJob.INSTANCE;
-		job.setException(null);
-		if (job.getEntries().size() > 0) {
-			job.setNeedsRefresh(true);
-			refreshBuzz();
-			job.setNeedsRefresh(false);
-		}
 		RefreshBuzzJobChangeListener = new RefreshBuzzJobChangeListener();
 		job.addJobChangeListener(RefreshBuzzJobChangeListener);
 		job.schedule();
@@ -510,8 +504,24 @@ public class GettingStartedPage extends AbstractJBossCentralPage implements Prox
 	  projectsSection.setClient(scratchComposite);
 	  resizedescriptionCompositeScroller();
 	  
-      List<ProxyWizard> proxyWizards = getProxyWizards();
-      addProxyWizardLinks(proxyWizards);
+	  Job job = new Job("Update project wizard list") {
+
+		@Override
+		protected IStatus run(IProgressMonitor monitor) {
+			final List<ProxyWizard> proxyWizards = getProxyWizards();
+			Display.getDefault().asyncExec(new Runnable() {
+				
+				@Override
+				public void run() {
+					addProxyWizardLinks(proxyWizards);
+					resize(true);
+				}
+			});
+			return Status.OK_STATUS;
+		}
+		  
+	  };
+	  job.schedule();
 	}
 
 	private void addProxyWizardLinks(List<ProxyWizard> proxyWizards) {
@@ -1085,10 +1095,9 @@ public class GettingStartedPage extends AbstractJBossCentralPage implements Prox
 	}
 
 	private void showEntries(List<FeedsEntry> entries, Composite composite, PageBook pageBook, ScrolledComposite scrollable) {
-		int i = 0;
 		disposeChildren(composite);
 		pageBook.layout(true, true);
-		int h = scrollable.getClientArea().height;
+		scrollable.getClientArea();
 		for (final FeedsEntry entry:entries) {
 			String text = entry.getShortString(false);
 			FormText formText = toolkit.createFormText(composite, true);
@@ -1285,7 +1294,7 @@ public class GettingStartedPage extends AbstractJBossCentralPage implements Prox
 				}
 				List<ProxyWizard> newWizards = event.getProxyWizards();
 				addProxyWizardLinks(newWizards);
-				projectsComposite.layout(true, true);
+				resize(true);
 			}
 		});
 	}
