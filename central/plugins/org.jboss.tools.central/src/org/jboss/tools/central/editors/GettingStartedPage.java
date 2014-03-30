@@ -1096,8 +1096,6 @@ public class GettingStartedPage extends AbstractJBossCentralPage implements Prox
 
 	private void showEntries(List<FeedsEntry> entries, Composite composite, PageBook pageBook, ScrolledComposite scrollable) {
 		disposeChildren(composite);
-		pageBook.layout(true, true);
-		scrollable.getClientArea();
 		for (final FeedsEntry entry:entries) {
 			String text = entry.getShortString(false);
 			FormText formText = toolkit.createFormText(composite, true);
