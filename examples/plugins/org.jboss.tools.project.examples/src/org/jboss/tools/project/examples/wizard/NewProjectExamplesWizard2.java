@@ -190,9 +190,7 @@ public class NewProjectExamplesWizard2 extends Wizard implements INewWizard {
 	
 	protected void createContributedPages() {
 		Map<String, List<ContributedPage>> extensionPages = ProjectExamplesActivator.getDefault().getContributedPages();
-		Set<String> keySet = extensionPages.keySet();
-		for (String key:keySet) {
-			List<ContributedPage> contributions = extensionPages.get(key);
+		for (List<ContributedPage> contributions : extensionPages.values()) {
 			for(ContributedPage page:contributions) {
 				try {
 					IProjectExamplesWizardPage contributedPage = (IProjectExamplesWizardPage) page.getConfigurationElement().createExecutableExtension(ProjectExamplesActivator.CLASS);

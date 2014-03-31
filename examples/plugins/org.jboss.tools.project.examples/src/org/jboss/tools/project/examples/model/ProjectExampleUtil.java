@@ -110,7 +110,7 @@ public class ProjectExampleUtil {
 
 	private static HashSet<IProjectExampleSite> invalidSites = new HashSet<IProjectExampleSite>();
 
-	private static HashSet<URL> categoryUrls;
+	private static Set<URL> categoryUrls;
 
 	private ProjectExampleUtil() {
 	}
@@ -404,8 +404,7 @@ public class ProjectExampleUtil {
 									String value = getContent(child);
 									if (value != null) {
 										try {
-											project.setPriority(new Integer(
-													value).intValue());
+											project.setPriority(Integer.parseInt(value));
 										} catch (Exception e) {
 											ProjectExamplesActivator.log(e);
 										}
@@ -428,7 +427,7 @@ public class ProjectExampleUtil {
 								} else if (nodeName.equals("size")) { //$NON-NLS-1$
 									long size = 0;
 									try {
-										size = new Long(getContent(child));
+										size = Long.parseLong(getContent(child));
 									} catch (Exception ignored) {
 									}
 									project.setSize(size);

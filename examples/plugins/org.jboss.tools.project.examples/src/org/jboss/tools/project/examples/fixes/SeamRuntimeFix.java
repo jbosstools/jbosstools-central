@@ -95,7 +95,7 @@ public class SeamRuntimeFix implements ProjectExamplesFix {
 		SeamRuntime[] seamRuntimes = SeamRuntimeManager.getInstance().getRuntimes();
 		if (seamRuntimeName != null) {
 			for (int i1 = 0; i1 < seamRuntimes.length; i1++) {
-				if (seamRuntimeName.equals(seamRuntimes[i1])) {
+				if (seamRuntimeName.equals(seamRuntimes[i1].getName())) {
 					return true;
 				}
 			}
