@@ -11,9 +11,10 @@
 package org.jboss.tools.central.editors;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
 import java.util.Dictionary;
+import java.util.List;
 
-import org.apache.commons.lang.NotImplementedException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.jobs.IJobChangeEvent;
 import org.eclipse.core.runtime.jobs.JobChangeAdapter;
@@ -27,6 +28,7 @@ import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerFilter;
 import org.eclipse.mylyn.commons.core.DelegatingProgressMonitor;
+import org.eclipse.mylyn.internal.discovery.core.model.ConnectorDescriptor;
 import org.eclipse.mylyn.internal.discovery.core.model.DiscoveryConnector;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
@@ -233,7 +235,7 @@ public class SoftwarePage extends AbstractJBossCentralPage implements IRunnableC
 	    discoveryViewer.addSelectionChangedListener(new ISelectionChangedListener() {
 			@Override
 			public void selectionChanged(SelectionChangedEvent event) {
-				int installableConnectors = discoveryViewer.getInstallableConnectors().size();
+				int installableConnectors = discoveryViewer.getInstallableConnectors().size() + discoveryViewer.getUpdatableConnectors().size();
 				installAction.setEnabled(installableConnectors > 0);
 				installButton.setEnabled(installableConnectors > 0);
 				installButton.setText(NLS.bind(Messages.installWithCount, installableConnectors));
@@ -276,8 +278,8 @@ public class SoftwarePage extends AbstractJBossCentralPage implements IRunnableC
 				JBossDiscoveryUi.uninstall(discoveryViewer.getInstalledConnectors(), SoftwarePage.this);
 			}
 		});
-	    
-		features.setClient(featureComposite);
+
+	    features.setClient(featureComposite);
 		showLoading();
 		pageBook.pack(true);
 		
@@ -432,7 +434,9 @@ public class SoftwarePage extends AbstractJBossCentralPage implements IRunnableC
 				if (installButton != null) {
 					installButton.setEnabled(false);
 				}
-				JBossDiscoveryUi.install(discoveryViewer.getInstallableConnectors(), SoftwarePage.this);
+				List<ConnectorDescriptor> toInstall = new ArrayList<ConnectorDescriptor>(discoveryViewer.getInstallableConnectors());
+				toInstall.addAll(discoveryViewer.getUpdatableConnectors());
+				JBossDiscoveryUi.install(toInstall, SoftwarePage.this);
 			} finally {
 				if (shell != null) {
 					shell.setCursor(cursor);
