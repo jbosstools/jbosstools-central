@@ -16,8 +16,11 @@ public class Messages extends NLS {
 	private static final String BUNDLE_NAME = "org.jboss.tools.central.messages"; //$NON-NLS-1$
 	
 	public static String DiscoveryViewer_Certification_Label0;
+	public static String DiscoveryViewer_X_installed;
+	
 	public static String installWithCount;
 	public static String uninstallWithCount;
+	public static String updateWithCount;
 	public static String selectAll;
 	public static String deselectAll;
 	
