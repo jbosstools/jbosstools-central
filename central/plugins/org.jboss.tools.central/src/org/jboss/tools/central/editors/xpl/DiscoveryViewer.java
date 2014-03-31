@@ -1,18 +1,21 @@
 /*******************************************************************************
- * Copyright (c) 2010 Tasktop Technologies and others.
+ * Copyright (c) 2010, 2014 Tasktop Technologies and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
- *     Tasktop Technologies - initial API and implementationO
+ *     Tasktop Technologies - initial API and implementation
+ *     Mickael Istria (Red Hat Inc.) - Added support for update
  *******************************************************************************/
 package org.jboss.tools.central.editors.xpl;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.lang.reflect.InvocationTargetException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -29,8 +32,19 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.MultiStatus;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.equinox.p2.core.IProvisioningAgent;
+import org.eclipse.equinox.p2.core.IProvisioningAgentProvider;
+import org.eclipse.equinox.p2.core.ProvisionException;
+import org.eclipse.equinox.p2.engine.IProfile;
+import org.eclipse.equinox.p2.engine.IProfileRegistry;
+import org.eclipse.equinox.p2.metadata.IInstallableUnit;
+import org.eclipse.equinox.p2.query.IQueryResult;
+import org.eclipse.equinox.p2.query.QueryUtil;
+import org.eclipse.equinox.p2.repository.metadata.IMetadataRepository;
+import org.eclipse.equinox.p2.repository.metadata.IMetadataRepositoryManager;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.layout.GridDataFactory;
@@ -52,7 +66,6 @@ import org.eclipse.mylyn.commons.ui.SelectionProviderAdapter;
 import org.eclipse.mylyn.commons.ui.compatibility.CommonThemes;
 import org.eclipse.mylyn.commons.workbench.browser.BrowserUtil;
 import org.eclipse.mylyn.internal.discovery.core.model.AbstractDiscoverySource;
-import org.eclipse.mylyn.internal.discovery.core.model.AbstractDiscoveryStrategy;
 import org.eclipse.mylyn.internal.discovery.core.model.ConnectorDescriptor;
 import org.eclipse.mylyn.internal.discovery.core.model.ConnectorDescriptorKind;
 import org.eclipse.mylyn.internal.discovery.core.model.ConnectorDiscovery;
@@ -122,12 +135,8 @@ import org.eclipse.ui.forms.IFormColors;
 import org.eclipse.ui.progress.WorkbenchJob;
 import org.eclipse.ui.statushandlers.StatusManager;
 import org.eclipse.ui.themes.IThemeManager;
-import org.jboss.tools.project.examples.internal.discovery.ChainedDiscoveryStrategy;
-import org.jboss.tools.project.examples.internal.discovery.ChainedDiscoveryStrategy.DataCollector;
-import org.jboss.tools.project.examples.internal.discovery.ChainedDiscoveryStrategy.DiscoveryConnectorCollector;
+import org.jboss.tools.central.JBossCentralActivator;
 import org.jboss.tools.project.examples.internal.discovery.DiscoveryUtil;
-import org.jboss.tools.project.examples.internal.discovery.ExpressionBasedBundleDiscoveryStrategy;
-import org.jboss.tools.project.examples.internal.discovery.ExpressionBasedRemoteBundleDiscoveryStrategy;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.Version;
 
@@ -151,25 +160,19 @@ public class DiscoveryViewer {
 
 	private class ConnectorDescriptorItemUi implements PropertyChangeListener, Runnable {
 		private final DiscoveryConnector connector;
+		private Map<String, org.eclipse.equinox.p2.metadata.Version> connectorUnits;
+		private boolean upToDate; // only relevant for installed connectors
 
 		private final Button checkbox;
-
 		private final Label iconLabel;
-
 		private final Label nameLabel;
-
+		private final Label statusLabel;
 		private ToolItem infoButton;
-
 		private final Link providerLabel;
-
 		private final Label description;
-
 		private final Composite checkboxContainer;
-
 		private final Composite connectorContainer;
-
 		private final Display display;
-
 		private Image iconImage;
 
 //		private Image warningIconImage;
@@ -184,7 +187,7 @@ public class DiscoveryViewer {
 
 			configureLook(connectorContainer, background);
 			GridDataFactory.fillDefaults().grab(true, false).applyTo(connectorContainer);
-			GridLayout layout = new GridLayout(4, false);
+			GridLayout layout = new GridLayout(5, false);
 			layout.marginLeft = 7;
 			layout.marginTop = 2;
 			layout.marginBottom = 2;
@@ -224,14 +227,32 @@ public class DiscoveryViewer {
 
 			nameLabel = new Label(connectorContainer, SWT.NULL);
 			configureLook(nameLabel, background);
-			GridDataFactory.fillDefaults().grab(true, false).align(SWT.BEGINNING, SWT.CENTER).applyTo(nameLabel);
+			GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.CENTER).applyTo(nameLabel);
 			nameLabel.setFont(h2Font);
+			nameLabel.setText(connector.getName());
+			
+			this.statusLabel = new Label(connectorContainer, SWT.NULL);
+			configureLook(this.statusLabel, background);
+			GridDataFactory.fillDefaults().grab(true, false).align(SWT.BEGINNING, SWT.CENTER).applyTo(this.statusLabel);
 			if (connector.isInstalled()) {
-				nameLabel.setText(NLS.bind(Messages.DiscoveryViewer_X_installed, connector.getName()));
-			} else {
-				nameLabel.setText(connector.getName());
+				String text = "(INSTALLED - ";
+				this.connectorUnits = resolveConnectorUnits(connector);
+				Map<String, org.eclipse.equinox.p2.metadata.Version> profileUnits = resolveProfileUnits(connector.getInstallableUnits());
+				for (String unitId : connector.getInstallableUnits()) {
+					this.upToDate = profileUnits.get(unitId).compareTo(this.connectorUnits.get(unitId)) >= 0;
+				}
+				if (this.upToDate) {
+					text += "UP TO DATE";
+					this.statusLabel.setForeground(getShell().getDisplay().getSystemColor(SWT.COLOR_DARK_GREEN));
+				} else {
+					text += "UPDATE AVAILABLE";
+					this.statusLabel.setForeground(getShell().getDisplay().getSystemColor(SWT.COLOR_DARK_YELLOW));
+				}
+				text += ")";
+				this.statusLabel.setText(text);
 			}
-
+			
+			
 			providerLabel = new Link(connectorContainer, SWT.RIGHT);
 			configureLook(providerLabel, background);
 			GridDataFactory.fillDefaults().align(SWT.END, SWT.CENTER).applyTo(providerLabel);
@@ -317,6 +338,67 @@ public class DiscoveryViewer {
 			description.addMouseListener(connectorItemMouseListener);
 		}
 
+		private /*static*/ Map<String, org.eclipse.equinox.p2.metadata.Version> resolveProfileUnits(List<String> installableUnits) {
+			IProvisioningAgentProvider provider = (IProvisioningAgentProvider)PlatformUI.getWorkbench().getService(IProvisioningAgentProvider.class);
+			try {
+				IProvisioningAgent agent = provider.createAgent(null);  // null = location for running system
+				if(agent == null) throw new RuntimeException("Location was not provisioned by p2");
+				IProfileRegistry profileRegistry = (IProfileRegistry) agent.getService(IProfileRegistry.SERVICE_NAME);
+				if (profileRegistry == null) throw new RuntimeException("Unable to acquire the profile registry service.");
+				// can also use IProfileRegistry.SELF for the current profile
+				IProfile profile = profileRegistry.getProfile(IProfileRegistry.SELF);
+				Map<String, org.eclipse.equinox.p2.metadata.Version> res = new HashMap<String, org.eclipse.equinox.p2.metadata.Version>();
+				for (String installableUnit : installableUnits) {
+					IQueryResult<IInstallableUnit> queryResult = profile.query(QueryUtil.createIUQuery(installableUnit), new NullProgressMonitor());
+					for (IInstallableUnit unit : queryResult) {
+						org.eclipse.equinox.p2.metadata.Version previousVersion = res.get(installableUnit);
+						if (previousVersion == null || previousVersion.compareTo(unit.getVersion()) < 0) {
+							res.put(installableUnit, unit.getVersion());
+						}
+					}
+				}
+				return res;
+			} catch (ProvisionException ex) {
+				JBossCentralActivator.getDefault().getLog().log(new Status(IStatus.ERROR, JBossCentralActivator.PLUGIN_ID, ex.getMessage(), ex));
+				return null;
+			}
+		}
+		
+		private /*static*/ Map<String, org.eclipse.equinox.p2.metadata.Version> resolveConnectorUnits(ConnectorDescriptor connector) {
+			IProvisioningAgentProvider provider = (IProvisioningAgentProvider)PlatformUI.getWorkbench().getService(IProvisioningAgentProvider.class);
+			try {
+				IProvisioningAgent agent = provider.createAgent(null);  // null = location for running system
+				if(agent == null) throw new RuntimeException("Location was not provisioned by p2");
+				IMetadataRepositoryManager metadataManager = (IMetadataRepositoryManager) agent.getService(IMetadataRepositoryManager.SERVICE_NAME);
+				IMetadataRepository repo = metadataManager.loadRepository(new URI(connector.getSiteUrl()), new NullProgressMonitor());
+				Map<String, org.eclipse.equinox.p2.metadata.Version> res = new HashMap<String, org.eclipse.equinox.p2.metadata.Version>();
+				for (String unitId : connector.getInstallableUnits()) {
+					IQueryResult<IInstallableUnit> queryResult = repo.query(QueryUtil.createIUQuery(unitId), new NullProgressMonitor());
+					for (IInstallableUnit unit : queryResult) {
+						org.eclipse.equinox.p2.metadata.Version previousVersion = res.get(unitId);
+						if (previousVersion == null || previousVersion.compareTo(unit.getVersion()) < 0) {
+							res.put(unitId, unit.getVersion());
+						}
+					}
+				}
+				return res;
+			} catch (ProvisionException ex) {
+				JBossCentralActivator.getDefault().getLog().log(new Status(IStatus.ERROR, JBossCentralActivator.PLUGIN_ID, ex.getMessage(), ex));
+			} catch (URISyntaxException ex) {
+				JBossCentralActivator.getDefault().getLog().log(new Status(IStatus.ERROR, JBossCentralActivator.PLUGIN_ID, ex.getMessage(), ex));
+			}
+			return null;
+		}
+		
+		/**
+		 * 
+		 * @return whether the connector is up-to-date. Ie whether a new version
+		 * for the included IUs exist on the associated site.
+		 */
+		public boolean isUpToDate() {
+			return this.upToDate;
+		}
+
 		protected boolean maybeModifySelection(boolean selected) {
 			if (selected) {
 				if (!connector.isInstalled() && !connector.isInstallable()) {
@@ -334,7 +416,7 @@ public class DiscoveryViewer {
 					return false;
 				}
 			}
-			DiscoveryViewer.this.modifySelection(connector, selected);
+			DiscoveryViewer.this.modifySelection(this, selected);
 			return true;
 		}
 
@@ -366,15 +448,6 @@ public class DiscoveryViewer {
 			description.setForeground(foreground);
 
 			if (iconImage != null) {
-//				boolean unavailable = !enabled && connector.getAvailable() != null;
-//				if (unavailable) {
-//					if (warningIconImage == null) {
-//						warningIconImage = new DecorationOverlayIcon(iconImage, DiscoveryImages.OVERLAY_WARNING_32,
-//								IDecoration.BOTTOM_RIGHT).createImage();
-//						disposables.add(warningIconImage);
-//					}
-//					iconLabel.setImage(warningIconImage);
-//				} else if (warningIconImage != null) {
 				iconLabel.setImage(iconImage);
 //				}
 			}
@@ -391,9 +464,6 @@ public class DiscoveryViewer {
 		}
 	}
 
-	// e3.5 replace with SWT.ICON_CANCEL
-	public static final int ICON_CANCEL = 1 << 8;
-
 	private static final int MINIMUM_HEIGHT = 100;
 
 	private static boolean useNativeSearchField(Composite composite) {
@@ -401,8 +471,8 @@ public class DiscoveryViewer {
 			useNativeSearchField = Boolean.FALSE;
 			Text testText = null;
 			try {
-				testText = new Text(composite, SWT.SEARCH | ICON_CANCEL);
-				useNativeSearchField = new Boolean((testText.getStyle() & ICON_CANCEL) != 0);
+				testText = new Text(composite, SWT.SEARCH | SWT.ICON_CANCEL);
+				useNativeSearchField = new Boolean((testText.getStyle() & SWT.ICON_CANCEL) != 0);
 			} finally {
 				if (testText != null) {
 					testText.dispose();
@@ -425,6 +495,7 @@ public class DiscoveryViewer {
 
 	private final List<ConnectorDescriptor> installableConnectors = new ArrayList<ConnectorDescriptor>();
 	private final List<ConnectorDescriptor> installedConnectors = new ArrayList<ConnectorDescriptor>();
+	private final List<ConnectorDescriptor> updatableConnectors = new ArrayList<ConnectorDescriptor>();
 
 	private volatile ConnectorDiscovery discovery;
 
@@ -792,7 +863,7 @@ public class DiscoveryViewer {
 					GridLayoutFactory.fillDefaults().numColumns(2).applyTo(textFilterContainer);
 
 					if (nativeSearch) {
-						filterText = new Text(textFilterContainer, SWT.SINGLE | SWT.BORDER | SWT.SEARCH | ICON_CANCEL);
+						filterText = new Text(textFilterContainer, SWT.SINGLE | SWT.BORDER | SWT.SEARCH | SWT.ICON_CANCEL);
 					} else {
 						filterText = new Text(textFilterContainer, SWT.SINGLE);
 					}
@@ -806,7 +877,7 @@ public class DiscoveryViewer {
 						filterText.addSelectionListener(new SelectionAdapter() {
 							@Override
 							public void widgetDefaultSelected(SelectionEvent e) {
-								if (e.detail == ICON_CANCEL) {
+								if (e.detail == SWT.ICON_CANCEL) {
 									clearFilterText();
 								}
 							}
@@ -1006,8 +1077,7 @@ public class DiscoveryViewer {
 						border.addPaintListener(new ConnectorBorderPaintListener());
 					}
 
-					ConnectorDescriptorItemUi itemUi = new ConnectorDescriptorItemUi(connector,
-							categoryChildrenContainer, background);
+					ConnectorDescriptorItemUi itemUi = new ConnectorDescriptorItemUi(connector, 	categoryChildrenContainer, background);
 					itemsUi.add(itemUi);
 					itemUi.updateAvailability();
 					allConnectors.add(connector);
@@ -1164,7 +1234,11 @@ public class DiscoveryViewer {
 	public List<ConnectorDescriptor> getInstalledConnectors() {
 		return this.installedConnectors;
 	}
-
+	
+	public List<ConnectorDescriptor> getUpdatableConnectors() {
+		return this.updatableConnectors;
+	}
+	
 	public IStructuredSelection getSelection() {
 		return (IStructuredSelection) selectionProvider.getSelection();
 	}
@@ -1199,6 +1273,10 @@ public class DiscoveryViewer {
 				hookRecursively(child, listener);
 			}
 		}
+	}
+
+	public boolean isShowInstalledFilterEnabled() {
+		return showInstalledFilterEnabled;
 	}
 
 	private void hookTooltip(final Control parent, final Widget tipActivator, final Control exitControl,
@@ -1407,10 +1485,6 @@ public class DiscoveryViewer {
 		return showInstalled;
 	}
 
-	public boolean isShowInstalledFilterEnabled() {
-		return showInstalledFilterEnabled;
-	}
-
 	/**
 	 * indicate if the given kind of connector is currently visible in the wizard
 	 * 
@@ -1423,14 +1497,22 @@ public class DiscoveryViewer {
 		return connectorDescriptorKindToVisibility.get(kind);
 	}
 
-	private void modifySelection(final DiscoveryConnector connector, boolean selected) {
-		modifySelectionInternal(connector, selected);
+	private void modifySelection(final ConnectorDescriptorItemUi item, boolean selected) {
+		modifySelectionInternal(item, selected);
 		updateState();
 	}
 
-	private void modifySelectionInternal(final DiscoveryConnector connector, boolean selected) {
+	private void modifySelectionInternal(final ConnectorDescriptorItemUi item, boolean selected) {
+		DiscoveryConnector connector = item.connector;
 		connector.setSelected(selected);
 		if (connector.isInstalled()) {
+			if (!item.isUpToDate()) {
+				if (selected) {
+					this.updatableConnectors.add(connector);
+				} else {
+					this.updatableConnectors.remove(connector);
+				}
+			}
 			if (selected) {
 				this.installedConnectors.add(connector);
 			} else {
@@ -1471,19 +1553,6 @@ public class DiscoveryViewer {
 			throw new IllegalArgumentException();
 		}
 		this.environment = environment;
-	}
-
-	public void setSelection(IStructuredSelection selection) {
-		Set<ConnectorDescriptor> selected = new HashSet<ConnectorDescriptor>();
-		for (Object descriptor : selection.toArray()) {
-			if (descriptor instanceof ConnectorDescriptor) {
-				selected.add((ConnectorDescriptor) descriptor);
-			}
-		}
-		for (DiscoveryConnector connector : allConnectors) {
-			modifySelectionInternal(connector, selected.contains(connector));
-		}
-		updateState();
 	}
 
 	/**

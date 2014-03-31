@@ -72,7 +72,7 @@ public class JBossDiscoveryUi {
 				public boolean select(InstalledItem item) {
 					for (ConnectorDescriptor desc : descriptors) {
 						for (String id : desc.getInstallableUnits()) {
-							if (id.equals(desc)) {
+							if (id.equals(desc.getId())) {
 								return true;
 							}
 						}
@@ -120,6 +120,10 @@ public class JBossDiscoveryUi {
 		} catch (IOException e) {
 			// ignore
 		}
+	}
+
+	public static void update(List<ConnectorDescriptor> updatableConnectors, IRunnableContext context) {
+		// TODO Auto-generated method stub
 	}
 
 }
