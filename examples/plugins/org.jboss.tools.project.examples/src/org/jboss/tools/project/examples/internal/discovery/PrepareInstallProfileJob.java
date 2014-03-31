@@ -273,8 +273,8 @@ public class PrepareInstallProfileJob extends AbstractInstallJob {
 			foundIds.add(unit.getId());
 		}
 
-		String message = ""; //$NON-NLS-1$
-		String detailedMessage = ""; //$NON-NLS-1$
+		StringBuilder message = new StringBuilder(); //$NON-NLS-1$
+		StringBuilder detailedMessage = new StringBuilder(); //$NON-NLS-1$
 		for (ConnectorDescriptor descriptor : installableConnectors) {
 			StringBuilder unavailableIds = null;
 			for (String id : descriptor.getInstallableUnits()) {
@@ -289,22 +289,22 @@ public class PrepareInstallProfileJob extends AbstractInstallJob {
 			}
 			if (unavailableIds != null) {
 				if (message.length() > 0) {
-					message += Messages.InstallConnectorsJob_commaSeparator;
+					message.append( Messages.InstallConnectorsJob_commaSeparator );
 				}
-				message += descriptor.getName();
+				message.append( descriptor.getName() );
 
 				if (detailedMessage.length() > 0) {
-					detailedMessage += Messages.InstallConnectorsJob_commaSeparator;
+					detailedMessage.append( Messages.InstallConnectorsJob_commaSeparator );
 				}
-				detailedMessage += NLS.bind(Messages.PrepareInstallProfileJob_notFoundDescriptorDetail, new Object[] {
-						descriptor.getName(), unavailableIds.toString(), descriptor.getSiteUrl() });
+				detailedMessage.append( NLS.bind(Messages.PrepareInstallProfileJob_notFoundDescriptorDetail, new Object[] {
+						descriptor.getName(), unavailableIds.toString(), descriptor.getSiteUrl() }) );
 			}
 		}
 
 		if (message.length() > 0) {
 			// instead of aborting here we ask the user if they wish to proceed anyways
 			final boolean[] okayToProceed = new boolean[1];
-			final String finalMessage = message;
+			final String finalMessage = message.toString();
 			Display.getDefault().syncExec(new Runnable() {
 				public void run() {
 					okayToProceed[0] = MessageDialog.openQuestion(DiscoveryUiUtil.getShell(),
@@ -314,7 +314,7 @@ public class PrepareInstallProfileJob extends AbstractInstallJob {
 			});
 			if (!okayToProceed[0]) {
 				throw new CoreException(new Status(IStatus.ERROR, DiscoveryUi.ID_PLUGIN, NLS.bind(
-						Messages.InstallConnectorsJob_connectorsNotAvailable, detailedMessage), null));
+						Messages.InstallConnectorsJob_connectorsNotAvailable, detailedMessage.toString()), null));
 			}
 		}
 	}

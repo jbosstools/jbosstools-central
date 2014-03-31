@@ -360,12 +360,13 @@ public class NewProjectExamplesMainPage extends WizardPage {
 		HashSet<IProjectExampleSite> invalidSites = ProjectExampleUtil.getInvalidSites();
 		boolean showInvalidSites = ProjectExamplesActivator.getDefault().getPreferenceStore().getBoolean(ProjectExamplesActivator.SHOW_INVALID_SITES);
 		if (invalidSites.size() > 0 && showInvalidSites && show) {
-			String message = Messages.NewProjectExamplesWizardPage_Cannot_access_the_following_sites;
+			StringBuilder message = new StringBuilder(Messages.NewProjectExamplesWizardPage_Cannot_access_the_following_sites);
 			for (IProjectExampleSite site:invalidSites) {
-				message = message + site.getName() + "\n"; //$NON-NLS-1$
+				message.append(site.getName());
+				message.append("\n"); //$NON-NLS-1$
 				ProjectExamplesActivator.log(NLS.bind(Messages.InvalideSite, new Object[] {site.getName(), site.getUrl()} ));
 			}
-			MessageDialogWithToggle dialog = MessageDialogWithToggle.openInformation(getShell(), Messages.NewProjectExamplesWizardPage_Invalid_Sites, message, Messages.NewProjectExamplesWizardPage_Show_this_dialog_next_time, true, ProjectExamplesActivator.getDefault().getPreferenceStore(), ProjectExamplesActivator.SHOW_INVALID_SITES);
+			MessageDialogWithToggle dialog = MessageDialogWithToggle.openInformation(getShell(), Messages.NewProjectExamplesWizardPage_Invalid_Sites, message.toString(), Messages.NewProjectExamplesWizardPage_Show_this_dialog_next_time, true, ProjectExamplesActivator.getDefault().getPreferenceStore(), ProjectExamplesActivator.SHOW_INVALID_SITES);
 			boolean toggleState = dialog.getToggleState();
 			ProjectExamplesActivator.getDefault().getPreferenceStore().setValue(ProjectExamplesActivator.SHOW_INVALID_SITES, toggleState);
 		}

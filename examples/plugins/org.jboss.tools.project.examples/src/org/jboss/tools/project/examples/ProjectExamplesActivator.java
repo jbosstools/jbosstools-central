@@ -1141,7 +1141,7 @@ public class ProjectExamplesActivator extends AbstractUIPlugin {
 					int priority = 0;
 					if (priorityString != null) {
 						try {
-							priority = new Integer(priorityString);
+							priority = Integer.parseInt(priorityString);
 						} catch (NumberFormatException e) {
 							ProjectExamplesActivator.log(e);
 						}

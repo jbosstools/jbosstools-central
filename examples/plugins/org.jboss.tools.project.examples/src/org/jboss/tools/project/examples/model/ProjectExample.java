@@ -343,6 +343,7 @@ public class ProjectExample implements ProjectModelElement,
 		}
 		return -1;
 	}
+	
 
 	public void setEssentialEnterpriseDependencyGavs(Set<String> gavs) {
 	  essentialEnterpriseDependencies = gavs;
