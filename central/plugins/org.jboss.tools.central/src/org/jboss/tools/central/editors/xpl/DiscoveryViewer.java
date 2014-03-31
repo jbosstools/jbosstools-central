@@ -18,6 +18,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Dictionary;
 import java.util.HashMap;
@@ -35,6 +36,7 @@ import org.eclipse.core.runtime.MultiStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.e4.ui.model.application.commands.impl.CategoryImpl;
 import org.eclipse.equinox.p2.core.IProvisioningAgent;
 import org.eclipse.equinox.p2.core.IProvisioningAgentProvider;
 import org.eclipse.equinox.p2.core.ProvisionException;
@@ -204,7 +206,7 @@ public class DiscoveryViewer {
 			checkbox.setData("connectorId", connector.getId()); //$NON-NLS-1$
 			checkbox.setVisible(connector.isInstallable());
 			configureLook(checkbox, background);
-			checkbox.setSelection(installableConnectors.contains(connector));
+			checkbox.setSelection(connector.isSelected());
 			checkbox.addFocusListener(new FocusAdapter() {
 				@Override
 				public void focusGained(FocusEvent e) {
@@ -456,7 +458,6 @@ public class DiscoveryViewer {
 		
 		private void select(boolean select) {
 			if (!checkbox.isDisposed() &&
-				checkbox.isEnabled() &&
 				checkbox.isVisible() &&
 				checkbox.getSelection() != select) {
 					checkbox.setSelection(select);
@@ -494,9 +495,9 @@ public class DiscoveryViewer {
 
 	private static Boolean useNativeSearchField;
 
-	private final List<ConnectorDescriptor> installableConnectors = new ArrayList<ConnectorDescriptor>();
-	private final List<ConnectorDescriptor> installedConnectors = new ArrayList<ConnectorDescriptor>();
-	private final List<ConnectorDescriptor> updatableConnectors = new ArrayList<ConnectorDescriptor>();
+	private final Set<ConnectorDescriptor> installableConnectors = new HashSet<ConnectorDescriptor>();
+	private final Set<ConnectorDescriptor> installedConnectors = new HashSet<ConnectorDescriptor>();
+	private final Set<ConnectorDescriptor> updatableConnectors = new HashSet<ConnectorDescriptor>();
 
 	private volatile ConnectorDiscovery discovery;
 
@@ -686,6 +687,7 @@ public class DiscoveryViewer {
 		}
 		clearDisposables();
 		allConnectors = new ArrayList<DiscoveryConnector>();
+		this.itemsUi.clear();
 		initializeCursors();
 		initializeImages();
 		initializeFonts();
@@ -1228,15 +1230,15 @@ public class DiscoveryViewer {
 		}
 	}
 
-	public List<ConnectorDescriptor> getInstallableConnectors() {
+	public Set<ConnectorDescriptor> getInstallableConnectors() {
 		return installableConnectors;
 	}
 	
-	public List<ConnectorDescriptor> getInstalledConnectors() {
+	public Set<ConnectorDescriptor> getInstalledConnectors() {
 		return this.installedConnectors;
 	}
 	
-	public List<ConnectorDescriptor> getUpdatableConnectors() {
+	public Set<ConnectorDescriptor> getUpdatableConnectors() {
 		return this.updatableConnectors;
 	}
 	

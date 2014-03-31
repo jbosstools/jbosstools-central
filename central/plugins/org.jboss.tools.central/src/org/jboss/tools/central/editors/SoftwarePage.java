@@ -275,7 +275,7 @@ public class SoftwarePage extends AbstractJBossCentralPage implements IRunnableC
 	    this.uninstallButton.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				JBossDiscoveryUi.uninstall(discoveryViewer.getInstalledConnectors(), SoftwarePage.this);
+				JBossDiscoveryUi.uninstall(new ArrayList<ConnectorDescriptor>(discoveryViewer.getInstalledConnectors()), SoftwarePage.this);
 			}
 		});
 
