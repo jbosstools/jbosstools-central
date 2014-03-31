@@ -23,6 +23,8 @@ import org.eclipse.mylyn.internal.discovery.core.model.ConnectorDescriptor;
 import org.eclipse.mylyn.internal.discovery.core.model.DiscoveryFeedbackJob;
 import org.eclipse.mylyn.internal.discovery.ui.AbstractInstallJob;
 import org.eclipse.mylyn.internal.discovery.ui.DiscoveryUi;
+import org.eclipse.mylyn.internal.discovery.ui.InstalledItem;
+import org.eclipse.mylyn.internal.discovery.ui.UninstallRequest;
 import org.eclipse.mylyn.internal.discovery.ui.wizards.Messages;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.ui.preferences.ScopedPreferenceStore;
@@ -63,7 +65,40 @@ public class JBossDiscoveryUi {
 		return true;
 	}
 	
-	public static AbstractInstallJob createInstallJob(List<ConnectorDescriptor> descriptors) {
+	public static boolean uninstall(final List<ConnectorDescriptor> descriptors, IRunnableContext context) {
+		try {
+			UninstallRequest request = new UninstallRequest() {
+				@Override
+				public boolean select(InstalledItem item) {
+					for (ConnectorDescriptor desc : descriptors) {
+						for (String id : desc.getInstallableUnits()) {
+							if (id.equals(desc.getId())) {
+								return true;
+							}
+						}
+					}
+					return false;
+				}
+			};
+			PrepareUninstallProfileJob runner = new PrepareUninstallProfileJob(descriptors, request);
+			context.run(true, true, runner);
+
+			// update stats
+			new DiscoveryFeedbackJob(descriptors).schedule();
+		} catch (InvocationTargetException e) {
+			IStatus status = new Status(IStatus.ERROR, ProjectExamplesActivator.PLUGIN_ID, NLS.bind(
+					Messages.ConnectorDiscoveryWizard_installProblems, new Object[] { e.getCause().getMessage() }),
+					e.getCause());
+			StatusManager.getManager().handle(status, StatusManager.SHOW | StatusManager.BLOCK | StatusManager.LOG);
+			return false;
+		} catch (InterruptedException e) {
+			// canceled
+			return false;
+		}
+		return true;
+	}
+	
+	public static PrepareInstallProfileJob createInstallJob(List<ConnectorDescriptor> descriptors) {
 		return new PrepareInstallProfileJob(descriptors);
 	}
 	
@@ -85,6 +120,10 @@ public class JBossDiscoveryUi {
 		} catch (IOException e) {
 			// ignore
 		}
+	}
+
+	public static void update(List<ConnectorDescriptor> updatableConnectors, IRunnableContext context) {
+		// TODO Auto-generated method stub
 	}
 
 }

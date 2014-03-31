@@ -1,5 +1,5 @@
 /*************************************************************************************
- * Copyright (c) 2008-2011 Red Hat, Inc. and others.
+ * Copyright (c) 2008-2014 Red Hat, Inc. and others.
  * All rights reserved. This program and the accompanying materials 
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -11,7 +11,9 @@
 package org.jboss.tools.central.editors;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
 import java.util.Dictionary;
+import java.util.List;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.jobs.IJobChangeEvent;
@@ -26,10 +28,13 @@ import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerFilter;
 import org.eclipse.mylyn.commons.core.DelegatingProgressMonitor;
+import org.eclipse.mylyn.internal.discovery.core.model.ConnectorDescriptor;
 import org.eclipse.mylyn.internal.discovery.core.model.DiscoveryConnector;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ControlAdapter;
 import org.eclipse.swt.events.ControlEvent;
+import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Cursor;
@@ -42,6 +47,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.Link;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.forms.IManagedForm;
 import org.eclipse.ui.forms.editor.FormEditor;
@@ -53,6 +59,7 @@ import org.eclipse.ui.handlers.IHandlerService;
 import org.eclipse.ui.menus.CommandContributionItem;
 import org.eclipse.ui.part.PageBook;
 import org.jboss.tools.central.JBossCentralActivator;
+import org.jboss.tools.central.Messages;
 import org.jboss.tools.central.editors.xpl.DiscoveryViewer;
 import org.jboss.tools.central.jobs.RefreshDiscoveryJob;
 import org.jboss.tools.project.examples.ProjectExamplesActivator;
@@ -80,8 +87,9 @@ public class SoftwarePage extends AbstractJBossCentralPage implements IRunnableC
 	private InstallAction installAction;
 	
 	private Button installButton;
-	private Button selectAllButton;
-	private Button deselectAllButton;
+	private Button uninstallButton;
+	private Link selectAllButton;
+	private Link deselectAllButton;
 
 	private ToolBarManager toolBarManager;
 	
@@ -186,26 +194,12 @@ public class SoftwarePage extends AbstractJBossCentralPage implements IRunnableC
 			}
 	    });
 
-	    Composite buttonComposite = toolkit.createComposite(featureComposite);
+	    Composite selectionButtonsComposite = toolkit.createComposite(featureComposite);
 	    gd = new GridData(SWT.FILL, SWT.FILL, false, false);
-		buttonComposite.setLayoutData(gd);
-		buttonComposite.setLayout(new GridLayout(3, false));
-	    installButton = toolkit.createButton(buttonComposite, "Install", SWT.PUSH);
-	    installButton.setEnabled(false);
-	    installButton.setImage(JBossCentralActivator.getDefault().getImage(ICON_INSTALL));
-	    installButton.addSelectionListener(new SelectionListener() {
-			
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				installAction.run();
-			}
-			
-			@Override
-			public void widgetDefaultSelected(SelectionEvent e) {
-				
-			}
-		});
-	    selectAllButton = toolkit.createButton(buttonComposite, "Select All", SWT.PUSH);
+	    selectionButtonsComposite.setLayout(new RowLayout(SWT.HORIZONTAL));
+
+	    selectAllButton = new Link(selectionButtonsComposite, SWT.NONE);
+	    selectAllButton.setText("<A>" + Messages.selectAll + "</A>");
 	    selectAllButton.setEnabled(true);
 	    selectAllButton.addSelectionListener(new SelectionListener() {
 			
@@ -221,7 +215,8 @@ public class SoftwarePage extends AbstractJBossCentralPage implements IRunnableC
 				
 			}
 		});
-	    deselectAllButton = toolkit.createButton(buttonComposite, "Deselect All", SWT.PUSH);
+	    deselectAllButton = new Link(selectionButtonsComposite, SWT.NONE);
+	    deselectAllButton.setText("<A>" + Messages.deselectAll + "</A>");
 	    deselectAllButton.setEnabled(true);
 	    deselectAllButton.addSelectionListener(new SelectionListener() {
 			
@@ -238,14 +233,53 @@ public class SoftwarePage extends AbstractJBossCentralPage implements IRunnableC
 			}
 		});
 	    discoveryViewer.addSelectionChangedListener(new ISelectionChangedListener() {
-			
 			@Override
 			public void selectionChanged(SelectionChangedEvent event) {
-				installAction.setEnabled(discoveryViewer.getInstallableConnectors().size() > 0);
-				installButton.setEnabled(discoveryViewer.getInstallableConnectors().size() > 0);
+				int installableConnectors = discoveryViewer.getInstallableConnectors().size() + discoveryViewer.getUpdatableConnectors().size();
+				installAction.setEnabled(installableConnectors > 0);
+				installButton.setEnabled(installableConnectors > 0);
+				installButton.setText(NLS.bind(Messages.installWithCount, installableConnectors));
 			}
 		});
-		features.setClient(featureComposite);
+
+	    Composite installationButtonsComposite = toolkit.createComposite(featureComposite);
+	    installationButtonsComposite.setLayout(new RowLayout(SWT.HORIZONTAL));
+	    installButton = toolkit.createButton(installationButtonsComposite, NLS.bind(Messages.installWithCount, "0"), SWT.PUSH);
+	    installButton.setEnabled(false);
+	    installButton.setImage(JBossCentralActivator.getDefault().getImage(ICON_INSTALL));
+	    installButton.addSelectionListener(new SelectionListener() {
+			
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				installAction.run();
+			}
+			
+			@Override
+			public void widgetDefaultSelected(SelectionEvent e) {
+				
+			}
+		});
+	    
+	    this.uninstallButton = toolkit.createButton(installationButtonsComposite, NLS.bind(Messages.uninstallWithCount, "0"), SWT.PUSH);
+	    this.uninstallButton.setEnabled(false);
+	    //this.uninstallButton(JBossCentralActivator.getDefault().getImage))
+	    this.discoveryViewer.addSelectionChangedListener(new ISelectionChangedListener() {
+			@Override
+			public void selectionChanged(SelectionChangedEvent event) {
+				int installedConnectors = discoveryViewer.getInstalledConnectors().size();
+				uninstallButton.setEnabled(installedConnectors > 0);
+				uninstallButton.setEnabled(installedConnectors > 0);
+				uninstallButton.setText(NLS.bind(Messages.uninstallWithCount, installedConnectors));
+			}
+		});
+	    this.uninstallButton.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				JBossDiscoveryUi.uninstall(discoveryViewer.getInstalledConnectors(), SoftwarePage.this);
+			}
+		});
+
+	    features.setClient(featureComposite);
 		showLoading();
 		pageBook.pack(true);
 		
@@ -400,7 +434,9 @@ public class SoftwarePage extends AbstractJBossCentralPage implements IRunnableC
 				if (installButton != null) {
 					installButton.setEnabled(false);
 				}
-				JBossDiscoveryUi.install(discoveryViewer.getInstallableConnectors(), SoftwarePage.this);
+				List<ConnectorDescriptor> toInstall = new ArrayList<ConnectorDescriptor>(discoveryViewer.getInstallableConnectors());
+				toInstall.addAll(discoveryViewer.getUpdatableConnectors());
+				JBossDiscoveryUi.install(toInstall, SoftwarePage.this);
 			} finally {
 				if (shell != null) {
 					shell.setCursor(cursor);
