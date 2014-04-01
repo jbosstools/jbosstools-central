@@ -20,13 +20,17 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Dictionary;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Hashtable;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeSet;
 import java.util.regex.Pattern;
 
 import org.eclipse.core.runtime.CoreException;
@@ -36,7 +40,6 @@ import org.eclipse.core.runtime.MultiStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.e4.ui.model.application.commands.impl.CategoryImpl;
 import org.eclipse.equinox.p2.core.IProvisioningAgent;
 import org.eclipse.equinox.p2.core.IProvisioningAgentProvider;
 import org.eclipse.equinox.p2.core.ProvisionException;
@@ -75,7 +78,6 @@ import org.eclipse.mylyn.internal.discovery.core.model.DiscoveryCategory;
 import org.eclipse.mylyn.internal.discovery.core.model.DiscoveryConnector;
 import org.eclipse.mylyn.internal.discovery.core.model.Icon;
 import org.eclipse.mylyn.internal.discovery.core.model.Overview;
-import org.eclipse.mylyn.internal.discovery.core.util.DiscoveryCategoryComparator;
 import org.eclipse.mylyn.internal.discovery.core.util.DiscoveryConnectorComparator;
 import org.eclipse.mylyn.internal.discovery.ui.DiscoveryImages;
 import org.eclipse.mylyn.internal.discovery.ui.DiscoveryUi;
@@ -499,8 +501,6 @@ public class DiscoveryViewer {
 	private final Set<ConnectorDescriptor> installedConnectors = new HashSet<ConnectorDescriptor>();
 	private final Set<ConnectorDescriptor> updatableConnectors = new HashSet<ConnectorDescriptor>();
 
-	private volatile ConnectorDiscovery discovery;
-
 	private Composite body;
 
 	private final List<Resource> disposables;
@@ -555,11 +555,11 @@ public class DiscoveryViewer {
 
 	private Control control;
 
-	private String directoryUrl;
+	private Set<String> directoryUrls;
+	private volatile HashMap<String, ConnectorDiscovery> discoveries = new HashMap<String, ConnectorDiscovery>();
+	private List<DiscoveryConnector> allConnectors;
 
 	private final SelectionProviderAdapter selectionProvider;
-
-	private List<DiscoveryConnector> allConnectors;
 
 	private int minimumHeight;
 
@@ -830,8 +830,10 @@ public class DiscoveryViewer {
 					}
 					clearDisposables();
 				}
-				if (discovery != null) {
-					discovery.dispose();
+				if (DiscoveryViewer.this.discoveries != null) {
+					for (ConnectorDiscovery discovery : DiscoveryViewer.this.discoveries.values()) {
+						discovery.dispose();
+					}
 				}
 			}
 		});
@@ -958,7 +960,15 @@ public class DiscoveryViewer {
 
 		Color background = container.getBackground();
 
-		if (discovery == null || isEmpty(discovery)) {
+		boolean emptyDiscoveries = true;
+		if (this.discoveries != null) {
+			for (ConnectorDiscovery discovery : this.discoveries.values()) {
+				if (!isEmpty(discovery)) {
+					emptyDiscoveries = false;
+				}
+			}
+		}
+		if (emptyDiscoveries) {
 			GridLayoutFactory.fillDefaults().margins(5, 5).applyTo(container);
 
 			boolean atLeastOneKindFiltered = false;
@@ -995,95 +1005,71 @@ public class DiscoveryViewer {
 			GridDataFactory.fillDefaults().grab(true, false).hint(100, SWT.DEFAULT).applyTo(helpTextControl);
 		} else {
 			GridLayoutFactory.fillDefaults().numColumns(2).spacing(0, 0).applyTo(container);
-
-			List<DiscoveryCategory> categories = new ArrayList<DiscoveryCategory>(discovery.getCategories());
-			Collections.sort(categories, new DiscoveryCategoryComparator());
+			Map<String, LinkedHashSet<DiscoveryCategory>> categoriesById = new HashMap<String, LinkedHashSet<DiscoveryCategory>>();
+			// necessary because categories from != discovery are not equal, whereas we want them unified in UI
+			for (ConnectorDiscovery discovery : this.discoveries.values()) {
+				for (DiscoveryCategory category : discovery.getCategories()) {
+					if (categoriesById.get(category.getId()) == null) {
+						categoriesById.put(category.getId(), new LinkedHashSet<DiscoveryCategory>());
+					}
+					categoriesById.get(category.getId()).add(category);
+				}
+			}
+			
+			SortedSet<LinkedHashSet<DiscoveryCategory>> sortedCategories = new TreeSet<LinkedHashSet<DiscoveryCategory>>(new Comparator<LinkedHashSet<DiscoveryCategory>>() {
+				@Override
+				public int compare(LinkedHashSet<DiscoveryCategory> o1, LinkedHashSet<DiscoveryCategory> o2) {
+					if (o1 == o2) {
+						return 0;
+					}
+					DiscoveryCategory category1 = o1.iterator().next();
+					DiscoveryCategory category2 = o2.iterator().next();
+					int res = category2.getRelevance().compareTo(category1.getRelevance());
+					if (res == 0) {
+						res = category2.getName().compareTo(category1.getName());
+					}
+					return res;
+				}
+			});
+			sortedCategories.addAll(categoriesById.values());
 
 			Composite categoryChildrenContainer = null;
-			for (DiscoveryCategory category : categories) {
-				if (isEmpty(category)) {
+			for (LinkedHashSet<DiscoveryCategory> categories : sortedCategories) {
+				boolean isEmpty = true;
+				for (DiscoveryCategory category : categories) {
+					if (!isEmpty(category)) {
+						isEmpty = false;
+					}
+				}
+				if (isEmpty) {
 					// don't add empty categories
 					continue;
 				}
-				{ // category header
-					final GradientCanvas categoryHeaderContainer = new GradientCanvas(container, SWT.NONE);
-					categoryHeaderContainer.setSeparatorVisible(true);
-					categoryHeaderContainer.setSeparatorAlignment(SWT.TOP);
-					categoryHeaderContainer.setBackgroundGradient(new Color[] { colorCategoryGradientStart,
-							colorCategoryGradientEnd }, new int[] { 100 }, true);
-					categoryHeaderContainer.putColor(IFormColors.H_BOTTOM_KEYLINE1, colorCategoryGradientStart);
-					categoryHeaderContainer.putColor(IFormColors.H_BOTTOM_KEYLINE2, colorCategoryGradientEnd);
-
-					GridDataFactory.fillDefaults().span(2, 1).applyTo(categoryHeaderContainer);
-					GridLayoutFactory.fillDefaults()
-							.numColumns(3)
-							.margins(5, 5)
-							.equalWidth(false)
-							.applyTo(categoryHeaderContainer);
-
-					Label iconLabel = new Label(categoryHeaderContainer, SWT.NULL);
-					if (category.getIcon() != null) {
-						Image image = computeIconImage(category.getSource(), category.getIcon(), 48, true);
-						if (image != null) {
-							iconLabel.setImage(image);
-						}
-					}
-					iconLabel.setBackground(null);
-					GridDataFactory.swtDefaults().align(SWT.CENTER, SWT.BEGINNING).span(1, 2).applyTo(iconLabel);
-
-					Label nameLabel = new Label(categoryHeaderContainer, SWT.NULL);
-					nameLabel.setFont(h1Font);
-					nameLabel.setText(category.getName());
-					nameLabel.setBackground(null);
-
-					GridDataFactory.fillDefaults().grab(true, false).applyTo(nameLabel);
-					if (hasTooltip(category)) {
-						ToolBar toolBar = new ToolBar(categoryHeaderContainer, SWT.FLAT);
-						toolBar.setBackground(null);
-						ToolItem infoButton = new ToolItem(toolBar, SWT.PUSH);
-						infoButton.setImage(infoImage);
-						infoButton.setToolTipText(Messages.ConnectorDiscoveryWizardMainPage_tooltip_showOverview);
-						hookTooltip(toolBar, infoButton, categoryHeaderContainer, nameLabel, category.getSource(),
-								category.getOverview(), null);
-						GridDataFactory.fillDefaults().align(SWT.END, SWT.CENTER).applyTo(toolBar);
-					} else {
-						new Label(categoryHeaderContainer, SWT.NULL).setText(" "); //$NON-NLS-1$
-					}
-					Label description = new Label(categoryHeaderContainer, SWT.WRAP);
-					GridDataFactory.fillDefaults()
-							.grab(true, false)
-							.span(2, 1)
-							.hint(100, SWT.DEFAULT)
-							.applyTo(description);
-					description.setBackground(null);
-					description.setText(category.getDescription());
-				}
-
-				categoryChildrenContainer = new Composite(container, SWT.NULL);
-				configureLook(categoryChildrenContainer, background);
-				GridDataFactory.fillDefaults().span(2, 1).grab(true, false).applyTo(categoryChildrenContainer);
-				GridLayoutFactory.fillDefaults().spacing(0, 0).applyTo(categoryChildrenContainer);
-
+				DiscoveryCategory firstCategory = categories.iterator().next();
+				categoryChildrenContainer = createCategoryHeaderAndContainer(container, firstCategory, background);
+				// Populate category
 				int numChildren = 0;
-				List<DiscoveryConnector> connectors = new ArrayList<DiscoveryConnector>(category.getConnectors());
-				Collections.sort(connectors, new DiscoveryConnectorComparator(category));
-				for (final DiscoveryConnector connector : connectors) {
-					if (isFiltered(connector)) {
-						continue;
+				for (DiscoveryCategory category : categories) {
+					List<DiscoveryConnector> connectors = new ArrayList<DiscoveryConnector>(category.getConnectors());
+					Collections.sort(connectors, new DiscoveryConnectorComparator(category));
+					for (final DiscoveryConnector connector : connectors) {
+						if (isFiltered(connector)) {
+							continue;
+						}
+	
+						if (++numChildren > 1) {
+							// a separator between connector descriptors
+							Composite border = new Composite(categoryChildrenContainer, SWT.NULL);
+							GridDataFactory.fillDefaults().grab(true, false).hint(SWT.DEFAULT, 1).applyTo(border);
+							GridLayoutFactory.fillDefaults().applyTo(border);
+							border.addPaintListener(new ConnectorBorderPaintListener());
+						}
+	
+						ConnectorDescriptorItemUi itemUi = new ConnectorDescriptorItemUi(connector, categoryChildrenContainer, background);
+						itemsUi.add(itemUi);
+						itemUi.updateAvailability();
+						allConnectors.add(connector);
 					}
-
-					if (++numChildren > 1) {
-						// a separator between connector descriptors
-						Composite border = new Composite(categoryChildrenContainer, SWT.NULL);
-						GridDataFactory.fillDefaults().grab(true, false).hint(SWT.DEFAULT, 1).applyTo(border);
-						GridLayoutFactory.fillDefaults().applyTo(border);
-						border.addPaintListener(new ConnectorBorderPaintListener());
-					}
-
-					ConnectorDescriptorItemUi itemUi = new ConnectorDescriptorItemUi(connector, 	categoryChildrenContainer, background);
-					itemsUi.add(itemUi);
-					itemUi.updateAvailability();
-					allConnectors.add(connector);
 				}
 			}
 			// last one gets a border
@@ -1094,6 +1080,76 @@ public class DiscoveryViewer {
 		}
 		container.layout(true);
 		container.redraw();
+	}
+
+	/**
+	 * @param container
+	 * @param category
+	 * @param background
+	 * @return
+	 */
+	private Composite createCategoryHeaderAndContainer(Composite container,
+			DiscoveryCategory category, Color background) {
+		Composite categoryChildrenContainer;
+		{ // category header
+			final GradientCanvas categoryHeaderContainer = new GradientCanvas(container, SWT.NONE);
+			categoryHeaderContainer.setSeparatorVisible(true);
+			categoryHeaderContainer.setSeparatorAlignment(SWT.TOP);
+			categoryHeaderContainer.setBackgroundGradient(new Color[] { colorCategoryGradientStart,
+					colorCategoryGradientEnd }, new int[] { 100 }, true);
+			categoryHeaderContainer.putColor(IFormColors.H_BOTTOM_KEYLINE1, colorCategoryGradientStart);
+			categoryHeaderContainer.putColor(IFormColors.H_BOTTOM_KEYLINE2, colorCategoryGradientEnd);
+
+			GridDataFactory.fillDefaults().span(2, 1).applyTo(categoryHeaderContainer);
+			GridLayoutFactory.fillDefaults()
+					.numColumns(3)
+					.margins(5, 5)
+					.equalWidth(false)
+					.applyTo(categoryHeaderContainer);
+
+			Label iconLabel = new Label(categoryHeaderContainer, SWT.NULL);
+			if (category.getIcon() != null) {
+				Image image = computeIconImage(category.getSource(), category.getIcon(), 48, true);
+				if (image != null) {
+					iconLabel.setImage(image);
+				}
+			}
+			iconLabel.setBackground(null);
+			GridDataFactory.swtDefaults().align(SWT.CENTER, SWT.BEGINNING).span(1, 2).applyTo(iconLabel);
+
+			Label nameLabel = new Label(categoryHeaderContainer, SWT.NULL);
+			nameLabel.setFont(h1Font);
+			nameLabel.setText(category.getName());
+			nameLabel.setBackground(null);
+
+			GridDataFactory.fillDefaults().grab(true, false).applyTo(nameLabel);
+			if (hasTooltip(category)) {
+				ToolBar toolBar = new ToolBar(categoryHeaderContainer, SWT.FLAT);
+				toolBar.setBackground(null);
+				ToolItem infoButton = new ToolItem(toolBar, SWT.PUSH);
+				infoButton.setImage(infoImage);
+				infoButton.setToolTipText(Messages.ConnectorDiscoveryWizardMainPage_tooltip_showOverview);
+				hookTooltip(toolBar, infoButton, categoryHeaderContainer, nameLabel, category.getSource(),
+						category.getOverview(), null);
+				GridDataFactory.fillDefaults().align(SWT.END, SWT.CENTER).applyTo(toolBar);
+			} else {
+				new Label(categoryHeaderContainer, SWT.NULL).setText(" "); //$NON-NLS-1$
+			}
+			Label description = new Label(categoryHeaderContainer, SWT.WRAP);
+			GridDataFactory.fillDefaults()
+					.grab(true, false)
+					.span(2, 1)
+					.hint(100, SWT.DEFAULT)
+					.applyTo(description);
+			description.setBackground(null);
+			description.setText(category.getDescription());
+		}
+
+		categoryChildrenContainer = new Composite(container, SWT.NULL);
+		configureLook(categoryChildrenContainer, background);
+		GridDataFactory.fillDefaults().span(2, 1).grab(true, false).applyTo(categoryChildrenContainer);
+		GridLayoutFactory.fillDefaults().spacing(0, 0).applyTo(categoryChildrenContainer);
+		return categoryChildrenContainer;
 	}
 
 	private void createEnvironment() {
@@ -1164,18 +1220,19 @@ public class DiscoveryViewer {
 				if (body == null || body.isDisposed()) {
 					return;
 				}
-				if (discovery != null && !wasCancelled) {
-					int categoryWithConnectorCount = 0;
-					for (DiscoveryCategory category : discovery.getCategories()) {
-						categoryWithConnectorCount += category.getConnectors().size();
-					}
-					if (categoryWithConnectorCount == 0) {
-						// nothing was discovered: notify the user
-						MessageDialog.openWarning(getShell(), Messages.ConnectorDiscoveryWizardMainPage_noConnectorsFound,
-								Messages.ConnectorDiscoveryWizardMainPage_noConnectorsFound_description);
-					}
-				}
 				selectionProvider.setSelection(StructuredSelection.EMPTY);
+				if (DiscoveryViewer.this.discoveries != null && !wasCancelled) {
+					for (ConnectorDiscovery discovery : DiscoveryViewer.this.discoveries.values()) {
+						for (DiscoveryCategory category : discovery.getCategories()) {
+							if (! category.getConnectors().isEmpty()) {
+								return;
+							}
+						}
+					}
+					// nothing was discovered: notify the user
+					MessageDialog.openWarning(getShell(), Messages.ConnectorDiscoveryWizardMainPage_noConnectorsFound,
+							Messages.ConnectorDiscoveryWizardMainPage_noConnectorsFound_description);
+				}
 			}
 		});
 	}
@@ -1198,14 +1255,6 @@ public class DiscoveryViewer {
 
 	public Control getControl() {
 		return control;
-	}
-
-	public String getDirectoryUrl() {
-		return directoryUrl;
-	}
-
-	public ConnectorDiscovery getDiscovery() {
-		return discovery;
 	}
 
 	/**
@@ -1541,9 +1590,61 @@ public class DiscoveryViewer {
 	protected void setControl(Control control) {
 		this.control = control;
 	}
-
-	public void setDirectoryUrl(String directoryUrl) {
-		this.directoryUrl = directoryUrl;
+	
+	/**
+	 * Add an URL to the list of catalog.
+	 * This won't have any effect until catalog gets recomputed, via
+	 * {@link DiscoveryViewer#updateDiscovery()} or similar.
+	 * 
+	 * Ideally, use it only when initiating the viewer, before it gets
+	 * actually displayed.
+	 * If you want to make viewer more dynamic, you should consider dealing
+	 * with filter enablement instead.
+	 * 
+	 * @param directoryUrl
+	 */
+	public void addDirectoryUrl(String directoryUrl) {
+		if (this.directoryUrls == null) {
+			this.directoryUrls = new HashSet<String>();
+		}
+		this.directoryUrls.add(directoryUrl);
+	}
+	
+	/**
+	 * Clears the list of URL loaded by catalog
+	 * This won't have any effect until catalog gets recomputed, via
+	 * {@link DiscoveryViewer#updateDiscovery()} or similar.
+	 * 
+	 * Ideally, use it only when initiating the viewer, before it gets
+	 * actually displayed.
+	 * If you want to make viewer more dynamic, you should consider dealing
+	 * with filter enablement instead.
+	 */
+	public void resetDirectoryUrls() {
+		this.directoryUrls.clear();
+	}
+	
+	/**
+	 * Add some URLs to the list of catalog.
+	 * This won't have any effect until catalog gets recomputed, via
+	 * {@link DiscoveryViewer#updateDiscovery()} or similar.
+	 * 
+	 * Ideally, use it only when initiating the viewer, before it gets
+	 * actually displayed.
+	 * If you want to make viewer more dynamic, you should consider dealing
+	 * with filter enablement instead.
+	 * 
+	 * @param directoryUrl
+	 */
+	public Set<String> getDirectoryUrls() {
+		return Collections.unmodifiableSet(this.directoryUrls);
+	}
+	
+	public void addDirectoryUrls(Collection<String> urls) {
+		if (this.directoryUrls == null) {
+			this.directoryUrls = new HashSet<String>();
+		}
+		this.directoryUrls.addAll(urls);
 	}
 
 	/**
@@ -1608,18 +1709,20 @@ public class DiscoveryViewer {
 					if (DiscoveryViewer.this.installedFeatures == null) {
 						DiscoveryViewer.this.installedFeatures = getInstalledFeatures(monitor);
 					}
-					ConnectorDiscovery connectorDiscovery = DiscoveryUtil.createConnectorDiscovery(directoryUrl);
-					connectorDiscovery.setEnvironment(environment);
-					connectorDiscovery.setVerifyUpdateSiteAvailability(false);
-					try {
-						result[0] = connectorDiscovery.performDiscovery(monitor);
-					} finally {
-						if (monitor.isCanceled()) {
-							return;
+					// TODO parallize this loop
+					for (String directoryUrl : DiscoveryViewer.this.directoryUrls) {
+						ConnectorDiscovery connectorDiscovery = DiscoveryUtil.createConnectorDiscovery(directoryUrl);
+						connectorDiscovery.setEnvironment(environment);
+						connectorDiscovery.setVerifyUpdateSiteAvailability(false);
+						try {
+							result[0] = connectorDiscovery.performDiscovery(monitor);
+						} finally {
+							if (monitor.isCanceled()) {
+								return;
+							}
+							DiscoveryViewer.this.discoveries.put(directoryUrl, connectorDiscovery);
+							postDiscovery(connectorDiscovery);
 						}
-						DiscoveryViewer.this.discovery = connectorDiscovery;
-
-						postDiscovery(connectorDiscovery);
 					}
 					if (monitor.isCanceled()) {
 						throw new InterruptedException();
@@ -1640,14 +1743,18 @@ public class DiscoveryViewer {
 			wasCancelled = true;
 			return;
 		}
-		if (discovery != null) {
+		if (this.discoveries != null && !this.discoveries.isEmpty()) {
 			discoveryUpdated(wasCancelled);
-			if (verifyUpdateSiteAvailability && !discovery.getConnectors().isEmpty()) {
+			if (verifyUpdateSiteAvailability) {
 				try {
 					context.run(true, true, new IRunnableWithProgress() {
-						public void run(IProgressMonitor monitor) throws InvocationTargetException,
-								InterruptedException {
-							discovery.verifySiteAvailability(monitor);
+						public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
+							// TODO parallelize
+							for (ConnectorDiscovery discovery : DiscoveryViewer.this.discoveries.values()) {
+								if (!discovery.getConnectors().isEmpty()) {
+									discovery.verifySiteAvailability(monitor);
+								}
+							}
 						}
 					});
 				} catch (InvocationTargetException e) {
