@@ -18,6 +18,7 @@ import static org.junit.Assert.assertNull;
 import java.io.File;
 import java.lang.reflect.Field;
 import java.util.List;
+import java.util.Set;
 
 import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IWorkbenchPage;
@@ -126,14 +127,16 @@ public class DiscoveryTest {
 	}
 	
 	public void testLocalDiscovery() throws Exception {
-		String url = discoveryViewer.getDirectoryUrl();
+		Set<String> urls = discoveryViewer.getDirectoryUrls();
 		try  {
-			discoveryViewer.setDirectoryUrl("file:/"+new File("test-resources", "directory.xml").getAbsolutePath().replace('\\', '/'));
+			discoveryViewer.resetDirectoryUrls();
+			discoveryViewer.addDirectoryUrl("file:/"+new File("test-resources", "directory.xml").getAbsolutePath().replace('\\', '/'));
 			discoveryViewer.updateDiscovery();
 			assertNotNull("Couldn't find connector from local discovery", getConnector("test.local.discovery"));
 			
 		} finally {
-			discoveryViewer.setDirectoryUrl(url);
+			discoveryViewer.resetDirectoryUrls();
+			discoveryViewer.addDirectoryUrls(urls);
 		}
 		
 	}
