@@ -140,6 +140,7 @@ import org.eclipse.ui.progress.WorkbenchJob;
 import org.eclipse.ui.statushandlers.StatusManager;
 import org.eclipse.ui.themes.IThemeManager;
 import org.jboss.tools.central.JBossCentralActivator;
+import org.jboss.tools.central.editors.xpl.filters.FilterEntry;
 import org.jboss.tools.project.examples.internal.discovery.DiscoveryUtil;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.Version;
@@ -487,8 +488,6 @@ public class DiscoveryViewer {
 		return useNativeSearchField;
 	}
 
-	private boolean showConnectorDescriptorKindFilter;
-
 	private boolean showConnectorDescriptorTextFilter;
 
 	private static final String COLOR_WHITE = "white"; //$NON-NLS-1$
@@ -537,14 +536,6 @@ public class DiscoveryViewer {
 
 	private boolean verifyUpdateSiteAvailability;
 
-	private final Map<ConnectorDescriptorKind, Boolean> connectorDescriptorKindToVisibility = new HashMap<ConnectorDescriptorKind, Boolean>();
-
-	{
-		for (ConnectorDescriptorKind kind : ConnectorDescriptorKind.values()) {
-			connectorDescriptorKindToVisibility.put(kind, true);
-		}
-	}
-
 	private Dictionary<Object, Object> environment;
 
 	private boolean complete;
@@ -563,12 +554,8 @@ public class DiscoveryViewer {
 
 	private int minimumHeight;
 
-	private final List<ViewerFilter> filters = new ArrayList<ViewerFilter>();
+	private final List<FilterEntry> userFilters = new ArrayList<FilterEntry>();
 
-	private boolean showInstalledFilterEnabled;
-
-	private boolean showInstalled;
-	
 	private List<ConnectorDescriptorItemUi> itemsUi = new ArrayList<DiscoveryViewer.ConnectorDescriptorItemUi>();
 
 	public DiscoveryViewer(IShellProvider shellProvider, IRunnableContext context) {
@@ -577,7 +564,6 @@ public class DiscoveryViewer {
 		this.selectionProvider = new SelectionProviderAdapter();
 		this.allConnectors = Collections.emptyList();
 		this.disposables = new ArrayList<Resource>();
-		setShowConnectorDescriptorKindFilter(true);
 		setShowConnectorDescriptorTextFilter(true);
 		setMinimumHeight(MINIMUM_HEIGHT);
 		createEnvironment();
@@ -666,15 +652,6 @@ public class DiscoveryViewer {
 
 	private void configureLook(Control control, Color background) {
 		control.setBackground(background);
-	}
-
-	/**
-	 * cause the UI to respond to a change in visibility filters
-	 * 
-	 * @see #setVisibility(ConnectorDescriptorKind, boolean)
-	 */
-	public void connectorDescriptorKindVisibilityUpdated() {
-		createBodyContents();
 	}
 
 	public void createBodyContents() {
@@ -848,7 +825,7 @@ public class DiscoveryViewer {
 			GridDataFactory.fillDefaults().grab(true, false).applyTo(header);
 
 			// TODO: refresh button?
-			if (isShowConnectorDescriptorKindFilter() || isShowConnectorDescriptorTextFilter()) {
+			if (isShowConnectorDescriptorTextFilter()) {
 				Composite filterContainer = new Composite(header, SWT.NULL);
 				GridDataFactory.fillDefaults().grab(true, false).applyTo(filterContainer);
 
@@ -895,40 +872,25 @@ public class DiscoveryViewer {
 					}
 				}
 
-				if (isShowInstalledFilterEnabled()) {
+				if (this.userFilters.size() == 1) {
+					final FilterEntry theFilter = this.userFilters.get(0);
 					final Button checkbox = new Button(filterContainer, SWT.CHECK);
-					checkbox.setSelection(false);
-					checkbox.setText(Messages.DiscoveryViewer_Show_Installed);
+					checkbox.setSelection(theFilter.isEnabled());
+					checkbox.setText(theFilter.getLabel());
 					checkbox.addSelectionListener(new SelectionListener() {
 						public void widgetDefaultSelected(SelectionEvent e) {
 							widgetSelected(e);
 						}
 
 						public void widgetSelected(SelectionEvent e) {
-							setShowInstalled(checkbox.getSelection());
+							theFilter.setEnabled(checkbox.getSelection());
+							// refresh UI
+							createBodyContents();
 						}
 					});
-				}
-
-				if (isShowConnectorDescriptorKindFilter()) { // filter
-					// buttons
-
-					for (final ConnectorDescriptorKind kind : ConnectorDescriptorKind.values()) {
-						final Button checkbox = new Button(filterContainer, SWT.CHECK);
-						checkbox.setSelection(isVisible(kind));
-						checkbox.setText(getFilterLabel(kind));
-						checkbox.addSelectionListener(new SelectionListener() {
-							public void widgetDefaultSelected(SelectionEvent e) {
-								widgetSelected(e);
-							}
-
-							public void widgetSelected(SelectionEvent e) {
-								boolean selection = checkbox.getSelection();
-								setVisibility(kind, selection);
-								connectorDescriptorKindVisibilityUpdated();
-							}
-						});
-					}
+				} else if (this.userFilters.size() > 0) {
+					// TODO
+					new Label(filterContainer, SWT.NONE).setText("TODO");
 				}
 
 				GridLayoutFactory.fillDefaults()
@@ -971,13 +933,6 @@ public class DiscoveryViewer {
 		if (emptyDiscoveries) {
 			GridLayoutFactory.fillDefaults().margins(5, 5).applyTo(container);
 
-			boolean atLeastOneKindFiltered = false;
-			for (ConnectorDescriptorKind kind : ConnectorDescriptorKind.values()) {
-				if (!isVisible(kind)) {
-					atLeastOneKindFiltered = true;
-					break;
-				}
-			}
 			Control helpTextControl;
 			if (filterPattern != null) {
 				Link link = new Link(container, SWT.WRAP);
@@ -994,11 +949,7 @@ public class DiscoveryViewer {
 			} else {
 				Label helpText = new Label(container, SWT.WRAP);
 				helpText.setFont(container.getFont());
-				if (atLeastOneKindFiltered) {
-					helpText.setText("There are no available plug-ins of the selected type. Please select another plug-in type or try again later.");
-				} else {
-					helpText.setText("Sorry, all available plug-ins from JBoss Central are already installed. More gets added over time, try again later.");
-				}
+				helpText.setText("Sorry, all available plug-ins from JBoss Central are already installed. More gets added over time, try again later.");
 				helpTextControl = helpText;
 			}
 			configureLook(helpTextControl, background);
@@ -1327,10 +1278,6 @@ public class DiscoveryViewer {
 		}
 	}
 
-	public boolean isShowInstalledFilterEnabled() {
-		return showInstalledFilterEnabled;
-	}
-
 	private void hookTooltip(final Control parent, final Widget tipActivator, final Control exitControl,
 			final Control titleControl, AbstractDiscoverySource source, Overview overview, Image image) {
 		final OverviewToolTip toolTip = new OverviewToolTip(parent, source, overview, image);
@@ -1482,36 +1429,26 @@ public class DiscoveryViewer {
 		return true;
 	}
 
-	public void addFilter(ViewerFilter filter) {
-		filters.add(filter);
-	}
-
-	public void removeFilter(ViewerFilter filter) {
-		filters.remove(filter);
+	/**
+	 * Adds an EXCLUSION filter to the viewer. When enabled, this filter
+	 * will exclude all elements which have filter.select returning false
+	 * @param filter
+	 * @param label
+	 * @param enableByDefault
+	 */
+	public void addFilter(ViewerFilter filter, String label, boolean enableByDefault) {
+		userFilters.add(new FilterEntry(filter, label, enableByDefault));
 	}
 
 	private boolean isFiltered(ConnectorDescriptor descriptor) {
-		boolean kindFiltered = true;
-		for (ConnectorDescriptorKind kind : descriptor.getKind()) {
-			if (isVisible(kind)) {
-				kindFiltered = false;
-				break;
-			}
-		}
-		if (kindFiltered) {
-			return true;
-		}
-		if (!showInstalled && descriptor.isInstalled()) {
-			return true;
-		}
 		if (previousFilterText != null && !previousFilterText.isEmpty()) {
 			if (!(filterMatches(descriptor.getName()) || filterMatches(descriptor.getDescription())
 					|| filterMatches(descriptor.getProvider()) || filterMatches(descriptor.getLicense()))) {
 				return true;
 			}
 		}
-		for (ViewerFilter filter : filters) {
-			if (!filter.select(null, null, descriptor)) {
+		for (FilterEntry filter : this.userFilters) {
+			if (filter.isEnabled() && !filter.getFilter().select(null, null, descriptor)) {
 				return true;
 			}
 		}
@@ -1519,34 +1456,10 @@ public class DiscoveryViewer {
 	}
 
 	/**
-	 * indicate if the connector descriptor filters should be shown in the UI. Changing this setting only has an effect
-	 * before the UI is presented.
-	 */
-	public boolean isShowConnectorDescriptorKindFilter() {
-		return showConnectorDescriptorKindFilter;
-	}
-
-	/**
 	 * indicate if a text field should be provided to allow the user to filter connector descriptors
 	 */
 	public boolean isShowConnectorDescriptorTextFilter() {
 		return showConnectorDescriptorTextFilter;
-	}
-
-	public boolean isShowInstalled() {
-		return showInstalled;
-	}
-
-	/**
-	 * indicate if the given kind of connector is currently visible in the wizard
-	 * 
-	 * @see #setVisibility(ConnectorDescriptorKind, boolean)
-	 */
-	public boolean isVisible(ConnectorDescriptorKind kind) {
-		if (kind == null) {
-			throw new IllegalArgumentException();
-		}
-		return connectorDescriptorKindToVisibility.get(kind);
 	}
 
 	private void modifySelection(final ConnectorDescriptorItemUi item, boolean selected) {
@@ -1660,43 +1573,14 @@ public class DiscoveryViewer {
 	}
 
 	/**
-	 * indicate if the connector descriptor filters should be shown in the UI. Changing this setting only has an effect
-	 * before the UI is presented.
-	 */
-	public void setShowConnectorDescriptorKindFilter(boolean showConnectorDescriptorKindFilter) {
-		this.showConnectorDescriptorKindFilter = showConnectorDescriptorKindFilter;
-	}
-
-	/**
 	 * indicate if a text field should be provided to allow the user to filter connector descriptors
 	 */
 	public void setShowConnectorDescriptorTextFilter(boolean showConnectorDescriptorTextFilter) {
 		this.showConnectorDescriptorTextFilter = showConnectorDescriptorTextFilter;
 	}
 
-	public void setShowInstalled(boolean showInstalled) {
-		this.showInstalled = showInstalled;
-		connectorDescriptorKindVisibilityUpdated();
-	}
-
-	public void setShowInstalledFilterEnabled(boolean showInstalledFilter) {
-		this.showInstalledFilterEnabled = showInstalledFilter;
-	}
-
 	public void setVerifyUpdateSiteAvailability(boolean verifyUpdateSiteAvailability) {
 		this.verifyUpdateSiteAvailability = verifyUpdateSiteAvailability;
-	}
-
-	/**
-	 * configure the page to show or hide connector descriptors of the given kind
-	 * 
-	 * @see #connectorDescriptorKindVisibilityUpdated()
-	 */
-	public void setVisibility(ConnectorDescriptorKind kind, boolean visible) {
-		if (kind == null) {
-			throw new IllegalArgumentException();
-		}
-		connectorDescriptorKindToVisibility.put(kind, visible);
 	}
 
 	public void updateDiscovery() {
