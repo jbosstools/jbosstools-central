@@ -17,6 +17,7 @@ public class Messages extends NLS {
 	
 	public static String DiscoveryViewer_Certification_Label0;
 	public static String DiscoveryViewer_X_installed;
+	public static String DiscoveryViewer_Hide_installed;
 	
 	public static String installWithCount;
 	public static String uninstallWithCount;
