@@ -141,6 +141,7 @@ import org.eclipse.ui.statushandlers.StatusManager;
 import org.eclipse.ui.themes.IThemeManager;
 import org.jboss.tools.central.JBossCentralActivator;
 import org.jboss.tools.central.editors.xpl.filters.FilterEntry;
+import org.jboss.tools.central.editors.xpl.filters.FiltersSelectionDialog;
 import org.jboss.tools.project.examples.internal.discovery.DiscoveryUtil;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.Version;
@@ -167,6 +168,7 @@ public class DiscoveryViewer {
 		private final DiscoveryConnector connector;
 		private Map<String, org.eclipse.equinox.p2.metadata.Version> connectorUnits;
 		private boolean upToDate; // only relevant for installed connectors
+		private boolean supported;
 
 		private final Button checkbox;
 		private final Label iconLabel;
@@ -888,9 +890,23 @@ public class DiscoveryViewer {
 							createBodyContents();
 						}
 					});
-				} else if (this.userFilters.size() > 0) {
-					// TODO
-					new Label(filterContainer, SWT.NONE).setText("TODO");
+				} else if (this.userFilters.size() > 1) {
+					Link link = new Link(filterContainer, SWT.NONE);
+					link.setText("<a>" + org.jboss.tools.central.Messages.DiscoveryViewer_filtersLink + "</a>");
+					link.addSelectionListener(new SelectionAdapter() {
+						@Override
+						public void widgetSelected(SelectionEvent e) {
+							FiltersSelectionDialog dialog = new FiltersSelectionDialog(getShell(), DiscoveryViewer.this.userFilters);
+							if (dialog.open() == Dialog.OK) {
+								if (!dialog.getToggledFilters().isEmpty()) {
+									for (FilterEntry entry : dialog.getToggledFilters()) {
+										entry.setEnabled(!entry.isEnabled());
+									}
+									createBodyContents();
+								}
+							}
+						}
+					});
 				}
 
 				GridLayoutFactory.fillDefaults()

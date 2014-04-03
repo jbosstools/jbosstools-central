@@ -14,10 +14,15 @@ import org.eclipse.osgi.util.NLS;
 
 public class Messages extends NLS {
 	private static final String BUNDLE_NAME = "org.jboss.tools.central.messages"; //$NON-NLS-1$
-	
+
 	public static String DiscoveryViewer_Certification_Label0;
 	public static String DiscoveryViewer_X_installed;
 	public static String DiscoveryViewer_Hide_installed;
+	public static String DiscoveryViewer_Hide_EarlyAccess;
+	public static String DiscoveryViewer_filtersLink;
+
+	public static String DiscoveryViewer_FilterSelectionDialog_label;
+	public static String DiscoveryViewer_FilterSelectionDialog_title;
 	
 	public static String installWithCount;
 	public static String uninstallWithCount;

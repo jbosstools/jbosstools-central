@@ -61,6 +61,7 @@ import org.eclipse.ui.part.PageBook;
 import org.jboss.tools.central.JBossCentralActivator;
 import org.jboss.tools.central.Messages;
 import org.jboss.tools.central.editors.xpl.DiscoveryViewer;
+import org.jboss.tools.central.editors.xpl.filters.EarlyAccessFilter;
 import org.jboss.tools.central.editors.xpl.filters.InstalledFilter;
 import org.jboss.tools.central.jobs.RefreshDiscoveryJob;
 import org.jboss.tools.project.examples.ProjectExamplesActivator;
@@ -145,6 +146,7 @@ public class SoftwarePage extends AbstractJBossCentralPage implements IRunnableC
 	    
 	    discoveryViewer = new DiscoveryViewer(getSite(), this);
 	    discoveryViewer.addFilter(new InstalledFilter(), Messages.DiscoveryViewer_Hide_installed, true);
+	    discoveryViewer.addFilter(new EarlyAccessFilter(), Messages.DiscoveryViewer_Hide_EarlyAccess, true);
 		discoveryViewer.addDirectoryUrl(ProjectExamplesActivator.getDefault().getConfigurator().getJBossDiscoveryDirectory());
 		discoveryViewer.addDirectoryUrl("http://www.eclipse.org/mylyn/discovery/directory.xml");
 		discoveryViewer.createControl(pageBook);
