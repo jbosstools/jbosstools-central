@@ -57,10 +57,8 @@
 	<feature url="features/org.jboss.tools.maven.test.feature_0.0.0.jar" id="org.jboss.tools.maven.test.feature" version="0.0.0">
 		<category name="AllFeatures"/>
 	</feature>
-	<feature url="features/org.jboss.tools.maven.gwt.feature_0.0.0.jar" id="org.jboss.tools.maven.gwt.feature" version="0.0.0">
-		<category name="AllFeatures"/>
-	</feature>
-	<feature url="features/org.jboss.tools.maven.sourcelookup.feature_0.0.0.jar" id="org.jboss.tools.maven.sourcelookup.feature" version="0.0.0">
+	<!-- JBIDE-16960 remove <feature url="features/org.jboss.tools.maven.gwt.feature_0.0.0.jar" id="org.jboss.tools.maven.gwt.feature" version="0.0.0"><category name="AllFeatures"/></feature> -->
+		<feature url="features/org.jboss.tools.maven.sourcelookup.feature_0.0.0.jar" id="org.jboss.tools.maven.sourcelookup.feature" version="0.0.0">
 		<category name="AllFeatures"/>
 	</feature>
 	<feature url="features/org.jboss.tools.maven.jdt.feature_0.0.0.jar" id="org.jboss.tools.maven.jdt.feature" version="0.0.0">
@@ -91,9 +89,7 @@
 	<feature url="features/org.jboss.tools.maven.test.feature.source_0.0.0.jar" id="org.jboss.tools.maven.test.feature.source" version="0.0.0">
 		<category name="AllSources"/>
 	</feature>
-	<feature url="features/org.jboss.tools.maven.gwt.feature.source_0.0.0.jar" id="org.jboss.tools.maven.gwt.feature.source" version="0.0.0">
-		<category name="AllSources"/>
-	</feature>
+	<!-- JBIDE-16960 remove <feature url="features/org.jboss.tools.maven.gwt.feature.source_0.0.0.jar" id="org.jboss.tools.maven.gwt.feature.source" version="0.0.0"><category name="AllSources"/></feature> -->
 	<feature url="features/org.jboss.tools.maven.sourcelookup.feature.source_0.0.0.jar" id="org.jboss.tools.maven.sourcelookup.feature.source" version="0.0.0">
 		<category name="AllSources"/>
 	</feature>
