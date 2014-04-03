@@ -1,5 +1,5 @@
 /*************************************************************************************
- * Copyright (c) 2008-2011 Red Hat, Inc. and others.
+ * Copyright (c) 2008-2014 Red Hat, Inc. and others.
  * All rights reserved. This program and the accompanying materials 
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -18,7 +18,8 @@ package org.jboss.tools.central.actions;
  */
 public class FavoriteAtEclipseMarketplaceHandler extends OpenWithBrowserHandler {
 
-	private static final String MARKETPLACE_ECLIPSE_URL = "http://marketplace.eclipse.org/node/420896";
+	//TODO : get this url from upcoming properties provider 
+	private static final String MARKETPLACE_ECLIPSE_URL = "http://marketplace.eclipse.org/content/jboss-tools-luna";
 
 	@Override
 	public String getLocation() {
