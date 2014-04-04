@@ -144,30 +144,12 @@ public class SoftwarePage extends AbstractJBossCentralPage implements IRunnableC
 		gd =new GridData(SWT.FILL, SWT.FILL, true, true);
 	    pageBook.setLayoutData(gd);
 	    
-	    discoveryViewer = new DiscoveryViewer(getSite(), this);
+	    discoveryViewer = new DiscoveryViewer(pageBook, this);
 	    discoveryViewer.addFilter(new InstalledFilter(), Messages.DiscoveryViewer_Hide_installed, true);
 	    discoveryViewer.addFilter(new EarlyAccessFilter(), Messages.DiscoveryViewer_Hide_EarlyAccess, true);
 		discoveryViewer.addDirectoryUrl(ProjectExamplesActivator.getDefault().getConfigurator().getJBossDiscoveryDirectory());
-		discoveryViewer.addDirectoryUrl("http://www.eclipse.org/mylyn/discovery/directory.xml");
-		discoveryViewer.createControl(pageBook);
+		discoveryViewer.createControl();
 		discoveryViewer.setEnvironment(getEnvironment());
-//		discoveryViewer.addFilter(new ViewerFilter() {
-//			
-//			@Override
-//			public boolean select(Viewer viewer, Object parentElement, Object element) {
-//		        DiscoveryConnector connector = (DiscoveryConnector)element;
-//		        //System.out.println(connector.getId());
-//		        if (connector.getId().equals("org.eclipse.mylyn.discovery.tests.connectorDescriptor1") ||
-//		        		connector.getId().equals("org.eclipse.mylyn.discovery.test1") ||
-//		        		connector.getId().equals("org.eclipse.mylyn.discovery.2tests") ||
-//		        		connector.getId().equals("org.eclipse.mylyn.trac") ) {
-//		        	//System.out.println("filtered " + connector.getId());
-//		          return false;
-//		        }
-//				return true;
-//			}
-//		});
-		
 		Control discoveryControl = discoveryViewer.getControl();
 		adapt(toolkit, discoveryControl);
 		if (discoveryControl instanceof Composite) {
