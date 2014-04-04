@@ -11,11 +11,7 @@
  *******************************************************************************/
 package org.jboss.tools.central.editors.xpl;
 
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.lang.reflect.InvocationTargetException;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -25,6 +21,7 @@ import java.util.Dictionary;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Hashtable;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -37,19 +34,8 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.MultiStatus;
-import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.equinox.p2.core.IProvisioningAgent;
-import org.eclipse.equinox.p2.core.IProvisioningAgentProvider;
-import org.eclipse.equinox.p2.core.ProvisionException;
-import org.eclipse.equinox.p2.engine.IProfile;
-import org.eclipse.equinox.p2.engine.IProfileRegistry;
-import org.eclipse.equinox.p2.metadata.IInstallableUnit;
-import org.eclipse.equinox.p2.query.IQueryResult;
-import org.eclipse.equinox.p2.query.QueryUtil;
-import org.eclipse.equinox.p2.repository.metadata.IMetadataRepository;
-import org.eclipse.equinox.p2.repository.metadata.IMetadataRepositoryManager;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.layout.GridDataFactory;
@@ -60,16 +46,16 @@ import org.eclipse.jface.resource.ColorRegistry;
 import org.eclipse.jface.resource.FontDescriptor;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.JFaceResources;
-import org.eclipse.jface.viewers.ISelectionChangedListener;
+import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
+import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerFilter;
 import org.eclipse.jface.window.IShellProvider;
 import org.eclipse.mylyn.commons.ui.CommonImages;
 import org.eclipse.mylyn.commons.ui.GradientCanvas;
-import org.eclipse.mylyn.commons.ui.SelectionProviderAdapter;
 import org.eclipse.mylyn.commons.ui.compatibility.CommonThemes;
-import org.eclipse.mylyn.commons.workbench.browser.BrowserUtil;
 import org.eclipse.mylyn.internal.discovery.core.model.AbstractDiscoverySource;
 import org.eclipse.mylyn.internal.discovery.core.model.ConnectorDescriptor;
 import org.eclipse.mylyn.internal.discovery.core.model.ConnectorDescriptorKind;
@@ -78,6 +64,7 @@ import org.eclipse.mylyn.internal.discovery.core.model.DiscoveryCategory;
 import org.eclipse.mylyn.internal.discovery.core.model.DiscoveryConnector;
 import org.eclipse.mylyn.internal.discovery.core.model.Icon;
 import org.eclipse.mylyn.internal.discovery.core.model.Overview;
+import org.eclipse.mylyn.internal.discovery.core.util.DiscoveryCategoryComparator;
 import org.eclipse.mylyn.internal.discovery.core.util.DiscoveryConnectorComparator;
 import org.eclipse.mylyn.internal.discovery.ui.DiscoveryImages;
 import org.eclipse.mylyn.internal.discovery.ui.DiscoveryUi;
@@ -94,13 +81,10 @@ import org.eclipse.swt.events.ControlAdapter;
 import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
-import org.eclipse.swt.events.FocusAdapter;
-import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
-import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.events.MouseMoveListener;
 import org.eclipse.swt.events.MouseTrackListener;
 import org.eclipse.swt.events.PaintEvent;
@@ -134,11 +118,11 @@ import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.ToolItem;
 import org.eclipse.swt.widgets.Widget;
 import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.browser.IWorkbenchBrowserSupport;
 import org.eclipse.ui.forms.IFormColors;
 import org.eclipse.ui.progress.WorkbenchJob;
 import org.eclipse.ui.statushandlers.StatusManager;
 import org.eclipse.ui.themes.IThemeManager;
+import org.eclipse.ui.views.markers.internal.CategoryComparator;
 import org.jboss.tools.central.JBossCentralActivator;
 import org.jboss.tools.central.editors.xpl.filters.FilterEntry;
 import org.jboss.tools.central.editors.xpl.filters.FiltersSelectionDialog;
@@ -152,324 +136,7 @@ import org.osgi.framework.Version;
  * @author David Green
  * @author Steffen Pingel
  */
-public class DiscoveryViewer {
-
-	public class ConnectorBorderPaintListener implements PaintListener {
-		public void paintControl(PaintEvent e) {
-			Composite composite = (Composite) e.widget;
-			Rectangle bounds = composite.getBounds();
-			GC gc = e.gc;
-			gc.setLineStyle(SWT.LINE_DOT);
-			gc.drawLine(bounds.x, bounds.y, bounds.x + bounds.width, bounds.y);
-		}
-	}
-
-	private class ConnectorDescriptorItemUi implements PropertyChangeListener, Runnable {
-		private final DiscoveryConnector connector;
-		private Map<String, org.eclipse.equinox.p2.metadata.Version> connectorUnits;
-		private boolean upToDate; // only relevant for installed connectors
-		private boolean supported;
-
-		private final Button checkbox;
-		private final Label iconLabel;
-		private final Label nameLabel;
-		private final Label statusLabel;
-		private ToolItem infoButton;
-		private final Link providerLabel;
-		private final Label description;
-		private final Composite checkboxContainer;
-		private final Composite connectorContainer;
-		private final Display display;
-		private Image iconImage;
-
-//		private Image warningIconImage;
-
-		public ConnectorDescriptorItemUi(final DiscoveryConnector connector, Composite categoryChildrenContainer,
-				Color background) {
-			display = categoryChildrenContainer.getDisplay();
-			this.connector = connector;
-			connector.addPropertyChangeListener(this);
-
-			connectorContainer = new Composite(categoryChildrenContainer, SWT.NULL);
-
-			configureLook(connectorContainer, background);
-			GridDataFactory.fillDefaults().grab(true, false).applyTo(connectorContainer);
-			GridLayout layout = new GridLayout(5, false);
-			layout.marginLeft = 7;
-			layout.marginTop = 2;
-			layout.marginBottom = 2;
-			connectorContainer.setLayout(layout);
-
-			checkboxContainer = new Composite(connectorContainer, SWT.NULL);
-			configureLook(checkboxContainer, background);
-			GridDataFactory.swtDefaults().align(SWT.CENTER, SWT.BEGINNING).span(1, 2).applyTo(checkboxContainer);
-			GridLayoutFactory.fillDefaults().spacing(1, 1).numColumns(2).applyTo(checkboxContainer);
-
-			checkbox = new Button(checkboxContainer, SWT.CHECK);
-			checkbox.setText(" "); //$NON-NLS-1$
-			// help UI tests
-			checkbox.setData("connectorId", connector.getId()); //$NON-NLS-1$
-			checkbox.setVisible(connector.isInstallable());
-			configureLook(checkbox, background);
-			checkbox.setSelection(connector.isSelected());
-			checkbox.addFocusListener(new FocusAdapter() {
-				@Override
-				public void focusGained(FocusEvent e) {
-					bodyScrolledComposite.showControl(connectorContainer);
-				}
-			});
-
-			GridDataFactory.swtDefaults().align(SWT.CENTER, SWT.CENTER).applyTo(checkbox);
-
-			iconLabel = new Label(checkboxContainer, SWT.NULL);
-			configureLook(iconLabel, background);
-			GridDataFactory.swtDefaults().align(SWT.CENTER, SWT.CENTER).applyTo(iconLabel);
-
-			if (connector.getIcon() != null) {
-				iconImage = computeIconImage(connector.getSource(), connector.getIcon(), 32, false);
-				if (iconImage != null) {
-					iconLabel.setImage(iconImage);
-				}
-			}
-
-			nameLabel = new Label(connectorContainer, SWT.NULL);
-			configureLook(nameLabel, background);
-			GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.CENTER).applyTo(nameLabel);
-			nameLabel.setFont(h2Font);
-			nameLabel.setText(connector.getName());
-			
-			this.statusLabel = new Label(connectorContainer, SWT.NULL);
-			configureLook(this.statusLabel, background);
-			GridDataFactory.fillDefaults().grab(true, false).align(SWT.BEGINNING, SWT.CENTER).applyTo(this.statusLabel);
-			if (connector.isInstalled()) {
-				String text = "(INSTALLED - ";
-				this.connectorUnits = resolveConnectorUnits(connector);
-				Map<String, org.eclipse.equinox.p2.metadata.Version> profileUnits = resolveProfileUnits(connector.getInstallableUnits());
-				this.upToDate = true;
-				for (String unitId : connector.getInstallableUnits()) {
-					this.upToDate &= profileUnits.get(unitId).compareTo(this.connectorUnits.get(unitId)) >= 0;
-				}
-				if (this.upToDate) {
-					text += "UP TO DATE";
-					this.statusLabel.setForeground(getShell().getDisplay().getSystemColor(SWT.COLOR_DARK_GREEN));
-				} else {
-					text += "UPDATE AVAILABLE";
-					this.statusLabel.setForeground(getShell().getDisplay().getSystemColor(SWT.COLOR_DARK_YELLOW));
-				}
-				text += ")";
-				this.statusLabel.setText(text);
-			}
-			
-			
-			providerLabel = new Link(connectorContainer, SWT.RIGHT);
-			configureLook(providerLabel, background);
-			GridDataFactory.fillDefaults().align(SWT.END, SWT.CENTER).applyTo(providerLabel);
-			if (connector.getCertification() != null) {
-				providerLabel.setText(NLS.bind(org.jboss.tools.central.Messages.DiscoveryViewer_Certification_Label0,
-						new String[] { connector.getProvider(), connector.getLicense(),
-								connector.getCertification().getName() }));
-				if (connector.getCertification().getUrl() != null) {
-					providerLabel.addSelectionListener(new SelectionAdapter() {
-						@Override
-						public void widgetSelected(SelectionEvent e) {
-							BrowserUtil.openUrl(connector.getCertification().getUrl(),
-									IWorkbenchBrowserSupport.AS_EXTERNAL);
-						}
-					});
-				}
-				Overview overview = new Overview();
-				overview.setSummary(connector.getCertification().getDescription());
-				overview.setUrl(connector.getCertification().getUrl());
-				Image image = computeIconImage(connector.getSource(), connector.getCertification().getIcon(), 48, true);
-				hookTooltip(providerLabel, providerLabel, connectorContainer, providerLabel, connector.getSource(),
-						overview, image);
-			} else {
-				providerLabel.setText(NLS.bind(Messages.ConnectorDiscoveryWizardMainPage_provider_and_license,
-						connector.getProvider(), connector.getLicense()));
-			}
-
-			if (hasTooltip(connector)) {
-				ToolBar toolBar = new ToolBar(connectorContainer, SWT.FLAT);
-				toolBar.setBackground(background);
-
-				infoButton = new ToolItem(toolBar, SWT.PUSH);
-				infoButton.setImage(infoImage);
-				infoButton.setToolTipText(Messages.ConnectorDiscoveryWizardMainPage_tooltip_showOverview);
-				hookTooltip(toolBar, infoButton, connectorContainer, nameLabel, connector.getSource(),
-						connector.getOverview(), null);
-				GridDataFactory.fillDefaults().align(SWT.END, SWT.CENTER).applyTo(toolBar);
-			} else {
-				Label label = new Label(connectorContainer, SWT.NULL);
-				label.setText(" "); //$NON-NLS-1$
-				configureLook(label, background);
-			}
-
-			description = new Label(connectorContainer, SWT.NULL | SWT.WRAP);
-			configureLook(description, background);
-
-			GridDataFactory.fillDefaults().grab(true, false).span(3, 1).hint(100, SWT.DEFAULT).applyTo(description);
-			String descriptionText = connector.getDescription();
-			int maxDescriptionLength = 162;
-			if (descriptionText.length() > maxDescriptionLength) {
-				descriptionText = descriptionText.substring(0, maxDescriptionLength);
-			}
-			description.setText(descriptionText.replaceAll("(\\r\\n)|\\n|\\r", " ")); //$NON-NLS-1$ //$NON-NLS-2$
-
-			// always disabled color to make it less prominent
-			providerLabel.setForeground(colorDisabled);
-
-			checkbox.addSelectionListener(new SelectionListener() {
-				public void widgetDefaultSelected(SelectionEvent e) {
-					widgetSelected(e);
-				}
-
-				public void widgetSelected(SelectionEvent e) {
-					boolean selected = checkbox.getSelection();
-					maybeModifySelection(selected);
-				}
-			});
-			MouseListener connectorItemMouseListener = new MouseAdapter() {
-				@Override
-				public void mouseUp(MouseEvent e) {
-					boolean selected = !checkbox.getSelection();
-					if (maybeModifySelection(selected)) {
-						checkbox.setSelection(selected);
-					}
-				}
-			};
-			checkboxContainer.addMouseListener(connectorItemMouseListener);
-			connectorContainer.addMouseListener(connectorItemMouseListener);
-			iconLabel.addMouseListener(connectorItemMouseListener);
-			nameLabel.addMouseListener(connectorItemMouseListener);
-			// the provider has clickable links
-			//providerLabel.addMouseListener(connectorItemMouseListener);
-			description.addMouseListener(connectorItemMouseListener);
-		}
-
-		private /*static*/ Map<String, org.eclipse.equinox.p2.metadata.Version> resolveProfileUnits(List<String> installableUnits) {
-			IProvisioningAgentProvider provider = (IProvisioningAgentProvider)PlatformUI.getWorkbench().getService(IProvisioningAgentProvider.class);
-			try {
-				IProvisioningAgent agent = provider.createAgent(null);  // null = location for running system
-				if(agent == null) throw new RuntimeException("Location was not provisioned by p2");
-				IProfileRegistry profileRegistry = (IProfileRegistry) agent.getService(IProfileRegistry.SERVICE_NAME);
-				if (profileRegistry == null) throw new RuntimeException("Unable to acquire the profile registry service.");
-				// can also use IProfileRegistry.SELF for the current profile
-				IProfile profile = profileRegistry.getProfile(IProfileRegistry.SELF);
-				Map<String, org.eclipse.equinox.p2.metadata.Version> res = new HashMap<String, org.eclipse.equinox.p2.metadata.Version>();
-				for (String installableUnit : installableUnits) {
-					IQueryResult<IInstallableUnit> queryResult = profile.query(QueryUtil.createIUQuery(installableUnit), new NullProgressMonitor());
-					for (IInstallableUnit unit : queryResult) {
-						org.eclipse.equinox.p2.metadata.Version previousVersion = res.get(installableUnit);
-						if (previousVersion == null || previousVersion.compareTo(unit.getVersion()) < 0) {
-							res.put(installableUnit, unit.getVersion());
-						}
-					}
-				}
-				return res;
-			} catch (ProvisionException ex) {
-				JBossCentralActivator.getDefault().getLog().log(new Status(IStatus.ERROR, JBossCentralActivator.PLUGIN_ID, ex.getMessage(), ex));
-				return null;
-			}
-		}
-		
-		private /*static*/ Map<String, org.eclipse.equinox.p2.metadata.Version> resolveConnectorUnits(ConnectorDescriptor connector) {
-			IProvisioningAgentProvider provider = (IProvisioningAgentProvider)PlatformUI.getWorkbench().getService(IProvisioningAgentProvider.class);
-			try {
-				IProvisioningAgent agent = provider.createAgent(null);  // null = location for running system
-				if(agent == null) throw new RuntimeException("Location was not provisioned by p2");
-				IMetadataRepositoryManager metadataManager = (IMetadataRepositoryManager) agent.getService(IMetadataRepositoryManager.SERVICE_NAME);
-				IMetadataRepository repo = metadataManager.loadRepository(new URI(connector.getSiteUrl()), new NullProgressMonitor());
-				Map<String, org.eclipse.equinox.p2.metadata.Version> res = new HashMap<String, org.eclipse.equinox.p2.metadata.Version>();
-				for (String unitId : connector.getInstallableUnits()) {
-					IQueryResult<IInstallableUnit> queryResult = repo.query(QueryUtil.createIUQuery(unitId), new NullProgressMonitor());
-					for (IInstallableUnit unit : queryResult) {
-						org.eclipse.equinox.p2.metadata.Version previousVersion = res.get(unitId);
-						if (previousVersion == null || previousVersion.compareTo(unit.getVersion()) < 0) {
-							res.put(unitId, unit.getVersion());
-						}
-					}
-				}
-				return res;
-			} catch (ProvisionException ex) {
-				JBossCentralActivator.getDefault().getLog().log(new Status(IStatus.ERROR, JBossCentralActivator.PLUGIN_ID, ex.getMessage(), ex));
-			} catch (URISyntaxException ex) {
-				JBossCentralActivator.getDefault().getLog().log(new Status(IStatus.ERROR, JBossCentralActivator.PLUGIN_ID, ex.getMessage(), ex));
-			}
-			return null;
-		}
-		
-		/**
-		 * 
-		 * @return whether the connector is up-to-date. Ie whether a new version
-		 * for the included IUs exist on the associated site.
-		 */
-		public boolean isUpToDate() {
-			return this.upToDate;
-		}
-
-		protected boolean maybeModifySelection(boolean selected) {
-			if (selected) {
-				if (!connector.isInstalled() && !connector.isInstallable()) {
-					if (connector.getInstallMessage() != null) {
-						MessageDialog.openInformation(shellProvider.getShell(),
-								Messages.DiscoveryViewer_Install_Connector_Title, connector.getInstallMessage());
-					}
-					return false;
-				}
-				if (connector.getAvailable() != null && !connector.getAvailable()) {
-					MessageDialog.openWarning(shellProvider.getShell(),
-							Messages.ConnectorDiscoveryWizardMainPage_warningTitleConnectorUnavailable, NLS.bind(
-									Messages.ConnectorDiscoveryWizardMainPage_warningMessageConnectorUnavailable,
-									connector.getName()));
-					return false;
-				}
-			}
-			DiscoveryViewer.this.modifySelection(this, selected);
-			return true;
-		}
-
-		public void propertyChange(PropertyChangeEvent evt) {
-			display.asyncExec(this);
-		}
-
-		public void run() {
-			if (!connectorContainer.isDisposed()) {
-				updateAvailability();
-			}
-		}
-
-		public void updateAvailability() {
-			boolean enabled = !connector.isInstalled()
-					&& (connector.getAvailable() == null || connector.getAvailable());
-
-			checkbox.setEnabled(enabled);
-			nameLabel.setEnabled(enabled);
-			providerLabel.setEnabled(enabled);
-			description.setEnabled(enabled);
-			Color foreground;
-			if (enabled) {
-				foreground = connectorContainer.getForeground();
-			} else {
-				foreground = colorDisabled;
-			}
-			nameLabel.setForeground(foreground);
-			description.setForeground(foreground);
-
-			if (iconImage != null) {
-				iconLabel.setImage(iconImage);
-//				}
-			}
-		}
-		
-		private void select(boolean select) {
-			if (!checkbox.isDisposed() &&
-				checkbox.isVisible() &&
-				checkbox.getSelection() != select) {
-					checkbox.setSelection(select);
-					maybeModifySelection(select);
-			}
-		}
-	}
+public class DiscoveryViewer extends Viewer {
 
 	private static final int MINIMUM_HEIGHT = 100;
 
@@ -494,98 +161,77 @@ public class DiscoveryViewer {
 
 	private static final String COLOR_WHITE = "white"; //$NON-NLS-1$
 
-	private static final String COLOR_DARK_GRAY = "DarkGray"; //$NON-NLS-1$
-
 	private static Boolean useNativeSearchField;
 
 	private final Set<ConnectorDescriptor> installableConnectors = new HashSet<ConnectorDescriptor>();
 	private final Set<ConnectorDescriptor> installedConnectors = new HashSet<ConnectorDescriptor>();
 	private final Set<ConnectorDescriptor> updatableConnectors = new HashSet<ConnectorDescriptor>();
 
+	private Composite parent;
+	private Composite topLevelControl;
 	private Composite body;
+	private ScrolledComposite bodyScrolledComposite;
+	private Composite scrolledContents;
 
 	private final List<Resource> disposables;
 
+	private Font h1Font;
 	private Font h2Font;
 
-	private Font h1Font;
-
 	private Color colorWhite;
-
-	private Text filterText;
-
-	private WorkbenchJob refreshJob;
+	private Color colorCategoryGradientStart;
+	private Color colorCategoryGradientEnd;
+	
+	private Image infoImage;
+	private Cursor handCursor;
+	
 
 	private String previousFilterText = ""; //$NON-NLS-1$
-
 	private Pattern filterPattern;
-
+	private Text filterText;
 	private Label clearFilterTextControl;
+	
+	private WorkbenchJob refreshJob;
 
 	private Set<String> installedFeatures;
-
-	private Image infoImage;
-
-	private Cursor handCursor;
-
-	private Color colorCategoryGradientStart;
-
-	private Color colorCategoryGradientEnd;
-
-	private Color colorDisabled;
-
-	private ScrolledComposite bodyScrolledComposite;
 
 	private boolean verifyUpdateSiteAvailability;
 
 	private Dictionary<Object, Object> environment;
 
-	private boolean complete;
-
 	private final IRunnableContext context;
 
-	private final IShellProvider shellProvider;
-
-	private Control control;
-
 	private Set<String> directoryUrls;
-	private volatile HashMap<String, ConnectorDiscovery> discoveries = new HashMap<String, ConnectorDiscovery>();
+	private volatile HashMap<String, ConnectorDiscovery> discoveries = new LinkedHashMap<String, ConnectorDiscovery>();
 	private List<DiscoveryConnector> allConnectors;
-
-	private final SelectionProviderAdapter selectionProvider;
+	private Map<DiscoveryConnector, ConnectorDescriptorItemUi> itemsUi = new HashMap<DiscoveryConnector, ConnectorDescriptorItemUi>();
+	private Map<String, Control> categories = new HashMap<String, Control>();
 
 	private int minimumHeight;
 
 	private final List<FilterEntry> userFilters = new ArrayList<FilterEntry>();
 
-	private List<ConnectorDescriptorItemUi> itemsUi = new ArrayList<DiscoveryViewer.ConnectorDescriptorItemUi>();
 
-	public DiscoveryViewer(IShellProvider shellProvider, IRunnableContext context) {
-		this.shellProvider = shellProvider;
+	public DiscoveryViewer(Composite parent, IRunnableContext context) {
+		this.parent = parent;
 		this.context = context;
-		this.selectionProvider = new SelectionProviderAdapter();
 		this.allConnectors = Collections.emptyList();
 		this.disposables = new ArrayList<Resource>();
 		setShowConnectorDescriptorTextFilter(true);
 		setMinimumHeight(MINIMUM_HEIGHT);
 		createEnvironment();
-		setComplete(false);
 	}
 
 	public void selectAll() {
-		for(ConnectorDescriptorItemUi itemUi:itemsUi) {
+		for(ConnectorDescriptorItemUi itemUi:itemsUi.values()) {
 			itemUi.select(true);
 		}
 	}
 	
 	public void deselectAll() {
-		for(ConnectorDescriptorItemUi itemUi:itemsUi) {
+		for(ConnectorDescriptorItemUi itemUi:itemsUi.values()) {
 			itemUi.select(false);
 		}
-	}
-	
-	public void addSelectionChangedListener(ISelectionChangedListener listener) {
-		selectionProvider.addSelectionChangedListener(listener);
 	}
 
 	private void clearDisposables() {
@@ -603,7 +249,7 @@ public class DiscoveryViewer {
 		filterTextChanged();
 	}
 
-	private Image computeIconImage(AbstractDiscoverySource discoverySource, Icon icon, int dimension, boolean fallback) {
+	static Image computeIconImage(AbstractDiscoverySource discoverySource, Icon icon, int dimension, boolean fallback) {
 		String imagePath;
 		switch (dimension) {
 		case 64:
@@ -628,7 +274,6 @@ public class DiscoveryViewer {
 				ImageDescriptor descriptor = ImageDescriptor.createFromURL(resource);
 				Image image = descriptor.createImage();
 				if (image != null) {
-					disposables.add(image);
 					return image;
 				}
 			}
@@ -652,7 +297,7 @@ public class DiscoveryViewer {
 		return status;
 	}
 
-	private void configureLook(Control control, Color background) {
+	void configureLook(Control control, Color background) {
 		control.setBackground(background);
 	}
 
@@ -679,11 +324,12 @@ public class DiscoveryViewer {
 		configureLook(bodyScrolledComposite, colorWhite);
 		GridDataFactory.fillDefaults().grab(true, true).applyTo(bodyScrolledComposite);
 
-		final Composite scrolledContents = new Composite(bodyScrolledComposite, SWT.NONE);
+		this.scrolledContents = new Composite(bodyScrolledComposite, SWT.NONE);
 		configureLook(scrolledContents, colorWhite);
 		scrolledContents.setRedraw(false);
 		try {
 			createDiscoveryContents(scrolledContents);
+			updateFilters();
 		} finally {
 			scrolledContents.layout(true);
 			scrolledContents.setRedraw(true);
@@ -796,7 +442,7 @@ public class DiscoveryViewer {
 		return clearButton;
 	}
 
-	public void createControl(Composite parent) {
+	public void createControl() {
 		createRefreshJob();
 
 		Composite container = new Composite(parent, SWT.NULL);
@@ -812,6 +458,9 @@ public class DiscoveryViewer {
 				if (DiscoveryViewer.this.discoveries != null) {
 					for (ConnectorDiscovery discovery : DiscoveryViewer.this.discoveries.values()) {
 						discovery.dispose();
+					}
+					for (ConnectorDescriptorItemUi item : itemsUi.values()) {
+						item.dispose();
 					}
 				}
 			}
@@ -887,7 +536,7 @@ public class DiscoveryViewer {
 						public void widgetSelected(SelectionEvent e) {
 							theFilter.setEnabled(checkbox.getSelection());
 							// refresh UI
-							createBodyContents();
+							updateFilters();
 						}
 					});
 				} else if (this.userFilters.size() > 1) {
@@ -896,13 +545,13 @@ public class DiscoveryViewer {
 					link.addSelectionListener(new SelectionAdapter() {
 						@Override
 						public void widgetSelected(SelectionEvent e) {
-							FiltersSelectionDialog dialog = new FiltersSelectionDialog(getShell(), DiscoveryViewer.this.userFilters);
+							FiltersSelectionDialog dialog = new FiltersSelectionDialog(parent.getShell(), DiscoveryViewer.this.userFilters);
 							if (dialog.open() == Dialog.OK) {
 								if (!dialog.getToggledFilters().isEmpty()) {
 									for (FilterEntry entry : dialog.getToggledFilters()) {
 										entry.setEnabled(!entry.isEnabled());
 									}
-									createBodyContents();
+									updateFilters();
 								}
 							}
 						}
@@ -920,9 +569,48 @@ public class DiscoveryViewer {
 			GridDataFactory.fillDefaults().grab(true, true).hint(SWT.DEFAULT, minimumHeight).applyTo(body);
 		}
 		Dialog.applyDialogFont(container);
-		setControl(container);
+		this.topLevelControl = container;
 	}
-
+	
+	private void updateFilters() {
+		for (ConnectorDescriptorItemUi item : this.itemsUi.values()) {
+			item.setVisible(true);
+		}
+		// First apply text filter
+		for (ConnectorDescriptorItemUi item : this.itemsUi.values()) {
+			ConnectorDescriptor descriptor = item.getConnector();
+			if (previousFilterText != null && !previousFilterText.isEmpty()) {
+				if (!(filterMatches(descriptor.getName()) || filterMatches(descriptor.getDescription())
+						|| filterMatches(descriptor.getProvider()) || filterMatches(descriptor.getLicense()))) {
+					item.setVisible(false);
+				}
+			}
+		}
+		// Then apply user filters SEQUENTIALLY (order of filters can have an impact)
+		for (FilterEntry filter : this.userFilters) {
+			if (filter.isEnabled()) {
+				for (ConnectorDescriptorItemUi item : this.itemsUi.values()) {
+					if (!filter.getFilter().select(this, null, item.getConnector())) {
+						item.setVisible(false);
+					}
+				}
+			}
+		}
+		
+		boolean atLeastAConnectorVisible = false;
+		for (ConnectorDescriptorItemUi item : this.itemsUi.values()) {
+			if (item.isVisible()) {
+				atLeastAConnectorVisible = true;
+			}
+		}
+		if (!atLeastAConnectorVisible) {
+			// TODO show help
+		}
+		
+		this.scrolledContents.layout(true);
+		this.scrolledContents.setRedraw(true);
+	}
+	
 	public void setMinimumHeight(int minimumHeight) {
 		this.minimumHeight = minimumHeight;
 		if (body != null) {
@@ -938,15 +626,7 @@ public class DiscoveryViewer {
 
 		Color background = container.getBackground();
 
-		boolean emptyDiscoveries = true;
-		if (this.discoveries != null) {
-			for (ConnectorDiscovery discovery : this.discoveries.values()) {
-				if (!isEmpty(discovery)) {
-					emptyDiscoveries = false;
-				}
-			}
-		}
-		if (emptyDiscoveries) {
+		/* TODO if (emptyDiscoveries) {
 			GridLayoutFactory.fillDefaults().margins(5, 5).applyTo(container);
 
 			Control helpTextControl;
@@ -970,7 +650,7 @@ public class DiscoveryViewer {
 			}
 			configureLook(helpTextControl, background);
 			GridDataFactory.fillDefaults().grab(true, false).hint(100, SWT.DEFAULT).applyTo(helpTextControl);
-		} else {
+		} else*/ {
 			GridLayoutFactory.fillDefaults().numColumns(2).spacing(0, 0).applyTo(container);
 			Map<String, LinkedHashSet<DiscoveryCategory>> categoriesById = new HashMap<String, LinkedHashSet<DiscoveryCategory>>();
 			// necessary because categories from != discovery are not equal, whereas we want them unified in UI
@@ -983,19 +663,16 @@ public class DiscoveryViewer {
 				}
 			}
 			
+			// Sort by 1st category
 			SortedSet<LinkedHashSet<DiscoveryCategory>> sortedCategories = new TreeSet<LinkedHashSet<DiscoveryCategory>>(new Comparator<LinkedHashSet<DiscoveryCategory>>() {
+				private DiscoveryCategoryComparator comparator = new DiscoveryCategoryComparator();
+				
 				@Override
 				public int compare(LinkedHashSet<DiscoveryCategory> o1, LinkedHashSet<DiscoveryCategory> o2) {
 					if (o1 == o2) {
 						return 0;
 					}
-					DiscoveryCategory category1 = o1.iterator().next();
-					DiscoveryCategory category2 = o2.iterator().next();
-					int res = category2.getRelevance().compareTo(category1.getRelevance());
-					if (res == 0) {
-						res = category2.getName().compareTo(category1.getName());
-					}
-					return res;
+					return this.comparator.compare(o1.iterator().next(), o2.iterator().next());
 				}
 			});
 			sortedCategories.addAll(categoriesById.values());
@@ -1003,37 +680,31 @@ public class DiscoveryViewer {
 			Composite categoryChildrenContainer = null;
 			for (LinkedHashSet<DiscoveryCategory> categories : sortedCategories) {
 				boolean isEmpty = true;
-				for (DiscoveryCategory category : categories) {
-					if (!isEmpty(category)) {
-						isEmpty = false;
-					}
-				}
-				if (isEmpty) {
-					// don't add empty categories
-					continue;
-				}
 				DiscoveryCategory firstCategory = categories.iterator().next();
 				categoryChildrenContainer = createCategoryHeaderAndContainer(container, firstCategory, background);
+				this.categories.put(firstCategory.getId(), categoryChildrenContainer);
 				// Populate category
-				int numChildren = 0;
 				for (DiscoveryCategory category : categories) {
 					List<DiscoveryConnector> connectors = new ArrayList<DiscoveryConnector>(category.getConnectors());
 					Collections.sort(connectors, new DiscoveryConnectorComparator(category));
 					for (final DiscoveryConnector connector : connectors) {
-						if (isFiltered(connector)) {
-							continue;
-						}
+//						if (isFiltered(connector)) {
+//							continue;
+//						}
+//	
+//						// a separator between connector descriptors
+//						Composite border = new Composite(categoryChildrenContainer, SWT.NULL);
+//						GridDataFactory.fillDefaults().grab(true, false).hint(SWT.DEFAULT, 1).applyTo(border);
+//						GridLayoutFactory.fillDefaults().applyTo(border);
+//						border.setBackground(border.getDisplay().getSystemColor(SWT.COLOR_GRAY));
+////						border.addPaintListener(new ConnectorBorderPaintListener());
 	
-						if (++numChildren > 1) {
-							// a separator between connector descriptors
-							Composite border = new Composite(categoryChildrenContainer, SWT.NULL);
-							GridDataFactory.fillDefaults().grab(true, false).hint(SWT.DEFAULT, 1).applyTo(border);
-							GridLayoutFactory.fillDefaults().applyTo(border);
-							border.addPaintListener(new ConnectorBorderPaintListener());
-						}
-	
-						ConnectorDescriptorItemUi itemUi = new ConnectorDescriptorItemUi(connector, categoryChildrenContainer, background);
-						itemsUi.add(itemUi);
+						ConnectorDescriptorItemUi itemUi = new ConnectorDescriptorItemUi(this, connector,
+								categoryChildrenContainer,
+								background,
+								h2Font,
+								infoImage);
+						itemsUi.put(connector, itemUi);
 						itemUi.updateAvailability();
 						allConnectors.add(connector);
 					}
@@ -1043,7 +714,6 @@ public class DiscoveryViewer {
 			Composite border = new Composite(categoryChildrenContainer, SWT.NULL);
 			GridDataFactory.fillDefaults().grab(true, false).hint(SWT.DEFAULT, 1).applyTo(border);
 			GridLayoutFactory.fillDefaults().applyTo(border);
-			border.addPaintListener(new ConnectorBorderPaintListener());
 		}
 		container.layout(true);
 		container.redraw();
@@ -1055,11 +725,11 @@ public class DiscoveryViewer {
 	 * @param background
 	 * @return
 	 */
-	private Composite createCategoryHeaderAndContainer(Composite container,
-			DiscoveryCategory category, Color background) {
+	private Composite createCategoryHeaderAndContainer(Composite container, DiscoveryCategory category, Color background) {
 		Composite categoryChildrenContainer;
 		{ // category header
 			final GradientCanvas categoryHeaderContainer = new GradientCanvas(container, SWT.NONE);
+			categoryHeaderContainer.setData(category);
 			categoryHeaderContainer.setSeparatorVisible(true);
 			categoryHeaderContainer.setSeparatorAlignment(SWT.TOP);
 			categoryHeaderContainer.setBackgroundGradient(new Color[] { colorCategoryGradientStart,
@@ -1079,6 +749,7 @@ public class DiscoveryViewer {
 				Image image = computeIconImage(category.getSource(), category.getIcon(), 48, true);
 				if (image != null) {
 					iconLabel.setImage(image);
+					this.disposables.add(image);
 				}
 			}
 			iconLabel.setBackground(null);
@@ -1187,7 +858,9 @@ public class DiscoveryViewer {
 				if (body == null || body.isDisposed()) {
 					return;
 				}
-				selectionProvider.setSelection(StructuredSelection.EMPTY);
+				DiscoveryViewer.this.installableConnectors.clear();
+				DiscoveryViewer.this.updatableConnectors.clear();
+				DiscoveryViewer.this.installedConnectors.clear();
 				if (DiscoveryViewer.this.discoveries != null && !wasCancelled) {
 					for (ConnectorDiscovery discovery : DiscoveryViewer.this.discoveries.values()) {
 						for (DiscoveryCategory category : discovery.getCategories()) {
@@ -1197,7 +870,7 @@ public class DiscoveryViewer {
 						}
 					}
 					// nothing was discovered: notify the user
-					MessageDialog.openWarning(getShell(), Messages.ConnectorDiscoveryWizardMainPage_noConnectorsFound,
+					MessageDialog.openWarning(parent.getShell(), Messages.ConnectorDiscoveryWizardMainPage_noConnectorsFound,
 							Messages.ConnectorDiscoveryWizardMainPage_noConnectorsFound_description);
 				}
 			}
@@ -1221,7 +894,7 @@ public class DiscoveryViewer {
 	}
 
 	public Control getControl() {
-		return control;
+		return topLevelControl;
 	}
 
 	/**
@@ -1231,19 +904,6 @@ public class DiscoveryViewer {
 	 */
 	public Dictionary<Object, Object> getEnvironment() {
 		return environment;
-	}
-
-	private String getFilterLabel(ConnectorDescriptorKind kind) {
-		switch (kind) {
-		case DOCUMENT:
-			return Messages.ConnectorDiscoveryWizardMainPage_filter_documents;
-		case TASK:
-			return Messages.ConnectorDiscoveryWizardMainPage_filter_tasks;
-		case VCS:
-			return Messages.ConnectorDiscoveryWizardMainPage_filter_vcs;
-		default:
-			throw new IllegalStateException(kind.name());
-		}
 	}
 
 	public Set<ConnectorDescriptor> getInstallableConnectors() {
@@ -1258,12 +918,18 @@ public class DiscoveryViewer {
 		return this.updatableConnectors;
 	}
 	
+	/**
+	 * Contains a list of {@link ConnectorDescriptorItemUi}
+	 */
+	@Override
 	public IStructuredSelection getSelection() {
-		return (IStructuredSelection) selectionProvider.getSelection();
-	}
-
-	private Shell getShell() {
-		return shellProvider.getShell();
+		List<ConnectorDescriptorItemUi> elements = new ArrayList<ConnectorDescriptorItemUi>();
+		for (ConnectorDescriptorItemUi item : elements) {
+			if (item.getConnector().isSelected()) {
+				elements.add(item);
+			}
+		}
+		return new StructuredSelection(elements);
 	}
 
 	public boolean getVerifyUpdateSiteAvailability() {
@@ -1275,12 +941,7 @@ public class DiscoveryViewer {
 				&& category.getOverview().getSummary().length() > 0;
 	}
 
-	private boolean hasTooltip(final DiscoveryConnector connector) {
-		return connector.getOverview() != null && connector.getOverview().getSummary() != null
-				&& connector.getOverview().getSummary().length() > 0;
-	}
-
-	private void hookRecursively(Control control, Listener listener) {
+	private static void hookRecursively(Control control, Listener listener) {
 		control.addListener(SWT.Dispose, listener);
 		control.addListener(SWT.MouseHover, listener);
 		control.addListener(SWT.MouseMove, listener);
@@ -1294,7 +955,7 @@ public class DiscoveryViewer {
 		}
 	}
 
-	private void hookTooltip(final Control parent, final Widget tipActivator, final Control exitControl,
+	static void hookTooltip(final Control parent, final Widget tipActivator, final Control exitControl,
 			final Control titleControl, AbstractDiscoverySource source, Overview overview, Image image) {
 		final OverviewToolTip toolTip = new OverviewToolTip(parent, source, overview, image);
 		Listener listener = new Listener() {
@@ -1357,13 +1018,6 @@ public class DiscoveryViewer {
 			}
 			colorWhite = colorRegistry.get(COLOR_WHITE);
 		}
-		if (colorDisabled == null) {
-			ColorRegistry colorRegistry = JFaceResources.getColorRegistry();
-			if (!colorRegistry.hasValueFor(COLOR_DARK_GRAY)) {
-				colorRegistry.put(COLOR_DARK_GRAY, new RGB(0x69, 0x69, 0x69));
-			}
-			colorDisabled = colorRegistry.get(COLOR_DARK_GRAY);
-		}
 		if (colorCategoryGradientStart == null) {
 			colorCategoryGradientStart = themeManager.getCurrentTheme()
 					.getColorRegistry()
@@ -1376,7 +1030,7 @@ public class DiscoveryViewer {
 
 	private void initializeCursors() {
 		if (handCursor == null) {
-			handCursor = new Cursor(getShell().getDisplay(), SWT.CURSOR_HAND);
+			handCursor = new Cursor(this.topLevelControl.getShell().getDisplay(), SWT.CURSOR_HAND);
 			disposables.add(handCursor);
 		}
 	}
@@ -1412,38 +1066,34 @@ public class DiscoveryViewer {
 		}
 	}
 
-	public boolean isComplete() {
-		return complete;
-	}
+//	/**
+//	 * indicate if there is nothing to display in the UI, given the current state of
+//	 * {@link org.eclipse.mylyn.internal.discovery.ui.wizards.ConnectorDiscoveryWizard#isVisible(ConnectorDescriptorKind) filters}.
+//	 */
+//	private boolean isEmpty(ConnectorDiscovery discovery) {
+//		for (DiscoveryCategory category : discovery.getCategories()) {
+//			if (!isEmpty(category)) {
+//				return false;
+//			}
+//		}
+//		return true;
+//	}
 
-	/**
-	 * indicate if there is nothing to display in the UI, given the current state of
-	 * {@link org.eclipse.mylyn.internal.discovery.ui.wizards.ConnectorDiscoveryWizard#isVisible(ConnectorDescriptorKind) filters}.
-	 */
-	private boolean isEmpty(ConnectorDiscovery discovery) {
-		for (DiscoveryCategory category : discovery.getCategories()) {
-			if (!isEmpty(category)) {
-				return false;
-			}
-		}
-		return true;
-	}
-
-	/**
-	 * indicate if the category has nothing to display in the UI, given the current state of
-	 * {@link org.eclipse.mylyn.internal.discovery.ui.wizards.ConnectorDiscoveryWizard#isVisible(ConnectorDescriptorKind) filters}.
-	 */
-	private boolean isEmpty(DiscoveryCategory category) {
-		if (category.getConnectors().isEmpty()) {
-			return true;
-		}
-		for (ConnectorDescriptor descriptor : category.getConnectors()) {
-			if (!isFiltered(descriptor)) {
-				return false;
-			}
-		}
-		return true;
-	}
+//	/**
+//	 * indicate if the category has nothing to display in the UI, given the current state of
+//	 * {@link org.eclipse.mylyn.internal.discovery.ui.wizards.ConnectorDiscoveryWizard#isVisible(ConnectorDescriptorKind) filters}.
+//	 */
+//	private boolean isEmpty(DiscoveryCategory category) {
+//		if (category.getConnectors().isEmpty()) {
+//			return true;
+//		}
+//		for (ConnectorDescriptor descriptor : category.getConnectors()) {
+//			if (connector) {
+//				return false;
+//			}
+//		}
+//		return true;
+//	}
 
 	/**
 	 * Adds an EXCLUSION filter to the viewer. When enabled, this filter
@@ -1456,21 +1106,6 @@ public class DiscoveryViewer {
 		userFilters.add(new FilterEntry(filter, label, enableByDefault));
 	}
 
-	private boolean isFiltered(ConnectorDescriptor descriptor) {
-		if (previousFilterText != null && !previousFilterText.isEmpty()) {
-			if (!(filterMatches(descriptor.getName()) || filterMatches(descriptor.getDescription())
-					|| filterMatches(descriptor.getProvider()) || filterMatches(descriptor.getLicense()))) {
-				return true;
-			}
-		}
-		for (FilterEntry filter : this.userFilters) {
-			if (filter.isEnabled() && !filter.getFilter().select(null, null, descriptor)) {
-				return true;
-			}
-		}
-		return false;
-	}
-
 	/**
 	 * indicate if a text field should be provided to allow the user to filter connector descriptors
 	 */
@@ -1478,13 +1113,8 @@ public class DiscoveryViewer {
 		return showConnectorDescriptorTextFilter;
 	}
 
-	private void modifySelection(final ConnectorDescriptorItemUi item, boolean selected) {
-		modifySelectionInternal(item, selected);
-		updateState();
-	}
-
-	private void modifySelectionInternal(final ConnectorDescriptorItemUi item, boolean selected) {
-		DiscoveryConnector connector = item.connector;
+	void modifySelection(final ConnectorDescriptorItemUi item, boolean selected) {
+		DiscoveryConnector connector = item.getConnector();
 		connector.setSelected(selected);
 		if (connector.isInstalled()) {
 			if (!item.isUpToDate()) {
@@ -1506,18 +1136,11 @@ public class DiscoveryViewer {
 				installableConnectors.remove(connector);
 			}
 		}
+		fireSelectionChanged(new SelectionChangedEvent(this, getSelection()));
 	}
 
-	public void removeSelectionChangedListener(ISelectionChangedListener listener) {
-		selectionProvider.removeSelectionChangedListener(listener);
-	}
-
-	public void setComplete(boolean complete) {
-		this.complete = complete;
-	}
-
-	protected void setControl(Control control) {
-		this.control = control;
+	public void showConnectorControl(ConnectorDescriptorItemUi item) {
+		this.bodyScrolledComposite.showControl(item.getControl());
 	}
 	
 	/**
@@ -1667,20 +1290,9 @@ public class DiscoveryViewer {
 					return;
 				}
 			}
-			// createBodyContents() shouldn't be necessary but for some
-			// reason checkboxes don't
-			// regain their enabled state
-			Display.getDefault().syncExec(new Runnable() {
-				
-				@Override
-				public void run() {
-					createBodyContents();
-				}
-			});
-			
 		}
 		// help UI tests
-		Display.getDefault().syncExec(new Runnable() {
+		Display.getDefault().asyncExec(new Runnable() {
 			@Override
 			public void run() {
 				if (body == null || body.isDisposed()) {
@@ -1689,11 +1301,6 @@ public class DiscoveryViewer {
 				body.setData("discoveryComplete", "true"); //$NON-NLS-1$ //$NON-NLS-2$
 			}
 		});
-	}
-
-	private void updateState() {
-		setComplete(!installableConnectors.isEmpty());
-		selectionProvider.setSelection(new StructuredSelection(getInstallableConnectors()));
 	}
 
 	protected void postDiscovery(ConnectorDiscovery connectorDiscovery) {
@@ -1705,6 +1312,47 @@ public class DiscoveryViewer {
 
 	protected Set<String> getInstalledFeatures(IProgressMonitor monitor) throws InterruptedException {
 		return DiscoveryUi.createInstallJob().getInstalledFeatures(monitor);
+	}
+
+	@Override
+	public Object getInput() {
+		return this.directoryUrls;
+	}
+
+	@Override
+	public void refresh() {
+		createBodyContents();
+	}
+
+	/**
+	 * this method supports either single String or Collection of String.
+	 * Those strings are expected to be discovery catalog URLs
+	 */
+	@Override
+	public void setInput(Object arg0) {
+		if (arg0 instanceof Collection) {
+			Collection<?> input = (Collection<?>) arg0;
+			for (Object o : input) {
+				if (o instanceof String) {
+					addDirectoryUrl((String)o);
+				} else {
+					JBossCentralActivator.getDefault().getLog().log(new Status(IStatus.WARNING,
+							JBossCentralActivator.PLUGIN_ID,
+							"Ignored input of type " + o.getClass().getName() + " in discovery viewer"));
+				}
+			}
+		} else if (arg0 instanceof String) {
+			addDirectoryUrl((String)arg0);
+		} else {
+			JBossCentralActivator.getDefault().getLog().log(new Status(IStatus.WARNING,
+					JBossCentralActivator.PLUGIN_ID,
+					"Ignored input of type " + arg0.getClass().getName() + " in discovery viewer"));
+		}
+	}
+
+	@Override
+	public void setSelection(ISelection arg0, boolean arg1) {
+		throw new UnsupportedOperationException("Not yet implemented");
 	}
 
 }
