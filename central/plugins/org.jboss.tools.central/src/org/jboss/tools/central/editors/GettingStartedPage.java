@@ -35,6 +35,7 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.IJobChangeEvent;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.core.runtime.jobs.JobChangeAdapter;
+import org.eclipse.e4.ui.model.application.ui.MUIElement;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IContributionItem;
 import org.eclipse.jface.action.ToolBarManager;
@@ -62,6 +63,8 @@ import org.eclipse.swt.events.ControlAdapter;
 import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
+import org.eclipse.swt.events.MouseEvent;
+import org.eclipse.swt.events.MouseTrackListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Color;
@@ -101,6 +104,7 @@ import org.eclipse.ui.forms.widgets.Section;
 import org.eclipse.ui.forms.widgets.TableWrapData;
 import org.eclipse.ui.forms.widgets.TableWrapLayout;
 import org.eclipse.ui.ide.IDEActionFactory;
+import org.eclipse.ui.internal.WorkbenchPage;
 import org.eclipse.ui.menus.CommandContributionItem;
 import org.eclipse.ui.part.PageBook;
 import org.jboss.tools.central.JBossCentralActivator;
@@ -1080,8 +1084,42 @@ public class GettingStartedPage extends AbstractJBossCentralPage implements Prox
 			}
 			
 		});
+		if (Platform.OS_LINUX.equals(Platform.getOS())) {
+			tutorialText.addMouseTrackListener(new MouseTrackListener() {
+
+				@Override
+				public void mouseHover(MouseEvent e) {
+				}
+
+				@Override
+				public void mouseExit(MouseEvent e) {
+					refreshSharedArea();
+				}
+
+				@Override
+				public void mouseEnter(MouseEvent e) {
+				}
+
+			});
+		}
 	}
 
+	private void refreshSharedArea() {
+		WorkbenchPage page = (WorkbenchPage) PlatformUI.getWorkbench()
+				.getActiveWorkbenchWindow().getActivePage();
+		MUIElement sharedArea = page.findSharedArea();
+		if (sharedArea != null && sharedArea.isVisible()) {
+			Object widget = sharedArea.getWidget();
+			if (widget instanceof Composite) {
+				Composite composite = (Composite) widget;
+				Rectangle area = composite.getClientArea();
+				composite.redraw(area.x, area.y, area.width, area.height, true);
+				composite.layout(true, true);
+				composite.update();
+			}
+		}
+	}
+	
 	private void disposeChildren(Composite composite) {
 		Control[] children = composite.getChildren();
 		for (Control child:children) {
@@ -1135,7 +1173,24 @@ public class GettingStartedPage extends AbstractJBossCentralPage implements Prox
 			}
 			formText.addHyperlinkListener(new HyperlinkOpener());
 			
-			
+			if (Platform.OS_LINUX.equals(Platform.getOS())) {
+				formText.addMouseTrackListener(new MouseTrackListener() {
+
+					@Override
+					public void mouseHover(MouseEvent e) {
+					}
+
+					@Override
+					public void mouseExit(MouseEvent e) {
+						refreshSharedArea();
+					}
+
+					@Override
+					public void mouseEnter(MouseEvent e) {
+					}
+
+				});
+			}
 		}
 		pageBook.showPage(composite);
 		pageBook.layout(true, true);
