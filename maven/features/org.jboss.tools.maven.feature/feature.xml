@@ -19,9 +19,14 @@
    </license>
 
    <requires>
-      <import feature="org.eclipse.m2e.feature" version="1.1.0" match="greaterOrEqual"/>
-      <import feature="org.eclipse.m2e.wtp.feature" version="0.16.0" match="greaterOrEqual"/>
-    </requires>
+      <import feature="org.eclipse.m2e.feature" version="1.5.0" match="greaterOrEqual"/>
+      <import feature="org.eclipse.m2e.wtp.feature" version="1.1.0" match="greaterOrEqual"/>
+
+      <!-- JBIDE-16574 : force m2eclipse-egit to be installed if available
+           Since it's not a real build requirement, we make it optional by tweaking p2.inf
+      -->
+      <import feature="org.sonatype.m2e.egit.feature" version="0.14.0" match="greaterOrEqual"/>
+   </requires>
 
    <plugin
          id="org.jboss.tools.maven.core"
@@ -42,6 +47,6 @@
          download-size="0"
          install-size="0"
          version="0.0.0"
-         unpack="false"/>         
-         
+         unpack="false"/>
+
 </feature>

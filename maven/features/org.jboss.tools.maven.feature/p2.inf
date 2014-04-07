@@ -1,0 +1,5 @@
+requires.2.namespace=org.eclipse.equinox.p2.iu
+requires.2.name=org.sonatype.m2e.egit.feature.feature.group
+requires.2.range=0.14.0
+requires.2.optional=true
+requires.2.greedy=true
