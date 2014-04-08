@@ -1153,8 +1153,13 @@ public class ConfigureMavenRepositoriesWizardPage extends WizardPage implements 
 		}
 		String outputString = getNewSettings();
 		FileOutputStream out = null;
-
+		
 		try {
+			File parent = file.getParentFile();
+			if (!parent.exists()) {
+				parent.mkdirs();
+			}
+			
 			out = new FileOutputStream(file);
 			byte[] bytes = outputString.getBytes(UTF_8);
 			out.write(bytes);
