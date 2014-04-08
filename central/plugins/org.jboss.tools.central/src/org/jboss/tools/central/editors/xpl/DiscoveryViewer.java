@@ -52,13 +52,11 @@ import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerFilter;
-import org.eclipse.jface.window.IShellProvider;
 import org.eclipse.mylyn.commons.ui.CommonImages;
 import org.eclipse.mylyn.commons.ui.GradientCanvas;
 import org.eclipse.mylyn.commons.ui.compatibility.CommonThemes;
 import org.eclipse.mylyn.internal.discovery.core.model.AbstractDiscoverySource;
 import org.eclipse.mylyn.internal.discovery.core.model.ConnectorDescriptor;
-import org.eclipse.mylyn.internal.discovery.core.model.ConnectorDescriptorKind;
 import org.eclipse.mylyn.internal.discovery.core.model.ConnectorDiscovery;
 import org.eclipse.mylyn.internal.discovery.core.model.DiscoveryCategory;
 import org.eclipse.mylyn.internal.discovery.core.model.DiscoveryConnector;
@@ -87,8 +85,6 @@ import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseMoveListener;
 import org.eclipse.swt.events.MouseTrackListener;
-import org.eclipse.swt.events.PaintEvent;
-import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
@@ -96,7 +92,6 @@ import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Cursor;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.FontData;
-import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.RGB;
@@ -112,7 +107,6 @@ import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Link;
 import org.eclipse.swt.widgets.Listener;
-import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.ToolItem;
@@ -122,7 +116,6 @@ import org.eclipse.ui.forms.IFormColors;
 import org.eclipse.ui.progress.WorkbenchJob;
 import org.eclipse.ui.statushandlers.StatusManager;
 import org.eclipse.ui.themes.IThemeManager;
-import org.eclipse.ui.views.markers.internal.CategoryComparator;
 import org.jboss.tools.central.JBossCentralActivator;
 import org.jboss.tools.central.editors.xpl.filters.FilterEntry;
 import org.jboss.tools.central.editors.xpl.filters.FiltersSelectionDialog;
@@ -135,6 +128,7 @@ import org.osgi.framework.Version;
  * 
  * @author David Green
  * @author Steffen Pingel
+ * @author Mickael Istria - Refactorings and feature additions
  */
 public class DiscoveryViewer extends Viewer {
 
@@ -185,14 +179,9 @@ public class DiscoveryViewer extends Viewer {
 	private Image infoImage;
 	private Cursor handCursor;
 	
-
-	private String previousFilterText = ""; //$NON-NLS-1$
-	private Pattern filterPattern;
-	private Text filterText;
+	private Text filterTextWidget;
 	private Label clearFilterTextControl;
 	
-	private WorkbenchJob refreshJob;
-
 	private Set<String> installedFeatures;
 
 	private boolean verifyUpdateSiteAvailability;
@@ -206,6 +195,7 @@ public class DiscoveryViewer extends Viewer {
 	private List<DiscoveryConnector> allConnectors;
 	private Map<DiscoveryConnector, ConnectorDescriptorItemUi> itemsUi = new HashMap<DiscoveryConnector, ConnectorDescriptorItemUi>();
 	private Map<String, Control> categories = new HashMap<String, Control>();
+	private Link nothingToShowLink;
 
 	private int minimumHeight;
 
@@ -245,8 +235,8 @@ public class DiscoveryViewer extends Viewer {
 	}
 
 	private void clearFilterText() {
-		filterText.setText(""); //$NON-NLS-1$
-		filterTextChanged();
+		filterTextWidget.setText(""); //$NON-NLS-1$
+		updateFilters();
 	}
 
 	static Image computeIconImage(AbstractDiscoverySource discoverySource, Icon icon, int dimension, boolean fallback) {
@@ -443,12 +433,9 @@ public class DiscoveryViewer extends Viewer {
 	}
 
 	public void createControl() {
-		createRefreshJob();
-
 		Composite container = new Composite(parent, SWT.NULL);
 		container.addDisposeListener(new DisposeListener() {
 			public void widgetDisposed(DisposeEvent e) {
-				refreshJob.cancel();
 				if (disposables != null) {
 					for (Resource resource : disposables) {
 						resource.dispose();
@@ -496,18 +483,18 @@ public class DiscoveryViewer extends Viewer {
 					GridLayoutFactory.fillDefaults().numColumns(2).applyTo(textFilterContainer);
 
 					if (nativeSearch) {
-						filterText = new Text(textFilterContainer, SWT.SINGLE | SWT.BORDER | SWT.SEARCH | SWT.ICON_CANCEL);
+						filterTextWidget = new Text(textFilterContainer, SWT.SINGLE | SWT.BORDER | SWT.SEARCH | SWT.ICON_CANCEL);
 					} else {
-						filterText = new Text(textFilterContainer, SWT.SINGLE);
+						filterTextWidget = new Text(textFilterContainer, SWT.SINGLE);
 					}
 
-					filterText.addModifyListener(new ModifyListener() {
+					filterTextWidget.addModifyListener(new ModifyListener() {
 						public void modifyText(ModifyEvent e) {
-							filterTextChanged();
+							updateFilters();
 						}
 					});
 					if (nativeSearch) {
-						filterText.addSelectionListener(new SelectionAdapter() {
+						filterTextWidget.addSelectionListener(new SelectionAdapter() {
 							@Override
 							public void widgetDefaultSelected(SelectionEvent e) {
 								if (e.detail == SWT.ICON_CANCEL) {
@@ -515,10 +502,10 @@ public class DiscoveryViewer extends Viewer {
 								}
 							}
 						});
-						GridDataFactory.fillDefaults().grab(true, false).span(2, 1).applyTo(filterText);
+						GridDataFactory.fillDefaults().grab(true, false).span(2, 1).applyTo(filterTextWidget);
 					} else {
-						GridDataFactory.fillDefaults().grab(true, false).applyTo(filterText);
-						clearFilterTextControl = createClearFilterTextControl(textFilterContainer, filterText);
+						GridDataFactory.fillDefaults().grab(true, false).applyTo(filterTextWidget);
+						clearFilterTextControl = createClearFilterTextControl(textFilterContainer, filterTextWidget);
 						clearFilterTextControl.setVisible(false);
 					}
 				}
@@ -535,7 +522,6 @@ public class DiscoveryViewer extends Viewer {
 
 						public void widgetSelected(SelectionEvent e) {
 							theFilter.setEnabled(checkbox.getSelection());
-							// refresh UI
 							updateFilters();
 						}
 					});
@@ -545,15 +531,7 @@ public class DiscoveryViewer extends Viewer {
 					link.addSelectionListener(new SelectionAdapter() {
 						@Override
 						public void widgetSelected(SelectionEvent e) {
-							FiltersSelectionDialog dialog = new FiltersSelectionDialog(parent.getShell(), DiscoveryViewer.this.userFilters);
-							if (dialog.open() == Dialog.OK) {
-								if (!dialog.getToggledFilters().isEmpty()) {
-									for (FilterEntry entry : dialog.getToggledFilters()) {
-										entry.setEnabled(!entry.isEnabled());
-									}
-									updateFilters();
-								}
-							}
+							openFiltersDialog();
 						}
 					});
 				}
@@ -572,14 +550,30 @@ public class DiscoveryViewer extends Viewer {
 		this.topLevelControl = container;
 	}
 	
+	private void openFiltersDialog() {
+		FiltersSelectionDialog dialog = new FiltersSelectionDialog(parent.getShell(), DiscoveryViewer.this.userFilters);
+		if (dialog.open() == Dialog.OK) {
+			if (!dialog.getToggledFilters().isEmpty()) {
+				for (FilterEntry entry : dialog.getToggledFilters()) {
+					entry.setEnabled(!entry.isEnabled());
+				}
+				updateFilters();
+			}
+		}
+	}
+	
 	private void updateFilters() {
 		for (ConnectorDescriptorItemUi item : this.itemsUi.values()) {
 			item.setVisible(true);
 		}
+		for (Control categoryControl : this.categories.values()) {
+			categoryControl.setVisible(true);
+			((GridData)categoryControl.getLayoutData()).exclude = false;
+		}
 		// First apply text filter
 		for (ConnectorDescriptorItemUi item : this.itemsUi.values()) {
 			ConnectorDescriptor descriptor = item.getConnector();
-			if (previousFilterText != null && !previousFilterText.isEmpty()) {
+			if (!this.filterTextWidget.getText().isEmpty()) {
 				if (!(filterMatches(descriptor.getName()) || filterMatches(descriptor.getDescription())
 						|| filterMatches(descriptor.getProvider()) || filterMatches(descriptor.getLicense()))) {
 					item.setVisible(false);
@@ -590,25 +584,33 @@ public class DiscoveryViewer extends Viewer {
 		for (FilterEntry filter : this.userFilters) {
 			if (filter.isEnabled()) {
 				for (ConnectorDescriptorItemUi item : this.itemsUi.values()) {
-					if (!filter.getFilter().select(this, null, item.getConnector())) {
-						item.setVisible(false);
+					if (item.isVisible()) {
+						if (!filter.getFilter().select(this, null, item.getConnector())) {
+							item.setVisible(false);
+						}
 					}
 				}
 			}
 		}
 		
-		boolean atLeastAConnectorVisible = false;
+		Set<String> visibleCategories = new HashSet<String>();
 		for (ConnectorDescriptorItemUi item : this.itemsUi.values()) {
 			if (item.isVisible()) {
-				atLeastAConnectorVisible = true;
+				visibleCategories.add(item.getConnector().getCategoryId());
 			}
 		}
-		if (!atLeastAConnectorVisible) {
-			// TODO show help
+		Set<String> invisibleCategories = new HashSet<String>(this.categories.keySet());
+		invisibleCategories.removeAll(visibleCategories);
+		for (String invisibleCategoryId : invisibleCategories) {
+			Control categoryControl = this.categories.get(invisibleCategoryId);
+			categoryControl.setVisible(false);
+			((GridData)categoryControl.getLayoutData()).exclude = true;
 		}
+
+		this.nothingToShowLink.setVisible(visibleCategories.isEmpty());
+		((GridData)this.nothingToShowLink.getLayoutData()).exclude = !visibleCategories.isEmpty();
 		
-		this.scrolledContents.layout(true);
-		this.scrolledContents.setRedraw(true);
+		this.scrolledContents.layout(true, true);
 	}
 	
 	public void setMinimumHeight(int minimumHeight) {
@@ -626,95 +628,82 @@ public class DiscoveryViewer extends Viewer {
 
 		Color background = container.getBackground();
 
-		/* TODO if (emptyDiscoveries) {
-			GridLayoutFactory.fillDefaults().margins(5, 5).applyTo(container);
-
-			Control helpTextControl;
-			if (filterPattern != null) {
-				Link link = new Link(container, SWT.WRAP);
-
-				link.setFont(container.getFont());
-				link.setText("There are no matching plug-ins.  Please <a>clear the filter text</a> or try again later.");
-				link.addListener(SWT.Selection, new Listener() {
-					public void handleEvent(Event event) {
-						clearFilterText();
-						filterText.setFocus();
-					}
-				});
-				helpTextControl = link;
-			} else {
-				Label helpText = new Label(container, SWT.WRAP);
-				helpText.setFont(container.getFont());
-				helpText.setText("Sorry, all available plug-ins from JBoss Central are already installed. More gets added over time, try again later.");
-				helpTextControl = helpText;
+		this.nothingToShowLink = new Link(container, SWT.WRAP);
+		this.nothingToShowLink.setFont(container.getFont());
+		this.nothingToShowLink.setBackground(background);
+		GridDataFactory.fillDefaults().grab(true, false).hint(100, SWT.DEFAULT).applyTo(this.nothingToShowLink);
+		String message = org.jboss.tools.central.Messages.bind(org.jboss.tools.central.Messages.DiscoveryViewer_noFeatureToShow, new Object[] {
+				org.jboss.tools.central.Messages.DiscoveryViewer_clearFilterText,
+				org.jboss.tools.central.Messages.DiscoveryViewer_disableFilters
 			}
-			configureLook(helpTextControl, background);
-			GridDataFactory.fillDefaults().grab(true, false).hint(100, SWT.DEFAULT).applyTo(helpTextControl);
-		} else*/ {
-			GridLayoutFactory.fillDefaults().numColumns(2).spacing(0, 0).applyTo(container);
-			Map<String, LinkedHashSet<DiscoveryCategory>> categoriesById = new HashMap<String, LinkedHashSet<DiscoveryCategory>>();
-			// necessary because categories from != discovery are not equal, whereas we want them unified in UI
-			for (ConnectorDiscovery discovery : this.discoveries.values()) {
-				for (DiscoveryCategory category : discovery.getCategories()) {
-					if (categoriesById.get(category.getId()) == null) {
-						categoriesById.put(category.getId(), new LinkedHashSet<DiscoveryCategory>());
-					}
-					categoriesById.get(category.getId()).add(category);
+		);
+		this.nothingToShowLink.setText(message);
+		this.nothingToShowLink.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				if (e.text.equals(org.jboss.tools.central.Messages.DiscoveryViewer_clearFilterText)) {
+					clearFilterText();
+				} else if (e.text.equals(org.jboss.tools.central.Messages.DiscoveryViewer_disableFilters)) {
+					openFiltersDialog();
 				}
 			}
-			
-			// Sort by 1st category
-			SortedSet<LinkedHashSet<DiscoveryCategory>> sortedCategories = new TreeSet<LinkedHashSet<DiscoveryCategory>>(new Comparator<LinkedHashSet<DiscoveryCategory>>() {
-				private DiscoveryCategoryComparator comparator = new DiscoveryCategoryComparator();
-				
-				@Override
-				public int compare(LinkedHashSet<DiscoveryCategory> o1, LinkedHashSet<DiscoveryCategory> o2) {
-					if (o1 == o2) {
-						return 0;
-					}
-					return this.comparator.compare(o1.iterator().next(), o2.iterator().next());
-				}
-			});
-			sortedCategories.addAll(categoriesById.values());
+		});
+		
+		((GridData)this.nothingToShowLink.getLayoutData()).exclude = true;
+		this.nothingToShowLink.setVisible(false);
 
-			Composite categoryChildrenContainer = null;
-			for (LinkedHashSet<DiscoveryCategory> categories : sortedCategories) {
-				boolean isEmpty = true;
-				DiscoveryCategory firstCategory = categories.iterator().next();
-				categoryChildrenContainer = createCategoryHeaderAndContainer(container, firstCategory, background);
-				this.categories.put(firstCategory.getId(), categoryChildrenContainer);
-				// Populate category
-				for (DiscoveryCategory category : categories) {
-					List<DiscoveryConnector> connectors = new ArrayList<DiscoveryConnector>(category.getConnectors());
-					Collections.sort(connectors, new DiscoveryConnectorComparator(category));
-					for (final DiscoveryConnector connector : connectors) {
-//						if (isFiltered(connector)) {
-//							continue;
-//						}
-//	
-//						// a separator between connector descriptors
-//						Composite border = new Composite(categoryChildrenContainer, SWT.NULL);
-//						GridDataFactory.fillDefaults().grab(true, false).hint(SWT.DEFAULT, 1).applyTo(border);
-//						GridLayoutFactory.fillDefaults().applyTo(border);
-//						border.setBackground(border.getDisplay().getSystemColor(SWT.COLOR_GRAY));
-////						border.addPaintListener(new ConnectorBorderPaintListener());
-	
-						ConnectorDescriptorItemUi itemUi = new ConnectorDescriptorItemUi(this, connector,
-								categoryChildrenContainer,
-								background,
-								h2Font,
-								infoImage);
-						itemsUi.put(connector, itemUi);
-						itemUi.updateAvailability();
-						allConnectors.add(connector);
-					}
+		GridLayoutFactory.fillDefaults().numColumns(2).spacing(0, 0).applyTo(container);
+		Map<String, LinkedHashSet<DiscoveryCategory>> categoriesById = new HashMap<String, LinkedHashSet<DiscoveryCategory>>();
+		// necessary because categories from != discovery are not equal, whereas we want them unified in UI
+		for (ConnectorDiscovery discovery : this.discoveries.values()) {
+			for (DiscoveryCategory category : discovery.getCategories()) {
+				if (categoriesById.get(category.getId()) == null) {
+					categoriesById.put(category.getId(), new LinkedHashSet<DiscoveryCategory>());
 				}
+				categoriesById.get(category.getId()).add(category);
 			}
-			// last one gets a border
-			Composite border = new Composite(categoryChildrenContainer, SWT.NULL);
-			GridDataFactory.fillDefaults().grab(true, false).hint(SWT.DEFAULT, 1).applyTo(border);
-			GridLayoutFactory.fillDefaults().applyTo(border);
 		}
+		
+		// Sort by 1st category
+		SortedSet<LinkedHashSet<DiscoveryCategory>> sortedCategories = new TreeSet<LinkedHashSet<DiscoveryCategory>>(new Comparator<LinkedHashSet<DiscoveryCategory>>() {
+			private DiscoveryCategoryComparator comparator = new DiscoveryCategoryComparator();
+			
+			@Override
+			public int compare(LinkedHashSet<DiscoveryCategory> o1, LinkedHashSet<DiscoveryCategory> o2) {
+				if (o1 == o2) {
+					return 0;
+				}
+				return this.comparator.compare(o1.iterator().next(), o2.iterator().next());
+			}
+		});
+		sortedCategories.addAll(categoriesById.values());
+
+		Composite categoryChildrenContainer = null;
+		for (LinkedHashSet<DiscoveryCategory> categories : sortedCategories) {
+			boolean isEmpty = true;
+			DiscoveryCategory firstCategory = categories.iterator().next();
+			categoryChildrenContainer = createCategoryHeaderAndContainer(container, firstCategory, background);
+			// Populate category
+			for (DiscoveryCategory category : categories) {
+				List<DiscoveryConnector> connectors = new ArrayList<DiscoveryConnector>(category.getConnectors());
+				Collections.sort(connectors, new DiscoveryConnectorComparator(category));
+				for (final DiscoveryConnector connector : connectors) {
+					ConnectorDescriptorItemUi itemUi = new ConnectorDescriptorItemUi(this, connector,
+							categoryChildrenContainer,
+							background,
+							h2Font,
+							infoImage);
+					itemsUi.put(connector, itemUi);
+					itemUi.updateAvailability();
+					allConnectors.add(connector);
+				}
+			}
+		}
+		// last one gets a border
+		Composite border = new Composite(categoryChildrenContainer, SWT.NULL);
+		GridDataFactory.fillDefaults().grab(true, false).hint(SWT.DEFAULT, 1).applyTo(border);
+		GridLayoutFactory.fillDefaults().applyTo(border);
+
 		container.layout(true);
 		container.redraw();
 	}
@@ -727,61 +716,61 @@ public class DiscoveryViewer extends Viewer {
 	 */
 	private Composite createCategoryHeaderAndContainer(Composite container, DiscoveryCategory category, Color background) {
 		Composite categoryChildrenContainer;
-		{ // category header
-			final GradientCanvas categoryHeaderContainer = new GradientCanvas(container, SWT.NONE);
-			categoryHeaderContainer.setData(category);
-			categoryHeaderContainer.setSeparatorVisible(true);
-			categoryHeaderContainer.setSeparatorAlignment(SWT.TOP);
-			categoryHeaderContainer.setBackgroundGradient(new Color[] { colorCategoryGradientStart,
-					colorCategoryGradientEnd }, new int[] { 100 }, true);
-			categoryHeaderContainer.putColor(IFormColors.H_BOTTOM_KEYLINE1, colorCategoryGradientStart);
-			categoryHeaderContainer.putColor(IFormColors.H_BOTTOM_KEYLINE2, colorCategoryGradientEnd);
+		// category header
+		final GradientCanvas categoryHeaderContainer = new GradientCanvas(container, SWT.NONE);
+		categoryHeaderContainer.setData(category);
+		categoryHeaderContainer.setSeparatorVisible(true);
+		categoryHeaderContainer.setSeparatorAlignment(SWT.TOP);
+		categoryHeaderContainer.setBackgroundGradient(new Color[] { colorCategoryGradientStart,
+				colorCategoryGradientEnd }, new int[] { 100 }, true);
+		categoryHeaderContainer.putColor(IFormColors.H_BOTTOM_KEYLINE1, colorCategoryGradientStart);
+		categoryHeaderContainer.putColor(IFormColors.H_BOTTOM_KEYLINE2, colorCategoryGradientEnd);
 
-			GridDataFactory.fillDefaults().span(2, 1).applyTo(categoryHeaderContainer);
-			GridLayoutFactory.fillDefaults()
-					.numColumns(3)
-					.margins(5, 5)
-					.equalWidth(false)
-					.applyTo(categoryHeaderContainer);
+		GridDataFactory.fillDefaults().span(2, 1).applyTo(categoryHeaderContainer);
+		GridLayoutFactory.fillDefaults()
+				.numColumns(3)
+				.margins(5, 5)
+				.equalWidth(false)
+				.applyTo(categoryHeaderContainer);
 
-			Label iconLabel = new Label(categoryHeaderContainer, SWT.NULL);
-			if (category.getIcon() != null) {
-				Image image = computeIconImage(category.getSource(), category.getIcon(), 48, true);
-				if (image != null) {
-					iconLabel.setImage(image);
-					this.disposables.add(image);
-				}
+		Label iconLabel = new Label(categoryHeaderContainer, SWT.NULL);
+		if (category.getIcon() != null) {
+			Image image = computeIconImage(category.getSource(), category.getIcon(), 48, true);
+			if (image != null) {
+				iconLabel.setImage(image);
+				this.disposables.add(image);
 			}
-			iconLabel.setBackground(null);
-			GridDataFactory.swtDefaults().align(SWT.CENTER, SWT.BEGINNING).span(1, 2).applyTo(iconLabel);
-
-			Label nameLabel = new Label(categoryHeaderContainer, SWT.NULL);
-			nameLabel.setFont(h1Font);
-			nameLabel.setText(category.getName());
-			nameLabel.setBackground(null);
-
-			GridDataFactory.fillDefaults().grab(true, false).applyTo(nameLabel);
-			if (hasTooltip(category)) {
-				ToolBar toolBar = new ToolBar(categoryHeaderContainer, SWT.FLAT);
-				toolBar.setBackground(null);
-				ToolItem infoButton = new ToolItem(toolBar, SWT.PUSH);
-				infoButton.setImage(infoImage);
-				infoButton.setToolTipText(Messages.ConnectorDiscoveryWizardMainPage_tooltip_showOverview);
-				hookTooltip(toolBar, infoButton, categoryHeaderContainer, nameLabel, category.getSource(),
-						category.getOverview(), null);
-				GridDataFactory.fillDefaults().align(SWT.END, SWT.CENTER).applyTo(toolBar);
-			} else {
-				new Label(categoryHeaderContainer, SWT.NULL).setText(" "); //$NON-NLS-1$
-			}
-			Label description = new Label(categoryHeaderContainer, SWT.WRAP);
-			GridDataFactory.fillDefaults()
-					.grab(true, false)
-					.span(2, 1)
-					.hint(100, SWT.DEFAULT)
-					.applyTo(description);
-			description.setBackground(null);
-			description.setText(category.getDescription());
 		}
+		iconLabel.setBackground(null);
+		GridDataFactory.swtDefaults().align(SWT.CENTER, SWT.BEGINNING).span(1, 2).applyTo(iconLabel);
+
+		Label nameLabel = new Label(categoryHeaderContainer, SWT.NULL);
+		nameLabel.setFont(h1Font);
+		nameLabel.setText(category.getName());
+		nameLabel.setBackground(null);
+
+		GridDataFactory.fillDefaults().grab(true, false).applyTo(nameLabel);
+		if (hasTooltip(category)) {
+			ToolBar toolBar = new ToolBar(categoryHeaderContainer, SWT.FLAT);
+			toolBar.setBackground(null);
+			ToolItem infoButton = new ToolItem(toolBar, SWT.PUSH);
+			infoButton.setImage(infoImage);
+			infoButton.setToolTipText(Messages.ConnectorDiscoveryWizardMainPage_tooltip_showOverview);
+			hookTooltip(toolBar, infoButton, categoryHeaderContainer, nameLabel, category.getSource(),
+					category.getOverview(), null);
+			GridDataFactory.fillDefaults().align(SWT.END, SWT.CENTER).applyTo(toolBar);
+		} else {
+			new Label(categoryHeaderContainer, SWT.NULL).setText(" "); //$NON-NLS-1$
+		}
+		Label description = new Label(categoryHeaderContainer, SWT.WRAP);
+		GridDataFactory.fillDefaults()
+				.grab(true, false)
+				.span(2, 1)
+				.hint(100, SWT.DEFAULT)
+				.applyTo(description);
+		description.setBackground(null);
+		description.setText(category.getDescription());
+		this.categories.put(category.getId(), categoryHeaderContainer);
 
 		categoryChildrenContainer = new Composite(container, SWT.NULL);
 		configureLook(categoryChildrenContainer, background);
@@ -793,8 +782,7 @@ public class DiscoveryViewer extends Viewer {
 	private void createEnvironment() {
 		environment = new Hashtable<Object, Object>(System.getProperties());
 		// add the installed Mylyn version to the environment so that we can
-		// have
-		// connectors that are filtered based on version of Mylyn
+		// have connectors that are filtered based on version of Mylyn
 		Bundle bundle = Platform.getBundle("org.eclipse.mylyn.tasks.core"); //$NON-NLS-1$
 		if (bundle == null) {
 			bundle = Platform.getBundle("org.eclipse.mylyn.commons.core"); //$NON-NLS-1$
@@ -819,31 +807,6 @@ public class DiscoveryViewer extends Viewer {
 		} catch (Exception e) {
 			return null;
 		}
-	}
-
-	private void createRefreshJob() {
-		refreshJob = new WorkbenchJob("filter") { //$NON-NLS-1$
-
-			@Override
-			public IStatus runInUIThread(IProgressMonitor monitor) {
-				if (filterText.isDisposed()) {
-					return Status.CANCEL_STATUS;
-				}
-				String text = filterText.getText();
-				text = text.trim();
-
-				if (!previousFilterText.equals(text)) {
-					previousFilterText = text;
-					filterPattern = createPattern(previousFilterText);
-					if (clearFilterTextControl != null) {
-						clearFilterTextControl.setVisible(!previousFilterText.isEmpty());
-					}
-					createBodyContents();
-				}
-				return Status.OK_STATUS;
-			}
-		};
-		refreshJob.setSystem(true);
 	}
 
 	private void discoveryUpdated(final boolean wasCancelled) {
@@ -878,19 +841,17 @@ public class DiscoveryViewer extends Viewer {
 	}
 
 	private boolean filterMatches(String text) {
-		boolean match = previousFilterText == null || previousFilterText.isEmpty();
-		if (text != null && !match && previousFilterText != null) {
-			match = text.toLowerCase().contains(previousFilterText.toLowerCase());
-			if (!match && filterPattern != null) {
-				match = filterPattern.matcher(text).find();
-			}
+		String filterValue = this.filterTextWidget.getText();
+		if (text == null) {
+			return false;
+		}  else if (filterValue == null || filterValue.isEmpty()) {
+			return true;
+		} else if (text.toLowerCase().contains(filterValue.toLowerCase())) {
+			return true;
+		} else {
+			Pattern filterPattern = Pattern.compile(filterValue);
+			return filterPattern.matcher(text).find();
 		}
-		return text != null && match;
-	}
-
-	private void filterTextChanged() {
-		refreshJob.cancel();
-		refreshJob.schedule(200L);
 	}
 
 	public Control getControl() {
@@ -991,8 +952,7 @@ public class DiscoveryViewer extends Viewer {
 					break;
 				case SWT.MouseExit:
 					/*
-					 * Check if the mouse exit happened because we move over the
-					 * tooltip
+					 * Check if the mouse exit happened because we move over the tooltip
 					 */
 					Rectangle containerBounds = exitControl.getBounds();
 					Point displayLocation = exitControl.getParent().toDisplay(containerBounds.x, containerBounds.y);
@@ -1065,35 +1025,6 @@ public class DiscoveryViewer extends Viewer {
 			disposables.add(infoImage);
 		}
 	}
-
-//	/**
-//	 * indicate if there is nothing to display in the UI, given the current state of
-//	 * {@link org.eclipse.mylyn.internal.discovery.ui.wizards.ConnectorDiscoveryWizard#isVisible(ConnectorDescriptorKind) filters}.
-//	 */
-//	private boolean isEmpty(ConnectorDiscovery discovery) {
-//		for (DiscoveryCategory category : discovery.getCategories()) {
-//			if (!isEmpty(category)) {
-//				return false;
-//			}
-//		}
-//		return true;
-//	}
-
-//	/**
-//	 * indicate if the category has nothing to display in the UI, given the current state of
-//	 * {@link org.eclipse.mylyn.internal.discovery.ui.wizards.ConnectorDiscoveryWizard#isVisible(ConnectorDescriptorKind) filters}.
-//	 */
-//	private boolean isEmpty(DiscoveryCategory category) {
-//		if (category.getConnectors().isEmpty()) {
-//			return true;
-//		}
-//		for (ConnectorDescriptor descriptor : category.getConnectors()) {
-//			if (connector) {
-//				return false;
-//			}
-//		}
-//		return true;
-//	}
 
 	/**
 	 * Adds an EXCLUSION filter to the viewer. When enabled, this filter
@@ -1353,6 +1284,10 @@ public class DiscoveryViewer extends Viewer {
 	@Override
 	public void setSelection(ISelection arg0, boolean arg1) {
 		throw new UnsupportedOperationException("Not yet implemented");
+	}
+
+	public Collection<ConnectorDescriptorItemUi> getAllConnectorsItemsUi() {
+		return this.itemsUi.values();
 	}
 
 }

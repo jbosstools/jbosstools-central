@@ -63,6 +63,7 @@ import org.jboss.tools.central.Messages;
 import org.jboss.tools.central.editors.xpl.DiscoveryViewer;
 import org.jboss.tools.central.editors.xpl.filters.EarlyAccessFilter;
 import org.jboss.tools.central.editors.xpl.filters.InstalledFilter;
+import org.jboss.tools.central.editors.xpl.filters.MostRecentVersionFilter;
 import org.jboss.tools.central.jobs.RefreshDiscoveryJob;
 import org.jboss.tools.project.examples.ProjectExamplesActivator;
 import org.jboss.tools.project.examples.internal.discovery.JBossDiscoveryUi;
@@ -147,6 +148,7 @@ public class SoftwarePage extends AbstractJBossCentralPage implements IRunnableC
 	    discoveryViewer = new DiscoveryViewer(pageBook, this);
 	    discoveryViewer.addFilter(new InstalledFilter(), Messages.DiscoveryViewer_Hide_installed, true);
 	    discoveryViewer.addFilter(new EarlyAccessFilter(), Messages.DiscoveryViewer_Hide_EarlyAccess, true);
+	    discoveryViewer.addFilter(new MostRecentVersionFilter(), Messages.DiscoveryViewer_Show_only_most_recent, true);
 		discoveryViewer.addDirectoryUrl(ProjectExamplesActivator.getDefault().getConfigurator().getJBossDiscoveryDirectory());
 		discoveryViewer.createControl();
 		discoveryViewer.setEnvironment(getEnvironment());
@@ -183,6 +185,7 @@ public class SoftwarePage extends AbstractJBossCentralPage implements IRunnableC
 	    gd = new GridData(SWT.FILL, SWT.FILL, false, false);
 	    selectionButtonsComposite.setLayout(new RowLayout(SWT.HORIZONTAL));
 
+	    // selectAll/Deselect All button would better be part of DiscoveryViewer
 	    selectAllButton = new Link(selectionButtonsComposite, SWT.NONE);
 	    selectAllButton.setText("<A>" + Messages.selectAll + "</A>");
 	    selectAllButton.setEnabled(true);
