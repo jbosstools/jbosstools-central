@@ -19,7 +19,11 @@ public class Messages extends NLS {
 	public static String DiscoveryViewer_X_installed;
 	public static String DiscoveryViewer_Hide_installed;
 	public static String DiscoveryViewer_Hide_EarlyAccess;
+	public static String DiscoveryViewer_Show_only_most_recent;
 	public static String DiscoveryViewer_filtersLink;
+	public static String DiscoveryViewer_noFeatureToShow;
+	public static String DiscoveryViewer_clearFilterText;
+	public static String DiscoveryViewer_disableFilters;
 
 	public static String DiscoveryViewer_FilterSelectionDialog_label;
 	public static String DiscoveryViewer_FilterSelectionDialog_title;
