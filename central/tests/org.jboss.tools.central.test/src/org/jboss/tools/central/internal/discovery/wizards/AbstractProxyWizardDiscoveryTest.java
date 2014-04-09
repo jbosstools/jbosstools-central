@@ -43,7 +43,7 @@ public abstract class AbstractProxyWizardDiscoveryTest {
 
 
 	protected void createRemoteResources(int port) throws IOException {
-		createRemoteResources(port, "test-resources/remote/org.jboss.tools.central.discovery-1.2.0-SNAPSHOT.jar");
+		createRemoteResources(port, "test-resources/remote/org.jboss.tools.central.discovery-4.2.0-SNAPSHOT.jar");
 	}
 	
 	protected void createRemoteResources(int port, String sourceDiscoveryJar) throws IOException {

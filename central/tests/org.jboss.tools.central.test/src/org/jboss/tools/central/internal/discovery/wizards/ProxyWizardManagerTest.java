@@ -69,7 +69,7 @@ public class ProxyWizardManagerTest extends AbstractProxyWizardDiscoveryTest imp
 	}
 	
 	private File createRootCacheFolder() throws IOException {
-		cacheFolder = new File("target/cache/");
+		cacheFolder = new File("target/cache/").getAbsoluteFile();
 		FileUtils.deleteDirectory(cacheFolder);
 		
 		FileUtils.copyDirectory(new File("test-resources/cache"), new File(cacheFolder, "123"));
@@ -91,7 +91,7 @@ public class ProxyWizardManagerTest extends AbstractProxyWizardDiscoveryTest imp
 		  pwm.setDiscoveryUrl("http://localhost:"+port+"/directory.xml");
 			
 		  List<ProxyWizard> wizards = pwm.getProxyWizards(true, monitor);
-		  assertEquals("Cache was not loaded", 7, wizards.size());		
+		  assertEquals("Cache was not loaded "+ wizards, 7, wizards.size());		
 		  waitForDownload(MAX_WAIT_TIME);
 		  assertNotNull("Remote wizards were not broadcast", remoteWizards);
 		  assertEquals("Remote wizards were not loaded", 6, remoteWizards.size());			

@@ -39,7 +39,7 @@ public class CachedProxyWizardDiscoveryStrategyTest extends AbstractProxyWizardD
 		strategy.setConnectors(new ArrayList<DiscoveryConnector>());
 		strategy.setCategories(new ArrayList<DiscoveryCategory>());
 	}
-	
+
 	@Test
 	public void testDiscovery() throws Exception {
 		strategy.performDiscovery(null);
@@ -49,7 +49,7 @@ public class CachedProxyWizardDiscoveryStrategyTest extends AbstractProxyWizardD
 		assertEquals("HTML5 Project", proxyWizards.get(0).getLabel());
 		assertEquals("OpenShift Application", proxyWizards.get(1).getLabel());
 		assertEquals("Richfaces Project", proxyWizards.get(2).getLabel());
-		assertEquals("JavaEE Web Project", proxyWizards.get(3).getLabel());
+		assertEquals("Java EE Web Project", proxyWizards.get(3).getLabel());
 		assertEquals("Maven Project", proxyWizards.get(4).getLabel());
 		assertEquals("Spring Project", proxyWizards.get(5).getLabel());
 		assertEquals("GWT Project", proxyWizards.get(6).getLabel());

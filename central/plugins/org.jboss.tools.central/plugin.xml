@@ -331,12 +331,13 @@
           requiredComponentIds="org.jboss.tools.openshift.feature">
       </proxyWizard>
       <proxyWizard 
-          id="spring.wizard" 
-          description="%springmvc.wizard.description"
-          label="Spring Project"
+          id="hybrid.mobile.wizard" 
+          description="%hybrid.mobile.wizard.description"
+          label="Hybrid Mobile Project"
           priority="6"
-          iconPath="icons/spring_wiz.gif"
-          wizardId="org.jboss.tools.central.wizards.NewSpringMvcProjectWizard">
+          iconPath="icons/newcordovaprj_wiz.png"
+          requiredComponentIds="org.jboss.tools.aerogear.hybrid"
+          wizardId="org.jboss.tools.aerogear.hybrid.ui.NewHybridProjectWizard">
       </proxyWizard>
       <proxyWizard
           id="maven.wizard" 
