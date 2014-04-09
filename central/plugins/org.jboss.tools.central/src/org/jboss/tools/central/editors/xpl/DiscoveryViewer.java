@@ -610,7 +610,10 @@ public class DiscoveryViewer extends Viewer {
 		this.nothingToShowLink.setVisible(visibleCategories.isEmpty());
 		((GridData)this.nothingToShowLink.getLayoutData()).exclude = !visibleCategories.isEmpty();
 		
+		this.scrolledContents.pack(true);
 		this.scrolledContents.layout(true, true);
+		this.bodyScrolledComposite.changed(new Control[] { this.scrolledContents });
+		this.bodyScrolledComposite.showControl(this.scrolledContents);
 	}
 	
 	public void setMinimumHeight(int minimumHeight) {
@@ -690,7 +693,7 @@ public class DiscoveryViewer extends Viewer {
 				for (final DiscoveryConnector connector : connectors) {
 					ConnectorDescriptorItemUi itemUi = new ConnectorDescriptorItemUi(this, connector,
 							categoryChildrenContainer,
-							background,
+							getBackgroundColor(connector, background),
 							h2Font,
 							infoImage);
 					itemsUi.put(connector, itemUi);
@@ -1027,17 +1030,6 @@ public class DiscoveryViewer extends Viewer {
 	}
 
 	/**
-	 * Adds an EXCLUSION filter to the viewer. When enabled, this filter
-	 * will exclude all elements which have filter.select returning false
-	 * @param filter
-	 * @param label
-	 * @param enableByDefault
-	 */
-	public void addFilter(ViewerFilter filter, String label, boolean enableByDefault) {
-		userFilters.add(new FilterEntry(filter, label, enableByDefault));
-	}
-
-	/**
 	 * indicate if a text field should be provided to allow the user to filter connector descriptors
 	 */
 	public boolean isShowConnectorDescriptorTextFilter() {
@@ -1289,5 +1281,26 @@ public class DiscoveryViewer extends Viewer {
 	public Collection<ConnectorDescriptorItemUi> getAllConnectorsItemsUi() {
 		return this.itemsUi.values();
 	}
-
+	
+	/**
+	 * Adds an EXCLUSION filter to the viewer. When enabled, this filter
+	 * will exclude all elements which have filter.select returning false
+	 * @param filter
+	 * @param label
+	 * @param enableByDefault
+	 */
+	public void addFilter(ViewerFilter filter, String label, boolean enableByDefault) {
+		userFilters.add(new FilterEntry(filter, label, enableByDefault));
+	}
+	
+	private Color getBackgroundColor(DiscoveryConnector connector, Color defaultColor) {
+		Color res = defaultColor;
+		// TODO allow to plug computation of color externally, similar to addFilter
+		// something like addConditionalStyle(ConnectorDiscovery)
+		if (connector.getCertificationId() != null && connector.getCertificationId().contains("earlyaccess")) {
+			res = this.parent.getDisplay().getSystemColor(SWT.COLOR_YELLOW);
+		}
+		return res;
+	}
+	
 }
