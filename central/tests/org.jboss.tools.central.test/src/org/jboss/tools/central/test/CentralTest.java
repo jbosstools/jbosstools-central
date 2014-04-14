@@ -1,5 +1,5 @@
 /*************************************************************************************
- * Copyright (c) 2012 Red Hat, Inc. and others.
+ * Copyright (c) 2012, 2014 Red Hat, Inc. and others.
  * All rights reserved. This program and the accompanying materials 
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -36,6 +36,7 @@ import org.jboss.tools.central.editors.JBossCentralEditor;
 import org.jboss.tools.central.jobs.RefreshBuzzJob;
 import org.jboss.tools.central.jobs.RefreshTutorialsJob;
 import org.jboss.tools.central.model.FeedsEntry;
+import org.jboss.tools.central.preferences.PreferenceKeys;
 import org.jboss.tools.project.examples.model.ProjectExample;
 import org.jboss.tools.project.examples.model.ProjectExampleCategory;
 import org.jboss.tools.test.util.JobUtils;
@@ -114,7 +115,7 @@ public class CentralTest {
 				hasOpenEditor());
 		IEclipsePreferences prefs = JBossCentralActivator.getDefault()
 				.getPreferences();
-		prefs.putBoolean(JBossCentralActivator.SHOW_JBOSS_CENTRAL_ON_STARTUP,
+		prefs.putBoolean(PreferenceKeys.SHOW_JBOSS_CENTRAL_ON_STARTUP,
 				false);
 		assertFalse("The Show On Startup property isn't changed",
 				JBossCentralActivator.getDefault().showJBossCentralOnStartup());
@@ -128,8 +129,8 @@ public class CentralTest {
 				"The JBoss Central editor is open when the Show On Startup property is unchecked",
 				hasOpenEditor());
 		prefs.putBoolean(
-				JBossCentralActivator.SHOW_JBOSS_CENTRAL_ON_STARTUP,
-				JBossCentralActivator.SHOW_JBOSS_CENTRAL_ON_STARTUP_DEFAULT_VALUE);
+				PreferenceKeys.SHOW_JBOSS_CENTRAL_ON_STARTUP,
+				PreferenceKeys.SHOW_JBOSS_CENTRAL_ON_STARTUP_DEFAULT_VALUE);
 	}
 
 	private boolean hasOpenEditor() {

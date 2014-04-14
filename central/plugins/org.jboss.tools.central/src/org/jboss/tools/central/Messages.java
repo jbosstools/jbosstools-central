@@ -34,6 +34,10 @@ public class Messages extends NLS {
 	public static String selectAll;
 	public static String deselectAll;
 	
+	public static String SoftwarePage_earlyAccessSection_Title;
+	public static String SoftwarePage_earlyAccessSection_message;
+	public static String SoftwarePage_earlyAccessSection_checkbox; 
+	
 	static {
 		// initialize resource bundle
 		NLS.initializeMessages(BUNDLE_NAME, Messages.class);

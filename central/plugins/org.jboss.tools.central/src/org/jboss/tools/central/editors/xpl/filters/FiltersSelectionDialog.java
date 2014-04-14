@@ -30,20 +30,20 @@ import org.eclipse.swt.widgets.Shell;
 import org.jboss.tools.central.Messages;
 
 /**
- * Shows all available {@link FilterEntry} and let user selects the one to
+ * Shows all available {@link UserFilterEntry} and let user selects the one to
  * enable/disable
  * @author mistria
  *
  */
 public class FiltersSelectionDialog extends Dialog {
 
-	private Collection<FilterEntry> filters;
-	private Set<FilterEntry> toggledFilters;
+	private Collection<UserFilterEntry> filters;
+	private Set<UserFilterEntry> toggledFilters;
 
-	public FiltersSelectionDialog(Shell parentShell, Collection<FilterEntry> filters) {
+	public FiltersSelectionDialog(Shell parentShell, Collection<UserFilterEntry> filters) {
 		super(parentShell);
 		this.filters = filters;
-		this.toggledFilters = new HashSet<FilterEntry>();
+		this.toggledFilters = new HashSet<UserFilterEntry>();
 	}
 	
 	public Control createDialogArea(Composite parent) {
@@ -52,7 +52,7 @@ public class FiltersSelectionDialog extends Dialog {
 		composite.setLayout(new GridLayout(1, false));
 		Label label = new Label(composite, SWT.NONE);
 		label.setText(Messages.DiscoveryViewer_FilterSelectionDialog_label);
-		for (final FilterEntry filter : filters) {
+		for (final UserFilterEntry filter : filters) {
 			final Button checkbox = new Button(composite, SWT.CHECK);
 			checkbox.setText(filter.getLabel());
 			checkbox.setSelection(filter.isEnabled());
@@ -73,7 +73,7 @@ public class FiltersSelectionDialog extends Dialog {
 		return composite;
 	}
 	
-	public Set<FilterEntry> getToggledFilters() {
+	public Set<UserFilterEntry> getToggledFilters() {
 		return this.toggledFilters;
 	}
 

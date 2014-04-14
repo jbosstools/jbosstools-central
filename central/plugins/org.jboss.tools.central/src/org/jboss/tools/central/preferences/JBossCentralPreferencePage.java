@@ -61,7 +61,7 @@ public class JBossCentralPreferencePage extends PreferencePage implements
 	@Override
 	protected void performApply() {
 		IEclipsePreferences preferences = JBossCentralActivator.getDefault().getPreferences();
-		preferences.putBoolean(JBossCentralActivator.SHOW_JBOSS_CENTRAL_ON_STARTUP, showOnStartup.getSelection());
+		preferences.putBoolean(PreferenceKeys.SHOW_JBOSS_CENTRAL_ON_STARTUP, showOnStartup.getSelection());
 		JBossCentralActivator.getDefault().savePreferences();
 	}
 
@@ -69,8 +69,8 @@ public class JBossCentralPreferencePage extends PreferencePage implements
 	protected void performDefaults() {
 		IEclipsePreferences preferences = JBossCentralActivator.getDefault().getPreferences();
 		
-		showOnStartup.setSelection(JBossCentralActivator.SHOW_JBOSS_CENTRAL_ON_STARTUP_DEFAULT_VALUE);
-		preferences.putBoolean(JBossCentralActivator.SHOW_JBOSS_CENTRAL_ON_STARTUP, JBossCentralActivator.SHOW_JBOSS_CENTRAL_ON_STARTUP_DEFAULT_VALUE);
+		showOnStartup.setSelection(PreferenceKeys.SHOW_JBOSS_CENTRAL_ON_STARTUP_DEFAULT_VALUE);
+		preferences.putBoolean(PreferenceKeys.SHOW_JBOSS_CENTRAL_ON_STARTUP, PreferenceKeys.SHOW_JBOSS_CENTRAL_ON_STARTUP_DEFAULT_VALUE);
 		JBossCentralActivator.getDefault().savePreferences();
 		super.performDefaults();
 	}

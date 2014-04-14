@@ -69,6 +69,7 @@ import org.eclipse.ui.menus.CommandContributionItem;
 import org.jboss.tools.central.JBossCentralActivator;
 import org.jboss.tools.central.actions.OpenWithBrowserHandler;
 import org.jboss.tools.central.editors.xpl.TextSearchControl;
+import org.jboss.tools.central.preferences.PreferenceKeys;
 import org.jboss.tools.project.examples.ProjectExamplesActivator;
 import org.jboss.tools.project.examples.internal.discovery.JBossDiscoveryUi;
 
@@ -272,8 +273,8 @@ public class JBossCentralEditor extends SharedHeaderFormEditor {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				IEclipsePreferences preferences = JBossCentralActivator.getDefault().getPreferences();
-				boolean showOnStartup = preferences.getBoolean(JBossCentralActivator.SHOW_JBOSS_CENTRAL_ON_STARTUP, JBossCentralActivator.SHOW_JBOSS_CENTRAL_ON_STARTUP_DEFAULT_VALUE);
-				preferences.putBoolean(JBossCentralActivator.SHOW_JBOSS_CENTRAL_ON_STARTUP, !showOnStartup);
+				boolean showOnStartup = preferences.getBoolean(PreferenceKeys.SHOW_JBOSS_CENTRAL_ON_STARTUP, PreferenceKeys.SHOW_JBOSS_CENTRAL_ON_STARTUP_DEFAULT_VALUE);
+				preferences.putBoolean(PreferenceKeys.SHOW_JBOSS_CENTRAL_ON_STARTUP, !showOnStartup);
 				JBossCentralActivator.getDefault().savePreferences();
 			}
 		
@@ -282,11 +283,11 @@ public class JBossCentralEditor extends SharedHeaderFormEditor {
 		final IPreferenceChangeListener prefChangeListener = new IPreferenceChangeListener() {
 			@Override
 			public void preferenceChange(PreferenceChangeEvent event) {
-				if (JBossCentralActivator.SHOW_JBOSS_CENTRAL_ON_STARTUP.equals(event.getKey()) 
+				if (PreferenceKeys.SHOW_JBOSS_CENTRAL_ON_STARTUP.equals(event.getKey()) 
 						&& showOnStartup != null && !showOnStartup.isDisposed()) {
 					Object value = event.getNewValue();
 					if (value instanceof String && !showOnStartup.isDisposed()) {
-						boolean newValue = new Boolean((String)value).booleanValue();
+						boolean newValue = Boolean.parseBoolean((String)value);
 						showOnStartup.setSelection(newValue);
 					}
 				}

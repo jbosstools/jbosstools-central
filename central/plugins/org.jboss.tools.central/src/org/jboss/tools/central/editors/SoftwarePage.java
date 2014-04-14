@@ -20,16 +20,14 @@ import org.eclipse.core.runtime.jobs.IJobChangeEvent;
 import org.eclipse.core.runtime.jobs.JobChangeAdapter;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ToolBarManager;
+import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.operation.IRunnableContext;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.operation.ModalContext;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
-import org.eclipse.jface.viewers.Viewer;
-import org.eclipse.jface.viewers.ViewerFilter;
 import org.eclipse.mylyn.commons.core.DelegatingProgressMonitor;
 import org.eclipse.mylyn.internal.discovery.core.model.ConnectorDescriptor;
-import org.eclipse.mylyn.internal.discovery.core.model.DiscoveryConnector;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ControlAdapter;
@@ -38,6 +36,7 @@ import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Cursor;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -47,6 +46,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Link;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.forms.IManagedForm;
@@ -65,6 +65,7 @@ import org.jboss.tools.central.editors.xpl.filters.EarlyAccessFilter;
 import org.jboss.tools.central.editors.xpl.filters.InstalledFilter;
 import org.jboss.tools.central.editors.xpl.filters.MostRecentVersionFilter;
 import org.jboss.tools.central.jobs.RefreshDiscoveryJob;
+import org.jboss.tools.central.preferences.PreferenceKeys;
 import org.jboss.tools.project.examples.ProjectExamplesActivator;
 import org.jboss.tools.project.examples.internal.discovery.JBossDiscoveryUi;
 
@@ -96,6 +97,8 @@ public class SoftwarePage extends AbstractJBossCentralPage implements IRunnableC
 
 	private ToolBarManager toolBarManager;
 	
+	private EarlyAccessFilter earlyAccessFilter;
+	
 	public SoftwarePage(FormEditor editor) {
 		super(editor, ID, "Software/Update");
 		monitor = new DelegatingProgressMonitor();
@@ -112,14 +115,8 @@ public class SoftwarePage extends AbstractJBossCentralPage implements IRunnableC
 	    body.setLayout(gridLayout);
 	    toolkit.paintBordersFor(body);
 		
-	    Composite left = createComposite(toolkit, body);
-		createFeaturesSection(toolkit, left);
-		toolkit.paintBordersFor(left);
-	    
-	    //Composite right = createComposite(toolkit, body);
-	    //Section toInstall = createSection(toolkit, right, "To install", ExpandableComposite.TITLE_BAR|ExpandableComposite.TWISTIE|ExpandableComposite.EXPANDED);
-		
-	    //toolkit.paintBordersFor(right);
+		createFeaturesSection(toolkit, body);
+		createEarlyAccessSection(toolkit, body);
 	    
 	    super.createFormContent(managedForm);
 		
@@ -146,9 +143,14 @@ public class SoftwarePage extends AbstractJBossCentralPage implements IRunnableC
 	    pageBook.setLayoutData(gd);
 	    
 	    discoveryViewer = new DiscoveryViewer(pageBook, this);
-	    discoveryViewer.addFilter(new InstalledFilter(), Messages.DiscoveryViewer_Hide_installed, true);
-	    discoveryViewer.addFilter(new EarlyAccessFilter(), Messages.DiscoveryViewer_Hide_EarlyAccess, true);
-	    discoveryViewer.addFilter(new MostRecentVersionFilter(), Messages.DiscoveryViewer_Show_only_most_recent, true);
+	    discoveryViewer.addUserFilter(new InstalledFilter(), Messages.DiscoveryViewer_Hide_installed, true);
+	    if (!JBossCentralActivator.getDefault().getPreferences().getBoolean(PreferenceKeys.ENABLE_EARLY_ACCESS, PreferenceKeys.ENABLE_EARLY_ACCESS_DEFAULT_VALUE)) {
+	    	if (this.earlyAccessFilter == null) {
+	    		this.earlyAccessFilter = new EarlyAccessFilter();
+	    	}
+	    	discoveryViewer.addSystemFilter(this.earlyAccessFilter);
+	    }
+	    discoveryViewer.addSystemFilter(new MostRecentVersionFilter());
 		discoveryViewer.addDirectoryUrl(ProjectExamplesActivator.getDefault().getConfigurator().getJBossDiscoveryDirectory());
 		discoveryViewer.createControl();
 		discoveryViewer.setEnvironment(getEnvironment());
@@ -310,6 +312,43 @@ public class SoftwarePage extends AbstractJBossCentralPage implements IRunnableC
 		section.setTextClient(headerComposite);
 	}
 
+	protected void createEarlyAccessSection(FormToolkit toolkit, Composite parent) {
+		final Section earlyAccessSection = toolkit.createSection(parent, ExpandableComposite.TITLE_BAR|ExpandableComposite.TWISTIE|ExpandableComposite.EXPANDED);
+		earlyAccessSection.setText(Messages.SoftwarePage_earlyAccessSection_Title);
+		GridLayout sectionLayout = new GridLayout();
+		earlyAccessSection.setLayout(sectionLayout);
+		GridDataFactory.fillDefaults().grab(true, false).applyTo(earlyAccessSection);
+	    
+	    Composite earlyAccessComposite = toolkit.createComposite(earlyAccessSection);
+	    GridLayout compositeLayout = new GridLayout(2, false);
+		earlyAccessComposite.setLayout(compositeLayout);
+		GridDataFactory.fillDefaults().grab(true, false).applyTo(earlyAccessComposite);
+	    
+	    Label warningImageLabel = toolkit.createLabel(earlyAccessComposite, ""); //$NON-NLS-1$
+	    Image warningImage = earlyAccessSection.getDisplay().getSystemImage(SWT.ICON_WARNING);
+		warningImageLabel.setImage(warningImage);
+		GridDataFactory.swtDefaults().hint(warningImage.getBounds().height, warningImage.getBounds().width).applyTo(warningImageLabel);
+	    Label warningLabel = toolkit.createLabel(earlyAccessComposite, Messages.SoftwarePage_earlyAccessSection_message, SWT.WRAP);
+	    GridDataFactory.swtDefaults().align(SWT.FILL, SWT.CENTER).span(1, 1).grab(true,  false).hint(300, SWT.DEFAULT).applyTo(warningLabel);
+	    
+	    final Button checkbox = toolkit.createButton(earlyAccessComposite, Messages.SoftwarePage_earlyAccessSection_checkbox, SWT.CHECK);
+	    GridDataFactory.fillDefaults().align(SWT.CENTER, SWT.TOP).span(2, 1).applyTo(checkbox);
+	    checkbox.setSelection(JBossCentralActivator.getDefault().getPreferences().getBoolean(PreferenceKeys.ENABLE_EARLY_ACCESS, PreferenceKeys.ENABLE_EARLY_ACCESS_DEFAULT_VALUE));
+	    checkbox.addSelectionListener(new SelectionAdapter() {
+	    	@Override
+	    	public void widgetSelected(SelectionEvent e) {
+	    		JBossCentralActivator.getDefault().getPreferences().putBoolean(PreferenceKeys.ENABLE_EARLY_ACCESS, checkbox.getSelection());
+	    		if (checkbox.getSelection()) {
+	    			SoftwarePage.this.discoveryViewer.removeSystemFilter(SoftwarePage.this.earlyAccessFilter);
+	    		} else {
+	    			SoftwarePage.this.discoveryViewer.addSystemFilter(SoftwarePage.this.earlyAccessFilter);
+	    		}
+	    		SoftwarePage.this.discoveryViewer.updateFilters();
+	    	}
+	    });
+	    
+	    earlyAccessSection.setClient(earlyAccessComposite);
+	}
 	
 	private void adapt(FormToolkit toolkit, Control control) {
 		toolkit.adapt(control, true, true);

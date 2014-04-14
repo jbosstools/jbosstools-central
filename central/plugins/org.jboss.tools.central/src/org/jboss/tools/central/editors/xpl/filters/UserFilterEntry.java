@@ -14,17 +14,18 @@ import org.eclipse.jface.viewers.ViewerFilter;
 import org.jboss.tools.central.editors.xpl.DiscoveryViewer;
 
 /**
- * A FilterEntry represent a user entry for a filter on {@link DiscoveryViewer}
+ * A {@link UserFilterEntry} represent a user entry for a filter on {@link DiscoveryViewer}
+ * that can be controlled by user
  * @author mistria
  *
  */
-public class FilterEntry {
+public class UserFilterEntry {
 
 	private ViewerFilter filter;
 	private String label;
 	private boolean enabled;
 
-	public FilterEntry(ViewerFilter filter, String label, boolean defaultEnabled) {
+	public UserFilterEntry(ViewerFilter filter, String label, boolean defaultEnabled) {
 		this.filter = filter;
 		this.label = label;
 		this.enabled = defaultEnabled;
