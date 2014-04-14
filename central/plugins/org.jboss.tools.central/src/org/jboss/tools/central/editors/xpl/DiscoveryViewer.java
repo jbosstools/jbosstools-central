@@ -117,7 +117,8 @@ import org.eclipse.ui.progress.WorkbenchJob;
 import org.eclipse.ui.statushandlers.StatusManager;
 import org.eclipse.ui.themes.IThemeManager;
 import org.jboss.tools.central.JBossCentralActivator;
-import org.jboss.tools.central.editors.xpl.filters.FilterEntry;
+import org.jboss.tools.central.editors.xpl.filters.EarlyAccessFilter;
+import org.jboss.tools.central.editors.xpl.filters.UserFilterEntry;
 import org.jboss.tools.central.editors.xpl.filters.FiltersSelectionDialog;
 import org.jboss.tools.project.examples.internal.discovery.DiscoveryUtil;
 import org.osgi.framework.Bundle;
@@ -199,8 +200,8 @@ public class DiscoveryViewer extends Viewer {
 
 	private int minimumHeight;
 
-	private final List<FilterEntry> userFilters = new ArrayList<FilterEntry>();
-
+	private final List<UserFilterEntry> userFilters = new ArrayList<UserFilterEntry>();
+	private final List<ViewerFilter> systemFilters = new ArrayList<ViewerFilter>();
 
 	public DiscoveryViewer(Composite parent, IRunnableContext context) {
 		this.parent = parent;
@@ -287,11 +288,11 @@ public class DiscoveryViewer extends Viewer {
 		return status;
 	}
 
-	void configureLook(Control control, Color background) {
+	static void configureLook(Control control, Color background) {
 		control.setBackground(background);
 	}
 
-	public void createBodyContents() {
+	private void createBodyContents() {
 		// remove any existing contents
 		if (body == null || body.isDisposed()) {
 			return;
@@ -432,6 +433,10 @@ public class DiscoveryViewer extends Viewer {
 		return clearButton;
 	}
 
+	/**
+	 * Create the widgets related to this viewer.
+	 * Be sure to call it only once!
+	 */
 	public void createControl() {
 		Composite container = new Composite(parent, SWT.NULL);
 		container.addDisposeListener(new DisposeListener() {
@@ -511,7 +516,7 @@ public class DiscoveryViewer extends Viewer {
 				}
 
 				if (this.userFilters.size() == 1) {
-					final FilterEntry theFilter = this.userFilters.get(0);
+					final UserFilterEntry theFilter = this.userFilters.get(0);
 					final Button checkbox = new Button(filterContainer, SWT.CHECK);
 					checkbox.setSelection(theFilter.isEnabled());
 					checkbox.setText(theFilter.getLabel());
@@ -554,7 +559,7 @@ public class DiscoveryViewer extends Viewer {
 		FiltersSelectionDialog dialog = new FiltersSelectionDialog(parent.getShell(), DiscoveryViewer.this.userFilters);
 		if (dialog.open() == Dialog.OK) {
 			if (!dialog.getToggledFilters().isEmpty()) {
-				for (FilterEntry entry : dialog.getToggledFilters()) {
+				for (UserFilterEntry entry : dialog.getToggledFilters()) {
 					entry.setEnabled(!entry.isEnabled());
 				}
 				updateFilters();
@@ -562,7 +567,7 @@ public class DiscoveryViewer extends Viewer {
 		}
 	}
 	
-	private void updateFilters() {
+	public void updateFilters() {
 		for (ConnectorDescriptorItemUi item : this.itemsUi.values()) {
 			item.setVisible(true);
 		}
@@ -581,13 +586,22 @@ public class DiscoveryViewer extends Viewer {
 			}
 		}
 		// Then apply user filters SEQUENTIALLY (order of filters can have an impact)
-		for (FilterEntry filter : this.userFilters) {
+		for (UserFilterEntry filter : this.userFilters) {
 			if (filter.isEnabled()) {
 				for (ConnectorDescriptorItemUi item : this.itemsUi.values()) {
 					if (item.isVisible()) {
 						if (!filter.getFilter().select(this, null, item.getConnector())) {
 							item.setVisible(false);
 						}
+					}
+				}
+			}
+		}
+		for (ViewerFilter filter : this.systemFilters) {
+			for (ConnectorDescriptorItemUi item : this.itemsUi.values()) {
+				if (item.isVisible()) {
+					if (!filter.select(this, null, item.getConnector())) {
+						item.setVisible(false);
 					}
 				}
 			}
@@ -866,7 +880,7 @@ public class DiscoveryViewer extends Viewer {
 	 * 
 	 * @see ConnectorDiscovery#getEnvironment()
 	 */
-	public Dictionary<Object, Object> getEnvironment() {
+	private Dictionary<Object, Object> getEnvironment() {
 		return environment;
 	}
 
@@ -1032,7 +1046,7 @@ public class DiscoveryViewer extends Viewer {
 	/**
 	 * indicate if a text field should be provided to allow the user to filter connector descriptors
 	 */
-	public boolean isShowConnectorDescriptorTextFilter() {
+	private boolean isShowConnectorDescriptorTextFilter() {
 		return showConnectorDescriptorTextFilter;
 	}
 
@@ -1145,6 +1159,10 @@ public class DiscoveryViewer extends Viewer {
 		this.verifyUpdateSiteAvailability = verifyUpdateSiteAvailability;
 	}
 
+	/**
+	 * This is a very heavy operation that reloads the catalog, re-create UI and re-computes versions.
+	 * Don't use it just to refresh UI.
+	 */
 	public void updateDiscovery() {
 		final Dictionary<Object, Object> environment = getEnvironment();
 		boolean wasCancelled = false;
@@ -1244,7 +1262,7 @@ public class DiscoveryViewer extends Viewer {
 
 	@Override
 	public void refresh() {
-		createBodyContents();
+		throw new UnsupportedOperationException("Not implemented. Not relevant. You may prefer using updateFilters to refresh visibility");
 	}
 
 	/**
@@ -1285,12 +1303,27 @@ public class DiscoveryViewer extends Viewer {
 	/**
 	 * Adds an EXCLUSION filter to the viewer. When enabled, this filter
 	 * will exclude all elements which have filter.select returning false
+	 * 
+	 * Those filters are shown in UI and user can select to enable/disable them
+	 * 
 	 * @param filter
 	 * @param label
 	 * @param enableByDefault
 	 */
-	public void addFilter(ViewerFilter filter, String label, boolean enableByDefault) {
-		userFilters.add(new FilterEntry(filter, label, enableByDefault));
+	public void addUserFilter(ViewerFilter filter, String label, boolean enableByDefault) {
+		this.userFilters.add(new UserFilterEntry(filter, label, enableByDefault));
+	}
+	
+	/**
+	 * System filters don't have related UI entry for user.
+	 * @param filter
+	 */
+	public void addSystemFilter(ViewerFilter filter) {
+		this.systemFilters.add(filter);
+	}
+	
+	public void removeSystemFilter(ViewerFilter filter) {
+		this.systemFilters.remove(filter);
 	}
 	
 	private Color getBackgroundColor(DiscoveryConnector connector, Color defaultColor) {
@@ -1302,5 +1335,5 @@ public class DiscoveryViewer extends Viewer {
 		}
 		return res;
 	}
-	
+
 }

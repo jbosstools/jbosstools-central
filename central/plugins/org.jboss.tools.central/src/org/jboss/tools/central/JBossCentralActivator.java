@@ -59,6 +59,7 @@ import org.eclipse.ui.services.IServiceLocator;
 import org.jboss.tools.central.editors.JBossCentralEditor;
 import org.jboss.tools.central.editors.JBossCentralEditorInput;
 import org.jboss.tools.central.internal.dnd.JBossCentralDropTarget;
+import org.jboss.tools.central.preferences.PreferenceKeys;
 import org.jboss.tools.project.examples.model.ProjectExample;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
@@ -85,10 +86,6 @@ public class JBossCentralActivator extends AbstractUIPlugin {
 
 	// The plug-in ID
 	public static final String PLUGIN_ID = "org.jboss.tools.central"; //$NON-NLS-1$
-
-	public static final String SHOW_JBOSS_CENTRAL_ON_STARTUP = "showJBossCentralOnStartup";
-
-	public static final boolean SHOW_JBOSS_CENTRAL_ON_STARTUP_DEFAULT_VALUE = true;
 
 	public static final String PROFILE_ID = "profileId";
 
@@ -248,8 +245,7 @@ public class JBossCentralActivator extends AbstractUIPlugin {
 	public boolean showJBossCentralOnStartup() {
 		IEclipsePreferences prefs = JBossCentralActivator.getDefault()
 				.getPreferences();
-		return prefs.getBoolean(SHOW_JBOSS_CENTRAL_ON_STARTUP,
-				SHOW_JBOSS_CENTRAL_ON_STARTUP_DEFAULT_VALUE);
+		return prefs.getBoolean(PreferenceKeys.SHOW_JBOSS_CENTRAL_ON_STARTUP, PreferenceKeys.SHOW_JBOSS_CENTRAL_ON_STARTUP_DEFAULT_VALUE);
 	}
 
 	public static void openUrl(String location, Shell shell) {
