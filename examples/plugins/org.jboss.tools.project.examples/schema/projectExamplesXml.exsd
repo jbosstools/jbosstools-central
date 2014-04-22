@@ -18,8 +18,9 @@
       </annotation>
       <complexType>
          <sequence>
-            <element ref="url"/>
+            <element ref="url" minOccurs="0" maxOccurs="1"/>
             <element ref="experimental"/>
+            <element ref="urlKey"/>
          </sequence>
          <attribute name="point" type="string" use="required">
             <annotation>
@@ -49,9 +50,25 @@
    </element>
 
    <element name="url" type="string">
+      <annotation>
+         <appInfo>
+            <meta.element deprecated="true"/>
+         </appInfo>
+         <documentation>
+            url is superceded by urlKey.
+         </documentation>
+      </annotation>
    </element>
 
    <element name="experimental" type="string">
+   </element>
+
+   <element name="urlKey" type="string">
+      <annotation>
+         <documentation>
+            Property key to look the URL from. Takes precedence over url. Falls back on url if not set.
+         </documentation>
+      </annotation>
    </element>
 
    <annotation>

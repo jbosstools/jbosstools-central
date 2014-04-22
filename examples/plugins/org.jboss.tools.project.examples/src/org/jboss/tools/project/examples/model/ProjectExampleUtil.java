@@ -1,5 +1,5 @@
 /*************************************************************************************
- * Copyright (c) 2008-2011 Red Hat, Inc. and others.
+ * Copyright (c) 2008-2014 Red Hat, Inc. and others.
  * All rights reserved. This program and the accompanying materials 
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -62,6 +62,7 @@ import org.eclipse.wst.server.core.IServer;
 import org.eclipse.wst.server.core.ServerCore;
 import org.jboss.ide.eclipse.as.core.server.IJBossServerRuntime;
 import org.jboss.tools.foundation.core.ecf.URLTransportUtility;
+import org.jboss.tools.foundation.core.properties.PropertiesHelper;
 import org.jboss.tools.project.examples.Messages;
 import org.jboss.tools.project.examples.ProjectExamplesActivator;
 import org.jboss.tools.project.examples.offline.OfflineUtil;
@@ -104,6 +105,8 @@ public class ProjectExampleUtil {
 
 	private static String URL_EXT = URL;
 
+	private static String URL_KEY = "urlKey"; //$NON-NLS-1$
+	
 	private static String EXPERIMENTAL_EXT = "experimental"; //$NON-NLS-1$
 
 	private static Set<IProjectExampleSite> pluginSites;
@@ -128,22 +131,25 @@ public class ProjectExampleUtil {
 						.getConfigurationElements();
 				IProjectExampleSite site = new ProjectExampleSite();
 				site.setName(extension.getLabel());
-				for (int j = 0; j < configurationElements.length; j++) {
-					IConfigurationElement configurationElement = configurationElements[j];
-					if (URL_EXT.equals(configurationElement.getName())) {
-						String urlString = configurationElement.getValue();
-						URL url = getURL(urlString);
-						if (url != null) {
-							site.setUrl(url);
-						}
-					} else if (EXPERIMENTAL_EXT.equals(configurationElement
-							.getName())) {
-						String experimental = configurationElement.getValue();
-						if ("true".equals(experimental)) { //$NON-NLS-1$
-							site.setExperimental(true);
-						}
-					}
-				}
+        String urlKey = null;
+        String urlValue = null;
+        for (int j = 0; j < configurationElements.length; j++) {
+          IConfigurationElement configurationElement = configurationElements[j];
+          if (URL_KEY.equals(configurationElement.getName())) {
+            urlKey = configurationElement.getValue();
+          } if (URL_EXT.equals(configurationElement.getName())) {
+            urlValue = configurationElement.getValue();
+          } else if (EXPERIMENTAL_EXT.equals(configurationElement
+              .getName())) {
+            String experimental = configurationElement.getValue();
+            site.setExperimental(Boolean.parseBoolean(experimental));
+          }
+          String urlString = PropertiesHelper.getPropertiesProvider().getValue(urlKey, urlValue);
+          URL url = getURL(urlString);
+          if (url != null) {
+            site.setUrl(url);
+          }
+        }
 				if (site.getUrl() != null) {
 					pluginSites.add(site);
 				}
@@ -529,33 +535,38 @@ public class ProjectExampleUtil {
 
 	}
 
-	public static Set<URL> getCategoryURLs() {
-		if (categoryUrls == null) {
-			categoryUrls = new HashSet<URL>();
-			IExtensionRegistry registry = Platform.getExtensionRegistry();
-			IExtensionPoint extensionPoint = registry
-					.getExtensionPoint(PROJECT_EXAMPLES_CATEGORIES_EXTENSION_ID);
-			IExtension[] extensions = extensionPoint.getExtensions();
-			for (int i = 0; i < extensions.length; i++) {
-				IExtension extension = extensions[i];
-				IConfigurationElement[] configurationElements = extension
-						.getConfigurationElements();
-				
-				for (int j = 0; j < configurationElements.length; j++) {
-					IConfigurationElement configurationElement = configurationElements[j];
-					if (URL_EXT.equals(configurationElement.getName())) {
-						String urlString = configurationElement.getValue();
-						URL url = getURL(urlString);
-						if (url != null) {
-							categoryUrls.add(url);
-						}
-					} 
-				}
-			}
+  public static Set<URL> getCategoryURLs() {
+    if (categoryUrls == null) {
+      categoryUrls = new HashSet<URL>();
+      IExtensionRegistry registry = Platform.getExtensionRegistry();
+      IExtensionPoint extensionPoint = registry
+          .getExtensionPoint(PROJECT_EXAMPLES_CATEGORIES_EXTENSION_ID);
+      IExtension[] extensions = extensionPoint.getExtensions();
+      for (int i = 0; i < extensions.length; i++) {
+        IExtension extension = extensions[i];
+        IConfigurationElement[] configurationElements = extension
+            .getConfigurationElements();
 
-		}
-		return categoryUrls;
-	}
+        String urlKey = null;
+        String urlValue = null;
+        for (int j = 0; j < configurationElements.length; j++) {
+          IConfigurationElement configurationElement = configurationElements[j];
+          if (URL_EXT.equals(configurationElement.getName())) {
+            urlValue = configurationElement.getValue();
+          } else if (URL_KEY.equals(configurationElement.getName())) {
+            urlKey = configurationElement.getValue();
+          }
+        }
+        String urlString = PropertiesHelper.getPropertiesProvider().getValue(urlKey, urlValue);
+        URL url = getURL(urlString);
+        if (url != null) {
+          categoryUrls.add(url);
+        }
+      }
+
+    }
+    return categoryUrls;
+  }
 	
 	private static void handleCategories(List<ProjectExampleCategory> list, IProgressMonitor monitor) {
 		Set<URL> urls = getCategoryURLs();

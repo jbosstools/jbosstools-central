@@ -1,5 +1,5 @@
 /*************************************************************************************
- * Copyright (c) 2011 Red Hat, Inc. and others.
+ * Copyright (c) 2011-2014 Red Hat, Inc. and others.
  * All rights reserved. This program and the accompanying materials 
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,12 +10,15 @@
  ************************************************************************************/
 package org.jboss.tools.project.examples.configurators;
 
+import static org.jboss.tools.project.examples.ProjectExamplesActivator.JBOSS_DISCOVERY_DIRECTORY;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.ResourceBundle;
 
 import org.eclipse.swt.graphics.Image;
+import org.jboss.tools.foundation.core.properties.IPropertiesProvider;
+import org.jboss.tools.foundation.core.properties.PropertiesHelper;
 import org.jboss.tools.project.examples.ProjectExamplesActivator;
 
 /**
@@ -41,25 +44,6 @@ public class DefaultJBossCentralConfigurator implements
 	    WIZARD_IDS = Collections.unmodifiableList(wizardIds);
 	}
 	
-	// This value should be configured at build-time via commandline (eg., in Jenkins via a job parameter)
-	// JBIDE-16642 TODO: when closer to release, switch this to /stable/luna/
-	// SEE ALSO examples/plugins/org.jboss.tools.project.examples/pom.xml
-	private static final String JBOSS_DIRECTORY_URL_DEFAULT = "http://download.jboss.org/jbosstools/updates/development/luna/jbosstools-directory.xml"; //$NON-NLS-1$
-
-	// see pom.xml for actual value -- this is passed it at build-time via Maven
-	private static final String JBOSS_DIRECTORY_URL;
-
-	static {
-		ResourceBundle rb = ResourceBundle.getBundle("org.jboss.tools.project.examples.configurators.discovery"); //$NON-NLS-1$
-		String url = rb.getString("discovery.url").trim(); //$NON-NLS-1$
-		if ("".equals(url) || "${jboss.discovery.directory.url}".equals(url)){  //$NON-NLS-1$//$NON-NLS-2$
-			//was not filtered, fallback to default value
-			JBOSS_DIRECTORY_URL = JBOSS_DIRECTORY_URL_DEFAULT;
-		} else {
-			JBOSS_DIRECTORY_URL = url;
-		}
-	}
-
 	private static final String TWITTER_LINK ="http://twitter.com/jbosstools"; //$NON-NLS-1$
 	
 	private static final String BLOGS_URL = "http://planet.jboss.org/feeds/blogs"; //$NON-NLS-1$
@@ -77,16 +61,16 @@ public class DefaultJBossCentralConfigurator implements
 		return new String[] {"org.jboss.tools.central.openJBossToolsHome",  //$NON-NLS-1$
 				"org.jboss.tools.central.favoriteAtEclipseMarketplace" //$NON-NLS-1$
 				//,"org.jboss.tools.central.preferences"
-				}; //$NON-NLS-1$
+				}; 
 	}
 
 	@Override
 	public String getJBossDiscoveryDirectory() {
 		// use commandline override -Djboss.discovery.directory.url
-		String directory = System.getProperty(ProjectExamplesActivator.JBOSS_DISCOVERY_DIRECTORY, null);
+		String directory = System.getProperty(JBOSS_DISCOVERY_DIRECTORY, null);
 		if (directory == null) {
-			// else use Maven-generated value (or fall back to default)
-			return JBOSS_DIRECTORY_URL;
+			IPropertiesProvider pp = PropertiesHelper.getPropertiesProvider();
+			directory = pp.getValue(JBOSS_DISCOVERY_DIRECTORY);
 		}
 		return directory;
 	}
