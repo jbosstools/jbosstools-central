@@ -102,11 +102,7 @@ public class ConnectorDescriptorItemUi implements PropertyChangeListener, Runnab
 			return arg0 == this;
 		}
 	};
-	/**
-	 * Cache resolved p2 repositories as it's a very long operation
-	 */
-	private static Map<String, IMetadataRepository> cachedRepo = new HashMap<String, IMetadataRepository>();
-	
+
 	public static enum ConnectorInstallationStatus { UNKNOWN, UP_TO_DATE, UPDATE_AVAILABLE, MORE_RECENT_VERSION_INSTALLED };
 	
 	private DiscoveryConnector connector;
@@ -337,7 +333,7 @@ public class ConnectorDescriptorItemUi implements PropertyChangeListener, Runnab
 		// we put lower (==more important) priority on installed jobs
 		// In case of join in UIThread, priority must be raised to limit freeze duration.
 		if (this.connector.isInstalled()) {
-			this.connectorUnitJob.setPriority(Job.LONG - 1);
+			this.connectorUnitJob.setPriority(Job.SHORT);
 		} else {
 			this.connectorUnitJob.setPriority(Job.LONG);
 		}
@@ -407,30 +403,7 @@ public class ConnectorDescriptorItemUi implements PropertyChangeListener, Runnab
 	 * @return
 	 */
 	private static Map<String, org.eclipse.equinox.p2.metadata.Version> resolveConnectorUnits(	ConnectorDescriptor connector) {
-		IProvisioningAgentProvider provider = (IProvisioningAgentProvider) PlatformUI.getWorkbench().getService(IProvisioningAgentProvider.class);
-		IMetadataRepository repo = cachedRepo.get(connector.getSiteUrl());
-		if (repo == null) {
-			try {
-				IProvisioningAgent agent = provider.createAgent(null); // null = for running system
-				if (agent == null)
-					throw new RuntimeException("Location was not provisioned by p2");
-				IMetadataRepositoryManager metadataManager = (IMetadataRepositoryManager) agent.getService(IMetadataRepositoryManager.SERVICE_NAME);
-				repo = metadataManager.loadRepository(new URI(connector.getSiteUrl()), new NullProgressMonitor());
-				cachedRepo.put(connector.getSiteUrl(), repo);
-			} catch (ProvisionException ex) {
-				JBossCentralActivator.getDefault().getLog().log(new Status(
-						IStatus.ERROR,
-						JBossCentralActivator.PLUGIN_ID,
-						ex.getMessage(),
-						ex));
-			} catch (URISyntaxException ex) {
-				JBossCentralActivator.getDefault().getLog().log(new Status(
-						IStatus.ERROR,
-						JBossCentralActivator.PLUGIN_ID,
-						ex.getMessage(),
-						ex));
-			}
-		}
+		IMetadataRepository repo = P2CachedRepoUtil.getRepoForConnector(connector);
 		Map<String, org.eclipse.equinox.p2.metadata.Version> res = new HashMap<String, org.eclipse.equinox.p2.metadata.Version>();
 		for (String unitId : connector.getInstallableUnits()) {
 			IQueryResult<IInstallableUnit> queryResult = repo.query(QueryUtil.createIUQuery(unitId), new NullProgressMonitor());
