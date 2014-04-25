@@ -113,13 +113,11 @@ import org.eclipse.swt.widgets.ToolItem;
 import org.eclipse.swt.widgets.Widget;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.forms.IFormColors;
-import org.eclipse.ui.progress.WorkbenchJob;
 import org.eclipse.ui.statushandlers.StatusManager;
 import org.eclipse.ui.themes.IThemeManager;
 import org.jboss.tools.central.JBossCentralActivator;
-import org.jboss.tools.central.editors.xpl.filters.EarlyAccessFilter;
-import org.jboss.tools.central.editors.xpl.filters.UserFilterEntry;
 import org.jboss.tools.central.editors.xpl.filters.FiltersSelectionDialog;
+import org.jboss.tools.central.editors.xpl.filters.UserFilterEntry;
 import org.jboss.tools.project.examples.internal.discovery.DiscoveryUtil;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.Version;
@@ -1174,6 +1172,7 @@ public class DiscoveryViewer extends Viewer {
 						DiscoveryViewer.this.installedFeatures = getInstalledFeatures(monitor);
 					}
 					// TODO parallize this loop
+					Map<String, Set<DiscoveryConnector>> connectorsById = new HashMap<String, Set<DiscoveryConnector>>();
 					for (String directoryUrl : DiscoveryViewer.this.directoryUrls) {
 						ConnectorDiscovery connectorDiscovery = DiscoveryUtil.createConnectorDiscovery(directoryUrl);
 						connectorDiscovery.setEnvironment(environment);
@@ -1185,7 +1184,21 @@ public class DiscoveryViewer extends Viewer {
 								return;
 							}
 							DiscoveryViewer.this.discoveries.put(directoryUrl, connectorDiscovery);
-							postDiscovery(connectorDiscovery);
+							for (DiscoveryConnector connector : connectorDiscovery.getConnectors()) {
+								connector.setInstalled(installedFeatures != null && installedFeatures.containsAll(connector.getInstallableUnits()));
+								if (connectorsById.get(connector.getId()) == null) {
+									connectorsById.put(connector.getId(), new HashSet<DiscoveryConnector>());
+								}
+								connectorsById.get(connector.getId()).add(connector);
+							}
+						}
+					}
+					// pre-load repositories that will be polled for comparison
+					for (Set<DiscoveryConnector> connectors : connectorsById.values()) {
+						if (connectors.size() > 1) {
+							for (DiscoveryConnector connector : connectors) {
+								P2CachedRepoUtil.getRepoForConnector(connector);
+							}
 						}
 					}
 					if (monitor.isCanceled()) {
@@ -1245,10 +1258,7 @@ public class DiscoveryViewer extends Viewer {
 	}
 
 	protected void postDiscovery(ConnectorDiscovery connectorDiscovery) {
-		for (DiscoveryConnector connector : connectorDiscovery.getConnectors()) {
-			connector.setInstalled(installedFeatures != null
-					&& installedFeatures.containsAll(connector.getInstallableUnits()));
-		}
+		
 	}
 
 	protected Set<String> getInstalledFeatures(IProgressMonitor monitor) throws InterruptedException {

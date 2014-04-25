@@ -36,7 +36,10 @@ public class Messages extends NLS {
 	
 	public static String SoftwarePage_earlyAccessSection_Title;
 	public static String SoftwarePage_earlyAccessSection_message;
-	public static String SoftwarePage_earlyAccessSection_checkbox; 
+	public static String SoftwarePage_earlyAccessSection_checkbox;
+
+	public static String uninstallEarlyAccess_title;
+	public static String uninstallEarlyAccess_message; 
 	
 	static {
 		// initialize resource bundle

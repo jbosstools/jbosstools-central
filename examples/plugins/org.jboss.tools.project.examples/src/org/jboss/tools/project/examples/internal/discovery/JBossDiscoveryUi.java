@@ -65,7 +65,7 @@ public class JBossDiscoveryUi {
 		return true;
 	}
 	
-	public static boolean uninstall(final List<ConnectorDescriptor> descriptors, IRunnableContext context) {
+	public static boolean uninstall(final List<ConnectorDescriptor> descriptors, IRunnableContext context, boolean fork) {
 		try {
 			UninstallRequest request = new UninstallRequest() {
 				@Override
@@ -81,10 +81,15 @@ public class JBossDiscoveryUi {
 				}
 			};
 			PrepareUninstallProfileJob runner = new PrepareUninstallProfileJob(descriptors, request);
-			context.run(true, true, runner);
+			context.run(fork, true, runner);
 
 			// update stats
-			new DiscoveryFeedbackJob(descriptors).schedule();
+			DiscoveryFeedbackJob discoveryFeedbackJob = new DiscoveryFeedbackJob(descriptors);
+			discoveryFeedbackJob.schedule();
+			if (!fork) {
+				discoveryFeedbackJob.join();
+				return discoveryFeedbackJob.getResult().isOK();
+			}
 		} catch (InvocationTargetException e) {
 			IStatus status = new Status(IStatus.ERROR, ProjectExamplesActivator.PLUGIN_ID, NLS.bind(
 					Messages.ConnectorDiscoveryWizard_installProblems, new Object[] { e.getCause().getMessage() }),
@@ -97,6 +102,7 @@ public class JBossDiscoveryUi {
 		}
 		return true;
 	}
+	
 	
 	public static PrepareInstallProfileJob createInstallJob(List<ConnectorDescriptor> descriptors) {
 		return new PrepareInstallProfileJob(descriptors);
