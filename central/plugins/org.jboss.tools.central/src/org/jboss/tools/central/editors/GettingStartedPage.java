@@ -200,7 +200,7 @@ public class GettingStartedPage extends AbstractJBossCentralPage implements Prox
 		
 		toolkit = managedForm.getToolkit();
 		form = managedForm.getForm();
-		blueish = toolkit.getColors().createColor("blue", 217, 230, 248);
+		blueish = toolkit.getColors().createColor("#EDF5FE", 237, 245, 254);
 		grey  = toolkit.getColors().createColor("grey", 194, 194, 194);
 	      
 		Composite body = form.getBody();
