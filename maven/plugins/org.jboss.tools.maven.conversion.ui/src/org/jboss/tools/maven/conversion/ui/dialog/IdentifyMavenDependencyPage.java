@@ -32,6 +32,7 @@ import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.jobs.IJobChangeEvent;
 import org.eclipse.core.runtime.jobs.Job;
@@ -188,6 +189,12 @@ public class IdentifyMavenDependencyPage extends WizardPage {
 		if (failedImage != null) failedImage.dispose();
 		if (loadingImage != null) loadingImage.dispose();
 		if (unresolvedImage != null) unresolvedImage.dispose();
+		
+		for (IdentificationJob job : identificationJobs.values()) {
+			if (job != null) {
+				job.cancel();
+			}
+		}
 		dependencyMap = null;
 		initialEntries = null;
 		dependencyResolution = null;
@@ -762,6 +769,11 @@ public class IdentifyMavenDependencyPage extends WizardPage {
 						
 						@Override
 						public void done(IJobChangeEvent event) {
+							if (dependencyMap == null || dependencyResolution == null 
+									|| event.getResult().getSeverity() == IStatus.CANCEL) {
+								//Dialog was closed/disposed
+								return;
+							}
 							Dependency d = job.getDependency();
 							dependencyMap.put(projectDep, d);
 							if (d != null) {
