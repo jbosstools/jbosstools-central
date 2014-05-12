@@ -17,3 +17,4 @@ Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-Localization: plugin
 Bundle-Vendor: %Bundle-Vendor
+Export-Package: org.jboss.tools.maven.portlet.configurators;x-friends:="org.jboss.tools.maven.configurators.tests"

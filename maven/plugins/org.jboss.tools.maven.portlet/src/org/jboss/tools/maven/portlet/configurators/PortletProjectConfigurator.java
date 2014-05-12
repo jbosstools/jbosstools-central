@@ -11,9 +11,11 @@
 package org.jboss.tools.maven.portlet.configurators;
 
 import org.apache.maven.project.MavenProject;
+import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jst.common.project.facet.core.libprov.ILibraryProvider;
 import org.eclipse.jst.common.project.facet.core.libprov.LibraryInstallDelegate;
@@ -24,6 +26,7 @@ import org.eclipse.m2e.core.project.configurator.AbstractProjectConfigurator;
 import org.eclipse.m2e.core.project.configurator.ILifecycleMappingConfiguration;
 import org.eclipse.m2e.core.project.configurator.MojoExecutionKey;
 import org.eclipse.m2e.core.project.configurator.ProjectConfigurationRequest;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.wst.common.componentcore.ModuleCoreNature;
 import org.eclipse.wst.common.frameworks.datamodel.IDataModel;
 import org.eclipse.wst.common.project.facet.core.IFacetedProject;
@@ -51,6 +54,9 @@ public class PortletProjectConfigurator extends AbstractProjectConfigurator {
 
 	private static final String PORTLETBRIDGE_API_GROUP_ID = "org.jboss.portletbridge"; //$NON-NLS-1$
 	private static final String PORTLETBRIDGE_API_ARTIFACT_ID = "portletbridge-api"; //$NON-NLS-1$
+
+	public static final String PORTLET_CONFIGURATION_ERROR_MARKER_ID = "org.jboss.tools.maven.portlet.problem.configuration"; //$NON-NLS-1$
+
 	
 	protected static final IProjectFacet dynamicWebFacet;
 	protected static final IProjectFacetVersion dynamicWebVersion;
@@ -98,13 +104,24 @@ public class PortletProjectConfigurator extends AbstractProjectConfigurator {
 	    String portletVersion = Activator.getDefault().getDependencyVersion(mavenProject, PORTLET_API_GROUP_ID, PORTLET_API_ARTIFACT_ID);
 	    String jsfportletVersion = Activator.getDefault().getDependencyVersion(mavenProject, PORTLETBRIDGE_API_GROUP_ID, PORTLETBRIDGE_API_ARTIFACT_ID);
 	    if (portletVersion != null) {
-	    	final IFacetedProject fproj = ProjectFacetsManager.create(project);
-	    	if (fproj != null) {
-	    		installWarFacets(fproj, portletVersion, jsfportletVersion, monitor);
-	    	}
+	      final IFacetedProject fproj = ProjectFacetsManager.create(project);
+	      if (fproj != null) {
+	        markerManager.deleteMarkers(project, PORTLET_CONFIGURATION_ERROR_MARKER_ID);
+	        try {
+	          installWarFacets(fproj, portletVersion, jsfportletVersion, monitor);
+	        } catch (CoreException e) {
+	          IStatus status = e.getStatus();
+	          String errorMessage = (status == null || status.getMessage() == null) ? e.getMessage():status.getMessage();
+	          String markerMessage = NLS.bind(Messages.PortletProjectConfigurator_Error_installing_facet, 
+	            new Object[]{portletFacet.getLabel(), portletVersion, errorMessage});
+	          addErrorMarker(fproj.getProject(), markerMessage);
+	          for (IStatus st : status.getChildren()) {
+	            addErrorMarker(fproj.getProject(), st.getMessage());
+	          }
+	        }
+	      }
 	    }
 	}
-
 
 	@Override
 	public void mavenProjectChanged(MavenProjectChangedEvent event,
@@ -136,7 +153,7 @@ public class PortletProjectConfigurator extends AbstractProjectConfigurator {
 	private void installWarFacets(IFacetedProject fproj, String portletVersion, String jsfportletVersion, IProgressMonitor monitor) throws CoreException {
 		
 		if (!fproj.hasProjectFacet(dynamicWebFacet)) {
-			MavenPortletActivator.log(Messages.PortletProjectConfigurator_The_project_does_not_contain_the_Web_Module_facet);
+			MavenPortletActivator.log(NLS.bind(Messages.PortletProjectConfigurator_The_project_does_not_contain_the_Web_Module_facet, fproj.getProject().getName()));
 			return;
 		}
 		installM2Facet(fproj, monitor);
@@ -156,11 +173,7 @@ public class PortletProjectConfigurator extends AbstractProjectConfigurator {
 				fproj.installProjectFacet(portletVersion20, model, monitor);	
 			}
 		}
-		IPreferenceStore store = Activator.getDefault().getPreferenceStore();
-		boolean configureJSFPortlet = store.getBoolean(Activator.CONFIGURE_JSFPORTLET);
-		if (!configureJSFPortlet) {
-			return;
-		}
+    
 		if (fproj.hasProjectFacet(portletFacet) && fproj.hasProjectFacet(jsfFacet) && jsfportletVersion != null) {
 			
 			if (!fproj.hasProjectFacet(jsfportletFacetVersion)) {
@@ -194,6 +207,14 @@ public class PortletProjectConfigurator extends AbstractProjectConfigurator {
       ILifecycleMappingConfiguration oldProjectConfiguration,
       MojoExecutionKey key, IProgressMonitor monitor) {
     return false;
+  }
+
+  @SuppressWarnings("restriction")
+  private void addErrorMarker(IProject project, String message) {
+      markerManager.addMarker(project, 
+          PORTLET_CONFIGURATION_ERROR_MARKER_ID, 
+          message
+          ,-1,  IMarker.SEVERITY_ERROR);
   }
 
 }

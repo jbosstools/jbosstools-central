@@ -22,4 +22,12 @@
           name="%Portlet_Project_configurator"
           secondaryTo="org.maven.ide.eclipse.configuration.wtp.configurator"/>
     </extension>
+    
+     <extension point="org.eclipse.core.resources.markers"
+         id="org.jboss.tools.maven.portlet.problem.configuration"
+         name="%Maven_Configuration_Problem">
+      <super type="org.eclipse.m2e.core.maven2Problem"/>
+      <persistent value="true"/>
+    </extension>
+    
 </plugin>
