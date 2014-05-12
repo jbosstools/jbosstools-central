@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2011 Red Hat, Inc.
+ * Copyright (c) 2011-2014 Red Hat, Inc.
  * Distributed under license by Red Hat, Inc. All rights reserved.
  * This program is made available under the terms of the
  * Eclipse Public License v1.0 which accompanies this distribution,
@@ -21,6 +21,8 @@ import org.eclipse.jst.common.project.facet.core.libprov.LibraryProviderFramewor
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.project.MavenProjectChangedEvent;
 import org.eclipse.m2e.core.project.configurator.AbstractProjectConfigurator;
+import org.eclipse.m2e.core.project.configurator.ILifecycleMappingConfiguration;
+import org.eclipse.m2e.core.project.configurator.MojoExecutionKey;
 import org.eclipse.m2e.core.project.configurator.ProjectConfigurationRequest;
 import org.eclipse.wst.common.componentcore.ModuleCoreNature;
 import org.eclipse.wst.common.frameworks.datamodel.IDataModel;
@@ -83,18 +85,21 @@ public class PortletProjectConfigurator extends AbstractProjectConfigurator {
 	
 	private void configureInternal(MavenProject mavenProject,IProject project,
 			IProgressMonitor monitor) throws CoreException {
+		String packaging = mavenProject.getPackaging();
+		if (!"war".equals(packaging)) { //$NON-NLS-1$
+			return;
+		}
+		
 		IPreferenceStore store = Activator.getDefault().getPreferenceStore();
 		boolean configurePortlet = store.getBoolean(Activator.CONFIGURE_PORTLET);
 		if (!configurePortlet) {
 			return;
 		}
-		
-		String packaging = mavenProject.getPackaging();
 	    String portletVersion = Activator.getDefault().getDependencyVersion(mavenProject, PORTLET_API_GROUP_ID, PORTLET_API_ARTIFACT_ID);
 	    String jsfportletVersion = Activator.getDefault().getDependencyVersion(mavenProject, PORTLETBRIDGE_API_GROUP_ID, PORTLETBRIDGE_API_ARTIFACT_ID);
 	    if (portletVersion != null) {
 	    	final IFacetedProject fproj = ProjectFacetsManager.create(project);
-	    	if (fproj != null && "war".equals(packaging)) { //$NON-NLS-1$
+	    	if (fproj != null) {
 	    		installWarFacets(fproj, portletVersion, jsfportletVersion, monitor);
 	    	}
 	    }
@@ -132,6 +137,7 @@ public class PortletProjectConfigurator extends AbstractProjectConfigurator {
 		
 		if (!fproj.hasProjectFacet(dynamicWebFacet)) {
 			MavenPortletActivator.log(Messages.PortletProjectConfigurator_The_project_does_not_contain_the_Web_Module_facet);
+			return;
 		}
 		installM2Facet(fproj, monitor);
 		installPortletFacet(fproj, portletVersion, jsfportletVersion, monitor);
@@ -182,4 +188,12 @@ public class PortletProjectConfigurator extends AbstractProjectConfigurator {
 		config.setProperty(IPortletConstants.JSFPORTLET_LIBRARY_PROVIDER_DELEGATE, libraryDelegate);
 		return config;
 	}
+	
+  @Override
+  public boolean hasConfigurationChanged(IMavenProjectFacade newFacade,
+      ILifecycleMappingConfiguration oldProjectConfiguration,
+      MojoExecutionKey key, IProgressMonitor monitor) {
+    return false;
+  }
+
 }
