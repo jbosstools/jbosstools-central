@@ -16,7 +16,7 @@ import org.eclipse.mylyn.internal.discovery.core.model.ConnectorDescriptor;
 
 /**
  * Filter that excludes connector which have certifacte id containing
- * "earlyaccess"
+ * "earlyaccess" and that are not installed.
  * @author mistria
  *
  */
@@ -27,7 +27,11 @@ public class EarlyAccessFilter extends ViewerFilter {
 		if (! (element instanceof ConnectorDescriptor)) {
 			return true;
 		}
-		String cert = ((ConnectorDescriptor)element).getCertificationId();
+		ConnectorDescriptor connector = (ConnectorDescriptor)element;
+		if (connector.isInstalled()) {
+			return true;
+		}
+		String cert = connector.getCertificationId();
 		return cert == null || !cert.toLowerCase().contains("earlyaccess");
 	}
 

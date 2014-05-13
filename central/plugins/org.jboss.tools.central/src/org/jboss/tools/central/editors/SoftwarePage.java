@@ -11,15 +11,19 @@
 package org.jboss.tools.central.editors;
 
 import java.lang.reflect.InvocationTargetException;
+import java.net.URI;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Dictionary;
 import java.util.List;
 
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.Platform;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.IJobChangeEvent;
 import org.eclipse.core.runtime.jobs.JobChangeAdapter;
+import org.eclipse.equinox.p2.core.IProvisioningAgent;
+import org.eclipse.equinox.p2.repository.artifact.IArtifactRepositoryManager;
+import org.eclipse.equinox.p2.repository.metadata.IMetadataRepositoryManager;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.dialogs.MessageDialog;
@@ -31,7 +35,6 @@ import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.mylyn.commons.core.DelegatingProgressMonitor;
 import org.eclipse.mylyn.internal.discovery.core.model.ConnectorDescriptor;
-import org.eclipse.mylyn.internal.discovery.core.model.ConnectorDiscovery;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ControlAdapter;
@@ -62,7 +65,6 @@ import org.eclipse.ui.forms.widgets.Section;
 import org.eclipse.ui.handlers.IHandlerService;
 import org.eclipse.ui.menus.CommandContributionItem;
 import org.eclipse.ui.part.PageBook;
-import org.eclipse.ui.progress.UIJob;
 import org.jboss.tools.central.JBossCentralActivator;
 import org.jboss.tools.central.Messages;
 import org.jboss.tools.central.editors.xpl.ConnectorDescriptorItemUi;
@@ -352,6 +354,7 @@ public class SoftwarePage extends AbstractJBossCentralPage implements IRunnableC
 	    					installedEarlyAccess.add(connector.getConnector());
 	    				}
 	    			}
+	    			// remaining early-access connectors
 	    			if (!installedEarlyAccess.isEmpty()) {
 	    				StringBuilder listOfConnectors = new StringBuilder();
 	    				for (ConnectorDescriptor connector : installedEarlyAccess) {
@@ -359,21 +362,29 @@ public class SoftwarePage extends AbstractJBossCentralPage implements IRunnableC
 	    					listOfConnectors.append(connector.getName());
 	    					listOfConnectors.append('\n'); //$NON-NLS-1$
 	    				}
-	    				if (MessageDialog.openConfirm(checkbox.getShell(), Messages.uninstallEarlyAccess_title, NLS.bind(Messages.uninstallEarlyAccess_message, listOfConnectors.toString()))) {
-	    					// this operation should be synchronous/modal/(gently)blocking
-	    					boolean hasUninstalled = JBossDiscoveryUi.uninstall(installedEarlyAccess, SoftwarePage.this, false);
-							if (hasUninstalled) {
-	    						JBossCentralActivator.getDefault().getPreferences().putBoolean(PreferenceKeys.ENABLE_EARLY_ACCESS, false);
-	    						SoftwarePage.this.discoveryViewer.addSystemFilter(SoftwarePage.this.earlyAccessFilter);
-	    					}
-	    				} else {
-	    					checkbox.setSelection(true);
-	    					return;
-	    				}
-	    			} else {
-	    				JBossCentralActivator.getDefault().getPreferences().putBoolean(PreferenceKeys.ENABLE_EARLY_ACCESS, false);
-	    				SoftwarePage.this.discoveryViewer.addSystemFilter(SoftwarePage.this.earlyAccessFilter);
+	    				MessageDialog.openInformation(checkbox.getShell(), Messages.remainingEarlyAccessConnectors_title, NLS.bind(Messages.remainingEarlyAccessConnectors_message, listOfConnectors.toString()));
 	    			}
+	    			// remove early-access sites
+	    			IProvisioningAgent agent = (IProvisioningAgent)JBossCentralActivator.getDefault().getService(IProvisioningAgent.SERVICE_NAME);
+    				IMetadataRepositoryManager metadataRepositoryManager = (IMetadataRepositoryManager)agent.getService(IMetadataRepositoryManager.SERVICE_NAME);
+    				IArtifactRepositoryManager artifactsitoryManager = (IArtifactRepositoryManager)agent.getService(IArtifactRepositoryManager.SERVICE_NAME);
+    				for (ConnectorDescriptorItemUi connector : SoftwarePage.this.discoveryViewer.getAllConnectorsItemsUi()) {
+	    				if (connector.getConnector().getCertificationId().contains("earlyaccess")) {
+	    					try {
+		    					URI repoUri = new URI(connector.getConnector().getSiteUrl());
+		    					metadataRepositoryManager.removeRepository(repoUri);
+		    					artifactsitoryManager.removeRepository(repoUri);
+	    					} catch (Exception ex) {
+	    						JBossCentralActivator.getDefault().getLog().log(new Status(IStatus.ERROR,
+	    							JBossCentralActivator.PLUGIN_ID,
+	    							ex.getMessage(),
+	    							ex));
+	    					}
+	    				}
+    				}
+    				
+    				JBossCentralActivator.getDefault().getPreferences().putBoolean(PreferenceKeys.ENABLE_EARLY_ACCESS, false);
+    				SoftwarePage.this.discoveryViewer.addSystemFilter(SoftwarePage.this.earlyAccessFilter);
 	    		}
 	    		SoftwarePage.this.discoveryViewer.updateFilters();
 	    	}
