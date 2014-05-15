@@ -82,15 +82,17 @@
     <extension
         point="org.jboss.tools.project.examples.projectExamplesXml"
         name="JBoss Featured Examples">
-        <url>http://download.jboss.org/jbosstools/examples/project-examples-shared-4.2.Beta1.xml</url> 
+        <!-- Key for URL in download.jboss.org/jbosstools/configuration/ide-config.properties -->
+        <urlKey>featured.examples.url</urlKey> 
         <experimental>false</experimental>
     </extension>
     
-    <extension
+  <extension
         point="org.jboss.tools.project.examples.categories"
         name="Project Examples Categories">
-        <url>http://download.jboss.org/jbosstools/examples/project-examples-category-4.2.xml</url>
-    </extension>
+        <!-- Key for URL in download.jboss.org/jbosstools/configuration/ide-config.properties -->
+        <urlKey>examples.categories.url</urlKey>
+  </extension>
    
     <extension
          point="org.jboss.tools.project.examples.wizardpages">
