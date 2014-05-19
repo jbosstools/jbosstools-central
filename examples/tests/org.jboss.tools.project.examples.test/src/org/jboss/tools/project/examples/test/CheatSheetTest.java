@@ -87,7 +87,7 @@ public class CheatSheetTest {
 	private static final String CHEATSHEET_HELLOWORLD_ZIP = "resources/cheatsheet-helloworld.zip";
 	
 	private static final String WEB_APPLICATIONS = "Web Applications";
-	private static final String KITCHENSINK = "jboss-as-kitchensink";
+	private static final String KITCHENSINK = "jboss-kitchensink";
 	
 	@BeforeClass
 	public static void init() throws Exception {
@@ -149,7 +149,7 @@ public class CheatSheetTest {
 		JobUtils.waitForIdle();
 		IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();    
 		IProject project = root.getProject(KITCHENSINK);
-		assertTrue("The jboss-as-kitchensink project is not imported.", project.exists());
+		assertTrue("The jboss-kitchensink project is not imported.", project.exists());
 		final IFile file = project.getFile("cheatsheet.xml");
 		Display.getDefault().syncExec(new Runnable() {
 			
@@ -166,7 +166,7 @@ public class CheatSheetTest {
 		JobUtils.waitForIdle();
 		IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();    
 		IProject project = root.getProject(KITCHENSINK);
-		assertTrue("The jboss-as-kitchensink project is not imported.", project.exists());
+		assertTrue("The jboss-kitchensink project is not imported.", project.exists());
 		final IFile file = project.getFile("cheatsheet.xml");
 		Display.getDefault().syncExec(new Runnable() {
 			
@@ -254,7 +254,7 @@ public class CheatSheetTest {
  		Command openFile = commandService.getCommand("org.jboss.tools.project.examples.cheatsheet.openFileInEditor");
  		IParameter path = openFile.getParameter("path");
  
- 		Parameterization parm = new Parameterization(path, "/jboss-as-kitchensink/src/main/java/org/jboss/as/quickstarts/kitchensink/model/Member.java");
+ 		Parameterization parm = new Parameterization(path, "/jboss-kitchensink/src/main/java/org/jboss/as/quickstarts/kitchensink/model/Member.java");
  		ParameterizedCommand parmCommand = new ParameterizedCommand(
  				openFile, new Parameterization[] { parm });
  
@@ -268,7 +268,7 @@ public class CheatSheetTest {
 		assertTrue("Incorrect editor input.", input instanceof IFileEditorInput);
 		IFileEditorInput fileEditorInput = (IFileEditorInput) input;
 		IFile file = fileEditorInput.getFile();
-		assertEquals("Incorrect file opened.",file.getFullPath().toString(), ("/jboss-as-kitchensink/src/main/java/org/jboss/as/quickstarts/kitchensink/model/Member.java"));
+		assertEquals("Incorrect file opened.",file.getFullPath().toString(), ("/jboss-kitchensink/src/main/java/org/jboss/as/quickstarts/kitchensink/model/Member.java"));
 		page.closeAllEditors(false);
 	}
 
