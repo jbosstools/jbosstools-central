@@ -48,6 +48,8 @@ import org.eclipse.m2e.core.internal.project.registry.MavenProjectManager;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.project.MavenProjectChangedEvent;
 import org.eclipse.m2e.core.project.configurator.AbstractProjectConfigurator;
+import org.eclipse.m2e.core.project.configurator.ILifecycleMappingConfiguration;
+import org.eclipse.m2e.core.project.configurator.MojoExecutionKey;
 import org.eclipse.m2e.core.project.configurator.ProjectConfigurationRequest;
 import org.eclipse.wst.common.componentcore.ComponentCore;
 import org.eclipse.wst.common.componentcore.ModuleCoreNature;
@@ -667,5 +669,28 @@ public class SeamProjectConfigurator extends AbstractProjectConfigurator {
 		config.setProperty(IJSFFacetInstallDataModelProperties.SERVLET_NAME, ""); //$NON-NLS-1$
 		config.setProperty(IJSFFacetInstallDataModelProperties.SERVLET_URL_PATTERNS, new String[0]);
 		return config;
+	}
+	
+	@Override
+	public boolean hasConfigurationChanged(IMavenProjectFacade newFacade,
+			ILifecycleMappingConfiguration oldProjectConfiguration,
+			MojoExecutionKey key, IProgressMonitor monitor) {
+
+		IPreferenceStore store = Activator.getDefault().getPreferenceStore();
+		boolean configureSeam = store.getBoolean(Activator.CONFIGURE_SEAM);
+		if (!configureSeam) {
+			return false;
+		}
+		
+		try {
+			IFacetedProject fproj = ProjectFacetsManager.create(newFacade.getProject());
+	    	if (fproj == null || !fproj.hasProjectFacet(seamFacet)) {
+	    		return false;
+	    	}
+		} catch (CoreException e) {
+			MavenSeamActivator.log(e);
+		}
+		return super.hasConfigurationChanged(newFacade, oldProjectConfiguration, key,
+				monitor);
 	}
 }
