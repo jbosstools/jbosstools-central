@@ -41,7 +41,6 @@
      <extension point="org.eclipse.core.resources.markers"
          id="org.jbosstools.maven.configuration.seam"
          name="%Maven_Configuration_Problem">
-      <super type="org.eclipse.m2e.core.maven2Problem.configuration"/>
       <persistent value="true"/>
     </extension>
 

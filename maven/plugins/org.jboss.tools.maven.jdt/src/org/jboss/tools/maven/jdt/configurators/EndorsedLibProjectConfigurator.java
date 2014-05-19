@@ -98,13 +98,15 @@ public class EndorsedLibProjectConfigurator extends AbstractProjectConfigurator 
 		return missingDirs;
 	}
 	
-	public void configureClasspath(IMavenProjectFacade facade,
+	@Override
+  public void configureClasspath(IMavenProjectFacade facade,
 			IClasspathDescriptor classpath, IProgressMonitor monitor)
 			throws CoreException {
 		// Nothing to configure here 
 	}
 
-	public void configureRawClasspath(ProjectConfigurationRequest request,
+	@Override
+  public void configureRawClasspath(ProjectConfigurationRequest request,
 			IClasspathDescriptor classpath, IProgressMonitor monitor)
 			throws CoreException {
 
@@ -197,7 +199,9 @@ public class EndorsedLibProjectConfigurator extends AbstractProjectConfigurator 
 	
     
 	private static String useSystemSeparator(String name) {
-		if (name == null) return null;
+		if (name == null) {
+      return null;
+    }
 		return name.replace('/', File.separatorChar)
 	            .replace('\\', File.separatorChar);
 	}
@@ -206,7 +210,7 @@ public class EndorsedLibProjectConfigurator extends AbstractProjectConfigurator 
 												   MavenSession session, 
 												   IProgressMonitor monitor) throws CoreException {
 		MavenExecutionPlan executionPlan = maven.calculateExecutionPlan(session, 
-																		mavenProjectFacade.getMavenProject(), 
+        mavenProjectFacade.getMavenProject(monitor),
 																		Collections.singletonList("compile"), 
 																		true, 
 																		monitor);
@@ -248,7 +252,8 @@ public class EndorsedLibProjectConfigurator extends AbstractProjectConfigurator 
 		return MavenJdtActivator.getDefault().getEndorsedLibrariesManager();
 	}
 	
-	public void unconfigure(ProjectConfigurationRequest request, IProgressMonitor monitor) throws CoreException {
+	@Override
+  public void unconfigure(ProjectConfigurationRequest request, IProgressMonitor monitor) throws CoreException {
 		super.unconfigure(request, monitor);
 		ClasspathHelpers.removeEndorsedLibClasspathContainer(request.getProject());		 
     }
