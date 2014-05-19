@@ -26,7 +26,9 @@
           class="org.jboss.tools.project.examples.wizard.NewProjectExamplesWizard2"
           icon="icons/examples_wiz.gif"
           id="org.jboss.tools.project.examples.wizard.NewProjectExamplesWizard"
-          name="%Project_Examples_wizard">
+          name="%Project_Examples_wizard"
+          project="true"
+          >
     </wizard>
     <category
           id="org.jboss.tools.project.examples.category"
