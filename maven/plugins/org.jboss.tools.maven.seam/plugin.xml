@@ -31,7 +31,7 @@
     <extension
          point="org.eclipse.ui.ide.markerSupport">
       <markerTypeCategory
-            name="%Maven_Configuration_Problems">
+            name="%Maven_Configuration_Problem">
          <markerTypeReference
                id="org.jbosstools.maven.configuration.seam">
          </markerTypeReference>
@@ -41,6 +41,7 @@
      <extension point="org.eclipse.core.resources.markers"
          id="org.jbosstools.maven.configuration.seam"
          name="%Maven_Configuration_Problem">
+      <super type="org.eclipse.core.resources.problemmarker"/>
       <persistent value="true"/>
     </extension>
 
