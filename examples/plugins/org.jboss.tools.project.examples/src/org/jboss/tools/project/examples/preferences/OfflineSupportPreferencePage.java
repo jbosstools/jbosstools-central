@@ -25,6 +25,7 @@ import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.PreferencePage;
+import org.eclipse.jface.resource.FontDescriptor;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.dnd.Clipboard;
@@ -261,18 +262,28 @@ public class OfflineSupportPreferencePage extends PreferencePage implements
 		
 	    copy.setText("Copy to clipboard"); //$NON-NLS-1$
 	    copy.addSelectionListener(new SelectionAdapter() {
-	    	public void widgetSelected(SelectionEvent e) {
-	    	   String textData = text.getText();
-	           TextTransfer textTransfer = TextTransfer.getInstance();
-	           cb.setContents(new Object[] { textData }, new Transfer[] {textTransfer});
+      @Override
+        public void widgetSelected(SelectionEvent e) {
+        String textData = text.getText();
+        TextTransfer textTransfer = TextTransfer.getInstance();
+        cb.setContents(new Object[] { textData },
+            new Transfer[] { textTransfer });
 	      }
 	    });
+
+    Label explanation = new Label(goOfflineGroup, SWT.WRAP);
+    GridDataFactory.fillDefaults().span(2, 1).applyTo(explanation);
+    explanation
+        .setText("The script will create an offline/ directory under the current directory.\n"
+            + "It will attempt to download and build all project examples, populating a clean local maven repository.\n\n");
 	    
 	    Label instructions = new Label(goOfflineGroup, SWT.WRAP);
+	    FontDescriptor descriptor = FontDescriptor.createFrom(instructions.getFont());
+    descriptor = descriptor.setStyle(SWT.BOLD);
+	    instructions.setFont(descriptor.createFont(instructions.getDisplay()));
 		GridDataFactory.fillDefaults().span(2, 1).applyTo(instructions);
-	    instructions.setText("The script will create an offline/ directory under the current directory.\n"
-	    		+ "It will attempt to download and build all project examples, populating a clean local maven repository.\n\n"
-	    		+ "- Make sure you copy the contents of offline/.jbosstools/cache to the final offline directory\n"
+    instructions
+        .setText("- Make sure you copy the contents of offline/.jbosstools/cache to the final offline directory\n"
 	    		+ "- Copy the contents offline/.m2/repository to your local maven repository location.");
 	}
 	
@@ -294,12 +305,13 @@ public class OfflineSupportPreferencePage extends PreferencePage implements
 		return sUrls;
 	}
 	
-	public void init(IWorkbench workbench) {
-	}
+  @Override
+  public void init(IWorkbench workbench) {
+  }
 
 	@Override
 	protected void performDefaults() {
-		offlineDirectoryText.setText(ProjectExamplesActivator.PROJECT_EXAMPLES_OFFLINE_DIRECTORY_VALUE); //$NON-NLS-1$
+		offlineDirectoryText.setText(ProjectExamplesActivator.PROJECT_EXAMPLES_OFFLINE_DIRECTORY_VALUE); 
 		storePreferences();
 		super.performDefaults();
 	}
