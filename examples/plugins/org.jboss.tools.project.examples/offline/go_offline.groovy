@@ -53,6 +53,12 @@ class GoOfflineScript {
 
   def buildErrors = [:]
 
+  def enterpriseArchetypes = ["org.jboss.aerogear.archetypes:jboss-html5-mobile-archetype:7.1.3.Final", 
+                              "org.jboss.spec.archetypes:jboss-javaee6-webapp-blank-archetype:7.1.3.Final",
+                              "org.jboss.spec.archetypes:jboss-javaee6-webapp-archetype:7.1.3.Final",
+                              "org.richfaces.archetypes:richfaces-archetype-kitchensink:4.2.3.Final-2"
+                              ]
+
   public static main(args) {
     def script = new GoOfflineScript() 
     def cmd = new JCommander();
@@ -206,7 +212,7 @@ class GoOfflineScript {
 
 
   def buildArchetypesFromExamples(projects, workDir, localRepo) {
-    def archetypes= projects.findAll{!(it.stacksId.text())}
+    def archetypes= projects.findAll{!(it.stacksId.text() || it.stacksType.text())}
 
     archetypes.each{p ->
       File folder = new File(workDir, p.mavenArchetype.archetypeArtifactId.text())
@@ -214,13 +220,19 @@ class GoOfflineScript {
         folder.deleteDir()
       }
       folder.mkdirs()
-      
-      def appName = "myapp"
-      execMavenArchetypeBuild (p.mavenArchetype.archetypeGroupId.text(), p.mavenArchetype.archetypeArtifactId.text(), p.mavenArchetype.archetypeVersion.text(), folder, localRepo, appName)
+      def pid = p.mavenArchetype.archetypeGroupId.text()
+      def aid = p.mavenArchetype.archetypeArtifactId.text()
+      def v = p.mavenArchetype.archetypeVersion.text()
+
+      def appName = "myapp."+aid
+      execMavenArchetypeBuild (pid, aid, v, folder, localRepo, appName)
       execMavenGoOffline(new File(folder, appName), localRepo) 
-      if (enterprise){
+
+      def gav = pid + ":"+ aid+ ":"+ v
+      //Only build with enterprise flag when necessary
+      if (enterprise && enterpriseArchetypes.contains(gav)){
         appName += "-enterprise"
-        execMavenArchetypeBuild (p.mavenArchetype.archetypeGroupId.text(), p.mavenArchetype.archetypeArtifactId.text(), p.mavenArchetype.archetypeVersion.text(), folder, localRepo, appName)
+        execMavenArchetypeBuild (pid, aid, v, folder, localRepo, appName)
         execMavenGoOffline(new File(folder, appName), localRepo) 
       }
     }
@@ -229,8 +241,8 @@ class GoOfflineScript {
   def buildArchetypesFromStacks(workDir, localRepo) {
     def config = new DefaultStacksClientConfiguration(cacheRefreshPeriodSeconds:1)
     Stacks stacks = new StacksClient(config).getStacks();
-    stacks.getAvailableArchetypes().each { a ->
-
+    stacks.getAvailableArchetypeVersions().each { av ->
+      def a = av.archetype
       File folder = new File(workDir, a.artifactId)
       if (folder.exists()) {
         folder.deleteDir()
@@ -238,10 +250,12 @@ class GoOfflineScript {
       folder.mkdirs()
 
       def appName = "my-${a.artifactId}"
-      execMavenArchetypeBuild (a.groupId, a.artifactId, a.recommendedVersion, folder, localRepo, appName)
+      execMavenArchetypeBuild (a.groupId, a.artifactId, av.version, folder, localRepo, appName)
       execMavenGoOffline(new File(folder, appName), localRepo) 
 
-      if (enterprise){
+      def gav = a.groupId + ":"+ a.artifactId+ ":"+ av.version
+      //Only build with enterprise flag when necessary
+      if (enterprise && enterpriseArchetypes.contains(gav)){
         appName += "-enterprise"
         execMavenArchetypeBuild (a.groupId, a.artifactId, a.recommendedVersion, folder, localRepo, appName)
         execMavenGoOffline(new File(folder, appName), localRepo) 
@@ -254,7 +268,7 @@ class GoOfflineScript {
     def directory = rootDirectory
     def pom = new File(directory, "pom.xml")
 
-    if (!pom.exists()) {
+    if (!pom.exists() && rootDirectory.exists()) {
        //GateIn examples have their pom.xml one folder down
       rootDirectory.traverse(maxDepth:1) {
         if (it.isDirectory()) {
