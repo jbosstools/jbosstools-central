@@ -65,7 +65,6 @@ import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseTrackAdapter;
-import org.eclipse.swt.events.MouseTrackListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Color;
@@ -568,7 +567,9 @@ public class GettingStartedPage extends AbstractJBossCentralPage implements Prox
 	}
 	
 	private void resizedescriptionCompositeScroller() {
-		  if (projectsComposite == null || descriptionCompositeScroller==null) return;
+		  if (projectsComposite == null || descriptionCompositeScroller==null) {
+        return;
+      }
 	      int total = form.getClientArea().width;
 	      int projectsSize = projectsComposite.getClientArea().width + 60;
 	      int width = total - projectsSize;
@@ -674,7 +675,8 @@ public class GettingStartedPage extends AbstractJBossCentralPage implements Prox
 		final ConnectorDiscovery[] connectorDiscoveries = new ConnectorDiscovery[1];
 		
 		IRunnableWithProgress runnable = new IRunnableWithProgress() {
-			public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
+			@Override
+      public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
 				connectorDiscoveries[0] = DiscoveryUtil.createConnectorDiscovery();
 				connectorDiscoveries[0].setEnvironment(JBossCentralActivator.getEnvironment());
 				results[0] = connectorDiscoveries[0].performDiscovery(monitor);
@@ -727,7 +729,8 @@ public class GettingStartedPage extends AbstractJBossCentralPage implements Prox
 			final Object[] ret = new Object[1];
 			final CoreException[] exc = new CoreException[1];
 			BusyIndicator.showWhile(null, new Runnable() {
-			    public void run() {
+			    @Override
+          public void run() {
 			        try {
 			            ret[0] = element
 			                    .createExecutableExtension(CLASS_ATTRIBUTE);
@@ -793,7 +796,8 @@ public class GettingStartedPage extends AbstractJBossCentralPage implements Prox
 		link.setUnderlined(false);
 		GridDataFactory.fillDefaults().applyTo(link);
 		link.addHyperlinkListener(new HyperlinkAdapter() {
-			public void linkActivated(HyperlinkEvent e) {
+			@Override
+      public void linkActivated(HyperlinkEvent e) {
 				JBossCentralActivator.openUrl(url, getSite().getShell());
 			}
 		});
@@ -948,7 +952,7 @@ public class GettingStartedPage extends AbstractJBossCentralPage implements Prox
 		gl.makeColumnsEqualWidth = false;
 		gl.horizontalSpacing = 0;
 		final Composite categoryComposite = toolkit.createComposite(tutorialsComposite);
-		int categoryHeight = 110;
+    int categoryHeight = 22 * categories.size() + 1;
 		GridDataFactory.fillDefaults().grab(false, false).hint(SWT.DEFAULT, categoryHeight).applyTo(categoryComposite);
 		GridLayout gl2 = new GridLayout();
 		gl2.marginRight = 0;
@@ -1283,7 +1287,8 @@ public class GettingStartedPage extends AbstractJBossCentralPage implements Prox
 		if (!JBossCentralEditor.useFefaultColors) {
 			Composite separator = new Composite(section, style);
 		    separator.addListener(SWT.Paint, new Listener() {
-				public void handleEvent(Event e) {
+				@Override
+        public void handleEvent(Event e) {
 		           if (section.isDisposed()) {
 		        	   return;
 		           }
