@@ -10,6 +10,7 @@
  *******************************************************************************/
 package org.jboss.tools.central.editors.xpl.filters;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -52,7 +53,7 @@ public class MostRecentVersionFilter extends ViewerFilter {
 		}
 
 		ConnectorDescriptor desc = (ConnectorDescriptor)item;
-		if (this.discoveryViewer == null) {
+		if (this.discoveryViewer == null || stateOutdated()) {
 			initializeDiscoveryViewer((DiscoveryViewer)viewer);
 		}
 		// search for first (top-version) connector and returns whether it is the current item
@@ -61,6 +62,21 @@ public class MostRecentVersionFilter extends ViewerFilter {
 				continue;
 			}
 			return other.getConnector() == desc;
+		}
+		return true;
+	}
+
+	/**
+	 * Since this filter is stateful, it can become outdated, for example after
+	 * an "updateDiscovery". This methods checks whether the state needs to be reset.
+	 * 
+	 * @return
+	 */
+	private boolean stateOutdated() {
+		for (Collection<ConnectorDescriptorItemUi> knownItem : this.sortedConnectorsById.values()) {
+			if (this.discoveryViewer.getAllConnectorsItemsUi().containsAll(knownItem)) {
+				return false;
+			}
 		}
 		return true;
 	}

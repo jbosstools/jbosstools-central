@@ -1168,6 +1168,7 @@ public class DiscoveryViewer extends Viewer {
 			final IStatus[] result = new IStatus[1];
 			context.run(true, true, new IRunnableWithProgress() {
 				public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
+					resetState();
 					if (DiscoveryViewer.this.installedFeatures == null) {
 						DiscoveryViewer.this.installedFeatures = getInstalledFeatures(monitor);
 					}
@@ -1253,6 +1254,32 @@ public class DiscoveryViewer extends Viewer {
 					return;
 				}
 				body.setData("discoveryComplete", "true"); //$NON-NLS-1$ //$NON-NLS-2$
+			}
+		});
+	}
+	
+	private void resetState() {
+		getControl().getDisplay().asyncExec(new Runnable() {
+			@Override
+			public void run() {
+				DiscoveryViewer.this.allConnectors.clear();
+				for (Control control : DiscoveryViewer.this.categories.values()) {
+					control.dispose();
+				}
+				DiscoveryViewer.this.categories.clear();
+
+				for (ConnectorDiscovery discovery : DiscoveryViewer.this.discoveries.values()) {
+					discovery.dispose();
+				}
+				DiscoveryViewer.this.discoveries.clear();
+
+				DiscoveryViewer.this.installableConnectors.clear();
+				DiscoveryViewer.this.installedConnectors.clear();
+				DiscoveryViewer.this.updatableConnectors.clear();
+				for (ConnectorDescriptorItemUi itemUI : DiscoveryViewer.this.itemsUi.values()) {
+					itemUI.dispose();
+				}
+				DiscoveryViewer.this.itemsUi.clear();
 			}
 		});
 	}
