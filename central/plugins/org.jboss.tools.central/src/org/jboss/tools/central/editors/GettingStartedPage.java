@@ -952,7 +952,7 @@ public class GettingStartedPage extends AbstractJBossCentralPage implements Prox
 		gl.makeColumnsEqualWidth = false;
 		gl.horizontalSpacing = 0;
 		final Composite categoryComposite = toolkit.createComposite(tutorialsComposite);
-    int categoryHeight = 22 * categories.size() + 1;
+    int categoryHeight = 22 * (categories.size() + 1);
 		GridDataFactory.fillDefaults().grab(false, false).hint(SWT.DEFAULT, categoryHeight).applyTo(categoryComposite);
 		GridLayout gl2 = new GridLayout();
 		gl2.marginRight = 0;
@@ -1070,7 +1070,7 @@ public class GettingStartedPage extends AbstractJBossCentralPage implements Prox
 		tutorialText.setHyperlinkSettings(hyperlinkSettings);
 		buffer.append(JBossCentralActivator.FORM_START_TAG);
 		buffer.append("<a href=\"link\">");
-		buffer.append(tutorial.getShortDescription());
+    buffer.append(tutorial.getShortDescription());
 		buffer.append("</a> ");
 		buffer.append(JBossCentralActivator.FORM_END_TAG);
 

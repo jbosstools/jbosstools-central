@@ -52,7 +52,7 @@ public class HibernateProjectConfigurator extends AbstractProjectConfigurator {
 			IProgressMonitor monitor) throws CoreException {
 		IPreferenceStore store = Activator.getDefault().getPreferenceStore();
 		boolean configureHibernate = store.getBoolean(Activator.CONFIGURE_HIBERNATE);
-		if (!configureHibernate) {
+		if (!configureHibernate || project.hasNature(HibernatePropertiesConstants.HIBERNATE_NATURE)) {
 			return;
 		}
 		
@@ -65,7 +65,7 @@ public class HibernateProjectConfigurator extends AbstractProjectConfigurator {
 					return;
 				}
 			}
-			ProjectUtils.toggleHibernateOnProject(project, true, ""); //$NON-NLS-1$
+      ProjectUtils.toggleHibernateOnProject(project, true, project.getName());
 		}
 	}
 
@@ -79,7 +79,6 @@ public class HibernateProjectConfigurator extends AbstractProjectConfigurator {
 	      MavenProject mavenProject = facade.getMavenProject(monitor);
 	      configureInternal(mavenProject, project, monitor);
 	    }
-		super.mavenProjectChanged(event, monitor);
 	}
 
 	private boolean isHibernateProject(MavenProject mavenProject) {
