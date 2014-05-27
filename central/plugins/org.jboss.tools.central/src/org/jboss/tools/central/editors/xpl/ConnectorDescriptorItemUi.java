@@ -301,10 +301,12 @@ public class ConnectorDescriptorItemUi implements PropertyChangeListener, Runnab
 	 */
 	private void startConnectorUnitJob() {
 		this.connectorUnitJob = new Job("Computing connector status") {
+			private boolean cancelled;
+			
 			@Override
 			protected IStatus run(IProgressMonitor arg0) {
 				ConnectorDescriptorItemUi.this.connectorUnits = resolveConnectorUnits(connector);
-				if (connector.isInstalled()) {
+				if (connector.isInstalled() && ConnectorDescriptorItemUi.this.connectorUnits != null) {
 					Map<String, org.eclipse.equinox.p2.metadata.Version> profileUnits = resolveProfileUnits(connector.getInstallableUnits());
 					for (String unitId : connector.getInstallableUnits()) {
 						int compare = profileUnits.get(unitId).compareTo(ConnectorDescriptorItemUi.this.connectorUnits.get(unitId)); 
@@ -318,6 +320,9 @@ public class ConnectorDescriptorItemUi implements PropertyChangeListener, Runnab
 							break;
 						}
 					}
+					if (this.cancelled) {
+						return Status.CANCEL_STATUS;
+					}
 					ConnectorDescriptorItemUi.this.checkboxContainer.getDisplay().syncExec(new Runnable() {
 						@Override
 						public void run() {
@@ -325,7 +330,12 @@ public class ConnectorDescriptorItemUi implements PropertyChangeListener, Runnab
 						}
 					});
 				}
-				return Status.OK_STATUS;
+				return Status.CANCEL_STATUS;
+			}
+			
+			@Override
+			protected void canceling() {
+				this.cancelled = true;
 			}
 		};
 		this.connectorUnitJob.setSystem(true);
@@ -400,10 +410,13 @@ public class ConnectorDescriptorItemUi implements PropertyChangeListener, Runnab
 	/**
 	 * This is a long-running operation! Don't call it in UI Thread.
 	 * @param connector
-	 * @return
+	 * @return the map of id/version for installation units or null if connector repo can't be resolved.
 	 */
 	private static Map<String, org.eclipse.equinox.p2.metadata.Version> resolveConnectorUnits(	ConnectorDescriptor connector) {
 		IMetadataRepository repo = P2CachedRepoUtil.getRepoForConnector(connector);
+		if (repo == null) {
+			return null;
+		}
 		Map<String, org.eclipse.equinox.p2.metadata.Version> res = new HashMap<String, org.eclipse.equinox.p2.metadata.Version>();
 		for (String unitId : connector.getInstallableUnits()) {
 			IQueryResult<IInstallableUnit> queryResult = repo.query(QueryUtil.createIUQuery(unitId), new NullProgressMonitor());
@@ -493,6 +506,9 @@ public class ConnectorDescriptorItemUi implements PropertyChangeListener, Runnab
 	}
 
 	public void dispose() {
+		if (this.connectorUnitJob != null) {
+			this.connectorUnitJob.cancel();
+		}
 		for (Resource resource : this.disposables) {
 			resource.dispose();
 		}
