@@ -35,6 +35,8 @@ import org.eclipse.core.runtime.SubProgressMonitor;
 import org.eclipse.equinox.internal.p2.ui.ProvUI;
 import org.eclipse.equinox.p2.core.ProvisionException;
 import org.eclipse.equinox.p2.engine.IProfile;
+import org.eclipse.equinox.p2.engine.IProvisioningPlan;
+import org.eclipse.equinox.p2.engine.ProvisioningContext;
 import org.eclipse.equinox.p2.metadata.IInstallableUnit;
 import org.eclipse.equinox.p2.metadata.Version;
 import org.eclipse.equinox.p2.operations.InstallOperation;
@@ -96,7 +98,7 @@ public class PrepareInstallProfileJob extends AbstractInstallJob {
 		}
 
 		try {
-			SubMonitor monitor = SubMonitor.convert(progressMonitor, Messages.InstallConnectorsJob_task_configuring,
+			final SubMonitor monitor = SubMonitor.convert(progressMonitor, Messages.InstallConnectorsJob_task_configuring,
 					100);
 			try {
 				final IInstallableUnit[] ius = computeInstallableUnits(monitor.newChild(50));
@@ -120,6 +122,12 @@ public class PrepareInstallProfileJob extends AbstractInstallJob {
 
 				Display.getDefault().asyncExec(new Runnable() {
 					public void run() {
+						if (installOperation != null) {
+							IProvisioningPlan plan = installOperation.getProvisioningPlan();
+							ProvisioningContext context = installOperation.getProvisioningContext();
+							ProvUI.getSize(ProvUI.getEngine(ProvisioningUI.getDefaultUI()
+									.getSession()), plan, context, monitor);
+						}
 						provisioningUI.openInstallWizard(Arrays.asList(ius), installOperation, rops[0], null);
 					}
 				});
