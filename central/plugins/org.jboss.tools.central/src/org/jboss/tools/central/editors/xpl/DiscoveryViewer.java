@@ -619,13 +619,18 @@ public class DiscoveryViewer extends Viewer {
 			((GridData)categoryControl.getLayoutData()).exclude = true;
 		}
 
-		this.nothingToShowLink.setVisible(visibleCategories.isEmpty());
-		((GridData)this.nothingToShowLink.getLayoutData()).exclude = !visibleCategories.isEmpty();
-		
-		this.scrolledContents.pack(true);
-		this.scrolledContents.layout(true, true);
-		this.bodyScrolledComposite.changed(new Control[] { this.scrolledContents });
-		this.bodyScrolledComposite.showControl(this.scrolledContents);
+		if (this.nothingToShowLink != null && !this.nothingToShowLink.isDisposed()) {
+			this.nothingToShowLink.setVisible(visibleCategories.isEmpty());
+			((GridData)this.nothingToShowLink.getLayoutData()).exclude = !visibleCategories.isEmpty();
+		}
+		if (this.scrolledContents != null && !this.scrolledContents.isDisposed()) {
+			this.scrolledContents.pack(true);
+			this.scrolledContents.layout(true, true);
+		}
+		if (this.bodyScrolledComposite != null && !this.bodyScrolledComposite.isDisposed()) {
+			this.bodyScrolledComposite.changed(new Control[] { this.scrolledContents });
+			this.bodyScrolledComposite.showControl(this.scrolledContents);
+		}
 	}
 	
 	public void setMinimumHeight(int minimumHeight) {

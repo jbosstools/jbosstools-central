@@ -35,6 +35,7 @@ import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.mylyn.commons.core.DelegatingProgressMonitor;
 import org.eclipse.mylyn.internal.discovery.core.model.ConnectorDescriptor;
+import org.eclipse.mylyn.internal.discovery.core.model.DiscoveryConnector;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ControlAdapter;
@@ -350,8 +351,9 @@ public class SoftwarePage extends AbstractJBossCentralPage implements IRunnableC
 	    			// if preference comes to be editable in several places
 	    			List<ConnectorDescriptor> installedEarlyAccess = new ArrayList<ConnectorDescriptor>();
 	    			for (ConnectorDescriptorItemUi connector : SoftwarePage.this.discoveryViewer.getAllConnectorsItemsUi()) {
-	    				if (connector.getConnector().getCertificationId().contains("earlyaccess") && connector.getConnector().isInstalled()) {
-	    					installedEarlyAccess.add(connector.getConnector());
+	    				DiscoveryConnector discoveryConnector = connector.getConnector();
+						if (discoveryConnector.getCertificationId() != null && discoveryConnector.getCertificationId().contains("earlyaccess") && discoveryConnector.isInstalled()) {
+	    					installedEarlyAccess.add(discoveryConnector);
 	    				}
 	    			}
 	    			// remaining early-access connectors
@@ -369,7 +371,7 @@ public class SoftwarePage extends AbstractJBossCentralPage implements IRunnableC
     				IMetadataRepositoryManager metadataRepositoryManager = (IMetadataRepositoryManager)agent.getService(IMetadataRepositoryManager.SERVICE_NAME);
     				IArtifactRepositoryManager artifactsitoryManager = (IArtifactRepositoryManager)agent.getService(IArtifactRepositoryManager.SERVICE_NAME);
     				for (ConnectorDescriptorItemUi connector : SoftwarePage.this.discoveryViewer.getAllConnectorsItemsUi()) {
-	    				if (connector.getConnector().getCertificationId().contains("earlyaccess")) {
+	    				if (connector.getConnector().getCertificationId() != null && connector.getConnector().getCertificationId().contains("earlyaccess")) {
 	    					try {
 		    					URI repoUri = new URI(connector.getConnector().getSiteUrl());
 		    					metadataRepositoryManager.removeRepository(repoUri);

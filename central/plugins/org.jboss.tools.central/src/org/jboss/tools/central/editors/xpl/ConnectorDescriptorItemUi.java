@@ -308,27 +308,34 @@ public class ConnectorDescriptorItemUi implements PropertyChangeListener, Runnab
 				ConnectorDescriptorItemUi.this.connectorUnits = resolveConnectorUnits(connector);
 				if (connector.isInstalled() && ConnectorDescriptorItemUi.this.connectorUnits != null) {
 					Map<String, org.eclipse.equinox.p2.metadata.Version> profileUnits = resolveProfileUnits(connector.getInstallableUnits());
-					for (String unitId : connector.getInstallableUnits()) {
-						int compare = profileUnits.get(unitId).compareTo(ConnectorDescriptorItemUi.this.connectorUnits.get(unitId)); 
-						if (compare == 0) {
-							ConnectorDescriptorItemUi.this.installationStatus = ConnectorInstallationStatus.UP_TO_DATE;
-						} else if (compare <= 0) {
-							ConnectorDescriptorItemUi.this.installationStatus = ConnectorInstallationStatus.UPDATE_AVAILABLE;
-							break;
-						} else if (compare >= 0) {
-							ConnectorDescriptorItemUi.this.installationStatus = ConnectorInstallationStatus.MORE_RECENT_VERSION_INSTALLED;
-							break;
+					if (profileUnits != null && !profileUnits.isEmpty()) {
+						for (String unitId : connector.getInstallableUnits()) {
+							Version version = profileUnits.get(unitId);
+							if (version != null) {
+								int compare = version.compareTo(ConnectorDescriptorItemUi.this.connectorUnits.get(unitId)); 
+								if (compare == 0) {
+									ConnectorDescriptorItemUi.this.installationStatus = ConnectorInstallationStatus.UP_TO_DATE;
+								} else if (compare <= 0) {
+									ConnectorDescriptorItemUi.this.installationStatus = ConnectorInstallationStatus.UPDATE_AVAILABLE;
+									break;
+								} else if (compare >= 0) {
+									ConnectorDescriptorItemUi.this.installationStatus = ConnectorInstallationStatus.MORE_RECENT_VERSION_INSTALLED;
+									break;
+								}
+							}
 						}
 					}
 					if (this.cancelled) {
 						return Status.CANCEL_STATUS;
 					}
-					ConnectorDescriptorItemUi.this.checkboxContainer.getDisplay().syncExec(new Runnable() {
-						@Override
-						public void run() {
-							setUpToDateStatus();							
-						}
-					});
+					if (!ConnectorDescriptorItemUi.this.checkboxContainer.isDisposed()) {
+						ConnectorDescriptorItemUi.this.checkboxContainer.getDisplay().syncExec(new Runnable() {
+							@Override
+							public void run() {
+								setUpToDateStatus();							
+							}
+						});
+					}
 				}
 				return Status.CANCEL_STATUS;
 			}
@@ -357,7 +364,7 @@ public class ConnectorDescriptorItemUi implements PropertyChangeListener, Runnab
 	 * @param connector
 	 */
 	private void setUpToDateStatus() {
-		if (!this.connector.isInstalled()) {
+		if (!this.connector.isInstalled() || this.statusLabel.isDisposed() || getControl().isDisposed()) {
 			return;
 		}
 		String text = "(INSTALLED";
