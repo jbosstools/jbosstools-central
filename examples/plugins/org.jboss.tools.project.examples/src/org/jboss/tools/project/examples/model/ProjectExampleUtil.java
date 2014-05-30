@@ -131,30 +131,32 @@ public class ProjectExampleUtil {
 						.getConfigurationElements();
 				IProjectExampleSite site = new ProjectExampleSite();
 				site.setName(extension.getLabel());
-        String urlKey = null;
-        String urlValue = null;
-        for (int j = 0; j < configurationElements.length; j++) {
-          IConfigurationElement configurationElement = configurationElements[j];
-          if (URL_KEY.equals(configurationElement.getName())) {
-            urlKey = configurationElement.getValue();
-          } if (URL_EXT.equals(configurationElement.getName())) {
-            urlValue = configurationElement.getValue();
-          } else if (EXPERIMENTAL_EXT.equals(configurationElement
-              .getName())) {
-            String experimental = configurationElement.getValue();
-            site.setExperimental(Boolean.parseBoolean(experimental));
-          }
-          String urlString = PropertiesHelper.getPropertiesProvider().getValue(urlKey, urlValue);
-          URL url = getURL(urlString);
-          if (url != null) {
-            site.setUrl(url);
-          }
-        }
-				if (site.getUrl() != null) {
+	        String urlKey = null;
+	        String urlValue = null;
+	        for (int j = 0; j < configurationElements.length; j++) {
+	          IConfigurationElement configurationElement = configurationElements[j];
+	          if (URL_KEY.equals(configurationElement.getName())) {
+	            urlKey = configurationElement.getValue();
+	          } if (URL_EXT.equals(configurationElement.getName())) {
+	            urlValue = configurationElement.getValue();
+	          } else if (EXPERIMENTAL_EXT.equals(configurationElement
+	              .getName())) {
+	            String experimental = configurationElement.getValue();
+	            site.setExperimental(Boolean.parseBoolean(experimental));
+	          }
+	        }
+	        String urlString = urlValue;
+	        if (urlKey != null) {
+	          urlString = PropertiesHelper.getPropertiesProvider().getValue(urlKey, urlValue);
+	        }
+	        URL url = getURL(urlString);
+	        if (url != null) {
+	        	site.setUrl(url);
+	        }
+			if (site.getUrl() != null) {
 					pluginSites.add(site);
 				}
 			}
-
 		}
 		return pluginSites;
 	}
