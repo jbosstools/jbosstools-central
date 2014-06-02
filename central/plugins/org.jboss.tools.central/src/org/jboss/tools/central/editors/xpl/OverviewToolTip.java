@@ -63,6 +63,7 @@ class OverviewToolTip extends GradientToolTip {
 		this.overview = overview;
 		this.leftImage = leftImage;
 		setHideOnMouseDown(false); // required for links to work
+		setShift(new Point(0, -20));
 	}
 
 	@Override
