@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.Dictionary;
 import java.util.List;
 
+import org.eclipse.core.commands.common.CommandException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
@@ -27,6 +28,7 @@ import org.eclipse.equinox.p2.repository.metadata.IMetadataRepositoryManager;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.operation.IRunnableContext;
 import org.eclipse.jface.operation.IRunnableWithProgress;
@@ -42,7 +44,6 @@ import org.eclipse.swt.events.ControlAdapter;
 import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.graphics.Cursor;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
@@ -488,24 +489,33 @@ public class SoftwarePage extends AbstractJBossCentralPage implements IRunnableC
 
 		@Override
 		public void run() {
-			Display display = Display.getCurrent();
-			Shell shell = display.getActiveShell();
-			Cursor cursor = shell == null ? null : shell.getCursor();
+			final Shell shell = getSite().getShell();
+			final ProgressMonitorDialog dialog = new ProgressMonitorDialog(shell);
 			try {
-				if (shell != null) {
-					shell.setCursor(display.getSystemCursor(SWT.CURSOR_WAIT));
-				}
 				setEnabled(false);
 				SoftwarePage.setEnabled(installButton, false);
+				dialog.run(true, false, new IRunnableWithProgress() {
+					@Override
+					public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
+						monitor.setTaskName(Messages.DiscoveryViewer_waitingForDiscoveryCompletion);
+						for (ConnectorDescriptorItemUi item : discoveryViewer.getAllConnectorsItemsUi()) {
+							// Calling this methods waits synchronously for jobs to finish and avoid conflict
+							// Cf JBIDE-17496, JBIDE-17504, Eclipse #436378
+							// When we use a p2 version with bug #436378 fixed, we should remove that to save much time
+							item.getConnectorUnits();
+						}
+					}						
+				});
 				List<ConnectorDescriptor> toInstall = new ArrayList<ConnectorDescriptor>(discoveryViewer.getInstallableConnectors());
 				toInstall.addAll(discoveryViewer.getUpdatableConnectors());
-				JBossDiscoveryUi.install(toInstall, SoftwarePage.this);
+				JBossDiscoveryUi.install(toInstall, dialog);
+			} catch (InterruptedException ex) {
+                JBossCentralActivator.getDefault().getLog().log(new Status(IStatus.ERROR, JBossCentralActivator.ID, ex.getMessage(), ex));
+			} catch (InvocationTargetException ite) {
+                JBossCentralActivator.getDefault().getLog().log(new Status(IStatus.ERROR, JBossCentralActivator.ID, ite.getMessage(), ite));
 			} finally {
-				if (shell != null) {
-					shell.setCursor(cursor);
-				}
 				setEnabled(true);
-				SoftwarePage.setEnabled(installButton, true);
+				updateInstallButton();
 			}
 		}
 		
@@ -524,7 +534,7 @@ public class SoftwarePage extends AbstractJBossCentralPage implements IRunnableC
 	        	setEnabled(false);
 	        	handlerService.executeCommand("org.eclipse.equinox.p2.ui.sdk.update", new Event());
 	        }
-	        catch (Exception e) {
+	        catch (CommandException e) {
 	        	JBossCentralActivator.log(e);
 	        } finally {
 	        	setEnabled(true);
