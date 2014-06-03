@@ -48,6 +48,7 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.layout.RowData;
 import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
@@ -243,6 +244,11 @@ public class SoftwarePage extends AbstractJBossCentralPage implements IRunnableC
 	    installButton = toolkit.createButton(installationButtonsComposite, NLS.bind(Messages.installWithCount, "0"), SWT.PUSH);
 	    installButton.setEnabled(false);
 	    installButton.setImage(JBossCentralActivator.getDefault().getImage(ICON_INSTALL));
+	    this.installButton.setText(NLS.bind(Messages.installWithCount, 99));
+	    // Allow until 99 connectors since at this point, we can't already know how many connectors are actually there
+	    int installWidthHint = this.installButton.computeSize(SWT.DEFAULT, SWT.DEFAULT).x;
+	    this.installButton.setLayoutData(new RowData(installWidthHint, SWT.DEFAULT));
+	    this.installButton.setText(NLS.bind(Messages.installWithCount, 0));
 	    installButton.addSelectionListener(new SelectionListener() {
 			
 			@Override
@@ -258,7 +264,10 @@ public class SoftwarePage extends AbstractJBossCentralPage implements IRunnableC
 	    
 	    this.uninstallButton = toolkit.createButton(installationButtonsComposite, NLS.bind(Messages.uninstallWithCount, "0"), SWT.PUSH);
 	    this.uninstallButton.setEnabled(false);
-	    //this.uninstallButton(JBossCentralActivator.getDefault().getImage))
+	    this.uninstallButton.setText(NLS.bind(Messages.uninstallWithCount, 99)); // Allow until 99 connectors
+	    int uninstallWidthHint = this.uninstallButton.computeSize(SWT.DEFAULT, SWT.DEFAULT).x;
+	    this.uninstallButton.setLayoutData(new RowData(uninstallWidthHint, SWT.DEFAULT));
+	    this.uninstallButton.setText(NLS.bind(Messages.uninstallWithCount, 0));
 	    this.discoveryViewer.addSelectionChangedListener(new ISelectionChangedListener() {
 			@Override
 			public void selectionChanged(SelectionChangedEvent event) {
