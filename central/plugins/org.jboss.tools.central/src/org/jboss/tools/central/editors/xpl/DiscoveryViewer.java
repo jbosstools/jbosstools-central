@@ -42,6 +42,7 @@ import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.operation.IRunnableContext;
 import org.eclipse.jface.operation.IRunnableWithProgress;
+import org.eclipse.jface.preference.PreferenceDialog;
 import org.eclipse.jface.resource.ColorRegistry;
 import org.eclipse.jface.resource.FontDescriptor;
 import org.eclipse.jface.resource.ImageDescriptor;
@@ -112,6 +113,7 @@ import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.ToolItem;
 import org.eclipse.swt.widgets.Widget;
 import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.dialogs.PreferencesUtil;
 import org.eclipse.ui.forms.IFormColors;
 import org.eclipse.ui.statushandlers.StatusManager;
 import org.eclipse.ui.themes.IThemeManager;
@@ -654,7 +656,8 @@ public class DiscoveryViewer extends Viewer {
 		GridDataFactory.fillDefaults().grab(true, false).hint(100, SWT.DEFAULT).applyTo(this.nothingToShowLink);
 		String message = org.jboss.tools.central.Messages.bind(org.jboss.tools.central.Messages.DiscoveryViewer_noFeatureToShow, new Object[] {
 				org.jboss.tools.central.Messages.DiscoveryViewer_clearFilterText,
-				org.jboss.tools.central.Messages.DiscoveryViewer_disableFilters
+				org.jboss.tools.central.Messages.DiscoveryViewer_disableFilters,
+				org.jboss.tools.central.Messages.DiscoveryViewer_configureProxy
 			}
 		);
 		this.nothingToShowLink.setText(message);
@@ -665,12 +668,16 @@ public class DiscoveryViewer extends Viewer {
 					clearFilterText();
 				} else if (e.text.equals(org.jboss.tools.central.Messages.DiscoveryViewer_disableFilters)) {
 					openFiltersDialog();
+				} else if (e.text.equals(org.jboss.tools.central.Messages.DiscoveryViewer_configureProxy)) {
+					PreferenceDialog prefDialog = PreferencesUtil.createPreferenceDialogOn(nothingToShowLink.getShell(), 
+							"org.eclipse.ui.net.NetPreferences" , new String[0], null); //$NON-NLS-1$
+					prefDialog.open();
 				}
 			}
 		});
 		
 		((GridData)this.nothingToShowLink.getLayoutData()).exclude = true;
-		this.nothingToShowLink.setVisible(false);
+		this.nothingToShowLink.setVisible(this.allConnectors == null || this.allConnectors.isEmpty());
 
 		GridLayoutFactory.fillDefaults().numColumns(2).spacing(0, 0).applyTo(container);
 		Map<String, LinkedHashSet<DiscoveryCategory>> categoriesById = new HashMap<String, LinkedHashSet<DiscoveryCategory>>();
@@ -719,11 +726,13 @@ public class DiscoveryViewer extends Viewer {
 				}
 			}
 		}
-		// last one gets a border
-		Composite border = new Composite(categoryChildrenContainer, SWT.NULL);
-		GridDataFactory.fillDefaults().grab(true, false).hint(SWT.DEFAULT, 1).applyTo(border);
-		GridLayoutFactory.fillDefaults().applyTo(border);
-
+		
+		if (categoryChildrenContainer != null) {
+			Composite border = new Composite(categoryChildrenContainer, SWT.NULL);
+			GridDataFactory.fillDefaults().grab(true, false).hint(SWT.DEFAULT, 1).applyTo(border);
+			GridLayoutFactory.fillDefaults().applyTo(border);
+		}
+	
 		container.layout(true);
 		container.redraw();
 	}
