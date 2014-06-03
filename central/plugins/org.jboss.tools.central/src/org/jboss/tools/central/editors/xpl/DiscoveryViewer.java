@@ -623,11 +623,13 @@ public class DiscoveryViewer extends Viewer {
 			this.nothingToShowLink.setVisible(visibleCategories.isEmpty());
 			((GridData)this.nothingToShowLink.getLayoutData()).exclude = !visibleCategories.isEmpty();
 		}
+		int heightHint = SWT.DEFAULT;
 		if (this.scrolledContents != null && !this.scrolledContents.isDisposed()) {
-			this.scrolledContents.pack(true);
 			this.scrolledContents.layout(true, true);
+			heightHint = this.scrolledContents.computeSize(this.scrolledContents.getSize().x, SWT.DEFAULT, true).y;
 		}
 		if (this.bodyScrolledComposite != null && !this.bodyScrolledComposite.isDisposed()) {
+			this.bodyScrolledComposite.setMinHeight(heightHint);
 			this.bodyScrolledComposite.changed(new Control[] { this.scrolledContents });
 			this.bodyScrolledComposite.showControl(this.scrolledContents);
 		}
