@@ -25,6 +25,7 @@ public class Messages extends NLS {
 	public static String DiscoveryViewer_clearFilterText;
 	public static String DiscoveryViewer_disableFilters;
 	public static String DiscoveryViewer_configureProxy;
+	public static String DiscoveryViewer_waitingForDiscoveryCompletion;
 
 	public static String DiscoveryViewer_FilterSelectionDialog_label;
 	public static String DiscoveryViewer_FilterSelectionDialog_title;
