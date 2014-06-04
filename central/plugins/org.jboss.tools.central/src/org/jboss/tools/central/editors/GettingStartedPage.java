@@ -513,14 +513,18 @@ public class GettingStartedPage extends AbstractJBossCentralPage implements Prox
 		@Override
 		protected IStatus run(IProgressMonitor monitor) {
 			final List<ProxyWizard> proxyWizards = getProxyWizards();
-			Display.getDefault().asyncExec(new Runnable() {
-				
-				@Override
-				public void run() {
-					addProxyWizardLinks(proxyWizards);
-					resize(true);
-				}
-			});
+			if(!projectsComposite.isDisposed()) {
+				Display.getDefault().asyncExec(new Runnable() {
+					
+					@Override
+					public void run() {
+						if(!projectsComposite.isDisposed()) {
+							addProxyWizardLinks(proxyWizards);
+							resize(true);
+						}
+					}
+				});
+			}
 			return Status.OK_STATUS;
 		}
 		  
