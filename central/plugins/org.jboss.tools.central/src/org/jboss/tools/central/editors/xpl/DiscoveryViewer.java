@@ -118,6 +118,8 @@ import org.eclipse.ui.forms.IFormColors;
 import org.eclipse.ui.statushandlers.StatusManager;
 import org.eclipse.ui.themes.IThemeManager;
 import org.jboss.tools.central.JBossCentralActivator;
+import org.jboss.tools.central.editors.SoftwarePage;
+import org.jboss.tools.central.editors.xpl.filters.EarlyAccessFilter;
 import org.jboss.tools.central.editors.xpl.filters.FiltersSelectionDialog;
 import org.jboss.tools.central.editors.xpl.filters.UserFilterEntry;
 import org.jboss.tools.project.examples.internal.discovery.DiscoveryUtil;
@@ -213,16 +215,12 @@ public class DiscoveryViewer extends Viewer {
 		createEnvironment();
 	}
 
-	public void selectAll() {
-		for(ConnectorDescriptorItemUi itemUi:itemsUi.values()) {
-			itemUi.select(true);
-		}
+	public void selectAllVisible() {
+		this.setSelection(new StructuredSelection(new ArrayList<ConnectorDescriptorItemUi>(this.getAllConnectorsItemsUi())));
 	}
 	
 	public void deselectAll() {
-		for(ConnectorDescriptorItemUi itemUi:itemsUi.values()) {
-			itemUi.select(false);
-		}
+		this.setSelection(new StructuredSelection());
 	}
 
 	private void clearDisposables() {
@@ -916,7 +914,7 @@ public class DiscoveryViewer extends Viewer {
 	@Override
 	public IStructuredSelection getSelection() {
 		List<ConnectorDescriptorItemUi> elements = new ArrayList<ConnectorDescriptorItemUi>();
-		for (ConnectorDescriptorItemUi item : elements) {
+		for (ConnectorDescriptorItemUi item : getAllConnectorsItemsUi()) {
 			if (item.getConnector().isSelected()) {
 				elements.add(item);
 			}
@@ -1344,9 +1342,15 @@ public class DiscoveryViewer extends Viewer {
 		}
 	}
 
+	/**
+	 * Takes a selection of {@link ConnectorDescriptorItemUi} as input
+	 */
 	@Override
-	public void setSelection(ISelection arg0, boolean arg1) {
-		throw new UnsupportedOperationException("Not yet implemented");
+	public void setSelection(ISelection selection, boolean arg1) {
+		List<ConnectorDescriptorItemUi> selected = (List<ConnectorDescriptorItemUi>) ((IStructuredSelection)selection).toList();
+		for (ConnectorDescriptorItemUi item : this.getAllConnectorsItemsUi()) {
+			item.select(selected.contains(item));
+		}
 	}
 
 	public Collection<ConnectorDescriptorItemUi> getAllConnectorsItemsUi() {
@@ -1383,7 +1387,7 @@ public class DiscoveryViewer extends Viewer {
 		Color res = defaultColor;
 		// TODO allow to plug computation of color externally, similar to addFilter
 		// something like addConditionalStyle(ConnectorDiscovery)
-		if (connector.getCertificationId() != null && connector.getCertificationId().contains("earlyaccess")) {
+		if (EarlyAccessFilter.isEarlyAccess(connector)) {
 			res = this.parent.getDisplay().getSystemColor(SWT.COLOR_YELLOW);
 		}
 		return res;
