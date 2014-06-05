@@ -42,7 +42,6 @@ import org.eclipse.swt.events.ControlAdapter;
 import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Cursor;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
@@ -198,7 +197,7 @@ public class SoftwarePage extends AbstractJBossCentralPage implements IRunnableC
 	    selectAllButton = new Link(selectionButtonsComposite, SWT.NONE);
 	    selectAllButton.setText("<A>" + Messages.selectAll + "</A>");
 	    selectAllButton.setEnabled(true);
-	    selectAllButton.addSelectionListener(new SelectionListener() {
+	    selectAllButton.addSelectionListener(new SelectionAdapter() {
 			
 			@Override
 			public void widgetSelected(SelectionEvent e) {
@@ -207,15 +206,11 @@ public class SoftwarePage extends AbstractJBossCentralPage implements IRunnableC
 				}
 			}
 			
-			@Override
-			public void widgetDefaultSelected(SelectionEvent e) {
-				
-			}
 		});
 	    deselectAllButton = new Link(selectionButtonsComposite, SWT.NONE);
 	    deselectAllButton.setText("<A>" + Messages.deselectAll + "</A>");
 	    deselectAllButton.setEnabled(true);
-	    deselectAllButton.addSelectionListener(new SelectionListener() {
+	    deselectAllButton.addSelectionListener(new SelectionAdapter() {
 			
 			@Override
 			public void widgetSelected(SelectionEvent e) {
@@ -223,19 +218,11 @@ public class SoftwarePage extends AbstractJBossCentralPage implements IRunnableC
 					discoveryViewer.deselectAll();
 				}
 			}
-			
-			@Override
-			public void widgetDefaultSelected(SelectionEvent e) {
-				
-			}
 		});
 	    discoveryViewer.addSelectionChangedListener(new ISelectionChangedListener() {
 			@Override
 			public void selectionChanged(SelectionChangedEvent event) {
-				int installableConnectors = discoveryViewer.getInstallableConnectors().size() + discoveryViewer.getUpdatableConnectors().size();
-				installAction.setEnabled(installableConnectors > 0);
-				installButton.setEnabled(installableConnectors > 0);
-				installButton.setText(NLS.bind(Messages.installWithCount, installableConnectors));
+				updateInstallButton();
 			}
 		});
 
@@ -249,17 +236,13 @@ public class SoftwarePage extends AbstractJBossCentralPage implements IRunnableC
 	    int installWidthHint = this.installButton.computeSize(SWT.DEFAULT, SWT.DEFAULT).x;
 	    this.installButton.setLayoutData(new RowData(installWidthHint, SWT.DEFAULT));
 	    this.installButton.setText(NLS.bind(Messages.installWithCount, 0));
-	    installButton.addSelectionListener(new SelectionListener() {
+	    installButton.addSelectionListener(new SelectionAdapter() {
 			
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				installAction.run();
 			}
 			
-			@Override
-			public void widgetDefaultSelected(SelectionEvent e) {
-				
-			}
 		});
 	    
 	    this.uninstallButton = toolkit.createButton(installationButtonsComposite, NLS.bind(Messages.uninstallWithCount, "0"), SWT.PUSH);
@@ -271,10 +254,7 @@ public class SoftwarePage extends AbstractJBossCentralPage implements IRunnableC
 	    this.discoveryViewer.addSelectionChangedListener(new ISelectionChangedListener() {
 			@Override
 			public void selectionChanged(SelectionChangedEvent event) {
-				int installedConnectors = discoveryViewer.getInstalledConnectors().size();
-				uninstallButton.setEnabled(installedConnectors > 0);
-				uninstallButton.setEnabled(installedConnectors > 0);
-				uninstallButton.setText(NLS.bind(Messages.uninstallWithCount, installedConnectors));
+				updateUninstallButton();
 			}
 		});
 	    this.uninstallButton.addSelectionListener(new SelectionAdapter() {
@@ -451,6 +431,8 @@ public class SoftwarePage extends AbstractJBossCentralPage implements IRunnableC
 				pageBook.showPage(discoveryViewer.getControl());
 				form.reflow(true);
 				form.redraw();
+				updateInstallButton();
+				updateUninstallButton();
 			}
 		});
 		
@@ -491,6 +473,8 @@ public class SoftwarePage extends AbstractJBossCentralPage implements IRunnableC
 
 		@Override
 		public void scheduled(IJobChangeEvent event) {
+			SoftwarePage.setEnabled(installButton, false);
+			SoftwarePage.setEnabled(uninstallButton, false);
 			showLoading();
 		}
 
@@ -512,9 +496,7 @@ public class SoftwarePage extends AbstractJBossCentralPage implements IRunnableC
 					shell.setCursor(display.getSystemCursor(SWT.CURSOR_WAIT));
 				}
 				setEnabled(false);
-				if (installButton != null) {
-					installButton.setEnabled(false);
-				}
+				SoftwarePage.setEnabled(installButton, false);
 				List<ConnectorDescriptor> toInstall = new ArrayList<ConnectorDescriptor>(discoveryViewer.getInstallableConnectors());
 				toInstall.addAll(discoveryViewer.getUpdatableConnectors());
 				JBossDiscoveryUi.install(toInstall, SoftwarePage.this);
@@ -523,9 +505,7 @@ public class SoftwarePage extends AbstractJBossCentralPage implements IRunnableC
 					shell.setCursor(cursor);
 				}
 				setEnabled(true);
-				if (installButton != null && !installButton.isDisposed()) {
-					installButton.setEnabled(true);
-				}
+				SoftwarePage.setEnabled(installButton, true);
 			}
 		}
 		
@@ -553,4 +533,26 @@ public class SoftwarePage extends AbstractJBossCentralPage implements IRunnableC
 		
 	}
 
+	private void updateInstallButton() {
+		if (installButton != null && !installButton.isDisposed()) {
+			int installableConnectors = discoveryViewer.getInstallableConnectors().size() + discoveryViewer.getUpdatableConnectors().size();
+			installAction.setEnabled(installableConnectors > 0);
+			installButton.setEnabled(installableConnectors > 0);
+			installButton.setText(NLS.bind(Messages.installWithCount, installableConnectors));
+		}
+	}
+
+	private void updateUninstallButton() {
+		if (uninstallButton != null && !uninstallButton.isDisposed()) {
+			int installedConnectors = discoveryViewer.getInstalledConnectors().size();
+			uninstallButton.setEnabled(installedConnectors > 0);
+			uninstallButton.setText(NLS.bind(Messages.uninstallWithCount, installedConnectors));
+		}
+	}
+
+	private static void setEnabled(Control control, boolean enabled) {
+		if (control != null && !control.isDisposed()) {
+			control.setEnabled(enabled);
+		}
+	}
 }

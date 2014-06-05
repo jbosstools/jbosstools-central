@@ -94,7 +94,7 @@ public class PrepareInstallProfileJob extends AbstractInstallJob {
 	@Override
 	public void run(IProgressMonitor progressMonitor) throws InvocationTargetException, InterruptedException {
 		if (installableConnectors.isEmpty()) {
-			throw new IllegalArgumentException();
+			throw new IllegalArgumentException("There are no connectors to install");
 		}
 
 		try {
