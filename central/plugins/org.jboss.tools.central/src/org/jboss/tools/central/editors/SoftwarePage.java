@@ -523,7 +523,7 @@ public class SoftwarePage extends AbstractJBossCentralPage implements IRunnableC
 					shell.setCursor(cursor);
 				}
 				setEnabled(true);
-				if (installButton != null) {
+				if (installButton != null && !installButton.isDisposed()) {
 					installButton.setEnabled(true);
 				}
 			}
