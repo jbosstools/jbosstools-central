@@ -17,6 +17,7 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -32,7 +33,12 @@ import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.SubProgressMonitor;
+import org.eclipse.equinox.internal.p2.ui.IProvHelpContextIds;
 import org.eclipse.equinox.internal.p2.ui.ProvUI;
+import org.eclipse.equinox.internal.p2.ui.dialogs.InstallWizard;
+import org.eclipse.equinox.internal.p2.ui.dialogs.PreselectedIUInstallWizard;
+import org.eclipse.equinox.internal.p2.ui.dialogs.ProvisioningWizardDialog;
+import org.eclipse.equinox.internal.p2.ui.dialogs.RemediationPage;
 import org.eclipse.equinox.p2.core.ProvisionException;
 import org.eclipse.equinox.p2.engine.IProfile;
 import org.eclipse.equinox.p2.engine.IProvisioningPlan;
@@ -49,8 +55,10 @@ import org.eclipse.equinox.p2.query.IQueryResult;
 import org.eclipse.equinox.p2.query.QueryUtil;
 import org.eclipse.equinox.p2.repository.metadata.IMetadataRepository;
 import org.eclipse.equinox.p2.repository.metadata.IMetadataRepositoryManager;
+import org.eclipse.equinox.p2.ui.LoadMetadataRepositoryJob;
 import org.eclipse.equinox.p2.ui.ProvisioningUI;
 import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.mylyn.internal.discovery.core.model.ConnectorDescriptor;
 import org.eclipse.mylyn.internal.discovery.ui.AbstractInstallJob;
 import org.eclipse.mylyn.internal.discovery.ui.DiscoveryUi;
@@ -60,6 +68,7 @@ import org.eclipse.mylyn.internal.discovery.ui.util.DiscoveryUiUtil;
 import org.eclipse.mylyn.internal.discovery.ui.wizards.Messages;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.ui.PlatformUI;
 
 /**
  * A job that configures a p2 {@link #getInstallAction() install action} for installing one or more
@@ -128,7 +137,7 @@ public class PrepareInstallProfileJob extends AbstractInstallJob {
 							ProvUI.getSize(ProvUI.getEngine(ProvisioningUI.getDefaultUI()
 									.getSession()), plan, context, monitor);
 						}
-						provisioningUI.openInstallWizard(Arrays.asList(ius), installOperation, rops[0], null);
+						openInstallWizard(Arrays.asList(ius), installOperation, rops[0], null);
 					}
 				});
 			} finally {
@@ -141,6 +150,33 @@ public class PrepareInstallProfileJob extends AbstractInstallJob {
 		}
 	}
 
+	private int openInstallWizard(Collection<IInstallableUnit> initialSelections, InstallOperation operation, 
+			final RemediationOperation rop, LoadMetadataRepositoryJob job) {
+		if (operation == null) {
+			InstallWizard wizard = new InstallWizard(provisioningUI, operation, initialSelections, job);
+			WizardDialog dialog = new ProvisioningWizardDialog(ProvUI.getDefaultParentShell(), wizard);
+			dialog.create();
+			PlatformUI.getWorkbench().getHelpSystem().setHelp(dialog.getShell(), IProvHelpContextIds.INSTALL_WIZARD);
+			return dialog.open();
+		}
+		PreselectedIUInstallWizard wizard = new PreselectedIUInstallWizard(provisioningUI, operation, initialSelections, job) {
+
+			@Override
+			protected RemediationPage createRemediationPage() {
+				if (rop == null) {
+					return null;
+				}
+				return super.createRemediationPage();
+			}
+			
+		};
+		wizard.setRemediationOperation(rop);
+		WizardDialog dialog = new ProvisioningWizardDialog(ProvUI.getDefaultParentShell(), wizard);
+		dialog.create();
+		PlatformUI.getWorkbench().getHelpSystem().setHelp(dialog.getShell(), IProvHelpContextIds.INSTALL_WIZARD);
+		return dialog.open();
+	}
+	
 	@Override
 	public IStatus uninstall(UninstallRequest request, IProgressMonitor progressMonitor)
 			throws InvocationTargetException, InterruptedException {
