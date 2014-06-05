@@ -502,6 +502,7 @@ public class ConnectorDescriptorItemUi implements PropertyChangeListener, Runnab
 	void select(boolean select) {
 		if (!checkbox.isDisposed() && checkbox.isVisible()	&& checkbox.getSelection() != select) {
 			checkbox.setSelection(select);
+			this.connector.setSelected(select);
 			maybeModifySelection(select);
 		}
 	}
