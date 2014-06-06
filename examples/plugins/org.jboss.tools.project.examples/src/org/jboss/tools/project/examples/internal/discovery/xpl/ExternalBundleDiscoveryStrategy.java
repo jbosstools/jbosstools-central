@@ -12,6 +12,7 @@
 package org.jboss.tools.project.examples.internal.discovery.xpl;
 
 import java.io.File;
+import java.io.FileFilter;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.util.HashMap;
@@ -172,12 +173,15 @@ public class ExternalBundleDiscoveryStrategy extends BundleDiscoveryStrategy {
 
 		Map<File, Directory.Entry> bundleFileToDirectoryEntry = new HashMap<File, Directory.Entry>();
 		try {
-			for (File f : storageDirectory.listFiles(new FilenameFilter() {
+			for (File f : storageDirectory.listFiles(new FileFilter() {
+				
 				@Override
-				public boolean accept(File dir, String name) {
-					return name.endsWith(".jar");
+				public boolean accept(File f) {
+					boolean accept =  (f.isFile() && f.canRead() && f.length() > 0 && f.getName().endsWith(".jar"));
+					return accept;
 				}
-			})) {
+			  }
+			)) {
 				Entry entry = new Directory.Entry();
 				entry.setLocation(f.getAbsolutePath());
 			    //FIXME set entry.setPermitCategories(...);

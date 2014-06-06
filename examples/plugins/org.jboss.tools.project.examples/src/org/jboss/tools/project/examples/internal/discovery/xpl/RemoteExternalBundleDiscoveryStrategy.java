@@ -29,6 +29,7 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
+import org.apache.commons.io.FileUtils;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -212,7 +213,7 @@ public class RemoteExternalBundleDiscoveryStrategy extends ExternalBundleDiscove
 						continue;
 					}
 					File target = File
-							.createTempFile(getFileNameFor(bundleUrl) + "_", ".jar", this.downloadStorage); //$NON-NLS-1$//$NON-NLS-2$//$NON-NLS-3$//$NON-NLS-4$
+							.createTempFile(getFileNameFor(bundleUrl) + "_", ".downloading", this.downloadStorage); //$NON-NLS-1$//$NON-NLS-2$//$NON-NLS-3$//$NON-NLS-4$
 
 					if (monitor.isCanceled()) {
 						break;
@@ -229,7 +230,8 @@ public class RemoteExternalBundleDiscoveryStrategy extends ExternalBundleDiscove
 								}/* don't use sub progress monitor here */);
 					} catch (URISyntaxException e) {
 					}
-					file = target;
+					file = new File(target.getParentFile(), target.getName().replace("downloading", "jar"));
+					FileUtils.moveFile(target, file);
 				} catch (IOException e) {
 					StatusHandler.log(new Status(IStatus.ERROR,
 							DiscoveryCore.ID_PLUGIN, NLS.bind(

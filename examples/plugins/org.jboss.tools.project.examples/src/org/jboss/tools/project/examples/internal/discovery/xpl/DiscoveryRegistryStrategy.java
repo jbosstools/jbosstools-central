@@ -156,7 +156,9 @@ public class DiscoveryRegistryStrategy extends RegistryStrategy {
 		try {
 			registry.addContribution(inputStream, contributor, false, bundleFile.getPath(), translationBundle, token);
 		} finally {
-			inputStream.close();
+			if (inputStream != null) {
+				inputStream.close();
+			}
 		}
 	}
 

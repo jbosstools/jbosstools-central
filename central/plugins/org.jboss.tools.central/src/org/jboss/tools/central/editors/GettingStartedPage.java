@@ -583,7 +583,9 @@ public class GettingStartedPage extends AbstractJBossCentralPage implements Prox
 	private void  createProjectLink(FormToolkit toolkit,
 			Composite composite, final ProxyWizard proxyWizard,
 			final Map<String, IConfigurationElement> installedWizardIds) {
-		
+		if (composite.isDisposed()) {
+			return;
+		}
 		final URL iconUrl = proxyWizard.getIconUrl();
 		Image image = null;
 		if (iconUrl != null) {
@@ -1121,13 +1123,15 @@ public class GettingStartedPage extends AbstractJBossCentralPage implements Prox
 	}
 	
 	private void disposeChildren(Composite composite) {
-		Control[] children = composite.getChildren();
-		for (Control child:children) {
-			if (child instanceof Composite) {
-				disposeChildren((Composite) child);
-				child.dispose();
-			} else {
-				child.dispose();
+		if (composite != null && !composite.isDisposed()) {
+			Control[] children = composite.getChildren();
+			for (Control child:children) {
+				if (child instanceof Composite) {
+					disposeChildren((Composite) child);
+					child.dispose();
+				} else {
+					child.dispose();
+				}
 			}
 		}
 	}
@@ -1187,7 +1191,7 @@ public class GettingStartedPage extends AbstractJBossCentralPage implements Prox
 	
 	protected void resize(boolean force) {
 		
-		if (documentationSection == null) {
+		if (documentationSection == null || form.isDisposed()) {
 			return;
 		}
 		Point size;
