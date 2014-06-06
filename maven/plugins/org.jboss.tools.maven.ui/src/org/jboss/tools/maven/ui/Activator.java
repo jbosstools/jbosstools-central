@@ -92,7 +92,17 @@ public class Activator extends AbstractUIPlugin {
 
 	public static final boolean CONFIGURE_GWT_VALUE = true;
 	
-	// The shared instance
+	/**
+	 * @since 1.6.0
+	 */
+  public static final String ENABLE_MAVEN_CLEAN_VERIFY_MENU = "enableMavenCleanVerifyMenu"; //$NON-NLS-1$
+
+  /**
+   * @since 1.6.0
+   */
+  public static final boolean ENABLE_MAVEN_CLEAN_VERIFY_MENU_VALUE = true;
+
+  // The shared instance
 	private static Activator plugin;
 	
 	/**
