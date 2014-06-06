@@ -42,32 +42,22 @@ public class ConfiguratorPreferencePage extends PreferencePage implements
 		IWorkbenchPreferencePage {
 
 	
-	private static final String ORG_JBOSS_TOOLS_MAVEN_JSF = "org.jboss.tools.maven.jsf"; //$NON-NLS-1$
 	private static final String ORG_JBOSS_TOOLS_MAVEN_PORTLET = "org.jboss.tools.maven.portlet"; //$NON-NLS-1$
 	private static final String ORG_JBOSS_TOOLS_MAVEN_CDI = "org.jboss.tools.maven.cdi"; //$NON-NLS-1$
 	private static final String ORG_JBOSS_TOOLS_MAVEN_HIBERNATE = "org.jboss.tools.maven.hibernate"; //$NON-NLS-1$
 	private static final String ORG_JBOSS_TOOLS_MAVEN_SEAM = "org.jboss.tools.maven.seam"; //$NON-NLS-1$
-	private static final String ORG_JBOSS_TOOLS_MAVEN_JAXRS = "org.jboss.tools.maven.jaxrs"; //$NON-NLS-1$
-	private static final String ORG_JBOSS_TOOLS_MAVEN_JPA = "org.jboss.tools.maven.jpa"; //$NON-NLS-1$
 	private static final String ORG_JBOSS_TOOLS_MAVEN_GWT = "org.jboss.tools.maven.gwt"; //$NON-NLS-1$
-
-	private static final String ORG_ECLIPSE_M2E_WTP_JAXRS = "org.eclipse.m2e.wtp.jaxrs"; //$NON-NLS-1$
-	private static final String ORG_ECLIPSE_M2E_WTP_JPA = "org.eclipse.m2e.wtp.jpa"; //$NON-NLS-1$
-	private static final String ORG_ECLIPSE_M2E_WTP_JSF = "org.eclipse.m2e.wtp.jsf"; //$NON-NLS-1$
 
 	private Button configureSeamButton;
 	private Button configureSeamRuntimeButton;
 	private Button configureSeamArtifactsButton;
-	private Button configureJSFButton;
-	private Button configureWebxmlJSF20Button;
 	private Button configurePortletButton;
 	private Button configureJSFPortletButton;
 	private Button configureSeamPortletButton;
 	private Button configureCDIButton;
 	private Button configureHibernateButton;
-	private Button configureJaxRsButton;
-	private Button configureJpaButton;
 	private Button configureGwtButton;
+  private Button enableMavenCleanVerifyMenuButton;
 	private Image jbossImage;
 	
 	@Override
@@ -111,18 +101,6 @@ public class ConfiguratorPreferencePage extends PreferencePage implements
 			});
 		}
 		
-		if (bundleExists(ORG_JBOSS_TOOLS_MAVEN_JSF) && !bundleExists(ORG_ECLIPSE_M2E_WTP_JSF) ) { 
-			configureJSFButton = new Button(composite,SWT.CHECK);
-			configureJSFButton.setText(Messages.ConfiguratorPreferencePage_Configure_JSF_facet);
-			boolean configureJSF = store.getBoolean(Activator.CONFIGURE_JSF);
-			configureJSFButton.setSelection(configureJSF);
-			
-			configureWebxmlJSF20Button = new Button(composite,SWT.CHECK);
-			configureWebxmlJSF20Button.setText(Messages.ConfiguratorPreferencePage_Configure_Webxml_JSF20);
-			boolean configureWebxml = store.getBoolean(Activator.CONFIGURE_WEBXML_JSF20);
-			configureWebxmlJSF20Button.setSelection(configureWebxml);
-		}
-		
 		if (bundleExists(ORG_JBOSS_TOOLS_MAVEN_PORTLET)) { 
 			configurePortletButton = new Button(composite,SWT.CHECK);
 			configurePortletButton.setText(Messages.ConfiguratorPreferencePage_Configure_JBoss_Portlet_Core_facet);
@@ -155,20 +133,6 @@ public class ConfiguratorPreferencePage extends PreferencePage implements
 			configureHibernateButton.setSelection(configureHibernate);
 		}
 		
-		if (bundleExists(ORG_JBOSS_TOOLS_MAVEN_JAXRS) && !bundleExists(ORG_ECLIPSE_M2E_WTP_JAXRS) ) { 
-			configureJaxRsButton = new Button(composite,SWT.CHECK);
-			configureJaxRsButton.setText(Messages.ConfiguratorPreferencePage_Configure_JAX_RS_facet);
-			boolean configureJaxRs = store.getBoolean(Activator.CONFIGURE_JAXRS);
-			configureJaxRsButton.setSelection(configureJaxRs);
-		}
-		
-		if (bundleExists(ORG_JBOSS_TOOLS_MAVEN_JPA) && !bundleExists(ORG_ECLIPSE_M2E_WTP_JPA) ) { 
-			configureJpaButton = new Button(composite,SWT.CHECK);
-			configureJpaButton.setText(Messages.ConfiguratorPreferencePage_Configure_JPA_facet);
-			boolean configureJpa = store.getBoolean(Activator.CONFIGURE_JPA);
-			configureJpaButton.setSelection(configureJpa);
-		}
-		
 		if (bundleExists(ORG_JBOSS_TOOLS_MAVEN_GWT)) { 
 			configureGwtButton = new Button(composite,SWT.CHECK);
 			configureGwtButton.setText(Messages.ConfiguratorPreferencePage_Configure_GWT);
@@ -192,7 +156,13 @@ public class ConfiguratorPreferencePage extends PreferencePage implements
 				dialog.open(); 
 			}
 		});
-		
+	
+	  new Label(composite, SWT.NONE);//spacer
+
+	  enableMavenCleanVerifyMenuButton = new Button(composite,SWT.CHECK);
+	  enableMavenCleanVerifyMenuButton.setText("Enable 'Maven clean verify' menu");
+    enableMavenCleanVerifyMenuButton.setSelection(store.getBoolean(Activator.ENABLE_MAVEN_CLEAN_VERIFY_MENU));
+	  
 		return composite;
 	}
 	
@@ -215,10 +185,6 @@ public class ConfiguratorPreferencePage extends PreferencePage implements
 
 	@Override
 	protected void performDefaults() {
-		if (bundleExists(ORG_JBOSS_TOOLS_MAVEN_JSF) && !bundleExists(ORG_ECLIPSE_M2E_WTP_JSF) ) { 
-			configureJSFButton.setSelection(Activator.CONFIGURE_JSF_VALUE);
-			configureWebxmlJSF20Button.setSelection(Activator.CONFIGURE_WEBXML_JSF20_VALUE);
-		}
 		if (bundleExists(ORG_JBOSS_TOOLS_MAVEN_SEAM)) { 
 			configureSeamButton.setSelection(Activator.CONFIGURE_SEAM_VALUE);
 			configureSeamRuntimeButton.setSelection(Activator.CONFIGURE_SEAM_RUNTIME_VALUE);
@@ -239,19 +205,7 @@ public class ConfiguratorPreferencePage extends PreferencePage implements
 			configureHibernateButton.setSelection(Activator.CONFIGURE_HIBERNATE_VALUE);
 		}
 		
-		if (bundleExists(ORG_JBOSS_TOOLS_MAVEN_JAXRS) && !bundleExists(ORG_ECLIPSE_M2E_WTP_JAXRS)) { 
-			configureJaxRsButton.setSelection(Activator.CONFIGURE_JAXRS_VALUE);
-		}
-
-		if (bundleExists(ORG_JBOSS_TOOLS_MAVEN_JPA) && !bundleExists(ORG_ECLIPSE_M2E_WTP_JPA)) { 
-			configureJpaButton.setSelection(Activator.CONFIGURE_JPA_VALUE);
-		}
-		
 		IPreferenceStore store = Activator.getDefault().getPreferenceStore();
-		
-		if (bundleExists(ORG_JBOSS_TOOLS_MAVEN_JSF) && !bundleExists(ORG_ECLIPSE_M2E_WTP_JSF)) { 
-			store.setValue(Activator.CONFIGURE_JSF, Activator.CONFIGURE_JSF_VALUE);
-		}
 		
 		if (bundleExists(ORG_JBOSS_TOOLS_MAVEN_PORTLET)) { 
 			store.setValue(Activator.CONFIGURE_JSFPORTLET, Activator.CONFIGURE_JSFPORTLET_VALUE);
@@ -275,28 +229,18 @@ public class ConfiguratorPreferencePage extends PreferencePage implements
 			store.setValue(Activator.CONFIGURE_HIBERNATE, Activator.CONFIGURE_HIBERNATE_VALUE);
 		}
 
-		if (bundleExists(ORG_JBOSS_TOOLS_MAVEN_JAXRS) && !bundleExists(ORG_ECLIPSE_M2E_WTP_JAXRS)) { 
-			store.setValue(Activator.CONFIGURE_JAXRS, Activator.CONFIGURE_JAXRS_VALUE);
-		}
-
-		if (bundleExists(ORG_JBOSS_TOOLS_MAVEN_JPA) && !bundleExists(ORG_ECLIPSE_M2E_WTP_JPA)) { 
-			store.setValue(Activator.CONFIGURE_JPA, Activator.CONFIGURE_JPA_VALUE);
-		}
-		
 		if (bundleExists(ORG_JBOSS_TOOLS_MAVEN_GWT)) { 
 			store.setValue(Activator.CONFIGURE_GWT, Activator.CONFIGURE_GWT_VALUE);
 		}
 		
+		enableMavenCleanVerifyMenuButton.setSelection(Activator.ENABLE_MAVEN_CLEAN_VERIFY_MENU_VALUE);
+		store.setValue(Activator.ENABLE_MAVEN_CLEAN_VERIFY_MENU, Activator.ENABLE_MAVEN_CLEAN_VERIFY_MENU_VALUE);
 		super.performDefaults();
 	}
 
 	@Override
 	public boolean performOk() {
 		IPreferenceStore store = Activator.getDefault().getPreferenceStore();
-		if (bundleExists(ORG_JBOSS_TOOLS_MAVEN_JSF) && !bundleExists(ORG_ECLIPSE_M2E_WTP_JSF)) { 
-			store.setValue(Activator.CONFIGURE_JSF, configureJSFButton.getSelection());
-			store.setValue(Activator.CONFIGURE_WEBXML_JSF20, configureWebxmlJSF20Button.getSelection());
-		}
 		
 		if (bundleExists(ORG_JBOSS_TOOLS_MAVEN_PORTLET)) {
 			store.setValue(Activator.CONFIGURE_PORTLET, configurePortletButton.getSelection());
@@ -318,17 +262,11 @@ public class ConfiguratorPreferencePage extends PreferencePage implements
 			store.setValue(Activator.CONFIGURE_HIBERNATE, configureHibernateButton.getSelection());
 		}
 
-		if (bundleExists(ORG_JBOSS_TOOLS_MAVEN_JAXRS) && !bundleExists(ORG_ECLIPSE_M2E_WTP_JAXRS)) {
-			store.setValue(Activator.CONFIGURE_JAXRS, configureJaxRsButton.getSelection());
-		}
-
-		if (bundleExists(ORG_JBOSS_TOOLS_MAVEN_JPA) && !bundleExists(ORG_ECLIPSE_M2E_WTP_JPA)) {
-			store.setValue(Activator.CONFIGURE_JPA, configureJpaButton.getSelection());
-		}
-		
 		if (bundleExists(ORG_JBOSS_TOOLS_MAVEN_GWT)) { 
 			store.setValue(Activator.CONFIGURE_GWT, configureGwtButton.getSelection());
 		}
+		
+		store.setValue(Activator.ENABLE_MAVEN_CLEAN_VERIFY_MENU, enableMavenCleanVerifyMenuButton.getSelection());
 		
 		return super.performOk();
 	}
