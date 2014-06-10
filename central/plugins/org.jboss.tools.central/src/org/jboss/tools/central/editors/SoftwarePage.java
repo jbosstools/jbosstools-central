@@ -99,7 +99,7 @@ public class SoftwarePage extends AbstractJBossCentralPage implements IRunnableC
 	private Composite featureComposite;
 	private DiscoveryViewer discoveryViewer;
 	private RefreshJobChangeListener refreshJobChangeListener;
-	private InstallAction installAction;
+	private InstallAction installAction = new InstallAction();
 	
 	private Button installButton;
 	private Button uninstallButton;
@@ -301,11 +301,6 @@ public class SoftwarePage extends AbstractJBossCentralPage implements IRunnableC
 	    
 	    toolBarManager = new ToolBarManager(SWT.FLAT | SWT.HORIZONTAL);
 		toolBarManager.createControl(headerComposite);
-
-		installAction = new InstallAction();
-		installAction.setEnabled(false);
-		toolBarManager.add(installAction);
-		
 		toolBarManager.add(new CheckForUpdatesAction());
 		
 		CommandContributionItem item = JBossCentralActivator.createContributionItem(getSite(), "org.jboss.tools.central.refreshDiscovery");
@@ -477,7 +472,6 @@ public class SoftwarePage extends AbstractJBossCentralPage implements IRunnableC
 	private void updateInstallButton() {
 		if (installButton != null && !installButton.isDisposed()) {
 			int installableConnectors = discoveryViewer.getInstallableConnectors().size() + discoveryViewer.getUpdatableConnectors().size();
-			installAction.setEnabled(installableConnectors > 0);
 			installButton.setEnabled(installableConnectors > 0);
 			installButton.setText(NLS.bind(Messages.installWithCount, installableConnectors));
 		}
