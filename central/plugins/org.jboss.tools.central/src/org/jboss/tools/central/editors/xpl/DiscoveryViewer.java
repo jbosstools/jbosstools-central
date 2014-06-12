@@ -516,7 +516,7 @@ public class DiscoveryViewer extends Viewer {
 				if (this.userFilters.size() == 1) {
 					final UserFilterEntry theFilter = this.userFilters.get(0);
 					final Button checkbox = new Button(filterContainer, SWT.CHECK);
-					checkbox.setSelection(theFilter.isEnabled());
+					checkbox.setSelection(!theFilter.isEnabled());
 					checkbox.setText(theFilter.getLabel());
 					checkbox.addSelectionListener(new SelectionListener() {
 						public void widgetDefaultSelected(SelectionEvent e) {
@@ -524,7 +524,7 @@ public class DiscoveryViewer extends Viewer {
 						}
 
 						public void widgetSelected(SelectionEvent e) {
-							theFilter.setEnabled(checkbox.getSelection());
+							theFilter.setEnabled(!checkbox.getSelection());
 							updateFilters();
 						}
 					});
