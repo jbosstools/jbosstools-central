@@ -35,6 +35,7 @@ import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.operation.ModalContext;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
+import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.mylyn.commons.core.DelegatingProgressMonitor;
 import org.eclipse.mylyn.internal.discovery.core.model.ConnectorDescriptor;
 import org.eclipse.mylyn.internal.discovery.core.model.DiscoveryConnector;
@@ -203,7 +204,7 @@ public class SoftwarePage extends AbstractJBossCentralPage implements IRunnableC
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				if (discoveryViewer != null && !discoveryViewer.getControl().isDisposed()) {
-					discoveryViewer.selectAll();
+					discoveryViewer.selectAllVisible();
 				}
 			}
 			
@@ -377,6 +378,13 @@ public class SoftwarePage extends AbstractJBossCentralPage implements IRunnableC
     				
     				JBossCentralActivator.getDefault().getPreferences().putBoolean(PreferenceKeys.ENABLE_EARLY_ACCESS, false);
     				SoftwarePage.this.discoveryViewer.addSystemFilter(SoftwarePage.this.earlyAccessFilter);
+    	    		List<ConnectorDescriptorItemUi> updatedSelection = new ArrayList<ConnectorDescriptorItemUi>();
+    	    		for (ConnectorDescriptorItemUi selected : (List<ConnectorDescriptorItemUi>)SoftwarePage.this.discoveryViewer.getSelection().toList() ) {
+    	    			if (!EarlyAccessFilter.isEarlyAccess(selected.getConnector())) {
+    	    				updatedSelection.add(selected);
+    	    			}
+    	    		}
+    	    		SoftwarePage.this.discoveryViewer.setSelection(new StructuredSelection(updatedSelection));
 	    		}
 	    		SoftwarePage.this.discoveryViewer.updateFilters();
 	    	}
