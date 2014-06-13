@@ -225,7 +225,7 @@ public class SoftwarePage extends AbstractJBossCentralPage implements IRunnableC
 			}
 		});
 	    
-	    final Button earlyAccessButton = toolkit.createButton(selectionButtonsComposite, Messages.DiscoveryViewer_Enable_EarlyAccess, SWT.CHECK);
+	    final Button earlyAccessButton = toolkit.createButton(selectionButtonsComposite, Messages.DiscoveryViewer_Show_EarlyAccess, SWT.CHECK);
 	    earlyAccessButton.setLayoutData(new GridData(SWT.END, SWT.DEFAULT, true, false));
 	    earlyAccessButton.setSelection(JBossCentralActivator.getDefault().getPreferences().getBoolean(PreferenceKeys.ENABLE_EARLY_ACCESS, PreferenceKeys.ENABLE_EARLY_ACCESS_DEFAULT_VALUE));
 	    earlyAccessButton.addSelectionListener(new SelectionAdapter() {
