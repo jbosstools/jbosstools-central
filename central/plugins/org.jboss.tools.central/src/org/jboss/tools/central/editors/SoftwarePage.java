@@ -128,7 +128,7 @@ public class SoftwarePage extends AbstractJBossCentralPage implements IRunnableC
 	}
 
 	protected void createFeaturesSection(FormToolkit toolkit, Composite parent) {
-		final Section features = toolkit.createSection(parent, ExpandableComposite.TITLE_BAR|ExpandableComposite.TWISTIE|ExpandableComposite.EXPANDED);
+		final Section features = toolkit.createSection(parent, ExpandableComposite.TITLE_BAR|ExpandableComposite.EXPANDED);
 		features.setText("Features Available");
 	    features.setLayout(new GridLayout());
 	    GridData gd = new GridData(SWT.FILL, SWT.FILL, true, true);
