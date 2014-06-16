@@ -68,6 +68,7 @@ import org.eclipse.ui.dialogs.PreferencesUtil;
 import org.eclipse.wst.server.core.IServer;
 import org.eclipse.wst.server.core.IServerLifecycleListener;
 import org.eclipse.wst.server.core.ServerCore;
+import org.jboss.tools.foundation.ui.xpl.taskwizard.TaskWizardDialog;
 import org.jboss.tools.project.examples.Messages;
 import org.jboss.tools.project.examples.ProjectExamplesActivator;
 import org.jboss.tools.project.examples.fixes.WTPRuntimeFix;
@@ -351,9 +352,7 @@ public class NewProjectExamplesRequirementsPage extends WizardPage implements IP
 				ProjectFix fix = getSelectedProjectFix();
 				if (fix != null) {
 					List<DownloadRuntime> runtimes = getDownloadRuntimes(fix);
-					//DownloadRuntimeDialog dialog = new DownloadRuntimeDialog(getShell(), runtimes);
-					//dialog.open();
-					WizardDialog dialog = new WizardDialog(getShell(), new DownloadRuntimesTaskWizard(runtimes));
+					WizardDialog dialog = new TaskWizardDialog(getShell(), new DownloadRuntimesTaskWizard(runtimes));
 					dialog.open();
 					refreshFixes();
 				}
@@ -363,25 +362,7 @@ public class NewProjectExamplesRequirementsPage extends WizardPage implements IP
 				
 			}
 		});
-		
-//		final IDownloadRuntimes downloader = getDownloader();
-//		if (downloader != null) {
-//			final Button downloadRuntimes = new Button(buttonComposite, SWT.PUSH);
-//			downloadRuntimes.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-//			downloadRuntimes.setText("Download Runtimes...");
-//			downloadRuntimes.setEnabled(true);
-//			downloadRuntimes.addSelectionListener(new SelectionListener() {
-//
-//				public void widgetSelected(SelectionEvent e) {
-//					downloader.execute(getShell());
-//				}
-//
-//				public void widgetDefaultSelected(SelectionEvent e) {
-//
-//				}
-//			});
-//		}
-		
+				
 		viewer.addSelectionChangedListener(new ISelectionChangedListener() {
 			
 			public void selectionChanged(SelectionChangedEvent event) {
