@@ -46,7 +46,7 @@ public class DefaultJBossCentralConfigurator implements
 	
 	private static final String BLOGS_URL = "http://planet.jboss.org/feeds/blogs"; //$NON-NLS-1$
 	
-	private static final String BUZZ_URL = "http://dcp.jboss.org/v1/rest/feed/?sys_type=blogpost&sortBy=new-create&feed_title=JBoss%20Developer%20Recent%20Posts"; //$NON-NLS-1$
+	private static final String BUZZ_URL = "http://planet.jboss.org/feeds/buzz"; //$NON-NLS-1$
 	
 	private static final String NEWS_URL = "http://planet.jboss.org/feeds/news"; //$NON-NLS-1$
 
