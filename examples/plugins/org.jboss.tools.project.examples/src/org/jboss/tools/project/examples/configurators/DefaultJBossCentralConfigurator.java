@@ -33,11 +33,9 @@ public class DefaultJBossCentralConfigurator implements
 	
 	static {
 		List<String> wizardIds = new ArrayList<String>();
-	    //wizardIds.add("org.eclipse.jst.servlet.ui.project.facet.WebProjectWizard"); //$NON-NLS-1$
-		wizardIds.add("org.jboss.tools.central.wizards.NewHtml5ProjectWizard"); //$NON-NLS-1$
-		wizardIds.add("org.jboss.ide.eclipse.as.openshift.express.ui.wizard.createNewApplicationWizard"); //$NON-NLS-1$
+	  	wizardIds.add("org.jboss.tools.central.wizards.NewHtml5ProjectWizard"); //$NON-NLS-1$
+  		wizardIds.add("org.jboss.ide.eclipse.as.openshift.express.ui.wizard.createNewApplicationWizard"); //$NON-NLS-1$
 	    wizardIds.add("org.jboss.tools.central.wizards.NewJavaeeWarProjectWizard"); //$NON-NLS-1$
-	    //wizardIds.add("org.jboss.tools.central.wizards.NewJavaeeEarProjectWizard"); //$NON-NLS-1$
 	    wizardIds.add("org.jboss.tools.central.wizards.NewRichfacesProjectWizard"); //$NON-NLS-1$
 	    wizardIds.add("org.jboss.tools.central.wizards.NewGwtProjectWizard"); //$NON-NLS-1$
 	    wizardIds.add("org.jboss.tools.central.wizards.NewSpringMvcProjectWizard"); //$NON-NLS-1$
@@ -48,7 +46,7 @@ public class DefaultJBossCentralConfigurator implements
 	
 	private static final String BLOGS_URL = "http://planet.jboss.org/feeds/blogs"; //$NON-NLS-1$
 	
-	private static final String BUZZ_URL = "http://planet.jboss.org/feeds/buzz"; //$NON-NLS-1$
+	private static final String BUZZ_URL = "http://dcp.jboss.org/v1/rest/feed/?sys_type=blogpost&sortBy=new-create&feed_title=JBoss%20Developer%20Recent%20Posts"; //$NON-NLS-1$
 	
 	private static final String NEWS_URL = "http://planet.jboss.org/feeds/news"; //$NON-NLS-1$
 
@@ -92,7 +90,7 @@ public class DefaultJBossCentralConfigurator implements
 	
 	@Override
 	public String getBuzzUrl() {
-		return BUZZ_URL;
+		return PropertiesHelper.getPropertiesProvider().getValue("buzz.feed.url", BUZZ_URL); //$NON-NLS-1$
 	}
 
 	@Override
