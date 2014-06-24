@@ -36,6 +36,5 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.m2e.wtp.jsf;bundle-version="1.0.0",
  org.jboss.tools.portlet.core
 Bundle-ActivationPolicy: lazy
-Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Eclipse-RegisterBuddy: org.apache.log4j
-
