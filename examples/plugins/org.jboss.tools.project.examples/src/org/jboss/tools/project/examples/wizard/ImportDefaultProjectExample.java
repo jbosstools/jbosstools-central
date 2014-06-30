@@ -48,6 +48,7 @@ import org.jboss.tools.project.examples.Messages;
 import org.jboss.tools.project.examples.ProjectExamplesActivator;
 import org.jboss.tools.project.examples.model.AbstractImportProjectExample;
 import org.jboss.tools.project.examples.model.ProjectExample;
+import org.jboss.tools.project.examples.model.ProjectExampleWorkingCopy;
 
 public class ImportDefaultProjectExample extends
 		AbstractImportProjectExample {
@@ -59,9 +60,9 @@ public class ImportDefaultProjectExample extends
 	};
 
 	@Override
-	public boolean importProject(ProjectExample projectDescription, File file,
+	public boolean importProject(ProjectExampleWorkingCopy projectDescription, File file,
 			Map<String, Object> propertiesMap, IProgressMonitor monitor) throws Exception {
-		List<ProjectExample> projects = new ArrayList<ProjectExample>();
+		List<ProjectExampleWorkingCopy> projects = new ArrayList<ProjectExampleWorkingCopy>();
 		if (projectDescription.getIncludedProjects() == null) {
 			boolean ret = importSingleProject(projectDescription, file, monitor);
 			projects.add(projectDescription);

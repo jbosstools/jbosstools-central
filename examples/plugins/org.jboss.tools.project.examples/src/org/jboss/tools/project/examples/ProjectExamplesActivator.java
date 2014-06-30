@@ -116,6 +116,7 @@ import org.jboss.tools.project.examples.fixes.WTPRuntimeFix;
 import org.jboss.tools.project.examples.model.IImportProjectExample;
 import org.jboss.tools.project.examples.model.ProjectExample;
 import org.jboss.tools.project.examples.model.ProjectExampleUtil;
+import org.jboss.tools.project.examples.model.ProjectExampleWorkingCopy;
 import org.jboss.tools.project.examples.model.ProjectFix;
 import org.jboss.tools.project.examples.wizard.ContributedPage;
 import org.jboss.tools.project.examples.wizard.ImportDefaultProjectExample;
@@ -301,7 +302,7 @@ public class ProjectExamplesActivator extends AbstractUIPlugin {
 		return context;
 	}
 
-	public static List<IMarker> getMarkers(List<ProjectExample> projects) {
+	public static List<IMarker> getMarkers(List<? extends ProjectExample> projects) {
 		List<IMarker> markers = new ArrayList<IMarker>();
 		for (ProjectExample project : projects) {
 			try {
@@ -464,7 +465,7 @@ public class ProjectExamplesActivator extends AbstractUIPlugin {
 			if (file == null) {
 				return false;
 			}
-			project.setFile(file);
+			ProjectExampleUtil.setProjectExamplesFile(project, file);
 		}
 		return true;
 	}
@@ -494,11 +495,11 @@ public class ProjectExamplesActivator extends AbstractUIPlugin {
 			}
 		}
 	}
-	public static void openWelcome(List<ProjectExample> projects) {
+	public static void openWelcome(List<ProjectExampleWorkingCopy> projects) {
 		if (projects == null) {
 			return;
 		}
-		for(final ProjectExample project:projects) {
+		for(final ProjectExampleWorkingCopy project:projects) {
 			fixWelcome(project);
 			if (project.isWelcome()) {
 				String urlString = project.getWelcomeURL();
@@ -665,7 +666,7 @@ public class ProjectExamplesActivator extends AbstractUIPlugin {
 		return editorDesc;
 	}
 	
-	public static void fixWelcome(ProjectExample project) {
+	public static void fixWelcome(ProjectExampleWorkingCopy project) {
 		if (project == null) {
 			return;
 		}
@@ -675,7 +676,7 @@ public class ProjectExamplesActivator extends AbstractUIPlugin {
 		checkCheatsheet(project);
 	}
 
-	protected static void checkCheatsheet(ProjectExample project) {
+	protected static void checkCheatsheet(ProjectExampleWorkingCopy project) {
 		List<String> includedProjects = project.getIncludedProjects();
 		if (includedProjects == null || includedProjects.size() <= 0) {
 			return;
@@ -716,7 +717,7 @@ public class ProjectExamplesActivator extends AbstractUIPlugin {
 		}
 	}
 
-	private static boolean checkCheatsheet(ProjectExample project,
+	private static boolean checkCheatsheet(ProjectExampleWorkingCopy project,
 			IProject eclipseProject, String path, String type) {
 		IResource cheatsheet = eclipseProject.findMember(path);
 		if (cheatsheet != null && cheatsheet.exists() && cheatsheet.getType() == IResource.FILE) {
@@ -812,7 +813,7 @@ public class ProjectExamplesActivator extends AbstractUIPlugin {
 		return true;
 	}
 	
-	public static void updatePerspective(List<ProjectExample> projects) {
+	public static void updatePerspective(List<? extends ProjectExample> projects) {
 		if (projects == null || projects.size() != 1) {
 			return;
 		}
@@ -1009,7 +1010,7 @@ public class ProjectExamplesActivator extends AbstractUIPlugin {
 		page.setPerspective(persp);
 	}
 
-	public static void showReadyWizard(final List<ProjectExample> projects) {
+	public static void showReadyWizard(final List<ProjectExampleWorkingCopy> projects) {
 
 		IPreferenceStore store = ProjectExamplesActivator.getDefault().getPreferenceStore();
 		
@@ -1051,7 +1052,7 @@ public class ProjectExamplesActivator extends AbstractUIPlugin {
 	}
 	
 	public static void importProjectExamples(
-			final List<ProjectExample> selectedProjects, IWorkingSet[] workingSets, final Map<String, Object> propertiesMap) {
+			final List<ProjectExampleWorkingCopy> selectedProjects, IWorkingSet[] workingSets, final Map<String, Object> propertiesMap) {
 		final NewProjectExamplesJob workspaceJob = new NewProjectExamplesJob(
 				Messages.NewProjectExamplesWizard_Downloading, selectedProjects, workingSets, propertiesMap);
 		workspaceJob.setUser(true);
@@ -1062,7 +1063,7 @@ public class ProjectExamplesActivator extends AbstractUIPlugin {
 					resetCheatSheet(propertiesMap);
 					return;
 				}
-				List<ProjectExample> projects = workspaceJob.getProjects();
+				List<ProjectExampleWorkingCopy> projects = workspaceJob.getProjects();
 				try {
 					ProjectExamplesActivator.updatePerspective(projects);
 					ProjectExamplesActivator.waitForBuildAndValidation

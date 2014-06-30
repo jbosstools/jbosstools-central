@@ -31,17 +31,18 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.jboss.tools.project.examples.ProjectExamplesActivator;
 import org.jboss.tools.project.examples.model.ProjectExample;
+import org.jboss.tools.project.examples.model.ProjectExampleWorkingCopy;
 
 public class NewProjectExamplesReadyPage extends WizardPage {
 	
 	private static final String SHOW_THE_QUICK_FIX_DIALOG = "Show the Quick Fix dialog";
 	private static final String SHOW_README_FILE_FOR_FURTHER_INSTRUCTIONS = "Show readme file for further instructions";
 	private Button showReadme;
-	private List<ProjectExample> projectExamples;
+	private List<ProjectExampleWorkingCopy> projectExamples;
 	private Button showQuickFix;
 	private IResourceChangeListener resourceChangeListener;
 
-	public NewProjectExamplesReadyPage(List<ProjectExample> projectExamples) {
+	public NewProjectExamplesReadyPage(List<ProjectExampleWorkingCopy> projectExamples) {
 		super("org.jboss.tools.project.examples.ready"); //$NON-NLS-1$
         this.projectExamples = projectExamples;
 	}
@@ -143,7 +144,7 @@ public class NewProjectExamplesReadyPage extends WizardPage {
 
 	}
 	
-	public void configure(List<ProjectExample> projectExamples) {
+	public void configure(List<ProjectExampleWorkingCopy> projectExamples) {
 		if (getControl() == null || getControl().isDisposed()) {
 			return;
 		}
@@ -157,7 +158,7 @@ public class NewProjectExamplesReadyPage extends WizardPage {
 			showReadme.setEnabled(false);
 		}
 		
-		ProjectExample projectExample = projectExamples.get(0);
+		ProjectExampleWorkingCopy projectExample = projectExamples.get(0);
 		IPreferenceStore store = ProjectExamplesActivator.getDefault().getPreferenceStore();
 		
 		if (projectExample != null) {

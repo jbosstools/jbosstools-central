@@ -59,6 +59,7 @@ import org.jboss.tools.project.examples.model.IProjectExampleSite;
 import org.jboss.tools.project.examples.model.ProjectExample;
 import org.jboss.tools.project.examples.model.ProjectExampleCategory;
 import org.jboss.tools.project.examples.model.ProjectExampleUtil;
+import org.jboss.tools.project.examples.model.ProjectExampleWorkingCopy;
 import org.jboss.tools.project.examples.model.ProjectFix;
 import org.jboss.tools.project.examples.runtimes.RuntimeUtils;
 
@@ -74,7 +75,7 @@ public class NewProjectExamplesMainPage extends WizardPage {
 	private Combo siteCombo;
 	private List<ProjectExampleCategory> categories;
 	private Text descriptionText;
-	private ProjectExample selectedProject;
+	private ProjectExampleWorkingCopy selectedProject;
 	private Combo targetRuntimeTypesCombo;
 	
 	public NewProjectExamplesMainPage() {
@@ -187,7 +188,7 @@ public class NewProjectExamplesMainPage extends WizardPage {
 				Object selected = selection.getFirstElement();
 				String projectType = null;
 				if (selected instanceof ProjectExample && selection.size() == 1) {
-					selectedProject = (ProjectExample) selected;
+					selectedProject = ((ProjectExample) selected).createWorkingCopy();
 					descriptionText.setText(selectedProject.getDescription());
 					projectName.setText(selectedProject.getName());
 					projectURL.setText(selectedProject.getUrl());
@@ -461,7 +462,7 @@ public class NewProjectExamplesMainPage extends WizardPage {
 			if (object instanceof ProjectExample) {
 				// FIXME
 				canFinish=true;
-				ProjectExample project = (ProjectExample) object;
+				ProjectExampleWorkingCopy project = ((ProjectExample) object).createWorkingCopy();
 				String importType = project.getImportType();
 				if (!ProjectExample.IMPORT_TYPE_ZIP.equals(importType) && importType != null && importType.length() > 0) {
 					IImportProjectExample importProjectExample = ProjectExamplesActivator.getDefault().getImportProjectExample(importType);

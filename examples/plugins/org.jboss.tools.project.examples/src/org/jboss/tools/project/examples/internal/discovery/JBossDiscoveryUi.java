@@ -21,7 +21,6 @@ import org.eclipse.jface.operation.IRunnableContext;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.mylyn.internal.discovery.core.model.ConnectorDescriptor;
 import org.eclipse.mylyn.internal.discovery.core.model.DiscoveryFeedbackJob;
-import org.eclipse.mylyn.internal.discovery.ui.AbstractInstallJob;
 import org.eclipse.mylyn.internal.discovery.ui.DiscoveryUi;
 import org.eclipse.mylyn.internal.discovery.ui.InstalledItem;
 import org.eclipse.mylyn.internal.discovery.ui.UninstallRequest;

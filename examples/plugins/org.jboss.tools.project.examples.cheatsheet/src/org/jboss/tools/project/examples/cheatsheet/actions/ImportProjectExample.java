@@ -11,6 +11,7 @@
 package org.jboss.tools.project.examples.cheatsheet.actions;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.StringTokenizer;
@@ -29,7 +30,7 @@ import org.jboss.tools.project.examples.Messages;
 import org.jboss.tools.project.examples.ProjectExamplesActivator;
 import org.jboss.tools.project.examples.cheatsheet.Activator;
 import org.jboss.tools.project.examples.model.IImportProjectExample;
-import org.jboss.tools.project.examples.model.ProjectExample;
+import org.jboss.tools.project.examples.model.ProjectExampleWorkingCopy;
 
 /**
  * 
@@ -56,7 +57,7 @@ public class ImportProjectExample extends Action implements ICheatSheetAction {
 			return;
 		}
 		
-		ProjectExample project = new ProjectExample();
+		ProjectExampleWorkingCopy project = new ProjectExampleWorkingCopy();
 		project.setName(params[0]);
 		StringTokenizer tokenizer = new StringTokenizer(params[1],","); //$NON-NLS-1$
 		List<String> includedProjects = new ArrayList<String>();
@@ -69,7 +70,7 @@ public class ImportProjectExample extends Action implements ICheatSheetAction {
 		
 	}
 
-	private void importProject(final ProjectExample project) {
+	private void importProject(final ProjectExampleWorkingCopy project) {
 		WorkspaceJob workspaceJob = new WorkspaceJob(Messages.NewProjectExamplesWizard_Downloading) {
 
 			@Override
@@ -105,10 +106,7 @@ public class ImportProjectExample extends Action implements ICheatSheetAction {
 				} catch (InterruptedException e) {
 					return;
 				}
-				List<ProjectExample> projects = new ArrayList<ProjectExample>();
-				projects.add(project);
-				ProjectExamplesActivator.showReadyWizard(projects);
-				
+				ProjectExamplesActivator.showReadyWizard(Collections.singletonList(project));
 			}
 		});
 		workspaceJob.schedule();

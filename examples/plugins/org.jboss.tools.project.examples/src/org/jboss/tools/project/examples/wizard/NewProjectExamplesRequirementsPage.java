@@ -75,6 +75,7 @@ import org.jboss.tools.project.examples.fixes.WTPRuntimeFix;
 import org.jboss.tools.project.examples.internal.discovery.DiscoveryUtil;
 import org.jboss.tools.project.examples.internal.discovery.JBossDiscoveryUi;
 import org.jboss.tools.project.examples.model.ProjectExample;
+import org.jboss.tools.project.examples.model.ProjectExampleWorkingCopy;
 import org.jboss.tools.project.examples.model.ProjectFix;
 import org.jboss.tools.runtime.core.RuntimeCoreActivator;
 import org.jboss.tools.runtime.core.model.DownloadRuntime;
@@ -85,7 +86,7 @@ import org.jboss.tools.runtime.ui.wizard.DownloadRuntimesTaskWizard;
 public class NewProjectExamplesRequirementsPage extends WizardPage implements IProjectExamplesWizardPage {
 
 	private static final String PAGE_NAME = "org.jboss.tools.project.examples.requirements"; //$NON-NLS-1$
-	protected ProjectExample projectExample;
+	protected ProjectExampleWorkingCopy projectExample;
 	protected Text descriptionText;
 	protected Label projectSizeLabel;
 	protected Text projectSize;
@@ -125,11 +126,11 @@ public class NewProjectExamplesRequirementsPage extends WizardPage implements IP
 
 	};
 	
-	public NewProjectExamplesRequirementsPage(ProjectExample projectExample) {
+	public NewProjectExamplesRequirementsPage(ProjectExampleWorkingCopy projectExample) {
 		this(PAGE_NAME, projectExample);
 	}
 
-	public NewProjectExamplesRequirementsPage(String pageName, ProjectExample projectExample) {
+	public NewProjectExamplesRequirementsPage(String pageName, ProjectExampleWorkingCopy projectExample) {
 		super(pageName);
 		this.projectExample = projectExample;
 		setTitleAndDescription(projectExample);
@@ -456,7 +457,7 @@ public class NewProjectExamplesRequirementsPage extends WizardPage implements IP
 		return projectExample;
 	}
 
-	public void setProjectExample(final ProjectExample projectExample) {
+	public void setProjectExample(final ProjectExampleWorkingCopy projectExample) {
 		this.projectExample = projectExample;
 		setTitleAndDescription(projectExample);
 		refreshFixes();

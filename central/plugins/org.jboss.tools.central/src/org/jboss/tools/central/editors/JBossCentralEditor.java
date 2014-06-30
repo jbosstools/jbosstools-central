@@ -71,7 +71,6 @@ import org.jboss.tools.central.actions.OpenWithBrowserHandler;
 import org.jboss.tools.central.editors.xpl.TextSearchControl;
 import org.jboss.tools.central.preferences.PreferenceKeys;
 import org.jboss.tools.project.examples.ProjectExamplesActivator;
-import org.jboss.tools.project.examples.internal.discovery.JBossDiscoveryUi;
 
 /**
  * 

@@ -61,7 +61,6 @@ public class ProjectExampleCategory implements ProjectModelElement, Comparable<P
 		return site;
 	}
 
-	@Override
 	public void setSite(IProjectExampleSite site) {
 		this.site = site;
 	}

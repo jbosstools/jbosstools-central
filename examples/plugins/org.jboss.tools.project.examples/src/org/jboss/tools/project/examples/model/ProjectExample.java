@@ -76,7 +76,7 @@ public class ProjectExample implements ProjectModelElement,
 		return name;
 	}
 
-	public void setName(String name) {
+	void setName(String name) {
 		this.name = name;
 	}
 
@@ -84,7 +84,7 @@ public class ProjectExample implements ProjectModelElement,
 		return shortDescription;
 	}
 
-	public void setShortDescription(String shortDescription) {
+	void setShortDescription(String shortDescription) {
 		this.shortDescription = shortDescription;
 	}
 
@@ -92,7 +92,7 @@ public class ProjectExample implements ProjectModelElement,
 		return description;
 	}
 
-	public void setDescription(String description) {
+	void setDescription(String description) {
 		this.description = description;
 	}
 
@@ -128,7 +128,7 @@ public class ProjectExample implements ProjectModelElement,
 		return urlString + SEP + url;
 	}
 
-	public void setUrl(String url) {
+	void setUrl(String url) {
 		this.url = url;
 	}
 
@@ -136,7 +136,7 @@ public class ProjectExample implements ProjectModelElement,
 		return size;
 	}
 
-	public void setSize(long size) {
+	void setSize(long size) {
 		this.size = size;
 	}
 
@@ -144,7 +144,7 @@ public class ProjectExample implements ProjectModelElement,
 		return category;
 	}
 
-	public void setCategory(ProjectExampleCategory category) {
+	void setCategory(ProjectExampleCategory category) {
 		this.category = category;
 	}
 
@@ -167,7 +167,7 @@ public class ProjectExample implements ProjectModelElement,
 		return includedProjects;
 	}
 
-	public void setIncludedProjects(List<String> includedProjects) {
+	void setIncludedProjects(List<String> includedProjects) {
 		this.includedProjects = includedProjects;
 	}
 
@@ -175,7 +175,7 @@ public class ProjectExample implements ProjectModelElement,
 		return welcome;
 	}
 
-	public void setWelcome(boolean welcome) {
+	void setWelcome(boolean welcome) {
 		this.welcome = welcome;
 	}
 
@@ -183,7 +183,7 @@ public class ProjectExample implements ProjectModelElement,
 		return type;
 	}
 
-	public void setType(String type) {
+	void setType(String type) {
 		this.type = type;
 	}
 
@@ -196,17 +196,10 @@ public class ProjectExample implements ProjectModelElement,
 	}
 
 	public IProjectExampleSite getSite() {
-		/*
-		 * if (site == null) { if
-		 * (getUrl().startsWith("http://anonsvn.jboss.org")) { //$NON-NLS-1$
-		 * site = Messages.Project_JBoss_Tools_Team_from_jboss_org; } else if
-		 * (getUrl().startsWith("file:")) { //$NON-NLS-1$ site =
-		 * Messages.Project_Local; } else { site = Messages.Project_Unknown; } }
-		 */
 		return site;
 	}
 
-	public void setSite(IProjectExampleSite site) {
+	void setSite(IProjectExampleSite site) {
 		this.site = site;
 	}
 
@@ -214,7 +207,7 @@ public class ProjectExample implements ProjectModelElement,
 		return fixes;
 	}
 
-	public void setFixes(List<ProjectFix> fixes) {
+	void setFixes(List<ProjectFix> fixes) {
 		this.fixes = fixes;
 	}
 
@@ -230,7 +223,7 @@ public class ProjectExample implements ProjectModelElement,
 		return perspectiveId;
 	}
 
-	public void setPerspectiveId(String perspectiveId) {
+	void setPerspectiveId(String perspectiveId) {
 		this.perspectiveId = perspectiveId;
 	}
 
@@ -238,7 +231,7 @@ public class ProjectExample implements ProjectModelElement,
 		return importType;
 	}
 
-	public void setImportType(String importType) {
+	void setImportType(String importType) {
 		this.importType = importType;
 	}
 
@@ -246,7 +239,7 @@ public class ProjectExample implements ProjectModelElement,
 		return importTypeDescription;
 	}
 
-	public void setImportTypeDescription(String importTypeDescription) {
+	void setImportTypeDescription(String importTypeDescription) {
 		this.importTypeDescription = importTypeDescription;
 	}
 
@@ -262,7 +255,7 @@ public class ProjectExample implements ProjectModelElement,
 		return file;
 	}
 
-	public void setFile(File file) {
+	void setFile(File file) {
 		this.file = file;
 	}
 
@@ -270,7 +263,7 @@ public class ProjectExample implements ProjectModelElement,
 		return defaultProfiles;
 	}
 
-	public void setDefaultProfiles(String defaultProfiles) {
+	void setDefaultProfiles(String defaultProfiles) {
 		this.defaultProfiles = defaultProfiles;
 	}
 
@@ -279,7 +272,7 @@ public class ProjectExample implements ProjectModelElement,
 		return getName();
 	}
 
-	public void setTags(Set<String> tags) {
+	void setTags(Set<String> tags) {
 		this.tags = tags;
 	}
 
@@ -314,7 +307,7 @@ public class ProjectExample implements ProjectModelElement,
 		return priority;
 	}
 
-	public void setPriority(int priority) {
+	void setPriority(int priority) {
 		this.priority = priority;
 	}
 
@@ -345,7 +338,7 @@ public class ProjectExample implements ProjectModelElement,
 	}
 	
 
-	public void setEssentialEnterpriseDependencyGavs(Set<String> gavs) {
+	void setEssentialEnterpriseDependencyGavs(Set<String> gavs) {
 	  essentialEnterpriseDependencies = gavs;
 	}
 	
@@ -358,7 +351,7 @@ public class ProjectExample implements ProjectModelElement,
 		return welcomeFixRequired;
 	}
 
-	public void setWelcomeFixRequired(boolean welcomeFixRequired) {
+	void setWelcomeFixRequired(boolean welcomeFixRequired) {
 		this.welcomeFixRequired = welcomeFixRequired;
 	}
 
@@ -366,7 +359,7 @@ public class ProjectExample implements ProjectModelElement,
 		return sourceLocation;
 	}
 
-	public void setSourceLocation(String sourceLocation) {
+	void setSourceLocation(String sourceLocation) {
 		this.sourceLocation = sourceLocation;
 	}
 	
@@ -374,7 +367,7 @@ public class ProjectExample implements ProjectModelElement,
 		return stacksId;
 	}
 
-	public void setStacksId(String stacksId) {
+	void setStacksId(String stacksId) {
 		this.stacksId = stacksId;
 	}
 
@@ -392,7 +385,7 @@ public class ProjectExample implements ProjectModelElement,
 	/**
 	 * @since 1.5.3
 	 */
-	public void setStacksType(String stacksType) {
+	void setStacksType(String stacksType) {
 		this.stacksType = stacksType;
 	}
 
@@ -403,4 +396,7 @@ public class ProjectExample implements ProjectModelElement,
 		return stacksType;
 	}
 
+	public ProjectExampleWorkingCopy createWorkingCopy() {
+		return new ProjectExampleWorkingCopy(this);
+	}
 }

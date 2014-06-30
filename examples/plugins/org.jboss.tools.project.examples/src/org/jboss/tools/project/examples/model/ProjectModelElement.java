@@ -20,5 +20,4 @@ public interface ProjectModelElement {
 	public String getDescription();
 	public String getShortDescription();
 	public IProjectExampleSite getSite();
-	public void setSite(IProjectExampleSite site);
 }

@@ -20,7 +20,7 @@ import org.eclipse.ui.internal.ide.IDEInternalWorkbenchImages;
 import org.jboss.tools.project.examples.Messages;
 import org.jboss.tools.project.examples.ProjectExamplesActivator;
 import org.jboss.tools.project.examples.dialog.MarkerDialog;
-import org.jboss.tools.project.examples.model.ProjectExample;
+import org.jboss.tools.project.examples.model.ProjectExampleWorkingCopy;
 
 /**
  * 
@@ -29,10 +29,10 @@ import org.jboss.tools.project.examples.model.ProjectExample;
  */
 public class ProjectReadyWizard extends Wizard {
 
-	private List<ProjectExample> projectExamples;
+	private List<ProjectExampleWorkingCopy> projectExamples;
 	private NewProjectExamplesReadyPage readyPage;
 
-	public ProjectReadyWizard(List<ProjectExample> projectExamples) {
+	public ProjectReadyWizard(List<ProjectExampleWorkingCopy> projectExamples) {
 		this.projectExamples = projectExamples;
 		setDefaultPageImageDescriptor(IDEInternalWorkbenchImages
 				.getImageDescriptor(IDEInternalWorkbenchImages.IMG_DLGBAN_QUICKFIX_DLG));

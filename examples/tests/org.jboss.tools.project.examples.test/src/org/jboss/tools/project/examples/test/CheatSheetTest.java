@@ -67,6 +67,7 @@ import org.jboss.tools.project.examples.model.IImportProjectExample;
 import org.jboss.tools.project.examples.model.ProjectExample;
 import org.jboss.tools.project.examples.model.ProjectExampleCategory;
 import org.jboss.tools.project.examples.model.ProjectExampleUtil;
+import org.jboss.tools.project.examples.model.ProjectExampleWorkingCopy;
 import org.jboss.tools.test.util.JobUtils;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -128,10 +129,10 @@ public class CheatSheetTest {
 			}
 		}
 		assertNotNull(quickstartsCategory);
-		ProjectExample projectExample = null;
+		ProjectExampleWorkingCopy projectExample = null;
 		for (ProjectExample project: quickstartsCategory.getProjects()) {
 			if (KITCHENSINK.equals(project.getName())) {
-				projectExample = project;
+				projectExample = project.createWorkingCopy();
 				break;
 			}
 		}

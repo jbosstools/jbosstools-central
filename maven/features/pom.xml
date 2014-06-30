@@ -18,7 +18,6 @@
 		<module>org.jboss.tools.maven.cdi.feature</module>
 		<module>org.jboss.tools.maven.hibernate.feature</module>
 		<module>org.jboss.tools.maven.portlet.feature</module>
-		<module>org.jboss.tools.maven.project.examples.feature</module>
 		<module>org.jboss.tools.maven.test.feature</module>
 		<module>org.jboss.tools.maven.jbosspackaging.feature</module>	
 		<!-- JBIDE-16960 remove <module>org.jboss.tools.maven.gwt.feature</module> -->
