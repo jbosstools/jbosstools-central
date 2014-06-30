@@ -43,6 +43,7 @@ import org.eclipse.swt.widgets.Shell;
 import org.jboss.tools.maven.ui.Activator;
 import org.jboss.tools.project.examples.ProjectExamplesActivator;
 import org.jboss.tools.project.examples.model.ProjectExample;
+import org.jboss.tools.project.examples.model.ProjectExampleWorkingCopy;
 
 /**
  * @author snjeza
@@ -55,7 +56,7 @@ public class ImportMavenProjectExampleDelegate extends AbstractImportMavenProjec
 	private boolean confirm;
 
 	@Override
-	public boolean importProject(ProjectExample projectDescription, File file,
+	public boolean importProject(ProjectExampleWorkingCopy projectDescription, File file,
 			Map<String, Object> propertiesMap, IProgressMonitor monitor) throws Exception {
 		List<ProjectExample> projects = new ArrayList<ProjectExample>();
 		projects.add(projectDescription);

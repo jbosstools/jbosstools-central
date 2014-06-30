@@ -33,6 +33,7 @@ import org.eclipse.m2e.core.project.MavenProjectInfo;
 import org.eclipse.m2e.core.project.ProjectImportConfiguration;
 import org.jboss.tools.project.examples.ProjectExamplesActivator;
 import org.jboss.tools.project.examples.model.ProjectExample;
+import org.jboss.tools.project.examples.model.ProjectExampleWorkingCopy;
 
 /**
  * @author snjeza
@@ -41,7 +42,7 @@ import org.jboss.tools.project.examples.model.ProjectExample;
 public class ImportMavenArchetypeProjectExampleDelegate extends AbstractImportMavenProjectDelegate {
 
 	@Override
-	public boolean importProject(final ProjectExample projectDescription, File file, 
+	public boolean importProject(final ProjectExampleWorkingCopy projectDescription, File file, 
 			Map<String, Object> propertiesMap, final IProgressMonitor monitor) throws Exception {
 		List<ProjectExample> projects = new ArrayList<ProjectExample>();
 		projects.add(projectDescription);

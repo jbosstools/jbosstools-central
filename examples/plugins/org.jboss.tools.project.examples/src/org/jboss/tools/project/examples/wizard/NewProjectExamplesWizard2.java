@@ -21,7 +21,6 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.dialogs.TrayDialog;
@@ -41,6 +40,7 @@ import org.eclipse.ui.PlatformUI;
 import org.jboss.tools.project.examples.Messages;
 import org.jboss.tools.project.examples.ProjectExamplesActivator;
 import org.jboss.tools.project.examples.model.ProjectExample;
+import org.jboss.tools.project.examples.model.ProjectExampleWorkingCopy;
 
 public class NewProjectExamplesWizard2 extends Wizard implements INewWizard {
 
@@ -50,7 +50,7 @@ public class NewProjectExamplesWizard2 extends Wizard implements INewWizard {
 	private IStructuredSelection fSelection;
 	//private NewProjectExamplesReadyPage readyPage;
 	List<IProjectExamplesWizardPage> contributedPages = new LinkedList<IProjectExamplesWizardPage>();
-	private ProjectExample projectExample;
+	private ProjectExampleWorkingCopy projectExample;
 
 	private WizardContext wizardContext = new WizardContext();
 	private boolean helpAvailable;
@@ -76,7 +76,13 @@ public class NewProjectExamplesWizard2 extends Wizard implements INewWizard {
 	}
 	
 	protected void initializeProjectExample(ProjectExample projectExample) {
-		this.projectExample = projectExample;
+		if (projectExample != null) {
+			if (projectExample instanceof ProjectExampleWorkingCopy) {
+				this.projectExample = (ProjectExampleWorkingCopy)projectExample;
+			} else {
+				this.projectExample = projectExample.createWorkingCopy();
+			}
+		}
 		setWindowTitle(Messages.NewProjectExamplesWizard_New_Project_Example);
 		setNeedsProgressMonitor(true);
 	}
@@ -86,7 +92,7 @@ public class NewProjectExamplesWizard2 extends Wizard implements INewWizard {
 	 */
 	@Override
 	public boolean performFinish() {
-		final List<ProjectExample> selectedProjects = new ArrayList<ProjectExample>();
+		final List<ProjectExampleWorkingCopy> selectedProjects = new ArrayList<ProjectExampleWorkingCopy>();
 		IWorkingSet[] workingSets = new IWorkingSet[0];
 		Map<String, Object> propertiesMap = new HashMap<String, Object>();
 		String showCheatsheets = ProjectExamplesActivator.getDefault().getShowCheatsheets();
@@ -103,7 +109,7 @@ public class NewProjectExamplesWizard2 extends Wizard implements INewWizard {
 					Object object = iterator.next();
 					if (object instanceof ProjectExample) {
 						ProjectExample project = (ProjectExample) object;
-						selectedProjects.add(project);
+						selectedProjects.add(project.createWorkingCopy());
 					}
 				}
 			} else {
@@ -290,7 +296,7 @@ public class NewProjectExamplesWizard2 extends Wizard implements INewWizard {
         return true;
 	}
 
-	public ProjectExample getProjectExample() {
+	public ProjectExampleWorkingCopy getProjectExample() {
 		return projectExample;
 	}
 

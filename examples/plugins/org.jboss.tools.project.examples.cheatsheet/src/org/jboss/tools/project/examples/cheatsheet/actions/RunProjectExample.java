@@ -11,6 +11,7 @@
 package org.jboss.tools.project.examples.cheatsheet.actions;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.eclipse.core.runtime.NullProgressMonitor;
@@ -25,6 +26,7 @@ import org.jboss.tools.project.examples.cheatsheet.internal.util.CheatSheetUtil;
 import org.jboss.tools.project.examples.model.ProjectExample;
 import org.jboss.tools.project.examples.model.ProjectExampleCategory;
 import org.jboss.tools.project.examples.model.ProjectExampleUtil;
+import org.jboss.tools.project.examples.model.ProjectExampleWorkingCopy;
 
 /**
  * 
@@ -56,12 +58,12 @@ public class RunProjectExample extends Action implements ICheatSheetAction {
 			return;
 		}
 		List<ProjectExampleCategory> categories = ProjectExampleUtil.getProjects(new NullProgressMonitor());
-		ProjectExample project = null;
+		ProjectExampleWorkingCopy project = null;
 		for (ProjectExampleCategory category:categories) {
 			if (projectExample[0].equals(category.getName())) {
 				for (ProjectExample p:category.getProjects()) {
 					if (projectExample[1].equals(p.getName())) {
-						project = p;
+						project = p.createWorkingCopy();
 						break;
 					}
 				}
@@ -71,9 +73,7 @@ public class RunProjectExample extends Action implements ICheatSheetAction {
 			}
 		}
 		if (project != null) {
-			List<ProjectExample> selectedProjects = new ArrayList<ProjectExample>();
-			selectedProjects.add(project);
-			ProjectExamplesActivator.importProjectExamples(selectedProjects, null, null);
+			ProjectExamplesActivator.importProjectExamples(Collections.singletonList(project), null, null);
 		}
 	}
 	

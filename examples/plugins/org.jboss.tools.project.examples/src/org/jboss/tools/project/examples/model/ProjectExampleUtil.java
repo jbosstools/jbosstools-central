@@ -970,5 +970,11 @@ public class ProjectExampleUtil {
 			return tuple;
 		}
 
+	}
+
+	public static void setProjectExamplesFile(ProjectExample project, File file) {
+		if (project != null) {
+			project.setFile(file);		
+		}
 	}	
 }

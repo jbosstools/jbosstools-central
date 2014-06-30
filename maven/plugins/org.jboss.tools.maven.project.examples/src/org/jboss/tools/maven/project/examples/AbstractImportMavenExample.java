@@ -17,7 +17,7 @@ import java.util.Map;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.jboss.tools.project.examples.model.AbstractImportProjectExample;
-import org.jboss.tools.project.examples.model.ProjectExample;
+import org.jboss.tools.project.examples.model.ProjectExampleWorkingCopy;
 
 /**
  * @author Fred Bricon
@@ -28,7 +28,7 @@ public abstract class AbstractImportMavenExample extends AbstractImportProjectEx
 	protected abstract AbstractImportMavenProjectDelegate getDelegate();
 	
 	@Override
-	public boolean importProject(ProjectExample projectDescription, File file,
+	public boolean importProject(ProjectExampleWorkingCopy projectDescription, File file,
 			Map<String, Object> propertiesMap, IProgressMonitor monitor) throws Exception {
 		
 		AbstractImportMavenProjectDelegate delegate = getDelegate();

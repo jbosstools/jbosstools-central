@@ -13,7 +13,7 @@ package org.jboss.tools.project.examples.wizard;
 import java.util.Map;
 
 import org.eclipse.jface.wizard.IWizardPage;
-import org.jboss.tools.project.examples.model.ProjectExample;
+import org.jboss.tools.project.examples.model.ProjectExampleWorkingCopy;
 
 public interface IProjectExamplesWizardPage extends IWizardPage, IWizardContextChangeListener {
 
@@ -21,7 +21,7 @@ public interface IProjectExamplesWizardPage extends IWizardPage, IWizardContextC
 	
 	String getProjectExampleType();
 	
-	void setProjectExample(ProjectExample projectExample);
+	void setProjectExample(ProjectExampleWorkingCopy projectExample);
 
 	Map<String, Object> getPropertiesMap();
 	
