@@ -14,6 +14,7 @@
 	<packaging>pom</packaging>
 	<modules>
 		<module>org.jboss.tools.project.examples.test</module>
+		<module>org.jboss.tools.maven.examples.test</module>
 	</modules>
 </project>
 	
