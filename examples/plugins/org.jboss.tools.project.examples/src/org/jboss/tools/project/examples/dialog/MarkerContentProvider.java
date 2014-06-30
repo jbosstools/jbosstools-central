@@ -24,9 +24,9 @@ import org.jboss.tools.project.examples.model.ProjectExample;
 */
 public class MarkerContentProvider implements IStructuredContentProvider {
 
-	private List<ProjectExample> projects;
+	private List<? extends ProjectExample> projects;
 
-	public MarkerContentProvider(List<ProjectExample> projects) {
+	public MarkerContentProvider(List<? extends ProjectExample> projects) {
 		this.projects = projects;
 	}
 

@@ -45,6 +45,7 @@ import org.jboss.tools.project.examples.model.IProjectExampleSite;
 import org.jboss.tools.project.examples.model.ProjectExample;
 import org.jboss.tools.project.examples.model.ProjectExampleSite;
 import org.jboss.tools.project.examples.model.ProjectExampleUtil;
+import org.jboss.tools.project.examples.model.ProjectExampleWorkingCopy;
 import org.jboss.tools.test.util.JobUtils;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -152,10 +153,10 @@ public class ProjectTest {
 			}
 		}
 		assertNotNull(seamCategory);
-		ProjectExample projectExample = null;
+		ProjectExampleWorkingCopy projectExample = null;
 		for (ProjectExample project: seamCategory.getProjects()) {
 			if ("numberguess".equals(project.getName())) {
-				projectExample = project;
+				projectExample = project.createWorkingCopy();
 				break;
 			}
 		}

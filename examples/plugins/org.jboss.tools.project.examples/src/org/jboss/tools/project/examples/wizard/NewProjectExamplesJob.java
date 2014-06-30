@@ -31,17 +31,17 @@ import org.eclipse.ui.PlatformUI;
 import org.jboss.tools.project.examples.Messages;
 import org.jboss.tools.project.examples.ProjectExamplesActivator;
 import org.jboss.tools.project.examples.model.IImportProjectExample;
-import org.jboss.tools.project.examples.model.ProjectExample;
+import org.jboss.tools.project.examples.model.ProjectExampleWorkingCopy;
 
 public class NewProjectExamplesJob extends WorkspaceJob {
 
 	private static final String WORKING_SETS = "workingSets"; //$NON-NLS-1$
-	private List<ProjectExample> selectedProjects;
-	private List<ProjectExample> projects = new ArrayList<ProjectExample>();
+	private List<ProjectExampleWorkingCopy> selectedProjects;
+	private List<ProjectExampleWorkingCopy> projects = new ArrayList<ProjectExampleWorkingCopy>();
 	private IWorkingSet[] workingSets;
 	private Map<String, Object> propertiesMap;
 
-	public NewProjectExamplesJob(String name, List<ProjectExample> selectedProjects, IWorkingSet[] workingSets, Map<String, Object> propertiesMap) {
+	public NewProjectExamplesJob(String name, List<ProjectExampleWorkingCopy> selectedProjects, IWorkingSet[] workingSets, Map<String, Object> propertiesMap) {
 		super(name);
 		this.selectedProjects = selectedProjects;
 		this.workingSets = workingSets;
@@ -52,7 +52,7 @@ public class NewProjectExamplesJob extends WorkspaceJob {
 	public IStatus runInWorkspace(IProgressMonitor monitor)
 			throws CoreException {
 		projects .clear();
-		for (ProjectExample selectedProject : selectedProjects) {
+		for (ProjectExampleWorkingCopy selectedProject : selectedProjects) {
 			boolean success = ProjectExamplesActivator.downloadProject(
 					selectedProject, monitor);
 			if (success) {
@@ -71,7 +71,7 @@ public class NewProjectExamplesJob extends WorkspaceJob {
 		}
 		try {
 			setName(Messages.NewProjectExamplesWizard_Importing);
-			for (final ProjectExample project : projects) {
+			for (final ProjectExampleWorkingCopy project : projects) {
 				IImportProjectExample importProjectExample = 
 					ProjectExamplesActivator.getDefault().getImportProjectExample(project.getImportType());
 				if (importProjectExample == null) {
@@ -134,7 +134,7 @@ public class NewProjectExamplesJob extends WorkspaceJob {
 		return null;
 	}
 
-	public List<ProjectExample> getProjects() {
+	public List<ProjectExampleWorkingCopy> getProjects() {
 		return projects;
 	}
 

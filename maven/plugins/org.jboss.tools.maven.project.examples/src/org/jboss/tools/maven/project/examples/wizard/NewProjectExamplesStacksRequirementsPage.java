@@ -60,7 +60,7 @@ import org.jboss.tools.maven.project.examples.Messages;
 import org.jboss.tools.maven.project.examples.internal.stacks.StacksArchetypeUtil;
 import org.jboss.tools.maven.project.examples.utils.MavenArtifactHelper;
 import org.jboss.tools.project.examples.model.ArchetypeModel;
-import org.jboss.tools.project.examples.model.ProjectExample;
+import org.jboss.tools.project.examples.model.ProjectExampleWorkingCopy;
 import org.jboss.tools.project.examples.model.ProjectFix;
 import org.jboss.tools.runtime.core.RuntimeCoreActivator;
 import org.jboss.tools.runtime.core.model.DownloadRuntime;
@@ -98,7 +98,7 @@ public class NewProjectExamplesStacksRequirementsPage extends MavenExamplesRequi
 		this(null);
 	}
 	
-	public NewProjectExamplesStacksRequirementsPage(ProjectExample projectExample) {
+	public NewProjectExamplesStacksRequirementsPage(ProjectExampleWorkingCopy projectExample) {
 		super(PAGE_NAME, projectExample);
 	    fieldsWithHistory = new HashMap<String, List<Combo>>();
 	    stacks = MavenProjectExamplesActivator.getDefault().getCachedStacks();
@@ -116,7 +116,7 @@ public class NewProjectExamplesStacksRequirementsPage extends MavenExamplesRequi
 	}
 	
 	@Override
-	public void setProjectExample(ProjectExample example) {
+	public void setProjectExample(ProjectExampleWorkingCopy example) {
 		exampleInitialized = false;
 		if (example != null) {
 			projectExample = example;

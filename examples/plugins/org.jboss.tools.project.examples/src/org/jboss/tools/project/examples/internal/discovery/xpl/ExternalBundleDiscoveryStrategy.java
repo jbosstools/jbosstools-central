@@ -13,7 +13,6 @@ package org.jboss.tools.project.examples.internal.discovery.xpl;
 
 import java.io.File;
 import java.io.FileFilter;
-import java.io.FilenameFilter;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;

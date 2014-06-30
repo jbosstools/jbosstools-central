@@ -16,7 +16,7 @@ import org.eclipse.swt.widgets.Display;
 import org.jboss.tools.maven.core.MavenCoreActivator;
 import org.jboss.tools.maven.core.settings.MavenSettingsChangeListener;
 import org.jboss.tools.maven.project.examples.utils.MavenArtifactHelper;
-import org.jboss.tools.project.examples.model.ProjectExample;
+import org.jboss.tools.project.examples.model.ProjectExampleWorkingCopy;
 import org.jboss.tools.project.examples.wizard.NewProjectExamplesRequirementsPage;
 
 public class MavenExamplesRequirementsPage extends
@@ -33,7 +33,7 @@ public class MavenExamplesRequirementsPage extends
 		this(PAGE_NAME, null);
 	}
 
-	public MavenExamplesRequirementsPage(String pageName, ProjectExample example) {
+	public MavenExamplesRequirementsPage(String pageName, ProjectExampleWorkingCopy example) {
 		super(pageName, example);
 	}
 
@@ -43,7 +43,7 @@ public class MavenExamplesRequirementsPage extends
 	}
 
 	@Override
-	public void setProjectExample(final ProjectExample projectExample) {
+	public void setProjectExample(final ProjectExampleWorkingCopy projectExample) {
 		super.setProjectExample(projectExample);
 		validateEnterpriseRepo();
 	}

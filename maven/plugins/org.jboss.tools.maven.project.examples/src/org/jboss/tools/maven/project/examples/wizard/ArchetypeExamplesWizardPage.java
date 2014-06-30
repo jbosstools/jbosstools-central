@@ -61,6 +61,7 @@ import org.jboss.tools.maven.project.examples.wizard.xpl.MavenProjectWizardArche
 import org.jboss.tools.project.examples.ProjectExamplesActivator;
 import org.jboss.tools.project.examples.model.ArchetypeModel;
 import org.jboss.tools.project.examples.model.ProjectExample;
+import org.jboss.tools.project.examples.model.ProjectExampleWorkingCopy;
 import org.jboss.tools.project.examples.wizard.IProjectExamplesWizardPage;
 import org.jboss.tools.project.examples.wizard.WizardContext;
 
@@ -458,7 +459,7 @@ public class ArchetypeExamplesWizardPage extends
 	}
 
 	@Override
-	public void setProjectExample(ProjectExample projectExample) {
+	public void setProjectExample(ProjectExampleWorkingCopy projectExample) {
 		this.projectExample = projectExample;
 		if (projectExample != null) {
 			if (projectExample.getShortDescription() != null) {

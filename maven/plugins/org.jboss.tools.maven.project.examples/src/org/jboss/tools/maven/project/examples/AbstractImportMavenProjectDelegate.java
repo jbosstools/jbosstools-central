@@ -15,13 +15,13 @@ import java.util.Map;
 
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.jboss.tools.project.examples.model.ProjectExample;
+import org.jboss.tools.project.examples.model.ProjectExampleWorkingCopy;
 
 abstract class AbstractImportMavenProjectDelegate {
 
 	private IPath location; 
 
-	protected abstract boolean importProject(ProjectExample projectDescription, File file,
+	protected abstract boolean importProject(ProjectExampleWorkingCopy projectDescription, File file,
 			Map<String, Object> propertiesMap, IProgressMonitor monitor) throws Exception;
 	
 	protected void setLocation(IPath location) {
