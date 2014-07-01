@@ -423,7 +423,9 @@ public class SoftwarePage extends AbstractJBossCentralPage implements IRunnableC
 							// Calling this methods waits synchronously for jobs to finish and avoid conflict
 							// Cf JBIDE-17496, JBIDE-17504, Eclipse #436378
 							// When we use a p2 version with bug #436378 fixed, we should remove that to save much time
-							item.getConnectorUnits();
+							if (item.isComputingUnits()) {
+								item.getConnectorUnits();
+							}
 						}
 					}						
 				});
