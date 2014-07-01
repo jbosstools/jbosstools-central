@@ -104,6 +104,8 @@ public class SoftwarePage extends AbstractJBossCentralPage implements IRunnableC
 	private ToolBarManager toolBarManager;
 	
 	private EarlyAccessFilter earlyAccessFilter;
+
+	private Button earlyAccessButton;
 	
 	public SoftwarePage(FormEditor editor) {
 		super(editor, ID, "Software/Update");
@@ -220,7 +222,7 @@ public class SoftwarePage extends AbstractJBossCentralPage implements IRunnableC
 			}
 		});
 	    
-	    final Button earlyAccessButton = toolkit.createButton(selectionButtonsComposite, Messages.DiscoveryViewer_Show_EarlyAccess, SWT.CHECK);
+	    earlyAccessButton = toolkit.createButton(selectionButtonsComposite, Messages.DiscoveryViewer_Show_EarlyAccess, SWT.CHECK);
 	    earlyAccessButton.setLayoutData(new GridData(SWT.END, SWT.DEFAULT, true, false));
 	    earlyAccessButton.setSelection(JBossCentralActivator.getDefault().getPreferences().getBoolean(PreferenceKeys.ENABLE_EARLY_ACCESS, PreferenceKeys.ENABLE_EARLY_ACCESS_DEFAULT_VALUE));
 	    earlyAccessButton.addSelectionListener(new SelectionAdapter() {
@@ -355,6 +357,9 @@ public class SoftwarePage extends AbstractJBossCentralPage implements IRunnableC
 				form.redraw();
 				updateInstallButton();
 				updateUninstallButton();
+				setEnabled(earlyAccessButton, true);
+				setEnabled(deselectAllButton, true);
+				setEnabled(selectAllButton, true);
 			}
 		});
 		
@@ -397,6 +402,9 @@ public class SoftwarePage extends AbstractJBossCentralPage implements IRunnableC
 		public void scheduled(IJobChangeEvent event) {
 			SoftwarePage.setEnabled(installButton, false);
 			SoftwarePage.setEnabled(uninstallButton, false);
+			SoftwarePage.setEnabled(earlyAccessButton, false);
+			SoftwarePage.setEnabled(selectAllButton, false);
+			SoftwarePage.setEnabled(deselectAllButton, false);
 			showLoading();
 		}
 
