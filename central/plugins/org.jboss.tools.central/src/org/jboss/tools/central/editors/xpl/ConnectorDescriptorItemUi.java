@@ -107,6 +107,7 @@ public class ConnectorDescriptorItemUi implements PropertyChangeListener, Runnab
 	private ConnectorInstallationStatus installationStatus = ConnectorInstallationStatus.UNKNOWN;
 
 	private DiscoveryViewer discoveryViewer;
+	
 	private Job connectorUnitJob;
 
 	private final Button checkbox;
@@ -204,7 +205,9 @@ public class ConnectorDescriptorItemUi implements PropertyChangeListener, Runnab
 		GridDataFactory.fillDefaults().grab(true, false).align(SWT.BEGINNING, SWT.CENTER).applyTo(this.statusLabel);
 		setUpToDateStatus();
 		// As resolution of version is a long operation, we create a job for that
-		startConnectorUnitJob();
+		if (this.connector.isInstalled()) {
+			createAndScheduleConnectorUnitJob();
+		}
 
 		providerLabel = new Link(connectorContainer, SWT.RIGHT);
 		providerLabel.setBackground(background);
@@ -296,7 +299,7 @@ public class ConnectorDescriptorItemUi implements PropertyChangeListener, Runnab
 	/**
 	 * Need asynchronous as it's long-running
 	 */
-	private void startConnectorUnitJob() {
+	private void createAndScheduleConnectorUnitJob() {
 		this.connectorUnitJob = new Job("Computing connector status") {
 			private boolean cancelled;
 			
@@ -353,8 +356,8 @@ public class ConnectorDescriptorItemUi implements PropertyChangeListener, Runnab
 		}
 		// All jobs use the same thread
 		this.connectorUnitJob.setRule(SINGLE_JOB_RULE);
-		this.connectorUnitJob.schedule();
 		this.connectorUnitJob.belongsTo(this.discoveryViewer);
+		this.connectorUnitJob.schedule();
 	}
 
 	/**
@@ -538,10 +541,13 @@ public class ConnectorDescriptorItemUi implements PropertyChangeListener, Runnab
 	
 	/**
 	 * This is a synchronous, potentially long-running operation!
-	 * @return
+	 * @return the map of connector units
 	 */
 	public Map<String, Version> getConnectorUnits() {
-		if (this.connectorUnitJob.getState() != Job.NONE) {
+		if (this.connectorUnitJob == null) {
+			createAndScheduleConnectorUnitJob();
+		}
+		if (isComputingUnits()) {
 			try {
 				// on request, raise priority to maximal
 				this.connectorUnitJob.setPriority(Job.INTERACTIVE);
@@ -554,5 +560,9 @@ public class ConnectorDescriptorItemUi implements PropertyChangeListener, Runnab
 			}
 		}
 		return this.connectorUnits;
+	}
+	
+	public boolean isComputingUnits() {
+		return this.connectorUnitJob != null && this.connectorUnitJob.getState() != Job.NONE;
 	}
 }
