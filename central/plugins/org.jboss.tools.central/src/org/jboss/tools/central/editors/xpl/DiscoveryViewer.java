@@ -159,10 +159,6 @@ public class DiscoveryViewer extends Viewer {
 
 	private static Boolean useNativeSearchField;
 
-	private final Set<ConnectorDescriptor> installableConnectors = new HashSet<ConnectorDescriptor>();
-	private final Set<ConnectorDescriptor> installedConnectors = new HashSet<ConnectorDescriptor>();
-	private final Set<ConnectorDescriptor> updatableConnectors = new HashSet<ConnectorDescriptor>();
-
 	private Composite parent;
 	private Composite topLevelControl;
 	private Composite body;
@@ -632,6 +628,7 @@ public class DiscoveryViewer extends Viewer {
 			this.bodyScrolledComposite.changed(new Control[] { this.scrolledContents });
 			this.bodyScrolledComposite.showControl(this.scrolledContents);
 		}
+		fireSelectionChanged(new SelectionChangedEvent(this, getSelection()));
 	}
 	
 	public void setMinimumHeight(int minimumHeight) {
@@ -849,9 +846,6 @@ public class DiscoveryViewer extends Viewer {
 				if (body == null || body.isDisposed()) {
 					return;
 				}
-				DiscoveryViewer.this.installableConnectors.clear();
-				DiscoveryViewer.this.updatableConnectors.clear();
-				DiscoveryViewer.this.installedConnectors.clear();
 				if (DiscoveryViewer.this.discoveries != null && !wasCancelled) {
 					for (ConnectorDiscovery discovery : DiscoveryViewer.this.discoveries.values()) {
 						for (DiscoveryCategory category : discovery.getCategories()) {
@@ -896,15 +890,33 @@ public class DiscoveryViewer extends Viewer {
 	}
 
 	public Set<ConnectorDescriptor> getInstallableConnectors() {
-		return installableConnectors;
+		Set<ConnectorDescriptor> res = new HashSet<ConnectorDescriptor>();
+		for (ConnectorDescriptorItemUi item : (List<ConnectorDescriptorItemUi>)getSelection().toList()) {
+			if (!item.getConnector().isInstalled()) {
+				res.add(item.getConnector());
+			}
+		}
+		return res;
 	}
 	
 	public Set<ConnectorDescriptor> getInstalledConnectors() {
-		return this.installedConnectors;
+		Set<ConnectorDescriptor> res = new HashSet<ConnectorDescriptor>();
+		for (ConnectorDescriptorItemUi item : (List<ConnectorDescriptorItemUi>)getSelection().toList()) {
+			if (item.getConnector().isInstalled()) {
+				res.add(item.getConnector());
+			}
+		}
+		return res;
 	}
 	
 	public Set<ConnectorDescriptor> getUpdatableConnectors() {
-		return this.updatableConnectors;
+		Set<ConnectorDescriptor> res = new HashSet<ConnectorDescriptor>();
+		for (ConnectorDescriptorItemUi item : (List<ConnectorDescriptorItemUi>)getSelection().toList()) {
+			if (item.getConnector().isInstalled() && !item.isUpToDate()) {
+				res.add(item.getConnector());
+			}
+		}
+		return res;
 	}
 	
 	/**
@@ -914,7 +926,7 @@ public class DiscoveryViewer extends Viewer {
 	public IStructuredSelection getSelection() {
 		List<ConnectorDescriptorItemUi> elements = new ArrayList<ConnectorDescriptorItemUi>();
 		for (ConnectorDescriptorItemUi item : getAllConnectorsItemsUi()) {
-			if (item.getConnector().isSelected()) {
+			if (item.getConnector().isSelected() && item.isVisible()) {
 				elements.add(item);
 			}
 		}
@@ -1064,29 +1076,9 @@ public class DiscoveryViewer extends Viewer {
 	void modifySelection(final ConnectorDescriptorItemUi item, boolean selected) {
 		DiscoveryConnector connector = item.getConnector();
 		connector.setSelected(selected);
-		if (connector.isInstalled()) {
-			if (!item.isUpToDate()) {
-				if (selected) {
-					this.updatableConnectors.add(connector);
-				} else {
-					this.updatableConnectors.remove(connector);
-				}
-			}
-			if (selected) {
-				this.installedConnectors.add(connector);
-			} else {
-				this.installedConnectors.remove(connector);
-			}
-		} else if (connector.isInstallable()) {
-			if (selected) {
-				installableConnectors.add(connector);
-			} else {
-				installableConnectors.remove(connector);
-			}
-		}
 		fireSelectionChanged(new SelectionChangedEvent(this, getSelection()));
 	}
-
+	
 	public void showConnectorControl(ConnectorDescriptorItemUi item) {
 		this.bodyScrolledComposite.showControl(item.getControl());
 	}
@@ -1286,9 +1278,6 @@ public class DiscoveryViewer extends Viewer {
 				}
 				DiscoveryViewer.this.discoveries.clear();
 
-				DiscoveryViewer.this.installableConnectors.clear();
-				DiscoveryViewer.this.installedConnectors.clear();
-				DiscoveryViewer.this.updatableConnectors.clear();
 				for (ConnectorDescriptorItemUi itemUI : DiscoveryViewer.this.itemsUi.values()) {
 					itemUI.dispose();
 				}

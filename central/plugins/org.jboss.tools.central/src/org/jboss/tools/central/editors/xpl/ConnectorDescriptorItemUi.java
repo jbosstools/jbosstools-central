@@ -105,6 +105,7 @@ public class ConnectorDescriptorItemUi implements PropertyChangeListener, Runnab
 	private DiscoveryConnector connector;
 	private Map<String, org.eclipse.equinox.p2.metadata.Version> connectorUnits;
 	private ConnectorInstallationStatus installationStatus = ConnectorInstallationStatus.UNKNOWN;
+	private boolean visible;
 
 	private DiscoveryViewer discoveryViewer;
 	
@@ -315,11 +316,15 @@ public class ConnectorDescriptorItemUi implements PropertyChangeListener, Runnab
 								int compare = version.compareTo(ConnectorDescriptorItemUi.this.connectorUnits.get(unitId)); 
 								if (compare == 0) {
 									ConnectorDescriptorItemUi.this.installationStatus = ConnectorInstallationStatus.UP_TO_DATE;
+									discoveryViewer.modifySelection(ConnectorDescriptorItemUi.this, ConnectorDescriptorItemUi.this.connector.isSelected());
+									break;
 								} else if (compare <= 0) {
 									ConnectorDescriptorItemUi.this.installationStatus = ConnectorInstallationStatus.UPDATE_AVAILABLE;
+									// default enables update, so no need to change it
 									break;
 								} else if (compare >= 0) {
 									ConnectorDescriptorItemUi.this.installationStatus = ConnectorInstallationStatus.MORE_RECENT_VERSION_INSTALLED;
+									discoveryViewer.modifySelection(ConnectorDescriptorItemUi.this, ConnectorDescriptorItemUi.this.connector.isSelected());
 									break;
 								}
 							}
@@ -531,12 +536,14 @@ public class ConnectorDescriptorItemUi implements PropertyChangeListener, Runnab
 	}
 
 	public void setVisible(boolean visible) {
+		this.visible = visible;
 		((GridData) this.connectorContainer.getLayoutData()).exclude = !visible;
 		this.connectorContainer.setVisible(visible);
 	}
 
 	public boolean isVisible() {
-		return !((GridData) this.connectorContainer.getLayoutData()).exclude;
+		// Use a field there to avoid called to UI elements and UI thread
+		return this.visible;
 	}
 	
 	/**

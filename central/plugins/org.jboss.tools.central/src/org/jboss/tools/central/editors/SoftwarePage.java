@@ -218,7 +218,12 @@ public class SoftwarePage extends AbstractJBossCentralPage implements IRunnableC
 	    discoveryViewer.addSelectionChangedListener(new ISelectionChangedListener() {
 			@Override
 			public void selectionChanged(SelectionChangedEvent event) {
-				updateInstallButton();
+				getDisplay().syncExec(new Runnable() {
+					@Override
+					public void run() {
+						updateInstallButton();						
+					}
+				});
 			}
 		});
 	    
@@ -260,7 +265,12 @@ public class SoftwarePage extends AbstractJBossCentralPage implements IRunnableC
 	    this.discoveryViewer.addSelectionChangedListener(new ISelectionChangedListener() {
 			@Override
 			public void selectionChanged(SelectionChangedEvent event) {
-				updateUninstallButton();
+				getDisplay().syncExec(new Runnable() {
+					@Override
+					public void run() {
+						updateUninstallButton();						
+					}
+				});
 			}
 		});
 	    this.uninstallButton.addSelectionListener(new SelectionAdapter() {
