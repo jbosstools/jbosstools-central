@@ -44,6 +44,7 @@ import org.jboss.tools.maven.ui.Activator;
 import org.jboss.tools.project.examples.ProjectExamplesActivator;
 import org.jboss.tools.project.examples.model.ProjectExample;
 import org.jboss.tools.project.examples.model.ProjectExampleWorkingCopy;
+import org.jboss.tools.project.examples.model.ProjectImportUtil;
 
 /**
  * @author snjeza
@@ -58,12 +59,10 @@ public class ImportMavenProjectExampleDelegate extends AbstractImportMavenProjec
 	@Override
 	public boolean importProject(ProjectExampleWorkingCopy projectDescription, File file,
 			Map<String, Object> propertiesMap, IProgressMonitor monitor) throws Exception {
-		List<ProjectExample> projects = new ArrayList<ProjectExample>();
-		projects.add(projectDescription);
 		IPath rootPath = getLocation();
 		IPath mavenProjectsRoot = rootPath;
 		String projectName = projectDescription.getName();
-		if (projectName == null || projectName.isEmpty()) {
+		if (projectName == null || projectName.trim().isEmpty()) {
 			projectName = UNNAMED_PROJECTS;
 		}
 		IPath path = mavenProjectsRoot.append(projectName);
@@ -136,6 +135,13 @@ public class ImportMavenProjectExampleDelegate extends AbstractImportMavenProjec
 			});
 			return false;
 		}
+		
+		List<String> originalProjects = projectDescription.getIncludedProjects();
+		if (originalProjects == null) {
+			originalProjects = new ArrayList<String>();
+		} 
+		List<String> includedProjects = new ArrayList<String>();
+		
 		IPreferenceStore store = Activator.getDefault().getPreferenceStore();
 		boolean configureSeam = store.getBoolean(Activator.CONFIGURE_SEAM);
 		boolean configurePortlet = store.getBoolean(Activator.CONFIGURE_PORTLET);
@@ -162,23 +168,27 @@ public class ImportMavenProjectExampleDelegate extends AbstractImportMavenProjec
 		}
 		new OpenMavenConsoleAction().run();
 		
-		List<String> includedProjects = projectDescription.getIncludedProjects();
-		if (includedProjects == null) {
-			includedProjects = new ArrayList<String>();
-			projectDescription.setIncludedProjects(includedProjects);
-		}
-		
-		if (projectNames != null && projectNames.size() > 0) {
-			includedProjects.clear();
+		if (projectNames != null && !projectNames.isEmpty()) {
 			includedProjects.addAll(projectNames);
-		} else {
-			if (!includedProjects.contains(projectName)) {
-				includedProjects.add(projectName);
-			}
-		}
+		} 
+		
 		waitForMavenJobs(monitor);
 
 		MavenProjectExamplesActivator.updateMavenConfiguration(projectName, includedProjects, monitor);
+
+		//Import standard projects
+		if (!originalProjects.isEmpty()) {
+			ProjectImportUtil importer = new ProjectImportUtil();
+			Collection<IProject> standardProjects = importer.importProjects(path, originalProjects, monitor);
+			if (standardProjects != null) {
+				for (IProject p : standardProjects) {
+					includedProjects.add(p.getName());
+				}
+			}
+		}
+
+		projectDescription.setIncludedProjects(includedProjects);
+		
 		return true;
 	}
 

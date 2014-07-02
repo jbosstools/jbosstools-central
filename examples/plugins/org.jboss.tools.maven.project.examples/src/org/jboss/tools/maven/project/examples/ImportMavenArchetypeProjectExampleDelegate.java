@@ -47,11 +47,6 @@ public class ImportMavenArchetypeProjectExampleDelegate extends AbstractImportMa
 		List<ProjectExample> projects = new ArrayList<ProjectExample>();
 		projects.add(projectDescription);
 		List<String> includedProjects = projectDescription.getIncludedProjects();
-		if (includedProjects == null) {
-			includedProjects = new ArrayList<String>();
-			projectDescription.setIncludedProjects(includedProjects);
-		}
-		projectDescription.getIncludedProjects().clear();
 		//JBIDE-12711 : reset welcomeURL for maven archetypes. 
 		projectDescription.setWelcomeURL(null);
 		projectDescription.setWelcome(false);
@@ -87,7 +82,7 @@ public class ImportMavenArchetypeProjectExampleDelegate extends AbstractImportMa
 		}
 		List<IProject> iprojects = toIProjects(includedProjects);
 		
-		//If maven projects are out of date, we trigger an project update.
+		//If maven projects are out of date, we trigger a project update.
 		//Now we don't need to join() on the updateJob, since this update is just meant for 
 		//m2e to get rid of the nasty out of date markers. No need to block import for that.
 		updateOutOfDateMavenProjects(iprojects , monitor);
