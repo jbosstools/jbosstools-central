@@ -112,4 +112,9 @@ public class ProjectExampleWorkingCopy extends ProjectExample {
 	public void setEssentialEnterpriseDependencyGavs(Set<String> gavs) {
 		super.setEssentialEnterpriseDependencyGavs(gavs);
 	}
+	
+	@Override
+	public void setImportType(String importType) {
+		super.setImportType(importType);
+	}
 }
