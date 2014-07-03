@@ -76,7 +76,7 @@ public class ProjectExample implements ProjectModelElement,
 		return name;
 	}
 
-	void setName(String name) {
+	public void setName(String name) {
 		this.name = name;
 	}
 
@@ -128,7 +128,7 @@ public class ProjectExample implements ProjectModelElement,
 		return urlString + SEP + url;
 	}
 
-	void setUrl(String url) {
+	public void setUrl(String url) {
 		this.url = url;
 	}
 
@@ -167,7 +167,7 @@ public class ProjectExample implements ProjectModelElement,
 		return includedProjects;
 	}
 
-	void setIncludedProjects(List<String> includedProjects) {
+	public void setIncludedProjects(List<String> includedProjects) {
 		this.includedProjects = includedProjects;
 	}
 
@@ -231,7 +231,7 @@ public class ProjectExample implements ProjectModelElement,
 		return importType;
 	}
 
-	void setImportType(String importType) {
+	public void setImportType(String importType) {
 		this.importType = importType;
 	}
 
