@@ -102,6 +102,10 @@ public class ArchetypeModel implements Cloneable {
 	
 	@Override
 	public Object clone() throws CloneNotSupportedException {
-		return super.clone();
+		ArchetypeModel clone = (ArchetypeModel)super.clone();
+		if (archetypeProperties != null) {
+			clone.archetypeProperties = (Properties)archetypeProperties.clone();
+		}
+		return clone;
 	}
 }

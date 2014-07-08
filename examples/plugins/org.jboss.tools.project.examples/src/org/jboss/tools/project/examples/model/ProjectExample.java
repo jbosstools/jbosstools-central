@@ -50,7 +50,7 @@ public class ProjectExample implements ProjectModelElement,
 	private String perspectiveId;
 	private String importType;
 	private String importTypeDescription;
-	private ArchetypeModel archetypeModel = new ArchetypeModel();
+	private ArchetypeModel archetypeModel;
 	private File file;
 	private IProjectExampleSite site;
 	private String defaultProfiles = ""; //$NON-NLS-1$
@@ -243,7 +243,14 @@ public class ProjectExample implements ProjectModelElement,
 		this.importTypeDescription = importTypeDescription;
 	}
 
+	void setArchetypeModel(ArchetypeModel archetypeModel) {
+		this.archetypeModel = archetypeModel;
+	}
+	
 	public ArchetypeModel getArchetypeModel() {
+		if (archetypeModel == null) {
+			archetypeModel = new ArchetypeModel();
+		}
 		return archetypeModel;
 	}
 

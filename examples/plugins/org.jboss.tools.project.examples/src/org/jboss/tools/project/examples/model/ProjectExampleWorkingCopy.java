@@ -68,6 +68,15 @@ public class ProjectExampleWorkingCopy extends ProjectExample {
 		setWelcome(projectExample.isWelcome());
 		setWelcomeFixRequired(projectExample.isWelcomeFixRequired());
 		setWelcomeURL(projectExample.getWelcomeURL());
+		
+		if (projectExample.getArchetypeModel() != null) {
+			try {
+					setArchetypeModel((ArchetypeModel)projectExample.getArchetypeModel().clone());
+			} catch (CloneNotSupportedException e) {
+				//there's *no* chance this can happen 
+				throw new RuntimeException("Error cloning archetypeModel", e); //$NON-NLS-1$
+			}
+		}
 	}
 
 	public List<ProjectFix> getUnsatisfiedFixes() {
