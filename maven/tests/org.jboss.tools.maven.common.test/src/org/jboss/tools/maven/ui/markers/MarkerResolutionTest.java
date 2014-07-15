@@ -39,7 +39,7 @@ public class MarkerResolutionTest extends AbstractMavenProjectTestCase {
 		IMarkerResolution[] resolutions = markerGenerator.getResolutions(markers.get(1));
 		assertEquals("Unexpected resolution number", markerClasses.length, resolutions.length);
 		int i = 0;
-		for (Class mc : markerClasses) {
+		for (Class<?> mc : markerClasses) {
 			assertEquals(mc, resolutions[i++].getClass());
 		}
 	}

@@ -282,7 +282,7 @@ public class SeamProjectConfigurator extends AbstractProjectConfigurator {
 		try {
 		  facetVersion = seamFacet.getVersion(version);
 		} catch (Exception e) {
-		  MavenSeamActivator.log(e, "Seam version "+ version+ " is not supported, using latest supported facet version instead"); 
+		  MavenSeamActivator.log(e, "Seam version "+ version+ " is not supported, using latest supported facet version instead");  //$NON-NLS-1$ //$NON-NLS-2$
 		  facetVersion = seamFacet.getLatestVersion();
 		}
 		return facetVersion;
@@ -312,7 +312,7 @@ public class SeamProjectConfigurator extends AbstractProjectConfigurator {
 		boolean hasConflicts = false;
 		for (IProjectFacetVersion fv : fproj.getProjectFacets()) {
 			if (seamFacetVersion.conflictsWith(fv)) {
-				addErrorMarker(fproj.getProject(), seamFacetVersion + " can not be installed as it conflicts with "+ fv);
+				addErrorMarker(fproj.getProject(), seamFacetVersion + " can not be installed as it conflicts with "+ fv); //$NON-NLS-1$
 				hasConflicts = true;
 			}
 		}
@@ -338,7 +338,7 @@ public class SeamProjectConfigurator extends AbstractProjectConfigurator {
 		} else {
 			String deploying = model.getStringProperty(ISeamFacetDataModelProperties.JBOSS_AS_DEPLOY_AS);
 			if (deploying != null && deploying.equals(ISeamFacetDataModelProperties.DEPLOY_AS_WAR)) {
-				IPreferenceStore store = MavenSeamActivator.getDefault().getPreferenceStore();
+				IPreferenceStore store = Activator.getDefault().getPreferenceStore();
 				boolean configureSeamArtifacts = store.getBoolean(Activator.CONFIGURE_SEAM_ARTIFACTS);
 				if (!configureSeamArtifacts) {
 					return;
@@ -354,7 +354,7 @@ public class SeamProjectConfigurator extends AbstractProjectConfigurator {
 		if (portletFacet == null) {
 			return;
 		}
-		IPreferenceStore store = MavenSeamActivator.getDefault().getPreferenceStore();
+		IPreferenceStore store = Activator.getDefault().getPreferenceStore();
 		boolean configureSeamPortlet = store.getBoolean(Activator.CONFIGURE_SEAMPORTLET);
 		if (!configureSeamPortlet) {
 			return;
@@ -529,7 +529,7 @@ public class SeamProjectConfigurator extends AbstractProjectConfigurator {
 		config.setBooleanProperty(ISeamFacetDataModelProperties.CONFIGURE_DEFAULT_SEAM_RUNTIME, false);
 		config.setBooleanProperty(ISeamFacetDataModelProperties.CONFIGURE_WAR_PROJECT, false);
 		config.setBooleanProperty(ISeamFacetDataModelProperties.PROJECT_ALREADY_EXISTS, true);
-		IPreferenceStore store = MavenSeamActivator.getDefault().getPreferenceStore();
+		IPreferenceStore store = Activator.getDefault().getPreferenceStore();
 		boolean configureSeamArtifacts = store.getBoolean(Activator.CONFIGURE_SEAM_ARTIFACTS);
 		if (!configureSeamArtifacts) {
 			return config;
@@ -558,7 +558,7 @@ public class SeamProjectConfigurator extends AbstractProjectConfigurator {
 				for (IPath sourcePath:sourcePaths) {
 					if (sourcePath.toString().contains("hot")) { //$NON-NLS-1$
 						actionSourceFolder = sourcePath;
-					} else {
+					} else if (!sourcePath.toString().contains("/test") || !sourcePath.toString().contains("/main/resources")){ //$NON-NLS-1$ //$NON-NLS-2$
 						modelSourceFolder = sourcePath;
 					}
 				}
@@ -597,7 +597,7 @@ public class SeamProjectConfigurator extends AbstractProjectConfigurator {
 		if (seamVersionStr == null) {
 			return null;
 		}
-		IPreferenceStore store = MavenSeamActivator.getDefault().getPreferenceStore();
+		IPreferenceStore store = Activator.getDefault().getPreferenceStore();
 		boolean configureSeamRuntime = store.getBoolean(Activator.CONFIGURE_SEAM_RUNTIME);
 		if (!configureSeamRuntime) {
 			return null;

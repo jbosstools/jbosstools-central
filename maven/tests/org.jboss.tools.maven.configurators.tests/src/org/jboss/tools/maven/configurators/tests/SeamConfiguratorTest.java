@@ -2,6 +2,8 @@ package org.jboss.tools.maven.configurators.tests;
 
 import java.io.File;
 
+import junit.framework.Assert;
+
 import org.apache.maven.model.Model;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
@@ -9,6 +11,7 @@ import org.eclipse.core.resources.IncrementalProjectBuilder;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.m2e.core.project.ResolverConfiguration;
 import org.eclipse.wst.common.project.facet.core.IFacetedProject;
+import org.eclipse.wst.common.project.facet.core.IFacetedProjectValidator;
 import org.eclipse.wst.common.project.facet.core.IProjectFacet;
 import org.eclipse.wst.common.project.facet.core.IProjectFacetVersion;
 import org.eclipse.wst.common.project.facet.core.ProjectFacetsManager;
@@ -16,12 +19,17 @@ import org.jboss.tools.jst.web.kb.IKbProject;
 import org.jboss.tools.maven.core.MavenUtil;
 import org.jboss.tools.seam.core.ISeamProject;
 import org.jboss.tools.seam.core.SeamCorePlugin;
+import org.jboss.tools.seam.core.project.facet.SeamRuntime;
+import org.jboss.tools.seam.core.project.facet.SeamRuntimeManager;
+import org.jboss.tools.seam.core.project.facet.SeamVersion;
 import org.jboss.tools.seam.internal.core.project.facet.ISeamFacetDataModelProperties;
 import org.junit.Test;
 
 @SuppressWarnings("restriction")
 public class SeamConfiguratorTest extends AbstractMavenConfiguratorTest {
 
+	public static final String SEAM_HOME_PROPERTY = System.getProperty("jbosstools.test.seam.2.3.home", "target/requirements/jboss-seam-2.3.1.Final");
+	
 	private static final IProjectFacetVersion JSF_FACET_VERSION_2_1;
 	private static final IProjectFacetVersion JSF_FACET_VERSION_2_0;
 	private static final IProjectFacetVersion JSF_FACET_VERSION_1_2;
@@ -152,5 +160,41 @@ public class SeamConfiguratorTest extends AbstractMavenConfiguratorTest {
 		assertHasError(project, "Missing artifact org.jboss.seam:jboss-seam:jar:missing");
 	}
 	
+	@Test
+	public void testJBIDE17846_checkMatchingSeamRuntime() throws Exception {
+		SeamRuntime seamRuntime = createSeamRuntime("jboss-seam-2.3", SEAM_HOME_PROPERTY, SeamVersion.SEAM_2_3);
+		
+		IProject project = importProject("projects/seam/JBIDE-17846/pom.xml");
+		waitForJobsToComplete();
+		assertNoErrors(project);
+		IFacetedProject fp = ProjectFacetsManager.create(project);
+		IProjectFacetVersion seamFacet = fp.getProjectFacetVersion(SEAM_FACET);
+		assertNotNull("Seam facet was not installed", seamFacet);
+		assertEquals("Unexpected Seam facet version", "2.3", seamFacet.getVersionString());
+		assertHasSeamRuntime(project, seamRuntime);
+	}
+	
+	
+	private void assertHasSeamRuntime(IProject project, SeamRuntime seamRuntime) {
+		assertEquals(seamRuntime, SeamRuntimeManager.getInstance().getRuntimeForProject(project));
+	}
+
+	protected static SeamRuntime createSeamRuntime(String name, String seamPath, SeamVersion seamVersion) {
+		SeamRuntime seamRuntime = SeamRuntimeManager.getInstance().findRuntimeByName(name);
+		if (seamRuntime != null) {
+			return seamRuntime;
+		}
+		File seamFolder = new File(seamPath);
+		assertTrue(seamFolder + " is missing. Either run a maven build first or run this test with -Djbosstools.test.seam.2.3.home", seamFolder.exists());
+		assertTrue(seamFolder + " is not a directory", seamFolder.isDirectory());
+		
+		SeamRuntime rt = new SeamRuntime();
+		rt.setHomeDir(seamPath);
+		rt.setName(name);
+		rt.setDefault(true);
+		rt.setVersion(seamVersion);
+		SeamRuntimeManager.getInstance().addRuntime(rt);
+		return rt;
+	}
 	
 }

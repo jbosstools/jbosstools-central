@@ -2,3 +2,4 @@ bin/
 cache/
 target/
 pmd-eclipse.log
+.DS_Store
