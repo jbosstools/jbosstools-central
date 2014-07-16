@@ -39,6 +39,7 @@ import org.eclipse.equinox.internal.p2.ui.dialogs.InstallWizard;
 import org.eclipse.equinox.internal.p2.ui.dialogs.PreselectedIUInstallWizard;
 import org.eclipse.equinox.internal.p2.ui.dialogs.ProvisioningWizardDialog;
 import org.eclipse.equinox.internal.p2.ui.dialogs.RemediationPage;
+import org.eclipse.equinox.internal.p2.ui.dialogs.SelectableIUsPage;
 import org.eclipse.equinox.p2.core.ProvisionException;
 import org.eclipse.equinox.p2.engine.IProfile;
 import org.eclipse.equinox.p2.engine.IProvisioningPlan;
@@ -58,6 +59,7 @@ import org.eclipse.equinox.p2.repository.metadata.IMetadataRepositoryManager;
 import org.eclipse.equinox.p2.ui.LoadMetadataRepositoryJob;
 import org.eclipse.equinox.p2.ui.ProvisioningUI;
 import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.mylyn.internal.discovery.core.model.ConnectorDescriptor;
 import org.eclipse.mylyn.internal.discovery.ui.AbstractInstallJob;
@@ -167,6 +169,14 @@ public class PrepareInstallProfileJob extends AbstractInstallJob {
 					return null;
 				}
 				return super.createRemediationPage();
+			}
+
+			@Override
+			public IWizardPage getPreviousPage(IWizardPage page) {
+				if (page instanceof SelectableIUsPage) {
+					return null;
+				}
+				return super.getPreviousPage(page);
 			}
 			
 		};
