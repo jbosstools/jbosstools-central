@@ -5,6 +5,7 @@ import java.io.FileFilter;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -14,6 +15,7 @@ import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.repository.RepositorySystem;
 import org.apache.maven.settings.Profile;
 import org.apache.maven.settings.Repository;
+import org.apache.maven.settings.RepositoryPolicy;
 import org.apache.maven.settings.Settings;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
@@ -51,10 +53,14 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.DirectoryDialog;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
+import org.eclipse.ui.forms.events.ExpansionAdapter;
+import org.eclipse.ui.forms.events.ExpansionEvent;
+import org.eclipse.ui.forms.widgets.ExpandableComposite;
 import org.jboss.tools.maven.core.IArtifactResolutionService;
 import org.jboss.tools.maven.core.MavenCoreActivator;
 import org.jboss.tools.maven.ui.Activator;
@@ -69,6 +75,8 @@ public class AddRepositoryDialog extends TitleAreaDialog {
 	private static final String PROFILE_ID_IS_REQUIRED = "Profile ID is required.";
 	private static final String ADD_MAVEN_REPOSITORY_TITLE = "Add Maven Repository";
 	private static final String EDIT_MAVEN_REPOSITORY_TITLE = "Edit Maven Repository";
+	private static final String UNKNOWN_SNAPSHOTS_POLICY = "Unknown snapshots update policy";
+	private static final String UNKNOWN_RELEASES_POLICY = "Unknown releases update policy";
 
 	private static final String EMPTY_STRING = ""; //$NON-NLS-1$
 	private static final String CONFIGURE_MAVEN_REPOSITORIES = "ConfigureMavenRepositories"; //$NON-NLS-1$
@@ -78,6 +86,8 @@ public class AddRepositoryDialog extends TitleAreaDialog {
 	private static final String JBOSS_EAP_MAVEN_REPOSITORY = "JBoss EAP Maven Repository"; //$NON-NLS-1$
 	private static final String JBOSS_EAP_MAVEN_REPOSITORY_ID = "jboss-eap-maven-repository";; //$NON-NLS-1$
 	private static final String JBOSS_WFK_MAVEN_REPOSITORY_ID = "jboss-wfk-maven-repository";; //$NON-NLS-1$
+	private static final String[] UPDATE_POLICIES = new String[] {"never","always","daily","interval:XXX"}; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+	private static final String[] REPO_LAYOUTS = new String[] {"default","p2","legacy"}; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
 	private Set<RepositoryWrapper> availableRepositories;
 	private Set<RepositoryWrapper> includedRepositories;
@@ -85,6 +95,11 @@ public class AddRepositoryDialog extends TitleAreaDialog {
 	private Combo profileCombo;
 	private Button activeByDefaultButton;
 	private boolean activeByDefault;
+	private Button snapshotsButton;
+	private Button releasesButton;
+	private Combo snapshotsPolicyCombo;
+	private Combo releasesPolicyCombo;
+	private Combo repositoryLayout;
 	private Text idText;
 	private Text urlText;
 	private Text nameText;
@@ -97,6 +112,8 @@ public class AddRepositoryDialog extends TitleAreaDialog {
 	private ControlDecoration urlTextDecoration;
 	private ControlDecoration urlValidTextDecoration;
 	private ControlDecoration urlExistsTextDecoration;
+	private ControlDecoration snapshotsPolicyDecoration;
+	private ControlDecoration releasesPolicyDecoration;
 	
 	private RepositoryWrapper repositoryWrapper;
 	private ArtifactKey artifactKey;
@@ -149,7 +166,7 @@ public class AddRepositoryDialog extends TitleAreaDialog {
 		Composite area = (Composite) super.createDialogArea(parent);
 		Composite contents = new Composite(area, SWT.NONE);
 		GridData gd = new GridData(GridData.FILL, GridData.FILL, true, true);
-		gd.heightHint = 300;
+		gd.heightHint = 400;
 		gd.widthHint = 500;
 		contents.setLayoutData(gd);
 		contents.setLayout(new GridLayout(1, false));
@@ -209,6 +226,18 @@ public class AddRepositoryDialog extends TitleAreaDialog {
 		urlTextDecoration = addDecoration(urlText, FieldDecorationRegistry.DEC_REQUIRED, REPOSITORY_URL_IS_REQUIRED);
 		urlValidTextDecoration = addDecoration(urlText, FieldDecorationRegistry.DEC_ERROR, URL_IS_NOT_VALID);
 		urlExistsTextDecoration = addDecoration(urlText, FieldDecorationRegistry.DEC_ERROR, URL_ALREADY_EXISTS);
+		
+		createAdvancedComposite(repositoryGroup);
+		
+		profileCombo.addSelectionListener(new SelectionAdapter() {
+
+			@Override
+			public void widgetSelected(SelectionEvent event) {
+				selectProfile();
+			}
+
+		});
+		
 		if (!isEditing) {
 			createRecognizeButton(contents);
 		}
@@ -268,7 +297,6 @@ public class AddRepositoryDialog extends TitleAreaDialog {
 				}
 			}
 		}
-
 		return area;
 	}
 
@@ -423,6 +451,8 @@ public class AddRepositoryDialog extends TitleAreaDialog {
 		profileComboDecoration.hide();
 		urlValidTextDecoration.hide();
 		urlExistsTextDecoration.hide();
+		snapshotsPolicyDecoration.hide();
+		releasesPolicyDecoration.hide();
 		enableOkButton(true);
 		
 		setMessage(null);
@@ -466,6 +496,21 @@ public class AddRepositoryDialog extends TitleAreaDialog {
 				}
 			}
 		}
+		
+		if(!validatePolicy(snapshotsButton, snapshotsPolicyCombo)){
+			setMessage(UNKNOWN_SNAPSHOTS_POLICY, IMessageProvider.ERROR);
+			enableOkButton(false);
+			showDecoration();
+			return;
+		}
+		
+		if(!validatePolicy(releasesButton, releasesPolicyCombo)){
+			setMessage(UNKNOWN_RELEASES_POLICY, IMessageProvider.ERROR);
+			enableOkButton(false);
+			showDecoration();
+			return;
+		}
+		
 		if (nameText.getText().trim().isEmpty()) {
 			setMessage(REPOSITORY_NAME_IS_EMPTY, IMessageProvider.WARNING);
 			showDecoration();
@@ -508,11 +553,38 @@ public class AddRepositoryDialog extends TitleAreaDialog {
 		if (nameText.getText().trim().isEmpty()) {
 			nameTextDecoration.show();
 		}
+		if(!validatePolicy(releasesButton, releasesPolicyCombo)){
+			releasesPolicyDecoration.show();
+		}
+		if(!validatePolicy(snapshotsButton, snapshotsPolicyCombo)){
+			snapshotsPolicyDecoration.show();
+		}
+	}
+	
+	private boolean validatePolicy(Button policyButton, Combo comboToValidate){
+		if(!policyButton.getSelection()){
+			return true;
+		}
+		if (comboToValidate.getText().trim().startsWith("interval:")) {
+			String[] interval = comboToValidate.getText().trim().split("interval:");
+			if(interval.length != 2){
+				return false;
+			} else {
+				try{
+					Integer.parseInt(interval[1]);
+				} catch (NumberFormatException ex){
+					return false;
+				}
+			}
+		} else if(!Arrays.asList(UPDATE_POLICIES).contains(comboToValidate.getText().trim())){
+			return false;
+		}
+		return true;
 	}
 
 	private Label createLabel(Composite parent, String text) {
 		Label label = new Label(parent, SWT.NONE);
-		label.setLayoutData(new GridData(GridData.FILL, GridData.FILL, false,
+		label.setLayoutData(new GridData(GridData.FILL, GridData.CENTER, false,
 				false));
 		label.setText(text);
 		return label;
@@ -538,6 +610,13 @@ public class AddRepositoryDialog extends TitleAreaDialog {
 		idText.setText(repository.getId() == null ? "" : repository.getId()); //$NON-NLS-1$
 		nameText.setText(repository.getName() == null ? "" : repository.getName()); //$NON-NLS-1$
 		urlText.setText(repository.getUrl() == null ? "" : repository.getUrl()); //$NON-NLS-1$
+		snapshotsButton.setSelection(repository.getSnapshots().isEnabled());
+		snapshotsButton.notifyListeners(SWT.Selection, new Event());
+		snapshotsPolicyCombo.setText(repository.getSnapshots().getUpdatePolicy());
+		releasesButton.setSelection(repository.getReleases().isEnabled());
+		releasesButton.notifyListeners(SWT.Selection, new Event());
+		releasesPolicyCombo.setText(repository.getReleases().getUpdatePolicy());
+		repositoryLayout.setText(repository.getLayout());
 	}
 
 	private Image getJBossImage() {
@@ -823,6 +902,24 @@ public class AddRepositoryDialog extends TitleAreaDialog {
 		repository.setId(idText.getText().trim());
 		repository.setName(nameText.getText().trim());
 		repository.setUrl(urlText.getText().trim());
+		
+		RepositoryPolicy snapsohtsPolicy = createRepositoryPolicy(snapshotsButton, snapshotsPolicyCombo);
+		repository.setSnapshots(snapsohtsPolicy);
+		RepositoryPolicy releasesPolicy = createRepositoryPolicy(releasesButton, releasesPolicyCombo);
+		repository.setReleases(releasesPolicy);
+		
+		repository.setLayout(repositoryLayout.getText());
+	}
+	
+	private RepositoryPolicy createRepositoryPolicy(Button policyButton, Combo policyCombo){
+		RepositoryPolicy policy = new RepositoryPolicy();
+		policy.setEnabled(policyButton.getSelection());
+		if(policyButton.getSelection()){
+			policy.setUpdatePolicy(policyCombo.getText());
+		} else {
+			policy.setUpdatePolicy(UPDATE_POLICIES[0]);
+		}
+		return policy;
 	}
 
 	public boolean isActiveByDefault() {
@@ -879,4 +976,97 @@ public class AddRepositoryDialog extends TitleAreaDialog {
 			Activator.log(e1);
 		}
 	}
+	
+	private void createAdvancedComposite(final Composite parent){
+		
+		final ExpandableComposite ex = new ExpandableComposite(parent,ExpandableComposite.COMPACT | ExpandableComposite.TWISTIE | ExpandableComposite.EXPANDED);
+		ex.setText("Advanced");
+
+		GridData gridData = new GridData(GridData.FILL, GridData.FILL, true, true);
+		gridData.horizontalSpan = 2;
+		ex.setLayoutData(gridData);
+		
+		Composite advancedComposite = new Composite(ex, SWT.NONE);
+		advancedComposite.setLayoutData(new GridData(GridData.FILL, GridData.FILL, true, true));
+		advancedComposite.setLayout(new GridLayout(2, false));
+		
+		createLabel(advancedComposite, "Repository layout: ");
+		repositoryLayout = new Combo(advancedComposite, SWT.DROP_DOWN);
+		populateCombo(repositoryLayout, REPO_LAYOUTS);
+		
+		Group srGroup = new Group(advancedComposite,SWT.NONE);
+		srGroup.setText("Snapshots && Releases");
+		srGroup.setLayoutData(gridData);
+		srGroup.setLayout(new GridLayout(3, false));
+		
+		releasesButton = new Button(srGroup, SWT.CHECK);
+		releasesButton.setText("Enable releases");
+		releasesButton.setSelection(true);
+		releasesButton.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent event) {
+				if(releasesButton.getSelection()){
+					releasesPolicyCombo.setEnabled(true);
+				} else {
+					releasesPolicyCombo.setEnabled(false);
+				}
+				validate();
+			}
+		});
+		
+		createLabel(srGroup, "Update policy: ");
+		releasesPolicyCombo = new Combo(srGroup, SWT.DROP_DOWN);
+		populateCombo(releasesPolicyCombo,UPDATE_POLICIES);
+		releasesPolicyDecoration = addDecoration(releasesPolicyCombo, FieldDecorationRegistry.DEC_ERROR, UNKNOWN_RELEASES_POLICY);
+		releasesPolicyCombo.addModifyListener(new ModifyListener() {
+			
+			public void modifyText(ModifyEvent e) {
+				validate();
+			}
+		});
+		
+		snapshotsButton = new Button(srGroup, SWT.CHECK);
+		snapshotsButton.setText("Enable snapshots");
+		snapshotsButton.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent event) {
+				if(snapshotsButton.getSelection()){
+					snapshotsPolicyCombo.setEnabled(true);
+					validate();
+				} else {
+					snapshotsPolicyCombo.setEnabled(false);
+				}
+				validate();
+			}
+		});
+
+		createLabel(srGroup, "Update policy: ");
+		snapshotsPolicyCombo = new Combo(srGroup, SWT.DROP_DOWN);
+		populateCombo(snapshotsPolicyCombo,UPDATE_POLICIES);
+		snapshotsPolicyDecoration = addDecoration(snapshotsPolicyCombo, FieldDecorationRegistry.DEC_ERROR, UNKNOWN_SNAPSHOTS_POLICY);
+		snapshotsPolicyCombo.setEnabled(false);
+		snapshotsPolicyCombo.addModifyListener(new ModifyListener() {
+			
+			public void modifyText(ModifyEvent e) {
+				validate();
+			}
+		});
+		
+		ex.setClient(advancedComposite);
+		
+		ex.addExpansionListener(new ExpansionAdapter() {
+			public void expansionStateChanged(ExpansionEvent e) {
+				parent.getParent().layout();
+			}
+		});
+		
+	}
+
+	private void populateCombo(Combo combo, String[] values){
+		for(int i=0; i<values.length;i++){
+			combo.add(values[i]);
+		}
+		combo.setText(values[0]);
+	}
 }
+

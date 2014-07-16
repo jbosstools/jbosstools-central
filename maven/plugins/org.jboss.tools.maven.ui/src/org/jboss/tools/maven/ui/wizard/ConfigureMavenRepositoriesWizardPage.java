@@ -677,19 +677,19 @@ public class ConfigureMavenRepositoriesWizardPage extends WizardPage implements 
 		addElement(repository, ID_ELEMENT, wrapper.getRepository().getId());
 		addElement(repository, NAME_ELEMENT, wrapper.getRepository().getName());
 		addElement(repository, URL_ELEMENT, wrapper.getRepository().getUrl());
-		addElement(repository, LAYOUT_ELEMENT, LAYOUT_DEFAULT);
+		addElement(repository, LAYOUT_ELEMENT, wrapper.getRepository().getLayout());
 		RepositoryPolicy policy = wrapper.getRepository().getReleases();
 		if (policy != null) {
 			Element releases = addElement(repository, RELEASES_ELEMENT, null);
 			addElement(releases, ENABLED_ELEMENT, policy.isEnabled() ? "true" : "false");  //$NON-NLS-1$//$NON-NLS-2$
-			addElement(releases, UPDATE_POLICY_ELEMENT, POLICY_NEVER);
+			addElement(releases, UPDATE_POLICY_ELEMENT, policy.getUpdatePolicy());
 			repository.appendChild(releases);
 		}
 		policy = wrapper.getRepository().getSnapshots();
 		if (policy != null) {
 			Element snapshots = addElement(repository, SNAPSHOTS_ELEMENT, null);
 			addElement(snapshots, ENABLED_ELEMENT, policy.isEnabled() ? "true" : "false");  //$NON-NLS-1$//$NON-NLS-2$
-			addElement(snapshots, UPDATE_POLICY_ELEMENT, POLICY_NEVER);
+			addElement(snapshots, UPDATE_POLICY_ELEMENT,  policy.getUpdatePolicy());
 			repository.appendChild(snapshots);
 		}
 	}
@@ -1317,3 +1317,4 @@ public class ConfigureMavenRepositoriesWizardPage extends WizardPage implements 
 	}
 	
 }
+
