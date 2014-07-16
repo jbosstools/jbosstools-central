@@ -30,7 +30,10 @@ import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.text.Document;
 import org.eclipse.jface.text.TextViewer;
+import org.eclipse.jface.util.IPropertyChangeListener;
+import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.StyleRange;
 import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.events.ControlAdapter;
 import org.eclipse.swt.events.ControlEvent;
@@ -502,7 +505,7 @@ public class JBossCentralEditor extends SharedHeaderFormEditor {
 		public HeaderText(ScrolledForm form) {
 			this.form = form;
 			try {
-				FormHeading heading = (FormHeading) form.getForm().getHead();
+				final FormHeading heading = (FormHeading) form.getForm().getHead();
 				heading.setBusy(true);
 				heading.setBusy(false);
 
@@ -520,15 +523,29 @@ public class JBossCentralEditor extends SharedHeaderFormEditor {
 
 				final TextViewer titleViewer = new TextViewer(titleRegion, SWT.READ_ONLY);
 				titleViewer.setDocument(new Document());
-
-				titleLabel = titleViewer.getTextWidget();
-				titleLabel.setText("Welcome to JBoss");
-				if (useFefaultColors) {
-					titleLabel.setForeground(heading.getForeground());
-				} else {
-					Color black = heading.getDisplay().getSystemColor(SWT.COLOR_BLACK);
-					titleLabel.setForeground(black);
-				}
+				
+				this.titleLabel = titleViewer.getTextWidget();
+				updateTitle(heading, JBossCentralActivator.getDefault().getPreferences().getBoolean(PreferenceKeys.ENABLE_EARLY_ACCESS, PreferenceKeys.ENABLE_EARLY_ACCESS_DEFAULT_VALUE));
+				JBossCentralActivator.getDefault().getPreferenceStore().addPropertyChangeListener(new IPropertyChangeListener() {
+					@Override
+					public void propertyChange(final PropertyChangeEvent arg0) {
+						if (arg0.getProperty().equals(PreferenceKeys.ENABLE_EARLY_ACCESS)) {
+							heading.getDisplay().asyncExec(new Runnable() {
+								@Override
+								public void run() {
+									Boolean newValue = Boolean.FALSE;
+									if (arg0.getNewValue() instanceof String) {
+										newValue = Boolean.parseBoolean((String)arg0.getNewValue());
+									} else if (arg0.getNewValue() instanceof Boolean) {
+										newValue = (Boolean)arg0.getNewValue();
+									}
+									updateTitle(heading, newValue);
+								}
+							});
+						}
+					}
+				});
+				
 				
 				Font font = new Font(heading.getDisplay(),"Lucida Sans Unicode",14,SWT.NORMAL); 
 				//titleLabel.setFont(heading.getFont());
@@ -570,6 +587,35 @@ public class JBossCentralEditor extends SharedHeaderFormEditor {
 			} catch (Exception e) {
 				JBossCentralActivator.log(e);
 			} 
+		}
+
+		/**
+		 * @param heading
+		 * @param titleViewer
+		 */
+		private void updateTitle(final FormHeading heading, boolean isEarlyAccess) {
+			if(heading.isDisposed() || titleLabel.isDisposed()) {
+				return;
+			}
+			Color foreground = null;
+			if (useFefaultColors) {
+				foreground = heading.getForeground();
+			} else {
+				foreground = heading.getDisplay().getSystemColor(SWT.COLOR_BLACK);
+			}
+			titleLabel.setForeground(foreground);
+			
+			String title = "Welcome to JBoss"; 
+			String earlyAccessSuffix = "with Early Access";
+			if (isEarlyAccess) {
+				this.titleLabel.setText(title + " " + earlyAccessSuffix); //$NON-NLS-1$
+				Color background = heading.getDisplay().getSystemColor(SWT.COLOR_YELLOW);
+				StyleRange range = new StyleRange(title.length() + 1, earlyAccessSuffix.length(), foreground, background);
+				range.fontStyle = SWT.ITALIC;
+				this.titleLabel.setStyleRange(range);
+			} else {
+				this.titleLabel.setText(title);
+			}
 		}
 
 		private void updateSizeAndLocations() {
