@@ -25,12 +25,15 @@ public class ProjectExampleWorkingCopy extends ProjectExample {
 
 	private List<ProjectFix> unsatisfiedFixes;
 
+	private String exampleId;
+	
 	public ProjectExampleWorkingCopy() {
 		super();
 	}
 	
 	public ProjectExampleWorkingCopy(ProjectExample projectExample) {
 		this();
+		exampleId = projectExample.getName();
 		setCategory(projectExample.getCategory());
 		setDefaultProfiles(projectExample.getDefaultProfiles());
 		setDescription(projectExample.getDescription());
@@ -125,5 +128,28 @@ public class ProjectExampleWorkingCopy extends ProjectExample {
 	@Override
 	public void setImportType(String importType) {
 		super.setImportType(importType);
+	}
+	
+	@Override
+	public void setArchetypeModel(ArchetypeModel archetypeModel) {
+		super.setArchetypeModel(archetypeModel);
+	}
+
+	public String getExampleId() {
+		//archetype model is a maven concept, shouldn't be available here
+		ArchetypeModel model = getArchetypeModel();
+		//need to introduce stinky coupling to maven type here
+		if (model != null && "mavenArchetype".equals(getImportType())) {
+			exampleId = model.getGAV();
+		}
+		
+		if (exampleId == null || exampleId.trim().isEmpty()) {
+			return getName();
+		}
+		return exampleId;
+	}
+
+	public void setExampleId(String exampleId) {
+		this.exampleId = exampleId;
 	}
 }

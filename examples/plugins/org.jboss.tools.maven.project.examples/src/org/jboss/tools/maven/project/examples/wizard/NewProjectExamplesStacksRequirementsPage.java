@@ -204,6 +204,7 @@ public class NewProjectExamplesStacksRequirementsPage extends MavenExamplesRequi
 					if (useBlankArchetype != null) {
 						useBlankArchetype.setVisible(hasBlank);
 					}
+					projectExample.setArchetypeModel(mavenArchetype);
 				}
 			} catch (CloneNotSupportedException e) {
 				e.printStackTrace();
@@ -219,11 +220,7 @@ public class NewProjectExamplesStacksRequirementsPage extends MavenExamplesRequi
 		if (mavenArchetype != null) {
 			description.append("\r\n").append("\r\n") //$NON-NLS-1$ //$NON-NLS-2$
 			.append("Project based on the ") //$NON-NLS-1$
-			.append(mavenArchetype.getArchetypeGroupId())
-			.append(":") //$NON-NLS-1$
-			.append(mavenArchetype.getArchetypeArtifactId())
-			.append(":") //$NON-NLS-1$
-			.append(mavenArchetype.getArchetypeVersion())
+			.append(mavenArchetype.getGAV())
 			.append(" Maven archetype"); //$NON-NLS-1$
 		}
 		

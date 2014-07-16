@@ -235,9 +235,13 @@ public class ProjectExamplesActivator extends AbstractUIPlugin {
 
 	private Map<String, List<ContributedPage>> contributedPages;
 
-	private static final String COMPONENT_NAME = "central";
-	private static final String INSTALL_ACTION = "install";
-	private UsageEventType installEventType;
+	private static final String CENTRAL_COMPONENT_NAME = "central"; //$NON-NLS-1$
+	private static final String EXAMPLES_COMPONENT_NAME = "examples"; //$NON-NLS-1$
+	private static final String INSTALL_ACTION = "install"; //$NON-NLS-1$
+	private static final String CREATE_FROM_EXAMPLE_ACTION = "create"; //$NON-NLS-1$
+	private UsageEventType installSoftwareEventType;
+
+	private UsageEventType createProjectFromExampleEventType;
 
 	/**
 	 * The constructor
@@ -257,14 +261,22 @@ public class ProjectExamplesActivator extends AbstractUIPlugin {
 		ProjectExamplesActivator.context = context;
 		plugin = this;
 
-		installEventType = new UsageEventType(COMPONENT_NAME, UsageEventType.getVersion(this), null, INSTALL_ACTION, Messages.UsageEventTypeInstallLabelDescription);
-		UsageReporter.getInstance().registerEvent(installEventType);
+		String version = UsageEventType.getVersion(this);
+		installSoftwareEventType = new UsageEventType(CENTRAL_COMPONENT_NAME, version , null, INSTALL_ACTION, Messages.UsageEventTypeInstallLabelDescription);
+		UsageReporter.getInstance().registerEvent(installSoftwareEventType);
+		
+		createProjectFromExampleEventType = new UsageEventType(EXAMPLES_COMPONENT_NAME, version, null, CREATE_FROM_EXAMPLE_ACTION, Messages.ProjectExamplesActivator_UsageEventTypeCreateProjectFromExampleDescription);
+		UsageReporter.getInstance().registerEvent(createProjectFromExampleEventType);
 	}
 
-	public UsageEventType getInstallEventType() {
-		return installEventType;
+	public UsageEventType getInstallSoftwareEventType() {
+		return installSoftwareEventType;
 	}
 
+	public UsageEventType getCreateProjectFromExampleEventType() {
+		return createProjectFromExampleEventType;
+	}
+	
 	/*
 	 * (non-Javadoc)
 	 * 

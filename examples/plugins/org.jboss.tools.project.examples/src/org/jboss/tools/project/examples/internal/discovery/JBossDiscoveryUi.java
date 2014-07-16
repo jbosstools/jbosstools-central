@@ -110,7 +110,7 @@ public class JBossDiscoveryUi {
 	private static void recordInstalled(List<ConnectorDescriptor> descriptors) {
 		StringBuilder sb = new StringBuilder();
 		for (ConnectorDescriptor descriptor : descriptors) {
-			UsageEventType eventType = ProjectExamplesActivator.getDefault().getInstallEventType();
+			UsageEventType eventType = ProjectExamplesActivator.getDefault().getInstallSoftwareEventType();
 			UsageReporter.getInstance().trackEvent(eventType.event(descriptor.getId()));
 
 			if (sb.length() > 0) {

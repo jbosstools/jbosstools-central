@@ -63,6 +63,7 @@ public class Messages extends NLS {
 	public static String PluginFix_Invalid_plugin_fix;
 	public static String Project_Unknown;
 	public static String ProjectExamplesActivator_All;
+	public static String ProjectExamplesActivator_UsageEventTypeCreateProjectFromExampleDescription;
 	public static String ProjectExamplesActivator_Waiting;
 	public static String ProjectExamplesPreferencePage_Add;
 	public static String ProjectExamplesPreferencePage_Edit;

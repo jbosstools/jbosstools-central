@@ -32,6 +32,8 @@ import org.jboss.tools.project.examples.Messages;
 import org.jboss.tools.project.examples.ProjectExamplesActivator;
 import org.jboss.tools.project.examples.model.IImportProjectExample;
 import org.jboss.tools.project.examples.model.ProjectExampleWorkingCopy;
+import org.jboss.tools.usage.event.UsageEventType;
+import org.jboss.tools.usage.event.UsageReporter;
 
 public class NewProjectExamplesJob extends WorkspaceJob {
 
@@ -86,6 +88,9 @@ public class NewProjectExamplesJob extends WorkspaceJob {
 					return Status.CANCEL_STATUS;
 				}
 				if (importProjectExample.importProject(project, project.getFile(), propertiesMap, monitor)) {
+					UsageEventType createProjectEvent = ProjectExamplesActivator.getDefault().getCreateProjectFromExampleEventType();
+					UsageReporter.getInstance().trackEvent(createProjectEvent.event(project.getExampleId()));
+					
 					importProjectExample.fix(project, monitor);			
 					ProjectExamplesActivator.fixWelcome(project);
 				} else {

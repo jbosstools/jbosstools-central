@@ -62,10 +62,8 @@ public class ImportDefaultProjectExample extends
 	@Override
 	public boolean importProject(ProjectExampleWorkingCopy projectDescription, File file,
 			Map<String, Object> propertiesMap, IProgressMonitor monitor) throws Exception {
-		List<ProjectExampleWorkingCopy> projects = new ArrayList<ProjectExampleWorkingCopy>();
 		if (projectDescription.getIncludedProjects() == null) {
 			boolean ret = importSingleProject(projectDescription, file, monitor);
-			projects.add(projectDescription);
 			return ret;
 		} else {
 			List<String> projectNames = projectDescription.getIncludedProjects();

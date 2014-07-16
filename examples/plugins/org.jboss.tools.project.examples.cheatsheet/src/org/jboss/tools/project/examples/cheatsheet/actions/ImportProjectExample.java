@@ -31,6 +31,8 @@ import org.jboss.tools.project.examples.ProjectExamplesActivator;
 import org.jboss.tools.project.examples.cheatsheet.Activator;
 import org.jboss.tools.project.examples.model.IImportProjectExample;
 import org.jboss.tools.project.examples.model.ProjectExampleWorkingCopy;
+import org.jboss.tools.usage.event.UsageEventType;
+import org.jboss.tools.usage.event.UsageReporter;
 
 /**
  * 
@@ -82,6 +84,9 @@ public class ImportProjectExample extends Action implements ICheatSheetAction {
 				try {
 					IImportProjectExample importProjectExample = ProjectExamplesActivator.getDefault().getImportProjectExample(project.getImportType());
 					if (importProjectExample.importProject(project, project.getFile(), new HashMap<String, Object>(), monitor)) {
+						UsageEventType createProjectEvent = ProjectExamplesActivator.getDefault().getCreateProjectFromExampleEventType();
+						UsageReporter.getInstance().trackEvent(createProjectEvent.event(project.getExampleId()));
+						
 						importProjectExample.fix(project, monitor);
 					}
 				} catch (Exception e) {

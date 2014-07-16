@@ -108,4 +108,19 @@ public class ArchetypeModel implements Cloneable {
 		}
 		return clone;
 	}
+	
+	/**
+	 * Returns the archetype model's coordinates as groupId:artifactId:version
+	 * @return groupId:artifactId:version
+	 * @since 2.0.0
+	 */
+	public String getGAV() {
+		StringBuilder sb = new StringBuilder();
+		sb.append(getArchetypeGroupId())
+		.append(":") //$NON-NLS-1$
+		.append(getArchetypeArtifactId())
+		.append(":") //$NON-NLS-1$
+		.append(getArchetypeVersion());
+		return sb.toString();
+	}
 }
