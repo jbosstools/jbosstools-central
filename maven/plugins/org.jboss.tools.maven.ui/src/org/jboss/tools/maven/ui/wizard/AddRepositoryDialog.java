@@ -1062,8 +1062,8 @@ public class AddRepositoryDialog extends TitleAreaDialog {
 	}
 
 	private void populateCombo(Combo combo, String[] values){
-		for(int i=0; i<values.length;i++){
-			combo.add(values[i]);
+		for(String value : values){
+			combo.add(value);
 		}
 	}
 }
