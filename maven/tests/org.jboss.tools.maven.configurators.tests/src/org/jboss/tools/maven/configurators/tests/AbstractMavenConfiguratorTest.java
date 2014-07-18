@@ -32,7 +32,12 @@ import org.eclipse.wst.common.project.facet.core.IProjectFacet;
 import org.eclipse.wst.common.project.facet.core.IProjectFacetVersion;
 import org.eclipse.wst.common.project.facet.core.ProjectFacetsManager;
 import org.jboss.tools.common.util.FileUtil;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.runner.RunWith;
+import org.junit.runners.BlockJUnit4ClassRunner;
 
+@RunWith(BlockJUnit4ClassRunner.class)
 public abstract class AbstractMavenConfiguratorTest extends
 		AbstractMavenProjectTestCase {
 
@@ -45,7 +50,17 @@ public abstract class AbstractMavenConfiguratorTest extends
 	protected String toString(IFile file) {
 		return FileUtil.getContentFromEditorOrFile(file);
 	}
+	
+	@Before
+	public void setup() throws Exception {
+		super.setUp();
+	}
 
+	@After
+	public void tearDown() throws Exception {
+		super.tearDown();
+	}	
+	
 	protected void assertIsJSFProject(IProject project,
 		IProjectFacetVersion expectedJSFVersion) throws Exception {
 		IFacetedProject facetedProject = ProjectFacetsManager.create(project);

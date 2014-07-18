@@ -89,9 +89,8 @@ public class CDIProjectConfigurator extends AbstractProjectConfigurator {
 	
 	private void configureInternal(MavenProject mavenProject,IProject project,
 			IProgressMonitor monitor) throws CoreException {
-		IPreferenceStore store = Activator.getDefault().getPreferenceStore();
-		boolean configureCDI = store.getBoolean(Activator.CONFIGURE_CDI);
-		if (!configureCDI) {
+		
+		if (!isCDIConfigurable(mavenProject)) {
 			return;
 		}
     	final IFacetedProject fproj = ProjectFacetsManager.create(project);
@@ -110,6 +109,19 @@ public class CDIProjectConfigurator extends AbstractProjectConfigurator {
 	    	}
 	    	CDIUtil.enableCDI(project, false, new NullProgressMonitor());
 	    }
+	}
+
+	private boolean isCDIConfigurable(MavenProject mavenProject) {
+		String cdiActivation = mavenProject.getProperties().getProperty("m2e.cdi.activation");
+		
+		boolean configureCDI; 
+		if (cdiActivation == null) {
+			IPreferenceStore store = Activator.getDefault().getPreferenceStore();
+			configureCDI = store.getBoolean(Activator.CONFIGURE_CDI);
+		} else {
+		  configureCDI = Boolean.valueOf(cdiActivation);
+		}
+		return configureCDI;
 	}
 
 

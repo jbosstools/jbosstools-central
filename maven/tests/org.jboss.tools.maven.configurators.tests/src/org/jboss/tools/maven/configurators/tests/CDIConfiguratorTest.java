@@ -14,12 +14,16 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IWorkspaceDescription;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.wst.common.project.facet.core.IFacetedProject;
 import org.eclipse.wst.common.project.facet.core.IProjectFacet;
 import org.eclipse.wst.common.project.facet.core.IProjectFacetVersion;
 import org.eclipse.wst.common.project.facet.core.ProjectFacetsManager;
 import org.jboss.tools.cdi.core.CDICoreNature;
 import org.jboss.tools.cdi.core.CDIUtil;
+import org.jboss.tools.maven.ui.Activator;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 
 @SuppressWarnings("restriction")
@@ -31,6 +35,12 @@ public class CDIConfiguratorTest extends AbstractMavenConfiguratorTest {
 	protected static final IProjectFacetVersion CDI_VERSION_1_1 = CDI_FACET.getVersion("1.1"); //$NON-NLS-1$
 	protected static final IProjectFacetVersion CDI_VERSION_DEFAULT = CDI_FACET.getDefaultVersion(); //$NON-NLS-1$
 
+	@Before
+	@After
+	public void activateCDIConfiguration() {
+	  setGlobalCdiConfigurationActivation(true);
+	}
+	
 	@Test
 	public void testJBIDE11741_deltaSpikeDependency() throws Exception {
 		testCdiProject("deltaspike", CDI_VERSION_1_0);
@@ -61,11 +71,7 @@ public class CDIConfiguratorTest extends AbstractMavenConfiguratorTest {
 		String projectLocation = "projects/cdi/war-no-cdi";
 		IProject notCdiProject = importProject(projectLocation+"/pom.xml");
 		waitForJobsToComplete();
-		assertNoErrors(notCdiProject);
-		assertFalse("CDI nature should be missing", notCdiProject.hasNature(CDICoreNature.NATURE_ID));
-
-		IFacetedProject facetedProject = ProjectFacetsManager.create(notCdiProject);
-		assertNull("CDI Facet should be missing ",facetedProject.getInstalledVersion(CDI_FACET));
+    assertIsNotCDIProject(notCdiProject);
 	}
 
 	@Test
@@ -102,7 +108,25 @@ public class CDIConfiguratorTest extends AbstractMavenConfiguratorTest {
 		testCdiProject("cdi-beans-1.1", CDI_VERSION_1_1);
 	}
 
-	protected void testCdiProject(String projectName, IProjectFacetVersion expectedCdiVersion) throws Exception {
+ @Test
+  public void testJBIDE17885_disableCdiViaProperty() throws Exception {
+    String projectLocation = "projects/cdi/deactivated-cdi";
+    IProject notCdiProject = importProject(projectLocation+"/pom.xml");
+    waitForJobsToComplete();
+    assertIsNotCDIProject(notCdiProject);
+  }
+
+  @Test
+  public void testJBIDE17885_forceCdiViaProperty() throws Exception {
+    setGlobalCdiConfigurationActivation(false);
+    String projectLocation = "projects/cdi/force-cdi";
+    IProject notCdiProject = importProject(projectLocation+"/pom.xml");
+    waitForJobsToComplete();
+    assertIsCDIProject(notCdiProject, CDI_VERSION_1_1);
+  }
+
+	
+  protected void testCdiProject(String projectName, IProjectFacetVersion expectedCdiVersion) throws Exception {
 		String projectLocation = "projects/cdi/"+projectName;
 		IProject cdiProject = importProject(projectLocation+"/pom.xml");
 		waitForJobsToComplete();
@@ -110,7 +134,7 @@ public class CDIConfiguratorTest extends AbstractMavenConfiguratorTest {
 		assertIsCDIProject(cdiProject, expectedCdiVersion);
 	}
 
-	private void assertIsCDIProject(IProject project, IProjectFacetVersion expectedCdiVersion) throws Exception {
+	protected void assertIsCDIProject(IProject project, IProjectFacetVersion expectedCdiVersion) throws Exception {
 		assertNoErrors(project);
 		assertTrue("CDI nature is missing", project.hasNature(CDICoreNature.NATURE_ID));
 
@@ -121,4 +145,20 @@ public class CDIConfiguratorTest extends AbstractMavenConfiguratorTest {
 			assertTrue("Maven Facet is missing",	facetedProject.hasProjectFacet(MAVEN_FACET));
 		}
 	}
+	
+	protected void assertIsNotCDIProject(IProject project) throws Exception {
+	    assertNoErrors(project);
+	    assertFalse("CDI nature should be missing", project.hasNature(CDICoreNature.NATURE_ID));
+
+	    IFacetedProject facetedProject = ProjectFacetsManager.create(project);
+	    if (facetedProject != null) {
+	    	assertNull("CDI Facet should be missing ",facetedProject.getInstalledVersion(CDI_FACET));
+	    }
+	}
+	
+	protected void setGlobalCdiConfigurationActivation(boolean active) {
+	  IPreferenceStore store = Activator.getDefault().getPreferenceStore();
+	  store.setValue(Activator.CONFIGURE_CDI, active);
+	}
+	
 }
