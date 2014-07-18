@@ -44,5 +44,14 @@
       <super type="org.eclipse.core.resources.problemmarker"/>
       <persistent value="true"/>
     </extension>
+    
+    <extension point="org.eclipse.ui.editors.templates">
+    <template id="org.jboss.tools.maven.seam.xml.templates.cdiActivationProperty"
+         contextTypeId="org.eclipse.m2e.editor.xml.templates.contextType.properties"
+         name="m2e-seam activation" 
+         description="Enable or disable automatic Seam configuration">
+      <pattern>&lt;m2e.seam.activation&gt;${cursor}${false}&lt;/m2e.seam.activation&gt;</pattern>
+    </template>
+   </extension> 
 
 </plugin>
