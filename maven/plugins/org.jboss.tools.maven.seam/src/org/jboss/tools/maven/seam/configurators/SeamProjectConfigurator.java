@@ -138,11 +138,22 @@ public class SeamProjectConfigurator extends AbstractProjectConfigurator {
 		return seamSettingsChangedByUser;
 	}
 	
+	private boolean isSeamConfigurable(MavenProject mavenProject) {
+		String cdiActivation = mavenProject.getProperties().getProperty("m2e.seam.activation");
+		
+		boolean configureCDI; 
+		if (cdiActivation == null) {
+			IPreferenceStore store = Activator.getDefault().getPreferenceStore();
+			configureCDI = store.getBoolean(Activator.CONFIGURE_SEAM);
+		} else {
+		  configureCDI = Boolean.valueOf(cdiActivation);
+		}
+		return configureCDI;
+	}
+	
 	private void configureInternal(MavenProject mavenProject,IProject project,
 			IProgressMonitor monitor) throws CoreException {
-		IPreferenceStore store = Activator.getDefault().getPreferenceStore();
-		boolean configureSeam = store.getBoolean(Activator.CONFIGURE_SEAM);
-		if (!configureSeam) {
+		if (!isSeamConfigurable(mavenProject)) {
 			return;
 		}
 		if (isSeamSettingChangedByUser(project)) {
@@ -165,6 +176,8 @@ public class SeamProjectConfigurator extends AbstractProjectConfigurator {
 	    	if (fproj == null) {
 	    		return;
 	    	}
+	    	IPreferenceStore store = Activator.getDefault().getPreferenceStore();
+			
 	    	IProjectFacetVersion seamFacetVersion = getSeamFacetVersion(seamVersion);
 	    	if ("war".equals(packaging)) { //$NON-NLS-1$
 	    		IDataModel model = createSeamDataModel(deploying, seamVersion, project);

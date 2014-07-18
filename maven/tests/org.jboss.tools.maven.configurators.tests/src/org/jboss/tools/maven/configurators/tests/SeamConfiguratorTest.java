@@ -174,6 +174,31 @@ public class SeamConfiguratorTest extends AbstractMavenConfiguratorTest {
 		assertHasSeamRuntime(project, seamRuntime);
 	}
 	
+	@Test
+	public void testJBIDE17929_DisableSeam()  throws Exception {
+		IProject[] projects = importProjects("projects/seam/multi-disabled", 
+				new String[]{ "pom.xml",
+							  "multi-ear/pom.xml",
+							  "multi-ejb/pom.xml",
+							  "multi-web/pom.xml"}, 
+				new ResolverConfiguration());
+		waitForJobsToComplete();
+		
+		IProject pom = projects[0];
+		IProject ear = projects[1];
+		IProject ejb = projects[2];
+		IProject web = projects[3];
+
+		assertNoErrors(pom);
+		assertNoErrors(ejb);
+		assertNoErrors(ear);
+		assertNoErrors(web);
+
+		assertFalse("Seam nature shouldn't be added to "+web, web.hasNature(ISeamProject.NATURE_ID));
+		assertFalse("Seam nature shouldn't be added to "+ejb, ejb.hasNature(ISeamProject.NATURE_ID));
+		assertFalse("Seam nature shouldn't be added to "+ear, ear.hasNature(ISeamProject.NATURE_ID));
+	}
+	
 	
 	private void assertHasSeamRuntime(IProject project, SeamRuntime seamRuntime) {
 		assertEquals(seamRuntime, SeamRuntimeManager.getInstance().getRuntimeForProject(project));
