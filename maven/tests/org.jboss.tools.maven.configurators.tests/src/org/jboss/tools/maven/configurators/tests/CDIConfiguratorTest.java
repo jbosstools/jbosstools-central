@@ -158,7 +158,6 @@ public class CDIConfiguratorTest extends AbstractMavenConfiguratorTest {
 	
 	protected void setGlobalCdiConfigurationActivation(boolean active) {
 	  IPreferenceStore store = Activator.getDefault().getPreferenceStore();
-	  System.err.println(((active)?"restoring":"disabling")+ " CDI config");
 	  store.setValue(Activator.CONFIGURE_CDI, active);
 	}
 	
