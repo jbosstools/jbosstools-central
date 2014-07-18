@@ -39,7 +39,14 @@
              priority="50">
        </facetDetector>
     </extension>
-    
+    <extension point="org.eclipse.ui.editors.templates">
+    <template id="org.jboss.tools.maven.cdi.xml.templates.cdiActivationProperty"
+         contextTypeId="org.eclipse.m2e.editor.xml.templates.contextType.properties"
+         name="m2e-cdi activation" 
+         description="Enable or disable automatic CDI configuration">
+      <pattern>&lt;m2e.cdi.activation&gt;${cursor}${false}&lt;/m2e.cdi.activation&gt;</pattern>
+    </template>
+   </extension> 
     
     
 </plugin>
