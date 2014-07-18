@@ -50,9 +50,7 @@ public class HibernateProjectConfigurator extends AbstractProjectConfigurator {
 	
 	private void configureInternal(MavenProject mavenProject,IProject project,
 			IProgressMonitor monitor) throws CoreException {
-		IPreferenceStore store = Activator.getDefault().getPreferenceStore();
-		boolean configureHibernate = store.getBoolean(Activator.CONFIGURE_HIBERNATE);
-		if (!configureHibernate || project.hasNature(HibernatePropertiesConstants.HIBERNATE_NATURE)) {
+		if (!isHibernateConfigurable(mavenProject) || project.hasNature(HibernatePropertiesConstants.HIBERNATE_NATURE)) {
 			return;
 		}
 		
@@ -65,10 +63,22 @@ public class HibernateProjectConfigurator extends AbstractProjectConfigurator {
 					return;
 				}
 			}
-      ProjectUtils.toggleHibernateOnProject(project, true, project.getName());
+            ProjectUtils.toggleHibernateOnProject(project, true, project.getName());
 		}
 	}
 
+	private boolean isHibernateConfigurable(MavenProject mavenProject) {
+		String hibernateActivation = mavenProject.getProperties().getProperty("m2e.hibernate.activation");
+		
+		boolean configureHibernate; 
+		if (hibernateActivation == null) {
+			IPreferenceStore store = Activator.getDefault().getPreferenceStore();
+			configureHibernate = store.getBoolean(Activator.CONFIGURE_HIBERNATE);
+		} else {
+		  configureHibernate = Boolean.valueOf(hibernateActivation);
+		}
+		return configureHibernate;
+	}
 
 	@Override
 	public void mavenProjectChanged(MavenProjectChangedEvent event,

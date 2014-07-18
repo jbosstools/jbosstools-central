@@ -117,6 +117,15 @@
                 </enablement>
         </libraryValidator>
 	</extension>  	
+	
+	<extension point="org.eclipse.ui.editors.templates">
+    <template id="org.jboss.tools.maven.hibernate.xml.templates.cdiActivationProperty"
+         contextTypeId="org.eclipse.m2e.editor.xml.templates.contextType.properties"
+         name="m2e-hibernate activation" 
+         description="Enable or disable automatic Hibernate configuration">
+      <pattern>&lt;m2e.hibernate.activation&gt;${cursor}${false}&lt;/m2e.hibernate.activation&gt;</pattern>
+    </template>
+   </extension> 
   	
   	  	
 </plugin>
