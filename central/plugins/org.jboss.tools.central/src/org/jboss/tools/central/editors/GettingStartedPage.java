@@ -184,6 +184,10 @@ public class GettingStartedPage extends AbstractJBossCentralPage implements Prox
 
 	private Color grey = null;
 	
+	private Font sectionFont;
+	
+	private Font categoryFont;
+	
 	public GettingStartedPage(FormEditor editor) {
 		super(editor, ID, "Getting Started");
 		
@@ -835,7 +839,16 @@ public class GettingStartedPage extends AbstractJBossCentralPage implements Prox
 		
 		grey = null;
 		blueish = null;
-				
+		
+		if (sectionFont != null) {
+			sectionFont.dispose();
+			sectionFont = null;
+		}
+		
+		if (categoryFont != null) {
+			categoryFont.dispose();
+			categoryFont = null;
+		}
 		
 		ProxyWizardManager.INSTANCE.unRegisterListener(this);
 		
@@ -977,7 +990,7 @@ public class GettingStartedPage extends AbstractJBossCentralPage implements Prox
 		List<ProjectExampleCategory> sortedCategories = new ArrayList<ProjectExampleCategory>(categories.keySet());
 		Collections.sort(sortedCategories);
 		Color black = getDisplay().getSystemColor(SWT.COLOR_BLACK);
-		Font arial = new Font(getDisplay(),"Arial",10,SWT.NONE);
+		Font arial = getCategoryFont();
 
 		final Color originalColor = categoryComposite.getBackground();
 		for (final ProjectExampleCategory category : sortedCategories) {
@@ -1009,6 +1022,13 @@ public class GettingStartedPage extends AbstractJBossCentralPage implements Prox
 		tutorialPageBook.showPage(tutorialsComposite);
 		tutorialPageBook.layout(true, true);
 		form.reflow(true);
+	}
+
+	private Font getCategoryFont() {
+		if (categoryFont == null) {
+			categoryFont = new Font(getDisplay(),"Arial",10,SWT.NONE);
+		}
+		return categoryFont;
 	}
 
 	private void selectCategory(
@@ -1312,9 +1332,15 @@ public class GettingStartedPage extends AbstractJBossCentralPage implements Prox
 		section.descriptionVerticalSpacing = 20;
 		section.setTitleBarBackground(section.getBackground());
 		section.setTitleBarBorderColor(section.getBackground());
-		Font font = new Font(getDisplay(),"Lucida Sans Unicode",12,SWT.NORMAL); 
-		section.setFont(font);
+		section.setFont(getSectionFont());
 		return section;
+	}
+
+	private Font getSectionFont() {
+		if (sectionFont == null) {
+			sectionFont = new Font(getDisplay(),"Lucida Sans Unicode",12,SWT.NORMAL);
+		}
+		return sectionFont;
 	}
 	
 	class HyperlinkOpener extends HyperlinkAdapter {
