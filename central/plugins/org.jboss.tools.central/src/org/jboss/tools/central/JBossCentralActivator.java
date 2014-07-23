@@ -40,11 +40,16 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IEditorReference;
+import org.eclipse.ui.IPerspectiveDescriptor;
+import org.eclipse.ui.IPerspectiveListener;
 import org.eclipse.ui.IViewReference;
+import org.eclipse.ui.IWindowListener;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchListener;
 import org.eclipse.ui.IWorkbenchPage;
+import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PartInitException;
+import org.eclipse.ui.PerspectiveAdapter;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.browser.IWebBrowser;
 import org.eclipse.ui.browser.IWorkbenchBrowserSupport;
@@ -115,6 +120,15 @@ public class JBossCentralActivator extends AbstractUIPlugin {
 
 	private static Boolean isInternalWebBrowserAvailable;
 	
+	private IPerspectiveListener perspectiveListener = new PerspectiveAdapter() {
+
+		@Override
+		public void perspectiveChanged(IWorkbenchPage page,
+				IPerspectiveDescriptor perspective, String changeId) {
+			fixEditors(page);
+		}
+		
+	};
 	private IWorkbenchListener workbenchListener = new IWorkbenchListener() {
 		
 		@Override
@@ -126,16 +140,7 @@ public class JBossCentralActivator extends AbstractUIPlugin {
 					IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
 					IEditorReference[] references = page.getEditorReferences();
 					if (references != null) {
-						List<IEditorReference> l = new ArrayList<IEditorReference>();
-						for (IEditorReference reference:references) {
-							if (EditorRegistry.EMPTY_EDITOR_ID.equals(reference.getId()) ||
-									JBossCentralEditor.ID.equals(reference.getId())) {
-								l.add(reference);
-							}
-						}
-						if (l.size() > 0) {
-							page.closeEditors(l.toArray(new IEditorReference[0]), false);
-						}
+						fixEditors(page);
 					}
 				}
 			});
@@ -164,6 +169,31 @@ public class JBossCentralActivator extends AbstractUIPlugin {
 		this.bundleContext = context;
 		plugin = this;
 		PlatformUI.getWorkbench().addWorkbenchListener(workbenchListener);
+		Display.getDefault().asyncExec(new Runnable() {
+			
+			@Override
+			public void run() {
+				PlatformUI.getWorkbench().getActiveWorkbenchWindow().addPerspectiveListener(perspectiveListener);
+			}
+		});
+		PlatformUI.getWorkbench().addWindowListener(new IWindowListener() {
+			
+			@Override
+			public void windowOpened(IWorkbenchWindow window) {
+				window.addPerspectiveListener(perspectiveListener);
+			}
+			
+			@Override
+			public void windowDeactivated(IWorkbenchWindow window) {}
+			
+			@Override
+			public void windowClosed(IWorkbenchWindow window) {
+				window.removePerspectiveListener(perspectiveListener);
+			}
+			
+			@Override
+			public void windowActivated(IWorkbenchWindow window) {}
+		});
 	}
 
 	/*
@@ -182,6 +212,13 @@ public class JBossCentralActivator extends AbstractUIPlugin {
 		super.stop(context);
 		
 		PlatformUI.getWorkbench().removeWorkbenchListener(workbenchListener);
+		Display.getDefault().asyncExec(new Runnable() {
+			
+			@Override
+			public void run() {
+				PlatformUI.getWorkbench().getActiveWorkbenchWindow().removePerspectiveListener(perspectiveListener);
+			}
+		});
 	}
 
 	/**
@@ -446,6 +483,30 @@ public class JBossCentralActivator extends AbstractUIPlugin {
 
 	public BundleContext getBundleContext() {
 		return bundleContext;
+	}
+
+	/**
+	 * A workaround for https://bugs.eclipse.org/bugs/show_bug.cgi?id=386648
+	 * If an editor is opened while the same one is being closed, Eclipse 
+	 * sometimes creates an editor reference that isn't restored, i.e., doesn't contain an editor.
+	 *
+	 * @param page
+	 */
+	private void fixEditors(IWorkbenchPage page) {
+		IEditorReference[] references = page.getEditorReferences();
+		if (references != null) {
+			List<IEditorReference> l = new ArrayList<IEditorReference>();
+			for (IEditorReference reference : references) {
+				String id = reference.getId();
+				if ((JBossCentralEditor.ID.equals(id) && reference.getEditor(false) == null)
+						|| EditorRegistry.EMPTY_EDITOR_ID.equals(id)) {
+					l.add(reference);
+				}
+			}
+			if (!l.isEmpty()) {
+				page.closeEditors(l.toArray(new IEditorReference[l.size()]), false);
+			}
+		}
 	}
 
 	public static boolean isInternalWebBrowserAvailable() {
