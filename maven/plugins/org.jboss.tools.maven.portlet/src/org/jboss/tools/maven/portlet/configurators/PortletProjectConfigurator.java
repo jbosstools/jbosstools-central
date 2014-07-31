@@ -96,9 +96,7 @@ public class PortletProjectConfigurator extends AbstractProjectConfigurator {
 			return;
 		}
 		
-		IPreferenceStore store = Activator.getDefault().getPreferenceStore();
-		boolean configurePortlet = store.getBoolean(Activator.CONFIGURE_PORTLET);
-		if (!configurePortlet) {
+		if (!isPortletConfigurable(mavenProject)) {
 			return;
 		}
 	    String portletVersion = Activator.getDefault().getDependencyVersion(mavenProject, PORTLET_API_GROUP_ID, PORTLET_API_ARTIFACT_ID);
@@ -123,6 +121,18 @@ public class PortletProjectConfigurator extends AbstractProjectConfigurator {
 	    }
 	}
 
+	private boolean isPortletConfigurable(MavenProject mavenProject) {
+		String portletActivation = mavenProject.getProperties().getProperty("m2e.portlet.activation");
+		
+		boolean configurePortlet; 
+		if (portletActivation == null) {
+			IPreferenceStore store = Activator.getDefault().getPreferenceStore();
+			configurePortlet = store.getBoolean(Activator.CONFIGURE_PORTLET);
+		} else {
+		  configurePortlet = Boolean.valueOf(portletActivation);
+		}
+		return configurePortlet;
+	}
 	@Override
 	public void mavenProjectChanged(MavenProjectChangedEvent event,
 			IProgressMonitor monitor) throws CoreException {
