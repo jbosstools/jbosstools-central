@@ -33,7 +33,23 @@ public class PortletConfiguratorTest extends AbstractMavenConfiguratorTest {
     IProject project = importProject("projects/portlets/portlet20/pom.xml");
     assertIsPortletProject(project, PORTLET_FACET_20);
   }
+  
+  @Test
+  public void testDisablePortletViaProperty() throws Exception {
+    String projectLocation = "projects/portlets/deactivated-portlet";
+    IProject notPortletProject = importProject(projectLocation+"/pom.xml");
+    waitForJobsToComplete();
+    assertIsNotPortletProject(notPortletProject);
+  }
 
+	protected void assertIsNotPortletProject(IProject project) throws Exception {
+		assertNoErrors(project);
+		IFacetedProject facetedProject = ProjectFacetsManager.create(project);
+		if (facetedProject != null) {
+			assertNull("Portlet Facet should be missing ", facetedProject.getInstalledVersion(PORTLET_FACET));
+		}
+	}
+  
   @Test
   public void testImportError() throws Exception {
     IProject project = importProject("projects/portlets/piglet/pom.xml");

@@ -29,5 +29,13 @@
       <super type="org.eclipse.m2e.core.maven2Problem"/>
       <persistent value="true"/>
     </extension>
+    <extension point="org.eclipse.ui.editors.templates">
+    <template id="org.jboss.tools.maven.portlet.xml.templates.portletActivationProperty"
+         contextTypeId="org.eclipse.m2e.editor.xml.templates.contextType.properties"
+         name="m2e-portlet activation" 
+         description="Enable or disable automatic Portlet configuration">
+      <pattern>&lt;m2e.portlet.activation&gt;${cursor}${false}&lt;/m2e.portlet.activation&gt;</pattern>
+    </template>
+   </extension>
     
 </plugin>
