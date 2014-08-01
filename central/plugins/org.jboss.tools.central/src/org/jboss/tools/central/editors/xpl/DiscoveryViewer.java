@@ -1384,6 +1384,7 @@ public class DiscoveryViewer extends Viewer {
 		Color res = defaultColor;
 		// TODO allow to plug computation of color externally, similar to addFilter
 		// something like addConditionalStyle(ConnectorDiscovery)
+		// TODO color is also defined in JBossCentralEditor 
 		if (EarlyAccessFilter.isEarlyAccess(connector)) {
 			res = colorLightYellow;
 		}

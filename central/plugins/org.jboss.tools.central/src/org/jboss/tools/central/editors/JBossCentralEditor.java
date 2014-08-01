@@ -28,6 +28,8 @@ import org.eclipse.jface.action.ControlContribution;
 import org.eclipse.jface.action.GroupMarker;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.ToolBarManager;
+import org.eclipse.jface.resource.ColorRegistry;
+import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.text.Document;
 import org.eclipse.jface.text.TextViewer;
 import org.eclipse.jface.util.IPropertyChangeListener;
@@ -50,6 +52,7 @@ import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
@@ -90,6 +93,10 @@ public class JBossCentralEditor extends SharedHeaderFormEditor {
 
 	public static final String ID = "org.jboss.tools.central.editors.JBossCentralEditor";
 
+	private Color colorLightYellow;
+
+	private static final String COLOR_LIGHTYELLOW = "lightyellow"; //$NON-NLS-1$
+
 	private AbstractJBossCentralPage gettingStartedPage;
 
 	private SoftwarePage softwarePage;
@@ -103,11 +110,11 @@ public class JBossCentralEditor extends SharedHeaderFormEditor {
 
 	private Composite searchComposite;
 
-	static boolean useFefaultColors;
+	static boolean useDefaultColors;
 	
 	public JBossCentralEditor() {
 		super();
-		useFefaultColors = true;
+		useDefaultColors = true;
 	}
 
 	public void dispose() {
@@ -152,7 +159,18 @@ public class JBossCentralEditor extends SharedHeaderFormEditor {
 		if (!(editorInput instanceof JBossCentralEditorInput))
 			editorInput = JBossCentralEditorInput.INSTANCE;
 		super.init(site, editorInput);
+		initializeColors();
 		setPartName(JBOSS_CENTRAL);
+	}
+
+	private void initializeColors() {
+		if (colorLightYellow == null) {
+			ColorRegistry colorRegistry = JFaceResources.getColorRegistry();
+			if (!colorRegistry.hasValueFor(COLOR_LIGHTYELLOW)) {
+				colorRegistry.put(COLOR_LIGHTYELLOW, new RGB(255, 255, 160));
+			}
+			colorLightYellow = colorRegistry.get(COLOR_LIGHTYELLOW);
+		}
 	}
 
 	/*
@@ -598,7 +616,7 @@ public class JBossCentralEditor extends SharedHeaderFormEditor {
 				return;
 			}
 			Color foreground = null;
-			if (useFefaultColors) {
+			if (useDefaultColors) {
 				foreground = heading.getForeground();
 			} else {
 				foreground = heading.getDisplay().getSystemColor(SWT.COLOR_BLACK);
@@ -606,10 +624,11 @@ public class JBossCentralEditor extends SharedHeaderFormEditor {
 			titleLabel.setForeground(foreground);
 			
 			String title = "Welcome to JBoss"; 
-			String earlyAccessSuffix = "with Early Access";
+			String earlyAccessSuffix = "(Early Access Enabled)";
 			if (isEarlyAccess) {
 				this.titleLabel.setText(title + " " + earlyAccessSuffix); //$NON-NLS-1$
-				Color background = heading.getDisplay().getSystemColor(SWT.COLOR_YELLOW);
+				// TODO color is also defined in DiscoveryViewer 
+				Color background = colorLightYellow;
 				StyleRange range = new StyleRange(title.length() + 1, earlyAccessSuffix.length(), foreground, background);
 				range.fontStyle = SWT.ITALIC;
 				this.titleLabel.setStyleRange(range);
