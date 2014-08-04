@@ -74,8 +74,6 @@ public class JBossCentralActivator extends AbstractUIPlugin {
 
 	public static final Object JBOSS_CENTRAL_FAMILY = new Object();
 	
-	private static final String MPC_CORE_PLUGIN_ID = "org.eclipse.epp.mpc.core"; //$NON-NLS-1$
-
 	public static final String ID = "id";
 
 	public static final String NAME = "name";
@@ -499,12 +497,6 @@ public class JBossCentralActivator extends AbstractUIPlugin {
 			}
 			new JBossCentralDropTarget((DropTarget)dropTarget);
 			return;
-		}
-		boolean mpcExists = Platform.getBundle(MPC_CORE_PLUGIN_ID) != null;
-		
-		if ((control instanceof Shell) && mpcExists) {
-				JBossCentralActivator.log("Cannot initialize JBoss DND");
-				return;
 		}
 		new JBossCentralDropTarget(control);
 	}
