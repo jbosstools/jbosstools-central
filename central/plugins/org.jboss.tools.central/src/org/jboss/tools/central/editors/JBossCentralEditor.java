@@ -495,11 +495,8 @@ public class JBossCentralEditor extends SharedHeaderFormEditor {
 	private class HeaderText {
 
 		private StyledText titleLabel;
-
 		private BusyIndicator busyLabel;
-
 		private TitleRegion titleRegion;
-
 		private ScrolledForm form;
 
 		public HeaderText(ScrolledForm form) {
@@ -526,23 +523,30 @@ public class JBossCentralEditor extends SharedHeaderFormEditor {
 				
 				this.titleLabel = titleViewer.getTextWidget();
 				updateTitle(heading, JBossCentralActivator.getDefault().getPreferences().getBoolean(PreferenceKeys.ENABLE_EARLY_ACCESS, PreferenceKeys.ENABLE_EARLY_ACCESS_DEFAULT_VALUE));
-				JBossCentralActivator.getDefault().getPreferenceStore().addPropertyChangeListener(new IPropertyChangeListener() {
+				final IPropertyChangeListener updateTitleOnEAChange = new IPropertyChangeListener() {
 					@Override
-					public void propertyChange(final PropertyChangeEvent arg0) {
-						if (arg0.getProperty().equals(PreferenceKeys.ENABLE_EARLY_ACCESS)) {
+					public void propertyChange(final PropertyChangeEvent event) {
+						if (event.getProperty().equals(PreferenceKeys.ENABLE_EARLY_ACCESS)) {
 							heading.getDisplay().asyncExec(new Runnable() {
 								@Override
 								public void run() {
 									Boolean newValue = Boolean.FALSE;
-									if (arg0.getNewValue() instanceof String) {
-										newValue = Boolean.parseBoolean((String)arg0.getNewValue());
-									} else if (arg0.getNewValue() instanceof Boolean) {
-										newValue = (Boolean)arg0.getNewValue();
+									if (event.getNewValue() instanceof String) {
+										newValue = Boolean.parseBoolean((String)event.getNewValue());
+									} else if (event.getNewValue() instanceof Boolean) {
+										newValue = (Boolean)event.getNewValue();
 									}
 									updateTitle(heading, newValue);
 								}
 							});
 						}
+					}
+				};
+				JBossCentralActivator.getDefault().getPreferenceStore().addPropertyChangeListener(updateTitleOnEAChange);
+				this.form.addDisposeListener(new DisposeListener() {
+					@Override
+					public void widgetDisposed(DisposeEvent arg0) {
+						JBossCentralActivator.getDefault().getPreferenceStore().removePropertyChangeListener(updateTitleOnEAChange);
 					}
 				});
 				
