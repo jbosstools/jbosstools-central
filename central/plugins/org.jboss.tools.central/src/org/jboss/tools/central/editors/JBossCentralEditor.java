@@ -75,6 +75,7 @@ import org.eclipse.ui.menus.CommandContributionItem;
 import org.jboss.tools.central.JBossCentralActivator;
 import org.jboss.tools.central.actions.OpenWithBrowserHandler;
 import org.jboss.tools.central.editors.xpl.TextSearchControl;
+import org.jboss.tools.central.installation.InstallationChecker;
 import org.jboss.tools.central.preferences.PreferenceKeys;
 import org.jboss.tools.project.examples.ProjectExamplesActivator;
 
@@ -615,7 +616,7 @@ public class JBossCentralEditor extends SharedHeaderFormEditor {
 		 * @param heading
 		 * @param titleViewer
 		 */
-		private void updateTitle(final FormHeading heading, boolean isEarlyAccess) {
+		private void updateTitle(final FormHeading heading, boolean isEarlyAccessEnabled) {
 			if(heading.isDisposed() || titleLabel.isDisposed()) {
 				return;
 			}
@@ -627,9 +628,20 @@ public class JBossCentralEditor extends SharedHeaderFormEditor {
 			}
 			titleLabel.setForeground(foreground);
 			
-			String title = "Welcome to JBoss"; 
-			String earlyAccessSuffix = "(Early Access Enabled)";
-			if (isEarlyAccess) {
+			String title = "Welcome to JBoss";
+			boolean hasEarlyAccessIUs = InstallationChecker.getInstance().hasEarlyAccess(); 
+			String earlyAccessSuffix = "(Early Access ";
+			if (isEarlyAccessEnabled) {
+				earlyAccessSuffix += "enabled";
+			}
+			if (isEarlyAccessEnabled && hasEarlyAccessIUs) {
+				earlyAccessSuffix += "/";
+			}
+			if (hasEarlyAccessIUs) {
+				earlyAccessSuffix += "installed";
+			}
+			earlyAccessSuffix += ")";
+			if (isEarlyAccessEnabled || hasEarlyAccessIUs) {
 				this.titleLabel.setText(title + " " + earlyAccessSuffix); //$NON-NLS-1$
 				// TODO color is also defined in DiscoveryViewer 
 				Color background = colorLightYellow;
@@ -639,6 +651,7 @@ public class JBossCentralEditor extends SharedHeaderFormEditor {
 			} else {
 				this.titleLabel.setText(title);
 			}
+			
 		}
 
 		private void updateSizeAndLocations() {

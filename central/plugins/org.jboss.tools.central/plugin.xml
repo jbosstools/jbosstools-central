@@ -3,6 +3,7 @@
 <plugin>
 
    <extension-point id="proxyWizard" name="Proxy Wizard" schema="schemas/org.jboss.tools.central.proxyWizard.exsd"/>
+   <extension-point id="iuFamilies" name="iuFamilies" schema="schemas/iuFamilies.exsd"/>
 
    <extension
          point="org.eclipse.ui.editors">
@@ -348,6 +349,14 @@
           wizardId="org.eclipse.m2e.core.wizards.Maven2ProjectWizard"
           requiredComponentIds="org.eclipse.m2e.feature">
       </proxyWizard>
+    </extension>
+    <extension
+          point="org.eclipse.ui.installationPages">
+       <page
+             class="org.jboss.tools.central.installation.CentralInstallationPage"
+             id="org.jboss.tools.central.installation.centralInstallationPage"
+             name="JBoss Central">
+       </page>
     </extension>		
 
 </plugin>
