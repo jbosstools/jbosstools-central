@@ -34,6 +34,7 @@ import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IPackageFragment;
 import org.eclipse.jdt.core.IPackageFragmentRoot;
+import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.internal.ui.javaeditor.IClassFileEditorInput;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.viewers.ISelection;
@@ -70,7 +71,7 @@ public class AttachSourcesActionDelegate implements IEditorActionDelegate {
 	 */
 	@Override
 	public void setActiveEditor(IAction action, IEditorPart targetEditor) {
-		if (targetEditor != null) {
+		if (targetEditor instanceof IClassFileEditorInput) {
 			try {
 				String value = SourceLookupActivator.getDefault().getAutoAddSourceAttachment();
 				if (SourceLookupActivator.AUTO_ADD_JBOSS_SOURCE_ATTACHMENT_NEVER.equals(value)) {
@@ -130,7 +131,7 @@ public class AttachSourcesActionDelegate implements IEditorActionDelegate {
 					}
 					element = element.getParent();
 				}
-			} catch (Exception e) {
+			} catch (JavaModelException e) {
 				SourceLookupUIActivator.log(e);
 			}
 		}
@@ -149,7 +150,7 @@ public class AttachSourcesActionDelegate implements IEditorActionDelegate {
 			jar = new ZipFile(attachementSource);
 			ZipEntry entry = jar.getEntry(className);//$NON-NLS-1$
 			return entry != null;
-		} catch (Exception e) {
+		} catch (IOException e) {
 			e.printStackTrace();
 		} finally {
 			try {
