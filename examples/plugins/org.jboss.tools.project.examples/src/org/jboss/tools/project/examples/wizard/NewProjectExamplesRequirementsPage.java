@@ -1,5 +1,5 @@
 /*************************************************************************************
- * Copyright (c) 2008-2012 Red Hat, Inc. and others.
+ * Copyright (c) 2008-2014 Red Hat, Inc. and others.
  * All rights reserved. This program and the accompanying materials 
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -24,19 +24,21 @@ import java.util.Set;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.preference.PreferenceDialog;
+import org.eclipse.jface.viewers.ColumnLabelProvider;
+import org.eclipse.jface.viewers.ColumnViewerToolTipSupport;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.jface.viewers.ITableLabelProvider;
-import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.TableViewer;
+import org.eclipse.jface.viewers.TableViewerColumn;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.wizard.IWizard;
 import org.eclipse.jface.wizard.IWizardPage;
@@ -60,7 +62,6 @@ import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Link;
 import org.eclipse.swt.widgets.Table;
-import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.browser.IWorkbenchBrowserSupport;
@@ -207,13 +208,15 @@ public class NewProjectExamplesRequirementsPage extends WizardPage implements IP
 		int[] columnWidths = new int[] { 100, 300, 50};
 		
 		for (int i = 0; i < columnNames.length; i++) {
-			TableColumn tc = new TableColumn(table, SWT.LEFT);
-			tc.setText(columnNames[i]);
-			tc.setWidth(columnWidths[i]);
+			TableViewerColumn tc = new TableViewerColumn(tableViewer, SWT.LEFT);
+			tc.getColumn().setText(columnNames[i]);
+			tc.getColumn().setWidth(columnWidths[i]);
+			tc.setLabelProvider(new FixLabelProvider(i));
 		}
 
-		tableViewer.setLabelProvider(new FixLabelProvider());
 		tableViewer.setContentProvider(new FixContentProvider(fixes));
+		
+		ColumnViewerToolTipSupport.enableFor(tableViewer);
 		
 		createButtons(fixesGroup, tableViewer);
 		
@@ -560,10 +563,21 @@ public class NewProjectExamplesRequirementsPage extends WizardPage implements IP
 		}
 	}
 	
-	private class FixLabelProvider extends LabelProvider implements
-			ITableLabelProvider {
+	private class FixLabelProvider extends ColumnLabelProvider {
 
-		public Image getColumnImage(Object element, int columnIndex) {
+		private int columnIndex;
+
+		public FixLabelProvider(int columnIndex) {
+			this.columnIndex = columnIndex;
+		}
+
+		@Override
+		public boolean useNativeToolTip(Object object) {
+			return super.useNativeToolTip(object);
+		}
+
+		@Override
+		public Image getImage(Object element) {
 			if (columnIndex == 2 && element instanceof ProjectFix) {
 				ProjectFix fix = (ProjectFix) element;
 				if (!unsatisfiedFixes.contains(fix)) {
@@ -576,7 +590,8 @@ public class NewProjectExamplesRequirementsPage extends WizardPage implements IP
 			return null;
 		}
 
-		public String getColumnText(Object element, int columnIndex) {
+		@Override
+		public String getText(Object element) {
 			if (element instanceof ProjectFix) {
 				ProjectFix fix = (ProjectFix) element;
 				if (columnIndex == 0) {
@@ -589,6 +604,17 @@ public class NewProjectExamplesRequirementsPage extends WizardPage implements IP
 					return getProjectFixDescription(fix);
 				}
 				
+			}
+			return null;
+		}
+		
+		@Override
+		public String getToolTipText(Object element) {
+			if (Platform.OS_WIN32.equals(Platform.getOS())) {
+				return null;
+			}
+			if (element instanceof ProjectFix && columnIndex == 1) {
+				return getProjectFixDescription((ProjectFix) element);
 			}
 			return null;
 		}
