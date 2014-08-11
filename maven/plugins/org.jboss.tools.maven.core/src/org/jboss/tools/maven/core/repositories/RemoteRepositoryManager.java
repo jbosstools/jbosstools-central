@@ -1,5 +1,5 @@
 /*************************************************************************************
- * Copyright (c) 2008-2012 Red Hat, Inc. and others.
+ * Copyright (c) 2008-2014 Red Hat, Inc. and others.
  * All rights reserved. This program and the accompanying materials 
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -27,11 +27,11 @@ import org.jboss.tools.maven.core.MavenCoreActivator;
 
 public class RemoteRepositoryManager {
 
-	private static final String NEXUS_REPOSITORIES = "nexusRepositories";
-	private static final String NEXUS_REPOSITORY = "nexusRepository";
-	private static final String NAME = "name";
-	private static final String URL = "url";
-	private static final String ENABLED = "enabled";
+	private static final String NEXUS_REPOSITORIES = "nexusRepositories"; //$NON-NLS-1$
+	private static final String NEXUS_REPOSITORY = "nexusRepository"; //$NON-NLS-1$
+	private static final String NAME = "name"; //$NON-NLS-1$
+	private static final String URL = "url"; //$NON-NLS-1$
+	private static final String ENABLED = "enabled"; //$NON-NLS-1$
 	
 	private Set<NexusRepository> nexusRepositories;
 	

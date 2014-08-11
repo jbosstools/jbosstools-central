@@ -1,5 +1,5 @@
 /*************************************************************************************
- * Copyright (c) 2010-2012 Red Hat, Inc. and others.
+ * Copyright (c) 2010-2014 Red Hat, Inc. and others.
  * All rights reserved. This program and the accompanying materials 
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -106,6 +106,7 @@ import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.jboss.tools.maven.core.MavenCoreActivator;
 import org.jboss.tools.maven.ui.Activator;
+import org.jboss.tools.maven.ui.preferences.AutoResizeTableLayout;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;

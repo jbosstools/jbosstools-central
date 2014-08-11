@@ -1,5 +1,5 @@
 /*************************************************************************************
- * Copyright (c) 2013 Red Hat, Inc. and others.
+ * Copyright (c) 2013-2014 Red Hat, Inc. and others.
  * All rights reserved. This program and the accompanying materials 
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -54,7 +54,6 @@ import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.jface.viewers.ITreeSelection;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TableLayout;
@@ -69,7 +68,6 @@ import org.eclipse.osgi.util.NLS;
 import org.eclipse.pde.internal.ua.ui.editor.cheatsheet.comp.CompCSEditor;
 import org.eclipse.pde.internal.ua.ui.editor.cheatsheet.simple.SimpleCSEditor;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;

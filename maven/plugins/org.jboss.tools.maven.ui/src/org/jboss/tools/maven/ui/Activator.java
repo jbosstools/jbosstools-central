@@ -1,5 +1,5 @@
 /*************************************************************************************
- * Copyright (c) 2009-2011 Red Hat, Inc. and others.
+ * Copyright (c) 2009-2014 Red Hat, Inc. and others.
  * All rights reserved. This program and the accompanying materials 
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,24 +10,13 @@
  ************************************************************************************/
 package org.jboss.tools.maven.ui;
 
-import java.io.File;
-import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
-import org.apache.maven.execution.MavenExecutionRequest;
-import org.apache.maven.execution.MavenExecutionResult;
 import org.apache.maven.project.MavenProject;
-import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.m2e.core.MavenPlugin;
-import org.eclipse.m2e.core.internal.embedder.MavenImpl;
-import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.jboss.tools.maven.core.MavenUtil;
 import org.osgi.framework.BundleContext;
