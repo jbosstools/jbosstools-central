@@ -337,7 +337,7 @@
           priority="6"
           iconPath="icons/newcordovaprj_wiz.png"
           requiredComponentIds="org.jboss.tools.aerogear.hybrid"
-          wizardId="org.jboss.tools.aerogear.hybrid.ui.NewHybridProjectWizard">
+          wizardId="org.eclipse.thym.ui.wizard.project.NewHybridProjectWizard">
       </proxyWizard>
       <proxyWizard
           id="maven.wizard" 
