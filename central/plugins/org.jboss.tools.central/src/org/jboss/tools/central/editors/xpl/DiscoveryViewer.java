@@ -156,6 +156,7 @@ public class DiscoveryViewer extends Viewer {
 	private boolean showConnectorDescriptorTextFilter;
 
 	private static final String COLOR_WHITE = "white"; //$NON-NLS-1$
+	private static final String COLOR_LIGHTYELLOW = "lightyellow"; //$NON-NLS-1$
 
 	private static Boolean useNativeSearchField;
 
@@ -171,6 +172,7 @@ public class DiscoveryViewer extends Viewer {
 	private Font h2Font;
 
 	private Color colorWhite;
+	private Color colorLightYellow;
 	private Color colorCategoryGradientStart;
 	private Color colorCategoryGradientEnd;
 	
@@ -1018,6 +1020,13 @@ public class DiscoveryViewer extends Viewer {
 			}
 			colorWhite = colorRegistry.get(COLOR_WHITE);
 		}
+		if (colorLightYellow == null) {
+			ColorRegistry colorRegistry = JFaceResources.getColorRegistry();
+			if (!colorRegistry.hasValueFor(COLOR_LIGHTYELLOW)) {
+				colorRegistry.put(COLOR_LIGHTYELLOW, new RGB(255, 255, 160));
+			}
+			colorLightYellow = colorRegistry.get(COLOR_LIGHTYELLOW);
+		}
 		if (colorCategoryGradientStart == null) {
 			colorCategoryGradientStart = themeManager.getCurrentTheme()
 					.getColorRegistry()
@@ -1377,7 +1386,7 @@ public class DiscoveryViewer extends Viewer {
 		// something like addConditionalStyle(ConnectorDiscovery)
 		// TODO color is also defined in JBossCentralEditor 
 		if (EarlyAccessFilter.isEarlyAccess(connector)) {
-			res = this.parent.getDisplay().getSystemColor(SWT.COLOR_YELLOW);
+			res = colorLightYellow;
 		}
 		return res;
 	}
