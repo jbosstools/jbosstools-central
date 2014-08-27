@@ -997,7 +997,7 @@ public class GettingStartedPage extends AbstractJBossCentralPage implements Prox
 			final Label categoryName = toolkit.createLabel(categoryComposite, category.getName());
 			GridDataFactory.fillDefaults().grab(true, false).applyTo(categoryName);
 			categoryName.setFont(arial);
-			if (!JBossCentralEditor.useFefaultColors) {
+			if (!JBossCentralEditor.useDefaultColors) {
 				categoryName.setForeground(black);
 			}
 			String description = category.getDescription();
@@ -1312,7 +1312,7 @@ public class GettingStartedPage extends AbstractJBossCentralPage implements Prox
 	protected Section createSection(FormToolkit toolkit, Composite parent,
 			String name, int style) {
 		final Section section = super.createSection(toolkit, parent, name, style);
-		if (!JBossCentralEditor.useFefaultColors) {
+		if (!JBossCentralEditor.useDefaultColors) {
 			Composite separator = new Composite(section, style);
 		    separator.addListener(SWT.Paint, new Listener() {
 				@Override
