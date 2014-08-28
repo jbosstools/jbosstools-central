@@ -63,7 +63,7 @@ public class JBossCentralDropTarget {
 	public static final String JBOSS_DROP_TARGET = "jbossDropTarget"; //$NON-NLS-1$
 	public static final String JBOSS_DROP_TARGET_ID = "jdt"; //$NON-NLS-1$
 	private static final String DOWNLOAD_JBOSS_ORG_JBOSSTOOLS_CENTRAL_INSTALL_CONNECTORS = "http://download.jboss.org/jbosstools/central/install?connectors="; //$NON-NLS-1$
-	private static final String DEVSTUDIO_JBOSS_COM_CENTRAL_INSTALL_CONNECTORS = "https://devstudio.jboss.com/central/install?connectors="; //$NON-NLS-1$
+	private static final String DEVSTUDIO_JBOSS_COM_CENTRAL_INSTALL_CONNECTORS = "https://devstudio.redhat.com/central/install?connectors="; //$NON-NLS-1$
 	
 	private DropTargetListener listener = new DropTargetAdapter() {
 		@Override
