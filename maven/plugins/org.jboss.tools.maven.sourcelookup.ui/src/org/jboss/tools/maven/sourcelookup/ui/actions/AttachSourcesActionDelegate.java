@@ -68,13 +68,17 @@ public class AttachSourcesActionDelegate implements IEditorActionDelegate {
 	 */
 	@Override
 	public void setActiveEditor(IAction action, IEditorPart targetEditor) {
-		if (targetEditor instanceof IClassFileEditorInput) {
+		if (targetEditor != null) {
 			try {
 				String value = SourceLookupActivator.getDefault().getAutoAddSourceAttachment();
 				if (SourceLookupActivator.AUTO_ADD_JBOSS_SOURCE_ATTACHMENT_NEVER.equals(value)) {
 					return;
 				}
-				IClassFileEditorInput input = (IClassFileEditorInput) targetEditor.getEditorInput();
+				Object object = targetEditor.getEditorInput();
+				if (! (object instanceof IClassFileEditorInput)) {
+					return;
+				}
+				IClassFileEditorInput input = (IClassFileEditorInput) object;
 				IJavaElement element = input.getClassFile();
 				String className = element.getElementName(); 
 				final boolean isMavenProject = isMavenProject(element.getJavaProject());
