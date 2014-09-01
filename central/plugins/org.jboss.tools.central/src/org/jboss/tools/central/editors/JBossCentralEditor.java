@@ -18,8 +18,10 @@ import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.OperationCanceledException;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener;
@@ -517,14 +519,15 @@ public class JBossCentralEditor extends SharedHeaderFormEditor {
 		private BusyIndicator busyLabel;
 		private TitleRegion titleRegion;
 		private ScrolledForm form;
+		private Boolean hasEarlyAccessIUs;
 
 		public HeaderText(ScrolledForm form) {
 			this.form = form;
+			final FormHeading heading = (FormHeading) form.getForm().getHead();
+			heading.setBusy(true);
+			heading.setBusy(false);
+				
 			try {
-				final FormHeading heading = (FormHeading) form.getForm().getHead();
-				heading.setBusy(true);
-				heading.setBusy(false);
-
 				Field field = FormHeading.class.getDeclaredField("titleRegion"); //$NON-NLS-1$
 				field.setAccessible(true);
 				titleRegion = (TitleRegion) field.get(heading);
@@ -541,7 +544,8 @@ public class JBossCentralEditor extends SharedHeaderFormEditor {
 				titleViewer.setDocument(new Document());
 				
 				this.titleLabel = titleViewer.getTextWidget();
-				updateTitle(heading, JBossCentralActivator.getDefault().getPreferences().getBoolean(PreferenceKeys.ENABLE_EARLY_ACCESS, PreferenceKeys.ENABLE_EARLY_ACCESS_DEFAULT_VALUE));
+				updateTitle(heading);
+				// Early access enablement
 				final IPropertyChangeListener updateTitleOnEAChange = new IPropertyChangeListener() {
 					@Override
 					public void propertyChange(final PropertyChangeEvent event) {
@@ -549,13 +553,8 @@ public class JBossCentralEditor extends SharedHeaderFormEditor {
 							heading.getDisplay().asyncExec(new Runnable() {
 								@Override
 								public void run() {
-									Boolean newValue = Boolean.FALSE;
-									if (event.getNewValue() instanceof String) {
-										newValue = Boolean.parseBoolean((String)event.getNewValue());
-									} else if (event.getNewValue() instanceof Boolean) {
-										newValue = (Boolean)event.getNewValue();
-									}
-									updateTitle(heading, newValue);
+									// At this point, the value in the preference stored is already changed
+									updateTitle(heading);
 								}
 							});
 						}
@@ -568,6 +567,21 @@ public class JBossCentralEditor extends SharedHeaderFormEditor {
 						JBossCentralActivator.getDefault().getPreferenceStore().removePropertyChangeListener(updateTitleOnEAChange);
 					}
 				});
+				// Early access installed
+				Job checkEarlyAccessJob = new Job("Check installation for Early Access") {
+					@Override
+					protected IStatus run(IProgressMonitor monitor) {
+						HeaderText.this.hasEarlyAccessIUs = InstallationChecker.getInstance().hasEarlyAccess();
+						heading.getDisplay().asyncExec(new Runnable() {
+							@Override
+							public void run() {
+								updateTitle(heading);	
+							}
+						});
+						return Status.OK_STATUS;
+					}
+				};
+				checkEarlyAccessJob.schedule();
 				
 				
 				Font font = new Font(heading.getDisplay(),"Lucida Sans Unicode",14,SWT.NORMAL); 
@@ -607,6 +621,8 @@ public class JBossCentralEditor extends SharedHeaderFormEditor {
 					}
 				});
 				updateSizeAndLocations();
+				
+				
 			} catch (Exception e) {
 				JBossCentralActivator.log(e);
 			} 
@@ -616,7 +632,7 @@ public class JBossCentralEditor extends SharedHeaderFormEditor {
 		 * @param heading
 		 * @param titleViewer
 		 */
-		private void updateTitle(final FormHeading heading, boolean isEarlyAccessEnabled) {
+		private void updateTitle(final FormHeading heading) {
 			if(heading.isDisposed() || titleLabel.isDisposed()) {
 				return;
 			}
@@ -627,21 +643,22 @@ public class JBossCentralEditor extends SharedHeaderFormEditor {
 				foreground = heading.getDisplay().getSystemColor(SWT.COLOR_BLACK);
 			}
 			titleLabel.setForeground(foreground);
-			
+
+			boolean isEarlyAccessEnabled = JBossCentralActivator.getDefault().getPreferences().getBoolean(PreferenceKeys.ENABLE_EARLY_ACCESS, PreferenceKeys.ENABLE_EARLY_ACCESS_DEFAULT_VALUE);
+			boolean showEarlyAccessInstalled = this.hasEarlyAccessIUs != null && this.hasEarlyAccessIUs;
 			String title = "Welcome to JBoss";
-			boolean hasEarlyAccessIUs = InstallationChecker.getInstance().hasEarlyAccess(); 
 			String earlyAccessSuffix = "(Early Access ";
 			if (isEarlyAccessEnabled) {
 				earlyAccessSuffix += "enabled";
 			}
-			if (isEarlyAccessEnabled && hasEarlyAccessIUs) {
+			if (isEarlyAccessEnabled && showEarlyAccessInstalled) {
 				earlyAccessSuffix += "/";
 			}
-			if (hasEarlyAccessIUs) {
+			if (showEarlyAccessInstalled) {
 				earlyAccessSuffix += "installed";
 			}
 			earlyAccessSuffix += ")";
-			if (isEarlyAccessEnabled || hasEarlyAccessIUs) {
+			if (isEarlyAccessEnabled || showEarlyAccessInstalled) {
 				this.titleLabel.setText(title + " " + earlyAccessSuffix); //$NON-NLS-1$
 				// TODO color is also defined in DiscoveryViewer 
 				Color background = colorLightYellow;
