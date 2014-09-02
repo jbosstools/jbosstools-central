@@ -627,9 +627,10 @@ public class GettingStartedPage extends AbstractJBossCentralPage implements Prox
 			@Override
 			public void linkActivated(HyperlinkEvent e) {
 				try {
-					IConfigurationElement element = installedWizardIds.get(proxyWizard.getWizardId());
+					IConfigurationElement element = findWizard(proxyWizard, installedWizardIds);
+				
 					if (element == null) {
-						//Wizard not installed
+						//Wizard not installed/completely available
 						installMissingWizard(proxyWizard.getRequiredComponentIds());
 					} else {
 						openWizard(element);
@@ -641,6 +642,24 @@ public class GettingStartedPage extends AbstractJBossCentralPage implements Prox
 				} catch (InterruptedException e1) {
 					JBossCentralActivator.log(e1);
 				}
+			}
+
+			private IConfigurationElement findWizard(ProxyWizard proxyWizard,
+					Map<String, IConfigurationElement> installedWizardIds) {
+				IConfigurationElement element = installedWizardIds.get(proxyWizard.getWizardId());
+				if (element == null) {
+					return null;
+				}
+				List<String> pluginIds = proxyWizard.getRequiredPluginIds();
+				if (pluginIds != null) {
+			        for (String id : pluginIds) {
+			          if (Platform.getBundle(id) == null) {
+			        	  // required plugin is missing
+			              return null;         
+			          }
+			        }
+			      }
+				return element;
 			}
 	    	
 	    });
