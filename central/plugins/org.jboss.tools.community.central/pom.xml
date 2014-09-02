@@ -11,4 +11,30 @@
 	<artifactId>org.jboss.tools.community.central</artifactId>
 	
 	<packaging>eclipse-plugin</packaging>
-</project>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>com.googlecode.maven-download-plugin</groupId>
+        	                <artifactId>download-maven-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>get-earlyaccess-listing</id>
+						<phase>generate-resources</phase>
+						<goals>
+							<goal>wget</goal>
+						</goals>
+						<configuration>
+							<skip>false</skip>
+							<url>http://download.jboss.org/jbosstools/discovery/nightly/core/${jbosstools-site-stream}/jbosstools-earlyaccess.properties</url>
+							<overwrite>true</overwrite>
+							<skipCache>true</skipCache>
+							<outputDirectory>${project.basedir}</outputDirectory>
+							<outputFileName>earlyaccess.properties</outputFileName>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
+</project>	
