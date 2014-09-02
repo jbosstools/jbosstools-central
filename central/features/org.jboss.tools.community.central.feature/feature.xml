@@ -29,4 +29,6 @@
       <import feature="org.jboss.tools.runtime.seam.detector.feature" version="3.4.0" match="greaterOrEqual"/>
    </requires>
 
+   <plugin id="org.jboss.tools.community.central" download-size="0" install-size="0" version="0.0.0" unpack="false"/>
+
 </feature>
