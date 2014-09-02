@@ -104,6 +104,13 @@
                </documentation>
             </annotation>
          </attribute>
+         <attribute name="requiredPluginIds" type="string">
+            <annotation>
+               <documentation>
+                  Optional comma-separated list of plugin ids that must be installed before running the wizard
+               </documentation>
+            </annotation>
+         </attribute>
       </complexType>
    </element>
 

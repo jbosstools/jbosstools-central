@@ -13,6 +13,8 @@ package org.jboss.tools.central.internal.discovery.wizards;
 import java.net.URL;
 import java.util.List;
 
+import org.eclipse.core.runtime.Platform;
+
 /**
  * 
  * @author Fred Bricon
@@ -26,6 +28,7 @@ public class ProxyWizard implements Comparable<ProxyWizard> {
 	URL iconUrl;
 	List<String> requiredComponentIds;
 	int priority;
+	private List<String> requiredPluginIds;
 
 	public String getId() {
 		return id;
@@ -81,6 +84,15 @@ public class ProxyWizard implements Comparable<ProxyWizard> {
 		return this;		
 	}
 	
+	public List<String> getRequiredPluginIds() {
+		return requiredPluginIds;
+	}
+	
+	public ProxyWizard setRequiredPluginIds(List<String> requiredPluginIds) {
+		this.requiredPluginIds = requiredPluginIds;
+		return this;    
+	}
+	
 	public int getPriority() {
 		return priority;
 	}
@@ -114,6 +126,10 @@ public class ProxyWizard implements Comparable<ProxyWizard> {
 				* result
 				+ ((requiredComponentIds == null) ? 0 : requiredComponentIds
 						.hashCode());
+	    result = prime
+	            * result
+	            + ((requiredPluginIds == null) ? 0 : requiredPluginIds
+	                .hashCode());
 		result = prime * result
 				+ ((wizardId == null) ? 0 : wizardId.hashCode());
 		return result;
@@ -169,7 +185,14 @@ public class ProxyWizard implements Comparable<ProxyWizard> {
 		} else if (!requiredComponentIds.equals(other.requiredComponentIds)) {
 			return false;
 		}
-		if (wizardId == null) {
+	    if (requiredPluginIds == null) {
+	        if (other.requiredPluginIds != null) {
+	          return false;
+	        }
+	    } else if (!requiredPluginIds.equals(other.requiredPluginIds)) {
+	        return false;
+	    }
+	    if (wizardId == null) {
 			if (other.wizardId != null) {
 				return false;
 			}

@@ -257,16 +257,15 @@
             name="Spring MVC Project"
             project="true">
       </wizard>
-      <!-- JBIDE-14445 : Remove GWT wizard  
       <wizard
             category="org.jboss.tools.central.ui.wizard.category"
-            id="org.jboss.tools.central.wizards.NewGwtProjectWizard"
-            class="org.jboss.tools.central.wizards.NewGwtProjectWizard"
-            icon="icons/new-gdt-project.png"
-            name="GWT Web Project"
+            id="org.jboss.tools.central.wizards.NewForgeProjectWizard"
+            class="org.jboss.tools.central.wizards.NewForgeProjectWizard"
+            icon="icons/jbossforge_icon_16px.png"
+            name="AngularJS with Forge Project"
             project="true">
       </wizard>
-      -->
+      
    </extension>
 
    <extension
@@ -302,28 +301,18 @@
           wizardId="org.jboss.tools.central.wizards.NewJavaeeWarProjectWizard"
           >
       </proxyWizard>
-      
-      <!--
+
       <proxyWizard 
-          id="richfaces.wizard" 
-          description="%richfaces.wizard.description"
-          label="Richfaces Project"
+          id="forge.wizard" 
+          description="%forge.wizard.description"
+          label="AngularJS with Forge Project"
           priority="4"
-          iconPath="icons/rf_logo.png"
-          wizardId="org.jboss.tools.central.wizards.NewRichfacesProjectWizard"
+          iconPath="icons/jbossforge_icon_16px.png"
+          wizardId="org.jboss.tools.central.wizards.NewForgeProjectWizard"
+          requiredPluginIds="org.jboss.tools.forge.ui.wizards"
+          requiredComponentIds="forge-tools-feature"
           >
       </proxyWizard>
-      
-      <proxyWizard 
-          id="gwt.wizard" 
-          description="%gwt.wizard.description"
-          label="GWT Project"
-          priority="7"
-          iconPath="icons/new-gdt-project.png"
-          wizardId="org.jboss.tools.central.wizards.NewGwtProjectWizard"
-          >
-      </proxyWizard>
-      -->
       <proxyWizard 
           id="openshift.wizard" 
           description="%openshift.wizard.description"

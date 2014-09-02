@@ -27,12 +27,14 @@ public class ProxyWizardExtensionReader {
 	public ProxyWizard readProxyWizardElement(IConfigurationElement element, AbstractDiscoverySource discoverySource) {
 		ProxyWizard pw = new ProxyWizard();
 		List<String> requiredComponentIds = split(element.getAttribute("requiredComponentIds"));
+		List<String> requiredPluginIds = split(element.getAttribute("requiredPluginIds"));
 		pw.setId(element.getAttribute("id"))
 		  .setLabel(element.getAttribute("label"))
 		  .setWizardId(element.getAttribute("wizardId"))
 		  .setDescription(element.getAttribute("description"))
 		  .setIconUrl(discoverySource.getResource(element.getAttribute("iconPath")))
 		  .setRequiredComponentIds(requiredComponentIds)
+		  .setRequiredPluginIds(requiredPluginIds)
 		  .setPriority(Integer.parseInt(element.getAttribute("priority")))
 		  ;
 		

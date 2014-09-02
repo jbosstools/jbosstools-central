@@ -93,7 +93,7 @@ public class ProxyWizardManager {
 			cachedDiscoveryStrategy.setStorageFolder(currentCacheFolder);
 			proxyWizardDiscoveryStrategy.addStrategy(cachedDiscoveryStrategy);
 		}
-		
+
 		//Finally, look for installed data
 		proxyWizardDiscoveryStrategy.addStrategy(new InstalledProxyWizardDiscoveryStrategy());
 		
