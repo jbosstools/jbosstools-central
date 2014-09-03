@@ -668,6 +668,7 @@ public class JBossCentralEditor extends SharedHeaderFormEditor {
 			} else {
 				this.titleLabel.setText(title);
 			}
+			heading.layout(true);
 			
 		}
 
