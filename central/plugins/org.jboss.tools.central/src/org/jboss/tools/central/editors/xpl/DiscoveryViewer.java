@@ -119,6 +119,7 @@ import org.eclipse.ui.statushandlers.StatusManager;
 import org.eclipse.ui.themes.IThemeManager;
 import org.jboss.tools.central.JBossCentralActivator;
 import org.jboss.tools.central.editors.xpl.filters.EarlyAccessFilter;
+import org.jboss.tools.central.editors.xpl.filters.EarlyAccessOrMostRecentVersionFilter;
 import org.jboss.tools.central.editors.xpl.filters.FiltersSelectionDialog;
 import org.jboss.tools.central.editors.xpl.filters.UserFilterEntry;
 import org.jboss.tools.project.examples.internal.discovery.DiscoveryUtil;
@@ -1364,7 +1365,13 @@ public class DiscoveryViewer extends Viewer {
 	 * @param filter
 	 */
 	public void addSystemFilter(ViewerFilter filter) {
-		this.systemFilters.add(filter);
+		// Hack: the only filter that allows to "choose" between 2 connectors
+		// has to be called last, so...
+		if (filter instanceof EarlyAccessOrMostRecentVersionFilter) {
+			this.systemFilters.add(filter);
+		} else {
+			this.systemFilters.add(0, filter);
+		}
 	}
 	
 	public void removeSystemFilter(ViewerFilter filter) {

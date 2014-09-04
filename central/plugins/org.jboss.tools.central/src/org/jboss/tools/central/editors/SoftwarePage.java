@@ -70,7 +70,7 @@ import org.jboss.tools.central.editors.xpl.ConnectorDescriptorItemUi;
 import org.jboss.tools.central.editors.xpl.DiscoveryViewer;
 import org.jboss.tools.central.editors.xpl.filters.EarlyAccessFilter;
 import org.jboss.tools.central.editors.xpl.filters.InstalledFilter;
-import org.jboss.tools.central.editors.xpl.filters.MostRecentVersionFilter;
+import org.jboss.tools.central.editors.xpl.filters.EarlyAccessOrMostRecentVersionFilter;
 import org.jboss.tools.central.preferences.PreferenceKeys;
 import org.jboss.tools.project.examples.ProjectExamplesActivator;
 import org.jboss.tools.project.examples.internal.discovery.JBossDiscoveryUi;
@@ -153,7 +153,7 @@ public class SoftwarePage extends AbstractJBossCentralPage implements IRunnableC
 	    if (!JBossCentralActivator.getDefault().getPreferences().getBoolean(PreferenceKeys.ENABLE_EARLY_ACCESS, PreferenceKeys.ENABLE_EARLY_ACCESS_DEFAULT_VALUE)) {
 	    	discoveryViewer.addSystemFilter(this.earlyAccessFilter);
 	    }
-	    discoveryViewer.addSystemFilter(new MostRecentVersionFilter());
+	    discoveryViewer.addSystemFilter(new EarlyAccessOrMostRecentVersionFilter());
 		discoveryViewer.addDirectoryUrl(ProjectExamplesActivator.getDefault().getConfigurator().getJBossDiscoveryDirectory());
 		discoveryViewer.createControl();
 		discoveryViewer.setEnvironment(getEnvironment());
