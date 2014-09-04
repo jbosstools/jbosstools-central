@@ -28,9 +28,6 @@ public class EarlyAccessFilter extends ViewerFilter {
 			return true;
 		}
 		ConnectorDescriptor connector = (ConnectorDescriptor)element;
-		if (connector.isInstalled()) {
-			return true;
-		}
 		return !isEarlyAccess(connector);
 	}
 
