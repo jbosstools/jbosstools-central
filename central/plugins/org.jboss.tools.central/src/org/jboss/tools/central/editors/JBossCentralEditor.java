@@ -98,7 +98,7 @@ public class JBossCentralEditor extends SharedHeaderFormEditor {
 
 	private Color colorLightYellow;
 
-	private static final String COLOR_LIGHTYELLOW = "lightyellow"; //$NON-NLS-1$
+	public static final String COLOR_LIGHTYELLOW = "lightyellow"; //$NON-NLS-1$
 
 	private AbstractJBossCentralPage gettingStartedPage;
 

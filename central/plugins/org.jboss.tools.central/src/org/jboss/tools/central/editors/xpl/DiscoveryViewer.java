@@ -118,6 +118,7 @@ import org.eclipse.ui.forms.IFormColors;
 import org.eclipse.ui.statushandlers.StatusManager;
 import org.eclipse.ui.themes.IThemeManager;
 import org.jboss.tools.central.JBossCentralActivator;
+import org.jboss.tools.central.editors.JBossCentralEditor;
 import org.jboss.tools.central.editors.xpl.filters.EarlyAccessFilter;
 import org.jboss.tools.central.editors.xpl.filters.FiltersSelectionDialog;
 import org.jboss.tools.central.editors.xpl.filters.UserFilterEntry;
@@ -1377,7 +1378,7 @@ public class DiscoveryViewer extends Viewer {
 		// something like addConditionalStyle(ConnectorDiscovery)
 		// TODO color is also defined in JBossCentralEditor 
 		if (EarlyAccessFilter.isEarlyAccess(connector)) {
-			res = this.parent.getDisplay().getSystemColor(SWT.COLOR_YELLOW);
+			return JFaceResources.getColorRegistry().get(JBossCentralEditor.COLOR_LIGHTYELLOW);
 		}
 		return res;
 	}
