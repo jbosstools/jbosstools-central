@@ -63,7 +63,8 @@ public class JBossCentralDropTarget {
 	public static final String JBOSS_DROP_TARGET = "jbossDropTarget"; //$NON-NLS-1$
 	public static final String JBOSS_DROP_TARGET_ID = "jdt"; //$NON-NLS-1$
 	private static final String DOWNLOAD_JBOSS_ORG_JBOSSTOOLS_CENTRAL_INSTALL_CONNECTORS = "http://download.jboss.org/jbosstools/central/install?connectors="; //$NON-NLS-1$
-	private static final String DEVSTUDIO_JBOSS_COM_CENTRAL_INSTALL_CONNECTORS = "https://devstudio.jboss.com/central/install?connectors="; //$NON-NLS-1$
+	private static final String LEGACY_DEVSTUDIO_JBOSS_COM_CENTRAL_INSTALL_CONNECTORS = "https://devstudio.jboss.com/central/install?connectors="; //$NON-NLS-1$
+	private static final String DEVSTUDIO_REDHAT_COM_CENTRAL_INSTALL_CONNECTORS = "https://devstudio.redhat.com/central/install?connectors="; //$NON-NLS-1$
 	
 	private DropTargetListener listener = new DropTargetAdapter() {
 		@Override
@@ -92,8 +93,10 @@ public class JBossCentralDropTarget {
 				final String[] connectorIds = new String[1];
 				if (url.startsWith(DOWNLOAD_JBOSS_ORG_JBOSSTOOLS_CENTRAL_INSTALL_CONNECTORS)) {
 					connectorIds[0] = url.replace(DOWNLOAD_JBOSS_ORG_JBOSSTOOLS_CENTRAL_INSTALL_CONNECTORS, "");
-				} else if (url.startsWith(DEVSTUDIO_JBOSS_COM_CENTRAL_INSTALL_CONNECTORS)) {
-					connectorIds[0] = url.replace(DEVSTUDIO_JBOSS_COM_CENTRAL_INSTALL_CONNECTORS, "");
+				} else if (url.startsWith(DEVSTUDIO_REDHAT_COM_CENTRAL_INSTALL_CONNECTORS)) {
+					connectorIds[0] = url.replace(DEVSTUDIO_REDHAT_COM_CENTRAL_INSTALL_CONNECTORS, "");
+				} else if (url.startsWith(LEGACY_DEVSTUDIO_JBOSS_COM_CENTRAL_INSTALL_CONNECTORS)) {
+					connectorIds[0] = url.replace(LEGACY_DEVSTUDIO_JBOSS_COM_CENTRAL_INSTALL_CONNECTORS, "");
 				}
 				
 				if (connectorIds[0] != null && !connectorIds[0].trim().isEmpty()) {
