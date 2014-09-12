@@ -305,7 +305,7 @@
       <proxyWizard 
           id="forge.wizard" 
           description="%forge.wizard.description"
-          label="AngularJS with Forge Project"
+          label="AngularJS Forge"
           priority="4"
           iconPath="icons/jbossforge_icon_16px.png"
           wizardId="org.jboss.tools.central.wizards.NewForgeProjectWizard"
