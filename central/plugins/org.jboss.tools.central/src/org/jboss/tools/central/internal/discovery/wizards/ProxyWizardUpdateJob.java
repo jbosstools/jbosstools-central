@@ -15,6 +15,7 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.ISchedulingRule;
 import org.eclipse.core.runtime.jobs.Job;
+import org.jboss.tools.central.JBossCentralActivator;
 
 public class ProxyWizardUpdateJob extends Job {
 
@@ -45,4 +46,8 @@ public class ProxyWizardUpdateJob extends Job {
 		return Status.OK_STATUS;
 	}
 	
+	@Override
+	public boolean belongsTo(Object family) {
+		return family == JBossCentralActivator.JBOSS_CENTRAL_FAMILY;
+	}
 }
