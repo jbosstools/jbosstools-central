@@ -79,6 +79,9 @@ public class ProxyWizardManager {
 		
 		File currentCacheFolder = getCurrentCacheFolder();
 		
+		if (monitor.isCanceled()) {
+			return;
+		}
 		if (searchRemote) {
 			//First look online
 			RemoteProxyWizardDiscoveryStrategy remoteDiscoveryStrategy = new RemoteProxyWizardDiscoveryStrategy();
@@ -87,6 +90,9 @@ public class ProxyWizardManager {
 			proxyWizardDiscoveryStrategy.addStrategy(remoteDiscoveryStrategy);
 		}
 
+		if (monitor.isCanceled()) {
+			return;
+		}
 		if (currentCacheFolder != null) {
 			//Second, look last cached data
 			CachedProxyWizardDiscoveryStrategy cachedDiscoveryStrategy = new CachedProxyWizardDiscoveryStrategy();
@@ -94,13 +100,26 @@ public class ProxyWizardManager {
 			proxyWizardDiscoveryStrategy.addStrategy(cachedDiscoveryStrategy);
 		}
 
+		if (monitor.isCanceled()) {
+			return;
+		}
 		//Finally, look for installed data
 		proxyWizardDiscoveryStrategy.addStrategy(new InstalledProxyWizardDiscoveryStrategy());
-		
+		if (monitor.isCanceled()) {
+			return;
+		}
 		connectorDiscovery.getDiscoveryStrategies().add(proxyWizardDiscoveryStrategy);
+		if (monitor.isCanceled()) {
+			return;
+		}
 		connectorDiscovery.performDiscovery(monitor);
-		
+		if (monitor.isCanceled()) {
+			return;
+		}
 		proxyWizards = dataCollector.getProxyWizards();
+		if (monitor.isCanceled()) {
+			return;
+		}
 		if (searchRemote) {
 			notifyListeners(proxyWizards);
 			purgeOldCacheFolders(2, monitor);
