@@ -348,7 +348,7 @@ public class ProjectExamplesActivator extends AbstractUIPlugin {
 				}
 			}
 		} else {
-			log(projectName + " is inaccessible");
+			log(projectName + " is inaccessible"); //$NON-NLS-1$
 		}
 		return markers;
 	}
