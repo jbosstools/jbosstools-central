@@ -309,7 +309,7 @@
           priority="4"
           iconPath="icons/jbossforge_icon_16px.png"
           wizardId="org.jboss.tools.central.wizards.NewForgeProjectWizard"
-          requiredPluginIds="org.jboss.tools.forge.ui.wizards"
+          requiredPluginIds="org.jboss.tools.forge.ui"
           requiredComponentIds="forge-tools-feature"
           >
       </proxyWizard>
