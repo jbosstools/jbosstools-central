@@ -56,7 +56,6 @@ public class ProxyWizardManager {
 	private ProxyWizardManager() {
 		updateJob = new ProxyWizardUpdateJob(this);
 		//Use -Djboss.discovery.directory.url=... to override the discovery url value
-		discoveryUrl = ProjectExamplesActivator.getDefault().getConfigurator().getJBossDiscoveryDirectory(); 
 	}
 
 	/**
@@ -147,6 +146,9 @@ public class ProxyWizardManager {
 	}
 
 	String getDiscoveryUrl() {
+		if (discoveryUrl == null) {
+			discoveryUrl = ProjectExamplesActivator.getDefault().getConfigurator().getJBossDiscoveryDirectory(); 
+		}
 		return discoveryUrl;
 	}
 
