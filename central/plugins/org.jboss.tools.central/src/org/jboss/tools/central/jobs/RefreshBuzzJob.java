@@ -31,7 +31,7 @@ public class RefreshBuzzJob extends AbstractRefreshJob {
 
 	
 	private RefreshBuzzJob() {
-		super("Refreshing JBoss Buzz...", ProjectExamplesActivator.getDefault().getConfigurator().getBuzzUrl());
+		super("Refreshing JBoss Buzz...");
 	}
 
 	@Override
@@ -48,5 +48,10 @@ public class RefreshBuzzJob extends AbstractRefreshJob {
 	@Override
 	public File getValidCacheFile() {
 		return getFile(VALID_CACHE_FILE);
+	}
+	
+	@Override
+	public String getUrlString() {
+		return ProjectExamplesActivator.getDefault().getConfigurator().getBuzzUrl();
 	}
 }

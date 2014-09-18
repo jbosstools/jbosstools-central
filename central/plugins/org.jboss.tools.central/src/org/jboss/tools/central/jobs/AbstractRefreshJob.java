@@ -58,9 +58,20 @@ public abstract class AbstractRefreshJob extends Job {
 	private boolean forcedDownload = false;
 	private boolean needsRefresh = true;
 
+	/**
+	 * Subclasses are expected to provide the urlString via the {@link #getUrlString()} method.
+	 * 
+	 * @param name the name of the Job
+	 * @param urlString the url to fetch data from
+	 */
+	@Deprecated
 	public AbstractRefreshJob(String name, String urlString) {
-		super(name);
+		this(name);
 		this.urlString = urlString;
+	}
+
+	public AbstractRefreshJob(String name) {
+		super(name);
 		setPriority(LONG);
 		cacheFile = getCacheFile();
 		if (cacheFile.exists()) {
@@ -78,7 +89,7 @@ public abstract class AbstractRefreshJob extends Job {
 			}
 		}
 	}
-
+	
 	public abstract File getCacheFile();
 	
 	public abstract File getValidCacheFile();
@@ -216,7 +227,7 @@ public abstract class AbstractRefreshJob extends Job {
 				tempFile.deleteOnExit();
 				OutputStream destination = new FileOutputStream(tempFile);
 				IStatus status = new URLTransportUtility().download(
-						cacheFile.getName(), urlString, destination, TIME_OUT, monitor);
+						cacheFile.getName(), getUrlString(), destination, TIME_OUT, monitor);
 				URL url = getURL();
 				if (monitor.isCanceled()) {
 					return getValidEntries(monitor);
@@ -293,7 +304,7 @@ public abstract class AbstractRefreshJob extends Job {
 	private URL getURL() {
 		URL url;
 		try {
-			url = new URL(urlString);
+			url = new URL(getUrlString());
 			return url;
 		} catch (MalformedURLException e) {
 			exception = e;
