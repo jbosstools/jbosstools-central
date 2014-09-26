@@ -167,8 +167,7 @@ public class NewProjectExamplesStacksRequirementsPage extends MavenExamplesRequi
 				
 				stArch = useBlank && stacksArchetype != null && stacksArchetype.getBlank() != null ?stacksArchetype.getBlank():stacksArchetype;
 				if (stArch != null && wtpRuntime != null && wtpRuntime.getRuntimeType() != null) {
-					String wtpRuntimeId = wtpRuntime.getRuntimeType().getId();
-					Runtime stacksRuntime = StacksUtil.getRuntimeFromWtpId(stacks, wtpRuntimeId );
+					Runtime stacksRuntime = StacksArchetypeUtil.getRuntimeFromWtp(stacks, wtpRuntime);
 					if (stacksRuntime != null) {
 						List<ArchetypeVersion> compatibleVersions = StacksUtil.getCompatibleArchetypeVersions(stArch, stacksRuntime);
 						if (compatibleVersions != null && !compatibleVersions.isEmpty()) {
