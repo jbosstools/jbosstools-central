@@ -26,9 +26,11 @@ import java.util.Properties;
 import java.util.Set;
 
 import org.apache.maven.artifact.versioning.ComparableVersion;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.jst.j2ee.project.facet.IJ2EEFacetConstants;
 import org.eclipse.wst.common.project.facet.core.runtime.RuntimeManager;
 import org.eclipse.wst.server.core.IRuntime;
+import org.jboss.ide.eclipse.as.core.server.bean.ServerBeanLoader;
 import org.jboss.ide.eclipse.as.core.util.RuntimeUtils;
 import org.jboss.jdf.stacks.model.ArchetypeVersion;
 import org.jboss.jdf.stacks.model.Runtime;
@@ -142,8 +144,7 @@ public class StacksArchetypeUtil {
 		
 		String targetProduct = RuntimeUtils.isEAP(runtime)?TARGET_PRODUCT:TARGET_COMMUNITY;
 		String environment = getEnvironment(runtime);
-		String runtimeTypeId = (runtime == null || runtime.getRuntimeType() == null) ? null : runtime.getRuntimeType().getId();
-		return getArchetype(archetypeType, isBlank, targetProduct, environment, runtimeTypeId, stacks);
+		return getArchetype(archetypeType, isBlank, targetProduct, environment, runtime, stacks);
 	}
 	
 
@@ -151,25 +152,26 @@ public class StacksArchetypeUtil {
 	 * Looks for the stacks archetype matching best the given requirements (isBlank, targetProduct, environment)
 	 */
 	public ArchetypeVersion getArchetype(String archetypeType, boolean isBlank, String targetProduct, String environment, Stacks stacks) {
-		return getArchetype(archetypeType, isBlank, targetProduct, environment, null, stacks);
+		return getArchetype(archetypeType, isBlank, targetProduct, environment, (IRuntime)null, stacks);
 	}
-
+	
 	/**
 	 * Looks for the stacks archetype matching best the given requirements (isBlank, targetProduct, environment)
 	 */
-	public ArchetypeVersion getArchetype(String archetypeType, boolean isBlank, String targetProduct, String environment, String serverId, Stacks stacks) {
+	public ArchetypeVersion getArchetype(String archetypeType, boolean isBlank, String targetProduct, String environment, IRuntime server, Stacks stacks) {
 		if (archetypeType == null) {
 			throw new IllegalArgumentException("Archetype type cannot be null");
 		}
 		
-		Map<ArchetypeVersion, Integer> matchingArchetypes = getBestMatchingArchetype(archetypeType, isBlank, targetProduct, environment, serverId, stacks);
+		Map<ArchetypeVersion, Integer> matchingArchetypes = getBestMatchingArchetype(archetypeType, isBlank, targetProduct, environment, server, stacks);
 		if (!matchingArchetypes.isEmpty()) {
 			return matchingArchetypes.keySet().iterator().next();
 		}
 		return null;
 	}
 
-	private Map<ArchetypeVersion, Integer> getBestMatchingArchetype(String archetypeType, boolean isBlank, String targetProduct /*community or product*/, String environment /* *-ee6 or *-ee7 */, String serverId, Stacks stacks) {
+
+	private Map<ArchetypeVersion, Integer> getBestMatchingArchetype(String archetypeType, boolean isBlank, String targetProduct /*community or product*/, String environment /* *-ee6 or *-ee7 */, IRuntime server, Stacks stacks) {
 		Map<ArchetypeVersion, Integer> matchingArchetypes = new HashMap<ArchetypeVersion, Integer>();
 		if (targetProduct == null) {
 			targetProduct = TARGET_COMMUNITY;
@@ -204,8 +206,8 @@ public class StacksArchetypeUtil {
 			matchingArchetypes.put(archetype, score);
 		}
 
-		if (serverId != null) {
-			Runtime rt = getRuntimeFromWtp(stacks, serverId);
+		if (server != null) {
+			Runtime rt = getRuntimeFromWtp(stacks, server);
 			if (rt != null && rt.getArchetypes() != null) {
 				for (ArchetypeVersion a : rt.getArchetypes()) {
 					//Archetypes belonging to the selected wtp runtime get an extra bonus
@@ -243,18 +245,6 @@ public class StacksArchetypeUtil {
 		return result;
 	}
 	
-	private Runtime getRuntimeFromWtp(Stacks stacks, String wtpRuntimeId) {
-		if (wtpRuntimeId != null) {
-			for (Runtime runtime : stacks.getAvailableRuntimes()) {
-				Properties p = runtime.getLabels();
-				if (p != null && wtpRuntimeId.equals(p.get("wtp-runtime-type"))) { //$NON-NLS-1$
-					return runtime;
-				}
-			}
-		}
-		return null;
-	}
-
 	/**
 	 * Returns a map of additional Maven repositories defined on a given stacks archetype.
 	 * <ul><li>The key corresponds to the repository id or profile id</li>
@@ -334,5 +324,60 @@ public class StacksArchetypeUtil {
 		boolean isArchetypeBlank = Boolean.parseBoolean(""+labels.get(ARCHETYPE_IS_BLANK)); 
 		return isArchetypeBlank;
 	}
+
+	public static Runtime getRuntimeFromWtp(Stacks stacks, IRuntime wtpRuntime) {
+		String wtpRuntimeId = (wtpRuntime == null || wtpRuntime.getRuntimeType() == null) ? null : wtpRuntime.getRuntimeType().getId();
+		if (wtpRuntimeId == null) {
+			return null;
+		}
+
+		List<Runtime> candidates = new ArrayList<Runtime>();
+		
+		for (Runtime runtime : stacks.getAvailableRuntimes()) {
+			Properties p = runtime.getLabels();
+			if (p != null && wtpRuntimeId.equals(p.get("wtp-runtime-type"))) { //$NON-NLS-1$
+				candidates.add(runtime);
+			}
+		}
+		if (candidates.isEmpty()) {
+			return null;
+		} else if (candidates.size() > 1) {		
+			String majMinVersion = getShortVersion(wtpRuntime);
+			if (majMinVersion != null) {
+				for (Runtime candidate : candidates) {
+					String candidateVersion = candidate.getVersion();
+					String candidateMajMinVersion = null;
+					if (candidateVersion != null) {
+						candidateMajMinVersion = ServerBeanLoader.getMajorMinorVersion(candidateVersion);
+					}
+					if (majMinVersion.equals(candidateMajMinVersion)) {
+						return candidate;
+					}
+				}				
+			}	
+		}
+		
+		//At this point, either we had 1 candidate or we were not able to disambiguate so pick the first one found
+		return candidates.get(0);
+	}
+
+
+	/**
+	 * Looks up the version of a given {@link IRuntime}. For any given X.Y.Z version, it will return X.Y.
+	 * Only works for {@link IRuntime} with a non-null location (typically won't work for remote servers)
+	 * */
+	private static String getShortVersion(IRuntime wtpRuntime) {
+		IPath location = wtpRuntime.getLocation();
+		if (location == null) {// maybe remote server
+			return null;
+		}
+		String fullVersion = new ServerBeanLoader(location.toFile()).getFullServerVersion();
+		if (fullVersion == null) {
+			return null;
+		}
+		return ServerBeanLoader.getMajorMinorVersion(fullVersion);
+	}
+	
+	
 	
 }
