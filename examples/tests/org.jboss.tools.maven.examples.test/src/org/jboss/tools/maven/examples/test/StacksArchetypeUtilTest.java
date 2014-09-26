@@ -28,12 +28,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.jst.j2ee.project.facet.IJ2EEFacetConstants;
 import org.eclipse.wst.common.project.facet.core.IProjectFacetVersion;
 import org.eclipse.wst.common.project.facet.core.runtime.IRuntime;
 import org.eclipse.wst.server.core.IRuntimeType;
 import org.jboss.jdf.stacks.model.ArchetypeVersion;
+import org.jboss.jdf.stacks.model.Runtime;
 import org.jboss.jdf.stacks.model.Stacks;
 import org.jboss.tools.maven.project.examples.internal.stacks.StacksArchetypeUtil;
 import org.jboss.tools.stacks.core.model.StacksManager;
@@ -248,8 +251,43 @@ public class StacksArchetypeUtilTest {
 		ArchetypeVersion newMobile = stacksArchetypeUtil.getArchetype("html5-mobile", false, eap62, stacks);
 		assertNotNull(newMobile);
 		assertEquals("jboss-html5-mobile-archetype-wfk",newMobile.getArchetype().getId());
-		assertEquals("2.4.0-build-1", newMobile.getVersion());
+		assertEquals("2.4.0-build-1", newMobile.getVersion());		
+	}
+	
+
+	@Test
+	public void testJBIDE18436_getMatchingStacksRuntimeFromWTP() {
+
+		IPath root = new Path("resources");
 		
+		//check actual EAP 6.1 is ... 6.1
+		org.eclipse.wst.server.core.IRuntime eap61 = createRuntime(EAP61);
+		when(eap61.getLocation()).thenReturn(root.append("eap610"));
+		Runtime stacksRuntime = StacksArchetypeUtil.getRuntimeFromWtp(stacks, eap61);
+		assertNotNull(stacksRuntime);
+		assertEquals("jbosseap610runtime",stacksRuntime.getId());
+
+		//check EAP 6.3 which looks like 6.1 is ... 6.3
+		org.eclipse.wst.server.core.IRuntime eap63 = createRuntime(EAP61);
+		when(eap63.getLocation()).thenReturn(root.append("eap630"));
+		stacksRuntime = StacksArchetypeUtil.getRuntimeFromWtp(stacks, eap63);
+		assertNotNull(stacksRuntime);
+		assertEquals("jbosseap630runtime",stacksRuntime.getId());
+
+		//check micro release matches minor stacks release
+		org.eclipse.wst.server.core.IRuntime eap69 = createRuntime(EAP61);
+		when(eap69.getLocation()).thenReturn(root.append("eap699"));
+		stacksRuntime = StacksArchetypeUtil.getRuntimeFromWtp(stacks, eap69);
+		assertNotNull(stacksRuntime);
+		assertEquals("jbosseap69xruntime",stacksRuntime.getId());
+
+		//check remote server matches first known matching stacks runtime
+		org.eclipse.wst.server.core.IRuntime remoteEap = createRuntime(EAP61);
+		when(eap69.getLocation()).thenReturn(null);
+		stacksRuntime = StacksArchetypeUtil.getRuntimeFromWtp(stacks, remoteEap);
+		assertNotNull(stacksRuntime);
+		//returned 1st one in the list of org.jboss.ide.eclipse.as.runtime.eap.61 runtimes
+		assertEquals("jbosseap610runtime",stacksRuntime.getId());	
 	}
 	
 	private org.eclipse.wst.server.core.IRuntime createRuntime(String id) {

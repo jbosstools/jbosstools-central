@@ -1853,7 +1853,52 @@
           runtime-size: 000000000,
           wtp-runtime-type: org.jboss.ide.eclipse.as.runtime.eap.62
      }   
-  
+
+   - &jbosseap630runtime
+     id: jbosseap630runtime
+     name: JBoss EAP 6.3.0
+     version: 6.3.0
+     license: *lgpl21
+     url: http://www.jboss.org/products
+     boms:
+     defaultBom: 
+     defaultArchetype: *jboss-javaee6-webapp-archetype-last-eap
+     archetypes:
+      - *jboss-javaee6-webapp-archetype-last-eap
+      - *jboss-javaee6-webapp-blank-archetype-last-eap
+      - *jboss-javaee6-webapp-ear-archetype-last-eap
+      - *jboss-javaee6-webapp-ear-blank-archetype-last-eap
+      - *jboss-html5-mobile-archetype-last-wfk
+      - *jboss-html5-mobile-blank-archetype-last-wfk
+     labels: {
+          runtime-category: SERVER,
+          runtime-type: EAP,
+          runtime-size: 000000000,
+          wtp-runtime-type: org.jboss.ide.eclipse.as.runtime.eap.61
+     }
+
+   - &jbosseap69xruntime
+     id: jbosseap69xruntime
+     name: JBoss EAP 6.9.x
+     version: 6.9.x
+     license: *lgpl21
+     url: http://www.jboss.org/products
+     boms:
+     defaultBom: 
+     defaultArchetype: *jboss-javaee6-webapp-archetype-last-eap
+     archetypes:
+      - *jboss-javaee6-webapp-archetype-last-eap
+      - *jboss-javaee6-webapp-blank-archetype-last-eap
+      - *jboss-javaee6-webapp-ear-archetype-last-eap
+      - *jboss-javaee6-webapp-ear-blank-archetype-last-eap
+      - *jboss-html5-mobile-archetype-last-wfk
+      - *jboss-html5-mobile-blank-archetype-last-wfk
+     labels: {
+          runtime-category: SERVER,
+          runtime-type: EAP,
+          runtime-size: 000000000,
+          wtp-runtime-type: org.jboss.ide.eclipse.as.runtime.eap.61
+     }
      ###############
      # JBoss 7.0.1 #
      ###############
