@@ -74,6 +74,8 @@ import org.eclipse.ui.forms.widgets.ExpandableComposite;
 import org.jboss.tools.maven.core.IArtifactResolutionService;
 import org.jboss.tools.maven.core.MavenCoreActivator;
 import org.jboss.tools.maven.ui.Activator;
+import org.jboss.tools.maven.ui.internal.repositories.RepositoryIdentificationManager;
+import org.jboss.tools.maven.ui.internal.repositories.SettingsRepositoryBuilder;
 
 public class AddRepositoryDialog extends TitleAreaDialog {
 
@@ -92,11 +94,6 @@ public class AddRepositoryDialog extends TitleAreaDialog {
 	private static final String EMPTY_STRING = ""; //$NON-NLS-1$
 	private static final String CONFIGURE_MAVEN_REPOSITORIES = "ConfigureMavenRepositories"; //$NON-NLS-1$
 	private static final String LASTPATH = "lastPath"; //$NON-NLS-1$
-	private static final String JSF_IMPL = "com" + File.separator + "sun" + File.separator + "faces" + File.separator + "jsf-impl";  //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
-	private static final String WFK_BOMS = "com" + File.separator + "redhat" + File.separator + "jboss" + File.separator + "wfk" + File.separator + "boms";  //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
-	private static final String JBOSS_EAP_MAVEN_REPOSITORY = "JBoss EAP Maven Repository"; //$NON-NLS-1$
-	private static final String JBOSS_EAP_MAVEN_REPOSITORY_ID = "jboss-eap-maven-repository";; //$NON-NLS-1$
-	private static final String JBOSS_WFK_MAVEN_REPOSITORY_ID = "jboss-wfk-maven-repository";; //$NON-NLS-1$
 	private static final String[] UPDATE_POLICIES = new String[] {"never","always","daily","interval:XXX"}; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 	private static final String[] REPO_LAYOUTS = new String[] {"default","p2","legacy"}; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
@@ -135,6 +132,8 @@ public class AddRepositoryDialog extends TitleAreaDialog {
 	private RepositoryWrapper editWrapper;
 	private boolean isEditing;
 	private boolean isActive;
+	
+	private RepositoryIdentificationManager repositoryIdentificationManager;
 
 	public AddRepositoryDialog(Shell parentShell,
 			Set<RepositoryWrapper> availableRepositories,
@@ -162,6 +161,8 @@ public class AddRepositoryDialog extends TitleAreaDialog {
 		ImageDescriptor desc = Activator.imageDescriptorFromPlugin(Activator.PLUGIN_ID,
 				"icons/MavenRepositoryWizBan.png"); //$NON-NLS-1$
 		setTitleImage(desc.createImage());
+		
+		repositoryIdentificationManager = new RepositoryIdentificationManager();
 	}
 
 	@Override
@@ -385,11 +386,11 @@ public class AddRepositoryDialog extends TitleAreaDialog {
 					} else {
 						boolean ok = MessageDialog.openQuestion(getShell(), "Confirm Add Repository", "No new repository found. Would you like me to add the '" + url + "' repository."); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 						if (ok) {
-							Repository repository = ConfigureMavenRepositoriesWizardPage.getDefaultRepository();
-							repository.setId(getUniqueId(new File(pathStr), "id", allRepositories)); //$NON-NLS-1$
-							repository.setName(new File(pathStr).getName());
-							repository.setUrl(url);
-							RepositoryWrapper wrapper = new RepositoryWrapper(repository, repository.getId());
+							SettingsRepositoryBuilder repoBuilder= new SettingsRepositoryBuilder()
+																	.setId(getUniqueId(getIdFromDirectory(new File(pathStr), "id"), allRepositories)) //$NON-NLS-1$
+																	.setName(new File(pathStr).getName())
+																	.setUrl(url);
+							RepositoryWrapper wrapper = new RepositoryWrapper(repoBuilder.get());
 							repos.add(wrapper);
 						}
 					}
@@ -399,7 +400,7 @@ public class AddRepositoryDialog extends TitleAreaDialog {
 						availableRepositories.add(wrapper);
 					}
 				}
-				if (repos.size() > 0) {
+				if (!repos.isEmpty()) {
 					String[] profileIDs = getProfileIds();
 					profileCombo.setItems(profileIDs);
 					RepositoryWrapper wrapper = repos.iterator().next();
@@ -697,7 +698,7 @@ public class AddRepositoryDialog extends TitleAreaDialog {
 		}
 		monitor.setTaskName("Searching " + directory.getAbsolutePath()); //$NON-NLS-1$
 		File comFile = new File(directory, "com"); //$NON-NLS-1$
-		if (comFile.isDirectory()) {
+		if (comFile.isDirectory() || new File(directory, ".maven-repository").exists()) { //$NON-NLS-1$
 			if (getRepositoryFromDir(directory, repos, monitor)) {
 				return;
 			}
@@ -726,86 +727,29 @@ public class AddRepositoryDialog extends TitleAreaDialog {
 			return false;
 		}
 		
-		File file = new File(directory, JSF_IMPL);
-		if (file.isDirectory()) {
-			File[] list = file.listFiles(new FileFilter() {
-				
-				public boolean accept(File pathname) {
-					if (pathname != null && pathname.getName() != null && pathname.getName().contains("redhat")) { //$NON-NLS-1$
-						return true;
-					}
-					return false;
-				}
-			});
-			if (list != null && list.length >= 1) {
-				// JBoss EAP Maven Repository
-				Repository repository = ConfigureMavenRepositoriesWizardPage.getDefaultRepository();
-				Set<RepositoryWrapper> allRepositories = new HashSet<RepositoryWrapper>();
-				allRepositories.addAll(repos);
-				allRepositories.addAll(includedRepositories);
-				allRepositories.addAll(availableRepositories);
-				String url = getUrl(directory);
-				if (url == null) {
-					return false;
-				}
-				for (RepositoryWrapper wrapper:allRepositories) {
-					if (url.equals(wrapper.getRepository().getUrl())) {
-						return true;
-					}
-				}
-				repository.setId(getUniqueId(directory, JBOSS_EAP_MAVEN_REPOSITORY_ID, allRepositories));
-				repository.setName(JBOSS_EAP_MAVEN_REPOSITORY);
-				repository.setUrl(url);
-				RepositoryWrapper wrapper = new RepositoryWrapper(repository, repository.getId());
-				repos.add(wrapper);
-				return true;
-			}
-		}
-		file = new File(directory, WFK_BOMS);
-		if (file.isDirectory()) {
-			// JBoss WFK Maven Repository
-			Repository repository = ConfigureMavenRepositoriesWizardPage.getDefaultRepository();
+		RepositoryWrapper repoWrapper = repositoryIdentificationManager.identifyRepository(directory, monitor);
+
+		if (repoWrapper != null) {
+			Repository repo = repoWrapper.getRepository();
 			Set<RepositoryWrapper> allRepositories = new HashSet<RepositoryWrapper>();
 			allRepositories.addAll(repos);
 			allRepositories.addAll(includedRepositories);
 			allRepositories.addAll(availableRepositories);
-			String url = getUrl(directory);
-			if (url == null) {
-				return false;
-			}
 			for (RepositoryWrapper wrapper:allRepositories) {
-				if (url.equals(wrapper.getRepository().getUrl())) {
+				if (repo.getUrl().equals(wrapper.getRepository().getUrl())) {
 					return true;
 				}
 			}
-			repository.setId(getUniqueId(directory, JBOSS_WFK_MAVEN_REPOSITORY_ID, allRepositories));
-			repository.setName("JBoss WFK Maven Repository"); //$NON-NLS-1$
-			repository.setUrl(url);
-			RepositoryWrapper wrapper = new RepositoryWrapper(repository, repository.getId());
-			repos.add(wrapper);
+			String uniqueId = getUniqueId(repo.getId(), allRepositories);
+			repo.setId(uniqueId);
+			repos.add(repoWrapper);
 			return true;
 		}
 		return false;
 	}
 
-	protected String getUrl(File directory) {
-		String url;
-		try {
-			url = directory.toURI().toURL().toString();
-		} catch (MalformedURLException e1) {
-			Activator.log(e1);
-			return null;
-		}
-		url = url.trim();
-		if (!url.endsWith(RepositoryWrapper.SEPARATOR)) {
-			url = url + RepositoryWrapper.SEPARATOR;
-		}
-		return url;
-	}
-
-	private String getUniqueId(File directory, String simpleId, Set<RepositoryWrapper> allRepositories) {
-		int i = 0;
-		String id = simpleId;
+    private String getIdFromDirectory(File directory, String defaultId) {
+		String id = defaultId;
 		try {
 			id = directory.toURI().toURL().toString();
 		} catch (MalformedURLException e1) {
@@ -815,7 +759,11 @@ public class AddRepositoryDialog extends TitleAreaDialog {
 		id = id.replace(" ", "-"); //$NON-NLS-1$ //$NON-NLS-2$
 		id = id.replace("_", "-"); //$NON-NLS-1$ //$NON-NLS-2$
 		id = id.replace(".", "-"); //$NON-NLS-1$ //$NON-NLS-2$
-		
+		return id;
+    }
+
+	private String getUniqueId(String id, Set<RepositoryWrapper> allRepositories) {
+		int i = 0;
 		String startId = id;
 		while (true) {
 			boolean found = false;
@@ -899,8 +847,7 @@ public class AddRepositoryDialog extends TitleAreaDialog {
 			repositoryWrapper = editWrapper;
 			populateRepository(repositoryWrapper.getRepository());
 		} else {
-			Repository repository = ConfigureMavenRepositoriesWizardPage
-					.getDefaultRepository();
+			Repository repository = SettingsRepositoryBuilder.getDefaultRepository();
 			populateRepository(repository);
 			repositoryWrapper = new RepositoryWrapper(repository, profileCombo
 					.getText().trim());
