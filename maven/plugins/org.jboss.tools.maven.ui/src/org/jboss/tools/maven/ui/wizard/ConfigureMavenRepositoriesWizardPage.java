@@ -106,6 +106,7 @@ import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.jboss.tools.maven.core.MavenCoreActivator;
 import org.jboss.tools.maven.ui.Activator;
+import org.jboss.tools.maven.ui.internal.repositories.SettingsRepositoryBuilder;
 import org.jboss.tools.maven.ui.preferences.AutoResizeTableLayout;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -160,12 +161,6 @@ public class ConfigureMavenRepositoriesWizardPage extends WizardPage implements 
 	private static final String RELEASES_ELEMENT = "releases"; //$NON-NLS-1$
 
 	private static final String LAYOUT_ELEMENT = "layout"; //$NON-NLS-1$
-
-	private static final String POLICY_NEVER = "never"; //$NON-NLS-1$
-
-	private static final String POLICY_DAILY = "daily"; //$NON-NLS-1$
-
-	private static final String LAYOUT_DEFAULT = "default"; //$NON-NLS-1$
 
 	private static final String NAME_ELEMENT = "name"; //$NON-NLS-1$
 
@@ -454,7 +449,7 @@ public class ConfigureMavenRepositoriesWizardPage extends WizardPage implements 
 				}
 			}
 			if(preconfiguredRepository == null) {
-				Repository r = getDefaultRepository();
+				SettingsRepositoryBuilder r = new SettingsRepositoryBuilder();
 				String name = StringUtils.capitaliseAllWords(repoId.replace("redhat", "Red Hat").replace("-", " "));
 				if (!name.endsWith(" Repository")) {
 					name += " Repository";
@@ -463,7 +458,7 @@ public class ConfigureMavenRepositoriesWizardPage extends WizardPage implements 
 				r.setUrl(preConfUrl);
 				String id = getUniqueProfileId(repoId, allRepos);
 				r.setId(id);
-				preconfiguredRepository = new RepositoryWrapper(r, id);
+				preconfiguredRepository = new RepositoryWrapper(r.get());
 			}
 			includedRepositories.add(preconfiguredRepository);
 			removeRepository(preconfiguredRepository);
@@ -941,58 +936,45 @@ public class ConfigureMavenRepositoriesWizardPage extends WizardPage implements 
 	private Set<RepositoryWrapper> getAvailableRepositories() {
 		Set<RepositoryWrapper> repositories = new TreeSet<RepositoryWrapper>();
         
-		Repository repository = getDefaultRepository();
-		repository.setId(JBOSS_PUBLIC_REPOSITORY_ID);
-		repository.setName("JBoss Public"); //$NON-NLS-1$
-		repository.setUrl("https://repository.jboss.org/nexus/content/groups/public-jboss/"); //$NON-NLS-1$
-		repositories.add(new RepositoryWrapper(repository, JBOSS_PUBLIC_REPOSITORY_PROFILE_ID));
+		SettingsRepositoryBuilder repoBuilder = new SettingsRepositoryBuilder() 
+		 											.setId(JBOSS_PUBLIC_REPOSITORY_ID)
+		 											.setName("JBoss Public") //$NON-NLS-1$
+		 											.setUrl("https://repository.jboss.org/nexus/content/groups/public-jboss/"); //$NON-NLS-1$
+		repositories.add(new RepositoryWrapper(repoBuilder.get()));
 		
-		repository = getDefaultRepository();
-		repository.setId(RED_HAT_TECHPREVIEW_ALL_REPOSITORY_ID);
-		repository.setName("Red Hat Tech Preview repository (all)"); //$NON-NLS-1$
-		repository.setUrl("http://maven.repository.redhat.com/techpreview/all/"); //$NON-NLS-1$
-		repositories.add(new RepositoryWrapper(repository, RED_HAT_TECHPREVIEW_ALL_REPOSITORY_PROFILE_ID));
+		repoBuilder = new SettingsRepositoryBuilder()
+						.setId(RED_HAT_TECHPREVIEW_ALL_REPOSITORY_ID)
+		               	.setName("Red Hat Tech Preview repository (all)") //$NON-NLS-1$
+						.setUrl("http://maven.repository.redhat.com/techpreview/all/"); //$NON-NLS-1$
+		repositories.add(new RepositoryWrapper(repoBuilder.get()));
 		
-		repository = getDefaultRepository();
-        repository.setId(JAVA_NET_PUBLIC_ID);
-		repository.setName("Java Net Public"); //$NON-NLS-1$
-		repository.setUrl("https://maven.java.net/content/groups/public/"); //$NON-NLS-1$
-		repositories.add(new RepositoryWrapper(repository, JAVA_NET_PUBLIC_PROFILE_ID));
+		repoBuilder = new SettingsRepositoryBuilder()
+        				.setId(JAVA_NET_PUBLIC_ID)
+						.setName("Java Net Public") //$NON-NLS-1$
+						.setUrl("https://maven.java.net/content/groups/public/"); //$NON-NLS-1$
+		repositories.add(new RepositoryWrapper(repoBuilder.get()));
 		
-		repository = getDefaultRepository();
-        repository.setId(COM_SPRINGSOURCE_REPOSITORY_BUNDLES_RELEASE_ID);
-		repository.setName("EBR Spring Release"); //$NON-NLS-1$
-		repository.setUrl("http://repository.springsource.com/maven/bundles/release/"); //$NON-NLS-1$
-		repositories.add(new RepositoryWrapper(repository, COM_SPRINGSOURCE_REPOSITORY_BUNDLES_RELEASE_PROFILE_ID));
+		repoBuilder = new SettingsRepositoryBuilder()
+        			.setId(COM_SPRINGSOURCE_REPOSITORY_BUNDLES_RELEASE_ID)
+					.setName("EBR Spring Release") //$NON-NLS-1$
+					.setUrl("http://repository.springsource.com/maven/bundles/release/"); //$NON-NLS-1$
+		repositories.add(new RepositoryWrapper(repoBuilder.get()));
 		
-		repository = getDefaultRepository();
-        repository.setId(COM_SPRINGSOURCE_REPOSITORY_BUNDLES_EXTERNAL_ID);
-		repository.setName("EBR External Release"); //$NON-NLS-1$
-		repository.setUrl("http://repository.springsource.com/maven/bundles/external/"); //$NON-NLS-1$
-		repositories.add(new RepositoryWrapper(repository, COM_SPRINGSOURCE_REPOSITORY_BUNDLES_EXTERNAL_PROFILE_ID));
-
-		repository = getDefaultRepository();
-        repository.setId(REPOSITORY_APACHE_ORG_ID);
-		repository.setName("Apache Repository"); //$NON-NLS-1$
-		repository.setUrl("https://repository.apache.org/content/groups/public/"); //$NON-NLS-1$
-		repositories.add(new RepositoryWrapper(repository, REPOSITORY_APACHE_ORG_PROFILE_ID));
+		repoBuilder = new SettingsRepositoryBuilder()
+        			.setId(COM_SPRINGSOURCE_REPOSITORY_BUNDLES_EXTERNAL_ID)
+					.setName("EBR External Release") //$NON-NLS-1$
+					.setUrl("http://repository.springsource.com/maven/bundles/external/"); //$NON-NLS-1$
+		repositories.add(new RepositoryWrapper(repoBuilder.get()));
+		
+		repoBuilder = new SettingsRepositoryBuilder()
+        			.setId(REPOSITORY_APACHE_ORG_ID)
+					.setName("Apache Repository") //$NON-NLS-1$
+					.setUrl("https://repository.apache.org/content/groups/public/"); //$NON-NLS-1$
+		repositories.add(new RepositoryWrapper(repoBuilder.get()));
 		
 		return repositories;
 	}
 	
-	public static Repository getDefaultRepository() {
-		Repository repository = new Repository();
-		repository.setLayout(LAYOUT_DEFAULT);
-		RepositoryPolicy releases = new RepositoryPolicy();
-		releases.setEnabled(true);
-		releases.setUpdatePolicy(POLICY_NEVER);
-		repository.setReleases(releases);
-		RepositoryPolicy snapshots = new RepositoryPolicy();
-		snapshots.setEnabled(false);
-		snapshots.setUpdatePolicy(POLICY_DAILY);
-		repository.setSnapshots(snapshots);
-		return repository;
-	}
 
 	private List<Profile> getProfiles() throws CoreException {
 		return maven.getSettings().getProfiles();

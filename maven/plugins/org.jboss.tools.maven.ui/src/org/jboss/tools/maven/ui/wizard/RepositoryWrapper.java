@@ -26,7 +26,6 @@ public class RepositoryWrapper implements Comparable<RepositoryWrapper> {
 
 	public RepositoryWrapper(Repository repository, String profileId) {
 		Assert.isNotNull(repository);
-		// Assert.isNotNull(profileId);
 		this.repository = repository;
 		this.profileId = profileId;
 		url = repository.getUrl();
@@ -39,7 +38,7 @@ public class RepositoryWrapper implements Comparable<RepositoryWrapper> {
 	}
 
 	public RepositoryWrapper(Repository repository) {
-		this(repository, null);
+		this(repository, repository == null? null : repository.getId());
 	}
 
 	public Repository getRepository() {
@@ -51,6 +50,9 @@ public class RepositoryWrapper implements Comparable<RepositoryWrapper> {
 	}
 
 	public String getProfileId() {
+		if (profileId == null && repository != null) {
+			profileId = repository.getId();
+		}
 		return profileId;
 	}
 
