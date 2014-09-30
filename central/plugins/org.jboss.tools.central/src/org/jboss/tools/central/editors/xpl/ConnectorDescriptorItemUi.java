@@ -389,6 +389,11 @@ public class ConnectorDescriptorItemUi implements PropertyChangeListener, Runnab
 
 	private static Map<String, org.eclipse.equinox.p2.metadata.Version> resolveProfileUnits(List<String> installableUnits) {
 		IProvisioningAgentProvider provider = (IProvisioningAgentProvider) PlatformUI.getWorkbench().getService(IProvisioningAgentProvider.class);
+		if (provider == null) {
+			// This is not expected to happen, but it actually does when shutting down IDE: JBIDE-18368
+			// so we just catch it there to avoid logging a NPE.
+			return null;
+		}
 		try {
 			IProvisioningAgent agent = provider.createAgent(null); // null = location for running system
 			if (agent == null)
