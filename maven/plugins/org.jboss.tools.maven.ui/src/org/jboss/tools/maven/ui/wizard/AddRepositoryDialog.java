@@ -622,12 +622,18 @@ public class AddRepositoryDialog extends TitleAreaDialog {
 		idText.setText(repository.getId() == null ? "" : repository.getId()); //$NON-NLS-1$
 		nameText.setText(repository.getName() == null ? "" : repository.getName()); //$NON-NLS-1$
 		urlText.setText(repository.getUrl() == null ? "" : repository.getUrl()); //$NON-NLS-1$
-		snapshotsButton.setSelection(repository.getSnapshots().isEnabled());
-		snapshotsButton.notifyListeners(SWT.Selection, new Event());
-		snapshotsPolicyCombo.setText(repository.getSnapshots().getUpdatePolicy());
-		releasesButton.setSelection(repository.getReleases().isEnabled());
-		releasesButton.notifyListeners(SWT.Selection, new Event());
-		releasesPolicyCombo.setText(repository.getReleases().getUpdatePolicy());
+		RepositoryPolicy policy = repository.getSnapshots();
+		if(policy != null){
+			snapshotsButton.setSelection(policy.isEnabled());
+			snapshotsPolicyCombo.setText(policy.getUpdatePolicy());
+			snapshotsButton.notifyListeners(SWT.Selection, new Event());
+		}
+		policy = repository.getReleases();
+		if(policy != null){
+			releasesButton.setSelection(policy.isEnabled());
+			releasesPolicyCombo.setText(policy.getUpdatePolicy());
+			releasesButton.notifyListeners(SWT.Selection, new Event());
+		}
 		repositoryLayout.setText(repository.getLayout());
 	}
 
