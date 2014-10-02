@@ -96,7 +96,9 @@ public class AddRepositoryDialog extends TitleAreaDialog {
 	private static final String LASTPATH = "lastPath"; //$NON-NLS-1$
 	private static final String[] UPDATE_POLICIES = new String[] {"never","always","daily","interval:XXX"}; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 	private static final String[] REPO_LAYOUTS = new String[] {"default","p2","legacy"}; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-
+	private static final String DEFAULT_LAYOUT = REPO_LAYOUTS[0];
+	private static final String DEFAULT_POLICY = UPDATE_POLICIES[2];
+	
 	private Set<RepositoryWrapper> availableRepositories;
 	private Set<RepositoryWrapper> includedRepositories;
 	private IMaven maven;
@@ -634,7 +636,10 @@ public class AddRepositoryDialog extends TitleAreaDialog {
 			releasesPolicyCombo.setText(policy.getUpdatePolicy());
 			releasesButton.notifyListeners(SWT.Selection, new Event());
 		}
-		repositoryLayout.setText(repository.getLayout());
+		String layout = repository.getLayout();
+		if(layout != null){
+			repositoryLayout.setText(layout.trim().isEmpty() ? DEFAULT_LAYOUT : layout.trim());
+		}
 	}
 
 	private Image getJBossImage() {
@@ -871,14 +876,21 @@ public class AddRepositoryDialog extends TitleAreaDialog {
 		repository.setSnapshots(snapshotsPolicy);
 		RepositoryPolicy releasesPolicy = createRepositoryPolicy(releasesButton, releasesPolicyCombo);
 		repository.setReleases(releasesPolicy);
-		
-		repository.setLayout(repositoryLayout.getText());
+		String layout = repositoryLayout.getText().trim();
+		if(layout.isEmpty() || layout.equals(DEFAULT_LAYOUT)){
+			repository.setLayout(null);
+		} else {
+			repository.setLayout(layout);
+		}
 	}
 	
 	private RepositoryPolicy createRepositoryPolicy(Button policyButton, Combo policyCombo){
-		RepositoryPolicy policy = new RepositoryPolicy();
-		policy.setEnabled(policyButton.getSelection());
-		policy.setUpdatePolicy(policyCombo.getText());
+		RepositoryPolicy policy = null;
+		if(!(policyButton.getSelection() && policyCombo.getText().trim().equals(DEFAULT_POLICY))){
+			policy = new RepositoryPolicy();
+			policy.setEnabled(policyButton.getSelection());
+			policy.setUpdatePolicy(policyCombo.getText().trim());
+		}
 		return policy;
 	}
 
@@ -953,6 +965,7 @@ public class AddRepositoryDialog extends TitleAreaDialog {
 		createLabel(advancedComposite, "Repository layout: "); //$NON-NLS-1$
 		repositoryLayout = new Combo(advancedComposite, SWT.DROP_DOWN);
 		populateCombo(repositoryLayout, REPO_LAYOUTS);
+		repositoryLayout.setText(DEFAULT_LAYOUT);
 		
 		Group srGroup = new Group(advancedComposite,SWT.NONE);
 		srGroup.setText("Snapshots && Releases"); //$NON-NLS-1$
@@ -977,7 +990,7 @@ public class AddRepositoryDialog extends TitleAreaDialog {
 		createLabel(srGroup, "Update policy: "); //$NON-NLS-1$
 		releasesPolicyCombo = new Combo(srGroup, SWT.DROP_DOWN);
 		populateCombo(releasesPolicyCombo,UPDATE_POLICIES);
-		releasesPolicyCombo.select(0);//Default set to never update releases
+		releasesPolicyCombo.setText(DEFAULT_POLICY);
 		releasesPolicyDecoration = addDecoration(releasesPolicyCombo, FieldDecorationRegistry.DEC_ERROR, INVALID_RELEASES_POLICY);
 		releasesPolicyCombo.addModifyListener(new ModifyListener() {
 			
@@ -988,6 +1001,7 @@ public class AddRepositoryDialog extends TitleAreaDialog {
 		
 		snapshotsButton = new Button(srGroup, SWT.CHECK);
 		snapshotsButton.setText("Enable snapshots"); //$NON-NLS-1$
+		snapshotsButton.setSelection(true);
 		snapshotsButton.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent event) {
@@ -1004,9 +1018,8 @@ public class AddRepositoryDialog extends TitleAreaDialog {
 		createLabel(srGroup, "Update policy: "); //$NON-NLS-1$
 		snapshotsPolicyCombo = new Combo(srGroup, SWT.DROP_DOWN);
 		populateCombo(snapshotsPolicyCombo,UPDATE_POLICIES);
-		snapshotsPolicyCombo.select(2);//Default set to update snapshots daily
+		snapshotsPolicyCombo.setText(DEFAULT_POLICY);
 		snapshotsPolicyDecoration = addDecoration(snapshotsPolicyCombo, FieldDecorationRegistry.DEC_ERROR, INVALID_SNAPSHOTS_POLICY);
-		snapshotsPolicyCombo.setEnabled(false);
 		snapshotsPolicyCombo.addModifyListener(new ModifyListener() {
 			
 			public void modifyText(ModifyEvent e) {
