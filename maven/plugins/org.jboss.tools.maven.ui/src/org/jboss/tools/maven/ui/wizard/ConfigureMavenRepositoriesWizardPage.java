@@ -675,7 +675,10 @@ public class ConfigureMavenRepositoriesWizardPage extends WizardPage implements 
 		addElement(repository, ID_ELEMENT, wrapper.getRepository().getId());
 		addElement(repository, NAME_ELEMENT, wrapper.getRepository().getName());
 		addElement(repository, URL_ELEMENT, wrapper.getRepository().getUrl());
-		addElement(repository, LAYOUT_ELEMENT, wrapper.getRepository().getLayout());
+		String layout = wrapper.getRepository().getLayout();
+		if(layout != null){
+			addElement(repository, LAYOUT_ELEMENT, wrapper.getRepository().getLayout());
+		}
 		RepositoryPolicy policy = wrapper.getRepository().getReleases();
 		if (policy != null) {
 			Element releases = addElement(repository, RELEASES_ELEMENT, null);
