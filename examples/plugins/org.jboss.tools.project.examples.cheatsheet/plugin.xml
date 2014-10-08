@@ -126,5 +126,11 @@
             id="org.jboss.tools.project.examples.cheatsheet.getProjectForCheatsheet">
       </command>
    </extension>
+   
+   <extension
+         point="org.eclipse.ui.startup">
+      <startup class="org.jboss.tools.project.examples.cheatsheet.Startup">
+      </startup>
+   </extension>
 
 </plugin>
