@@ -627,13 +627,17 @@ public class AddRepositoryDialog extends TitleAreaDialog {
 		RepositoryPolicy policy = repository.getSnapshots();
 		if(policy != null){
 			snapshotsButton.setSelection(policy.isEnabled());
-			snapshotsPolicyCombo.setText(policy.getUpdatePolicy());
+			if(policy.getUpdatePolicy() != null){
+				snapshotsPolicyCombo.setText(policy.getUpdatePolicy());
+			}
 			snapshotsButton.notifyListeners(SWT.Selection, new Event());
 		}
 		policy = repository.getReleases();
 		if(policy != null){
 			releasesButton.setSelection(policy.isEnabled());
-			releasesPolicyCombo.setText(policy.getUpdatePolicy());
+			if(policy.getUpdatePolicy() != null){
+				releasesPolicyCombo.setText(policy.getUpdatePolicy());
+			}
 			releasesButton.notifyListeners(SWT.Selection, new Event());
 		}
 		String layout = repository.getLayout();
@@ -869,7 +873,9 @@ public class AddRepositoryDialog extends TitleAreaDialog {
 
 	private void populateRepository(Repository repository) {
 		repository.setId(idText.getText().trim());
-		repository.setName(nameText.getText().trim());
+		if(!nameText.getText().trim().isEmpty()){
+			repository.setName(nameText.getText().trim());
+		}
 		repository.setUrl(urlText.getText().trim());
 		
 		RepositoryPolicy snapshotsPolicy = createRepositoryPolicy(snapshotsButton, snapshotsPolicyCombo);

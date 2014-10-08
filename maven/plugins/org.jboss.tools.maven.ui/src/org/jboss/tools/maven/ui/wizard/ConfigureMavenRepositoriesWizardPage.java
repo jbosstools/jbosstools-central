@@ -673,7 +673,10 @@ public class ConfigureMavenRepositoriesWizardPage extends WizardPage implements 
 		}
 		repos.appendChild(repository);
 		addElement(repository, ID_ELEMENT, wrapper.getRepository().getId());
-		addElement(repository, NAME_ELEMENT, wrapper.getRepository().getName());
+		String name = wrapper.getRepository().getName();
+		if(name != null){
+			addElement(repository, NAME_ELEMENT, wrapper.getRepository().getName());
+		}
 		addElement(repository, URL_ELEMENT, wrapper.getRepository().getUrl());
 		String layout = wrapper.getRepository().getLayout();
 		if(layout != null){
