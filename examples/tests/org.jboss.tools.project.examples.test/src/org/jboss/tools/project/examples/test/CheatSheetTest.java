@@ -89,16 +89,25 @@ public class CheatSheetTest {
 	private static final String WEB_APPLICATIONS = "Web Applications";
 	private static final String KITCHENSINK = "jboss-kitchensink";
 	
+	private static IPreferenceStore store;
+	private static String originalValue;
+	
 	@BeforeClass
 	public static void init() throws Exception {
+		store = ProjectExamplesActivator.getDefault().getPreferenceStore();
+		originalValue = ProjectExamplesActivator.getDefault().getShowCheatsheets();		
+		store.putValue(ProjectExamplesActivator.SHOW_CHEATSHEETS, ProjectExamplesActivator.SHOW_CHEATSHEETS_NEVER);
 		importKitchensink();
 	}
 
 	@AfterClass
 	public static void removeProjects() throws Exception {
+		store.putValue(ProjectExamplesActivator.SHOW_CHEATSHEETS, originalValue);
 		ProjectExamplesUtil.removeProjects();
+		store = null;
 	}
 	
+
 	private static void importKitchensink() throws Exception {
 		WorkspaceJob workspaceJob = new WorkspaceJob(Messages.NewProjectExamplesWizard_Downloading) {
 
