@@ -373,12 +373,12 @@ public class JBossCentralEditor extends SharedHeaderFormEditor {
 							.getInitialMessage());
 				} else {
 					try {
-						final StringBuffer url = new StringBuffer();
+						final StringBuilder url = new StringBuilder();
 						String initialMessage = searchControl
 								.getInitialMessage();
 						if (JBossCentralActivator.SEARCH_RED_HAT_CUSTOMER_PORTAL
 								.equals(initialMessage)) {
-							url.append("https://access.redhat.com/knowledge/searchResults?col=avalon_portal&topSearchForm=topSearchForm&language=en&quickSearch=");
+							url.append("https://access.redhat.com/search/browse/search#?col=avalon_portal&keyword=");
 							url.append(URLEncoder.encode(
 									searchControl.getText(), UTF_8_ENCODING));
 						} else {
