@@ -204,21 +204,23 @@ public class JBossCentralActivator extends AbstractUIPlugin {
 	 * )
 	 */
 	public void stop(BundleContext context) throws Exception {
+		PlatformUI.getWorkbench().removeWorkbenchListener(workbenchListener);
+		if (!PlatformUI.getWorkbench().isClosing()) {
+			Display.getDefault().asyncExec(new Runnable() {
+
+				@Override
+				public void run() {
+					PlatformUI.getWorkbench().getActiveWorkbenchWindow()
+							.removePerspectiveListener(perspectiveListener);
+				}
+			});
+		}
 		Job.getJobManager().cancel(JBOSS_CENTRAL_FAMILY); 
 		Job.getJobManager().join(JBOSS_CENTRAL_FAMILY, new NullProgressMonitor());
 		
 		plugin = null;
 		bundleContext = null;
 		super.stop(context);
-		
-		PlatformUI.getWorkbench().removeWorkbenchListener(workbenchListener);
-		Display.getDefault().asyncExec(new Runnable() {
-			
-			@Override
-			public void run() {
-				PlatformUI.getWorkbench().getActiveWorkbenchWindow().removePerspectiveListener(perspectiveListener);
-			}
-		});
 	}
 
 	/**
