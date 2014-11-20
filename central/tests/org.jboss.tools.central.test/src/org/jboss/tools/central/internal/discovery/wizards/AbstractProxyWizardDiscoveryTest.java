@@ -14,7 +14,9 @@ import java.io.File;
 import java.io.IOException;
 
 import org.apache.commons.io.FileUtils;
+import org.eclipse.jetty.server.Connector;
 import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.server.ServerConnector;
 import org.eclipse.jetty.server.handler.ResourceHandler;
 import org.junit.After;
 import org.junit.AfterClass;
@@ -68,7 +70,12 @@ public abstract class AbstractProxyWizardDiscoveryTest {
 		resourceHandler.setResourceBase(new File("target/jetty-resources").getAbsolutePath());
 		server.setHandler(resourceHandler);
 	    server.start();
-	    return server.getConnectors()[0].getLocalPort();
+	    Connector conn0 = server.getConnectors()[0];
+	    int port = 80;
+	    if (conn0 instanceof ServerConnector) {
+	    	port = ((ServerConnector)conn0).getLocalPort();
+	    } 
+	    return port;
 	}
 	
 	@After
