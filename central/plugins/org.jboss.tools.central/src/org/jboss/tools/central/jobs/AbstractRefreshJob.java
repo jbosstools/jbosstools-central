@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -33,7 +34,6 @@ import org.jboss.tools.central.JBossCentralActivator;
 import org.jboss.tools.central.model.FeedsEntry;
 import org.jboss.tools.central.model.FeedsEntry.Type;
 import org.jboss.tools.foundation.core.ecf.URLTransportUtility;
-import org.jboss.tools.project.examples.ProjectExamplesActivator;
 
 import com.sun.syndication.feed.synd.SyndContent;
 import com.sun.syndication.feed.synd.SyndEntry;
@@ -234,7 +234,7 @@ public abstract class AbstractRefreshJob extends Job {
 				}
 				if (status.isOK() && url != null) {
 					cacheModified = new URLTransportUtility().getLastModified(url);
-					ProjectExamplesActivator.copyFile(tempFile, cacheFile);
+					FileUtils.copyFile(tempFile, cacheFile);
 					tempFile.delete();
 					if (monitor.isCanceled()) {
 						return getValidEntries(monitor);
@@ -255,7 +255,7 @@ public abstract class AbstractRefreshJob extends Job {
 			try {
 				File validCacheFile = getValidCacheFile();
 				if (!validCacheFile.isFile() || cacheFile.lastModified() != validCacheFile.lastModified()) {
-					ProjectExamplesActivator.copyFile(cacheFile, getValidCacheFile());
+					FileUtils.copyFile(cacheFile, getValidCacheFile());
 					validCacheFile.setLastModified(cacheFile.lastModified());
 				}
 			} catch (Exception e) {

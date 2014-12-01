@@ -123,7 +123,7 @@ import org.jboss.tools.central.editors.xpl.filters.EarlyAccessFilter;
 import org.jboss.tools.central.editors.xpl.filters.EarlyAccessOrMostRecentVersionFilter;
 import org.jboss.tools.central.editors.xpl.filters.FiltersSelectionDialog;
 import org.jboss.tools.central.editors.xpl.filters.UserFilterEntry;
-import org.jboss.tools.project.examples.internal.discovery.DiscoveryUtil;
+import org.jboss.tools.discovery.core.internal.connectors.DiscoveryUtil;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.Version;
 

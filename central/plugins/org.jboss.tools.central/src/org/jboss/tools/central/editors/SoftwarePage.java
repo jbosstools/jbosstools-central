@@ -69,11 +69,11 @@ import org.jboss.tools.central.Messages;
 import org.jboss.tools.central.editors.xpl.ConnectorDescriptorItemUi;
 import org.jboss.tools.central.editors.xpl.DiscoveryViewer;
 import org.jboss.tools.central.editors.xpl.filters.EarlyAccessFilter;
-import org.jboss.tools.central.editors.xpl.filters.InstalledFilter;
 import org.jboss.tools.central.editors.xpl.filters.EarlyAccessOrMostRecentVersionFilter;
+import org.jboss.tools.central.editors.xpl.filters.InstalledFilter;
 import org.jboss.tools.central.preferences.PreferenceKeys;
-import org.jboss.tools.project.examples.ProjectExamplesActivator;
-import org.jboss.tools.project.examples.internal.discovery.JBossDiscoveryUi;
+import org.jboss.tools.discovery.core.internal.DiscoveryActivator;
+import org.jboss.tools.discovery.core.internal.connectors.JBossDiscoveryUi;
 
 /**
  * 
@@ -154,7 +154,7 @@ public class SoftwarePage extends AbstractJBossCentralPage implements IRunnableC
 	    	discoveryViewer.addSystemFilter(this.earlyAccessFilter);
 	    }
 	    discoveryViewer.addSystemFilter(new EarlyAccessOrMostRecentVersionFilter());
-		discoveryViewer.addDirectoryUrl(ProjectExamplesActivator.getDefault().getConfigurator().getJBossDiscoveryDirectory());
+		discoveryViewer.addDirectoryUrl(DiscoveryActivator.getDefault().getJBossDiscoveryDirectory());
 		discoveryViewer.createControl();
 		discoveryViewer.setEnvironment(getEnvironment());
 		Control discoveryControl = discoveryViewer.getControl();

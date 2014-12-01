@@ -50,8 +50,8 @@ import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.ide.IDE;
 import org.jboss.tools.central.JBossCentralActivator;
-import org.jboss.tools.project.examples.internal.discovery.DiscoveryUtil;
-import org.jboss.tools.project.examples.internal.discovery.JBossDiscoveryUi;
+import org.jboss.tools.discovery.core.internal.connectors.DiscoveryUtil;
+import org.jboss.tools.discovery.core.internal.connectors.JBossDiscoveryUi;
 
 /**
  * 

@@ -4,7 +4,6 @@
    <extension-point id="projectExamplesXml" name="%ProjectExamples" schema="schema/projectExamplesXml.exsd"/>
    <extension-point id="categories" name="%ProjectExampleCategories" schema="schema/categories.exsd"/>
    <extension-point id="importProjectExamples" name="Import Project Examples" schema="schema/importProjectExample.exsd"/>
-   <extension-point id="configurators" name="JBoss Central Configurator" schema="schema/configurators.exsd"/>
    <extension-point id="wizardpages" name="Project Examples Wizard Pages" schema="schema/wizardpages.exsd"/>
    
   <extension point="org.eclipse.ui.newWizards">
