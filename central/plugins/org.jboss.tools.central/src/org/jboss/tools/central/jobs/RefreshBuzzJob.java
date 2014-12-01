@@ -14,7 +14,6 @@ import java.io.File;
 
 import org.eclipse.core.runtime.IPath;
 import org.jboss.tools.central.JBossCentralActivator;
-import org.jboss.tools.project.examples.ProjectExamplesActivator;
 
 /**
  * 
@@ -52,6 +51,6 @@ public class RefreshBuzzJob extends AbstractRefreshJob {
 	
 	@Override
 	public String getUrlString() {
-		return ProjectExamplesActivator.getDefault().getConfigurator().getBuzzUrl();
+		return JBossCentralActivator.getDefault().getConfigurator().getBuzzUrl();
 	}
 }

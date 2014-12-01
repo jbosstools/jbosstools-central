@@ -61,8 +61,10 @@ import org.eclipse.ui.menus.CommandContributionItem;
 import org.eclipse.ui.menus.CommandContributionItemParameter;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.eclipse.ui.services.IServiceLocator;
+import org.jboss.tools.central.configurators.IJBossCentralConfigurator;
 import org.jboss.tools.central.editors.JBossCentralEditor;
 import org.jboss.tools.central.editors.JBossCentralEditorInput;
+import org.jboss.tools.central.internal.CentralConfiguratorFactory;
 import org.jboss.tools.central.internal.dnd.JBossCentralDropTarget;
 import org.jboss.tools.central.preferences.PreferenceKeys;
 import org.jboss.tools.project.examples.model.ProjectExample;
@@ -151,6 +153,8 @@ public class JBossCentralActivator extends AbstractUIPlugin {
 		public void postShutdown(IWorkbench workbench) {}
 	};
 
+	private IJBossCentralConfigurator configurator;
+
 	/**
 	 * The constructor
 	 */
@@ -217,7 +221,7 @@ public class JBossCentralActivator extends AbstractUIPlugin {
 		}
 		Job.getJobManager().cancel(JBOSS_CENTRAL_FAMILY); 
 		Job.getJobManager().join(JBOSS_CENTRAL_FAMILY, new NullProgressMonitor());
-		
+		configurator = null;
 		plugin = null;
 		bundleContext = null;
 		super.stop(context);
@@ -562,6 +566,13 @@ public class JBossCentralActivator extends AbstractUIPlugin {
 			return;
 		}
 		new JBossCentralDropTarget(control);
+	}
+
+	public IJBossCentralConfigurator getConfigurator() {
+		if (configurator == null) {
+			configurator = CentralConfiguratorFactory.createConfigurator();
+		}
+		return configurator;
 	}
 
 }

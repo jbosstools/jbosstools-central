@@ -11,7 +11,8 @@
 
 package org.jboss.tools.central.actions;
 
-import org.jboss.tools.project.examples.ProjectExamplesActivator;
+import org.jboss.tools.central.JBossCentralActivator;
+
 
 /**
  * 
@@ -22,7 +23,7 @@ public class OpenJBossBuzzHandler extends OpenWithBrowserHandler {
 
 	@Override
 	public String getLocation() {
-		return ProjectExamplesActivator.getDefault().getConfigurator().getBuzzUrl();
+		return JBossCentralActivator.getDefault().getConfigurator().getBuzzUrl();
 	}
 
 }

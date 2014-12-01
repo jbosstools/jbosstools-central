@@ -79,7 +79,6 @@ import org.jboss.tools.central.actions.OpenWithBrowserHandler;
 import org.jboss.tools.central.editors.xpl.TextSearchControl;
 import org.jboss.tools.central.installation.InstallationChecker;
 import org.jboss.tools.central.preferences.PreferenceKeys;
-import org.jboss.tools.project.examples.ProjectExamplesActivator;
 
 /**
  * 
@@ -239,7 +238,7 @@ public class JBossCentralEditor extends SharedHeaderFormEditor {
 
 		toolbar.add(searchControl);
 		toolbar.add(new GroupMarker(COMMANDS_GROUP));
-		String[] commandIds = ProjectExamplesActivator.getDefault()
+		String[] commandIds = JBossCentralActivator.getDefault()
 				.getConfigurator().getMainToolbarCommandIds();
 		for (String commandId : commandIds) {
 			CommandContributionItem item = JBossCentralActivator
@@ -498,7 +497,7 @@ public class JBossCentralEditor extends SharedHeaderFormEditor {
 	}
 
 	private Image getHeaderImage() {
-		return ProjectExamplesActivator.getDefault().getConfigurator()
+		return JBossCentralActivator.getDefault().getConfigurator()
 				.getHeaderImage();
 	}
 

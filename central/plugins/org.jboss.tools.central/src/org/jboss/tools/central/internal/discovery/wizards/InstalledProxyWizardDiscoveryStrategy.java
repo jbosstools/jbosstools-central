@@ -19,7 +19,7 @@ import org.eclipse.core.runtime.IContributor;
 import org.eclipse.core.runtime.IExtension;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.mylyn.internal.discovery.core.model.AbstractDiscoverySource;
-import org.jboss.tools.project.examples.internal.discovery.xpl.BundleDiscoveryStrategy;
+import org.jboss.tools.discovery.core.internal.connectors.xpl.BundleDiscoveryStrategy;
 
 /**
  * @author Fred Bricon

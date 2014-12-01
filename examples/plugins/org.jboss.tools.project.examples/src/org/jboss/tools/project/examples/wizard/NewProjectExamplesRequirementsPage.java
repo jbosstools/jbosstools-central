@@ -69,12 +69,12 @@ import org.eclipse.ui.dialogs.PreferencesUtil;
 import org.eclipse.wst.server.core.IServer;
 import org.eclipse.wst.server.core.IServerLifecycleListener;
 import org.eclipse.wst.server.core.ServerCore;
+import org.jboss.tools.discovery.core.internal.connectors.DiscoveryUtil;
+import org.jboss.tools.discovery.core.internal.connectors.JBossDiscoveryUi;
 import org.jboss.tools.foundation.ui.xpl.taskwizard.TaskWizardDialog;
 import org.jboss.tools.project.examples.Messages;
 import org.jboss.tools.project.examples.ProjectExamplesActivator;
 import org.jboss.tools.project.examples.fixes.WTPRuntimeFix;
-import org.jboss.tools.project.examples.internal.discovery.DiscoveryUtil;
-import org.jboss.tools.project.examples.internal.discovery.JBossDiscoveryUi;
 import org.jboss.tools.project.examples.model.ProjectExample;
 import org.jboss.tools.project.examples.model.ProjectExampleWorkingCopy;
 import org.jboss.tools.project.examples.model.ProjectFix;
@@ -321,29 +321,6 @@ public class NewProjectExamplesRequirementsPage extends WizardPage implements IP
 			}
 		
 		});
-		
-//		final Button p2install = new Button(buttonComposite, SWT.PUSH);
-//		p2install.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-//		p2install.setText("Install New Software...");
-//		p2install.setToolTipText("P2 Install New Software");
-//		p2install.addSelectionListener(new SelectionListener(){
-//
-//			public void widgetDefaultSelected(SelectionEvent e) {
-//				
-//			}
-//
-//			public void widgetSelected(SelectionEvent e) {
-//				IHandlerService handlerService = (IHandlerService) PlatformUI.getWorkbench().getActiveWorkbenchWindow().getService(IHandlerService.class);
-//		        try {
-//		          handlerService.executeCommand("org.eclipse.equinox.p2.ui.sdk.install", new Event()); //$NON-NLS-1$
-//		        }
-//		        catch (Exception e1) {
-//		        	ProjectExamplesActivator.log(e1);
-//		        }
-//				refreshFixes();
-//			}
-//		
-//		});
 		
 		final Button downloadAndInstall = new Button(buttonComposite, SWT.PUSH);
 		downloadAndInstall.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));

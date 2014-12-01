@@ -25,7 +25,7 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.MultiStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.mylyn.internal.discovery.core.model.AbstractDiscoveryStrategy;
-import org.jboss.tools.project.examples.internal.discovery.ChainedDiscoveryStrategy;
+import org.jboss.tools.discovery.core.internal.connectors.ChainedDiscoveryStrategy;
 import org.junit.Test;
 
 public class ChainedDiscoveryStrategyTest {

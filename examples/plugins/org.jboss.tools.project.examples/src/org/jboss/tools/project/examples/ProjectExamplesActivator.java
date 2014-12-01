@@ -106,8 +106,6 @@ import org.eclipse.ui.internal.wizards.newresource.ResourceMessages;
 import org.eclipse.ui.part.FileEditorInput;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.eclipse.wst.validation.internal.operations.ValidationBuilder;
-import org.jboss.tools.project.examples.configurators.DefaultJBossCentralConfigurator;
-import org.jboss.tools.project.examples.configurators.IJBossCentralConfigurator;
 import org.jboss.tools.project.examples.dialog.MarkerDialog;
 import org.jboss.tools.project.examples.fixes.PluginFix;
 import org.jboss.tools.project.examples.fixes.ProjectExamplesFix;
@@ -190,12 +188,8 @@ public class ProjectExamplesActivator extends AbstractUIPlugin {
 
 	public static final String WIZARDPAGES_EXTENSION_ID = "org.jboss.tools.project.examples.wizardpages"; //$NON-NLS-1$
 
-	private IJBossCentralConfigurator configurator;
-	
 	public static final String JBOSS_DISCOVERY_DIRECTORY = "jboss.discovery.directory.url"; //$NON-NLS-1$
 	
-	private static final Object CONFIGURATOR = "configurator"; //$NON-NLS-1$
-
 	public static final String SHOW_CHEATSHEETS = "showCheatsheets"; //$NON-NLS-1$
 	public static final String SHOW_CHEATSHEETS_PROMPT = "prompt"; //$NON-NLS-1$
 	public static final String SHOW_CHEATSHEETS_NEVER = "never"; //$NON-NLS-1$
@@ -235,11 +229,8 @@ public class ProjectExamplesActivator extends AbstractUIPlugin {
 
 	private Map<String, List<ContributedPage>> contributedPages;
 
-	private static final String CENTRAL_COMPONENT_NAME = "central"; //$NON-NLS-1$
 	private static final String EXAMPLES_COMPONENT_NAME = "examples"; //$NON-NLS-1$
-	private static final String INSTALL_ACTION = "install"; //$NON-NLS-1$
 	private static final String CREATE_FROM_EXAMPLE_ACTION = "create"; //$NON-NLS-1$
-	private UsageEventType installSoftwareEventType;
 
 	private UsageEventType createProjectFromExampleEventType;
 
@@ -262,15 +253,9 @@ public class ProjectExamplesActivator extends AbstractUIPlugin {
 		plugin = this;
 
 		String version = UsageEventType.getVersion(this);
-		installSoftwareEventType = new UsageEventType(CENTRAL_COMPONENT_NAME, version , null, INSTALL_ACTION, Messages.UsageEventTypeInstallLabelDescription);
-		UsageReporter.getInstance().registerEvent(installSoftwareEventType);
 		
 		createProjectFromExampleEventType = new UsageEventType(EXAMPLES_COMPONENT_NAME, version, null, CREATE_FROM_EXAMPLE_ACTION, Messages.ProjectExamplesActivator_UsageEventTypeCreateProjectFromExampleDescription);
 		UsageReporter.getInstance().registerEvent(createProjectFromExampleEventType);
-	}
-
-	public UsageEventType getInstallSoftwareEventType() {
-		return installSoftwareEventType;
 	}
 
 	public UsageEventType getCreateProjectFromExampleEventType() {
@@ -679,13 +664,9 @@ public class ProjectExamplesActivator extends AbstractUIPlugin {
 	}
 	
 	public static void fixWelcome(ProjectExampleWorkingCopy project) {
-		if (project == null) {
-			return;
+		if (project != null && project.isWelcomeFixRequired()) {
+			checkCheatsheet(project);
 		}
-		if (!project.isWelcomeFixRequired()) {
-			return;
-		}
-		checkCheatsheet(project);
 	}
 
 	protected static void checkCheatsheet(ProjectExampleWorkingCopy project) {
@@ -1175,63 +1156,6 @@ public class ProjectExamplesActivator extends AbstractUIPlugin {
 		return contributedPages;
 	}
 	
-	public IJBossCentralConfigurator getConfigurator() {
-		if (configurator == null) {
-			IExtensionRegistry registry = Platform.getExtensionRegistry();
-			IExtensionPoint extensionPoint = registry
-					.getExtensionPoint(CONFIGURATORS_EXTENSION_ID);
-			IExtension[] extensions = extensionPoint.getExtensions();
-			if (extensions.length > 1) {
-				for (int i = 1; i < extensions.length; i++) {
-					logIgnoredExtensionPoint(extensions[i]);
-				}
-			}
-			if (extensions.length > 0) {
-				IExtension extension = extensions[0];
-				IConfigurationElement[] configurationElements = extension
-						.getConfigurationElements();
-				for (int j = 0; j < configurationElements.length; j++) {
-					IConfigurationElement configurationElement = configurationElements[j];
-					if (CONFIGURATOR.equals(configurationElement.getName())) {
-						try {
-							configurator = (IJBossCentralConfigurator) configurationElement
-									.createExecutableExtension("class"); //$NON-NLS-1$
-						} catch (CoreException e) {
-							ProjectExamplesActivator.log(e);
-							continue;
-						}
-						break;
-					}
-				}
-
-			}
-			if (configurator == null) {
-				configurator = new DefaultJBossCentralConfigurator();
-			}
-		}
-		return configurator;
-	}
-
-	private void logIgnoredExtensionPoint(IExtension extension) {
-		String className = null;
-		IConfigurationElement[] configurationElements = extension
-				.getConfigurationElements();
-		for (int j = 0; j < configurationElements.length; j++) {
-			IConfigurationElement configurationElement = configurationElements[j];
-			if (CONFIGURATOR.equals(configurationElement.getName())) {
-				className = configurationElement.getAttribute("class");
-			}
-		}
-		StringBuilder builder = new StringBuilder();
-		builder.append("The configurators extension point is ignored: classname=");
-		builder.append(className);
-		if (extension.getContributor() != null && extension.getContributor().getName() != null) {
-			builder.append(",pluginId=");
-			builder.append(extension.getContributor().getName());
-		}
-		log(builder.toString());
-	}
-
 	public static String getShortDescription(String description) {
 		if (description.length() <= DESCRIPTION_LENGTH) {
 			return description;

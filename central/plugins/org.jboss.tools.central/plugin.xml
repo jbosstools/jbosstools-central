@@ -2,6 +2,7 @@
 <?eclipse version="3.4"?>
 <plugin>
 
+   <extension-point id="configurators" name="JBoss Central Configurator" schema="schema/configurators.exsd"/>
    <extension-point id="proxyWizard" name="Proxy Wizard" schema="schemas/org.jboss.tools.central.proxyWizard.exsd"/>
    <extension-point id="iuFamilies" name="iuFamilies" schema="schemas/iuFamilies.exsd"/>
 
@@ -80,12 +81,6 @@
             name="JBoss Buzz"
             id="org.jboss.tools.central.openJBossBuzz">
       </command>
-
-      <command
-      		defaultHandler="org.jboss.tools.central.actions.OpenJBossNewsHandler"
-            name="News"
-            id="org.jboss.tools.central.openJBossNews">
-      </command>
       
       <command
       		defaultHandler="org.jboss.tools.central.actions.RefreshJBossTutorialsHandler"
@@ -142,14 +137,6 @@
       </command>
       <command
       		name="Warning"
-            id="org.jboss.tools.central.newsWarning">
-      </command>
-      <command
-      		name="Warning"
-            id="org.jboss.tools.central.blogsWarning">
-      </command>
-      <command
-      		name="Warning"
             id="org.jboss.tools.central.buzzWarning">
       </command>
 
@@ -165,10 +152,6 @@
             commandId="org.jboss.tools.central.openJBossBuzz"
             icon="icons/buzz.gif">
       </image>
-      <image
-            commandId="org.jboss.tools.central.openJBossNews"
-            icon="icons/news.png">
-      </image>      
       <image
             commandId="org.jboss.tools.central.refreshJBossBuzz"
             icon="icons/refresh.gif">
