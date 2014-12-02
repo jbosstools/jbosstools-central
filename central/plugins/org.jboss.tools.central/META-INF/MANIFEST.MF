@@ -35,7 +35,8 @@ Require-Bundle: org.eclipse.ui;bundle-version="3.7.0",
  org.eclipse.e4.ui.model.workbench;bundle-version="1.0.0",
  org.eclipse.e4.ui.workbench;bundle-version="1.0.0",
  org.eclipse.core.filesystem,
- org.eclipse.ui.net
+ org.eclipse.ui.net,
+ org.jboss.tools.discovery.core;bundle-version="1.0.0"
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-Localization: plugin
@@ -44,6 +45,7 @@ Bundle-ClassPath: lib/ocpsoft-pretty-time-1.0.7.jar,
  .
 Export-Package: org.jboss.tools.central,
  org.jboss.tools.central.actions,
+ org.jboss.tools.central.configurators,
  org.jboss.tools.central.editors,
  org.jboss.tools.central.editors.xpl,
  org.jboss.tools.central.internal;x-friends:="org.jboss.tools.central.test",

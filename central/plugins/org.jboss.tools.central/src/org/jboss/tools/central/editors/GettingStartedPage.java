@@ -118,9 +118,8 @@ import org.jboss.tools.central.jobs.RefreshTutorialsJob;
 import org.jboss.tools.central.model.FeedsEntry;
 import org.jboss.tools.central.wizards.AbstractJBossCentralProjectWizard;
 import org.jboss.tools.central.wizards.ErrorPage;
-import org.jboss.tools.project.examples.ProjectExamplesActivator;
-import org.jboss.tools.project.examples.internal.discovery.DiscoveryUtil;
-import org.jboss.tools.project.examples.internal.discovery.JBossDiscoveryUi;
+import org.jboss.tools.discovery.core.internal.connectors.DiscoveryUtil;
+import org.jboss.tools.discovery.core.internal.connectors.JBossDiscoveryUi;
 import org.jboss.tools.project.examples.model.ProjectExample;
 import org.jboss.tools.project.examples.model.ProjectExampleCategory;
 import org.jboss.tools.project.examples.wizard.NewProjectExamplesWizard2;
@@ -820,7 +819,7 @@ public class GettingStartedPage extends AbstractJBossCentralPage implements Prox
 		addHyperlink(toolkit, documentationComposite, "JBoss developer website", "http://www.jboss.org/developer/");
 		addHyperlink(toolkit, documentationComposite, "User Forum", "http://community.jboss.org/en/tools?view=discussions");		
 		addHyperlink(toolkit, documentationComposite, "Developer Forum", "http://community.jboss.org/en/tools/dev?view=discussions");
-		addHyperlink(toolkit, documentationComposite, "Product documentation", ProjectExamplesActivator.getDefault().getConfigurator().getDocumentationUrl());
+		addHyperlink(toolkit, documentationComposite, "Product documentation", JBossCentralActivator.getDefault().getConfigurator().getDocumentationUrl());
 		addHyperlink(toolkit, documentationComposite, "Videos", "http://docs.jboss.org/tools/movies/");
 
 		documentationSection.setClient(documentationComposite);
