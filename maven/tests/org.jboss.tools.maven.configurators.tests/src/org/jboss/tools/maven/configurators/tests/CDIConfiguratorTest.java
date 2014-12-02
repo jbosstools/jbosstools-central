@@ -48,7 +48,7 @@ public class CDIConfiguratorTest extends AbstractMavenConfiguratorTest {
 
 	@Test
 	public void testJBIDE12558_unsupportedCdiVersion() throws Exception {
-		testCdiProject("unsupported-cdi-version", CDI_VERSION_DEFAULT);
+		testCdiProject("unsupported-cdi-version", CDI_VERSION_1_1);
 	}
 
 	@Test

@@ -116,6 +116,8 @@ public class SarProjectConfigurator extends AbstractProjectConfigurator {
 		WTPProjectsUtil.removeWTPClasspathContainer(project);
 		
 		fileCleaner.cleanUp();
+		
+		setModuleDependencies(project, mavenProject, monitor);
 	}
 
 	//TODO Fix/refactor that method from WTPProjectUtils in m2e-wtp 0.14.x
