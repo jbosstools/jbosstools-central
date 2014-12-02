@@ -90,7 +90,10 @@ import org.eclipse.m2e.core.embedder.IMavenConfiguration;
 import org.eclipse.m2e.core.internal.index.IndexManager;
 import org.eclipse.m2e.core.project.MavenUpdateRequest;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.custom.StyleRange;
+import org.eclipse.swt.events.ControlEvent;
+import org.eclipse.swt.events.ControlListener;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -293,12 +296,35 @@ public class ConfigureMavenRepositoriesWizardPage extends WizardPage implements 
         repositoriesGroup.setLayout(layout);
         repositoriesGroup.setLayoutData(gd);
         repositoriesGroup.setText("Repositories"); //$NON-NLS-1$
-	        
-        Composite includedRepositoriesComposite = new Composite(repositoriesGroup, SWT.NONE);
+
+        final ScrolledComposite sc = new ScrolledComposite(repositoriesGroup, SWT.H_SCROLL
+                | SWT.V_SCROLL);
+        gd = new GridData(SWT.FILL, SWT.FILL, true,false);
+        sc.setLayoutData(gd);
+        sc.setLayout(new GridLayout());
+
+        final Composite includedRepositoriesComposite = new Composite(sc, SWT.NONE);
         gd = new GridData(SWT.FILL, SWT.FILL, true, false);
         includedRepositoriesComposite.setLayoutData(gd);
         includedRepositoriesComposite.setLayout(new GridLayout(1, false));
-            
+        
+        sc.setContent(includedRepositoriesComposite);
+        sc.setAlwaysShowScrollBars(false);
+        sc.setExpandHorizontal(true);
+        sc.setExpandVertical(true);
+
+        includedRepositoriesComposite.addControlListener(new ControlListener() {
+
+                @Override
+                public void controlResized(ControlEvent e) {
+                        sc.setMinSize(includedRepositoriesComposite.computeSize(SWT.DEFAULT, SWT.DEFAULT));
+                }
+
+                @Override
+                public void controlMoved(ControlEvent e) {
+                }
+        });
+
 	    includedRepositoriesViewer = new TableViewer(includedRepositoriesComposite, SWT.BORDER | SWT.MULTI | SWT.H_SCROLL|SWT.V_SCROLL);
         gd = new GridData(SWT.FILL, SWT.FILL, true, false);
         gd.widthHint = 500;
@@ -536,6 +562,11 @@ public class ConfigureMavenRepositoriesWizardPage extends WizardPage implements 
 			addRepository(wrapper, pluginRepositoriesElement, true);
 		}
 		
+		configureActiveByDefault(activeByDefault, profileId);
+	}
+
+	private void configureActiveByDefault(boolean activeByDefault,
+			String profileId) {
 		if (activeByDefault) {
 
 			NodeList activeProfilesList = document
@@ -565,9 +596,19 @@ public class ConfigureMavenRepositoriesWizardPage extends WizardPage implements 
 				}
 			}
 			if (!activated) {
-				addElement(activeProfiles, ACTIVE_PROFILE, profileId);
+				addNewElement(activeProfiles, ACTIVE_PROFILE, profileId);
 			}
 		}
+	}
+	
+	protected Element addNewElement(Element element, String name, String value) {
+		Element child = document.createElement(name);
+		if (value != null) {
+			Text textNode = document.createTextNode(value);
+			child.appendChild(textNode);
+		}
+		element.appendChild(child);
+		return child;
 	}
 
 	private Element getElement(Element element, String name) {
@@ -672,6 +713,11 @@ public class ConfigureMavenRepositoriesWizardPage extends WizardPage implements 
 			repository = document.createElement(REPOSITORY_ELEMENT);
 		}
 		repos.appendChild(repository);
+		populateRepository(repository, wrapper);
+	}
+
+	private void populateRepository(Element repository,
+			RepositoryWrapper wrapper) {
 		addElement(repository, ID_ELEMENT, wrapper.getRepository().getId());
 		String name = wrapper.getRepository().getName();
 		if(name != null){
@@ -687,25 +733,53 @@ public class ConfigureMavenRepositoriesWizardPage extends WizardPage implements 
 			Element releases = addElement(repository, RELEASES_ELEMENT, null);
 			addElement(releases, ENABLED_ELEMENT, policy.isEnabled() ? "true" : "false");  //$NON-NLS-1$//$NON-NLS-2$
 			addElement(releases, UPDATE_POLICY_ELEMENT, policy.getUpdatePolicy());
-			repository.appendChild(releases);
 		}
 		policy = wrapper.getRepository().getSnapshots();
 		if (policy != null) {
 			Element snapshots = addElement(repository, SNAPSHOTS_ELEMENT, null);
 			addElement(snapshots, ENABLED_ELEMENT, policy.isEnabled() ? "true" : "false");  //$NON-NLS-1$//$NON-NLS-2$
 			addElement(snapshots, UPDATE_POLICY_ELEMENT,  policy.getUpdatePolicy());
-			repository.appendChild(snapshots);
 		}
 	}
 
 	protected Element addElement(Element element, String name, String value) {
-		Element child = document.createElement(name);
+		Element child = getElementsByTagName(element, name);
+		boolean isNew = false;
+		if (child == null) {
+			child = document.createElement(name);
+			isNew = true;
+		}
 		if (value != null) {
 			Text textNode = document.createTextNode(value);
-			child.appendChild(textNode);
+			if (!isNew) {
+				Node oldTextNode = child.getFirstChild();
+				if (oldTextNode != null) {
+					String oldValue = oldTextNode.getNodeValue();
+					if (!value.equals(oldValue)) {
+						child.replaceChild(textNode, oldTextNode);
+					}
+				} else {
+					child.appendChild(textNode);
+				}
+			} else {
+				child.appendChild(textNode);
+			}
 		}
-		element.appendChild(child);
+		if (isNew) {
+			element.appendChild(child);
+		}
 		return child;
+	}
+
+	private Element getElementsByTagName(Element element, String name) {
+		NodeList children = element.getElementsByTagName(name);
+		for (int i = 0; i < children.getLength(); i++) {
+			Node node = children.item(i);
+			if (node.getNodeType() == Node.ELEMENT_NODE) {
+				return (Element) node;
+			}
+		}
+		return null;
 	}
 
 	protected void removeRepository(RepositoryWrapper wrapper) {
@@ -750,6 +824,10 @@ public class ConfigureMavenRepositoriesWizardPage extends WizardPage implements 
 				}
 			}
 		}
+		removeActiveProfileId(profileId, profile);
+	}
+
+	private void removeActiveProfileId(String profileId, Element profile) {
 		NodeList profilesList = document.getElementsByTagName(PROFILES_ELEMENT);
 		Element profiles = (Element) profilesList.item(0);
 		profiles.removeChild(profile);
@@ -1276,14 +1354,116 @@ public class ConfigureMavenRepositoriesWizardPage extends WizardPage implements 
 		if (ok == Window.OK) {
 			RepositoryWrapper wrapper = dialog.getRepositoryWrapper();
 			includedRepositories.remove(selectedWrapper);
-			removeRepository(selectedWrapper);
-			addRepository(wrapper, dialog.isActiveByDefault());
+			//removeRepository(selectedWrapper);
+			//addRepository(wrapper, dialog.isActiveByDefault());
+			editRepository(selectedWrapper, wrapper, dialog.isActiveByDefault());
 			includedRepositories.add(wrapper);
 			setPageComplete(true);
 			refreshRepositories();
 		}
 	}
 	
+	private void editRepository(RepositoryWrapper selectedWrapper,
+			RepositoryWrapper wrapper, boolean activeByDefault) {
+		if (wrapper == null || wrapper.getProfileId() == null || wrapper.getRepository() == null) {
+			return;
+		}
+		String profileId = wrapper.getProfileId();
+		Element profile = getProfile(profileId);
+		Node repository = getRepository(selectedWrapper, REPOSITORIES_ELEMENT);
+		if (repository == null) {
+			removeRepository(selectedWrapper);
+			addRepository(wrapper, activeByDefault);
+			return;
+		} 
+		populateRepository((Element) repository, wrapper);
+		Node pluginRepository = getRepository(selectedWrapper, PLUGIN_REPOSITORIES_ELEMENT);
+		if (pluginRepository == null) {
+			Element repos = getElement(profile, PLUGIN_REPOSITORIES_ELEMENT);
+			addRepository(wrapper, repos, true);
+		} else {
+			populateRepository((Element) pluginRepository, wrapper);
+		}
+		if (!activeByDefault) {
+			removeActiveProfileId(profileId);
+		}
+		configureActiveByDefault(activeByDefault, profileId);
+	}
+
+	private void removeActiveProfileId(String profileId) {
+		NodeList activeProfilesList = document
+				.getElementsByTagName(ACTIVE_PROFILES);
+		Element activeProfiles = null;
+		if (activeProfilesList.getLength() > 0) {
+			activeProfiles = (Element) activeProfilesList.item(0);
+		}
+		if (activeProfiles != null) {
+			NodeList activeProfileList = activeProfiles.getChildNodes();
+			Node profileNode = null;
+			for (int i = 0; i < activeProfileList.getLength(); i++) {
+				Node node = activeProfileList.item(i);
+				if (node.getNodeType() == Node.ELEMENT_NODE
+						&& ACTIVE_PROFILE.equals(node.getNodeName())) {
+					String id = node.getTextContent();
+					if (id != null) {
+						id = id.trim();
+					}
+					if (profileId.equals(id)) {
+						profileNode = node;
+						break;
+					}
+				}
+			}
+			if (profileNode != null) {
+				activeProfiles.removeChild(profileNode);
+			}
+		}
+	}
+
+	private Node getRepository(RepositoryWrapper wrapper, String type) {
+		if (wrapper == null || wrapper.getProfileId() == null || wrapper.getRepository() == null || wrapper.getRepository().getUrl() == null) {
+			return null;
+		}
+		String url = wrapper.getRepository().getUrl();
+		String profileId = wrapper.getProfileId();
+		Element profile = getProfile(profileId);
+		if (profile == null) {
+			return null;
+		}
+		Element repositoriesElement = getElement(profile, type);
+		if (repositoriesElement != null) {
+			return getRepository(url, repositoriesElement, PLUGIN_REPOSITORIES_ELEMENT.equals(type));
+		}
+		return null;
+	}
+
+	private Node getRepository(String url, Element repos,
+			boolean isPluginRepository) {
+		NodeList repositoryNodeList = repos.getChildNodes();
+		int len = repositoryNodeList.getLength();
+		String name;
+		if (isPluginRepository) {
+			name = PLUGIN_REPOSITORY_ELEMENT;
+		} else {
+			name = REPOSITORY_ELEMENT;
+		}
+		Node repository = null;
+		for (int i = 0; i < len; i++) {
+			Node node = repositoryNodeList.item(i);
+			if (node.getNodeType() == Node.ELEMENT_NODE && name.equals(node.getNodeName())) {
+				String urlNode = getRepositoryUrl(node);
+				if (url != null && !url.endsWith(RepositoryWrapper.SEPARATOR)) {
+					url = url + RepositoryWrapper.SEPARATOR;
+				}
+				if (urlNode != null && urlNode.equals(url)) {
+					repository = node;
+					break;
+				}
+			}
+		}
+		return repository;
+	}
+
 	private void openAddRepositoryDialog() {
 		AddRepositoryDialog dialog = new AddRepositoryDialog(getShell(), availableRepositories, includedRepositories, maven, artifactKey);
 		dialog.setPreSelectedProfile(preSelectedProfileId);
