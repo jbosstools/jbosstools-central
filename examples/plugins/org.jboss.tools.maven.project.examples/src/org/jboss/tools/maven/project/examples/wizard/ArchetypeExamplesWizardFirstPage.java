@@ -47,7 +47,7 @@ import org.eclipse.ui.IWorkingSet;
 import org.eclipse.wst.server.core.IRuntimeLifecycleListener;
 import org.jboss.tools.maven.project.examples.MavenProjectExamplesActivator;
 import org.jboss.tools.maven.project.examples.Messages;
-import org.jboss.tools.project.examples.ProjectExamplesActivator;
+import org.jboss.tools.project.examples.internal.ProjectExamplesActivator;
 import org.jboss.tools.project.examples.model.ArchetypeModel;
 import org.jboss.tools.project.examples.model.ProjectExample;
 import org.jboss.tools.project.examples.model.ProjectExampleWorkingCopy;

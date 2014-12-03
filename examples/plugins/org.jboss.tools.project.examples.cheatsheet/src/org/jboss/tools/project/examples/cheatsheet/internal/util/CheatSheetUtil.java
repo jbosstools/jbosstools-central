@@ -100,9 +100,9 @@ import org.eclipse.wst.server.ui.actions.RunOnServerAction;
 import org.jboss.ide.eclipse.as.core.modules.SingleDeployableFactory;
 import org.jboss.ide.eclipse.as.core.util.ServerConverter;
 import org.jboss.tools.common.model.ui.editor.EditorPartWrapper;
-import org.jboss.tools.project.examples.ProjectExamplesActivator;
 import org.jboss.tools.project.examples.cheatsheet.Activator;
 import org.jboss.tools.project.examples.cheatsheet.Messages;
+import org.jboss.tools.project.examples.internal.ProjectExamplesActivator;
 import org.jboss.tools.project.examples.model.ProjectExampleUtil;
 import org.osgi.service.prefs.BackingStoreException;
 

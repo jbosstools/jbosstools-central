@@ -449,15 +449,11 @@ public class JBossCentralActivator extends AbstractUIPlugin {
 
 	public String getDescription(ProjectExample project) {
 		StringBuilder buffer = new StringBuilder();
-    if (project.getDescription() != null) {
-      buffer.append(project.getDescription());
-    }
-		buffer.append("\n\n");
-		buffer.append("Size: ");
+	    if (project.getDescription() != null) {
+	      buffer.append(project.getDescription());
+	    }
+		buffer.append("\n\nSize: ");
 		buffer.append(project.getSizeAsText());
-		if (project.getUnsatisfiedFixes() != null && project.getUnsatisfiedFixes().size() > 0) {
-			buffer.append("\n\n");
-		}
 		return buffer.toString();
 	}
 

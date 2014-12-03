@@ -32,8 +32,8 @@ import org.eclipse.core.runtime.content.IContentType;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
-import org.jboss.tools.project.examples.ProjectExamplesActivator;
 import org.jboss.tools.project.examples.cheatsheet.internal.util.CheatSheetUtil;
+import org.jboss.tools.project.examples.internal.ProjectExamplesActivator;
 import org.osgi.framework.BundleContext;
 
 /**

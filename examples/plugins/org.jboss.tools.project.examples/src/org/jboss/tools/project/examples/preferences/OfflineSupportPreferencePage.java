@@ -55,8 +55,8 @@ import org.eclipse.ui.browser.IWebBrowser;
 import org.eclipse.ui.browser.IWorkbenchBrowserSupport;
 import org.eclipse.ui.internal.browser.WebBrowserPreference;
 import org.eclipse.ui.internal.browser.WorkbenchBrowserSupport;
-import org.jboss.tools.project.examples.Messages;
-import org.jboss.tools.project.examples.ProjectExamplesActivator;
+import org.jboss.tools.project.examples.internal.Messages;
+import org.jboss.tools.project.examples.internal.ProjectExamplesActivator;
 import org.jboss.tools.project.examples.internal.offline.ExtractScriptJob;
 import org.jboss.tools.project.examples.model.IProjectExampleSite;
 import org.jboss.tools.project.examples.model.ProjectExampleUtil;
@@ -297,12 +297,12 @@ public class OfflineSupportPreferencePage extends PreferencePage implements
 		return descriptorUrls;
 	}
 
-	private Collection<String> getAsStringCollection(Collection<URL> urls) {
-		List<String> sUrls = new ArrayList<String>(urls.size());
-		for (URL u : urls) {
-		   sUrls.add(u.toString());
+	private Collection<String> getAsStringCollection(Collection<?> objects) {
+		List<String> collection = new ArrayList<String>(objects.size());
+		for (Object u : objects) {
+		   collection.add(u.toString());
 		}
-		return sUrls;
+		return collection;
 	}
 	
   @Override

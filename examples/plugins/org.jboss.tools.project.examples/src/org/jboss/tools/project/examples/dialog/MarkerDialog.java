@@ -62,9 +62,9 @@ import org.eclipse.ui.statushandlers.StatusAdapter;
 import org.eclipse.ui.statushandlers.StatusManager;
 import org.eclipse.ui.views.markers.WorkbenchMarkerResolution;
 import org.eclipse.ui.views.markers.internal.MarkerMessages;
-import org.jboss.tools.project.examples.Messages;
-import org.jboss.tools.project.examples.ProjectExamplesActivator;
 import org.jboss.tools.project.examples.dialog.xpl.QuickFixWizard;
+import org.jboss.tools.project.examples.internal.Messages;
+import org.jboss.tools.project.examples.internal.ProjectExamplesActivator;
 import org.jboss.tools.project.examples.model.ProjectExampleWorkingCopy;
 
 /**

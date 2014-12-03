@@ -13,7 +13,7 @@
 	<packaging>eclipse-test-plugin</packaging>
 
 	<properties>
-		<systemProperties>-Djbosstools.test.jboss.home.7.1.1=${requirementsDirectory}/jboss-as-7.1.1.Final -Djbosstools.test.jboss.home.eap.6.1=${requirementsDirectory}/jboss-eap-6.1 -Dorg.jboss.tools.tests.skipPrivateRequirements=false </systemProperties>
+		<systemProperties>-Djbosstools.test.jboss.home.7.1.1=${requirementsDirectory}/jboss-as-7.1.1.Final -Djbosstools.test.jboss.home.eap.6.1=${requirementsDirectory}/jboss-eap-6.1  -Dusage_reporting_enabled=false -Dorg.jboss.tools.central.donotshow=true -Dorg.jboss.tools.tests.skipPrivateRequirements=${skipPrivateRequirements}</systemProperties>
 	</properties>
 
 	<build>

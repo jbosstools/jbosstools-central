@@ -15,6 +15,8 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.jboss.tools.project.examples.fixes.IProjectExamplesFix;
+
 /**
  * Implementation of a ProjectExample designed to be mutable
  * 
@@ -23,7 +25,7 @@ import java.util.Set;
  */
 public class ProjectExampleWorkingCopy extends ProjectExample {
 
-	private List<ProjectFix> unsatisfiedFixes;
+	private List<IProjectExamplesFix> fixes;
 
 	private String exampleId;
 	
@@ -38,18 +40,18 @@ public class ProjectExampleWorkingCopy extends ProjectExample {
 		setDefaultProfiles(projectExample.getDefaultProfiles());
 		setDescription(projectExample.getDescription());
 		if (projectExample.getEssentialEnterpriseDependencyGavs() != null) {
-		  setEssentialEnterpriseDependencyGavs(new LinkedHashSet<String>(projectExample.getEssentialEnterpriseDependencyGavs()));
+		  setEssentialEnterpriseDependencyGavs(new LinkedHashSet<>(projectExample.getEssentialEnterpriseDependencyGavs()));
 		}
 		setFile(projectExample.getFile());
-		if (projectExample.getFixes() != null) {
-		  setFixes(new ArrayList<ProjectFix>(projectExample.getFixes()));
+		if (projectExample.getRequirements() != null) {
+		  setRequirements(new ArrayList<>(projectExample.getRequirements()));
 		}
 		setHeadLine(projectExample.getHeadLine());
 		setIconPath(projectExample.getIconPath());
 		setImportType(projectExample.getImportType());
 		setImportTypeDescription(projectExample.getImportTypeDescription());
 		if (projectExample.getIncludedProjects() != null) {
-			setIncludedProjects(new ArrayList<String>(projectExample.getIncludedProjects()));
+			setIncludedProjects(new ArrayList<>(projectExample.getIncludedProjects()));
 		}
 		setName(projectExample.getName());
 		setPerspectiveId(projectExample.getPerspectiveId());
@@ -61,12 +63,9 @@ public class ProjectExampleWorkingCopy extends ProjectExample {
 		setStacksId(projectExample.getStacksId());
 		setStacksType(projectExample.getStacksType());
 		if (projectExample.getTags() != null) {
-			setTags(new LinkedHashSet<String>(projectExample.getTags()));
+			setTags(new LinkedHashSet<>(projectExample.getTags()));
 		}
 		setType(projectExample.getType());
-		if (projectExample.getUnsatisfiedFixes() != null) {
-			setUnsatisfiedFixes(projectExample.getUnsatisfiedFixes());
-		}
 		setUrl(projectExample.getUrl());
 		setWelcome(projectExample.isWelcome());
 		setWelcomeFixRequired(projectExample.isWelcomeFixRequired());
@@ -82,12 +81,12 @@ public class ProjectExampleWorkingCopy extends ProjectExample {
 		}
 	}
 
-	public List<ProjectFix> getUnsatisfiedFixes() {
-		return unsatisfiedFixes;
+	public List<IProjectExamplesFix> getFixes() {
+		return fixes;
 	}
 
-	public void setUnsatisfiedFixes(List<ProjectFix> unsatisfiedFixes) {
-		this.unsatisfiedFixes = unsatisfiedFixes;
+	public void setFixes(List<IProjectExamplesFix> fixes) {
+		this.fixes = fixes;
 	}
 	
 	@Override
@@ -151,5 +150,15 @@ public class ProjectExampleWorkingCopy extends ProjectExample {
 
 	public void setExampleId(String exampleId) {
 		this.exampleId = exampleId;
+	}
+
+	@Override
+	public void setHeadLine(String headline) {
+		super.setHeadLine(headline);
+	}
+	
+	@Override
+	public void setWelcomeURL(String welcomeURL) {
+		super.setWelcomeURL(welcomeURL);
 	}
 }

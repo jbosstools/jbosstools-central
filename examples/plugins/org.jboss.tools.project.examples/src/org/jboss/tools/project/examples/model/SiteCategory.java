@@ -10,7 +10,7 @@
  ************************************************************************************/
 package org.jboss.tools.project.examples.model;
 
-import java.net.URL;
+import java.net.URI;
 import java.util.Set;
 
 /**
@@ -56,10 +56,10 @@ public class SiteCategory implements IProjectExampleSite {
 	public void setName(String name) {
 	}
 
-	public void setUrl(URL url) {
+	public void setUrl(URI url) {
 	}
 
-	public URL getUrl() {
+	public URI getUrl() {
 		return null;
 	}
 }

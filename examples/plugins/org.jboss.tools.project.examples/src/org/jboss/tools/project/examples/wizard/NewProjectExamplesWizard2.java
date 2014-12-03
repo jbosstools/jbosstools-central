@@ -37,8 +37,8 @@ import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.IWorkingSet;
 import org.eclipse.ui.PlatformUI;
-import org.jboss.tools.project.examples.Messages;
-import org.jboss.tools.project.examples.ProjectExamplesActivator;
+import org.jboss.tools.project.examples.internal.Messages;
+import org.jboss.tools.project.examples.internal.ProjectExamplesActivator;
 import org.jboss.tools.project.examples.model.ProjectExample;
 import org.jboss.tools.project.examples.model.ProjectExampleWorkingCopy;
 
@@ -80,7 +80,7 @@ public class NewProjectExamplesWizard2 extends Wizard implements INewWizard {
 			if (projectExample instanceof ProjectExampleWorkingCopy) {
 				this.projectExample = (ProjectExampleWorkingCopy)projectExample;
 			} else {
-				this.projectExample = projectExample.createWorkingCopy();
+				this.projectExample = ProjectExamplesActivator.getDefault().getProjectExampleManager().createWorkingCopy(projectExample);
 			}
 		}
 		setWindowTitle(Messages.NewProjectExamplesWizard_New_Project_Example);
@@ -104,12 +104,13 @@ public class NewProjectExamplesWizard2 extends Wizard implements INewWizard {
 					return false;
 				}
 				IStructuredSelection selection = mainPage.getSelection();
-				Iterator iterator = selection.iterator();
+				Iterator<?> iterator = selection.iterator();
 				while (iterator.hasNext()) {
 					Object object = iterator.next();
 					if (object instanceof ProjectExample) {
 						ProjectExample project = (ProjectExample) object;
-						selectedProjects.add(project.createWorkingCopy());
+						ProjectExampleWorkingCopy copy = ProjectExamplesActivator.getDefault().getProjectExampleManager().createWorkingCopy(project);
+						selectedProjects.add(copy);
 					}
 				}
 			} else {

@@ -13,6 +13,7 @@ package org.jboss.tools.maven.project.examples.wizard;
 import static org.jboss.tools.stacks.core.model.StacksUtil.getArchetype;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -23,6 +24,7 @@ import java.util.Set;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.IJobChangeEvent;
 import org.eclipse.core.runtime.jobs.Job;
@@ -59,9 +61,11 @@ import org.jboss.tools.maven.project.examples.MavenProjectExamplesActivator;
 import org.jboss.tools.maven.project.examples.Messages;
 import org.jboss.tools.maven.project.examples.internal.stacks.StacksArchetypeUtil;
 import org.jboss.tools.maven.project.examples.utils.MavenArtifactHelper;
+import org.jboss.tools.project.examples.fixes.AbstractRuntimeFix;
+import org.jboss.tools.project.examples.fixes.IDownloadRuntimeProvider;
+import org.jboss.tools.project.examples.fixes.IProjectExamplesFix;
 import org.jboss.tools.project.examples.model.ArchetypeModel;
 import org.jboss.tools.project.examples.model.ProjectExampleWorkingCopy;
-import org.jboss.tools.project.examples.model.ProjectFix;
 import org.jboss.tools.runtime.core.RuntimeCoreActivator;
 import org.jboss.tools.runtime.core.model.DownloadRuntime;
 import org.jboss.tools.stacks.core.model.StacksUtil;
@@ -72,7 +76,7 @@ public class NewProjectExamplesStacksRequirementsPage extends MavenExamplesRequi
 
 	private static final String TARGET_RUNTIME = "targetRuntime"; //$NON-NLS-1$
 
-	private Map<ArchetypeVersion, IStatus> enterpriseRepoStatusMap = new HashMap<ArchetypeVersion, IStatus>();
+	private Map<ArchetypeVersion, IStatus> enterpriseRepoStatusMap = new HashMap<>();
 
 	private org.jboss.jdf.stacks.model.Archetype stacksArchetype;   
 
@@ -100,7 +104,7 @@ public class NewProjectExamplesStacksRequirementsPage extends MavenExamplesRequi
 	
 	public NewProjectExamplesStacksRequirementsPage(ProjectExampleWorkingCopy projectExample) {
 		super(PAGE_NAME, projectExample);
-	    fieldsWithHistory = new HashMap<String, List<Combo>>();
+	    fieldsWithHistory = new HashMap<>();
 	    stacks = MavenProjectExamplesActivator.getDefault().getCachedStacks();
 	    initDialogSettings();
 	}
@@ -382,31 +386,6 @@ public class NewProjectExamplesStacksRequirementsPage extends MavenExamplesRequi
 			serverTargetCombo.select(selectedRuntimeIdx);
 		}
 	}
-		
-	protected List<DownloadRuntime> getDownloadRuntimes(ProjectFix fix) {
-		if (ProjectFix.WTP_RUNTIME.equals(fix.getType())) {
-			List<Runtime> stacksRuntimes = StacksUtil.getCompatibleServerRuntimes(stacksArchetype, stacks);
-			if (stacksRuntimes != null && !stacksRuntimes.isEmpty()) {
-				List<DownloadRuntime> downloadableRuntimes = new ArrayList<DownloadRuntime>(stacksRuntimes.size());
-				for (Runtime r : stacksRuntimes) {
-					DownloadRuntime dr = RuntimeCoreActivator.getDefault().findDownloadRuntime(r.getId());
-					if (dr == null){
-						String downloadUrl = StacksUtil.isEnterprise(r)?null:r.getUrl();
-						dr = new DownloadRuntime(r.getId(),
-								r.getName(), 
-								r.getVersion(), 
-								downloadUrl);
-						dr.setDisclaimer(!StacksUtil.isEnterprise(r));
-						dr.setHumanUrl(r.getUrl());
-                    } 
-                    downloadableRuntimes.add(dr);
-				}
-				return downloadableRuntimes;
-			}
-		}
-		return super.getDownloadRuntimes(fix);
-	}
-
 	
 	protected Map<String, IRuntime> getServerRuntimes(
 			IProjectFacetVersion facetVersion) {
@@ -417,7 +396,7 @@ public class NewProjectExamplesStacksRequirementsPage extends MavenExamplesRequi
 			runtimesSet = RuntimeManager.getRuntimes(Collections.singleton(facetVersion));
 		}
 		
-		Map<String, IRuntime> runtimesMap = new LinkedHashMap<String, IRuntime>();
+		Map<String, IRuntime> runtimesMap = new LinkedHashMap<>();
 		for (org.eclipse.wst.common.project.facet.core.runtime.IRuntime r : runtimesSet) {
 			IRuntime serverRuntime = FacetUtil.getRuntime(r);
 			if (serverRuntime != null) {
@@ -565,7 +544,7 @@ public class NewProjectExamplesStacksRequirementsPage extends MavenExamplesRequi
 	    for(Map.Entry<String, List<Combo>> e : fieldsWithHistory.entrySet()) {
 	      String id = e.getKey();
 
-	      Set<String> history = new LinkedHashSet<String>(MAX_HISTORY);
+	      Set<String> history = new LinkedHashSet<>(MAX_HISTORY);
 
 	      for(Combo combo : e.getValue()) {
 	        String lastValue = combo.getText();
@@ -589,7 +568,7 @@ public class NewProjectExamplesStacksRequirementsPage extends MavenExamplesRequi
 	    if(combo != null) {
 	      List<Combo> combos = fieldsWithHistory.get(id);
 	      if(combos == null) {
-	        combos = new ArrayList<Combo>();
+	        combos = new ArrayList<>();
 	        fieldsWithHistory.put(id, combos);
 	      }
 	      combos.add(combo);
@@ -649,4 +628,77 @@ public class NewProjectExamplesStacksRequirementsPage extends MavenExamplesRequi
 		}
 	}
 
+	
+	@Override
+	protected IProjectExamplesFix getSelectedProjectFix() {
+		IProjectExamplesFix fix = super.getSelectedProjectFix();
+		if (fix instanceof AbstractRuntimeFix) {
+			return new StacksBasedRuntimeFix((AbstractRuntimeFix)fix);
+		}
+		return fix;
+	}
+	
+	private class StacksBasedRuntimeFix implements IProjectExamplesFix, IDownloadRuntimeProvider {
+		
+		private AbstractRuntimeFix delegate;
+
+		StacksBasedRuntimeFix(AbstractRuntimeFix delegate) {
+			this.delegate = delegate;
+		}
+
+		@Override
+		public boolean isSatisfied() {
+			return delegate.isSatisfied();
+		}
+
+		@Override
+		public boolean fix(IProgressMonitor monitor) {
+			return delegate.fix(monitor);
+		}
+
+		@Override
+		public Collection<DownloadRuntime> getDownloadRuntimes(IProgressMonitor monitor) {
+			
+			List<Runtime> stacksRuntimes = StacksUtil.getCompatibleServerRuntimes(stacksArchetype, stacks);
+			if (stacksRuntimes != null && !stacksRuntimes.isEmpty()) {
+				List<DownloadRuntime> downloadableRuntimes = new ArrayList<>(stacksRuntimes.size());
+				for (Runtime r : stacksRuntimes) {
+					DownloadRuntime dr = RuntimeCoreActivator.getDefault().findDownloadRuntime(r.getId(), monitor);
+					if (dr == null){
+						String downloadUrl = StacksUtil.isEnterprise(r)?null:r.getUrl();
+						dr = new DownloadRuntime(r.getId(),
+								r.getName(), 
+								r.getVersion(), 
+								downloadUrl);
+						dr.setDisclaimer(!StacksUtil.isEnterprise(r));
+						dr.setHumanUrl(r.getUrl());
+                    } 
+                    downloadableRuntimes.add(dr);
+				}
+				return downloadableRuntimes;
+			}
+			return delegate.getDownloadRuntimes(monitor);
+		}
+
+		@Override
+		public String getType() {
+			return delegate.getType();
+		}
+
+		@Override
+		public String getDescription() {
+			return delegate.getDescription();
+		}
+
+		@Override
+		public String getLabel() {
+			return delegate.getLabel();
+		}
+
+		@Override
+		public boolean isRequired() {
+			return delegate.isRequired();
+		}
+	}
+	
 }

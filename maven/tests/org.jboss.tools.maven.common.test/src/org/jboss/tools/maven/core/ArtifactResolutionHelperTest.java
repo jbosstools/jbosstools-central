@@ -83,9 +83,9 @@ public class ArtifactResolutionHelperTest {
 
 	}
 
-	private void assertResolved(String coordinates) throws Exception {
-		assertResolved(coordinates, repositories);
-	}
+//	private void assertResolved(String coordinates) throws Exception {
+//		assertResolved(coordinates, repositories);
+//	}
 
 	private void assertResolved(String coordinates, List<ArtifactRepository> repos) throws Exception {
 		assertTrue(coordinates + " should be resolved", resolutionService.isResolved(coordinates, repos, monitor));

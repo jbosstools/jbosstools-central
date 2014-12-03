@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.2"?>
+<plugin>
+      <extension
+         point="org.jboss.tools.project.examples.projectFixProvider">
+         <projectFixProvider
+            name="Fix Missing Seam requirements"
+            class="org.jboss.tools.project.examples.seam.internal.fixes.SeamProjectFixProvider"
+            type="seam">
+         </projectFixProvider>
+         </extension>
+</plugin>

@@ -14,7 +14,7 @@
 	<packaging>pom</packaging>
 	<modules>
 		<module>org.jboss.tools.maven.configurators.tests</module>
-    <module>org.jboss.tools.maven.conversion.test</module>
+    	<module>org.jboss.tools.maven.conversion.test</module>
 		<module>org.jboss.tools.maven.common.test</module>
 		<module>org.jboss.tools.maven.sourcelookup.test</module>
 	</modules>

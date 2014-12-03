@@ -13,26 +13,43 @@ package org.jboss.tools.project.examples.model;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.jboss.tools.project.examples.Messages;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlTransient;
+
+import org.jboss.tools.project.examples.internal.Messages;
 
 /**
  * @author snjeza
  * 
  */
+@XmlRootElement(name = "category")
+@XmlAccessorType (XmlAccessType.PROPERTY)
 public class ProjectExampleCategory implements ProjectModelElement, Comparable<ProjectExampleCategory> {
 
-	private String name;
-	private List<ProjectExample> projects = new ArrayList<ProjectExample>();
-	private IProjectExampleSite site;
-	private String description;
-	private int priority;
-	public static ProjectExampleCategory OTHER = new ProjectExampleCategory(Messages.Category_Other);
+	public static String OTHER = Messages.Category_Other;
 
-	public ProjectExampleCategory(String name) {
+	private String name;
+	
+	@XmlTransient
+	private List<ProjectExample> projects = new ArrayList<>();
+	
+	private String description;
+	
+	private int priority = Integer.MAX_VALUE -1 ;
+
+	public ProjectExampleCategory() {
 		super();
-		this.name = name;
+	}
+	
+	public ProjectExampleCategory(String name) {
+		this();
+		setName(name);
 	}
 
+	@XmlAttribute
 	public String getName() {
 		return name;
 	}
@@ -49,22 +66,17 @@ public class ProjectExampleCategory implements ProjectModelElement, Comparable<P
 		this.projects = projects;
 	}
 
+	@XmlAttribute
 	public String getDescription() {
 		return description;
 	}
 
+	@XmlAttribute
 	public String getShortDescription() {
 		return getName();
 	}
 
-	public IProjectExampleSite getSite() {
-		return site;
-	}
-
-	public void setSite(IProjectExampleSite site) {
-		this.site = site;
-	}
-
+	@XmlAttribute
 	public int getPriority() {
 		return priority;
 	}
@@ -81,8 +93,9 @@ public class ProjectExampleCategory implements ProjectModelElement, Comparable<P
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
+		result = prime * result + ((description == null) ? 0 : description.hashCode());
 		result = prime * result + ((name == null) ? 0 : name.hashCode());
-		result = prime * result + ((site == null) ? 0 : site.hashCode());
+		result = prime * result + priority;
 		return result;
 	}
 
@@ -100,10 +113,7 @@ public class ProjectExampleCategory implements ProjectModelElement, Comparable<P
 				return false;
 		} else if (!name.equals(other.name))
 			return false;
-		if (site == null) {
-			if (other.site != null)
-				return false;
-		} else if (!site.equals(other.site))
+		if (priority != other.priority)
 			return false;
 		return true;
 	}
@@ -119,13 +129,18 @@ public class ProjectExampleCategory implements ProjectModelElement, Comparable<P
 			return -1;
 		if (name == null)
 			return -1;
+		
+		if (OTHER.equals(name)) {
+			return 1;
+		}
+		
 		return name.compareTo(o.getName());
 	}
 
 	@Override
 	public String toString() {
 		return "ProjectExampleCategory [name=" + name + ", description=" //$NON-NLS-1$ //$NON-NLS-2$
-				+ description + ", site=" + site + ", priority=" + priority  //$NON-NLS-1$//$NON-NLS-2$
+				+ description + ", priority=" + priority  //$NON-NLS-1$//$NON-NLS-2$
 				+ "]"; //$NON-NLS-1$
 	}
 

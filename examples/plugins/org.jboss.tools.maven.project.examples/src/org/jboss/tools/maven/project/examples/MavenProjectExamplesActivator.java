@@ -40,7 +40,7 @@ import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.jboss.jdf.stacks.model.Stacks;
 import org.jboss.tools.maven.project.examples.offline.MavenOfflinePropertyChangeListener;
 import org.jboss.tools.maven.project.examples.xpl.UpdateMavenProjectJob;
-import org.jboss.tools.project.examples.ProjectExamplesActivator;
+import org.jboss.tools.project.examples.internal.ProjectExamplesActivator;
 import org.jboss.tools.stacks.core.model.StacksManager;
 import org.jboss.tools.stacks.core.model.StacksManager.StacksType;
 import org.osgi.framework.BundleContext;

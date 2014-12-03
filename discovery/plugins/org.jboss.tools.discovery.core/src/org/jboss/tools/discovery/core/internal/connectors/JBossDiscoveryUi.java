@@ -41,7 +41,7 @@ import org.jboss.tools.usage.event.UsageReporter;
  */
 public class JBossDiscoveryUi {
 	
-	private static final String MPC_CORE_PLUGIN_ID = "org.eclipse.epp.mpc.core"; //$NON-NLS-1$
+	//private static final String MPC_CORE_PLUGIN_ID = "org.eclipse.epp.mpc.core"; //$NON-NLS-1$
 
 	public static boolean install(List<ConnectorDescriptor> descriptors, IRunnableContext context) {
 		try {

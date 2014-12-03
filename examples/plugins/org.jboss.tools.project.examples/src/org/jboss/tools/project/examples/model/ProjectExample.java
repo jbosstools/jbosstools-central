@@ -12,24 +12,36 @@ package org.jboss.tools.project.examples.model;
 
 import java.io.File;
 import java.math.BigDecimal;
-import java.net.URL;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 
-import org.jboss.tools.project.examples.ProjectExamplesActivator;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlElementWrapper;
+import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlTransient;
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+
+import org.jboss.tools.project.examples.internal.ProjectExamplesActivator;
+import org.jboss.tools.project.examples.internal.model.XmlUnMarshallers.StringToListUnMarshaller;
+import org.jboss.tools.project.examples.internal.model.XmlUnMarshallers.StringToSetUnMarshaller;
 
 /**
  * @author snjeza
  * 
  */
+@XmlRootElement(name = "project")
+@XmlAccessorType (XmlAccessType.FIELD)
 public class ProjectExample implements ProjectModelElement,
 		Comparable<ProjectExample> {
-
-	public static final String IMPORT_TYPE_ZIP = "zip"; //$NON-NLS-1$
 	private static final String SEP = "/"; //$NON-NLS-1$
 	private static String[] PREFIXES = { "file:", "http:", "https:", "ftp:" }; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+	public static final String IMPORT_TYPE_ZIP = "zip"; //$NON-NLS-1$
 	//name acts as example id
 	private String name;
 	//headline used in project wizards
@@ -39,23 +51,35 @@ public class ProjectExample implements ProjectModelElement,
 	private String description;
 	private String url;
 	private long size;
-	private ProjectExampleCategory category;
+	private String category = ProjectExampleCategory.OTHER;
+	@XmlElement(name="included-projects")
+	@XmlJavaTypeAdapter(StringToListUnMarshaller.class)
 	private List<String> includedProjects;
 	private boolean welcome;
 	private String type;
 	private String welcomeURL;
 	private boolean welcomeFixRequired = true;
-	private List<ProjectFix> fixes = new ArrayList<ProjectFix>();
-	private List<ProjectFix> unsatisfiedFixes;
+	@XmlElementWrapper(name = "fixes")
+	@XmlElement(name = "fix")
+	private List<RequirementModel> requirements;
 	private String perspectiveId;
 	private String importType;
 	private String importTypeDescription;
+	@XmlElement(name="mavenArchetype")
 	private ArchetypeModel archetypeModel;
 	private File file;
+	
+	@XmlTransient
 	private IProjectExampleSite site;
+	
+	@XmlElement(name="defaultMavenProfiles")
 	private String defaultProfiles = ""; //$NON-NLS-1$
 	private int priority;
+
+	@XmlJavaTypeAdapter(StringToSetUnMarshaller.class)
 	private Set<String> tags;
+
+	@XmlJavaTypeAdapter(StringToSetUnMarshaller.class)
 	private Set<String> essentialEnterpriseDependencies;
 	private String iconPath;
 	private String sourceLocation;
@@ -69,7 +93,6 @@ public class ProjectExample implements ProjectModelElement,
 		welcome = false;
 		perspectiveId = null;
 		importType = IMPORT_TYPE_ZIP;
-		setCategory(ProjectExampleCategory.OTHER);
 	}
 
 	public String getName() {
@@ -109,7 +132,7 @@ public class ProjectExample implements ProjectModelElement,
 		if (site == null) {
 			return url;
 		}
-		URL siteURL = site.getUrl();
+		URI siteURL = site.getUrl();
 		if (siteURL == null) {
 			return url;
 		}
@@ -140,11 +163,11 @@ public class ProjectExample implements ProjectModelElement,
 		this.size = size;
 	}
 
-	public ProjectExampleCategory getCategory() {
+	public String getCategory() {
 		return category;
 	}
 
-	void setCategory(ProjectExampleCategory category) {
+	void setCategory(String category) {
 		this.category = category;
 	}
 
@@ -154,11 +177,11 @@ public class ProjectExample implements ProjectModelElement,
 		BigDecimal MB = new BigDecimal(1024 * 1024);
 		BigDecimal KB = new BigDecimal(1024);
 		if (sizeDecimal.compareTo(MB) > 0) {
-			sizeString = String.format("%5.2fM", sizeDecimal.divide(MB)); //$NON-NLS-1$
+			sizeString = String.format(Locale.US,"%5.2fMB", sizeDecimal.divide(MB)); //$NON-NLS-1$
 		} else if (sizeDecimal.compareTo(KB) > 0) {
-			sizeString = String.format("%5.2fK", sizeDecimal.divide(KB)); //$NON-NLS-1$
+			sizeString = String.format(Locale.US,"%5.2fKB", sizeDecimal.divide(KB)); //$NON-NLS-1$
 		} else {
-			sizeString = String.format("%d", size); //$NON-NLS-1$
+			sizeString = String.format("%db", size); //$NON-NLS-1$
 		}
 		return sizeString;
 	}
@@ -191,7 +214,7 @@ public class ProjectExample implements ProjectModelElement,
 		return (welcomeURL == null) ? "" : welcomeURL;
 	}
 
-	public void setWelcomeURL(String welcomeURL) {
+	void setWelcomeURL(String welcomeURL) {
 		this.welcomeURL = welcomeURL;
 	}
 
@@ -203,20 +226,15 @@ public class ProjectExample implements ProjectModelElement,
 		this.site = site;
 	}
 
-	public List<ProjectFix> getFixes() {
-		return fixes;
+	public List<RequirementModel> getRequirements() {
+		if (requirements == null) {
+			requirements = new ArrayList<>();
+		}
+		return requirements;
 	}
 
-	void setFixes(List<ProjectFix> fixes) {
-		this.fixes = fixes;
-	}
-
-	public List<ProjectFix> getUnsatisfiedFixes() {
-		return unsatisfiedFixes;
-	}
-
-	public void setUnsatisfiedFixes(List<ProjectFix> unsatisfiedFixes) {
-		this.unsatisfiedFixes = unsatisfiedFixes;
+	void setRequirements(List<RequirementModel> requirements) {
+		this.requirements = requirements;
 	}
 
 	public String getPerspectiveId() {
@@ -302,7 +320,7 @@ public class ProjectExample implements ProjectModelElement,
 		return false;
 	}
 
-	public void setIconPath(String path) {
+	void setIconPath(String path) {
 		this.iconPath = path;
 	}
 
@@ -323,25 +341,15 @@ public class ProjectExample implements ProjectModelElement,
 		if (o == null) {
 			return -1;
 		}
-		ProjectExampleCategory otherCategory = o.getCategory();
-		if (otherCategory == null && this.category == null) {
-			return 0;
+		int other = o.getPriority();
+		if (other < this.priority)
+			return 1;
+		else if (other > this.priority)
+			return -1;
+		if (name == null) {
+			return -1;
 		}
-		if (this.category != null) {
-			if (this.category.compareTo(otherCategory) != 0) {
-				return this.category.compareTo(otherCategory);
-			}
-			int other = o.getPriority();
-			if (other < this.priority)
-				return 1;
-			else if (other > this.priority)
-				return -1;
-			if (name == null) {
-				return -1;
-			}
-			return name.compareTo(o.getName());
-		}
-		return -1;
+		return name.compareTo(o.getName());
 	}
 	
 
@@ -385,7 +393,7 @@ public class ProjectExample implements ProjectModelElement,
 		return headLine;
 	}
 
-	public void setHeadLine(String headLine) {
+	void setHeadLine(String headLine) {
 		this.headLine = headLine;
 	}
 
@@ -403,7 +411,4 @@ public class ProjectExample implements ProjectModelElement,
 		return stacksType;
 	}
 
-	public ProjectExampleWorkingCopy createWorkingCopy() {
-		return new ProjectExampleWorkingCopy(this);
-	}
 }

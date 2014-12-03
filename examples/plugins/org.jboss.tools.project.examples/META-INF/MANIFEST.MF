@@ -3,7 +3,7 @@ Bundle-ManifestVersion: 2
 Bundle-Name: %BundleName
 Bundle-SymbolicName: org.jboss.tools.project.examples;singleton:=true
 Bundle-Version: 3.0.0.qualifier
-Bundle-Activator: org.jboss.tools.project.examples.ProjectExamplesActivator
+Bundle-Activator: org.jboss.tools.project.examples.internal.ProjectExamplesActivator
 Bundle-Vendor: %BundleVendor
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
@@ -50,8 +50,7 @@ Require-Bundle: org.eclipse.ui,
  org.jboss.tools.usage;bundle-version="2.0.0",
  org.jboss.ide.eclipse.as.wtp.core,
  org.jboss.tools.discovery.core;bundle-version="1.0.0",
- org.jboss.tools.seam.core;bundle-version="3.6.0",
- org.jboss.tools.portlet.core;bundle-version="1.6.0"
+ org.eclipse.ui.editors
 Bundle-ActivationPolicy: lazy
 Bundle-Localization: plugin
 Export-Package: org.jboss.tools.project.examples,
@@ -59,9 +58,12 @@ Export-Package: org.jboss.tools.project.examples,
  org.jboss.tools.project.examples.dialog,
  org.jboss.tools.project.examples.dialog.xpl,
  org.jboss.tools.project.examples.fixes,
+ org.jboss.tools.project.examples.internal;x-friends:="org.jboss.tools.project.examples.test",
+ org.jboss.tools.project.examples.internal.fixes;x-friends:="org.jboss.tools.project.examples.test",
+ org.jboss.tools.project.examples.internal.model;x-friends:="org.jboss.tools.project.examples.test",
  org.jboss.tools.project.examples.model,
  org.jboss.tools.project.examples.preferences,
  org.jboss.tools.project.examples.runtimes,
  org.jboss.tools.project.examples.wizard
-Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 

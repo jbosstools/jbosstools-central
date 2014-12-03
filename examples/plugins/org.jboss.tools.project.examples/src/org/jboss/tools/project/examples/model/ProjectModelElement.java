@@ -19,5 +19,4 @@ public interface ProjectModelElement {
 	public String getName();
 	public String getDescription();
 	public String getShortDescription();
-	public IProjectExampleSite getSite();
 }

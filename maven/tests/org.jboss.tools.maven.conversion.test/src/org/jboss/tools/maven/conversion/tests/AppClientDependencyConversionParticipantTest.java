@@ -16,7 +16,6 @@ import org.apache.maven.model.Build;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Plugin;
 import org.eclipse.core.resources.IProject;
-import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.jboss.tools.maven.conversion.ui.internal.AbstractReferenceConversionParticipant;
 import org.junit.Test;

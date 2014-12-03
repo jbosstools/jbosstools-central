@@ -128,27 +128,15 @@ public class ConfigureMavenRepositoriesWizardPage extends WizardPage implements 
 
 	private static final String REPOSITORY_APACHE_ORG_ID = "repository-apache-org"; //$NON-NLS-1$
 	
-	private static final String REPOSITORY_APACHE_ORG_PROFILE_ID = REPOSITORY_APACHE_ORG_ID;
-
 	private static final String COM_SPRINGSOURCE_REPOSITORY_BUNDLES_EXTERNAL_ID = "com-springsource-repository-bundles-external"; //$NON-NLS-1$
 
-	private static final String COM_SPRINGSOURCE_REPOSITORY_BUNDLES_EXTERNAL_PROFILE_ID = COM_SPRINGSOURCE_REPOSITORY_BUNDLES_EXTERNAL_ID;
-	
 	private static final String COM_SPRINGSOURCE_REPOSITORY_BUNDLES_RELEASE_ID = "com-springsource-repository-bundles-release"; //$NON-NLS-1$
 
-	private static final String COM_SPRINGSOURCE_REPOSITORY_BUNDLES_RELEASE_PROFILE_ID = COM_SPRINGSOURCE_REPOSITORY_BUNDLES_RELEASE_ID;
-	
 	private static final String JAVA_NET_PUBLIC_ID = "java-net-public"; //$NON-NLS-1$
 	
-	private static final String JAVA_NET_PUBLIC_PROFILE_ID = JAVA_NET_PUBLIC_ID;
-
 	private static final String JBOSS_PUBLIC_REPOSITORY_ID = "jboss-public-repository"; //$NON-NLS-1$
 	
-	private static final String JBOSS_PUBLIC_REPOSITORY_PROFILE_ID = JBOSS_PUBLIC_REPOSITORY_ID;
-
 	private static final String RED_HAT_TECHPREVIEW_ALL_REPOSITORY_ID = "redhat-techpreview-all-repository";//$NON-NLS-1$
-	
-	private static final String RED_HAT_TECHPREVIEW_ALL_REPOSITORY_PROFILE_ID = RED_HAT_TECHPREVIEW_ALL_REPOSITORY_ID; 
 	
 	private static final String ERROR_TITLE = "Error";
 

@@ -14,7 +14,7 @@ import java.io.File;
 import java.net.URL;
 
 import org.eclipse.core.runtime.Platform;
-import org.jboss.tools.project.examples.ProjectExamplesActivator;
+import org.jboss.tools.project.examples.internal.ProjectExamplesActivator;
 
 /**
  * Utility class related to offline support

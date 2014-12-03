@@ -51,16 +51,15 @@ import org.eclipse.swt.widgets.Tree;
 import org.eclipse.ui.dialogs.FilteredTree;
 import org.eclipse.ui.model.AdaptableList;
 import org.eclipse.wst.server.core.IRuntimeType;
-import org.jboss.tools.project.examples.Messages;
-import org.jboss.tools.project.examples.ProjectExamplesActivator;
-import org.jboss.tools.project.examples.fixes.WTPRuntimeFix;
+import org.jboss.tools.project.examples.internal.Messages;
+import org.jboss.tools.project.examples.internal.ProjectExamplesActivator;
+import org.jboss.tools.project.examples.internal.fixes.WTPRuntimeFix;
 import org.jboss.tools.project.examples.model.IImportProjectExample;
 import org.jboss.tools.project.examples.model.IProjectExampleSite;
 import org.jboss.tools.project.examples.model.ProjectExample;
 import org.jboss.tools.project.examples.model.ProjectExampleCategory;
 import org.jboss.tools.project.examples.model.ProjectExampleUtil;
 import org.jboss.tools.project.examples.model.ProjectExampleWorkingCopy;
-import org.jboss.tools.project.examples.model.ProjectFix;
 import org.jboss.tools.project.examples.runtimes.RuntimeUtils;
 
 /**
@@ -188,7 +187,7 @@ public class NewProjectExamplesMainPage extends WizardPage {
 				Object selected = selection.getFirstElement();
 				String projectType = null;
 				if (selected instanceof ProjectExample && selection.size() == 1) {
-					selectedProject = ((ProjectExample) selected).createWorkingCopy();
+					selectedProject = ProjectExamplesActivator.getDefault().getProjectExampleManager().createWorkingCopy((ProjectExample) selected);
 					descriptionText.setText(selectedProject.getDescription());
 					projectName.setText(selectedProject.getName());
 					projectURL.setText(selectedProject.getUrl());
@@ -456,13 +455,13 @@ public class NewProjectExamplesMainPage extends WizardPage {
 	public boolean refresh(boolean force) {
 		boolean canFinish = false;
 		
-		Iterator iterator = selection.iterator();
+		Iterator<?> iterator = selection.iterator();
 		while (iterator.hasNext()) {
 			Object object = iterator.next();
 			if (object instanceof ProjectExample) {
 				// FIXME
 				canFinish=true;
-				ProjectExampleWorkingCopy project = ((ProjectExample) object).createWorkingCopy();
+				ProjectExampleWorkingCopy project = ProjectExamplesActivator.getDefault().getProjectExampleManager().createWorkingCopy((ProjectExample) object);
 				String importType = project.getImportType();
 				if (!ProjectExample.IMPORT_TYPE_ZIP.equals(importType) && importType != null && importType.length() > 0) {
 					IImportProjectExample importProjectExample = ProjectExamplesActivator.getDefault().getImportProjectExample(importType);
@@ -474,21 +473,7 @@ public class NewProjectExamplesMainPage extends WizardPage {
 						//setDefaultNote();
 					}
 				}
-				if (force || project.getUnsatisfiedFixes() == null) {
-					List<ProjectFix> fixes = project.getFixes();
-					List<ProjectFix> unsatisfiedFixes = new ArrayList<ProjectFix>();
-					project.setUnsatisfiedFixes(unsatisfiedFixes);
-					for (ProjectFix fix:fixes) {
-						if (!ProjectExamplesActivator.canFix(project, fix)) {
-							unsatisfiedFixes.add(fix);
-						}
-					}
-				}
-				if (project.getUnsatisfiedFixes().size() > 0) {
-					// FIXME
-				} else {
-					
-				}
+				
 
 			} else {
 				canFinish=false;

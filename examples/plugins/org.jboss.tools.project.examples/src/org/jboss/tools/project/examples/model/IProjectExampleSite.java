@@ -10,7 +10,7 @@
  ************************************************************************************/
 package org.jboss.tools.project.examples.model;
 
-import java.net.URL;
+import java.net.URI;
 
 public interface IProjectExampleSite {
 	public String getName();
@@ -25,7 +25,7 @@ public interface IProjectExampleSite {
 
 	public void setName(String name);
 
-	public void setUrl(URL url);
+	public void setUrl(URI url);
 
-	public URL getUrl();
+	public URI getUrl();
 }

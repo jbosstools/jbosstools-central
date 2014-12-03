@@ -1,0 +1,10 @@
+<categories>
+  <category name="Mobile Applications"
+    description="These quickstarts are aimed to get you up to writing mobile applications with minimal fuss."
+    priority="35" />
+  <category name="Portal Examples" />
+  <category name="Other" />
+  <category name="Web Applications"
+    description="These quickstarts are aimed to get you up to writing web applications with minimal fuss."
+    priority="1" />
+</categories>

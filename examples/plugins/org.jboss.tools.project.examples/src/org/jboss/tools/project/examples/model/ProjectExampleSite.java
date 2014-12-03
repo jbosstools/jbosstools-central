@@ -10,24 +10,35 @@
  ************************************************************************************/
 package org.jboss.tools.project.examples.model;
 
-import java.net.URL;
+import java.net.URI;
 
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlRootElement;
+
+@XmlAccessorType (XmlAccessType.FIELD)
+@XmlRootElement(name="site")
 public class ProjectExampleSite implements IProjectExampleSite {
-	private URL url;
+	@XmlAttribute
+	private URI url;
+	
+	@XmlAttribute
 	private String name;
+	
+	@XmlAttribute
 	private boolean experimental;
+	
+	@XmlAttribute
 	private boolean editable = false;
 	
-	public ProjectExampleSite() {		
-	}
-	
 	@Override
-	public URL getUrl() {
+	public URI getUrl() {
 		return url;
 	}
 	
 	@Override
-	public void setUrl(URL url) {
+	public void setUrl(URI url) {
 		this.url = url;
 	}
 	
@@ -65,7 +76,10 @@ public class ProjectExampleSite implements IProjectExampleSite {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
+		result = prime * result + (editable ? 1231 : 1237);
+		result = prime * result + (experimental ? 1231 : 1237);
 		result = prime * result + ((name == null) ? 0 : name.hashCode());
+		result = prime * result + ((url == null) ? 0 : url.hashCode());
 		return result;
 	}
 
@@ -78,17 +92,29 @@ public class ProjectExampleSite implements IProjectExampleSite {
 		if (getClass() != obj.getClass())
 			return false;
 		ProjectExampleSite other = (ProjectExampleSite) obj;
+		if (editable != other.editable)
+			return false;
+		if (experimental != other.experimental)
+			return false;
 		if (name == null) {
 			if (other.name != null)
 				return false;
 		} else if (!name.equals(other.name))
 			return false;
+		if (url == null) {
+			if (other.url != null)
+				return false;
+		} else if (!url.equals(other.url))
+			return false;
 		return true;
 	}
 
+	@SuppressWarnings("nls")
 	@Override
 	public String toString() {
-		return "ProjectExampleSite [name=" + name + ", url=" + url + "]"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		return "ProjectExampleSite [url=" + url + ", name=" + name
+				+ ", experimental=" + experimental + ", editable=" + editable
+				+ "]";
 	}
 
 }

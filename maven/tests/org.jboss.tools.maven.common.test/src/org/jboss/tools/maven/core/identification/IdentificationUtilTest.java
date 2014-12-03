@@ -10,9 +10,10 @@
  ************************************************************************************/
 package org.jboss.tools.maven.core.identification;
 
+import static org.jboss.tools.maven.core.identification.IdentificationUtil.getSHA1;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
-import static org.jboss.tools.maven.core.identification.IdentificationUtil.getSHA1;
+
 import java.io.File;
 
 import org.junit.Test;

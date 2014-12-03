@@ -12,6 +12,8 @@ package org.jboss.tools.project.examples.preferences;
 
 import java.io.File;
 import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Set;
 
@@ -33,8 +35,8 @@ import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
-import org.jboss.tools.project.examples.Messages;
-import org.jboss.tools.project.examples.ProjectExamplesActivator;
+import org.jboss.tools.project.examples.internal.Messages;
+import org.jboss.tools.project.examples.internal.ProjectExamplesActivator;
 import org.jboss.tools.project.examples.model.IProjectExampleSite;
 import org.jboss.tools.project.examples.model.ProjectExampleSite;
 
@@ -50,7 +52,7 @@ public class SiteDialog extends TitleAreaDialog {
 	private Image dlgTitleImage;
 	private ProjectExampleSite selectedSite;
 	private String name;
-	private URL url;
+	private URI url;
 	private Text nameText;
 	private Text urlText;
 	private Button okButton;
@@ -187,8 +189,8 @@ public class SiteDialog extends TitleAreaDialog {
 		setErrorMessage(null);
 		name = nameText.getText();
 		try {
-			url = new URL(urlText.getText());
-		} catch (MalformedURLException ignore) {}
+			url = new URL(urlText.getText()).toURI();
+		} catch (MalformedURLException | URISyntaxException ignore) {}
 		return updateButton(true);
 	}
 
@@ -212,7 +214,7 @@ public class SiteDialog extends TitleAreaDialog {
 		return name;
 	}
 	
-	public URL getURL() {
+	public URI getURL() {
 		return url;
 	}
 	

@@ -10,24 +10,17 @@
  ************************************************************************************/
 package org.jboss.tools.central.installation;
 
-import org.eclipse.equinox.internal.p2.ui.ProvUIImages;
 import org.eclipse.equinox.internal.p2.ui.ProvUIMessages;
 import org.eclipse.equinox.internal.p2.ui.dialogs.ILayoutConstants;
 import org.eclipse.equinox.internal.p2.ui.viewers.IUColumnConfig;
 import org.eclipse.equinox.internal.p2.ui.viewers.IUDetailsLabelProvider;
-import org.eclipse.equinox.p2.engine.IProfile;
-import org.eclipse.equinox.p2.metadata.IInstallableUnit;
 import org.eclipse.jface.viewers.ArrayContentProvider;
-import org.eclipse.jface.viewers.ILabelProviderListener;
-import org.eclipse.jface.viewers.ITableLabelProvider;
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeColumn;
 import org.eclipse.ui.about.InstallationPage;
@@ -37,9 +30,9 @@ import org.jboss.tools.central.Messages;
 
 public class CentralInstallationPage extends InstallationPage {
 
-	private static final int COLUMN_INDEX_ID = 0;
-	private static final int COLUMN_INDEX_LABEL = COLUMN_INDEX_ID + 1;
-	private static final int COLUMN_INDEX_VERSION = COLUMN_INDEX_LABEL + 1;
+	//private static final int COLUMN_INDEX_ID = 0;
+	//private static final int COLUMN_INDEX_LABEL = COLUMN_INDEX_ID + 1;
+	//private static final int COLUMN_INDEX_VERSION = COLUMN_INDEX_LABEL + 1;
 	
 	public CentralInstallationPage() {
 	}

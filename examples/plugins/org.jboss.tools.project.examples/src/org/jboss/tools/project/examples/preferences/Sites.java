@@ -13,7 +13,7 @@ package org.jboss.tools.project.examples.preferences;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.jboss.tools.project.examples.Messages;
+import org.jboss.tools.project.examples.internal.Messages;
 import org.jboss.tools.project.examples.model.IProjectExampleSite;
 import org.jboss.tools.project.examples.model.ProjectExampleSite;
 import org.jboss.tools.project.examples.model.ProjectExampleUtil;

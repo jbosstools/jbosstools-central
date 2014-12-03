@@ -5,6 +5,7 @@
    <extension-point id="categories" name="%ProjectExampleCategories" schema="schema/categories.exsd"/>
    <extension-point id="importProjectExamples" name="Import Project Examples" schema="schema/importProjectExample.exsd"/>
    <extension-point id="wizardpages" name="Project Examples Wizard Pages" schema="schema/wizardpages.exsd"/>
+   <extension-point id="projectFixProvider" name="Project Examples Fix Providers" schema="schema/projectFixProviders.exsd"/>
    
   <extension point="org.eclipse.ui.newWizards">
     <category
@@ -106,4 +107,19 @@
             type="zip">
       </page>
    </extension>
+   
+      <extension
+         point="org.jboss.tools.project.examples.projectFixProvider">
+         <projectFixProvider
+            name="Fix Missing Plugin requirements"
+            class="org.jboss.tools.project.examples.internal.fixes.PluginFixProvider"
+            type="plugin">
+         </projectFixProvider>
+          <projectFixProvider
+            name="Fix Missing Runtime requirements"
+            class="org.jboss.tools.project.examples.internal.fixes.RuntimeFixProvider"
+            type="wtpruntime">
+          </projectFixProvider> 
+   </extension>
+   
 </plugin>

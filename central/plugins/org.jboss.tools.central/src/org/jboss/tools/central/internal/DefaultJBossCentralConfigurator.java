@@ -13,8 +13,6 @@ package org.jboss.tools.central.internal;
 import org.eclipse.swt.graphics.Image;
 import org.jboss.tools.central.JBossCentralActivator;
 import org.jboss.tools.central.configurators.IJBossCentralConfigurator;
-import org.jboss.tools.discovery.core.internal.DiscoveryActivator;
-import org.jboss.tools.foundation.core.properties.IPropertiesProvider;
 import org.jboss.tools.foundation.core.properties.PropertiesHelper;
 
 /**

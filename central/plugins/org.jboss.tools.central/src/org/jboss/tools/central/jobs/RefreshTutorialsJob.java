@@ -12,6 +12,7 @@ package org.jboss.tools.central.jobs;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -20,11 +21,9 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.jboss.tools.central.JBossCentralActivator;
-import org.jboss.tools.project.examples.ProjectExamplesActivator;
 import org.jboss.tools.project.examples.model.ProjectExample;
 import org.jboss.tools.project.examples.model.ProjectExampleCategory;
 import org.jboss.tools.project.examples.model.ProjectExampleUtil;
-import org.jboss.tools.project.examples.model.ProjectFix;
 
 /**
  * 
@@ -34,12 +33,12 @@ import org.jboss.tools.project.examples.model.ProjectFix;
 public class RefreshTutorialsJob extends Job {
 
 	private Exception exception;
-	private Map<ProjectExampleCategory,List<ProjectExample>> tutorialCategories;
+	private Map<ProjectExampleCategory, List<ProjectExample>> tutorialCategories;
 
 	private List<ProjectExample> wizardProjects;
 
 	public static RefreshTutorialsJob INSTANCE = new RefreshTutorialsJob();
-	
+
 	private RefreshTutorialsJob() {
 		super("Refreshing JBoss Tutorials...");
 		setPriority(LONG);
@@ -51,40 +50,29 @@ public class RefreshTutorialsJob extends Job {
 			return Status.CANCEL_STATUS;
 		}
 		List<ProjectExampleCategory> categories = ProjectExampleUtil.getProjects(monitor);
+		Map<String, ProjectExampleCategory> categoriesMap = new LinkedHashMap<>(categories.size());
+		for (ProjectExampleCategory c : categories) {
+			categoriesMap.put(c.getName(), c);
+		}
 		wizardProjects = ProjectExampleUtil.getProjectsByTags(categories, "wizard");
 		List<ProjectExample> tutorials = ProjectExampleUtil.getProjectsByTags(categories, "central");
 		if (tutorialCategories == null) {
-		  tutorialCategories = new HashMap<ProjectExampleCategory, List<ProjectExample>>();
+			tutorialCategories = new HashMap<ProjectExampleCategory, List<ProjectExample>>();
 		} else {
-		  tutorialCategories.clear();
+			tutorialCategories.clear();
 		}
-		
-		for (ProjectExample project : tutorials) {
-		  if (canBeImported(project)){
-				List<ProjectFix> unsatisfiedFixes = new ArrayList<ProjectFix>();
-				List<ProjectFix> fixes = project.getFixes();
-				project.setUnsatisfiedFixes(unsatisfiedFixes);
-				for (ProjectFix fix : fixes) {
-					if (!ProjectExamplesActivator.canFix(project, fix)) {
-						unsatisfiedFixes.add(fix);
-					}
-				}
-  			ProjectExampleCategory category = project.getCategory();
-  			List<ProjectExample> projects = tutorialCategories.get(category);
-  			if (projects == null) {
-  			  projects = new ArrayList<ProjectExample>();
-  			  tutorialCategories.put(category, projects);
-  			}
-  			projects.add(project);
-			}
-		}
-		
-		return Status.OK_STATUS;
-	}
 
-	private boolean canBeImported(ProjectExample project) {
-		return ProjectExamplesActivator.getDefault()
-				.getImportProjectExample(project.getImportType()) != null;
+		for (ProjectExample project : tutorials) {
+			ProjectExampleCategory category = categoriesMap.get(project.getCategory());
+			List<ProjectExample> projects = tutorialCategories.get(category);
+			if (projects == null) {
+				projects = new ArrayList<ProjectExample>();
+				tutorialCategories.put(category, projects);
+			}
+			projects.add(project);
+		}
+
+		return Status.OK_STATUS;
 	}
 
 	public Exception getException() {
@@ -95,13 +83,13 @@ public class RefreshTutorialsJob extends Job {
 		this.exception = exception;
 	}
 
-	public Map<ProjectExampleCategory,List<ProjectExample>> getTutorialCategories() {
+	public Map<ProjectExampleCategory, List<ProjectExample>> getTutorialCategories() {
 		return tutorialCategories;
 	}
 
-    public List<ProjectExample> getWizardProjects() {
-        return wizardProjects;
-    }
+	public List<ProjectExample> getWizardProjects() {
+		return wizardProjects;
+	}
 
 	@Override
 	public boolean belongsTo(Object family) {

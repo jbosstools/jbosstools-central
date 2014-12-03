@@ -12,10 +12,20 @@ package org.jboss.tools.project.examples.model;
 
 import java.util.Properties;
 
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+
+import org.jboss.tools.project.examples.internal.model.XmlUnMarshallers.ArchetypePropertyUnMarshaller;
+
 /**
  * @author snjeza
  * 
  */
+@XmlAccessorType (XmlAccessType.FIELD)
+@XmlRootElement(name = "mavenArchetype")
 public class ArchetypeModel implements Cloneable {
 	private String groupId;
 	private String artifactId;
@@ -26,6 +36,9 @@ public class ArchetypeModel implements Cloneable {
 	private String archetypeVersion;
 	private String archetypeRepository;
 	private String javaPackage;
+	
+	@XmlJavaTypeAdapter(ArchetypePropertyUnMarshaller.class)
+	@XmlElement(name="properties")
 	private Properties archetypeProperties = new Properties();
 
 	public String getGroupId() {
@@ -122,5 +135,93 @@ public class ArchetypeModel implements Cloneable {
 		.append(":") //$NON-NLS-1$
 		.append(getArchetypeVersion());
 		return sb.toString();
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime
+				* result
+				+ ((archetypeArtifactId == null) ? 0 : archetypeArtifactId
+						.hashCode());
+		result = prime
+				* result
+				+ ((archetypeGroupId == null) ? 0 : archetypeGroupId.hashCode());
+		result = prime
+				* result
+				+ ((archetypeProperties == null) ? 0 : archetypeProperties
+						.hashCode());
+		result = prime
+				* result
+				+ ((archetypeRepository == null) ? 0 : archetypeRepository
+						.hashCode());
+		result = prime
+				* result
+				+ ((archetypeVersion == null) ? 0 : archetypeVersion.hashCode());
+		result = prime * result
+				+ ((artifactId == null) ? 0 : artifactId.hashCode());
+		result = prime * result + ((groupId == null) ? 0 : groupId.hashCode());
+		result = prime * result
+				+ ((javaPackage == null) ? 0 : javaPackage.hashCode());
+		result = prime * result + ((version == null) ? 0 : version.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		ArchetypeModel other = (ArchetypeModel) obj;
+		if (archetypeArtifactId == null) {
+			if (other.archetypeArtifactId != null)
+				return false;
+		} else if (!archetypeArtifactId.equals(other.archetypeArtifactId))
+			return false;
+		if (archetypeGroupId == null) {
+			if (other.archetypeGroupId != null)
+				return false;
+		} else if (!archetypeGroupId.equals(other.archetypeGroupId))
+			return false;
+		if (archetypeProperties == null) {
+			if (other.archetypeProperties != null)
+				return false;
+		} else if (!archetypeProperties.equals(other.archetypeProperties))
+			return false;
+		if (archetypeRepository == null) {
+			if (other.archetypeRepository != null)
+				return false;
+		} else if (!archetypeRepository.equals(other.archetypeRepository))
+			return false;
+		if (archetypeVersion == null) {
+			if (other.archetypeVersion != null)
+				return false;
+		} else if (!archetypeVersion.equals(other.archetypeVersion))
+			return false;
+		if (artifactId == null) {
+			if (other.artifactId != null)
+				return false;
+		} else if (!artifactId.equals(other.artifactId))
+			return false;
+		if (groupId == null) {
+			if (other.groupId != null)
+				return false;
+		} else if (!groupId.equals(other.groupId))
+			return false;
+		if (javaPackage == null) {
+			if (other.javaPackage != null)
+				return false;
+		} else if (!javaPackage.equals(other.javaPackage))
+			return false;
+		if (version == null) {
+			if (other.version != null)
+				return false;
+		} else if (!version.equals(other.version))
+			return false;
+		return true;
 	}
 }

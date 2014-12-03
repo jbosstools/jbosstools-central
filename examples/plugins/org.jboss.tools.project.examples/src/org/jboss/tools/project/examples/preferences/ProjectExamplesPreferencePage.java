@@ -10,7 +10,7 @@
  ************************************************************************************/
 package org.jboss.tools.project.examples.preferences;
 
-import java.net.URL;
+import java.net.URI;
 
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.preference.IPreferenceStore;
@@ -40,8 +40,8 @@ import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
-import org.jboss.tools.project.examples.Messages;
-import org.jboss.tools.project.examples.ProjectExamplesActivator;
+import org.jboss.tools.project.examples.internal.Messages;
+import org.jboss.tools.project.examples.internal.ProjectExamplesActivator;
 import org.jboss.tools.project.examples.model.IProjectExampleSite;
 import org.jboss.tools.project.examples.model.ProjectExampleSite;
 import org.jboss.tools.project.examples.model.ProjectExampleUtil;
@@ -192,11 +192,12 @@ public class ProjectExamplesPreferencePage extends PreferencePage implements
 				if (ok == Window.OK) {
 					String name = dialog.getName();
 					if (name != null) {
-						URL url = dialog.getURL();
+						URI url = dialog.getURL();
 						ProjectExampleSite site = new ProjectExampleSite();
 						site.setUrl(url);
 						site.setName(name);
 						site.setEditable(true);
+						site.setExperimental(true);
 						sites.add(site);
 						viewer.refresh();
 					}
@@ -218,7 +219,7 @@ public class ProjectExamplesPreferencePage extends PreferencePage implements
 				if (ok == Window.OK) {
 					String name = dialog.getName();
 					if (name != null) {
-						URL url = dialog.getURL();
+						URI url = dialog.getURL();
 						ProjectExampleSite site = selectedSite;
 						site.setUrl(url);
 						site.setName(name);

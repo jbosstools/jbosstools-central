@@ -18,9 +18,9 @@ import org.eclipse.jface.action.Action;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.ui.cheatsheets.ICheatSheetAction;
 import org.eclipse.ui.cheatsheets.ICheatSheetManager;
-import org.jboss.tools.project.examples.ProjectExamplesActivator;
 import org.jboss.tools.project.examples.cheatsheet.Activator;
 import org.jboss.tools.project.examples.cheatsheet.Messages;
+import org.jboss.tools.project.examples.internal.ProjectExamplesActivator;
 import org.jboss.tools.project.examples.model.ProjectExample;
 import org.jboss.tools.project.examples.model.ProjectExampleCategory;
 import org.jboss.tools.project.examples.model.ProjectExampleUtil;
@@ -61,7 +61,7 @@ public class RunProjectExample extends Action implements ICheatSheetAction {
 			if (projectExample[0].equals(category.getName())) {
 				for (ProjectExample p:category.getProjects()) {
 					if (projectExample[1].equals(p.getName())) {
-						project = p.createWorkingCopy();
+						project =ProjectExamplesActivator.getDefault().getProjectExampleManager().createWorkingCopy(p);
 						break;
 					}
 				}

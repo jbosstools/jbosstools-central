@@ -12,8 +12,6 @@ package org.jboss.tools.maven.configurators.tests;
 
 import java.io.File;
 
-import junit.framework.Assert;
-
 import org.apache.maven.model.Model;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
@@ -21,7 +19,6 @@ import org.eclipse.core.resources.IncrementalProjectBuilder;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.m2e.core.project.ResolverConfiguration;
 import org.eclipse.wst.common.project.facet.core.IFacetedProject;
-import org.eclipse.wst.common.project.facet.core.IFacetedProjectValidator;
 import org.eclipse.wst.common.project.facet.core.IProjectFacet;
 import org.eclipse.wst.common.project.facet.core.IProjectFacetVersion;
 import org.eclipse.wst.common.project.facet.core.ProjectFacetsManager;
@@ -40,10 +37,10 @@ public class SeamConfiguratorTest extends AbstractMavenConfiguratorTest {
 
 	public static final String SEAM_HOME_PROPERTY = System.getProperty("jbosstools.test.seam.2.3.home", "target/requirements/jboss-seam-2.3.1.Final");
 	
-	private static final IProjectFacetVersion JSF_FACET_VERSION_2_1;
-	private static final IProjectFacetVersion JSF_FACET_VERSION_2_0;
+	//private static final IProjectFacetVersion JSF_FACET_VERSION_2_1;
+	//private static final IProjectFacetVersion JSF_FACET_VERSION_2_0;
 	private static final IProjectFacetVersion JSF_FACET_VERSION_1_2;
-	private static final IProjectFacetVersion JSF_FACET_VERSION_1_1;
+	//private static final IProjectFacetVersion JSF_FACET_VERSION_1_1;
 	//protected static final IProjectFacet m2Facet;
 	//protected static final IProjectFacetVersion m2Version;
 	public static final String JSF_VERSION_2_1 = "2.1";
@@ -55,10 +52,10 @@ public class SeamConfiguratorTest extends AbstractMavenConfiguratorTest {
 	public static final String JSF_VERSION_1_1 = "1.1";
 	
 	static {
-		JSF_FACET_VERSION_2_1 = JSF_FACET.getVersion(JSF_VERSION_2_1); 
-		JSF_FACET_VERSION_2_0 = JSF_FACET.getVersion(JSF_VERSION_2_0); 
+		//JSF_FACET_VERSION_2_1 = JSF_FACET.getVersion(JSF_VERSION_2_1); 
+		//JSF_FACET_VERSION_2_0 = JSF_FACET.getVersion(JSF_VERSION_2_0); 
 		JSF_FACET_VERSION_1_2 = JSF_FACET.getVersion(JSF_VERSION_1_2); //$NON-NLS-1$
-		JSF_FACET_VERSION_1_1 = JSF_FACET.getVersion(JSF_VERSION_1_1); //$NON-NLS-1$
+		//JSF_FACET_VERSION_1_1 = JSF_FACET.getVersion(JSF_VERSION_1_1); //$NON-NLS-1$
 	}
 	
 	private static final IProjectFacet SEAM_FACET = ProjectFacetsManager.getProjectFacet("jst.seam");
@@ -89,7 +86,7 @@ public class SeamConfiguratorTest extends AbstractMavenConfiguratorTest {
 		assertEquals("web.xml content changed ", toString(originalWebXml), toString(webXml));
 		return seamProject;
 	}	
-
+	
 	@Test
 	public void testJBIDE10764_builderOrder() throws Exception {
 		IProject ejb = importProject("projects/seam/JBIDE-10764/pom.xml");

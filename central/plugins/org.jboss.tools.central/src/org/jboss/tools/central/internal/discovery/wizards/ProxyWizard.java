@@ -13,8 +13,6 @@ package org.jboss.tools.central.internal.discovery.wizards;
 import java.net.URL;
 import java.util.List;
 
-import org.eclipse.core.runtime.Platform;
-
 /**
  * 
  * @author Fred Bricon

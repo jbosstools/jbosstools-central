@@ -58,7 +58,7 @@ public class DiscoveryRegistryStrategy extends RegistryStrategy {
 
 	private Map<File, Entry> bundleFileToDirectoryEntry;
 
-	private List<String> extensionPointProviderBundles;
+	//private List<String> extensionPointProviderBundles;
 
 	private String[] bundleIds;
 	

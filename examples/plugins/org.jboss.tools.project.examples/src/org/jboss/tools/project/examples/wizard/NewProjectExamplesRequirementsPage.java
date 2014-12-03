@@ -10,26 +10,15 @@
  ************************************************************************************/
 package org.jboss.tools.project.examples.wizard;
 
-import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Platform;
-import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.dialogs.Dialog;
-import org.eclipse.jface.dialogs.MessageDialog;
-import org.eclipse.jface.operation.IRunnableWithProgress;
-import org.eclipse.jface.preference.PreferenceDialog;
 import org.eclipse.jface.viewers.ColumnLabelProvider;
 import org.eclipse.jface.viewers.ColumnViewerToolTipSupport;
 import org.eclipse.jface.viewers.ISelection;
@@ -42,15 +31,11 @@ import org.eclipse.jface.viewers.TableViewerColumn;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.wizard.IWizard;
 import org.eclipse.jface.wizard.IWizardPage;
-import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.jface.wizard.WizardPage;
-import org.eclipse.mylyn.internal.discovery.core.model.ConnectorDescriptor;
-import org.eclipse.mylyn.internal.discovery.core.model.ConnectorDiscovery;
-import org.eclipse.mylyn.internal.discovery.core.model.DiscoveryConnector;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.events.SelectionListener;
+import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
@@ -65,25 +50,18 @@ import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.browser.IWorkbenchBrowserSupport;
-import org.eclipse.ui.dialogs.PreferencesUtil;
 import org.eclipse.wst.server.core.IServer;
 import org.eclipse.wst.server.core.IServerLifecycleListener;
 import org.eclipse.wst.server.core.ServerCore;
-import org.jboss.tools.discovery.core.internal.connectors.DiscoveryUtil;
-import org.jboss.tools.discovery.core.internal.connectors.JBossDiscoveryUi;
-import org.jboss.tools.foundation.ui.xpl.taskwizard.TaskWizardDialog;
-import org.jboss.tools.project.examples.Messages;
-import org.jboss.tools.project.examples.ProjectExamplesActivator;
-import org.jboss.tools.project.examples.fixes.WTPRuntimeFix;
+import org.jboss.tools.project.examples.fixes.IProjectExamplesFix;
+import org.jboss.tools.project.examples.fixes.ProjectFixManager;
+import org.jboss.tools.project.examples.fixes.UIHandler;
+import org.jboss.tools.project.examples.internal.Messages;
+import org.jboss.tools.project.examples.internal.ProjectExamplesActivator;
 import org.jboss.tools.project.examples.model.ProjectExample;
 import org.jboss.tools.project.examples.model.ProjectExampleWorkingCopy;
-import org.jboss.tools.project.examples.model.ProjectFix;
-import org.jboss.tools.runtime.core.RuntimeCoreActivator;
-import org.jboss.tools.runtime.core.model.DownloadRuntime;
-import org.jboss.tools.runtime.ui.RuntimeSharedImages;
-import org.jboss.tools.runtime.ui.RuntimeUIActivator;
-import org.jboss.tools.runtime.ui.wizard.DownloadRuntimesTaskWizard;
 
+@SuppressWarnings("nls")
 public class NewProjectExamplesRequirementsPage extends WizardPage implements IProjectExamplesWizardPage {
 
 	private static final String PAGE_NAME = "org.jboss.tools.project.examples.requirements"; //$NON-NLS-1$
@@ -93,10 +71,11 @@ public class NewProjectExamplesRequirementsPage extends WizardPage implements IP
 	protected Text projectSize;
 	protected WizardContext wizardContext;
 	protected TableViewer tableViewer;
-	protected List<ProjectFix> fixes = new ArrayList<ProjectFix>();
-	protected ArrayList<ProjectFix> unsatisfiedFixes = new ArrayList<ProjectFix>();
-	private Image checkboxOn;
-	private Image checkboxOff;
+	protected List<IProjectExamplesFix> fixes = new ArrayList<IProjectExamplesFix>();
+	private Image fulfilledRequirement;
+	private Image missingRecommendation;
+	private Image missingRequirement;
+	
 	private Link link;
 	private IServerLifecycleListener serverListener = new IServerLifecycleListener() {
 
@@ -126,6 +105,7 @@ public class NewProjectExamplesRequirementsPage extends WizardPage implements IP
 		}
 
 	};
+	protected ProjectFixManager fixManager;
 	
 	public NewProjectExamplesRequirementsPage(ProjectExampleWorkingCopy projectExample) {
 		this(PAGE_NAME, projectExample);
@@ -135,8 +115,10 @@ public class NewProjectExamplesRequirementsPage extends WizardPage implements IP
 		super(pageName);
 		this.projectExample = projectExample;
 		setTitleAndDescription(projectExample);
-		checkboxOn =  RuntimeUIActivator.sharedImages().image(RuntimeSharedImages.CHECKBOX_ON_KEY);
-		checkboxOff = RuntimeUIActivator.sharedImages().image(RuntimeSharedImages.CHECKBOX_OFF_KEY);
+		fulfilledRequirement =  ProjectExamplesActivator.getImageDescriptor("icons/ok.png").createImage();
+		missingRecommendation =  ProjectExamplesActivator.getImageDescriptor("icons/warning.gif").createImage();
+		missingRequirement = ProjectExamplesActivator.getImageDescriptor("icons/error.gif").createImage();
+		fixManager = ProjectExamplesActivator.getDefault().getProjectFixManager();
 	}
 
 	public NewProjectExamplesRequirementsPage() {
@@ -144,7 +126,7 @@ public class NewProjectExamplesRequirementsPage extends WizardPage implements IP
 	}
 
 	protected void setTitleAndDescription(ProjectExample projectExample) {
-		setTitle( "Requirements" );
+		setTitle( "Requirements and Recommendations" );
         setDescription( "Project Example Requirements" );
 		if (projectExample != null) {
 			if (projectExample.getShortDescription() != null) {
@@ -162,8 +144,6 @@ public class NewProjectExamplesRequirementsPage extends WizardPage implements IP
 				}
 			}
 		} else {
-			setTitle( "Requirements" );
-	        setDescription( "Project Example Requirements" );
 	        if (descriptionText != null) {
 	        	descriptionText.setText(""); //$NON-NLS-1$
 	        	if (projectSize != null) {
@@ -193,7 +173,7 @@ public class NewProjectExamplesRequirementsPage extends WizardPage implements IP
 		fixesGroup.setLayoutData(gd);
 		GridLayout layout = new GridLayout(2, false);
 		fixesGroup.setLayout(layout);
-		fixesGroup.setText("Requirements");
+		fixesGroup.setText("Requirements and Recommendations");
 		
 		tableViewer = new TableViewer(fixesGroup, SWT.SINGLE | SWT.FULL_SELECTION | SWT.H_SCROLL
 				| SWT.V_SCROLL | SWT.BORDER);
@@ -204,7 +184,7 @@ public class NewProjectExamplesRequirementsPage extends WizardPage implements IP
 		table.setHeaderVisible(true);
 		table.setLinesVisible(true);
 
-		String[] columnNames = new String[] { "Type", "Description", "Found?"};
+		String[] columnNames = new String[] { "Type", "Description", "Status"};
 		int[] columnWidths = new int[] { 100, 300, 50};
 		
 		for (int i = 0; i < columnNames.length; i++) {
@@ -283,43 +263,15 @@ public class NewProjectExamplesRequirementsPage extends WizardPage implements IP
 		install.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		install.setText("Install...");
 		install.setEnabled(false);
-		install.addSelectionListener(new SelectionListener(){
-
-			public void widgetDefaultSelected(SelectionEvent e) {
-				
-			}
-
+		install.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
-				ProjectFix fix = getSelectedProjectFix();
-				if (ProjectFix.WTP_RUNTIME.equals(fix.getType())
-						|| ProjectFix.SEAM_RUNTIME.equals(fix.getType())) {
-					String preferenceId = "org.jboss.tools.runtime.preferences.RuntimePreferencePage"; //$NON-NLS-1$
-					PreferenceDialog preferenceDialog = PreferencesUtil.createPreferenceDialogOn(getShell(), preferenceId, null, null);
-					preferenceDialog.open();
-					refreshFixes();
-				} else if (ProjectFix.PLUGIN_TYPE.equals(fix.getType())) {
-					String connectorId = fix.getProperties().get(ProjectFix.CONNECTOR_ID);
-					Set<String> connectorIds = new HashSet<String>();
-					if (connectorId != null) {
-						String[] ids = connectorId.split(","); //$NON-NLS-1$
-						for (String id:ids) {
-							if (id != null && !id.trim().isEmpty()) {
-								connectorIds.add(id.trim());
-							}
-						}
-					}
-					if (connectorIds.size() > 0) {
-						try {
-							install(connectorIds);
-						} catch (Exception e1) {
-							ProjectExamplesActivator.log(e1);
-						}
-					}
+				IProjectExamplesFix fix = getSelectedProjectFix();
+				if (fix != null) {
+					UIHandler uiHandler = getUIHandler(fix);
+					uiHandler.handleInstallRequest(getShell(), getContainer(), fix);
 					refreshFixes();
 				}
-				
 			}
-		
 		});
 		
 		final Button downloadAndInstall = new Button(buttonComposite, SWT.PUSH);
@@ -327,118 +279,62 @@ public class NewProjectExamplesRequirementsPage extends WizardPage implements IP
 		downloadAndInstall.setText("Download and Install...");
 		downloadAndInstall.setEnabled(false);
 		
-		downloadAndInstall.addSelectionListener(new SelectionListener(){
-		
+		downloadAndInstall.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
-				ProjectFix fix = getSelectedProjectFix();
-				if (fix != null) {
-					List<DownloadRuntime> runtimes = getDownloadRuntimes(fix);
-					WizardDialog dialog = new TaskWizardDialog(getShell(), new DownloadRuntimesTaskWizard(runtimes));
-					dialog.open();
-					refreshFixes();
+				final IProjectExamplesFix fix = getSelectedProjectFix();
+				if (fix == null) {
+					return;
 				}
-			}
-		
-			public void widgetDefaultSelected(SelectionEvent e) {
-				
-			}
-		});
+				Display.getCurrent().asyncExec(new Runnable() {
+					@Override
+					public void run() {
+						UIHandler uiHandler = fixManager.getUIHandler(fix);
+						uiHandler.handleDownloadRequest(Display.getCurrent().getActiveShell(), getContainer(), fix);
+						refreshFixes();
+					}
+			});
+		}});
 				
 		viewer.addSelectionChangedListener(new ISelectionChangedListener() {
 			
 			public void selectionChanged(SelectionChangedEvent event) {
-				ISelection sel = viewer.getSelection();
-				install.setEnabled(false);
-				downloadAndInstall.setEnabled(false);
-				downloadAndInstall.setToolTipText("");
-				if (sel instanceof IStructuredSelection) {
-					IStructuredSelection selection = (IStructuredSelection) sel;
-					Object object = selection.getFirstElement();
-					if (object instanceof ProjectFix) {
-						ProjectFix fix = (ProjectFix) object;
-						String fixType = fix.getType();
-						if (!unsatisfiedFixes.contains(fix) && !(ProjectFix.WTP_RUNTIME.equals(fixType)
-								|| ProjectFix.SEAM_RUNTIME.equals(fixType))) {
-							return;
-						}
-						if (ProjectFix.WTP_RUNTIME.equals(fixType)
-								|| ProjectFix.SEAM_RUNTIME.equals(fixType)) {
-							List<DownloadRuntime> downloadRuntimes = getDownloadRuntimes(fix);
-							if (downloadRuntimes != null) {
-								for (Iterator iterator = downloadRuntimes.iterator(); iterator.hasNext();) {
-									DownloadRuntime downloadRuntime = (DownloadRuntime) iterator.next();
-									if (downloadRuntime == null) {
-										iterator.remove();
-									}
-								}
-							}
-							if (downloadRuntimes != null && !downloadRuntimes.isEmpty()) {
-								StringBuilder tooltip = new StringBuilder("Download and install ");
-								if (downloadRuntimes.size() > 1 && downloadRuntimes.get(0) != null && downloadRuntimes.get(0).getName() != null) {
-									tooltip.append("a runtime");
-								} else {
-									tooltip.append(downloadRuntimes.get(0).getName());
-								}
-								downloadAndInstall.setToolTipText(tooltip.toString());
-								downloadAndInstall.setEnabled(true);
-							} else {
-								downloadAndInstall.setEnabled(false);
-							}
-							install.setEnabled(true);
-							install.setToolTipText("JBoss Runtime Detection");
-						} else if (ProjectFix.PLUGIN_TYPE.equals(fixType)) {
-							install.setEnabled(fix.getProperties().get(ProjectFix.CONNECTOR_ID) != null);
-							install.setToolTipText("Install required feature(s)");
-						}
-							
+				final IProjectExamplesFix fix = getSelectedProjectFix();
+				if (fix == null) {
+					return;
+				}
+				Display.getCurrent().asyncExec(new Runnable() {
+					@Override
+					public void run() {
+						IProgressMonitor monitor = new NullProgressMonitor();
+						UIHandler uiHandler = getUIHandler(fix);
+						uiHandler.decorateInstallButton(install, fix, monitor);
+						uiHandler.decorateDownloadButton(downloadAndInstall, fix, monitor);
 					}
-				} 
+				});
 			}
 		});	
 		
 	}
 
-	protected ProjectFix getSelectedProjectFix() {
+	protected IProjectExamplesFix getSelectedProjectFix() {
 		ISelection sel = tableViewer.getSelection();
 		if (sel instanceof IStructuredSelection) {
 			IStructuredSelection selection = (IStructuredSelection) sel;
 			Object object = selection.getFirstElement();
-			if (object instanceof ProjectFix) {
-				return (ProjectFix) object;
+			if (object instanceof IProjectExamplesFix) {
+				return (IProjectExamplesFix) object;
 			}
 		}
 		return null;
 	}
 
-	protected List<DownloadRuntime> getDownloadRuntimes(ProjectFix fix) {
-		if (ProjectFix.WTP_RUNTIME.equals(fix.getType())) {
-			IProgressMonitor monitor = new NullProgressMonitor();
-			String allDownloadRuntimeIds = fix.getProperties().get(ProjectFix.ALLOWED_TYPES);
-			if (allDownloadRuntimeIds != null && !ProjectFix.ANY.equals(allDownloadRuntimeIds)) {
-				DownloadRuntime[] downloadableRuntimes = WTPRuntimeFix.getDownloadRuntimesFromPattern(allDownloadRuntimeIds, monitor);
-				if (downloadableRuntimes != null && downloadableRuntimes.length > 0) {
-					return Arrays.asList(downloadableRuntimes);
-				}
-			}
-		}
-		
-        //Fall back on legacy stuff		
-		final String downloadId = fix.getProperties().get(ProjectFix.DOWNLOAD_ID);
-		if (downloadId != null) {
-			DownloadRuntime dr = RuntimeCoreActivator.getDefault().getDownloadRuntimes().get(downloadId);
-			if (dr != null) {
-				return Collections.singletonList(dr);
-			}
-		}
-		return null;
-	}
-	
 	public ProjectExample getProjectExample() {
 		return projectExample;
 	}
 
 	public void setProjectExample(final ProjectExampleWorkingCopy projectExample) {
 		this.projectExample = projectExample;
+		
 		setTitleAndDescription(projectExample);
 		refreshFixes();
 		
@@ -477,69 +373,14 @@ public class NewProjectExamplesRequirementsPage extends WizardPage implements IP
 		if (getControl() == null || getControl().isDisposed()) {
 			return;
 		}
-		fixes = new ArrayList<ProjectFix>();
-		unsatisfiedFixes = new ArrayList<ProjectFix>();
-		if (projectExample == null) {
-			return;
-		}
-		
-		fixes = projectExample.getFixes();
-		projectExample.setUnsatisfiedFixes(unsatisfiedFixes);
-		for (ProjectFix fix:fixes) {
-			if (!ProjectExamplesActivator.canFix(projectExample, fix)) {
-				unsatisfiedFixes.add(fix);
-			}
+		fixes.clear();
+		if (projectExample != null) {
+			fixes.addAll(projectExample.getFixes());
 		}
 		tableViewer.setInput(fixes);
+		validate();
 	}
 
-	private String getProjectFixDescription(ProjectFix projectFix) {
-		
-		return projectFix.getProperties().get(ProjectFix.DESCRIPTION);
-	}
-	
-	protected void install(final Set<String> connectorIds) throws InvocationTargetException, InterruptedException {
-		final IStatus[] results = new IStatus[1];
-		final ConnectorDiscovery[] connectorDiscoveries = new ConnectorDiscovery[1];
-		IRunnableWithProgress runnable = new IRunnableWithProgress() {
-			public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
-				ConnectorDiscovery connectorDiscovery = DiscoveryUtil.createConnectorDiscovery();
-				connectorDiscoveries[0] = connectorDiscovery;
-				results[0] = connectorDiscoveries[0].performDiscovery(monitor);
-				if (monitor.isCanceled()) {
-					results[0] = Status.CANCEL_STATUS;
-				}
-			}
-		};
-		getWizard().getContainer().run(true, true, runnable);
-		if (results[0] == null) {
-			return;
-		}
-		if (results[0].isOK()) {
-			List<DiscoveryConnector> connectors = connectorDiscoveries[0].getConnectors();
-			List<ConnectorDescriptor> installableConnectors = new ArrayList<ConnectorDescriptor>();
-			for (DiscoveryConnector connector:connectors) {
-				if (connectorIds.contains(connector.getId())) {
-					installableConnectors.add(connector);
-				}
-			}
-			JBossDiscoveryUi.install(installableConnectors, getWizard().getContainer());
-		} else {
-			String message = results[0].toString();
-			switch (results[0].getSeverity()) {
-			case IStatus.ERROR:	
-				MessageDialog.openError(getShell(), "Error", message);
-				break;
-			case IStatus.WARNING:
-				MessageDialog.openWarning(getShell(), "Warning", message);
-				break;
-			case IStatus.INFO:
-				MessageDialog.openInformation(getShell(), "Information", message);
-				break;
-			}
-		}
-	}
-	
 	private class FixLabelProvider extends ColumnLabelProvider {
 
 		private int columnIndex;
@@ -555,34 +396,41 @@ public class NewProjectExamplesRequirementsPage extends WizardPage implements IP
 
 		@Override
 		public Image getImage(Object element) {
-			if (columnIndex == 2 && element instanceof ProjectFix) {
-				ProjectFix fix = (ProjectFix) element;
-				if (!unsatisfiedFixes.contains(fix)) {
-					return checkboxOn;
+			Image image = null;
+			if (columnIndex == 2 && element instanceof IProjectExamplesFix) {
+				IProjectExamplesFix fix = (IProjectExamplesFix) element;
+				if (fix.isSatisfied()) {
+					image = fulfilledRequirement;
 				} else {
-					return checkboxOff;
+					image = fix.isRequired()?missingRequirement:missingRecommendation;
 				}
-				
+			}
+			return image;
+		}
+		
+		@Override
+		public String getText(Object element) {
+			if (element instanceof IProjectExamplesFix) {
+				IProjectExamplesFix fix = (IProjectExamplesFix) element;
+				if (columnIndex == 0) {
+					return fix.getLabel();
+				}
+				if (columnIndex == 1) {
+					return fix.getDescription();
+				}
 			}
 			return null;
 		}
-
+		
 		@Override
-		public String getText(Object element) {
-			if (element instanceof ProjectFix) {
-				ProjectFix fix = (ProjectFix) element;
-				if (columnIndex == 0) {
-					if (ProjectFix.WTP_RUNTIME.equals(fix.getType())) {
-						return "server/runtime";
-					}
-					return fix.getType();
+		public Color getForeground(Object element) {
+			if (element instanceof IProjectExamplesFix) {
+				IProjectExamplesFix fix = (IProjectExamplesFix) element;
+				if (isBlocking(fix)) {
+					return Display.getCurrent().getSystemColor(SWT.COLOR_RED);
 				}
-				if (columnIndex == 1) {
-					return getProjectFixDescription(fix);
-				}
-				
 			}
-			return null;
+			return super.getForeground(element);
 		}
 		
 		@Override
@@ -590,8 +438,8 @@ public class NewProjectExamplesRequirementsPage extends WizardPage implements IP
 			if (Platform.OS_WIN32.equals(Platform.getOS())) {
 				return null;
 			}
-			if (element instanceof ProjectFix && columnIndex == 1) {
-				return getProjectFixDescription((ProjectFix) element);
+			if (element instanceof IProjectExamplesFix && columnIndex == 1) {
+				return ((IProjectExamplesFix) element).getDescription();
 			}
 			return null;
 		}
@@ -599,9 +447,9 @@ public class NewProjectExamplesRequirementsPage extends WizardPage implements IP
 
 	private class FixContentProvider implements IStructuredContentProvider {
 
-		private List<ProjectFix> fixes;
+		private List<IProjectExamplesFix> fixes;
 
-		public FixContentProvider(List<ProjectFix> fixes) {
+		public FixContentProvider(List<IProjectExamplesFix> fixes) {
 			this.fixes = fixes;
 		}
 
@@ -614,11 +462,14 @@ public class NewProjectExamplesRequirementsPage extends WizardPage implements IP
 		}
 
 		public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
-			fixes = (List<ProjectFix>) newInput;
+			fixes = (List<IProjectExamplesFix>) newInput;
 		}
 
 	}
 
+	protected UIHandler getUIHandler(IProjectExamplesFix fix) {
+		return fixManager.getUIHandler(fix);
+	}
 
 	public void setDescriptionText(String longDescription) {
 		if (descriptionText != null) {
@@ -655,12 +506,10 @@ public class NewProjectExamplesRequirementsPage extends WizardPage implements IP
 
 	@Override
 	public void onWizardContextChange(String key, Object value) {
-		// TODO Auto-generated method stub
 	}
 
 	@Override
 	public boolean finishPage() {
-		// TODO Auto-generated method stub
 		return true;
 	}
 
@@ -671,7 +520,6 @@ public class NewProjectExamplesRequirementsPage extends WizardPage implements IP
 
 	@Override
 	public Map<String, Object> getPropertiesMap() {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
@@ -684,5 +532,22 @@ public class NewProjectExamplesRequirementsPage extends WizardPage implements IP
 	public String getPageType() {
 		return "requirement";
 	}
+	
+	protected void validate() {
+		if (fixes != null && !fixes.isEmpty()) {
+			for (IProjectExamplesFix fix : fixes) {
+				if (isBlocking(fix)) {
+					setErrorMessage("Some requirements must be installed in order to proceed");
+					setPageComplete(false);
+					return;
+				}
+			}
+		}
+		setErrorMessage(null);
+		setPageComplete(true);
+	}
 
+	private boolean isBlocking(IProjectExamplesFix fix) {
+		return fix != null && fix.isRequired() && !fix.isSatisfied();
+	}
 }

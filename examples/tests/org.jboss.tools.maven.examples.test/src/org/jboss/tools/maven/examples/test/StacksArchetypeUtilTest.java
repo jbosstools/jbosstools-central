@@ -165,7 +165,7 @@ public class StacksArchetypeUtilTest {
 	
 	@Test
 	public void getAdditionalRepositories() {
-		ArchetypeVersion javaeeEar = stacksArchetypeUtil.getArchetype("javaee-ear", false, "community", "web-ee7", stacks);
+		ArchetypeVersion javaeeEar = stacksArchetypeUtil.getArchetype("javaee-ear", false, "community", "full-ee7", stacks);
 		Map<String, String> repos = StacksArchetypeUtil.getAdditionalRepositories(javaeeEar);
 		assertNotNull(repos);
 		assertEquals(3, repos.size());
@@ -193,7 +193,7 @@ public class StacksArchetypeUtilTest {
 	}
 	
 	
-	@Test
+	//@Test
 	public void testGetArchetypeUnsupportedRuntimes() {
 
 		//Always return the latest archetype, even for unsupported servers

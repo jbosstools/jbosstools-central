@@ -27,14 +27,14 @@ import org.jboss.tools.central.JBossCentralActivator;
 
 public class BundleFamilyExtension {
 
-	private String id;
-	private String label;
+	//private String id;
+	//private String label;
 	private URL defaultListingFileResource;
 	private String url;
 
 	public BundleFamilyExtension(String id, String label, URL defaultListingFileResource, String url) {
-		this.id = id;
-		this.label = label;
+		//this.id = id;
+		//this.label = label;
 		this.defaultListingFileResource = defaultListingFileResource;
 		this.url = url;
 	}

@@ -15,7 +15,7 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
-import org.jboss.tools.project.examples.ProjectExamplesActivator;
+import org.jboss.tools.project.examples.internal.ProjectExamplesActivator;
 
 /**
  * @author snjeza
@@ -46,7 +46,7 @@ public abstract class AbstractImportProjectExample implements
 
 	@Override
 	public void fix(ProjectExampleWorkingCopy project, IProgressMonitor monitor) {
-		ProjectExamplesActivator.fix(project, monitor);
+		ProjectExamplesActivator.getDefault().getProjectFixManager().fix(project, monitor);
 	}
 	
 	@Override

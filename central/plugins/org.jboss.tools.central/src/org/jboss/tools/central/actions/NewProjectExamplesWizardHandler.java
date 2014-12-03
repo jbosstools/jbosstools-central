@@ -27,7 +27,6 @@ import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.ui.INewWizard;
 import org.eclipse.ui.IWorkbenchPartSite;
 import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.internal.WorkbenchPlugin;
 import org.jboss.tools.central.JBossCentralActivator;
 
 /**
@@ -50,7 +49,7 @@ public class NewProjectExamplesWizardHandler extends AbstractHandler {
 				String id = element.getAttribute("id");
 				if (JBossCentralActivator.NEW_PROJECT_EXAMPLES_WIZARD_ID.equals(id)) {
 					try {
-						Object object = WorkbenchPlugin.createExtension(element, "class");
+						Object object = element.createExecutableExtension("class");
 						if (object instanceof INewWizard) {
 					          INewWizard wizard = (INewWizard)object;
 					          IWorkbenchPartSite site = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getPartService().getActivePart().getSite();

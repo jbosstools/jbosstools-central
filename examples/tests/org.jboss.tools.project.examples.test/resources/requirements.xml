@@ -1,0 +1,12 @@
+<projects>
+    <project>
+		<name>errai</name>
+		<fixes>
+			<fix type="wtpruntime">
+				<property name="allowed-types">org.jboss.ide.eclipse.as.runtime.71, org.jboss.ide.eclipse.as.runtime.eap.60, org.jboss.ide.eclipse.as.runtime.eap.61,org.jboss.ide.eclipse.as.runtime.wildfly.80</property>
+				<property name="description">This example runs on JBoss EAP 6, JBoss AS 7.1 or WildFly 8.x</property>
+				<property name="downloadId">org.jboss.tools.runtime.core.as.711</property>
+			</fix>
+		</fixes>
+    </project>		
+</projects>
