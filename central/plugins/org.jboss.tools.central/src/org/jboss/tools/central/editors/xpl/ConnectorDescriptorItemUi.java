@@ -312,8 +312,11 @@ public class ConnectorDescriptorItemUi implements PropertyChangeListener, Runnab
 					if (profileUnits != null && !profileUnits.isEmpty()) {
 						for (String unitId : connector.getInstallableUnits()) {
 							Version version = profileUnits.get(unitId);
-							if (version != null) {
-								int compare = version.compareTo(ConnectorDescriptorItemUi.this.connectorUnits.get(unitId)); 
+							Version connectorUnitVersion = ConnectorDescriptorItemUi.this.connectorUnits.get(unitId);
+							if (connectorUnitVersion == null) {
+								JBossCentralActivator.log("Could not resolve remote IU '" + unitId + "' in repository '" + connector.getSiteUrl() + "'");
+							} else if (version != null) {
+								int compare = version.compareTo(connectorUnitVersion); 
 								if (compare == 0) {
 									ConnectorDescriptorItemUi.this.installationStatus = ConnectorInstallationStatus.UP_TO_DATE;
 									discoveryViewer.modifySelection(ConnectorDescriptorItemUi.this, ConnectorDescriptorItemUi.this.connector.isSelected());
