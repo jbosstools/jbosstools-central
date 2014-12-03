@@ -195,16 +195,13 @@ public class JBossCentralEditor extends SharedHeaderFormEditor {
 			}
 			setPageImage(index, gettingStartedImage);
 
-			if (ProjectExamplesActivator.getDefault().getConfigurator()
-					.getJBossDiscoveryDirectory() != null) {
-				softwarePage = new SoftwarePage(this);
-				index = addPage(softwarePage);
-				if (softwareImage == null) {
-					softwareImage = JBossCentralActivator.getImageDescriptor(
-							"/icons/software.png").createImage();
-				}
-				setPageImage(index, softwareImage);
+			softwarePage = new SoftwarePage(this);
+			index = addPage(softwarePage);
+			if (softwareImage == null) {
+				softwareImage = JBossCentralActivator.getImageDescriptor(
+						"/icons/software.png").createImage();
 			}
+			setPageImage(index, softwareImage);
 		} catch (PartInitException e) {
 			JBossCentralActivator.log(e, "Error adding page");
 		}
