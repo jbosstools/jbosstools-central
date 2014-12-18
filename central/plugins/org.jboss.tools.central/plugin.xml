@@ -275,7 +275,6 @@
 			<newWizardShortcut id="org.jboss.tools.central.wizards.NewJavaeeWarProjectWizard" />
 			<newWizardShortcut id="org.jboss.tools.central.wizards.NewJavaeeEarProjectWizard"/>
 			<newWizardShortcut id="org.jboss.tools.central.wizards.NewHtml5ProjectWizard"/>
-			<newWizardShortcut id="org.jboss.tools.central.wizards.NewRichfacesProjectWizard"/>
 			<newWizardShortcut id="org.jboss.tools.central.wizards.NewSpringMvcProjectWizard"/>
 			<newWizardShortcut id="org.jboss.tools.central.wizards.NewGwtProjectWizard"/>
 		</perspectiveExtension>
