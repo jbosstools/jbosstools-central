@@ -14,8 +14,13 @@ import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.jobs.IJobChangeEvent;
+import org.eclipse.core.runtime.jobs.IJobChangeListener;
+import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.core.runtime.jobs.JobChangeAdapter;
 import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jface.operation.IRunnableContext;
 import org.eclipse.jface.operation.IRunnableWithProgress;
@@ -26,6 +31,7 @@ import org.eclipse.mylyn.internal.discovery.ui.InstalledItem;
 import org.eclipse.mylyn.internal.discovery.ui.UninstallRequest;
 import org.eclipse.mylyn.internal.discovery.ui.wizards.Messages;
 import org.eclipse.osgi.util.NLS;
+import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.preferences.ScopedPreferenceStore;
 import org.eclipse.ui.statushandlers.StatusManager;
 import org.jboss.tools.project.examples.ProjectExamplesActivator;
@@ -43,25 +49,41 @@ public class JBossDiscoveryUi {
 	
 	private static final String MPC_CORE_PLUGIN_ID = "org.eclipse.epp.mpc.core"; //$NON-NLS-1$
 
-	public static boolean install(List<ConnectorDescriptor> descriptors, IRunnableContext context) {
-		try {
-			IRunnableWithProgress runner = createInstallJob(descriptors);
-			context.run(true, true, runner);
-
+	public static boolean install(final List<ConnectorDescriptor> descriptors, IRunnableContext context) {
+			final PrepareInstallProfileJob runner = createInstallJob(descriptors);
+			Job install = new Job("Preparing installation") {
+				@Override
+				protected IStatus run(IProgressMonitor monitor) {
+					try {
+						runner.run(monitor);
+					} catch (InvocationTargetException e) {
+						IStatus status = new Status(IStatus.ERROR, ProjectExamplesActivator.PLUGIN_ID, NLS.bind(
+								Messages.ConnectorDiscoveryWizard_installProblems, new Object[] { e.getCause().getMessage() }),
+								e.getCause());
+						StatusManager.getManager().handle(status, StatusManager.SHOW | StatusManager.BLOCK | StatusManager.LOG);
+						return status;
+					} catch (InterruptedException e) {
+					} finally {
+						monitor.done();
+					}
+					return Status.OK_STATUS;
+				}
+			};
+			
+			install.addJobChangeListener(new JobChangeAdapter() {
+				
+				@Override
+				public void done(IJobChangeEvent event) {
+					new DiscoveryFeedbackJob(descriptors).schedule();
+					recordInstalled(descriptors);
+				}
+			});
+			install.setUser(true);
+			install.schedule();
+				
 			// update stats
-			new DiscoveryFeedbackJob(descriptors).schedule();
-			recordInstalled(descriptors);
-		} catch (InvocationTargetException e) {
-			IStatus status = new Status(IStatus.ERROR, ProjectExamplesActivator.PLUGIN_ID, NLS.bind(
-					Messages.ConnectorDiscoveryWizard_installProblems, new Object[] { e.getCause().getMessage() }),
-					e.getCause());
-			StatusManager.getManager().handle(status, StatusManager.SHOW | StatusManager.BLOCK | StatusManager.LOG);
-			return false;
-		} catch (InterruptedException e) {
-			// canceled
-			return false;
-		}
-		return true;
+			
+			return true;
 	}
 	
 	public static boolean uninstall(final List<ConnectorDescriptor> descriptors, IRunnableContext context, boolean fork) {
