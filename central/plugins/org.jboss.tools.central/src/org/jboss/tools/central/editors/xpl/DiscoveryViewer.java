@@ -1201,14 +1201,6 @@ public class DiscoveryViewer extends Viewer {
 							}
 						}
 					}
-					// pre-load repositories that will be polled for comparison
-					for (Set<DiscoveryConnector> connectors : connectorsById.values()) {
-						if (connectors.size() > 1) {
-							for (DiscoveryConnector connector : connectors) {
-								P2CachedRepoUtil.getRepoForConnector(connector);
-							}
-						}
-					}
 					if (monitor.isCanceled()) {
 						throw new InterruptedException();
 					}
