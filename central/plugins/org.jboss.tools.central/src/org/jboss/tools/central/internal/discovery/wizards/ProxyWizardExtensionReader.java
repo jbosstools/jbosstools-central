@@ -36,6 +36,7 @@ public class ProxyWizardExtensionReader {
 		  .setRequiredComponentIds(requiredComponentIds)
 		  .setRequiredPluginIds(requiredPluginIds)
 		  .setPriority(Integer.parseInt(element.getAttribute("priority")))
+		  .setTags(split(element.getAttribute("tags")))
 		  ;
 		
 		return pw;

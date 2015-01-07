@@ -111,6 +111,13 @@
                </documentation>
             </annotation>
          </attribute>
+         <attribute name="tags" type="string">
+            <annotation>
+               <documentation>
+                  Optional comma-separated list of tags caracterizing this wizard.
+               </documentation>
+            </annotation>
+         </attribute>
       </complexType>
    </element>
 
