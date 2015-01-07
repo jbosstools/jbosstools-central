@@ -29,6 +29,7 @@ public class ProxyWizard implements Comparable<ProxyWizard> {
 	List<String> requiredComponentIds;
 	int priority;
 	private List<String> requiredPluginIds;
+	private List<String> tags;
 
 	public String getId() {
 		return id;
@@ -132,6 +133,8 @@ public class ProxyWizard implements Comparable<ProxyWizard> {
 	                .hashCode());
 		result = prime * result
 				+ ((wizardId == null) ? 0 : wizardId.hashCode());
+		result = prime * result
+				+ ((tags == null) ? 0 : tags.hashCode());
 		return result;
 	}
 
@@ -199,6 +202,26 @@ public class ProxyWizard implements Comparable<ProxyWizard> {
 		} else if (!wizardId.equals(other.wizardId)) {
 			return false;
 		}
+	    if (tags == null) {
+			if (other.tags != null) {
+				return false;
+			}
+		} else if (!tags.equals(other.tags)) {
+			return false;
+		}
 		return true;
+	}
+
+	public List<String> getTags() {
+		return tags;
+	}
+
+	public ProxyWizard setTags(List<String> tags) {
+		this.tags = tags;
+		return this;
+	}
+	
+	public boolean hasTag(String tag) {
+		return tags !=null && tags.contains(tag);
 	}
 }

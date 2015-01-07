@@ -12,6 +12,7 @@ package org.jboss.tools.central.internal.discovery.wizards;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 import java.io.File;
 import java.io.IOException;
@@ -58,6 +59,10 @@ public class RemoteProxyWizardDiscoveryStrategyTest extends AbstractProxyWizardD
 		assertEquals("Java EE Web Project", proxyWizards.get(3).getLabel());
 		assertEquals("Maven Project", proxyWizards.get(4).getLabel());
 		assertEquals("Hybrid Mobile Project", proxyWizards.get(5).getLabel());
+
+		ProxyWizard tagged = proxyWizards.get(4);
+		assertTrue("foo tag not found", tagged.hasTag("foo"));
+		assertTrue("bar tag not found", tagged.hasTag("bar"));
 	}
 	
 	@After
