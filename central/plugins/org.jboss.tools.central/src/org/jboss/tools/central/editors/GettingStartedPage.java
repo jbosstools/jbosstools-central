@@ -50,6 +50,8 @@ import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.preference.PreferenceDialog;
 import org.eclipse.jface.resource.JFaceColors;
 import org.eclipse.jface.resource.JFaceResources;
+import org.eclipse.jface.util.IPropertyChangeListener;
+import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.wizard.WizardDialog;
@@ -116,6 +118,7 @@ import org.jboss.tools.central.internal.discovery.wizards.ProxyWizardManager.Upd
 import org.jboss.tools.central.jobs.RefreshBuzzJob;
 import org.jboss.tools.central.jobs.RefreshTutorialsJob;
 import org.jboss.tools.central.model.FeedsEntry;
+import org.jboss.tools.central.preferences.PreferenceKeys;
 import org.jboss.tools.central.wizards.AbstractJBossCentralProjectWizard;
 import org.jboss.tools.central.wizards.ErrorPage;
 import org.jboss.tools.project.examples.ProjectExamplesActivator;
@@ -132,7 +135,7 @@ import org.osgi.framework.Bundle;
  * @author Fred Bricon
  *
  */
-public class GettingStartedPage extends AbstractJBossCentralPage implements ProxyWizardManagerListener {
+public class GettingStartedPage extends AbstractJBossCentralPage implements ProxyWizardManagerListener, IPropertyChangeListener {
 
 	private static final String BUZZ_WARNING_ID = "org.jboss.tools.central.buzzWarning";
 	
@@ -192,6 +195,8 @@ public class GettingStartedPage extends AbstractJBossCentralPage implements Prox
 		super(editor, ID, "Getting Started");
 		
 		ProxyWizardManager.INSTANCE.registerListener(this);
+		
+		JBossCentralActivator.getDefault().getPreferenceStore().addPropertyChangeListener(this);
 	}
 
 	@Override
@@ -536,9 +541,6 @@ public class GettingStartedPage extends AbstractJBossCentralPage implements Prox
 		public boolean belongsTo(Object family) {
 			return family == JBossCentralActivator.JBOSS_CENTRAL_FAMILY;
 		}
-		
-		
-		  
 	  };
 	  job.schedule();
 	}
@@ -546,8 +548,13 @@ public class GettingStartedPage extends AbstractJBossCentralPage implements Prox
 	private void addProxyWizardLinks(List<ProxyWizard> proxyWizards) {
 		Map<String, IConfigurationElement> installedWizardIds = getInstalledWizardIds();
 		disposeChildren(projectsComposite);
+		
+		boolean earlyAccessEnabled = JBossCentralActivator.getDefault().getPreferences().getBoolean(PreferenceKeys.ENABLE_EARLY_ACCESS, PreferenceKeys.ENABLE_EARLY_ACCESS_DEFAULT_VALUE);
+		
 		for (ProxyWizard proxyWizard : proxyWizards){
-			createProjectLink(toolkit, projectsComposite, proxyWizard, installedWizardIds);
+			if (earlyAccessEnabled || !proxyWizard.hasTag("earlyaccess")) {
+				createProjectLink(toolkit, projectsComposite, proxyWizard, installedWizardIds);
+			}
 		}
 	}
 
@@ -875,6 +882,8 @@ public class GettingStartedPage extends AbstractJBossCentralPage implements Prox
 			categoryFont.dispose();
 			categoryFont = null;
 		}
+		
+		JBossCentralActivator.getDefault().getPreferenceStore().removePropertyChangeListener(this);
 		
 		ProxyWizardManager.INSTANCE.unRegisterListener(this);
 		
@@ -1383,20 +1392,23 @@ public class GettingStartedPage extends AbstractJBossCentralPage implements Prox
 
 	@Override
 	public void onProxyWizardUpdate(final UpdateEvent event) throws CoreException {
-		getDisplay().syncExec(new Runnable() {
+		resetWizards(event.getProxyWizards());
+	}
+	
+	private void resetWizards(final List<ProxyWizard> wizards) throws CoreException {
+		getDisplay().asyncExec(new Runnable() {
 			@Override
 			public void run() {
 				if (projectsComposite.isDisposed()) {
 					return;
 				}
-				List<ProxyWizard> newWizards = event.getProxyWizards();
-				addProxyWizardLinks(newWizards);
+				addProxyWizardLinks(wizards);
 				resize(true);
 			}
 		});
 	}
 
-private class WizardLoadingErrorDialog extends MessageDialog {
+	private class WizardLoadingErrorDialog extends MessageDialog {
 		
 		public WizardLoadingErrorDialog(Shell parentShell) {
 			super(parentShell, "Failed to load Wizard", null,
@@ -1423,5 +1435,16 @@ private class WizardLoadingErrorDialog extends MessageDialog {
 			return link;
 		}
 
+	}
+
+	@Override
+	public void propertyChange(PropertyChangeEvent event) {
+		if (PreferenceKeys.ENABLE_EARLY_ACCESS.equals(event.getProperty())) {
+			try {
+				resetWizards(getProxyWizards());
+			} catch (CoreException e) {
+				JBossCentralActivator.log(e);
+			}
+		}
 	}
 }
