@@ -44,7 +44,7 @@ import org.osgi.framework.Version;
 public class ShowJBossCentral implements IStartup {
 
 	private static final String EDITOR_AREA_ID = IPageLayout.ID_EDITOR_AREA;
-	private static final String ORG_JBOSS_TOOLS_CENTRAL_DONOTSHOW = "org.jboss.tools.central.donotshow"; //$NON-NLS-1$
+	public static final String ORG_JBOSS_TOOLS_CENTRAL_DONOTSHOW = "org.jboss.tools.central.donotshow"; //$NON-NLS-1$
 	private static final String ORG_JBOSS_TOOLS_USAGE = "org.jboss.tools.usage"; //$NON-NLS-1$
 
 	@Override

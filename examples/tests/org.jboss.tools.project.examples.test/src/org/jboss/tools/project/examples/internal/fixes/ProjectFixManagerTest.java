@@ -11,6 +11,7 @@
 package org.jboss.tools.project.examples.internal.fixes;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
@@ -56,11 +57,11 @@ public class ProjectFixManagerTest {
 		example.getRequirements().add(new RequirementModel("wtpruntime"));
 		example.getRequirements().add(new RequirementModel("seam"));
 		ProjectExampleWorkingCopy workingCopy =new ProjectExampleWorkingCopy(example);
-		assertNull(workingCopy.getFixes());
+		assertEquals(0, workingCopy.getFixes().size());
 		
 		manager.loadFixes(workingCopy);
 
-		assertNotNull(workingCopy.getFixes());
+		assertFalse(workingCopy.getFixes().isEmpty());
 		assertEquals(workingCopy.getRequirements().size(), workingCopy.getFixes().size());
 		assertEquals(PluginFix.class, workingCopy.getFixes().get(0).getClass());
 		assertEquals(NoopFix.class, workingCopy.getFixes().get(1).getClass());

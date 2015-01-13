@@ -50,25 +50,13 @@ import com.sun.syndication.io.XmlReader;
 public abstract class AbstractRefreshJob extends Job {
 
 	private static final int TIME_OUT = 2*1000; //2 sec
-	protected List<FeedsEntry> entries = new ArrayList<FeedsEntry>();
+	protected List<FeedsEntry> entries = new ArrayList<>();
 	protected Throwable exception;
 	protected long cacheModified;
 	private String urlString;
 	private File cacheFile;
 	private boolean forcedDownload = false;
 	private boolean needsRefresh = true;
-
-	/**
-	 * Subclasses are expected to provide the urlString via the {@link #getUrlString()} method.
-	 * 
-	 * @param name the name of the Job
-	 * @param urlString the url to fetch data from
-	 */
-	@Deprecated
-	public AbstractRefreshJob(String name, String urlString) {
-		this(name);
-		this.urlString = urlString;
-	}
 
 	public AbstractRefreshJob(String name) {
 		super(name);
@@ -101,6 +89,7 @@ public abstract class AbstractRefreshJob extends Job {
 		InputStream in = new FileInputStream(file);
 		SyndFeedInput input = new SyndFeedInput();
 		SyndFeed syndFeed = input.build(new XmlReader(in));
+		@SuppressWarnings("unchecked")
 		List<SyndEntry> feeds = syndFeed.getEntries();
 		if (feeds == null || feeds.size() == 0) {
 			return;
@@ -150,6 +139,7 @@ public abstract class AbstractRefreshJob extends Job {
 			}
 		}
 		if (description == null) {
+			@SuppressWarnings("unchecked")
 			List<SyndContent> contents = entry.getContents();
 			if (contents != null && contents.size() > 0) {
 				SyndContent desc = contents.get(0);
@@ -207,6 +197,8 @@ public abstract class AbstractRefreshJob extends Job {
 
 	@Override
 	public IStatus run(IProgressMonitor monitor) {
+		long start = System.currentTimeMillis();
+		try {
 		if (monitor.isCanceled()) {
 			return Status.CANCEL_STATUS;
 		}
@@ -251,7 +243,7 @@ public abstract class AbstractRefreshJob extends Job {
 		if (monitor.isCanceled()) {
 			return getValidEntries(monitor);
 		}
-		if (getEntries().size() > 0) {
+		if (!getEntries().isEmpty()) {
 			try {
 				File validCacheFile = getValidCacheFile();
 				if (!validCacheFile.isFile() || cacheFile.lastModified() != validCacheFile.lastModified()) {
@@ -264,6 +256,11 @@ public abstract class AbstractRefreshJob extends Job {
 			}
 		} else {
 			return getValidEntries(monitor);
+		}
+		}
+		finally {
+			long elapsed = System.currentTimeMillis() - start;
+			System.err.println("fetched buzz in "+elapsed);
 		}
 		return Status.OK_STATUS;
 	}

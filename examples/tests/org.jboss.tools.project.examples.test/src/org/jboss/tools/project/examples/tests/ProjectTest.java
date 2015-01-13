@@ -40,6 +40,7 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.jboss.tools.project.examples.internal.Messages;
 import org.jboss.tools.project.examples.internal.ProjectExamplesActivator;
+import org.jboss.tools.project.examples.internal.UnArchiver;
 import org.jboss.tools.project.examples.model.IImportProjectExample;
 import org.jboss.tools.project.examples.model.IProjectExampleSite;
 import org.jboss.tools.project.examples.model.ProjectExample;
@@ -87,7 +88,8 @@ public class ProjectTest {
 		try (InputStream is = entry.openStream()){
 			File file = new File(destination, "testRelativePath.zip");
 			FileUtils.copyInputStreamToFile(is, file);
-			ProjectExamplesActivator.extractZipFile(file, destination, new NullProgressMonitor());
+			UnArchiver unarchiver = UnArchiver.create(file, destination);
+			unarchiver.extract(new NullProgressMonitor());
 		} 
 		IProjectExampleSite site = new ProjectExampleSite();
 		site.setExperimental(false);

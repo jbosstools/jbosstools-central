@@ -27,15 +27,13 @@ public class ProjectExampleWorkingCopy extends ProjectExample {
 
 	private List<IProjectExamplesFix> fixes;
 
-	private String exampleId;
-	
 	public ProjectExampleWorkingCopy() {
 		super();
 	}
 	
 	public ProjectExampleWorkingCopy(ProjectExample projectExample) {
 		this();
-		exampleId = projectExample.getName();
+		setId(projectExample.getId());
 		setCategory(projectExample.getCategory());
 		setDefaultProfiles(projectExample.getDefaultProfiles());
 		setDescription(projectExample.getDescription());
@@ -70,7 +68,7 @@ public class ProjectExampleWorkingCopy extends ProjectExample {
 		setWelcome(projectExample.isWelcome());
 		setWelcomeFixRequired(projectExample.isWelcomeFixRequired());
 		setWelcomeURL(projectExample.getWelcomeURL());
-		
+		setImportFilter(projectExample.getImportFilter());
 		if (projectExample.getArchetypeModel() != null) {
 			try {
 					setArchetypeModel((ArchetypeModel)projectExample.getArchetypeModel().clone());
@@ -82,6 +80,9 @@ public class ProjectExampleWorkingCopy extends ProjectExample {
 	}
 
 	public List<IProjectExamplesFix> getFixes() {
+		if (fixes == null) {
+			fixes = new ArrayList<>(0);
+		}
 		return fixes;
 	}
 
@@ -134,22 +135,8 @@ public class ProjectExampleWorkingCopy extends ProjectExample {
 		super.setArchetypeModel(archetypeModel);
 	}
 
-	public String getExampleId() {
-		//archetype model is a maven concept, shouldn't be available here
-		ArchetypeModel model = getArchetypeModel();
-		//need to introduce stinky coupling to maven type here
-		if (model != null && "mavenArchetype".equals(getImportType())) {
-			exampleId = model.getGAV();
-		}
-		
-		if (exampleId == null || exampleId.trim().isEmpty()) {
-			return getName();
-		}
-		return exampleId;
-	}
-
-	public void setExampleId(String exampleId) {
-		this.exampleId = exampleId;
+	public void setId(String exampleId) {
+		super.setId(exampleId);
 	}
 
 	@Override
@@ -160,5 +147,10 @@ public class ProjectExampleWorkingCopy extends ProjectExample {
 	@Override
 	public void setWelcomeURL(String welcomeURL) {
 		super.setWelcomeURL(welcomeURL);
+	}
+	
+	@Override
+	public void setImportFilter(Set<String> importFilter) {
+		super.setImportFilter(importFilter);
 	}
 }

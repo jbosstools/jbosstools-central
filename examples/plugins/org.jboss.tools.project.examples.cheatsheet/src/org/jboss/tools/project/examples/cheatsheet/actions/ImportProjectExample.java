@@ -85,7 +85,7 @@ public class ImportProjectExample extends Action implements ICheatSheetAction {
 					IImportProjectExample importProjectExample = ProjectExamplesActivator.getDefault().getImportProjectExample(project.getImportType());
 					if (importProjectExample.importProject(project, project.getFile(), new HashMap<String, Object>(), monitor)) {
 						UsageEventType createProjectEvent = ProjectExamplesActivator.getDefault().getCreateProjectFromExampleEventType();
-						UsageReporter.getInstance().trackEvent(createProjectEvent.event(project.getExampleId()));
+						UsageReporter.getInstance().trackEvent(createProjectEvent.event(project.getId()));
 						
 						importProjectExample.fix(project, monitor);
 					}

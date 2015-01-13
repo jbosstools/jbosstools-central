@@ -57,7 +57,7 @@ public class RefreshTutorialsJob extends Job {
 		wizardProjects = ProjectExampleUtil.getProjectsByTags(categories, "wizard");
 		List<ProjectExample> tutorials = ProjectExampleUtil.getProjectsByTags(categories, "central");
 		if (tutorialCategories == null) {
-			tutorialCategories = new HashMap<ProjectExampleCategory, List<ProjectExample>>();
+			tutorialCategories = new HashMap<>();
 		} else {
 			tutorialCategories.clear();
 		}
@@ -66,7 +66,7 @@ public class RefreshTutorialsJob extends Job {
 			ProjectExampleCategory category = categoriesMap.get(project.getCategory());
 			List<ProjectExample> projects = tutorialCategories.get(category);
 			if (projects == null) {
-				projects = new ArrayList<ProjectExample>();
+				projects = new ArrayList<>();
 				tutorialCategories.put(category, projects);
 			}
 			projects.add(project);

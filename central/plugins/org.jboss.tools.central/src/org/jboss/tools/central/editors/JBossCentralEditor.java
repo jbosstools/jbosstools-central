@@ -189,7 +189,7 @@ public class JBossCentralEditor extends SharedHeaderFormEditor {
 	protected void addPages() {
 		try {
 			//gettingStartedPage = new GettingStartedPage(this);
-			gettingStartedPage = new GettingStartedPage(this);
+			gettingStartedPage = new GettingStartedHtmlPage(this);
 			int index = addPage(gettingStartedPage);
 			if (gettingStartedImage == null) {
 				gettingStartedImage = JBossCentralActivator.getImageDescriptor(
@@ -214,8 +214,8 @@ public class JBossCentralEditor extends SharedHeaderFormEditor {
 		return false;
 	}
 
-	@Override
-	protected void createHeaderContents(IManagedForm headerForm) {
+	//@Override
+	protected void _createHeaderContents(IManagedForm headerForm) {
 		final ScrolledForm form = headerForm.getForm();
 		//form.setText(JBOSS_CENTRAL);
 		new HeaderText(form);

@@ -451,9 +451,16 @@ public class ProjectExampleUtil {
 					long modified = file.lastModified();
 					if (modified > 0 && //file already exists and doesn't come from github (or other server sending lastmodified = 0) 
 							(urlModified == 0 //and now there is a problem downloading the file
-							|| urlModified == modified )) {//or the file hasn't changed
+							|| 
+							urlModified == modified)) {//or the file hasn't changed
 						return file;
 					}
+					//Attention fugly hack following this, please close your eyes :-/
+					//if .GA.zip or .Final.zip from github, assume cache can be safely reused
+					if (modified == 0 && urlModified==modified && (file.getName().endsWith("GA.zip") || file.getName().endsWith("Final.zip"))) {
+						return file;
+					}
+					
 				}
 				// file = File.createTempFile(prefix, suffix);
 				// file.deleteOnExit();

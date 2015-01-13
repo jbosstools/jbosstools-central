@@ -443,31 +443,6 @@ public class ProjectExamplesActivator extends AbstractUIPlugin {
 		return true;
 	}
 	
-	public static void copyFile(File inputFile, File outputFile)
-			throws FileNotFoundException, IOException {
-		InputStream in = null;
-		OutputStream out = null;
-		try {
-			in = new FileInputStream(inputFile);
-			out = new FileOutputStream(outputFile);
-			copy(in, out);
-		} finally {
-			if (in != null) {
-				try {
-					in.close();
-				} catch (Exception e) {
-					// ignore
-				}
-			}
-			if (out != null) {
-				try {
-					out.close();
-				} catch (Exception e) {
-					// ignore
-				}
-			}
-		}
-	}
 	public static void openWelcome(List<ProjectExampleWorkingCopy> projects) {
 		if (projects == null) {
 			return;
@@ -698,73 +673,6 @@ public class ProjectExamplesActivator extends AbstractUIPlugin {
 		return false;
 	}
 
-	public static boolean extractZipFile(File file, File destination,
-			IProgressMonitor monitor) {
-		ZipFile zipFile = null;
-		destination.mkdirs();
-		try {
-			zipFile = new ZipFile(file);
-			Enumeration<? extends ZipEntry> entries = zipFile.entries();
-			while (entries.hasMoreElements()) {
-				if (monitor.isCanceled()) {
-					return false;
-				}
-				ZipEntry entry = (ZipEntry) entries.nextElement();
-				if (entry.isDirectory()) {
-					monitor.setTaskName("Extracting " + entry.getName());
-					File dir = new File(destination, entry.getName());
-					dir.mkdirs();
-					continue;
-				}
-				monitor.setTaskName("Extracting " + entry.getName());
-				File entryFile = new File(destination, entry.getName());
-				entryFile.getParentFile().mkdirs();
-				InputStream in = null;
-				OutputStream out = null;
-				try {
-					in = zipFile.getInputStream(entry);
-					out = new FileOutputStream(entryFile);
-					copy(in, out);
-				} finally {
-					if (in != null) {
-						try {
-							in.close();
-						} catch (Exception e) {
-							// ignore
-						}
-					}
-					if (out != null) {
-						try {
-							out.close();
-						} catch (Exception e) {
-							// ignore
-						}
-					}
-				}
-			}
-		} catch (IOException e) {
-			ProjectExamplesActivator.log(e);
-			return false;
-		} finally {
-			if (zipFile != null) {
-				try {
-					zipFile.close();
-				} catch (IOException e) {
-					// ignore
-				}
-			}
-		}
-		return true;
-	}
-	
-	public static void copy(InputStream in, OutputStream out) throws IOException {
-		byte[] buffer = new byte[16 * 1024];
-		int len;
-		while ((len = in.read(buffer)) >= 0) {
-			out.write(buffer, 0, len);
-		}
-	}
-	
 	public static void updatePerspective(List<? extends ProjectExample> projects) {
 		if (projects == null || projects.size() != 1) {
 			return;

@@ -43,6 +43,8 @@ public class ProjectExample implements ProjectModelElement,
 	private static String[] PREFIXES = { "file:", "http:", "https:", "ftp:" }; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 	public static final String IMPORT_TYPE_ZIP = "zip"; //$NON-NLS-1$
 	//name acts as example id
+	private String id;
+	
 	private String name;
 	//headline used in project wizards
 	private String headLine;
@@ -80,6 +82,9 @@ public class ProjectExample implements ProjectModelElement,
 	private Set<String> tags;
 
 	@XmlJavaTypeAdapter(StringToSetUnMarshaller.class)
+	private Set<String> importFilter;
+	
+	@XmlJavaTypeAdapter(StringToSetUnMarshaller.class)
 	private Set<String> essentialEnterpriseDependencies;
 	private String iconPath;
 	private String sourceLocation;
@@ -115,7 +120,7 @@ public class ProjectExample implements ProjectModelElement,
 		return description;
 	}
 
-	void setDescription(String description) {
+	public void setDescription(String description) {
 		this.description = description;
 	}
 
@@ -249,7 +254,7 @@ public class ProjectExample implements ProjectModelElement,
 		return importType;
 	}
 
-	void setImportType(String importType) {
+	public void setImportType(String importType) {
 		this.importType = importType;
 	}
 
@@ -306,6 +311,17 @@ public class ProjectExample implements ProjectModelElement,
 			tags = new HashSet<String>();
 		}
 		return tags;
+	}
+	
+	void setImportFilter(Set<String> importFilter) {
+		this.importFilter = importFilter;
+	}
+
+	public Set<String> getImportFilter() {
+		if (importFilter == null) {
+			importFilter = new HashSet<String>();
+		}
+		return importFilter;
 	}
 
 	public boolean hasTags(String... tags) {
@@ -409,6 +425,23 @@ public class ProjectExample implements ProjectModelElement,
 	 */
 	public String getStacksType() {
 		return stacksType;
+	}
+
+	public String getId() {
+		//archetype model is a maven concept, shouldn't be available here
+		ArchetypeModel model = getArchetypeModel();
+		//need to introduce stinky coupling to maven type here
+		if (model != null && "mavenArchetype".equals(getImportType())) {
+			return model.getGAV();
+		}
+		if (id == null) {
+			id = name;
+		}
+		return id;
+	}
+
+	void setId(String id) {
+		this.id = id;
 	}
 
 }

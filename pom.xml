@@ -66,6 +66,11 @@
 			<url>${jbosstools-playground-site}</url>
 		</repository>
 		<repository>
+			<id>jbosstools-browsersim</id>
+			<layout>p2</layout>
+			<url>${jbosstools-browsersim-site}</url>
+		</repository>
+		<repository>
 			<id>thym</id>
 			<layout>p2</layout>
 			<url>http://download.jboss.org/jbosstools/updates/requirements/thym/0.3.0-SNAPSHOT-201504101636</url>

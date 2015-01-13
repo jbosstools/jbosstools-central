@@ -86,13 +86,11 @@ public class ProjectExampleManagerTest {
 		assertNotSame(archetypeModel, newModel);
 		assertEquals(archetypeModel, newModel);
 		
+		assertEquals(example.getId(), workingCopy.getId());
 		assertEquals(example.getEssentialEnterpriseDependencyGavs(), workingCopy.getEssentialEnterpriseDependencyGavs());
-		assertEquals(example.getName(), workingCopy.getExampleId());
+		assertEquals(example.getName(), workingCopy.getName());
 		assertEquals(example.getHeadLine(), workingCopy.getHeadLine());
 		assertEquals(example.getImportType(), workingCopy.getImportType());
-
-		assertEquals(example.getImportType(), workingCopy.getImportType());
-
 		assertEquals(example.getIncludedProjects(), workingCopy.getIncludedProjects());
 		assertEquals(example.getName(), workingCopy.getName());
 		assertEquals(example.getType(), workingCopy.getType());

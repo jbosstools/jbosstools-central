@@ -140,6 +140,7 @@ public class NewProjectExamplesRequirementsPage extends WizardPage implements IP
 					descriptionText.setText(projectExample.getDescription());
 				}
 				if (projectExample.getSizeAsText() != null && projectSize != null) {
+					projectSize.setVisible(true);
 					projectSize.setText(projectExample.getSizeAsText());
 				}
 			}

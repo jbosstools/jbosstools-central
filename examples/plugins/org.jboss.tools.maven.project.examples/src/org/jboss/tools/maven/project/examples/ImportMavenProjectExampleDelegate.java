@@ -41,7 +41,7 @@ import org.eclipse.m2e.core.ui.internal.actions.OpenMavenConsoleAction;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.jboss.tools.maven.ui.Activator;
-import org.jboss.tools.project.examples.internal.ProjectExamplesActivator;
+import org.jboss.tools.project.examples.internal.UnArchiver;
 import org.jboss.tools.project.examples.model.ProjectExample;
 import org.jboss.tools.project.examples.model.ProjectExampleWorkingCopy;
 import org.jboss.tools.project.examples.model.ProjectImportUtil;
@@ -50,6 +50,7 @@ import org.jboss.tools.project.examples.model.ProjectImportUtil;
  * @author snjeza
  * 
  */
+@SuppressWarnings("restriction")
 public class ImportMavenProjectExampleDelegate extends AbstractImportMavenProjectDelegate {
 
 	private static final String UNNAMED_PROJECTS = "UnnamedProjects"; //$NON-NLS-1$
@@ -106,7 +107,9 @@ public class ImportMavenProjectExampleDelegate extends AbstractImportMavenProjec
 		}
 		boolean ok = false;
 		if (file.isFile()) {
-			ok = ProjectExamplesActivator.extractZipFile(file, destination, monitor);
+			UnArchiver unarchiver = UnArchiver.create(file, destination);
+			unarchiver.setFilters(projectDescription.getImportFilter());
+			ok = unarchiver.extract(monitor);
 		}
 		else if (file.isDirectory()) {
 			destination.mkdirs();
@@ -228,7 +231,7 @@ public class ImportMavenProjectExampleDelegate extends AbstractImportMavenProjec
 			String profiles = projectDescription.getDefaultProfiles();
 			if (profiles != null && profiles.trim().length() > 0) {
 				importConfiguration.getResolverConfiguration()
-						.setActiveProfiles(profiles);
+						.setSelectedProfiles(profiles);
 			}
 			for (MavenProjectInfo info : infos) {
 				String projectName = MavenProjectExamplesActivator.getProjectName(info, importConfiguration);

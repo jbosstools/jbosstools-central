@@ -62,6 +62,7 @@ import org.eclipse.ui.internal.cheatsheets.views.ViewUtilities;
 import org.jboss.tools.project.examples.cheatsheet.Activator;
 import org.jboss.tools.project.examples.internal.Messages;
 import org.jboss.tools.project.examples.internal.ProjectExamplesActivator;
+import org.jboss.tools.project.examples.internal.UnArchiver;
 import org.jboss.tools.project.examples.model.IImportProjectExample;
 import org.jboss.tools.project.examples.model.ProjectExample;
 import org.jboss.tools.project.examples.model.ProjectExampleCategory;
@@ -117,7 +118,7 @@ public class CheatSheetTest {
 				try {
 					importProject(monitor);
 				} catch (Exception e) {
-					// ignore
+					throw new RuntimeException(e);
 				} 
 				return Status.OK_STATUS;
 			}
@@ -334,7 +335,8 @@ public class CheatSheetTest {
 					
 					String dest = Platform.getConfigurationLocation().getURL().getFile();
 					File destination = new File(dest);
-					ProjectExamplesActivator.extractZipFile(file, destination, new NullProgressMonitor());
+					UnArchiver unarchiver = UnArchiver.create(file, destination);
+					unarchiver.extract(new NullProgressMonitor());
 					description.setName(projectName);
 					description.setLocation(new Path(dest).append(projectName));
 					project = workspace.getRoot().getProject(projectName);
