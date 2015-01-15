@@ -16,7 +16,6 @@
 		<module>org.jboss.tools.community.project.examples.feature</module>
 		<module>org.jboss.tools.project.examples.feature</module>
 		<module>org.jboss.tools.maven.project.examples.feature</module>
-		<module>org.jboss.tools.project.examples.seam.feature</module>
 		<module>org.jboss.tools.project.examples.test.feature</module>
 	</modules>
 	<build>
