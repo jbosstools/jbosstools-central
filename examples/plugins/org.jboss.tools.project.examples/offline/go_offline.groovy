@@ -49,6 +49,9 @@ class GoOfflineScript {
   @Parameter(names = ["-h", "--help"], description = "This help", help = true)
   boolean help;
 
+  @Parameter(names =["-s", "--settings"], description = "Path to custom Maven settings.xml")
+  File settings = null
+
   boolean forceMavenResourcePluginResolution = true //on some OS/maven combos, m-r-p:2.5 is not resolved. It should.
 
   def buildErrors = [:]
@@ -80,6 +83,13 @@ class GoOfflineScript {
   }
 
   def goOffline (args) {
+
+    if (settings && !settings.exists()) {
+        throw new IllegalArgumentException("${settings.absolutePath} is not a valid settings.xml path")
+    } else {
+      println "Using settings from ${settings.absolutePath}"
+    }
+
     println "Descriptors : "+ descriptors
     long start = System.currentTimeMillis()
      
@@ -243,6 +253,7 @@ class GoOfflineScript {
     Stacks stacks = new StacksClient(config).getStacks();
     stacks.getAvailableArchetypeVersions().each { av ->
       def a = av.archetype
+      
       File folder = new File(workDir, a.artifactId)
       if (folder.exists()) {
         folder.deleteDir()
@@ -256,11 +267,12 @@ class GoOfflineScript {
       def gav = a.groupId + ":"+ a.artifactId+ ":"+ av.version
       //Only build with enterprise flag when necessary
       if (enterprise && enterpriseArchetypes.contains(gav)){
+
+       
         appName += "-enterprise"
         execMavenArchetypeBuild (a.groupId, a.artifactId, a.recommendedVersion, folder, localRepo, appName)
         execMavenGoOffline(new File(folder, appName), localRepo) 
       } 
-
     }
   }
 
@@ -288,9 +300,26 @@ class GoOfflineScript {
     def pomModel = new XmlSlurper(false,false).parse(pom)    
     def profiles = pomModel?.profiles?.profile?.id.collect{ it.text()}.findAll{!it.startsWith("aerogearci")}.join(",")   
 
+    def name = pomModel.name.text().toLowerCase()
+
     //errai has borked profiles
-    if (pomModel.name.text().toLowerCase().contains("errai")) {
+    if (name.contains("errai")) {
       profiles = profiles.replace(",arq-jbossas-managed","").replace(",arq-jbossas-remote","")
+    }
+
+    //richfaces-archetype-kitchensink 4.5.x has a borked debug profile
+    else if (name.contains("richfaces-archetype-kitchensink")) {
+      profiles = profiles.replace(",debug","")
+    }
+
+    //contacts-mobile-basic has a borked minify profile
+    else if (name.contains("contacts-mobile-basic")) {
+      profiles = profiles.replace(",minify","")
+    }
+
+    //kitchensink-backbone has a borked profiles
+    else if (name.contains("kitchensink-backbone")) {
+      profiles = profiles.replace(",minify","").replace(",graph","")
     }
 
      //"arq-jbossas-remote" can't be combined with other arquillian profiles, it would bork dependency resolution
@@ -327,6 +356,10 @@ class GoOfflineScript {
              failonerror: "false",
              dir: directory,
              executable: getMavenExec()) {
+                if (settings) {
+                  arg(value:"-s")
+                  arg(value:"${settings.absolutePath}")
+                }
                 arg(value:"-B")
                 if (quiet) arg(value:"-q") 
                 arg(value:"clean") 
@@ -380,6 +413,10 @@ class GoOfflineScript {
              dir: directory,
              executable: getMavenExec()) {
                 arg(value:"archetype:generate") 
+                if (settings) {
+                  arg(value:"-s")
+                  arg(value:"${settings.absolutePath}")
+                }
                 if (quiet) arg(value:"-q") 
                 arg(value:"-B") 
                 arg(value:"-DarchetypeGroupId=${groupId}") 
@@ -391,6 +428,7 @@ class GoOfflineScript {
                 arg(value:"-Dversion=1.0.0-SNAPSHOT") 
                 if (appName.endsWith("-enterprise")) arg(value:"-Denterprise=true")
                 if (localRepo) arg(value:"-Dmaven.repo.local=${localRepo.absolutePath}")
+
              }   
 
       if(ant.project.properties.cmdExit != "0"){
