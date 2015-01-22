@@ -313,7 +313,7 @@ class GoOfflineScript {
     }
 
     //contacts-mobile-basic has a borked minify profile
-    else if (name.contains("contacts-mobile-basic")) {
+    else if (name.contains("contacts-mobile-basic") || name.contains("html5-mobile-blank-archetype")) {
       profiles = profiles.replace(",minify","")
     }
 
