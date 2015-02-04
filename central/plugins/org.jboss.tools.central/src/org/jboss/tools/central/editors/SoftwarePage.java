@@ -27,6 +27,7 @@ import org.eclipse.equinox.p2.repository.artifact.IArtifactRepositoryManager;
 import org.eclipse.equinox.p2.repository.metadata.IMetadataRepositoryManager;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ToolBarManager;
+import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.jface.operation.IRunnableContext;
@@ -154,7 +155,15 @@ public class SoftwarePage extends AbstractJBossCentralPage implements IRunnableC
 	    	discoveryViewer.addSystemFilter(this.earlyAccessFilter);
 	    }
 	    discoveryViewer.addSystemFilter(new EarlyAccessOrMostRecentVersionFilter());
-		discoveryViewer.addDirectoryUrl(DiscoveryActivator.getDefault().getJBossDiscoveryDirectory());
+		String catalogURL = DiscoveryActivator.getDefault().getJBossDiscoveryDirectory();
+		if (catalogURL == null) {
+			IStatus errorStatus = new Status(IStatus.ERROR, JBossCentralActivator.PLUGIN_ID,
+					"No URL set for discovery catalog. Check that property " + DiscoveryActivator.JBOSS_DISCOVERY_DIRECTORY + " is set.");
+			JBossCentralActivator.getDefault().getLog().log(errorStatus);
+			ErrorDialog.openError(getSite().getShell(), "Could not load catalog", errorStatus.getMessage(), errorStatus);
+		} else {
+			discoveryViewer.addDirectoryUrl(catalogURL);
+		}
 		discoveryViewer.createControl();
 		discoveryViewer.setEnvironment(getEnvironment());
 		Control discoveryControl = discoveryViewer.getControl();
