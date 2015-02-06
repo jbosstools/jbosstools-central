@@ -63,7 +63,7 @@ public class RefreshTutorialsJob extends Job {
 		}
 
 		for (ProjectExample project : tutorials) {
-			ProjectExampleCategory category = categoriesMap.get(project.getCategory());
+			ProjectExampleCategory category = categoriesMap.get(project.getCategory().getName());
 			List<ProjectExample> projects = tutorialCategories.get(category);
 			if (projects == null) {
 				projects = new ArrayList<ProjectExample>();
