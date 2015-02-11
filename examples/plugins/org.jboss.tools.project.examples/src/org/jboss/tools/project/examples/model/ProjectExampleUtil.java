@@ -223,7 +223,7 @@ public class ProjectExampleUtil {
 		return sites;
 	}
 
-	private static ProjectExampleSite getSite(String url) {
+	public static ProjectExampleSite getSite(String url) {
 		if (url != null) {
 			ProjectExampleSite site = new ProjectExampleSite();
 			try {

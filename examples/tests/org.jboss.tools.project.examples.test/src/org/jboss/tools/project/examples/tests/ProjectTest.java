@@ -20,6 +20,7 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -132,7 +133,10 @@ public class ProjectTest {
 	}
 
 	private void importProject(IProgressMonitor monitor) throws MalformedURLException, Exception {
-		List<ProjectExampleCategory> projects = ProjectExampleUtil.getProjects(monitor);
+		
+		IProjectExampleSite site = ProjectExampleUtil.getSite("http://download.jboss.org/jbosstools/examples/project-examples-community-4.2.Beta2.xml");
+		site.setExperimental(false);
+		List<ProjectExampleCategory> projects = ProjectExampleUtil.getProjects(Collections.singleton(site), monitor);
 		ProjectExampleCategory seamCategory = null;
 		for (ProjectExampleCategory category: projects) {
 			if ("Seam".equals(category.getName())) {
