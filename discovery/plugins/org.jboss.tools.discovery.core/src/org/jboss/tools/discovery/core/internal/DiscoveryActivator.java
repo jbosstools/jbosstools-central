@@ -133,7 +133,7 @@ public class DiscoveryActivator extends AbstractUIPlugin {
 		String directory = System.getProperty(JBOSS_DISCOVERY_DIRECTORY, null);
 		if (directory == null) {
 			IPropertiesProvider pp = PropertiesHelper.getPropertiesProvider();
-			//directory = pp.getValue(JBOSS_DISCOVERY_DIRECTORY);
+			directory = pp.getValue(JBOSS_DISCOVERY_DIRECTORY);
 		}
 		if (directory == null) {
 			logError(String.format("No URL set for discovery catalog. Property %s is missing!", DiscoveryActivator.JBOSS_DISCOVERY_DIRECTORY)); //$NON-NLS-1$
