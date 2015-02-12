@@ -85,10 +85,18 @@ public class DiscoveryActivator extends AbstractUIPlugin {
 	}
 	
 	public static void log(String message) {
-		IStatus status = new Status(IStatus.WARNING, PLUGIN_ID,message);
-		DiscoveryActivator.getDefault().getLog().log(status);
+		log(IStatus.WARNING, message);
+	}
+	
+	public static void logError(String message) {
+		log(IStatus.ERROR, message);
 	}
 
+	public static void log(int severity, String message) {
+		IStatus status = new Status(severity, PLUGIN_ID,message);
+		DiscoveryActivator.getDefault().getLog().log(status);
+	}
+	
 	public Image getImage(ImageDescriptor imageDescriptor) {
 		ImageRegistry imageRegistry = getImageRegistry();
 		String id = getImageId(imageDescriptor);
@@ -125,7 +133,10 @@ public class DiscoveryActivator extends AbstractUIPlugin {
 		String directory = System.getProperty(JBOSS_DISCOVERY_DIRECTORY, null);
 		if (directory == null) {
 			IPropertiesProvider pp = PropertiesHelper.getPropertiesProvider();
-			directory = pp.getValue(JBOSS_DISCOVERY_DIRECTORY);
+			//directory = pp.getValue(JBOSS_DISCOVERY_DIRECTORY);
+		}
+		if (directory == null) {
+			logError(String.format("No URL set for discovery catalog. Property %s is missing!", DiscoveryActivator.JBOSS_DISCOVERY_DIRECTORY)); //$NON-NLS-1$
 		}
 		return directory;
 	}
