@@ -88,16 +88,22 @@ public class InstallationChecker {
 			} catch (ProvisionException ex) {
 				throw new RuntimeException(ex);
 			}
-			if (agent == null)
+			if (agent == null) {
 				throw new RuntimeException("Location was not provisioned by p2");
+			}
 			IProfileRegistry profileRegistry = (IProfileRegistry) agent.getService(IProfileRegistry.SERVICE_NAME);
 			if (profileRegistry == null) {
 				throw new RuntimeException("Unable to acquire the profile registry service.");
 			}
 			IProfile profile = profileRegistry.getProfile(IProfileRegistry.SELF);
+			Set<IInstallableUnit> foundFamilyUnits = Collections.emptySet();
+			if(profile == null) {
+				throw new RuntimeException("Current Eclipse instance doesn't support software installation.");
+			}
+			
 			BundleFamilyExtension entry = this.iuFamilies.get(family);
 			Map<String, Set<VersionRange>> iusForFamily = entry.loadBundleList();
-			Set<IInstallableUnit> foundFamilyUnits = new HashSet<IInstallableUnit>();
+			foundFamilyUnits = new HashSet<IInstallableUnit>();
 			for (Entry<String, Set<VersionRange>> iuVersions : iusForFamily.entrySet()) {
 				String iuId = iuVersions.getKey();
 				for (VersionRange versionRange : iuVersions.getValue()) {
@@ -106,6 +112,7 @@ public class InstallationChecker {
 					foundFamilyUnits.addAll(res.toSet());
 				}
 			}
+
 			installedUnitsPerFamily.put(family, foundFamilyUnits);
 		}
 		return Collections.unmodifiableSet(installedUnitsPerFamily.get(family));
