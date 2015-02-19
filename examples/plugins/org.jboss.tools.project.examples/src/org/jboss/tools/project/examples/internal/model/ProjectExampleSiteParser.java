@@ -1,5 +1,5 @@
 /*************************************************************************************
- * Copyright (c) 2014 Red Hat, Inc. and others.
+ * Copyright (c) 2014-2015 Red Hat, Inc. and others.
  * All rights reserved. This program and the accompanying materials 
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -11,6 +11,7 @@
 package org.jboss.tools.project.examples.internal.model;
 
 import java.io.StringWriter;
+import java.util.Collections;
 import java.util.Set;
 
 import javax.xml.bind.JAXBContext;
@@ -47,7 +48,7 @@ public class ProjectExampleSiteParser extends JaxbParser {
 		}
 		try {
 			SitesWrapper siteList = (SitesWrapper) unmarshall(jaxbContext, xml);
-			return siteList.sites;
+			return siteList.sites == null? Collections.<IProjectExampleSite>emptySet():siteList.sites;
 		} catch (Exception e) {
 			throw new CoreException(new Status(IStatus.ERROR, ProjectExamplesActivator.PLUGIN_ID,
 					"Unable to parse user example sites", e));

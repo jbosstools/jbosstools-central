@@ -1,5 +1,5 @@
 /*************************************************************************************
- * Copyright (c) 2008-2014 Red Hat, Inc. and others.
+ * Copyright (c) 2008-2015 Red Hat, Inc. and others.
  * All rights reserved. This program and the accompanying materials 
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -207,7 +207,10 @@ public class ProjectExampleUtil {
 		String sitesAsXml = store.getString(ProjectExamplesActivator.USER_SITES);
 		if (sitesAsXml != null && !sitesAsXml.trim().isEmpty()) {
 			try {
-				sites.addAll(new ProjectExampleSiteParser().parse(sitesAsXml));
+				Set<IProjectExampleSite> userSites = new ProjectExampleSiteParser().parse(sitesAsXml);
+				if (userSites != null) {
+					sites.addAll(userSites);
+				}
 			} catch (CoreException e) {
 				ProjectExamplesActivator.log("Unable to parse user site preferences ( " + sitesAsXml+ ").\r\nException :"+e.getLocalizedMessage());
 			}
