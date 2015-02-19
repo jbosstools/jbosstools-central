@@ -10,6 +10,9 @@
  ************************************************************************************/
 package org.jboss.tools.project.examples.internal.model;
 
+
+import static org.apache.commons.lang.StringUtils.trimToEmpty;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -22,7 +25,6 @@ import javax.xml.bind.annotation.XmlType;
 import javax.xml.bind.annotation.XmlValue;
 import javax.xml.bind.annotation.adapters.XmlAdapter;
 
-import org.apache.commons.lang.StringUtils;
 import org.jboss.tools.project.examples.internal.TokenizerUtil;
 
 public class XmlUnMarshallers {
@@ -79,12 +81,12 @@ public class XmlUnMarshallers {
 	public static class StringTrimXmlAdapter extends XmlAdapter<String, String> {
 	    @Override
 	    public String unmarshal(String text) throws Exception {
-	        return StringUtils.trimToNull(text);
+	        return trimToEmpty(text);
 	    }
 
 		@Override
 		public String marshal(String text) throws Exception {
-			return StringUtils.trimToEmpty(text);
+			return trimToEmpty(text);
 		}
 	}
 	

@@ -101,6 +101,11 @@ public class ProjectExampleParserTest {
 			assertEquals("org.jboss.ide.eclipse.as.runtime.71, org.jboss.ide.eclipse.as.runtime.eap.60, org.jboss.ide.eclipse.as.runtime.eap.61, org.jboss.ide.eclipse.as.runtime.wildfly.80", wtpReq.getProperties().get("allowed-types"));
 		}
 		{
+			ProjectExample numberguess = result.get(3);
+			assertEquals("richfaces-archetype-simpleapp", numberguess.getName());
+			assertEquals("", numberguess.getUrl());
+		}
+		{
 			ProjectExample numberguess = result.get(4);	
 			assertEquals("numberguess", numberguess.getName());
 			assertEquals(" 2.10MB", numberguess.getSizeAsText());
