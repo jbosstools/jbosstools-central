@@ -346,10 +346,17 @@ public class NewProjectExamplesMainPage extends WizardPage {
 	}
 
 	private List<ProjectExampleCategory> getCategories(boolean show) {
+		
+		final List<ProjectExampleCategory> nonEmptyCategories = new ArrayList<>();
 		IRunnableWithProgress op = new IRunnableWithProgress() {
 			
 			public void run(IProgressMonitor monitor) {
-				categories = ProjectExampleUtil.getProjects(monitor);
+				List<ProjectExampleCategory> rawCategories = ProjectExampleUtil.getProjects(monitor);
+				for (ProjectExampleCategory c : rawCategories) {
+					if (c != null && c.getProjects() != null && !c.getProjects().isEmpty()) {
+						nonEmptyCategories.add(c);
+					}
+				}
 			}
 		};
 		try {
@@ -370,6 +377,7 @@ public class NewProjectExamplesMainPage extends WizardPage {
 			boolean toggleState = dialog.getToggleState();
 			ProjectExamplesActivator.getDefault().getPreferenceStore().setValue(ProjectExamplesActivator.SHOW_INVALID_SITES, toggleState);
 		}
+		categories = nonEmptyCategories;
 		return categories;
 	}
 	
