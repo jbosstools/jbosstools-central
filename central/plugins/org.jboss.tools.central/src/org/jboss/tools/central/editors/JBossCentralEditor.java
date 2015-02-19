@@ -546,6 +546,9 @@ public class JBossCentralEditor extends SharedHeaderFormEditor {
 					@Override
 					public void propertyChange(final PropertyChangeEvent event) {
 						if (event.getProperty().equals(PreferenceKeys.ENABLE_EARLY_ACCESS)) {
+							if (heading.isDisposed()) {
+								return;
+							}
 							heading.getDisplay().asyncExec(new Runnable() {
 								@Override
 								public void run() {
