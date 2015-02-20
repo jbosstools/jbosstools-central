@@ -74,6 +74,7 @@ import org.eclipse.ui.internal.forms.widgets.BusyIndicator;
 import org.eclipse.ui.internal.forms.widgets.FormHeading;
 import org.eclipse.ui.internal.forms.widgets.TitleRegion;
 import org.eclipse.ui.menus.CommandContributionItem;
+import org.eclipse.ui.progress.UIJob;
 import org.jboss.tools.central.JBossCentralActivator;
 import org.jboss.tools.central.actions.OpenWithBrowserHandler;
 import org.jboss.tools.central.editors.xpl.TextSearchControl;
@@ -567,16 +568,11 @@ public class JBossCentralEditor extends SharedHeaderFormEditor {
 					}
 				});
 				// Early access installed
-				Job checkEarlyAccessJob = new Job("Check installation for Early Access") {
+				Job checkEarlyAccessJob = new UIJob("Check installation for Early Access") {
 					@Override
-					protected IStatus run(IProgressMonitor monitor) {
+					public IStatus runInUIThread(IProgressMonitor monitor) {
 						HeaderText.this.hasEarlyAccessIUs = InstallationChecker.getInstance().hasEarlyAccess();
-						heading.getDisplay().asyncExec(new Runnable() {
-							@Override
-							public void run() {
-								updateTitle(heading);	
-							}
-						});
+						updateTitle(heading);	
 						return Status.OK_STATUS;
 					}
 				};
