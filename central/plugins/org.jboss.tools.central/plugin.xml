@@ -330,4 +330,20 @@
        </page>
     </extension>		
 
+  <extension
+         point="org.eclipse.help.ui.searchEngine">
+	<engine
+	      enabled="true"
+	      engineTypeId="org.jboss.tools.common.help.ui.search.SearchiskoSearchEngine"
+	      id="org.jboss.tools.developer.search"
+	      label="JBoss Developer Search">
+	      <description>
+	        Searches blog posts, articles, web pages and solutions on JBoss Community and Red Hat websites.
+	      </description>
+	      <param 
+      			name="url" 
+      			value="http://dcp.jboss.org/v1/rest/search?query={expression}+AND+sys_type%3A(blogpost+article+webpage+solution)&amp;size=100">
+      	  </param>
+	</engine>
+  </extension>
 </plugin>
