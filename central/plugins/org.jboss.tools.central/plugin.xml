@@ -75,19 +75,19 @@
             name="JBoss Tools Home"
             id="org.jboss.tools.central.openJBossToolsHome">
       </command>
-      
+
       <command
       		defaultHandler="org.jboss.tools.central.actions.OpenJBossBuzzHandler"
             name="JBoss Buzz"
             id="org.jboss.tools.central.openJBossBuzz">
       </command>
-      
+
       <command
       		defaultHandler="org.jboss.tools.central.actions.RefreshJBossTutorialsHandler"
             name="Refresh"
             id="org.jboss.tools.central.refreshJBossTutorials">
       </command>
-      
+
       <command
       		defaultHandler="org.jboss.tools.central.actions.RefreshJBossBuzzHandler"
             name="Refresh"
@@ -248,7 +248,7 @@
             name="AngularJS with Forge Project"
             project="true">
       </wizard>
-      
+
    </extension>
 
    <extension
@@ -261,10 +261,10 @@
 		</perspectiveExtension>
    </extension>
 
-   <!-- for offline access to the wizards -->	
+   <!-- for offline access to the wizards -->
     <extension point="org.jboss.tools.central.proxyWizard">
-      <proxyWizard 
-          id="html5.wizard" 
+      <proxyWizard
+          id="html5.wizard"
           description="%html5.wizard.description"
           label="HTML5 Project"
           priority="1"
@@ -272,8 +272,8 @@
           wizardId="org.jboss.tools.central.wizards.NewHtml5ProjectWizard"
           >
       </proxyWizard>
-      <proxyWizard 
-          id="javaee.wizard" 
+      <proxyWizard
+          id="javaee.wizard"
           description="%javaeeweb.wizard.description"
           label="Java EE Web Project"
           priority="5"
@@ -282,8 +282,8 @@
           >
       </proxyWizard>
 
-      <proxyWizard 
-          id="forge.wizard" 
+      <proxyWizard
+          id="forge.wizard"
           description="%forge.wizard.description"
           label="AngularJS Forge"
           priority="4"
@@ -293,8 +293,8 @@
           requiredComponentIds="forge-tools-feature"
           >
       </proxyWizard>
-      <proxyWizard 
-          id="openshift.wizard" 
+      <proxyWizard
+          id="openshift.wizard"
           description="%openshift.wizard.description"
           label="OpenShift Application"
           priority="2"
@@ -302,8 +302,8 @@
           wizardId="org.jboss.ide.eclipse.as.openshift.express.ui.wizard.createNewApplicationWizard"
           requiredComponentIds="org.jboss.tools.openshift.feature">
       </proxyWizard>
-      <proxyWizard 
-          id="hybrid.mobile.wizard" 
+      <proxyWizard
+          id="hybrid.mobile.wizard"
           description="%hybrid.mobile.wizard.description"
           label="Hybrid Mobile Project"
           priority="6"
@@ -312,7 +312,7 @@
           wizardId="org.eclipse.thym.ui.NewHybridProjectWizard">
       </proxyWizard>
       <proxyWizard
-          id="maven.wizard" 
+          id="maven.wizard"
           description="%maven.wizard.description"
           label="Maven Project"
           priority="5"
@@ -328,6 +328,22 @@
              id="org.jboss.tools.central.installation.centralInstallationPage"
              name="JBoss Central">
        </page>
-    </extension>		
+    </extension>
 
+  <extension
+         point="org.eclipse.help.ui.searchEngine">
+	<engine
+	      enabled="true"
+	      engineTypeId="org.jboss.tools.foundation.help.ui.search.SearchiskoSearchEngine"
+	      id="org.jboss.tools.developer.search"
+	      label="JBoss Developer Search">
+	      <description>
+	        Searches blog posts, articles, web pages and solutions on JBoss Community and Red Hat websites.
+	      </description>
+	      <param
+      			name="url"
+      			value="http://dcp.jboss.org/v1/rest/search?query={expression}+AND+sys_type%3A(blogpost+article+webpage+solution)&amp;size=100">
+      	  </param>
+	</engine>
+  </extension>
 </plugin>
