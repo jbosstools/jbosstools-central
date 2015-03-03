@@ -285,7 +285,8 @@ public class JBossCentralEditor extends SharedHeaderFormEditor {
 	    settingsComposite.setLayout(layout);
 	    //GridDataFactory.fillDefaults().grab(true, true).applyTo(settingsComposite);
 		
-	    final Button showOnStartup = getToolkit().createButton(settingsComposite, "Show on Startup", SWT.CHECK);
+	    final Button showOnStartup = getToolkit().createButton(settingsComposite, "", SWT.CHECK);
+	    showOnStartup.setToolTipText("Show on Startup");
 		showOnStartup.setLayoutData(new GridData(SWT.BEGINNING, SWT.TOP, false, false));
 		showOnStartup.setBackground(null);
 		showOnStartup.setSelection(JBossCentralActivator.getDefault().showJBossCentralOnStartup());
