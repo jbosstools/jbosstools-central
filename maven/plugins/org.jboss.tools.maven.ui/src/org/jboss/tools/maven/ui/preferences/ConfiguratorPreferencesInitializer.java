@@ -68,7 +68,11 @@ public class ConfiguratorPreferencesInitializer extends
 				Activator.CONFIGURE_GWT_VALUE);
 		node.putBoolean(
 				Activator.ENABLE_MAVEN_CLEAN_VERIFY_MENU,
-				Activator.ENABLE_MAVEN_CLEAN_VERIFY_MENU_VALUE);	
+				Activator.ENABLE_MAVEN_CLEAN_VERIFY_MENU_VALUE);
+		node.putBoolean(
+				Activator.CONFIGURE_ARQUILLIAN,
+				Activator.CONFIGURE_ARQUILLIAN_VALUE);
+		
 	}
 
 }
