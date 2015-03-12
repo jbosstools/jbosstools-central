@@ -26,7 +26,8 @@
 						</goals>
 						<configuration>
 							<skip>false</skip>
-							<url>http://download.jboss.org/jbosstools/discovery/nightly/core/${jbosstools-site-stream}/jbosstools-earlyaccess.properties</url>
+							<!-- TODO: JBDS-3208 change this URL to new path -->
+							<url>http://download.jboss.org/jbosstools/discovery/nightly/core/${jbosstools_site_stream}/jbosstools-earlyaccess.properties</url>
 							<overwrite>true</overwrite>
 							<skipCache>true</skipCache>
 							<outputDirectory>${project.basedir}</outputDirectory>
