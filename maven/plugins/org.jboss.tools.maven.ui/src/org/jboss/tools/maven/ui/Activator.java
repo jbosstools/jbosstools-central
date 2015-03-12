@@ -80,7 +80,11 @@ public class Activator extends AbstractUIPlugin {
 	public static final String CONFIGURE_GWT = "configureGWT"; //$NON-NLS-1$
 
 	public static final boolean CONFIGURE_GWT_VALUE = true;
-	
+
+	public static final String CONFIGURE_ARQUILLIAN = "configureArquillian"; //$NON-NLS-1$
+
+	public static final boolean CONFIGURE_ARQUILLIAN_VALUE = true;
+
 	/**
 	 * @since 1.6.0
 	 */

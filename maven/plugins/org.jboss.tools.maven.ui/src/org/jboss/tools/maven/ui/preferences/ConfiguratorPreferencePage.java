@@ -47,6 +47,7 @@ public class ConfiguratorPreferencePage extends PreferencePage implements
 	private static final String ORG_JBOSS_TOOLS_MAVEN_HIBERNATE = "org.jboss.tools.maven.hibernate"; //$NON-NLS-1$
 	private static final String ORG_JBOSS_TOOLS_MAVEN_SEAM = "org.jboss.tools.maven.seam"; //$NON-NLS-1$
 	private static final String ORG_JBOSS_TOOLS_MAVEN_GWT = "org.jboss.tools.maven.gwt"; //$NON-NLS-1$
+	private static final String ORG_JBOSS_TOOLS_MAVEN_ARQUILLIAN = "org.jboss.tools.arquillian.core"; //$NON-NLS-1$
 
 	private Button configureSeamButton;
 	private Button configureSeamRuntimeButton;
@@ -59,6 +60,7 @@ public class ConfiguratorPreferencePage extends PreferencePage implements
 	private Button configureGwtButton;
   private Button enableMavenCleanVerifyMenuButton;
 	private Image jbossImage;
+	private Button configureArquillianButton;
 	
 	@Override
 	protected Control createContents(Composite parent) {
@@ -138,6 +140,13 @@ public class ConfiguratorPreferencePage extends PreferencePage implements
 			configureGwtButton.setText(Messages.ConfiguratorPreferencePage_Configure_GWT);
 			boolean configureJpa = store.getBoolean(Activator.CONFIGURE_GWT);
 			configureGwtButton.setSelection(configureJpa);
+		}
+		
+		if (bundleExists(ORG_JBOSS_TOOLS_MAVEN_ARQUILLIAN)) { 
+			configureArquillianButton = new Button(composite,SWT.CHECK);
+			configureArquillianButton.setText(Messages.ConfiguratorPreferencePage_Configure_Arquillian);
+			boolean configureArquillian = store.getBoolean(Activator.CONFIGURE_ARQUILLIAN);
+			configureArquillianButton.setSelection(configureArquillian);
 		}
 
 		Button configureMavenButton = new Button(composite, SWT.PUSH);
@@ -232,6 +241,9 @@ public class ConfiguratorPreferencePage extends PreferencePage implements
 		if (bundleExists(ORG_JBOSS_TOOLS_MAVEN_GWT)) { 
 			store.setValue(Activator.CONFIGURE_GWT, Activator.CONFIGURE_GWT_VALUE);
 		}
+		if (bundleExists(ORG_JBOSS_TOOLS_MAVEN_ARQUILLIAN)) { 
+			store.setValue(Activator.CONFIGURE_ARQUILLIAN, Activator.CONFIGURE_ARQUILLIAN_VALUE);
+		}
 		
 		enableMavenCleanVerifyMenuButton.setSelection(Activator.ENABLE_MAVEN_CLEAN_VERIFY_MENU_VALUE);
 		store.setValue(Activator.ENABLE_MAVEN_CLEAN_VERIFY_MENU, Activator.ENABLE_MAVEN_CLEAN_VERIFY_MENU_VALUE);
@@ -264,6 +276,10 @@ public class ConfiguratorPreferencePage extends PreferencePage implements
 
 		if (bundleExists(ORG_JBOSS_TOOLS_MAVEN_GWT)) { 
 			store.setValue(Activator.CONFIGURE_GWT, configureGwtButton.getSelection());
+		}
+		
+		if (bundleExists(ORG_JBOSS_TOOLS_MAVEN_ARQUILLIAN)) { 
+			store.setValue(Activator.CONFIGURE_ARQUILLIAN, configureArquillianButton.getSelection());
 		}
 		
 		store.setValue(Activator.ENABLE_MAVEN_CLEAN_VERIFY_MENU, enableMavenCleanVerifyMenuButton.getSelection());
