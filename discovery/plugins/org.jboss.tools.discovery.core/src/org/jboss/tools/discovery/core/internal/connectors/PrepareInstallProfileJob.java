@@ -156,6 +156,7 @@ public class PrepareInstallProfileJob extends AbstractInstallJob {
 			final RemediationOperation rop, LoadMetadataRepositoryJob job) {
 		if (operation == null) {
 			InstallWizard wizard = new InstallWizard(provisioningUI, operation, initialSelections, job);
+			wizard.setNeedsProgressMonitor(true);
 			WizardDialog dialog = new ProvisioningWizardDialog(ProvUI.getDefaultParentShell(), wizard);
 			dialog.create();
 			PlatformUI.getWorkbench().getHelpSystem().setHelp(dialog.getShell(), IProvHelpContextIds.INSTALL_WIZARD);
@@ -178,8 +179,8 @@ public class PrepareInstallProfileJob extends AbstractInstallJob {
 				}
 				return super.getPreviousPage(page);
 			}
-			
 		};
+		wizard.setNeedsProgressMonitor(true);
 		wizard.setRemediationOperation(rop);
 		WizardDialog dialog = new ProvisioningWizardDialog(ProvUI.getDefaultParentShell(), wizard);
 		dialog.create();
