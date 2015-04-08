@@ -26,6 +26,7 @@ import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent;
+import org.eclipse.equinox.p2.core.ProvisionException;
 import org.eclipse.jface.action.ControlContribution;
 import org.eclipse.jface.action.GroupMarker;
 import org.eclipse.jface.action.IToolBarManager;
@@ -60,6 +61,7 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
@@ -516,7 +518,8 @@ public class JBossCentralEditor extends SharedHeaderFormEditor {
 		private BusyIndicator busyLabel;
 		private TitleRegion titleRegion;
 		private ScrolledForm form;
-		private Boolean hasEarlyAccessIUs;
+		
+		private InstallationChecker installChecker;
 
 		public HeaderText(ScrolledForm form) {
 			this.form = form;
@@ -568,11 +571,22 @@ public class JBossCentralEditor extends SharedHeaderFormEditor {
 					}
 				});
 				// Early access installed
-				Job checkEarlyAccessJob = new UIJob("Check installation for Early Access") {
+				Job checkEarlyAccessJob = new Job("Check installation for Early Access") {
+					private Display display = heading.getDisplay();
+					
 					@Override
-					public IStatus runInUIThread(IProgressMonitor monitor) {
-						HeaderText.this.hasEarlyAccessIUs = InstallationChecker.getInstance().hasEarlyAccess();
-						updateTitle(heading);	
+					public IStatus run(IProgressMonitor monitor) {
+						try {
+							HeaderText.this.installChecker = InstallationChecker.getInstance();	
+						} catch (ProvisionException ex) {
+							JBossCentralActivator.log(ex);
+						}
+						this.display.syncExec(new Runnable() {
+							@Override
+							public void run() {
+								updateTitle(heading);
+							}
+						});	
 						return Status.OK_STATUS;
 					}
 				};
@@ -640,7 +654,7 @@ public class JBossCentralEditor extends SharedHeaderFormEditor {
 			titleLabel.setForeground(foreground);
 
 			boolean isEarlyAccessEnabled = JBossCentralActivator.getDefault().getPreferences().getBoolean(PreferenceKeys.ENABLE_EARLY_ACCESS, PreferenceKeys.ENABLE_EARLY_ACCESS_DEFAULT_VALUE);
-			boolean showEarlyAccessInstalled = this.hasEarlyAccessIUs != null && this.hasEarlyAccessIUs;
+			boolean showEarlyAccessInstalled = this.installChecker != null && this.installChecker.hasEarlyAccess();
 			String title = "Welcome to JBoss";
 			String earlyAccessSuffix = "(Early Access ";
 			if (isEarlyAccessEnabled) {

@@ -44,7 +44,9 @@ public class InstallationChecker {
 	private Map<String, BundleFamilyExtension> iuFamilies;
 	private Map<String, Set<IInstallableUnit>> installedUnitsPerFamily;
 	
-	private InstallationChecker() {
+	private IProfile applicationProfile;
+	
+	private InstallationChecker() throws ProvisionException {
 		this.iuFamilies = new HashMap<String, BundleFamilyExtension>();
 		for (IConfigurationElement extension : Platform.getExtensionRegistry().getConfigurationElementsFor(EXTENSION_POINT_ID)) {
 			String familyId = extension.getAttribute("familyId"); //$NON-NLS-1$
@@ -58,10 +60,26 @@ public class InstallationChecker {
 				JBossCentralActivator.log("Could not load default listing file for " + familyId);
 			}
 		}
+		
+		IProvisioningAgentProvider provider = (IProvisioningAgentProvider) PlatformUI.getWorkbench().getService(IProvisioningAgentProvider.class);
+		IProvisioningAgent agent;
+		agent = provider.createAgent(null); // null = location for running system
+		if (agent == null) {
+			throw new ProvisionException("Location was not provisioned by p2");
+		}
+		IProfileRegistry profileRegistry = (IProfileRegistry) agent.getService(IProfileRegistry.SERVICE_NAME);
+		if (profileRegistry == null) {
+			throw new ProvisionException("Unable to acquire the profile registry service.");
+		}
+		this.applicationProfile = profileRegistry.getProfile(IProfileRegistry.SELF);
+		if(this.applicationProfile == null) {
+			throw new ProvisionException("Current Eclipse instance does not support software installation.");
+		}
+		
 		this.installedUnitsPerFamily = new HashMap<String, Set<IInstallableUnit>>();
 	}
 	
-	public static InstallationChecker getInstance() {
+	public synchronized static InstallationChecker getInstance() throws ProvisionException {
 		if (INSTANCE == null) {
 			INSTANCE = new InstallationChecker();
 		}
@@ -81,26 +99,7 @@ public class InstallationChecker {
 	
 	public Set<IInstallableUnit> getUnits(String family) {
 		if (! installedUnitsPerFamily.containsKey(family)) {
-			IProvisioningAgentProvider provider = (IProvisioningAgentProvider) PlatformUI.getWorkbench().getService(IProvisioningAgentProvider.class);
-			IProvisioningAgent agent;
-			try {
-				agent = provider.createAgent(null); // null = location for running system
-			} catch (ProvisionException ex) {
-				throw new RuntimeException(ex);
-			}
-			if (agent == null) {
-				throw new RuntimeException("Location was not provisioned by p2");
-			}
-			IProfileRegistry profileRegistry = (IProfileRegistry) agent.getService(IProfileRegistry.SERVICE_NAME);
-			if (profileRegistry == null) {
-				throw new RuntimeException("Unable to acquire the profile registry service.");
-			}
-			IProfile profile = profileRegistry.getProfile(IProfileRegistry.SELF);
 			Set<IInstallableUnit> foundFamilyUnits = Collections.emptySet();
-			if(profile == null) {
-				throw new RuntimeException("Current Eclipse instance doesn't support software installation.");
-			}
-			
 			BundleFamilyExtension entry = this.iuFamilies.get(family);
 			Map<String, Set<VersionRange>> iusForFamily = entry.loadBundleList();
 			foundFamilyUnits = new HashSet<IInstallableUnit>();
@@ -108,7 +107,8 @@ public class InstallationChecker {
 				String iuId = iuVersions.getKey();
 				for (VersionRange versionRange : iuVersions.getValue()) {
 					IQuery<IInstallableUnit> query = QueryUtil.createIUQuery(iuId, versionRange);
-					IQueryResult<IInstallableUnit> res = profile.query(query, new NullProgressMonitor());
+					// can use null progress monitor as querying against installed profile is immediate
+					IQueryResult<IInstallableUnit> res = this.applicationProfile.query(query, new NullProgressMonitor());
 					foundFamilyUnits.addAll(res.toSet());
 				}
 			}
