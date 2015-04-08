@@ -388,6 +388,7 @@ public class ConnectorDescriptorItemUi implements PropertyChangeListener, Runnab
 		}
 		text += ")";
 		this.statusLabel.setText(text);
+		this.statusLabel.getParent().layout(new Control[] { this.statusLabel });
 	}
 
 	private static Map<String, org.eclipse.equinox.p2.metadata.Version> resolveProfileUnits(List<String> installableUnits) {
