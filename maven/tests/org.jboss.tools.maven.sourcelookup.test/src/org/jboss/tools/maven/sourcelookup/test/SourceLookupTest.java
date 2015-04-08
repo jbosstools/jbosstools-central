@@ -64,22 +64,19 @@ public class SourceLookupTest {
 		SourceLookupActivator.getDefault().savePreferences();
 		IRuntimeDetectorDelegate delegate = getJBossASHandler();
 		List<RuntimeDefinition> runtimeDefinitions = new ArrayList<RuntimeDefinition>();
-		RuntimeDefinition runtimeDefinition = getRuntimDefinition(delegate, JBOSSTOOLS_TEST_JBOSS_HOME_7_1_1, JBOSS_AS_7_1_1_FINAL);
+		RuntimeDefinition runtimeDefinition = getRuntimeDefinition(delegate, JBOSSTOOLS_TEST_JBOSS_HOME_7_1_1, JBOSS_AS_7_1_1_FINAL);
 		runtimeDefinitions.add(runtimeDefinition);
-		runtimeDefinition = getRuntimDefinition(delegate, JBOSSTOOLS_TEST_JBOSS_HOME_EAP_6_1, JBOSS_EAP_61);
+		runtimeDefinition = getRuntimeDefinition(delegate, JBOSSTOOLS_TEST_JBOSS_HOME_EAP_6_1, JBOSS_EAP_61);
 		runtimeDefinitions.add(runtimeDefinition);
 		delegate.initializeRuntimes(runtimeDefinitions);
 	}
 
 	private static IRuntimeDetectorDelegate getJBossASHandler() {
 		IRuntimeDetector rtdet = RuntimeCoreActivator.getDefault().findRuntimeDetector("org.jboss.tools.runtime.handlers.JBossASHandler");
-		if (rtdet instanceof RuntimeDetector) {
-			return ((RuntimeDetector)rtdet).getDelegate();
-		}
-		return null;
+		return ((RuntimeDetector)rtdet).getDelegate();
 	}
 
-	private static RuntimeDefinition getRuntimDefinition(
+	private static RuntimeDefinition getRuntimeDefinition(
 			IRuntimeDetectorDelegate delegate, String property, String directory) throws IOException {
 		String home = System.getProperty(property, DEVICE_C + directory);
 		File homeFile = new File(home);
@@ -92,22 +89,22 @@ public class SourceLookupTest {
 	@Test
 	public void testServerCreated() {
 		IServer[] servers = ServerCore.getServers();
-		assertTrue("No one JBoss server is created.", servers.length > 0);
+		assertTrue("Some servers were not created. Found ["+ getServersAsString(servers)+"]", servers.length > 1);
 	}
 	
 	@Test
 	public void testSourceContainerAS711() throws Exception {
-		assertServerHasSource(JBOSS_AS_7_1_1_FINAL,WELD_BOOTSTRAP_JAVA);	
+		assertServerHasSource("JBoss AS 7.1",WELD_BOOTSTRAP_JAVA);
 	}
 	
 	@Test
 	public void testSourceContainerEAP61() throws Exception {
-		assertServerHasSource(JBOSS_EAP_61,WELD_BOOTSTRAP_JAVA);
+		assertServerHasSource("JBoss EAP 6.1",WELD_BOOTSTRAP_JAVA);
 	}
 	
 	private void assertServerHasSource(String serverName, String sourceName) throws Exception {
 		IServer server = getServerByName(serverName);
-		assertNotNull(server);
+		assertNotNull(serverName + " was not found among "+ getServersAsString(), server);
 		ILaunchConfiguration configuration = server.getLaunchConfiguration(true, null);
 		assertNotNull(configuration);
 		String sourcePathComputer = configuration.getAttribute(ISourcePathComputer.ATTR_SOURCE_PATH_COMPUTER_ID, (String)null);
@@ -117,7 +114,25 @@ public class SourceLookupTest {
 		assertNotNull("The '" + sourceName + "' entry is not found.", source);
 	}
 
+	private String getServersAsString(IServer[] servers) {
+		StringBuilder sb = new StringBuilder();
+		boolean addComma = false;
+		for (IServer server:servers) {
+			if (addComma) {
+				sb.append(", ");
+			}
+			sb.append(server.getName());
+			addComma = true;
+		}
+		return sb.toString();
+	}
+
+	private String getServersAsString() {
+		IServer[] servers = ServerCore.getServers();
+		return getServersAsString(servers);
+	}
 	private IServer getServerByName(String name) {
+		
 		IServer[] servers = ServerCore.getServers();
 		for (IServer server:servers) {
 			if (name.equals(server.getName()) ) { 
@@ -126,4 +141,5 @@ public class SourceLookupTest {
 		}
 		return null;
 	}
+	
 }

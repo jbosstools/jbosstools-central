@@ -60,8 +60,7 @@
 					</plugin>
 					<plugin>
     					<groupId>com.googlecode.maven-download-plugin</groupId>
-    					<artifactId>maven-download-plugin</artifactId>
-    					<version>1.0.0</version>
+    					<artifactId>download-maven-plugin</artifactId>
     					<configuration>
                 			<url>http://download.jboss.org/jbosseap/6/jboss-eap-6.1.0.Alpha/jboss-eap-6.1.0.Alpha.zip</url>
                 			<unpack>true</unpack>
