@@ -38,11 +38,13 @@ public class Messages extends NLS {
 	
 	public static String SoftwarePage_earlyAccessSection_Title;
 	public static String SoftwarePage_earlyAccessSection_message;
+	public static String SoftwarePage_nothingToInstall_title;
+	public static String SoftwarePage_nothingToInstall_description;
 	public static String EarlyAccess_Description;
 
 	public static String remainingEarlyAccessConnectors_title;
-	public static String remainingEarlyAccessConnectors_message; 
-	
+	public static String remainingEarlyAccessConnectors_message;
+
 	static {
 		// initialize resource bundle
 		NLS.initializeMessages(BUNDLE_NAME, Messages.class);

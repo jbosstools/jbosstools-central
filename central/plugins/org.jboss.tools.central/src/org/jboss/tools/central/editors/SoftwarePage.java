@@ -449,7 +449,11 @@ public class SoftwarePage extends AbstractJBossCentralPage implements IRunnableC
 				});
 				List<ConnectorDescriptor> toInstall = new ArrayList<ConnectorDescriptor>(discoveryViewer.getInstallableConnectors());
 				toInstall.addAll(discoveryViewer.getUpdatableConnectors());
-				JBossDiscoveryUi.install(toInstall, dialog);
+				if (toInstall.isEmpty()) {
+					MessageDialog.openInformation(getSite().getShell(), Messages.SoftwarePage_nothingToInstall_title, Messages.SoftwarePage_nothingToInstall_description);
+				} else {
+					JBossDiscoveryUi.install(toInstall, dialog);
+				}
 			} catch (InterruptedException ex) {
                 JBossCentralActivator.getDefault().getLog().log(new Status(IStatus.ERROR, JBossCentralActivator.ID, ex.getMessage(), ex));
 			} catch (InvocationTargetException ite) {
