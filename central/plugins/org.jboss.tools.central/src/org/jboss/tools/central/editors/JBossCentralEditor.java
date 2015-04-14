@@ -377,7 +377,7 @@ public class JBossCentralEditor extends SharedHeaderFormEditor {
 								.getInitialMessage();
 						if (JBossCentralActivator.SEARCH_RED_HAT_CUSTOMER_PORTAL
 								.equals(initialMessage)) {
-							url.append("https://access.redhat.com/search/browse/search#?col=avalon_portal&keyword=");
+							url.append("https://access.redhat.com/search/#/?p=1&srch=any&language=en&q=");
 							url.append(URLEncoder.encode(
 									searchControl.getText(), UTF_8_ENCODING));
 						} else {
