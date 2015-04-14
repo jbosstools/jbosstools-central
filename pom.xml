@@ -60,13 +60,16 @@
 			<layout>p2</layout>
 			<url>${jbosstools-vpe-site}</url>
 		</repository>
-    <!--
-    	<repository>
-      		<id>mars</id>
-      		<layout>p2</layout>
-      		<url>http://download.eclipse.org/releases/mars/</url>
-    	</repository>
-    -->
+		<repository>
+			<id>jbosstools-playground</id>
+			<layout>p2</layout>
+			<url>${jbosstools-playground-site}</url>
+		</repository>
+		<repository>
+			<id>thym</id>
+			<layout>p2</layout>
+			<url>http://download.jboss.org/jbosstools/updates/requirements/thym/0.3.0-SNAPSHOT-201504101636</url>
+		</repository>
 	</repositories>
 
 	<build>
