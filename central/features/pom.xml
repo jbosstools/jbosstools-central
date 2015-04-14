@@ -17,6 +17,7 @@
 		<module>org.jboss.tools.community.central.feature</module>
 		<module>org.jboss.tools.central.themes.feature</module>
 		<module>org.jboss.tools.central.test.feature</module>
+		<module>org.jboss.tools.central.easymport.feature</module>
 	</modules>
 	<build>
 		<plugins>
