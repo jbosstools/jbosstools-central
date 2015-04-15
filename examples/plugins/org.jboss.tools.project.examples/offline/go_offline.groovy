@@ -126,18 +126,6 @@ class GoOfflineScript {
 
     buildArchetypesFromStacks(workDir, mavenRepoDir)
 
-    /*FIXME add interactive support
-    boolean copyCache = false
-    boolean copyMaven = false
-    if (copyCache && downloadDir.exists()) {
-      println "Copy $downloadDir to $finalCacheDir"
-      FileUtils.copyDirectory(downloadDir, finalCacheDir)
-    }
-    if (copyMaven && mavenRepoDir.exists()) {
-      FileUtils.copyDirectory(mavenRepoDir, localMavenRepoDir)
-    }
-    */
-
     println 'Cleaning up installed artifacts created from archetypes'
     if (mavenRepoDir) {
       def installedArtifactfolder = new File(mavenRepoDir, "org/jbosstoolsofflineexamples")
@@ -154,11 +142,15 @@ class GoOfflineScript {
         TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(elapsed))
     );
 
-
     println "Script executed in $duration with ${buildErrors.size()} error(s)"
+
+    if (buildErrors.size()) {
+      def msg = ""
       buildErrors.each {
-        println it.key
+        msg += '\r\n\t'+it.key
       }
+      throw new ScriptProblems(msg)
+    } 
   }
 
 
@@ -438,5 +430,25 @@ class GoOfflineScript {
       }
       ant.project.properties.cmdExit
   }
+}
 
+class ScriptProblems extends RuntimeException {
+
+  boolean displayMessage;
+
+  public ScriptProblems(String msg) {
+    super(msg)
+  }
+
+  public synchronized Throwable fillInStackTrace() {
+    this
+  }
+
+  public String getMessage() {
+    if (!displayMessage) {
+      displayMessage = true
+      return "Some build errors occured"
+    }
+    super.getMessage()
+  }
 }
