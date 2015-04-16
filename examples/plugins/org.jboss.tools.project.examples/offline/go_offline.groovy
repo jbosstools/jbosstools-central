@@ -8,10 +8,10 @@
  * Contributors:
  *     JBoss by Red Hat - Initial implementation.
  ************************************************************************************/
-@Grab(group='org.jboss.jdf', module='stacks-client', version='1.0.1.Final')
-@Grab(group='commons-io', module='commons-io', version='2.4')
-//jcommander is included in the groovy distro by accident, better make sure we express a direct dependency here
-@Grab(group='com.beust', module='jcommander', version='1.30')
+@Grab('org.jboss.jdf:stacks-client:1.0.1.Final')
+@Grab('commons-io:commons-io:2.4')
+@Grab('com.beust:jcommander:1.30')
+@Grab('org.apache.httpcomponents:httpcore:4.0.1')
 
 import org.apache.commons.io.FileUtils
 import static groovyx.gpars.GParsPool.*
@@ -113,18 +113,17 @@ class GoOfflineScript {
 
     def allArchetypeProjects= []
 
+    def mavenRepoDir = new File(offlineDir, ".m2/repository")
+
+    buildArchetypesFromStacks(workDir, mavenRepoDir)
+
     descriptors.each { descriptorUrl ->
       def archetypeProjects = downloadExamples(descriptorUrl, downloadDir, workDir)
       if (archetypeProjects) allArchetypeProjects.addAll archetypeProjects
     }
-
-    def mavenRepoDir = new File(offlineDir, ".m2/repository")
-
     buildExamplesDir(workDir, mavenRepoDir)
 
     buildArchetypesFromExamples(allArchetypeProjects, workDir, mavenRepoDir)
-
-    buildArchetypesFromStacks(workDir, mavenRepoDir)
 
     println 'Cleaning up installed artifacts created from archetypes'
     if (mavenRepoDir) {
@@ -395,7 +394,7 @@ class GoOfflineScript {
   String getMavenExec()  {
     def mvnFileName="./mvnw"
     if (System.properties['os.name'].toLowerCase().contains('windows')) {
-      mvnFileName+=".bat"
+      mvnFileName+=".cmd"
     }
     mvnFileName
   }
