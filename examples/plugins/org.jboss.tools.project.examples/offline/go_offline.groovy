@@ -447,7 +447,10 @@ class GoOfflineScript {
     //remove [exec] prefixes
     def logger = ant.project.buildListeners.find { it instanceof org.apache.tools.ant.DefaultLogger }
     logger.emacsMode = true
-
+    if (!quiet) {
+      logger.setMessageOutputLevel(3)
+    }
+  
     ant.exec(errorproperty: "cmdErr",
              resultproperty:"cmdExit",
              failonerror: "true",
