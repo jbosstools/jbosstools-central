@@ -338,7 +338,10 @@ class GoOfflineScript {
     //remove [exec] prefixes
     def logger = ant.project.buildListeners.find { it instanceof org.apache.tools.ant.DefaultLogger }
     logger.emacsMode = true
-
+    if (!quiet) {
+      logger.setMessageOutputLevel(3)
+    }
+    
     def ultimateGoal = "install"
 
     if (pomModel.groupId.text() == "org.jboss.resteasy.examples" && pomModel.artifactId.text() == "simple") {
@@ -405,7 +408,10 @@ class GoOfflineScript {
     //remove [exec] prefixes
     def logger = ant.project.buildListeners.find { it instanceof org.apache.tools.ant.DefaultLogger }
     logger.emacsMode = true
-
+    if (!quiet) {
+      logger.setMessageOutputLevel(3)
+    }
+  
     ant.exec(errorproperty: "cmdErr",
              resultproperty:"cmdExit",
              failonerror: "false",
