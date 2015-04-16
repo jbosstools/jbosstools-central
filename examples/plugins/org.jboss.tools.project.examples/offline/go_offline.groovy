@@ -316,6 +316,8 @@ class GoOfflineScript {
       profiles = profiles.replace(",minify","")
     }
 
+    addMavenWrapper(directory, localRepo)
+
      //"arq-jbossas-remote" can't be combined with other arquillian profiles, it would bork dependency resolution
      //so we execute 2 builds. with and without arq-jbossas-remote
      if (profiles.contains("arq-jbossas-remote")) {
@@ -388,7 +390,7 @@ class GoOfflineScript {
   }
 
   String getMavenExec()  {
-    def mvnFileName="mvn"
+    def mvnFileName="./mvnw"
     if (System.properties['os.name'].toLowerCase().contains('windows')) {
       mvnFileName+=".bat"
     }
@@ -396,6 +398,9 @@ class GoOfflineScript {
   }
 
   def execMavenArchetypeBuild (groupId, artifactId, version, directory, localRepo, appName) {
+
+    addMavenWrapper(directory, localRepo)
+    
     def ant = new AntBuilder()
     //remove [exec] prefixes
     def logger = ant.project.buildListeners.find { it instanceof org.apache.tools.ant.DefaultLogger }
@@ -430,7 +435,38 @@ class GoOfflineScript {
       }
       ant.project.properties.cmdExit
   }
+
+  def addMavenWrapper(directory, localRepo) {
+    def ant = new AntBuilder()
+    //remove [exec] prefixes
+    def logger = ant.project.buildListeners.find { it instanceof org.apache.tools.ant.DefaultLogger }
+    logger.emacsMode = true
+
+    ant.exec(errorproperty: "cmdErr",
+             resultproperty:"cmdExit",
+             failonerror: "true",
+             dir: directory,
+             executable: "mvn") {
+                arg(value:"io.takari:maven:wrapper")
+                 arg(value:"-N")
+                if (settings) {
+                  arg(value:"-s")
+                  arg(value:"${settings.absolutePath}")
+                }
+                if (quiet) arg(value:"-q")
+                if (localRepo) arg(value:"-Dmaven.repo.local=${localRepo.absolutePath}")
+             }
+
+    if(ant.project.properties.cmdExit != "0"){
+        buildErrors["Failed to add the maven wrapper to "+directory] = ant.project.properties.cmdErr
+    }
+    ant.project.properties.cmdExit
+  }
+
+
 }
+
+
 
 class ScriptProblems extends RuntimeException {
 

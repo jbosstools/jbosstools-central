@@ -5,7 +5,7 @@
       <id>jboss-public-repository</id>
       <repositories>
         <repository>
-          <id>jboss-public-repository</id>
+          <id>jboss-public-repository-group</id>
           <name>JBoss Public</name>
           <url>https://repository.jboss.org/nexus/content/groups/public-jboss/</url>
           <releases>
@@ -16,7 +16,7 @@
       </repositories>
       <pluginRepositories>
         <pluginRepository>
-          <id>jboss-public-repository</id>
+          <id>jboss-public-repository-group</id>
           <name>JBoss Public</name>
           <url>https://repository.jboss.org/nexus/content/groups/public-jboss/</url>
           <releases>

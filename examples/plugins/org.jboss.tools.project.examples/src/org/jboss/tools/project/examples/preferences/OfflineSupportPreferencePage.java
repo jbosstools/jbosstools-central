@@ -219,13 +219,18 @@ public class OfflineSupportPreferencePage extends PreferencePage implements
 		GridDataFactory.fillDefaults().span(2, 1).applyTo(description);
 		description.setText("The following command generates an offline cache usable by the project examples.\n Pre-requisites :\n");
 		
+		
+		Label mvnReq = new Label(goOfflineGroup, SWT.WRAP);
+		GridDataFactory.fillDefaults().span(2, 1).applyTo(mvnReq);
+		mvnReq.setText(" - The version of Maven on your path must be the same embedded in Eclipse");
+				
 		Link groovylink = new Link(goOfflineGroup, SWT.WRAP);
 		GridDataFactory.fillDefaults().span(2, 1).applyTo(groovylink);
 		groovylink.setText(" - <a>Groovy 2.1.x</a> must be set in your path");
 		groovylink.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				openUrl("http://groovy.codehaus.org/Installing+Groovy");
+				openUrl("http://groovy-lang.org/install.html");
 			}
 		});
 		
