@@ -9,42 +9,5 @@
 	</parent>
 	<groupId>org.jboss.tools.discovery.plugins</groupId>
 	<artifactId>org.jboss.tools.discovery.core</artifactId>
-
-	<properties>
-		<!-- This value should be configured at build-time via commandline (eg., in Jenkins via a job parameter)
-         JBIDE-16642 TODO: when closer to release, switch this to /stable/luna/ 
-         SEE ALSO examples/plugins/org.jboss.tools.project.examples/src/org/jboss/tools/project/examples/configurators/DefaultJBossCentralConfigurator.java -->
-		<jboss.discovery.directory.url>http://download.jboss.org/jbosstools/updates/development/luna/jbosstools-directory.xml</jboss.discovery.directory.url>
-	</properties>
-
 	<packaging>eclipse-plugin</packaging>
-	<build>
-		<resources>
-			<resource>
-				<directory>src</directory>
-				<includes>
-					<include>**/discovery.properties</include>
-				</includes>
-				<filtering>true</filtering>
-			</resource>
-		</resources>
-		<plugins>
-			<plugin>
-				<artifactId>maven-resources-plugin</artifactId>
-				<version>2.5</version>
-				<executions>
-					<execution>
-						<id>resource-filtering</id>
-						<!-- Need to execute resource filtering AFTER tycho-compiler-plugin 
-							is executed -->
-						<phase>process-classes</phase>
-						<goals>
-							<goal>resources</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
-		</plugins>
-	</build>
-
 </project>
