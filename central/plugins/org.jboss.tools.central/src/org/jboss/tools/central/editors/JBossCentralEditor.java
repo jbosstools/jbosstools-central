@@ -21,6 +21,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.OperationCanceledException;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
@@ -76,7 +77,6 @@ import org.eclipse.ui.internal.forms.widgets.BusyIndicator;
 import org.eclipse.ui.internal.forms.widgets.FormHeading;
 import org.eclipse.ui.internal.forms.widgets.TitleRegion;
 import org.eclipse.ui.menus.CommandContributionItem;
-import org.eclipse.ui.progress.UIJob;
 import org.jboss.tools.central.JBossCentralActivator;
 import org.jboss.tools.central.actions.OpenWithBrowserHandler;
 import org.jboss.tools.central.editors.xpl.TextSearchControl;
@@ -204,6 +204,9 @@ public class JBossCentralEditor extends SharedHeaderFormEditor {
 						"/icons/software.png").createImage();
 			}
 			setPageImage(index, softwareImage);
+			if (Platform.OS_LINUX.equals(Platform.getOS()) && Platform.WS_GTK.equals(Platform.getWS())) {
+				JBossEditorUtil.refreshTheme();
+			}
 		} catch (PartInitException e) {
 			JBossCentralActivator.log(e, "Error adding page");
 		}

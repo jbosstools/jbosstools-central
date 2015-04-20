@@ -19,6 +19,7 @@ import java.util.List;
 import org.eclipse.core.commands.common.CommandException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.IJobChangeEvent;
 import org.eclipse.core.runtime.jobs.JobChangeAdapter;
@@ -370,6 +371,9 @@ public class SoftwarePage extends AbstractJBossCentralPage implements IRunnableC
 				setEnabled(earlyAccessButton, true);
 				setEnabled(deselectAllButton, true);
 				setEnabled(selectAllButton, true);
+				if (Platform.OS_LINUX.equals(Platform.getOS()) && Platform.WS_GTK.equals(Platform.getWS())) {
+					JBossEditorUtil.refreshTheme();
+				}
 			}
 		});
 		
