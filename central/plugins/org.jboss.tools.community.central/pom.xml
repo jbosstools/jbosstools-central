@@ -16,7 +16,7 @@
 		<plugins>
 			<plugin>
 				<groupId>com.googlecode.maven-download-plugin</groupId>
-        	                <artifactId>download-maven-plugin</artifactId>
+				<artifactId>download-maven-plugin</artifactId>
 				<executions>
 					<execution>
 						<id>get-earlyaccess-listing</id>
@@ -26,8 +26,8 @@
 						</goals>
 						<configuration>
 							<skip>false</skip>
-							<!-- TODO: JBDS-3208 change this URL to new path -->
-							<url>http://download.jboss.org/jbosstools/discovery/nightly/core/${jbosstools_site_stream}/jbosstools-earlyaccess.properties</url>
+							<!-- TODO: JBIDE-19346 should this move to /configuration/ instead of /mars/snapshots/updates/ ? -->
+							<url>http://download.jboss.org/jbosstools/mars/snapshots/updates/earlyaccess.properties/${jbosstools_site_stream}/jbosstools-earlyaccess.properties</url>
 							<overwrite>true</overwrite>
 							<skipCache>true</skipCache>
 							<outputDirectory>${project.basedir}</outputDirectory>
