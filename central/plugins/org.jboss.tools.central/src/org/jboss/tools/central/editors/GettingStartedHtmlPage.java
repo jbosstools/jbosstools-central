@@ -15,25 +15,21 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
-import org.eclipse.core.runtime.IExtension;
-import org.eclipse.core.runtime.IExtensionPoint;
-import org.eclipse.core.runtime.IExtensionRegistry;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.InvalidRegistryObjectException;
-import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.IJobChangeEvent;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.core.runtime.jobs.JobChangeAdapter;
+import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener;
+import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.jface.layout.GridLayoutFactory;
@@ -41,29 +37,24 @@ import org.eclipse.jface.operation.IRunnableContext;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
-import org.eclipse.jface.viewers.ISelection;
-import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.wizard.IWizard;
 import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.mylyn.internal.discovery.core.model.ConnectorDescriptor;
 import org.eclipse.mylyn.internal.discovery.core.model.ConnectorDiscovery;
 import org.eclipse.mylyn.internal.discovery.core.model.DiscoveryConnector;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.custom.BusyIndicator;
+import org.eclipse.swt.browser.Browser;
+import org.eclipse.swt.browser.BrowserFunction;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
-import org.eclipse.ui.INewWizard;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.forms.IManagedForm;
 import org.eclipse.ui.forms.editor.FormEditor;
 import org.eclipse.ui.forms.widgets.ScrolledForm;
-import org.jboss.tools.browsersim.browser.IBrowser;
-import org.jboss.tools.browsersim.browser.IBrowserFunction;
-import org.jboss.tools.browsersim.browser.WebKitBrowserFactory;
 import org.jboss.tools.central.JBossCentralActivator;
 import org.jboss.tools.central.internal.CentralHelper;
 import org.jboss.tools.central.internal.JsonUtil;
@@ -75,14 +66,12 @@ import org.jboss.tools.central.internal.discovery.wizards.ProxyWizardManager.Upd
 import org.jboss.tools.central.jobs.RefreshBuzzJob;
 import org.jboss.tools.central.model.FeedsEntry;
 import org.jboss.tools.central.preferences.PreferenceKeys;
-import org.jboss.tools.central.wizards.AbstractJBossCentralProjectWizard;
 import org.jboss.tools.discovery.core.internal.connectors.DiscoveryUtil;
 import org.jboss.tools.discovery.core.internal.connectors.JBossDiscoveryUi;
 import org.jboss.tools.project.examples.IProjectExampleManager;
 import org.jboss.tools.project.examples.internal.ProjectExamplesActivator;
 import org.jboss.tools.project.examples.model.ProjectExample;
 import org.jboss.tools.project.examples.wizard.NewProjectExamplesWizard2;
-import org.osgi.framework.Bundle;
 
 import com.google.common.base.Function;
 import com.google.common.collect.Maps;
@@ -134,13 +123,14 @@ public class GettingStartedHtmlPage extends AbstractJBossCentralPage implements 
 	public static final String ID = ID_PREFIX + "GettingStartedPage";
 
 	private ScrolledForm form;
-	private IBrowser browser;
+	private Browser browser;
 
 	private Collection<ProxyWizard> allWizards;
 	private Map<String, ProjectExample> examples;
 	private Map<String, ProxyWizard> displayedWizardsMap;
 	private RefreshBuzzJobChangeListener buzzlistener;
-
+	private boolean showOnStartup;
+	
 	public GettingStartedHtmlPage(FormEditor editor) {
 		super(editor, ID, "Getting Started");
 		ProxyWizardManager.INSTANCE.registerListener(this);
@@ -166,7 +156,9 @@ public class GettingStartedHtmlPage extends AbstractJBossCentralPage implements 
 		job.schedule();
 
 		super.createFormContent(managedForm);
-
+		
+		showOnStartup = CentralHelper.isShowOnStartup();
+		
 		form = managedForm.getForm();
 		Composite body = form.getBody();
 		GridLayoutFactory.fillDefaults().applyTo(body);
@@ -178,17 +170,17 @@ public class GettingStartedHtmlPage extends AbstractJBossCentralPage implements 
 				form.removeDisposeListener(this);
 			}
 		});
+		createSettingsListener(body);
 	}
 
 	private void createBrowserSection(final Composite parent) {
-		WebKitBrowserFactory factory = new WebKitBrowserFactory();
-		browser = factory.createBrowser(parent, SWT.NONE, false);
+		browser = new Browser(parent, SWT.NONE);
 		GridData layoutData = new GridData(GridData.FILL_BOTH);
 		layoutData.horizontalSpan = 1;
 		layoutData.verticalSpan = 1;
 		browser.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
-		browser.registerBrowserFunction("openInIDE", new IBrowserFunction() {
+		new BrowserFunction(browser, "openInIDE") {
 			@Override
 			public Object function(Object[] browserArgs) {
 				String function = browserArgs[0].toString();
@@ -205,24 +197,29 @@ public class GettingStartedHtmlPage extends AbstractJBossCentralPage implements 
 					break;
 				case "openpage":
 					getEditor().setActivePage(arg);
-				default:
 					break;
-
+				case "showonstartup":
+					showOnStartup = Boolean.parseBoolean(arg);
+					CentralHelper.setShowOnStartup(showOnStartup);
+					break;
+				default:
+					System.err.println("Function "+ function+"("+ arg+") is not supported");
 				}
 				return null;
 			}
-		});
+		};
 
-		browser.registerBrowserFunction("initialize", new IBrowserFunction() {
+		new BrowserFunction(browser, "initialize") {
 			@Override
 			public Object function(Object[] browserArgs) {
 				browser.execute(getBuzzScript());
 				browser.execute(getProxyWizardsScript());
 				browser.execute(getLoadQuickstartsScript());
 				browser.execute(getToggleEarlyAccessScript());
+				browser.execute(getSetShowOnStartupScript());
 				return null;
 			}
-		});
+		};
 
 		Job centralJob = new Job("Extract Central page") {
 			@Override
@@ -231,7 +228,6 @@ public class GettingStartedHtmlPage extends AbstractJBossCentralPage implements 
 				try {
 					url = CentralHelper.getCentralUrl(monitor);
 					Display.getDefault().asyncExec(new Runnable() {
-						
 						@Override
 						public void run() {
 							browser.setUrl(url);
@@ -414,7 +410,7 @@ public class GettingStartedHtmlPage extends AbstractJBossCentralPage implements 
 	
 	private void syncBrowserExec(final String script) {
 		if (browser != null && !browser.isDisposed()) {
-			Display.getDefault().syncExec(new Runnable() {
+			Display.getDefault().asyncExec(new Runnable() {
 				@Override
 				public void run() {
 					if (!browser.isDisposed()) {
@@ -468,6 +464,40 @@ public class GettingStartedHtmlPage extends AbstractJBossCentralPage implements 
 			browser = null;
 		}
 		super.dispose();
+	}
+	
+	public void createSettingsListener(final Composite parent) {
+		
+		final IPreferenceChangeListener prefChangeListener = new IPreferenceChangeListener() {
+			@Override
+			public void preferenceChange(PreferenceChangeEvent event) {
+				if (PreferenceKeys.SHOW_JBOSS_CENTRAL_ON_STARTUP.equals(event.getKey())) {
+					Object value = event.getNewValue();
+					if (value instanceof String && !browser.isDisposed()) {
+						boolean show = Boolean.parseBoolean((String)value);
+						if (show != showOnStartup) {
+							showOnStartup = show;
+							syncBrowserExec(getSetShowOnStartupScript());
+						}
+					}
+				}
+			}
+		};
+		JBossCentralActivator.getDefault().getPreferences().addPreferenceChangeListener(prefChangeListener );
+		
+		parent.addDisposeListener(new DisposeListener() {
+			@Override
+			public void widgetDisposed(DisposeEvent e) {
+				JBossCentralActivator.getDefault().getPreferences().removePreferenceChangeListener(prefChangeListener);
+				parent.removeDisposeListener(this);
+			}
+		});
+	}
+
+	private String getSetShowOnStartupScript() {
+		String script = "setShowOnStartup('" + showOnStartup + "');";
+		System.err.println(script);
+		return script;
 	}
 	
 }

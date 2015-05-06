@@ -24,7 +24,9 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.jboss.tools.central.JBossCentralActivator;
+import org.jboss.tools.central.preferences.PreferenceKeys;
 import org.jboss.tools.foundation.core.ecf.URLTransportUtility;
 import org.jboss.tools.foundation.core.properties.PropertiesHelper;
 import org.jboss.tools.project.examples.internal.UnArchiver;
@@ -35,6 +37,16 @@ public class CentralHelper {
 
 	private CentralHelper() {}
 	
+	/**
+	 * Returns the url to the Central webpage, defined by the key <code>jboss.central.webpage.url</code> in 
+	 * <a href="http://download.jboss.org/jbosstools/configuration/ide-config.properties">http://download.jboss.org/jbosstools/configuration/ide-config.properties</a>.
+	 *  Note this url can be overriden by starting Eclipse with the system property <code>-Djboss.central.webpage.url=...</code>
+	 * <ul>
+	 * <li>if the <code>jboss.central.webpage.url</code> value ends with the <code>.zip</code> extension, the target file will be downloaded if necessary and extracted locally. The url to the local index.html will be returned.
+	 * <li>else the url defined by <code>jboss.central.webpage.url</code> will be returned as-is</li>
+	 * </ul>
+	 * @throws CoreException
+	 */
 	public static String getCentralUrl(IProgressMonitor monitor) throws CoreException {
 		String remoteUrl = System.getProperty(JBOSS_CENTRAL_WEBPAGE_URL_KEY);
 		if (remoteUrl == null) {
@@ -43,6 +55,14 @@ public class CentralHelper {
 		return getCentralUrl(remoteUrl, monitor);
 	}
 
+	/**
+	 * Returns the url to the Central webpage, defined by the <code>remoteUrl</code> parameter.
+	 * <ul>
+	 * <li>if the <code>remoteUrl</code> ends with the <code>.zip</code>, the target file will be downloaded if necessary and extracted locally.
+	 * <li>else the <code>remoteUrl</code> will be returned as-is</li>
+	 * </ul>
+	 * @throws CoreException
+	 */
 	public static String getCentralUrl(String remoteUrl, IProgressMonitor monitor) throws CoreException {
 		StringBuilder url = new StringBuilder();
 		if (remoteUrl.endsWith(".zip")) {
@@ -93,7 +113,7 @@ public class CentralHelper {
 		return Paths.get(path);
 	}
 
-	static Path downloadIfNeeded(URI uri, IProgressMonitor monitor) throws CoreException {
+	private static Path downloadIfNeeded(URI uri, IProgressMonitor monitor) throws CoreException {
 		String url = uri.toString();
 		int lifespan = URLTransportUtility.CACHE_FOREVER;//url.contains("-SNAPSHOT")?URLTransportUtility.CACHE_UNTIL_EXIT:;
 		File zip = new URLTransportUtility().getCachedFileForURL(url, "Download central", lifespan, monitor);
@@ -123,4 +143,15 @@ public class CentralHelper {
 		return extractedFile ;
 	}
 
+	public static boolean isShowOnStartup() {
+		IEclipsePreferences preferences = JBossCentralActivator.getDefault().getPreferences();
+		return preferences.getBoolean(PreferenceKeys.SHOW_JBOSS_CENTRAL_ON_STARTUP, true);
+	}
+	
+	public static void setShowOnStartup(boolean value) {
+		System.err.println("Setting showOnStartup "+value);
+		IEclipsePreferences preferences = JBossCentralActivator.getDefault().getPreferences();
+		preferences.putBoolean(PreferenceKeys.SHOW_JBOSS_CENTRAL_ON_STARTUP, value);
+		JBossCentralActivator.getDefault().savePreferences();	
+	}
 }

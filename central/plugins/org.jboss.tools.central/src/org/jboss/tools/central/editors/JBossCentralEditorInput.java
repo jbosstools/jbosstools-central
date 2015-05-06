@@ -24,7 +24,7 @@ public class JBossCentralEditorInput implements IEditorInput {
 	public static final JBossCentralEditorInput INSTANCE = new JBossCentralEditorInput();
 	
 	@Override
-	public Object getAdapter(@SuppressWarnings("rawtypes") Class adapter) {
+	public <T> T getAdapter(Class<T> adapter) {
 		return null;
 	}
 

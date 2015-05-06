@@ -225,12 +225,6 @@ public class JBossCentralEditor extends SharedHeaderFormEditor {
 		getToolkit().decorateFormHeading(form.getForm());
 		
 		final IToolBarManager toolbar = form.getToolBarManager();
-		ControlContribution settingsControl = new ControlContribution("Settings") {
-			@Override
-			protected Control createControl(Composite parent) {
-				return createSettingsControl(parent);
-			}
-		};
 		
 		ControlContribution searchControl = new ControlContribution("Search") {
 			@Override
@@ -248,7 +242,6 @@ public class JBossCentralEditor extends SharedHeaderFormEditor {
 					.createContributionItem(getSite(), commandId);
 			toolbar.appendToGroup(COMMANDS_GROUP, item);
 		}
-		toolbar.add(settingsControl);
 
 		toolbar.update(true);
 		form.addDisposeListener(new DisposeListener() {
@@ -273,62 +266,7 @@ public class JBossCentralEditor extends SharedHeaderFormEditor {
 		return composite;
 	}
 
-	public Control createSettingsControl(Composite parent) {
-		
-		settingsComposite = getToolkit().createComposite(parent);
-		GridData gd = new GridData(SWT.BEGINNING, SWT.TOP, false, false);
-		gd.widthHint = 400;
-		settingsComposite.setLayoutData(gd);
-		settingsComposite.setBackground(null);
-		Color black = null;//Display.getDefault().getSystemColor(SWT.COLOR_BLACK);
-		settingsComposite.setBackground(black);
-	    GridLayout layout = new GridLayout(1, true);
-	    layout.horizontalSpacing = 30;
-	    settingsComposite.setLayout(layout);
-	    //GridDataFactory.fillDefaults().grab(true, true).applyTo(settingsComposite);
-		
-	    final Button showOnStartup = getToolkit().createButton(settingsComposite, "Show on Startup", SWT.CHECK);
-		showOnStartup.setLayoutData(new GridData(SWT.BEGINNING, SWT.TOP, false, false));
-		showOnStartup.setBackground(null);
-		showOnStartup.setSelection(JBossCentralActivator.getDefault().showJBossCentralOnStartup());
-		showOnStartup.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				IEclipsePreferences preferences = JBossCentralActivator.getDefault().getPreferences();
-				boolean showOnStartup = preferences.getBoolean(PreferenceKeys.SHOW_JBOSS_CENTRAL_ON_STARTUP, PreferenceKeys.SHOW_JBOSS_CENTRAL_ON_STARTUP_DEFAULT_VALUE);
-				preferences.putBoolean(PreferenceKeys.SHOW_JBOSS_CENTRAL_ON_STARTUP, !showOnStartup);
-				JBossCentralActivator.getDefault().savePreferences();
-			}
-		
-		});
-
-		final IPreferenceChangeListener prefChangeListener = new IPreferenceChangeListener() {
-			@Override
-			public void preferenceChange(PreferenceChangeEvent event) {
-				if (PreferenceKeys.SHOW_JBOSS_CENTRAL_ON_STARTUP.equals(event.getKey()) 
-						&& showOnStartup != null && !showOnStartup.isDisposed()) {
-					Object value = event.getNewValue();
-					if (value instanceof String && !showOnStartup.isDisposed()) {
-						boolean newValue = Boolean.parseBoolean((String)value);
-						showOnStartup.setSelection(newValue);
-					}
-				}
-			}
-		};
-		JBossCentralActivator.getDefault().getPreferences().addPreferenceChangeListener(prefChangeListener );
-		
-		settingsComposite.addDisposeListener(new DisposeListener() {
-			
-			@Override
-			public void widgetDisposed(DisposeEvent e) {
-				JBossCentralActivator.getDefault().getPreferences().removePreferenceChangeListener(prefChangeListener);
-				settingsComposite.removeDisposeListener(this);
-			}
-		});
-		
-		return settingsComposite;
-	}
-
+	
 	protected Control createSearchControl(Composite parent) {
 		
 		toolbarComposite = parent;

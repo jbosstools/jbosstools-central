@@ -11,6 +11,7 @@
 package org.jboss.tools.central.internal;
 
 import java.util.Collection;
+import java.util.Set;
 
 import org.eclipse.core.runtime.CoreException;
 import org.jboss.tools.central.internal.discovery.wizards.ProxyWizard;
@@ -69,10 +70,34 @@ public class JsonUtil {
 	
 
 	private static void append(String key, Object value, StringBuilder json) {
-		String quote = "\"";
-		json.append(quote).append(key).append(quote).append(":").append(quote)
-				.append(value == null ? "" : value.toString().replace("\n", "\\n")).append(quote).append(",");
+		quote(key, json).append(":");
+		if (value instanceof Collection) {
+			json.append("[");
+			boolean addComma = false;
+			for (Object o : (Collection)value) {
+				if (addComma) {
+					json.append(",");
+				}
+				addComma = true;
+				quote(sanitize(o), json);
+			}
+			json.append("]");
+		} else {
+			quote(sanitize(value), json).append(",");
+		}
 	}
+	
+	private static String sanitize(Object value) {
+		return value == null ? "" : value.toString().replace("\n", "\\n");
+	}
+	
+	private static StringBuilder quote(String value, StringBuilder json) {
+		String quote = "\"";
+		json.append(quote).append(value).append(quote);
+		return json;
+	}
+		
+	
 	
 	public static String jsonifyExamples(Collection<ProjectExample> examples) {
 		StringBuilder json = new StringBuilder("[");
@@ -88,6 +113,7 @@ public class JsonUtil {
 				append("label", ex.getName(), json);
 				append("title", ex.getHeadLine(), json);
 				append("description", ex.getDescription(), json);
+				append("tags", ex.getTags(), json);
 				json.append("}");
 			}
 		}
@@ -95,5 +121,4 @@ public class JsonUtil {
 		System.err.println(json);
 		return json.toString();
 	}
-
 }

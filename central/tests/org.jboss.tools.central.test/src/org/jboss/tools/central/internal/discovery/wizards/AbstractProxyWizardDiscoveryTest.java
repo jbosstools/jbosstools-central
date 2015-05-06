@@ -18,6 +18,7 @@ import org.eclipse.jetty.server.Connector;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
 import org.eclipse.jetty.server.handler.ResourceHandler;
+import org.jboss.tools.central.ShowJBossCentral;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -33,7 +34,7 @@ public abstract class AbstractProxyWizardDiscoveryTest {
 	
 	@BeforeClass
 	public static void beforeClass() {
-		System.setProperty("org.jboss.tools.central.donotshow", Boolean.FALSE.toString());
+		System.setProperty(ShowJBossCentral.ORG_JBOSS_TOOLS_CENTRAL_DONOTSHOW, Boolean.FALSE.toString());
 		System.setProperty("org.eclipse.ui.testsDisableWorkbenchAutoSave", Boolean.TRUE.toString());
 	}
 	

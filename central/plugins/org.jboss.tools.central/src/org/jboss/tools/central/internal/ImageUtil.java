@@ -11,8 +11,6 @@
 package org.jboss.tools.central.internal;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
@@ -26,8 +24,6 @@ import java.nio.file.Paths;
 import java.util.jar.JarFile;
 import java.util.zip.ZipEntry;
 
-import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.io.IOUtils;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
@@ -35,7 +31,6 @@ import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.graphics.Device;
 import org.eclipse.swt.graphics.Image;
 import org.jboss.tools.central.JBossCentralActivator;
-import org.jboss.tools.project.examples.internal.ProjectExamplesActivator;
 
 
 /**
@@ -98,7 +93,7 @@ public class ImageUtil {
 				throw new CoreException(status);
 			}
 		}
-		return "file://"+ localFile.toString();
+		return localFile.toUri().toString();
 	}
 	
 	private static Path getLocalImage(String url) {

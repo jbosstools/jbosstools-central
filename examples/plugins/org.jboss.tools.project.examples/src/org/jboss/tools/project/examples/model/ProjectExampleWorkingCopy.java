@@ -153,4 +153,9 @@ public class ProjectExampleWorkingCopy extends ProjectExample {
 	public void setImportFilter(Set<String> importFilter) {
 		super.setImportFilter(importFilter);
 	}
+	
+	@Override
+	public void setTags(Set<String> tags) {
+		super.setTags(tags);
+	}
 }

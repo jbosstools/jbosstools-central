@@ -77,8 +77,8 @@ public class ProjectExampleParser implements IProjectExampleParser {
 
 			// example.setGitRepo(new URI(github_repo_url));
 			example.setUrl(downloadUrl);
-			//Set<String> sys_tags = asSet(fields.get("sys_tags"));
-			//example.setTags(TokenizerUtil.splitToSet(sys_tags));
+			Set<String> sys_tags = asSet(fields.get("sys_tags"));
+			example.setTags(sys_tags);
 			Set<String> importFilter = new HashSet<>();
 			importFilter.add(name);
 			Set<String> prerequisites = asSet(fields.get("prerequisites"));

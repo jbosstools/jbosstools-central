@@ -33,11 +33,6 @@ public class CentralHelperTest {
 			
 		}
 	}
-
-	@Test
-	public  void fff() {
-		System.err.println("index".indexOf(""));
-	}
 	
 	@Test
 	public void testGetCentralSyspropUrl() throws Exception {
