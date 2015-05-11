@@ -23,17 +23,17 @@ import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
-abstract class JaxbParser {
+public abstract class JaxbParser {
 
-	Object unmarshall(JAXBContext jaxbContext, String xml) throws JAXBException, IOException, XMLStreamException {
+	protected Object unmarshall(JAXBContext jaxbContext, String xml) throws JAXBException, IOException, XMLStreamException {
 		return unmarshall(jaxbContext, new StringReader(xml));
 	}
 	
-	Object unmarshall(JAXBContext jaxbContext, File file) throws JAXBException, IOException, XMLStreamException {
+	protected Object unmarshall(JAXBContext jaxbContext, File file) throws JAXBException, IOException, XMLStreamException {
 		return unmarshall(jaxbContext, new FileReader(file));
 	}
 
-	Object unmarshall(JAXBContext jaxbContext, Reader reader) throws JAXBException, IOException, XMLStreamException {
+	protected Object unmarshall(JAXBContext jaxbContext, Reader reader) throws JAXBException, IOException, XMLStreamException {
 		Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
 		XMLInputFactory xmlif = XMLInputFactory.newInstance();
 		try (Reader r = reader){

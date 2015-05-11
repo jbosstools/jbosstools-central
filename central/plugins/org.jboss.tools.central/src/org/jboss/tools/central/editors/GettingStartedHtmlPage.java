@@ -37,6 +37,7 @@ import org.eclipse.jface.operation.IRunnableContext;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
+import org.eclipse.jface.window.Window;
 import org.eclipse.jface.wizard.IWizard;
 import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.mylyn.internal.discovery.core.model.ConnectorDescriptor;
@@ -68,6 +69,8 @@ import org.jboss.tools.central.model.FeedsEntry;
 import org.jboss.tools.central.preferences.PreferenceKeys;
 import org.jboss.tools.discovery.core.internal.connectors.DiscoveryUtil;
 import org.jboss.tools.discovery.core.internal.connectors.JBossDiscoveryUi;
+import org.jboss.tools.project.examples.FavoriteItem;
+import org.jboss.tools.project.examples.IFavoriteExampleManager;
 import org.jboss.tools.project.examples.IProjectExampleManager;
 import org.jboss.tools.project.examples.internal.ProjectExamplesActivator;
 import org.jboss.tools.project.examples.model.ProjectExample;
@@ -126,6 +129,8 @@ public class GettingStartedHtmlPage extends AbstractJBossCentralPage implements 
 	private Browser browser;
 
 	private Collection<ProxyWizard> allWizards;
+	private Collection<FavoriteItem> favorites;
+
 	private Map<String, ProjectExample> examples;
 	private Map<String, ProxyWizard> displayedWizardsMap;
 	private RefreshBuzzJobChangeListener buzzlistener;
@@ -149,7 +154,8 @@ public class GettingStartedHtmlPage extends AbstractJBossCentralPage implements 
 			@Override
 			public void done(IJobChangeEvent event) {
 				examples = ((RefreshQuickstartsJob) event.getJob()).getExamples();
-				syncBrowserExec(getLoadQuickstartsScript());
+				browserExec(getLoadQuickstartsScript());
+				browserExec(getLoadFavoritesScript());
 			}
 
 		});
@@ -181,16 +187,18 @@ public class GettingStartedHtmlPage extends AbstractJBossCentralPage implements 
 		browser.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
 		new BrowserFunction(browser, "openInIDE") {
+			//All function calls must return immediately or else the script will be considered 
+			//blocking in the browser.
 			@Override
 			public Object function(Object[] browserArgs) {
 				String function = browserArgs[0].toString();
 				String arg =  browserArgs[1].toString();
 				switch (function) {
 				case "quickstart":
-					openQuickstart(parent.getShell(), arg);
+					openQuickstart(arg);
 					break;
 				case "wizard":
-					openProxyWizard(parent.getShell(), arg);
+					openProxyWizard(arg);
 					break;
 				case "openlink":
 					JBossCentralActivator.openUrl(arg, parent.getShell());
@@ -212,11 +220,12 @@ public class GettingStartedHtmlPage extends AbstractJBossCentralPage implements 
 		new BrowserFunction(browser, "initialize") {
 			@Override
 			public Object function(Object[] browserArgs) {
-				browser.execute(getBuzzScript());
-				browser.execute(getProxyWizardsScript());
+				browser.execute(getLoadBuzzScript());
+				browser.execute(getLoadProxyWizardsScript());
 				browser.execute(getLoadQuickstartsScript());
 				browser.execute(getToggleEarlyAccessScript());
 				browser.execute(getSetShowOnStartupScript());
+				browser.execute(getLoadFavoritesScript());
 				return null;
 			}
 		};
@@ -243,8 +252,18 @@ public class GettingStartedHtmlPage extends AbstractJBossCentralPage implements 
 					protected IStatus run(IProgressMonitor monitor) {
 						ProxyWizardManager proxyWizardManager = ProxyWizardManager.INSTANCE; // FIXME lookup global instance.
 						List<ProxyWizard> wizards = proxyWizardManager.getProxyWizards(true, monitor);
+						try {
+							favorites = collectFavorites(monitor);
+						} catch (CoreException e) {
+							e.printStackTrace();
+						}
 						resetWizards(wizards);
 						return Status.OK_STATUS;
+					}
+
+					private List<FavoriteItem> collectFavorites(IProgressMonitor monitor) throws CoreException {
+						IFavoriteExampleManager favoriteExampleManager = ProjectExamplesActivator.getDefault().getFavoriteExampleManager();
+						return favoriteExampleManager.getFavoriteItems(10, monitor);
 					}
 
 					@Override
@@ -260,40 +279,64 @@ public class GettingStartedHtmlPage extends AbstractJBossCentralPage implements 
 		centralJob.schedule();
 	}
 
-	protected void openQuickstart(Shell shell, String quickstartId) {
+	protected void openQuickstart(final String quickstartId) {
 		final ProjectExample pe = examples.get(quickstartId);
 		if (pe == null) {
 			System.err.println(quickstartId + " is not a valid quickstart");
 			return;
 		}
-		Display.getDefault().syncExec(new Runnable() {
+		Display.getDefault().asyncExec(new Runnable() {
 			@Override
 			public void run() {
 				IWizard wizard = new NewProjectExamplesWizard2(pe);
 				WizardDialog dialog = new WizardDialog(getSite().getShell(), wizard);
-				dialog.open();
+				if (dialog.open() == Window.OK) {
+					favorite(quickstartId);
+				}
 			}
 		});
 	}
 
-	protected void openProxyWizard(Shell shell, String proxyWizardId) {
-		try {
-			ProxyWizard proxyWizard = displayedWizardsMap.get(proxyWizardId);
-			IConfigurationElement element = findWizard(proxyWizard);
-			if (element == null) {
-				// Wizard not installed/completely available
-				installMissingWizard(proxyWizard.getRequiredComponentIds());
-			} else {
-				WizardSupport.openWizard(element);
+	protected void favorite(final String itemId) {
+		Job job = new Job("Adding "+itemId+" to favorites") {
+			@Override
+			protected IStatus run(IProgressMonitor monitor) {
+				try {
+					IFavoriteExampleManager favoriteExampleManager = ProjectExamplesActivator.getDefault().getFavoriteExampleManager();
+					favoriteExampleManager.favorite(itemId, monitor);
+					favorites = favoriteExampleManager.getFavoriteItems(10, monitor);
+					browserExec(getLoadFavoritesScript());
+				} catch (CoreException e) {
+					JBossCentralActivator.log(e);
+				}
+				return Status.OK_STATUS;
 			}
-		} catch (CoreException e1) {
-			JBossCentralActivator.log(e1);
-		} catch (InvocationTargetException e1) {
-			JBossCentralActivator.log(e1);
-		} catch (InterruptedException e1) {
-			JBossCentralActivator.log(e1);
-		}
-		System.err.println("Opening " + proxyWizardId);
+		};
+		job.schedule();
+	}
+
+	protected void openProxyWizard(String proxyWizardId) {
+		final ProxyWizard proxyWizard = displayedWizardsMap.get(proxyWizardId);
+		Display.getDefault().asyncExec(new Runnable() {
+			@Override
+			public void run() {
+				try {
+					IConfigurationElement element = findWizard(proxyWizard);
+					if (element == null) {
+						// Wizard not installed/completely available
+						installMissingWizard(proxyWizard.getRequiredComponentIds());
+					} else {
+						WizardSupport.openWizard(element);
+					}
+				} catch (CoreException e1) {
+					JBossCentralActivator.log(e1);
+				} catch (InvocationTargetException e1) {
+					JBossCentralActivator.log(e1);
+				} catch (InterruptedException e1) {
+					JBossCentralActivator.log(e1);
+				}
+			}
+		});
 	}
 
 	private IConfigurationElement findWizard(ProxyWizard proxyWizard) {
@@ -372,7 +415,7 @@ public class GettingStartedHtmlPage extends AbstractJBossCentralPage implements 
 	@Override
 	public void propertyChange(PropertyChangeEvent event) {
 		if (PreferenceKeys.ENABLE_EARLY_ACCESS.equals(event.getProperty())) {
-			syncBrowserExec(getToggleEarlyAccessScript());
+			browserExec(getToggleEarlyAccessScript());
 			resetWizards(allWizards);
 		}
 	}
@@ -393,7 +436,7 @@ public class GettingStartedHtmlPage extends AbstractJBossCentralPage implements 
 		}
 		displayedWizardsMap = newWizards;
 		
-		syncBrowserExec(getProxyWizardsScript());
+		browserExec(getLoadProxyWizardsScript());
 	}
 	
 	@Override
@@ -404,16 +447,16 @@ public class GettingStartedHtmlPage extends AbstractJBossCentralPage implements 
 	private class RefreshBuzzJobChangeListener extends JobChangeAdapter {
 		@Override
 		public void done(IJobChangeEvent event) {
-			syncBrowserExec(getBuzzScript());
+			browserExec(getLoadBuzzScript());
 		}
 	}
 	
-	private void syncBrowserExec(final String script) {
+	private void browserExec(final String script) {
 		if (browser != null && !browser.isDisposed()) {
 			Display.getDefault().asyncExec(new Runnable() {
 				@Override
 				public void run() {
-					if (!browser.isDisposed()) {
+					if (browser != null && !browser.isDisposed()) {
 						browser.execute(script);
 					}
 				}
@@ -422,7 +465,7 @@ public class GettingStartedHtmlPage extends AbstractJBossCentralPage implements 
 	}
 
 	//Javascript providers
-	private String getBuzzScript() {
+	private String getLoadBuzzScript() {
 		List<FeedsEntry> buzz = RefreshBuzzJob.INSTANCE.getEntries();
 		buzz = buzz.size() > 5 ? buzz.subList(0, 5) : buzz;
 		String json = JsonUtil.jsonifyBuzz(buzz);
@@ -434,21 +477,39 @@ public class GettingStartedHtmlPage extends AbstractJBossCentralPage implements 
 		boolean earlyAccessEnabled = JBossCentralActivator.getDefault().getPreferences()
 				.getBoolean(PreferenceKeys.ENABLE_EARLY_ACCESS, PreferenceKeys.ENABLE_EARLY_ACCESS_DEFAULT_VALUE);
 		String script = "toggleEarlyAccess(" + earlyAccessEnabled + ");";
-		System.err.println(script);
 		return script;
 	}
 	
-	private String getProxyWizardsScript() {
+	private String getLoadProxyWizardsScript() {
 		final Collection<ProxyWizard> proxyWizards = displayedWizardsMap.values();
 		String wizardsJson = JsonUtil.jsonifyWizards(proxyWizards);
-		System.err.println(wizardsJson);
 		String script = "loadWizards(" + wizardsJson + ");";
 		return script;
 	}
 	
+	
+	private String getLoadFavoritesScript() {
+		Collection<ProjectExample> favoriteExamples = new ArrayList<ProjectExample>(favorites.size());
+		for (FavoriteItem fi : favorites) {
+			ProjectExample example = examples.get(fi.getId());
+			if (example != null) {
+				favoriteExamples.add(example);
+			}
+		}
+		String favoritesJson = JsonUtil.jsonifyExamples(favoriteExamples);
+		String script = "loadFavorites(" + favoritesJson + ");";
+		return script;
+	}
+	
+	
 	private String getLoadQuickstartsScript() {
 		String json = JsonUtil.jsonifyExamples(examples==null?Collections.<ProjectExample>emptyList():examples.values());
 		String script = "loadQuickstarts(" + json + ");";
+		return script;
+	}
+	
+	private String getSetShowOnStartupScript() {
+		String script = "setShowOnStartup('" + showOnStartup + "');";
 		return script;
 	}
 	
@@ -477,7 +538,7 @@ public class GettingStartedHtmlPage extends AbstractJBossCentralPage implements 
 						boolean show = Boolean.parseBoolean((String)value);
 						if (show != showOnStartup) {
 							showOnStartup = show;
-							syncBrowserExec(getSetShowOnStartupScript());
+							browserExec(getSetShowOnStartupScript());
 						}
 					}
 				}
@@ -494,10 +555,4 @@ public class GettingStartedHtmlPage extends AbstractJBossCentralPage implements 
 		});
 	}
 
-	private String getSetShowOnStartupScript() {
-		String script = "setShowOnStartup('" + showOnStartup + "');";
-		System.err.println(script);
-		return script;
-	}
-	
 }

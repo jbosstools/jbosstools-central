@@ -106,6 +106,7 @@ import org.eclipse.ui.internal.wizards.newresource.ResourceMessages;
 import org.eclipse.ui.part.FileEditorInput;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.eclipse.wst.validation.internal.operations.ValidationBuilder;
+import org.jboss.tools.project.examples.IFavoriteExampleManager;
 import org.jboss.tools.project.examples.IProjectExampleManager;
 import org.jboss.tools.project.examples.dialog.MarkerDialog;
 import org.jboss.tools.project.examples.fixes.ProjectFixManager;
@@ -236,6 +237,8 @@ public class ProjectExamplesActivator extends AbstractUIPlugin {
 
 	private IProjectExampleManager projectExampleManager;
 
+	private FavoriteExampleManager favoriteExampleManager;
+
 	
 	/*
 	 * (non-Javadoc)
@@ -271,6 +274,7 @@ public class ProjectExamplesActivator extends AbstractUIPlugin {
 		plugin = null;
 		createProjectFromExampleEventType = null;
 		projectFixManager = null;
+		favoriteExampleManager = null;
 		context = null;
 	}
 
@@ -1060,6 +1064,14 @@ public class ProjectExamplesActivator extends AbstractUIPlugin {
 		}
 		
 		return projectExampleManager;
+	}
+	
+	public IFavoriteExampleManager getFavoriteExampleManager() {
+		if (favoriteExampleManager == null) {
+			favoriteExampleManager = new FavoriteExampleManager();
+		}
+		
+		return favoriteExampleManager;
 	}
 	
 	public ProjectFixManager getProjectFixManager() {
