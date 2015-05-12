@@ -197,8 +197,6 @@ public abstract class AbstractRefreshJob extends Job {
 
 	@Override
 	public IStatus run(IProgressMonitor monitor) {
-		long start = System.currentTimeMillis();
-		try {
 		if (monitor.isCanceled()) {
 			return Status.CANCEL_STATUS;
 		}
@@ -256,11 +254,6 @@ public abstract class AbstractRefreshJob extends Job {
 			}
 		} else {
 			return getValidEntries(monitor);
-		}
-		}
-		finally {
-			long elapsed = System.currentTimeMillis() - start;
-			System.err.println("fetched buzz in "+elapsed);
 		}
 		return Status.OK_STATUS;
 	}
