@@ -149,7 +149,6 @@ public class CentralHelper {
 	}
 	
 	public static void setShowOnStartup(boolean value) {
-		System.err.println("Setting showOnStartup "+value);
 		IEclipsePreferences preferences = JBossCentralActivator.getDefault().getPreferences();
 		preferences.putBoolean(PreferenceKeys.SHOW_JBOSS_CENTRAL_ON_STARTUP, value);
 		JBossCentralActivator.getDefault().savePreferences();	

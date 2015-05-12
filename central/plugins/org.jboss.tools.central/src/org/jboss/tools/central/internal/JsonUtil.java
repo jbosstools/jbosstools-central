@@ -118,7 +118,6 @@ public class JsonUtil {
 			}
 		}
 		json.append("]");
-		System.err.println(json);
 		return json.toString();
 	}
 }
