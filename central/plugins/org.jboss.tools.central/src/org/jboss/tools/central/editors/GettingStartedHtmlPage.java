@@ -45,7 +45,6 @@ import org.eclipse.mylyn.internal.discovery.core.model.ConnectorDescriptor;
 import org.eclipse.mylyn.internal.discovery.core.model.ConnectorDiscovery;
 import org.eclipse.mylyn.internal.discovery.core.model.DiscoveryConnector;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.browser.Browser;
 import org.eclipse.swt.browser.BrowserFunction;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
@@ -58,6 +57,7 @@ import org.eclipse.ui.forms.IManagedForm;
 import org.eclipse.ui.forms.editor.FormEditor;
 import org.eclipse.ui.forms.widgets.ScrolledForm;
 import org.jboss.tools.central.JBossCentralActivator;
+import org.jboss.tools.central.editors.browser.VersionedBrowser;
 import org.jboss.tools.central.internal.CentralHelper;
 import org.jboss.tools.central.internal.JsonUtil;
 import org.jboss.tools.central.internal.WizardSupport;
@@ -128,10 +128,10 @@ public class GettingStartedHtmlPage extends AbstractJBossCentralPage implements 
 		}
 	}
 
-	public static final String ID = ID_PREFIX + "GettingStartedPage";
+	public static final String ID = ID_PREFIX + "GettingStartedPage"; //$NON-NLS-1$
 
 	private ScrolledForm form;
-	private Browser browser;
+	private VersionedBrowser browser;
 
 	private Collection<ProxyWizard> allWizards;
 	private Collection<FavoriteItem> favorites;
@@ -185,13 +185,13 @@ public class GettingStartedHtmlPage extends AbstractJBossCentralPage implements 
 	}
 
 	private void createBrowserSection(final Composite parent) {
-		browser = new Browser(parent, SWT.NONE);
+		browser = new VersionedBrowser(parent, SWT.NONE);
 		GridData layoutData = new GridData(GridData.FILL_BOTH);
 		layoutData.horizontalSpan = 1;
 		layoutData.verticalSpan = 1;
 		browser.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
-
-		new BrowserFunction(browser, "openInIDE") {
+		
+		new BrowserFunction(browser, "openInIDE") { //$NON-NLS-1$
 			//All function calls must return immediately or else the script will be considered 
 			//blocking in the browser.
 			@Override
@@ -199,19 +199,19 @@ public class GettingStartedHtmlPage extends AbstractJBossCentralPage implements 
 				String function = browserArgs[0].toString();
 				String arg =  browserArgs[1].toString();
 				switch (function) {
-				case "quickstart":
+				case "quickstart": //$NON-NLS-1$
 					openQuickstart(arg);
 					break;
-				case "wizard":
+				case "wizard": //$NON-NLS-1$
 					openProxyWizard(arg);
 					break;
-				case "openlink":
+				case "openlink": //$NON-NLS-1$
 					JBossCentralActivator.openUrl(arg, parent.getShell());
 					break;
-				case "openpage":
+				case "openpage": //$NON-NLS-1$
 					getEditor().setActivePage(arg);
 					break;
-				case "showonstartup":
+				case "showonstartup": //$NON-NLS-1$
 					showOnStartup = Boolean.parseBoolean(arg);
 					CentralHelper.setShowOnStartup(showOnStartup);
 					break;
@@ -222,7 +222,7 @@ public class GettingStartedHtmlPage extends AbstractJBossCentralPage implements 
 			}
 		};
 
-		new BrowserFunction(browser, "initialize") {
+		new BrowserFunction(browser, "initialize") { //$NON-NLS-1$
 			@Override
 			public Object function(Object[] browserArgs) {
 				browser.execute(getLoadBuzzScript());
@@ -240,7 +240,8 @@ public class GettingStartedHtmlPage extends AbstractJBossCentralPage implements 
 			protected IStatus run(IProgressMonitor monitor) {
 				final String url;
 				try {
-					url = CentralHelper.getCentralUrl(monitor);
+					// TODO: create a new URL for browsers which does not support HTML5
+					url = browser.HTML5supported() ? CentralHelper.getCentralUrl(monitor) : CentralHelper.getCentralUrl(monitor);
 					Display.getDefault().asyncExec(new Runnable() {
 						@Override
 						public void run() {
@@ -287,7 +288,7 @@ public class GettingStartedHtmlPage extends AbstractJBossCentralPage implements 
 		};
 		centralJob.schedule();
 	}
-
+	
 	protected void openQuickstart(final String quickstartId) {
 		final ProjectExample pe = examples.get(quickstartId);
 		if (pe == null) {
@@ -415,7 +416,7 @@ public class GettingStartedHtmlPage extends AbstractJBossCentralPage implements 
 				MessageDialog.openWarning(shell, "Warning", message);
 				break;
 			case IStatus.INFO:
-				MessageDialog.openInformation(shell, "Information", message);
+				MessageDialog.openInformation(shell, "Information", message); 
 				break;
 			}
 		}
@@ -439,7 +440,7 @@ public class GettingStartedHtmlPage extends AbstractJBossCentralPage implements 
 				.getBoolean(PreferenceKeys.ENABLE_EARLY_ACCESS, PreferenceKeys.ENABLE_EARLY_ACCESS_DEFAULT_VALUE);
 		Map<String, ProxyWizard> newWizards = new LinkedHashMap<>(proxyWizards.size());
 		for (ProxyWizard proxyWizard : proxyWizards) {
-			if (earlyAccessEnabled || !proxyWizard.hasTag("earlyaccess") ) {
+			if (earlyAccessEnabled || !proxyWizard.hasTag("earlyaccess") ) { //$NON-NLS-1$
 				newWizards.put(proxyWizard.getId(), proxyWizard);
 			}
 		}
@@ -478,21 +479,21 @@ public class GettingStartedHtmlPage extends AbstractJBossCentralPage implements 
 		List<FeedsEntry> buzz = RefreshBuzzJob.INSTANCE.getEntries();
 		buzz = buzz.size() > 5 ? buzz.subList(0, 5) : buzz;
 		String json = JsonUtil.jsonifyBuzz(buzz);
-		String script = "loadBuzz(" + json + ");";
+		String script = "loadBuzz(" + json + ");"; //$NON-NLS-1$ //$NON-NLS-2$
 		return script;
 	}
 	
 	private String getToggleEarlyAccessScript() {
 		boolean earlyAccessEnabled = JBossCentralActivator.getDefault().getPreferences()
 				.getBoolean(PreferenceKeys.ENABLE_EARLY_ACCESS, PreferenceKeys.ENABLE_EARLY_ACCESS_DEFAULT_VALUE);
-		String script = "toggleEarlyAccess(" + earlyAccessEnabled + ");";
+		String script = "toggleEarlyAccess(" + earlyAccessEnabled + ");"; //$NON-NLS-1$ //$NON-NLS-2$
 		return script;
 	}
 	
 	private String getLoadProxyWizardsScript() {
 		final Collection<ProxyWizard> proxyWizards = displayedWizardsMap.values();
 		String wizardsJson = JsonUtil.jsonifyWizards(proxyWizards);
-		String script = "loadWizards(" + wizardsJson + ");";
+		String script = "loadWizards(" + wizardsJson + ");"; //$NON-NLS-1$ //$NON-NLS-2$
 		return script;
 	}
 	
@@ -508,19 +509,19 @@ public class GettingStartedHtmlPage extends AbstractJBossCentralPage implements 
 			}
 		}
 		String favoritesJson = JsonUtil.jsonifyExamples(favoriteExamples);
-		String script = "loadFavorites(" + favoritesJson + ");";
+		String script = "loadFavorites(" + favoritesJson + ");"; //$NON-NLS-1$ //$NON-NLS-2$
 		return script;
 	}
 	
 	
 	private String getLoadQuickstartsScript() {
 		String json = JsonUtil.jsonifyExamples(examples==null?Collections.<ProjectExample>emptyList():examples.values());
-		String script = "loadQuickstarts(" + json + ");";
+		String script = "loadQuickstarts(" + json + ");"; //$NON-NLS-1$ //$NON-NLS-2$
 		return script;
 	}
 	
 	private String getSetShowOnStartupScript() {
-		String script = "setShowOnStartup('" + showOnStartup + "');";
+		String script = "setShowOnStartup('" + showOnStartup + "');"; //$NON-NLS-1$ //$NON-NLS-2$
 		return script;
 	}
 	
