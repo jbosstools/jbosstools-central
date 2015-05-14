@@ -109,6 +109,9 @@ public class ProjectExample implements ProjectModelElement,
 	}
 
 	public String getShortDescription() {
+		if (shortDescription == null) {
+			shortDescription = name;
+		}
 		return shortDescription;
 	}
 
@@ -238,7 +241,7 @@ public class ProjectExample implements ProjectModelElement,
 		return requirements;
 	}
 
-	void setRequirements(List<RequirementModel> requirements) {
+	public void setRequirements(List<RequirementModel> requirements) {
 		this.requirements = requirements;
 	}
 
