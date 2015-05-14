@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -77,8 +78,18 @@ public class ProjectExampleParser implements IProjectExampleParser {
 
 			// example.setGitRepo(new URI(github_repo_url));
 			example.setUrl(downloadUrl);
-			Set<String> sys_tags = asSet(fields.get("sys_tags"));
+			
+			Set<String> sys_tags = new LinkedHashSet<>();
+			if (fields.get("target_product").isDefined()) {
+				StringBuilder productTag = new StringBuilder("product:").append(fields.get("target_product").asString());
+				if (fields.get("git_tag").isDefined()) {
+					productTag.append("-").append(fields.get("git_tag").asString());
+				}
+				sys_tags.add(productTag.toString());
+			}
+			sys_tags.addAll(asSet(fields.get("sys_tags")));
 			example.setTags(sys_tags);
+			
 			Set<String> importFilter = new HashSet<>();
 			importFilter.add(name);
 			Set<String> prerequisites = asSet(fields.get("prerequisites"));
