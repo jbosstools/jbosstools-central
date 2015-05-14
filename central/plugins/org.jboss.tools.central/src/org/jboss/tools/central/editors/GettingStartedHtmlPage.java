@@ -15,6 +15,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -100,11 +101,15 @@ public class GettingStartedHtmlPage extends AbstractJBossCentralPage implements 
 			try {
 				//long start = System.currentTimeMillis();
 				Collection<ProjectExample> examplesList = manager.getExamples(monitor);
-				examples = Maps.uniqueIndex(examplesList, new Function<ProjectExample, String>() {
-					public String apply(ProjectExample example) {
-						return example.getId();
+				examples = new HashMap<>(examplesList.size());
+				for (ProjectExample example : examplesList) {
+					String id = example.getId();
+					if (examples.containsKey(id)) {
+						JBossCentralActivator.log("Found duplicate quickstart "+id);
+						continue;
 					}
-				});
+					examples.put(id,  example);
+				}
 
 				//long elapsed = System.currentTimeMillis() - start;
 			} catch (CoreException e) {
