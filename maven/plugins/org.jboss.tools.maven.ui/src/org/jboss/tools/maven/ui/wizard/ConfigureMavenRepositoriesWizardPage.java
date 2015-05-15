@@ -123,6 +123,7 @@ import org.xml.sax.InputSource;
  * @author snjeza
  *
  */
+@SuppressWarnings("nls")
 public class ConfigureMavenRepositoriesWizardPage extends WizardPage implements IPageChangedListener {
 
 	private static final String ACTIVE_PROFILE = "activeProfile"; //$NON-NLS-1$
@@ -134,6 +135,8 @@ public class ConfigureMavenRepositoriesWizardPage extends WizardPage implements 
 	private static final String COM_SPRINGSOURCE_REPOSITORY_BUNDLES_EXTERNAL_ID = "com-springsource-repository-bundles-external"; //$NON-NLS-1$
 
 	private static final String COM_SPRINGSOURCE_REPOSITORY_BUNDLES_RELEASE_ID = "com-springsource-repository-bundles-release"; //$NON-NLS-1$
+
+	private static final String BINTRAY_ID = "bintray"; //$NON-NLS-1$
 
 	private static final String JAVA_NET_PUBLIC_ID = "java-net-public"; //$NON-NLS-1$
 	
@@ -1019,6 +1022,13 @@ public class ConfigureMavenRepositoriesWizardPage extends WizardPage implements 
 		               	.setName("Red Hat Tech Preview repository (all)") //$NON-NLS-1$
 						.setUrl("http://maven.repository.redhat.com/techpreview/all/"); //$NON-NLS-1$
 		repositories.add(new RepositoryWrapper(repoBuilder.get()));
+
+		repoBuilder = new SettingsRepositoryBuilder()
+				.setId(BINTRAY_ID)
+				.setName("Bintray JCenter") //$NON-NLS-1$
+				.setUrl("https://jcenter.bintray.com"); //$NON-NLS-1$
+		repositories.add(new RepositoryWrapper(repoBuilder.get()));
+
 		
 		repoBuilder = new SettingsRepositoryBuilder()
         				.setId(JAVA_NET_PUBLIC_ID)
