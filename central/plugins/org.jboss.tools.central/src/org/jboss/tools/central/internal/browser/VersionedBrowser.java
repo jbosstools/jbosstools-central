@@ -9,7 +9,7 @@
  *     JBoss by Red Hat - Initial implementation.
  ************************************************************************************/
 
-package org.jboss.tools.central.editors.browser;
+package org.jboss.tools.central.internal.browser;
 
 import org.eclipse.swt.browser.Browser;
 import org.eclipse.swt.widgets.Composite;
@@ -19,7 +19,6 @@ import org.eclipse.swt.widgets.Composite;
  * @author Konstantin Marmalyukov
  *
  */
-
 public class VersionedBrowser extends Browser {
 	private String name;
 	private String version;
@@ -28,9 +27,10 @@ public class VersionedBrowser extends Browser {
 		super(parent, style);
 		if (System.getProperty("os.name", "generic").toLowerCase().indexOf("win") >= 0) { //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 			//workaround for https://bugs.eclipse.org/bugs/show_bug.cgi?id=465822
-			//this bug should be fixed into 4.6
+			//this bug should be fixed into 4.6 (Eclipse Neon)
 			setUrl(getUrl());
 		}
+		//TODO Check Project Spartan/Edge
 		String browserScript =
 				   "var ua = navigator.userAgent,tem,M=ua.match(/(opera|chrome|safari|firefox|msie|trident(?=\\/))\\/?\\s*(\\d+)/i) || [];" +  //$NON-NLS-1$
 				   "if(/trident/i.test(M[1])){" + //$NON-NLS-1$
@@ -63,7 +63,7 @@ public class VersionedBrowser extends Browser {
 	/**
 	 * @return true if browser supports HTML5 content
 	 */
-	public boolean HTML5supported() {
+	public boolean isHTML5supported() {
 		double browserVersion = Double.parseDouble(version);
 		if (("Mozilla".equals(name) && browserVersion < 10) //$NON-NLS-1$
 			|| ("IE".equals(name) && browserVersion < 10)) { //$NON-NLS-1$
@@ -74,5 +74,10 @@ public class VersionedBrowser extends Browser {
 	
 	@Override
 	protected void checkSubclass() {
+	}
+	
+	@Override
+	public String toString() {
+		return getClass().getSimpleName() + ": " + name +" v"+version;
 	}
 }

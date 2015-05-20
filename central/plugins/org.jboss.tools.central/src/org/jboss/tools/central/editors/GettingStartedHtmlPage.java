@@ -57,10 +57,10 @@ import org.eclipse.ui.forms.IManagedForm;
 import org.eclipse.ui.forms.editor.FormEditor;
 import org.eclipse.ui.forms.widgets.ScrolledForm;
 import org.jboss.tools.central.JBossCentralActivator;
-import org.jboss.tools.central.editors.browser.VersionedBrowser;
 import org.jboss.tools.central.internal.CentralHelper;
 import org.jboss.tools.central.internal.JsonUtil;
 import org.jboss.tools.central.internal.WizardSupport;
+import org.jboss.tools.central.internal.browser.VersionedBrowser;
 import org.jboss.tools.central.internal.discovery.wizards.ProxyWizard;
 import org.jboss.tools.central.internal.discovery.wizards.ProxyWizardManager;
 import org.jboss.tools.central.internal.discovery.wizards.ProxyWizardManager.ProxyWizardManagerListener;
@@ -240,7 +240,7 @@ public class GettingStartedHtmlPage extends AbstractJBossCentralPage implements 
 			protected IStatus run(IProgressMonitor monitor) {
 				final String url;
 				try {
-					url = browser.HTML5supported() ? CentralHelper.getCentralUrl(monitor) 
+					url = browser.isHTML5supported() ? CentralHelper.getCentralUrl(monitor) 
 							                       : CentralHelper.getCentralFallbackUrl(monitor);
 					Display.getDefault().asyncExec(new Runnable() {
 						@Override
