@@ -58,6 +58,9 @@ public class ChainedDiscoveryStrategy extends AbstractDiscoveryStrategy  {
 		
 		for (AbstractDiscoveryStrategy ds : strategies) {
 			try {
+				if (monitor.isCanceled()) {
+					break;
+				}
 				ds.performDiscovery(monitor);
 				dataCollector.collectData(ds);
 				if (dataCollector.isComplete()) {
