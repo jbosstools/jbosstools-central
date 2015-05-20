@@ -494,11 +494,13 @@ public class GettingStartedHtmlPage extends AbstractJBossCentralPage implements 
 	
 	
 	private String getLoadFavoritesScript() {
-		Collection<ProjectExample> favoriteExamples = new ArrayList<ProjectExample>(favorites.size());
-		for (FavoriteItem fi : favorites) {
-			ProjectExample example = examples.get(fi.getId());
-			if (example != null) {
-				favoriteExamples.add(example);
+		Collection<ProjectExample> favoriteExamples = (favorites == null)?Collections.<ProjectExample>emptyList():new ArrayList<ProjectExample>(favorites.size());
+		if (examples != null) {
+			for (FavoriteItem fi : favorites) {
+				ProjectExample example = examples.get(fi.getId());
+				if (example != null) {
+					favoriteExamples.add(example);
+				}
 			}
 		}
 		String favoritesJson = JsonUtil.jsonifyExamples(favoriteExamples);
