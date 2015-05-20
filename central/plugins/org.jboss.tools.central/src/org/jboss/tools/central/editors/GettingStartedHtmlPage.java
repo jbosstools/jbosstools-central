@@ -244,13 +244,17 @@ public class GettingStartedHtmlPage extends AbstractJBossCentralPage implements 
 					Display.getDefault().asyncExec(new Runnable() {
 						@Override
 						public void run() {
-							browser.setUrl(url);
+							if (browser != null && !browser.isDisposed()) {
+								browser.setUrl(url);
+							}
 						}
 					});
 				} catch (CoreException e) {
 					return e.getStatus();
 				}
-
+				if (monitor.isCanceled()) {
+					return Status.CANCEL_STATUS;
+				}
 				Job job = new Job("Update project wizard list") {
 
 					@Override
