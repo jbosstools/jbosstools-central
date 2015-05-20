@@ -76,7 +76,6 @@ public class RemoteRepositoryManager {
 		addRepository("Sonatype Nexus Repository", "http://repository.sonatype.org", false);
 		addRepository("Apache Nexus Repository", "https://repository.apache.org", false);
 		addRepository("Sonatype OSS Repository", "http://oss.sonatype.org", false);
-		addRepository("Codehaus Repository", "https://nexus.codehaus.org", false);
 		addRepository("Java.net Repository", "https://maven.java.net", false);
 		return nexusRepositories;
 	}
