@@ -891,12 +891,9 @@ public class AddRepositoryDialog extends TitleAreaDialog {
 	}
 	
 	private RepositoryPolicy createRepositoryPolicy(Button policyButton, Combo policyCombo){
-		RepositoryPolicy policy = null;
-		if(!(policyButton.getSelection() && policyCombo.getText().trim().equals(DEFAULT_POLICY))){
-			policy = new RepositoryPolicy();
-			policy.setEnabled(policyButton.getSelection());
-			policy.setUpdatePolicy(policyCombo.getText().trim());
-		}
+		RepositoryPolicy policy = new RepositoryPolicy();
+		policy.setEnabled(policyButton.getSelection());
+		policy.setUpdatePolicy(policyCombo.getText().trim());
 		return policy;
 	}
 
