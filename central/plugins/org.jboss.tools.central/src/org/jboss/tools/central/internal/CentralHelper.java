@@ -48,11 +48,26 @@ public class CentralHelper {
 	 * @throws CoreException
 	 */
 	public static String getCentralUrl(IProgressMonitor monitor) throws CoreException {
+		String remoteUrl = getCentralUrlPropertyValue();
+		return getCentralPageUrl(remoteUrl, "index.html", monitor);
+	}
+
+	/**
+	 * Returns the url to the Central legacy webpage (legacy.html).
+	 * 
+	 * @throws CoreException
+	 */
+	public static String getCentralFallbackUrl(IProgressMonitor monitor) throws CoreException {
+		String remoteUrl = getCentralUrlPropertyValue();
+		return getCentralPageUrl(remoteUrl, "legacy.html", monitor);
+	}
+	
+	private static String getCentralUrlPropertyValue() {
 		String remoteUrl = System.getProperty(JBOSS_CENTRAL_WEBPAGE_URL_KEY);
 		if (remoteUrl == null) {
 			remoteUrl = PropertiesHelper.getPropertiesProvider().getValue(JBOSS_CENTRAL_WEBPAGE_URL_KEY, "http://central-fredapp.rhcloud.com/");
 		}
-		return getCentralUrl(remoteUrl, monitor);
+		return remoteUrl;
 	}
 
 	/**
@@ -64,6 +79,10 @@ public class CentralHelper {
 	 * @throws CoreException
 	 */
 	public static String getCentralUrl(String remoteUrl, IProgressMonitor monitor) throws CoreException {
+		return getCentralPageUrl(remoteUrl, "index.html", monitor);
+	}
+
+	private static String getCentralPageUrl(String remoteUrl, String page, IProgressMonitor monitor) throws CoreException {
 		StringBuilder url = new StringBuilder();
 		if (remoteUrl.endsWith(".zip")) {
 			//download it
@@ -97,15 +116,19 @@ public class CentralHelper {
 			url.append(remoteUrl);
 		}
 		String _url = url.toString();
-		if (!_url.endsWith("index.html")){
-			if (!_url.endsWith("/")) {
-				url.append("/");
-			}
-			url.append("index.html"); 
+		if (_url.endsWith(page)) {
+			return _url;
 		}
+		if (_url.endsWith(".html")) {
+			url = new StringBuilder(_url.substring(0, _url.lastIndexOf("/")));
+		}
+		
+		if (!_url.endsWith("/")) {
+			url.append("/");
+		}
+		url.append(page); 
 		return url.toString();
 	}
-
 	
 	private static Path getCentralFolder() {
 		IPath location = JBossCentralActivator.getDefault().getStateLocation();

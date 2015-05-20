@@ -78,5 +78,26 @@ public class CentralHelperTest {
 		}
 	}
 
+	@Test
+	public void testGetCentralFallbackSyspropUrl() throws Exception {
+		String url;
+		try {
+			url = "/foo/bar/central";
+			System.setProperty(CentralHelper.JBOSS_CENTRAL_WEBPAGE_URL_KEY, url);
+			assertEquals(url+"/legacy.html", CentralHelper.getCentralFallbackUrl(null));
+
+			url = "file:///foo/bar/central/index.html";
+			System.setProperty(CentralHelper.JBOSS_CENTRAL_WEBPAGE_URL_KEY, url);
+			assertEquals("file:///foo/bar/central/legacy.html", CentralHelper.getCentralFallbackUrl(null));
+
+		
+			url = "http://central.jboss.org/";
+			System.setProperty(CentralHelper.JBOSS_CENTRAL_WEBPAGE_URL_KEY, url);
+			assertEquals(url+"legacy.html", CentralHelper.getCentralFallbackUrl(null));
+		} finally {
+			System.clearProperty(CentralHelper.JBOSS_CENTRAL_WEBPAGE_URL_KEY);
+		}
+	}
+	
 	//TODO setup jetty server to server remote URL and test caching capabilities
 }
