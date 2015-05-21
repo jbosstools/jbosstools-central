@@ -57,6 +57,7 @@ import org.eclipse.ui.forms.IManagedForm;
 import org.eclipse.ui.forms.editor.FormEditor;
 import org.eclipse.ui.forms.widgets.ScrolledForm;
 import org.jboss.tools.central.JBossCentralActivator;
+import org.jboss.tools.central.internal.browser.CentralBrowserErrorWrapper;
 import org.jboss.tools.central.internal.CentralHelper;
 import org.jboss.tools.central.internal.JsonUtil;
 import org.jboss.tools.central.internal.WizardSupport;
@@ -185,108 +186,114 @@ public class GettingStartedHtmlPage extends AbstractJBossCentralPage implements 
 	}
 
 	private void createBrowserSection(final Composite parent) {
-		browser = new VersionedBrowser(parent, SWT.NONE);
-		GridData layoutData = new GridData(GridData.FILL_BOTH);
-		layoutData.horizontalSpan = 1;
-		layoutData.verticalSpan = 1;
-		browser.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
-		
-		new BrowserFunction(browser, "openInIDE") { //$NON-NLS-1$
-			//All function calls must return immediately or else the script will be considered 
-			//blocking in the browser.
-			@Override
-			public Object function(Object[] browserArgs) {
-				String function = browserArgs[0].toString();
-				String arg =  browserArgs[1].toString();
-				switch (function) {
-				case "quickstart": //$NON-NLS-1$
-					openQuickstart(arg);
-					break;
-				case "wizard": //$NON-NLS-1$
-					openProxyWizard(arg);
-					break;
-				case "openlink": //$NON-NLS-1$
-					JBossCentralActivator.openUrl(arg, parent.getShell());
-					break;
-				case "openpage": //$NON-NLS-1$
-					getEditor().setActivePage(arg);
-					break;
-				case "showonstartup": //$NON-NLS-1$
-					showOnStartup = Boolean.parseBoolean(arg);
-					CentralHelper.setShowOnStartup(showOnStartup);
-					break;
-				default:
-					System.err.println("Function "+ function+"("+ arg+") is not supported");
+		try {
+			browser = new VersionedBrowser(parent, SWT.NONE);
+			GridData layoutData = new GridData(GridData.FILL_BOTH);
+			layoutData.horizontalSpan = 1;
+			layoutData.verticalSpan = 1;
+			browser.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+			
+			new BrowserFunction(browser, "openInIDE") { //$NON-NLS-1$
+				//All function calls must return immediately or else the script will be considered 
+				//blocking in the browser.
+				@Override
+				public Object function(Object[] browserArgs) {
+					String function = browserArgs[0].toString();
+					String arg =  browserArgs[1].toString();
+					switch (function) {
+					case "quickstart": //$NON-NLS-1$
+						openQuickstart(arg);
+						break;
+					case "wizard": //$NON-NLS-1$
+						openProxyWizard(arg);
+						break;
+					case "openlink": //$NON-NLS-1$
+						JBossCentralActivator.openUrl(arg, parent.getShell());
+						break;
+					case "openpage": //$NON-NLS-1$
+						getEditor().setActivePage(arg);
+						break;
+					case "showonstartup": //$NON-NLS-1$
+						showOnStartup = Boolean.parseBoolean(arg);
+						CentralHelper.setShowOnStartup(showOnStartup);
+						break;
+					default:
+						System.err.println("Function "+ function+"("+ arg+") is not supported");
+					}
+					return null;
 				}
-				return null;
-			}
-		};
-
-		new BrowserFunction(browser, "initialize") { //$NON-NLS-1$
-			@Override
-			public Object function(Object[] browserArgs) {
-				browser.execute(getLoadBuzzScript());
-				browser.execute(getLoadProxyWizardsScript());
-				browser.execute(getLoadQuickstartsScript());
-				browser.execute(getToggleEarlyAccessScript());
-				browser.execute(getSetShowOnStartupScript());
-				browser.execute(getLoadFavoritesScript());
-				return null;
-			}
-		};
-
-		Job centralJob = new Job("Extract Central page") {
-			@Override
-			protected IStatus run(IProgressMonitor monitor) {
-				final String url;
-				try {
-					url = browser.isHTML5supported() ? CentralHelper.getCentralUrl(monitor) 
-							                       : CentralHelper.getCentralFallbackUrl(monitor);
-					Display.getDefault().asyncExec(new Runnable() {
-						@Override
-						public void run() {
-							if (browser != null && !browser.isDisposed()) {
-								browser.setUrl(url);
+			};
+	
+			new BrowserFunction(browser, "initialize") { //$NON-NLS-1$
+				@Override
+				public Object function(Object[] browserArgs) {
+					browser.execute(getLoadBuzzScript());
+					browser.execute(getLoadProxyWizardsScript());
+					browser.execute(getLoadQuickstartsScript());
+					browser.execute(getToggleEarlyAccessScript());
+					browser.execute(getSetShowOnStartupScript());
+					browser.execute(getLoadFavoritesScript());
+					return null;
+				}
+			};
+	
+			Job centralJob = new Job("Extract Central page") {
+				@Override
+				protected IStatus run(IProgressMonitor monitor) {
+					final String url;
+					try {
+						url = browser.isHTML5supported() ? CentralHelper.getCentralUrl(monitor) 
+								                       : CentralHelper.getCentralFallbackUrl(monitor);
+						Display.getDefault().asyncExec(new Runnable() {
+							@Override
+							public void run() {
+								if (browser != null && !browser.isDisposed()) {
+									browser.setUrl(url);
+								}
 							}
+						});
+					} catch (CoreException e) {
+						return e.getStatus();
+					}
+					if (monitor.isCanceled()) {
+						return Status.CANCEL_STATUS;
+					}
+					Job job = new Job("Update project wizard list") {
+	
+						@Override
+						protected IStatus run(IProgressMonitor monitor) {
+							ProxyWizardManager proxyWizardManager = ProxyWizardManager.INSTANCE; // FIXME lookup global instance.
+							List<ProxyWizard> wizards = proxyWizardManager.getProxyWizards(true, monitor);
+							try {
+								favorites = collectFavorites(monitor);
+							} catch (CoreException e) {
+								e.printStackTrace();
+							}
+							resetWizards(wizards);
+							return Status.OK_STATUS;
 						}
-					});
-				} catch (CoreException e) {
-					return e.getStatus();
-				}
-				if (monitor.isCanceled()) {
-					return Status.CANCEL_STATUS;
-				}
-				Job job = new Job("Update project wizard list") {
-
-					@Override
-					protected IStatus run(IProgressMonitor monitor) {
-						ProxyWizardManager proxyWizardManager = ProxyWizardManager.INSTANCE; // FIXME lookup global instance.
-						List<ProxyWizard> wizards = proxyWizardManager.getProxyWizards(true, monitor);
-						try {
-							favorites = collectFavorites(monitor);
-						} catch (CoreException e) {
-							e.printStackTrace();
+	
+						private List<FavoriteItem> collectFavorites(IProgressMonitor monitor) throws CoreException {
+							IFavoriteExampleManager favoriteExampleManager = ProjectExamplesActivator.getDefault().getFavoriteExampleManager();
+							return favoriteExampleManager.getFavoriteItems(10, monitor);
 						}
-						resetWizards(wizards);
-						return Status.OK_STATUS;
-					}
-
-					private List<FavoriteItem> collectFavorites(IProgressMonitor monitor) throws CoreException {
-						IFavoriteExampleManager favoriteExampleManager = ProjectExamplesActivator.getDefault().getFavoriteExampleManager();
-						return favoriteExampleManager.getFavoriteItems(10, monitor);
-					}
-
-					@Override
-					public boolean belongsTo(Object family) {
-						return family == JBossCentralActivator.JBOSS_CENTRAL_FAMILY;
-					}
-				};
-				job.schedule();
-				
-				return Status.OK_STATUS;
-			}
-		};
-		centralJob.schedule();
+	
+						@Override
+						public boolean belongsTo(Object family) {
+							return family == JBossCentralActivator.JBOSS_CENTRAL_FAMILY;
+						}
+					};
+					job.schedule();
+					
+					return Status.OK_STATUS;
+				}
+			};
+			centralJob.schedule();
+		}  catch (Throwable t) {
+			//cannot create browser. show error message then
+			CentralBrowserErrorWrapper errorWrapper = new CentralBrowserErrorWrapper();
+			errorWrapper.showError(parent, t);
+		}
 	}
 	
 	protected void openQuickstart(final String quickstartId) {
