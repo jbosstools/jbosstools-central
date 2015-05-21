@@ -44,6 +44,10 @@ public class Messages extends NLS {
 
 	public static String remainingEarlyAccessConnectors_title;
 	public static String remainingEarlyAccessConnectors_message;
+	
+	public static String noEngineError_message;
+	public static String visualEditorFaq;
+	public static String visualEditorFaqLink;
 
 	static {
 		// initialize resource bundle
