@@ -19,6 +19,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.dialogs.Dialog;
+import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.viewers.ColumnLabelProvider;
 import org.eclipse.jface.viewers.ColumnViewerToolTipSupport;
 import org.eclipse.jface.viewers.ISelection;
@@ -106,6 +107,7 @@ public class NewProjectExamplesRequirementsPage extends WizardPage implements IP
 
 	};
 	protected ProjectFixManager fixManager;
+	private Composite sizeComposite;
 	
 	public NewProjectExamplesRequirementsPage(ProjectExampleWorkingCopy projectExample) {
 		this(PAGE_NAME, projectExample);
@@ -128,6 +130,7 @@ public class NewProjectExamplesRequirementsPage extends WizardPage implements IP
 	protected void setTitleAndDescription(ProjectExample projectExample) {
 		setTitle( "Requirements and Recommendations" );
         setDescription( "Project Example Requirements" );
+        boolean showSize = false;
 		if (projectExample != null) {
 			if (projectExample.getShortDescription() != null) {
 				setTitle(projectExample.getShortDescription());
@@ -139,8 +142,8 @@ public class NewProjectExamplesRequirementsPage extends WizardPage implements IP
 				if (projectExample.getDescription() != null) {
 					descriptionText.setText(projectExample.getDescription());
 				}
-				if (projectExample.getSizeAsText() != null && projectSize != null) {
-					projectSize.setVisible(true);
+				if(projectSize != null && projectExample.getSize() > 0) {
+					showSize = true;
 					projectSize.setText(projectExample.getSizeAsText());
 				}
 			}
@@ -151,6 +154,12 @@ public class NewProjectExamplesRequirementsPage extends WizardPage implements IP
 	        		projectSize.setText(""); //$NON-NLS-1$
 	        	}
 	        }
+		}
+		if(sizeComposite != null) {
+			GridData data = (GridData) sizeComposite.getLayoutData();
+			data.exclude = !showSize;
+			sizeComposite.setVisible(showSize);
+			sizeComposite.getParent().pack();
 		}
 	}
 
@@ -241,15 +250,19 @@ public class NewProjectExamplesRequirementsPage extends WizardPage implements IP
 	}
 	
 	protected void setSelectionArea(Composite composite) {
-		projectSizeLabel = new Label(composite,SWT.NULL);
+		sizeComposite = new Composite(composite, SWT.NONE);
+		sizeComposite.setLayout(new GridLayout(2, false));
+		
+		final GridData data = new GridData(SWT.FILL, SWT.FILL, true, true);
+		sizeComposite.setLayoutData(data);
+	
+		projectSizeLabel = new Label(sizeComposite,SWT.NULL);
 		projectSizeLabel.setText(Messages.NewProjectExamplesWizardPage_Project_size);
-		projectSize = new Text(composite,SWT.READ_ONLY);
+		projectSize = new Text(sizeComposite,SWT.READ_ONLY);
 		projectSize.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		
-		Label label = new Label(composite, SWT.NONE);
-		GridData gd = new GridData(SWT.FILL, SWT.FILL, true, false);
-		gd.horizontalSpan = 2;
-		label.setLayoutData(gd);
+		Label filler = new Label(composite, SWT.NONE);
+		GridDataFactory.fillDefaults().grab(true, false).span(1, 2).applyTo(filler);
 	}
 	
 	protected void setAdditionalControls(Composite composite) {
