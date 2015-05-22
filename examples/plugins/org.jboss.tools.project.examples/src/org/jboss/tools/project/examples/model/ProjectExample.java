@@ -434,7 +434,7 @@ public class ProjectExample implements ProjectModelElement,
 		//archetype model is a maven concept, shouldn't be available here
 		ArchetypeModel model = getArchetypeModel();
 		//need to introduce stinky coupling to maven type here
-		if (model != null && "mavenArchetype".equals(getImportType())) {
+		if (model != null && "mavenArchetype".equals(getImportType()) && model.getArchetypeArtifactId() != null) {
 			return model.getGAV();
 		}
 		if (id == null) {
