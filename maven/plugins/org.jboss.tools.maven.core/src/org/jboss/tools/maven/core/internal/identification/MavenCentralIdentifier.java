@@ -27,12 +27,13 @@ import org.eclipse.osgi.util.NLS;
 import org.jboss.dmr.ModelNode;
 import org.jboss.tools.common.util.HttpUtil;
 
+@SuppressWarnings("nls")
 public class MavenCentralIdentifier extends AbstractArtifactIdentifier {
 
 
-	private String SHA1_SEARCH_QUERY = "http://search.maven.org/solrsearch/select?q=1:%22{0}%22&rows=1&wt=json";
+	private static final String SHA1_SEARCH_QUERY = "http://search.maven.org/solrsearch/select?q=1:%22{0}%22&rows=1&wt=json";
 
-	private String NAME_VERSION_SEARCH_QUERY = "http://search.maven.org/solrsearch/select?q=a:%22{0}%22%20AND%20v:%22{1}%22&rows=2&wt=json";
+	private static final String NAME_VERSION_SEARCH_QUERY = "http://search.maven.org/solrsearch/select?q=a:%22{0}%22%20AND%20v:%22{1}%22&rows=2&wt=json";
 
 	@Deprecated
 	public ArtifactKey identify(File file) throws CoreException {
