@@ -81,9 +81,16 @@ public class ProjectExampleParser implements IProjectExampleParser {
 			
 			Set<String> sys_tags = new LinkedHashSet<>();
 			if (fields.get("target_product").isDefined()) {
-				StringBuilder productTag = new StringBuilder("product:").append(fields.get("target_product").asString());
+				StringBuilder productTag = new StringBuilder("product:");
+				String targetProduct = fields.get("target_product").asString().toLowerCase();
+				String tag = "";
 				if (fields.get("git_tag").isDefined()) {
-					productTag.append("-").append(fields.get("git_tag").asString());
+					tag = fields.get("git_tag").asString();
+				}
+				if (tag.toLowerCase().startsWith(targetProduct)) {
+					productTag.append(tag);
+				} else {
+					productTag.append(targetProduct).append("-").append(tag);
 				}
 				sys_tags.add(productTag.toString());
 			}
@@ -97,7 +104,7 @@ public class ProjectExampleParser implements IProjectExampleParser {
 			example.setImportFilter(importFilter);
 			return example;
 		} catch (Exception O_o) {
-			System.err.println("Error parsing " + name + " : " + O_o.getMessage());
+			ProjectExamplesActivator.log("Error parsing " + name + " : " + O_o.getMessage());
 		}
 		return null;
 	}
