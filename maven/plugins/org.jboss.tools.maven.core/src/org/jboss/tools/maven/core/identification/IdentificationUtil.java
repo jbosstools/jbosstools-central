@@ -1,5 +1,5 @@
 /*************************************************************************************
- * Copyright (c) 2008-2014 Red Hat, Inc. and others.
+ * Copyright (c) 2008-2015 Red Hat, Inc. and others.
  * All rights reserved. This program and the accompanying materials 
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -11,11 +11,10 @@
 package org.jboss.tools.maven.core.identification;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+
+import org.jboss.tools.foundation.core.digest.DigestUtils;
 
 public class IdentificationUtil {
 
@@ -25,36 +24,13 @@ public class IdentificationUtil {
 
 	private IdentificationUtil() {}
 	
+	/**
+	 * @deprecated use {@link DigestUtils#sha1(File)} instead
+	 */
+	@Deprecated
 	public static String getSHA1(File file) throws IOException,
 			NoSuchAlgorithmException {
-		if (file == null) {
-			return null;
-		}
-		InputStream inputStream = null;
-		StringBuilder sb = new StringBuilder();
-		try {
-			MessageDigest md = MessageDigest.getInstance("SHA1");
-			inputStream = new FileInputStream(file);
-			byte[] bytes = new byte[16 * 1024];
-			int count = 0;
-			while ((count = inputStream.read(bytes)) != -1) {
-				md.update(bytes, 0, count);
-			}
-			byte[] digestBytes = md.digest();
-			for (int i = 0; i < digestBytes.length; i++) {
-				sb.append(Integer.toString((digestBytes[i] & 0xff) + 0x100, 16)
-						.substring(1));
-			}
-		} finally {
-			if (inputStream != null) {
-				try {
-					inputStream.close();
-				} catch (Exception e){
-				  //ignore
-				}
-			}
-		}
-		return sb.toString();
+		return DigestUtils.sha1(file);
 	}
 	
 	public static String getSourcesClassifier(String baseClassifier) {

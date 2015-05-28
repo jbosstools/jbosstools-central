@@ -82,6 +82,7 @@ import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.dialogs.PreferencesUtil;
 import org.eclipse.ui.internal.ide.StringMatcher;
+import org.jboss.tools.foundation.core.digest.DigestUtils;
 import org.jboss.tools.maven.conversion.core.ProjectDependency;
 import org.jboss.tools.maven.conversion.core.ProjectDependency.DependencyKind;
 import org.jboss.tools.maven.conversion.ui.dialog.xpl.ConversionUtils;
@@ -338,7 +339,7 @@ public class IdentifyMavenDependencyPage extends WizardPage {
 					return "";
 				}
 				try {
-					return "SHA1 Checksum : "+IdentificationUtil.getSHA1(ConversionUtils.getFile(projectDependency.getPath()));
+					return "SHA1 Checksum : "+DigestUtils.sha1(ConversionUtils.getFile(projectDependency.getPath()));
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
