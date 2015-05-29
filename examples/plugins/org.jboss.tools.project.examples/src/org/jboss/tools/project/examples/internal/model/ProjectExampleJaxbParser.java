@@ -29,7 +29,7 @@ import org.jboss.tools.project.examples.internal.ProjectExamplesActivator;
 import org.jboss.tools.project.examples.model.ProjectExample;
 
 @SuppressWarnings("nls")
-public class ProjectExampleParser extends JaxbParser {
+public class ProjectExampleJaxbParser extends JaxbParser {
 
 	private static final JAXBContext jaxbContext; 
 	

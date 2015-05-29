@@ -33,11 +33,11 @@ import org.junit.Test;
  */
 public class ProjectExampleParserTest {
 
-	private ProjectExampleParser parser;
+	private ProjectExampleJaxbParser parser;
 
 	@Before
 	public void setup() {
-		parser = new ProjectExampleParser();
+		parser = new ProjectExampleJaxbParser();
 	}
 	
 	@Test

@@ -4,11 +4,9 @@ Bundle-Name: %BundleName
 Bundle-SymbolicName: org.jboss.tools.maven.examples.test;singleton:=true
 Bundle-Version: 3.0.0.qualifier
 Require-Bundle: org.eclipse.core.runtime,
- org.jboss.tools.tests,
  org.jboss.tools.project.examples,
  org.jboss.tools.community.project.examples,
  org.jboss.tools.common,
- org.jboss.tools.tests,
  org.jboss.ide.eclipse.as.core,
  org.eclipse.wst.server.core,
  org.eclipse.jst.jee.web,

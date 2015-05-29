@@ -101,7 +101,7 @@ public class JBossCentralActivator extends AbstractUIPlugin {
 	public static final String FORM_END_TAG = "</p></form>";
 	public static final String FORM_START_TAG = "<form><p>";
 	public static final String CANCELED = FORM_START_TAG
-			+ "<span color=\"header\" font=\"header\">Canceled.</span>"
+			+ "<span color=\"header\" font=\"header\">Cancelled.</span>"
 			+ FORM_END_TAG;
 	public static final String LOADING = FORM_START_TAG
 			+ "<span color=\"header\" font=\"header\">Loading...</span>"
@@ -117,6 +117,7 @@ public class JBossCentralActivator extends AbstractUIPlugin {
 
 	private static final String ORG_ECLIPSE_UI_INTERNAL_INTROVIEW = "org.eclipse.ui.internal.introview";
 
+	private static String CURRENT_VERSION;
 	// The shared instance
 	private static JBossCentralActivator plugin;
 
@@ -571,4 +572,11 @@ public class JBossCentralActivator extends AbstractUIPlugin {
 		return configurator;
 	}
 
+	public static String getVersion() {
+	  if (CURRENT_VERSION == null) {
+	    String version = getDefault().getBundle().getHeaders().get("Bundle-Version"); //$NON-NLS-1$
+	    CURRENT_VERSION = version.replace('-', '_'); //$NON-NLS-1$
+	  }
+	  return CURRENT_VERSION;
+	}
 }

@@ -109,7 +109,7 @@ public class ProjectExample implements ProjectModelElement,
 	}
 
 	public String getShortDescription() {
-		if (shortDescription == null) {
+		if (shortDescription == null || shortDescription.isEmpty()) {
 			shortDescription = name;
 		}
 		return shortDescription;

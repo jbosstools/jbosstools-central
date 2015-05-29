@@ -77,11 +77,7 @@ public class NewProjectExamplesWizard2 extends Wizard implements INewWizard {
 	
 	protected void initializeProjectExample(ProjectExample projectExample) {
 		if (projectExample != null) {
-			if (projectExample instanceof ProjectExampleWorkingCopy) {
-				this.projectExample = (ProjectExampleWorkingCopy)projectExample;
-			} else {
-				this.projectExample = ProjectExamplesActivator.getDefault().getProjectExampleManager().createWorkingCopy(projectExample);
-			}
+			this.projectExample = ProjectExamplesActivator.getDefault().getProjectExampleManager().createWorkingCopy(projectExample);
 		}
 		setWindowTitle(Messages.NewProjectExamplesWizard_New_Project_Example);
 		setNeedsProgressMonitor(true);

@@ -12,23 +12,30 @@ package org.jboss.tools.central.internal;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.jboss.tools.central.JBossCentralActivator;
 import org.jboss.tools.central.preferences.PreferenceKeys;
+import org.jboss.tools.foundation.core.digest.DigestUtils;
 import org.jboss.tools.foundation.core.ecf.URLTransportUtility;
 import org.jboss.tools.foundation.core.properties.PropertiesHelper;
+import org.jboss.tools.project.examples.internal.ProjectExamplesActivator;
 import org.jboss.tools.project.examples.internal.UnArchiver;
 import org.jboss.tools.foundation.core.digest.DigestUtils;
 
@@ -133,7 +140,7 @@ public class CentralHelper {
 	
 	private static Path getCentralFolder() {
 		IPath location = JBossCentralActivator.getDefault().getStateLocation();
-		String path = location.append("versions").toOSString();
+		String path = location.append("central").toOSString();
 		return Paths.get(path);
 	}
 
@@ -167,6 +174,29 @@ public class CentralHelper {
 		return extractedFile ;
 	}
 
+	public static String getLoadingPageUrl() {
+		Path loadingPage = getLoadingPage();
+		try {
+			if (!Files.exists(loadingPage) //file doesn't exit 
+				|| loadingPage.getFileName().toString().contains(".qualifier")) { //or during development
+				String packageFolder = CentralHelper.class.getPackage().getName().replace('.', '/');
+				URL scriptUrl = new URL("platform:/plugin/"+JBossCentralActivator.PLUGIN_ID+"/"+ packageFolder +"/loading.html"); //$NON-NLS-1$
+				URL sourceUrl = FileLocator.resolve(scriptUrl);
+				FileUtils.copyURLToFile(sourceUrl, loadingPage.toFile());
+			}
+		} catch (IOException e) {
+			JBossCentralActivator.log(e, "Unable to extract loading.html");
+			return null;
+		}
+		return loadingPage.toUri().toString();
+	}
+	
+	public static Path getLoadingPage() {
+		Path centralFolder = getCentralFolder();
+		Path loadingPage = centralFolder.resolve("loading_"+JBossCentralActivator.getVersion()+".html");
+		return loadingPage;
+	}
+	
 	public static boolean isShowOnStartup() {
 		IEclipsePreferences preferences = JBossCentralActivator.getDefault().getPreferences();
 		return preferences.getBoolean(PreferenceKeys.SHOW_JBOSS_CENTRAL_ON_STARTUP, true);

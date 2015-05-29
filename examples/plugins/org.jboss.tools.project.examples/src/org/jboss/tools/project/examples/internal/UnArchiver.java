@@ -44,7 +44,7 @@ public class UnArchiver {
 		if (destination == null) {
 			File parent = zip.getParentFile();
 			if (parent == null) {
-				throw new IllegalArgumentException("Can not infer a destination folder to extract "+zip);
+				throw new IllegalArgumentException("Can not infer a destination folder to extract "+zip); //$NON-NLS-1$
 			}
 			String zipName = FilenameUtils.getBaseName(zip.getName());
 			destination = new File(parent, zipName);

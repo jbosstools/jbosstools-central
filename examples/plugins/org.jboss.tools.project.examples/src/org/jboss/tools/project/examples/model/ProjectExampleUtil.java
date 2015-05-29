@@ -55,7 +55,7 @@ import org.jboss.tools.foundation.core.properties.PropertiesHelper;
 import org.jboss.tools.project.examples.internal.Messages;
 import org.jboss.tools.project.examples.internal.ProjectExamplesActivator;
 import org.jboss.tools.project.examples.internal.model.ProjectExampleCategoryParser;
-import org.jboss.tools.project.examples.internal.model.ProjectExampleParser;
+import org.jboss.tools.project.examples.internal.model.ProjectExampleJaxbParser;
 import org.jboss.tools.project.examples.internal.model.ProjectExampleSiteParser;
 import org.jboss.tools.project.examples.offline.OfflineUtil;
 
@@ -558,7 +558,7 @@ public class ProjectExampleUtil {
 				return tuple;
 			}
 			try {
-				ProjectExampleParser parser = new ProjectExampleParser();
+				ProjectExampleJaxbParser parser = new ProjectExampleJaxbParser();
 				List<ProjectExample> examples = parser.parse(file);
 				if (examples != null) {
 					for (ProjectExample project : examples) {

@@ -237,7 +237,11 @@ public class GettingStartedHtmlPage extends AbstractJBossCentralPage implements 
 					return null;
 				}
 			};
-	
+			String loadingUrl = CentralHelper.getLoadingPageUrl();
+			if (loadingUrl != null) {
+				browser.setUrl(loadingUrl);
+			}
+			
 			Job centralJob = new Job("Extract Central page") {
 				@Override
 				protected IStatus run(IProgressMonitor monitor) {

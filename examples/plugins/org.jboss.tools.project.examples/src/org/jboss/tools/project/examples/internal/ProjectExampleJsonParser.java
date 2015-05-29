@@ -26,7 +26,7 @@ import org.jboss.tools.project.examples.model.ProjectExample;
 import org.jboss.tools.project.examples.model.ProjectExampleWorkingCopy;
 
 @SuppressWarnings("nls")
-public class ProjectExampleParser implements IProjectExampleParser {
+public class ProjectExampleJsonParser implements IProjectExampleParser {
 
 	private static final String HITS_NODE = "hits"; //$NON-NLS-1$
 
