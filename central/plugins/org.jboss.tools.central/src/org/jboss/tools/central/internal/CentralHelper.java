@@ -30,6 +30,7 @@ import org.jboss.tools.central.preferences.PreferenceKeys;
 import org.jboss.tools.foundation.core.ecf.URLTransportUtility;
 import org.jboss.tools.foundation.core.properties.PropertiesHelper;
 import org.jboss.tools.project.examples.internal.UnArchiver;
+import org.jboss.tools.foundation.core.digest.DigestUtils;
 
 public class CentralHelper {
 	

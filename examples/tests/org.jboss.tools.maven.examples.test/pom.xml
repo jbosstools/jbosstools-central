@@ -38,6 +38,7 @@
               <goal>copy-dependencies</goal>
             </goals>
             <configuration>
+              <skip>false</skip>
               <includeArtifactIds>mockito-core,objenesis</includeArtifactIds>
               <outputDirectory>${basedir}/lib/</outputDirectory>
             </configuration>
