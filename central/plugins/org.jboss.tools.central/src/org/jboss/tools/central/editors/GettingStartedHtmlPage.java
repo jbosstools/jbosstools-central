@@ -20,6 +20,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang.StringUtils;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -45,7 +46,6 @@ import org.eclipse.mylyn.internal.discovery.core.model.ConnectorDescriptor;
 import org.eclipse.mylyn.internal.discovery.core.model.ConnectorDiscovery;
 import org.eclipse.mylyn.internal.discovery.core.model.DiscoveryConnector;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.SWTError;
 import org.eclipse.swt.browser.BrowserFunction;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
@@ -58,10 +58,10 @@ import org.eclipse.ui.forms.IManagedForm;
 import org.eclipse.ui.forms.editor.FormEditor;
 import org.eclipse.ui.forms.widgets.ScrolledForm;
 import org.jboss.tools.central.JBossCentralActivator;
-import org.jboss.tools.central.internal.browser.CentralBrowserErrorWrapper;
 import org.jboss.tools.central.internal.CentralHelper;
 import org.jboss.tools.central.internal.JsonUtil;
 import org.jboss.tools.central.internal.WizardSupport;
+import org.jboss.tools.central.internal.browser.CentralBrowserErrorWrapper;
 import org.jboss.tools.central.internal.browser.VersionedBrowser;
 import org.jboss.tools.central.internal.discovery.wizards.ProxyWizard;
 import org.jboss.tools.central.internal.discovery.wizards.ProxyWizardManager;
@@ -72,15 +72,13 @@ import org.jboss.tools.central.model.FeedsEntry;
 import org.jboss.tools.central.preferences.PreferenceKeys;
 import org.jboss.tools.discovery.core.internal.connectors.DiscoveryUtil;
 import org.jboss.tools.discovery.core.internal.connectors.JBossDiscoveryUi;
+import org.jboss.tools.foundation.core.properties.PropertiesHelper;
 import org.jboss.tools.project.examples.FavoriteItem;
 import org.jboss.tools.project.examples.IFavoriteExampleManager;
 import org.jboss.tools.project.examples.IProjectExampleManager;
 import org.jboss.tools.project.examples.internal.ProjectExamplesActivator;
 import org.jboss.tools.project.examples.model.ProjectExample;
 import org.jboss.tools.project.examples.wizard.NewProjectExamplesWizard2;
-
-import com.google.common.base.Function;
-import com.google.common.collect.Maps;
 
 /**
  * 
@@ -228,6 +226,7 @@ public class GettingStartedHtmlPage extends AbstractJBossCentralPage implements 
 			new BrowserFunction(browser, "initialize") { //$NON-NLS-1$
 				@Override
 				public Object function(Object[] browserArgs) {
+					browser.execute(getSetIntegrationStackSupportScript());
 					browser.execute(getLoadBuzzScript());
 					browser.execute(getLoadProxyWizardsScript());
 					browser.execute(getLoadQuickstartsScript());
@@ -300,7 +299,7 @@ public class GettingStartedHtmlPage extends AbstractJBossCentralPage implements 
 			errorWrapper.showError(parent, t);
 		}
 	}
-	
+
 	protected void openQuickstart(final String quickstartId) {
 		final ProjectExample pe = examples.get(quickstartId);
 		if (pe == null) {
@@ -534,6 +533,12 @@ public class GettingStartedHtmlPage extends AbstractJBossCentralPage implements 
 	
 	private String getSetShowOnStartupScript() {
 		String script = "setShowOnStartup('" + showOnStartup + "');"; //$NON-NLS-1$ //$NON-NLS-2$
+		return script;
+	}
+	
+	private String getSetIntegrationStackSupportScript() {
+		boolean integrationStackAvailable = StringUtils.isNotEmpty(PropertiesHelper.getPropertiesProvider().getValue("jboss.discovery.site.integration-stack.url"));
+		String script = "setIntegrationStackSupport(" + integrationStackAvailable  + ");"; //$NON-NLS-1$ //$NON-NLS-2$
 		return script;
 	}
 	
