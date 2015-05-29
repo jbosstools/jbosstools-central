@@ -23,10 +23,6 @@ public class RequirementModelUtil {
 	
 	private RequirementModelUtil(){}
 	
-	public static RequirementModel getRequirement(String tag) {
-		return null;
-	}
-
 	public static Collection<RequirementModel> getAsRequirements(Collection<String> tags) {
 		if (tags == null || tags.isEmpty()) {
 			return Collections.emptyList();
