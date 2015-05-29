@@ -24,7 +24,6 @@ import java.util.Set;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.IJobChangeEvent;
 import org.eclipse.core.runtime.jobs.Job;
@@ -658,7 +657,6 @@ public class NewProjectExamplesStacksRequirementsPage extends MavenExamplesRequi
 
 		@Override
 		public Collection<DownloadRuntime> getDownloadRuntimes(IProgressMonitor monitor) {
-			
 			List<Runtime> stacksRuntimes = StacksUtil.getCompatibleServerRuntimes(stacksArchetype, stacks);
 			if (stacksRuntimes != null && !stacksRuntimes.isEmpty()) {
 				List<DownloadRuntime> downloadableRuntimes = new ArrayList<>(stacksRuntimes.size());

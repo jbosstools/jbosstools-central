@@ -95,23 +95,31 @@ public abstract class AbstractRuntimeFix extends AbstractProjectFix implements I
 		if (monitor == null) {
 			monitor = new NullProgressMonitor();
 		}
+		final String downloadId = requirement.getProperties().get(RequirementModel.DOWNLOAD_ID);
+		DownloadRuntime preferredDownload = null;
+		if (downloadId != null) {
+			preferredDownload = RuntimeCoreActivator.getDefault().getDownloadRuntimes(monitor).get(downloadId);
+
+		}
+		
 		String allDownloadRuntimeIds = requirement.getProperties().get(RequirementModel.ALLOWED_TYPES);
+		
+		List<DownloadRuntime> runtimes = new ArrayList<>();
 		if (allDownloadRuntimeIds != null && !ANY.equals(allDownloadRuntimeIds)) {
 			DownloadRuntime[] downloadableRuntimes = getDownloadRuntimesFromPattern(allDownloadRuntimeIds, monitor);
 			if (downloadableRuntimes != null && downloadableRuntimes.length > 0) {
-				return Arrays.asList(downloadableRuntimes);
+				runtimes.addAll(Arrays.asList(downloadableRuntimes));
 			}
 			//FIXME : ANY not supported!!!
 		}
-		
-        //Fall back on legacy stuff		
-		final String downloadId = requirement.getProperties().get(RequirementModel.DOWNLOAD_ID);
-		if (downloadId != null) {
-			DownloadRuntime dr = RuntimeCoreActivator.getDefault().getDownloadRuntimes(monitor).get(downloadId);
-			if (dr != null) {
-				return Collections.singletonList(dr);
+		if (preferredDownload != null) {
+			int i = runtimes.indexOf(preferredDownload);
+			if (i < -1) {
+				runtimes.add(preferredDownload);
+			}else if (i > 0 ) {//move at the top
+				runtimes.add(0, runtimes.remove(i));
 			}
 		}
-		return null;
+		return runtimes;
 	}
 }

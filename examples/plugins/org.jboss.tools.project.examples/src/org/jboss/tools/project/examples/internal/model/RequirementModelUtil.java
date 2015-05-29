@@ -34,6 +34,7 @@ public class RequirementModelUtil {
 		return reqMap.values();
 	}
 
+	//TODO Find a more dynamic way to infer all this stuff
 	private static void inferRequirement(String tag, Map<String, RequirementModel> reqMap) {
 		if (tag ==null) { 
 			return;
@@ -69,7 +70,22 @@ public class RequirementModelUtil {
 				|| tag.startsWith("product:wfk")) {
 			key = "server";
 			if (!reqMap.containsKey(key)) {
-				req = createServerRuntimeRequirement();
+				String serverId = null;
+				if (tag.startsWith("product:eap")) {
+					if (tag.contains("6.4.")) {
+						serverId = "jbosseap640runtime";
+					} else if  (tag.contains("6.3.")) {
+						serverId = "jbosseap630runtime";
+					} 
+				} else if (tag.startsWith("wfk")) {
+					if (tag.contains("2.7.")) {
+						serverId = "jbosseap640runtime";
+					} else if  (tag.contains("2.6.")) {
+						serverId = "jbosseap630runtime";
+					} 
+				}
+				
+				req = createServerRuntimeRequirement(serverId);
 			}
 		} else if (tag.contains("fuse")) {
 			key = "fuse";
@@ -109,12 +125,12 @@ public class RequirementModelUtil {
 		return req;
 	}
 
-	public static RequirementModel createServerRuntimeRequirement() {
+	public static RequirementModel createServerRuntimeRequirement(String serverId) {
 	    RequirementModel req = createServerRequirement();
 		Map<String, String> properties = new HashMap<>();
 		properties.put("allowed-types", "org.jboss.ide.eclipse.as.runtime.71, org.jboss.ide.eclipse.as.runtime.eap.60, org.jboss.ide.eclipse.as.runtime.eap.61, org.jboss.ide.eclipse.as.runtime.wildfly.80,org.jboss.ide.eclipse.as.runtime.wildfly.90");
 		properties.put("description", "Requires JBoss EAP 6, JBoss AS 7.1 or WildFly 8.x/9.x");
-		properties.put("downloadId", "org.jboss.tools.runtime.core.as.711");
+		properties.put("downloadId", serverId == null?"wildfly-820finalruntime":serverId);
 		req.setProperties(properties);
 		return req;
 	}
