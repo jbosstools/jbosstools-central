@@ -67,7 +67,8 @@ public class RequirementModelUtil {
 				req = createBrmsRequirement();
 			}
 		} else if (tag.startsWith("product:eap")
-				|| tag.startsWith("product:wfk")) {
+				|| tag.startsWith("product:wfk")
+				|| tag.equals("jsf") || tag.contains("picketlink")) {
 			key = "server";
 			if (!reqMap.containsKey(key)) {
 				String serverId = null;
