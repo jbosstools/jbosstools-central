@@ -39,7 +39,7 @@ public class OfflineUtil {
 	 */
 	public static File getGoOfflineScript() {
 		File baseDir = ProjectExamplesActivator.getDefault().getStateLocation().toFile();
-		File offlineScript = new File(baseDir, "offline/go_offline_"+CURRENT_VERSION+".groovy"); //$NON-NLS-1$
+		File offlineScript = new File(baseDir, "offline/go_offline_"+CURRENT_VERSION+".groovy"); //$NON-NLS-1$ //$NON-NLS-2$
 		return offlineScript;
 	}
 	
@@ -55,6 +55,13 @@ public class OfflineUtil {
 	
 	public static boolean isOfflineEnabled() {
 		return ProjectExamplesActivator.getDefault().getPreferenceStore().getBoolean(ProjectExamplesActivator.PROJECT_EXAMPLES_OFFLINE_ENABLED);
+	}
+
+	public static File getGrapeConfigXml() {
+		File baseDir = ProjectExamplesActivator.getDefault().getStateLocation().toFile();
+		File jbossToolsGrapeConfig = new File(baseDir, "offline/jbossToolsGrapeConfig_"+CURRENT_VERSION+".xml"); //$NON-NLS-1$ //$NON-NLS-2$
+		return jbossToolsGrapeConfig;
+
 	}
 
 }

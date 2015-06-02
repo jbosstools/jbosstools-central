@@ -250,8 +250,10 @@ public class OfflineSupportPreferencePage extends PreferencePage implements
 		
 		Collection<String> descriptors = getDescriptors(ProjectExampleUtil.getPluginSites());
 		Collection<String> categories = getAsStringCollection(ProjectExampleUtil.getCategoryURLs());
-		StringBuilder command = new StringBuilder("groovy \"") //$NON-NLS-1$
-		                        .append(OfflineUtil.getGoOfflineScript().getAbsolutePath())
+		StringBuilder command = new StringBuilder("groovy -Dgrape.config=\"") //$NON-NLS-1$
+								.append(OfflineUtil.getGrapeConfigXml().getAbsolutePath())
+								.append("\" \"")
+								.append(OfflineUtil.getGoOfflineScript().getAbsolutePath())
 		                        .append("\" ") //$NON-NLS-1$
 		                        .append(StringUtils.join(categories, " ")) //$NON-NLS-1$
 		                        .append(" ") //$NON-NLS-1$

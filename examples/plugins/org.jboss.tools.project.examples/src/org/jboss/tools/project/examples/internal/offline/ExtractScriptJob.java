@@ -52,14 +52,28 @@ public class ExtractScriptJob extends Job {
 	@Override
 	protected IStatus run(IProgressMonitor monitor) {
 		File offlineScript = OfflineUtil.getGoOfflineScript();
+		File grapeConfigXml = OfflineUtil.getGrapeConfigXml();
 		//No need to overwrite existing script if not in dev mode
-		if (!offlineScript.exists() || offlineScript.getName().contains(".qualifier")) { //$NON-NLS-1$
+		boolean devMode = offlineScript.getName().contains(".qualifier");//$NON-NLS-1$
+		URL sourceUrl = null;
+		String base = "platform:/plugin/org.jboss.tools.project.examples/offline/";//$NON-NLS-1$
+		if (devMode || !offlineScript.exists()) {
 			try {
-				URL scriptUrl = new URL("platform:/plugin/org.jboss.tools.project.examples/offline/go_offline.groovy"); //$NON-NLS-1$
-				URL sourceUrl = FileLocator.resolve(scriptUrl);
+				URL scriptUrl = new URL(base+"go_offline.groovy"); //$NON-NLS-1$
+				sourceUrl = FileLocator.resolve(scriptUrl);
 				FileUtils.copyURLToFile(sourceUrl, offlineScript);
 			} catch (Exception e) {
 				Status error = new Status(IStatus.ERROR, ProjectExamplesActivator.PLUGIN_ID, "Impossible to copy the go_offline script", e); //$NON-NLS-1$
+				return error;
+			}
+		}
+		if (devMode || !grapeConfigXml.exists()) { 
+			try {
+				URL grapeConfigUrl = new URL(base+"jbossToolsGrapeConfig.xml"); //$NON-NLS-1$
+				sourceUrl = FileLocator.resolve(grapeConfigUrl);
+				FileUtils.copyURLToFile(sourceUrl, grapeConfigXml);
+			} catch (Exception e) {
+				Status error = new Status(IStatus.ERROR, ProjectExamplesActivator.PLUGIN_ID, "Impossible to copy jbossToolsGrapeConfig.xml", e); //$NON-NLS-1$
 				return error;
 			}
 		}
