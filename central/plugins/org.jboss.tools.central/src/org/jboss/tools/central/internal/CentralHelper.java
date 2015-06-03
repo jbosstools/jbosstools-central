@@ -56,16 +56,6 @@ public class CentralHelper {
 		String remoteUrl = getCentralUrlPropertyValue();
 		return getCentralPageUrl(remoteUrl, "index.html", monitor);
 	}
-
-	/**
-	 * Returns the url to the Central legacy webpage (legacy.html).
-	 * 
-	 * @throws CoreException
-	 */
-	public static String getCentralFallbackUrl(IProgressMonitor monitor) throws CoreException {
-		String remoteUrl = getCentralUrlPropertyValue();
-		return getCentralPageUrl(remoteUrl, "legacy.html", monitor);
-	}
 	
 	private static String getCentralUrlPropertyValue() {
 		String remoteUrl = System.getProperty(JBOSS_CENTRAL_WEBPAGE_URL_KEY);
