@@ -26,6 +26,7 @@
 					</execution>
 				</executions>
 				<configuration>
+					<skip>false</skip>
 					<artifactItems>
 						<artifactItem>
 							<groupId>org.jboss.tools.central</groupId>
@@ -44,7 +45,9 @@
 					<filesets>
 						<fileset>
 							<directory>resources</directory>
-							<includes>*.zip</includes>
+							<includes>
+								<include>*.zip</include>
+							</includes>
 						</fileset>
 					</filesets>
 				</configuration>
