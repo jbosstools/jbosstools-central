@@ -59,3 +59,4 @@ Export-Package: org.jboss.tools.central,
  org.jboss.tools.central.jobs,
  org.jboss.tools.central.model,
  org.jboss.tools.central.preferences
+Eclipse-BundleShape: dir

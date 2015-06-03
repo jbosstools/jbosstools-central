@@ -12,7 +12,6 @@ package org.jboss.tools.central.internal;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -21,23 +20,21 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.IOUtils;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.jboss.tools.central.JBossCentralActivator;
 import org.jboss.tools.central.preferences.PreferenceKeys;
 import org.jboss.tools.foundation.core.digest.DigestUtils;
+import org.jboss.tools.foundation.core.digest.DigestUtils;
 import org.jboss.tools.foundation.core.ecf.URLTransportUtility;
 import org.jboss.tools.foundation.core.properties.PropertiesHelper;
-import org.jboss.tools.project.examples.internal.ProjectExamplesActivator;
 import org.jboss.tools.project.examples.internal.UnArchiver;
-import org.jboss.tools.foundation.core.digest.DigestUtils;
+import org.osgi.framework.Bundle;
 
 public class CentralHelper {
 	
@@ -94,27 +91,41 @@ public class CentralHelper {
 		StringBuilder url = new StringBuilder();
 		if (remoteUrl.endsWith(".zip")) {
 			//download it
-			URI uri;
+			URI uri = null;
+			Path zip = null;
 			try {
 				uri = new URI(remoteUrl);
 			} catch (URISyntaxException e) {
-				IStatus status = new Status(IStatus.ERROR, JBossCentralActivator.PLUGIN_ID, "Central page has an invalid URL", e);
-				throw new CoreException(status);
+				JBossCentralActivator.logWarning("Central page URL ("+remoteUrl+") is invalid. Falling back to embedded version");
+				zip = getEmbeddedCentralZipPath();
 			}
-			Path zip;
-			if (uri.getScheme() == null){
-				zip = Paths.get(remoteUrl).toAbsolutePath();
+			if (uri != null) {
+				if (uri.getScheme() == null || "file".equals(uri.getScheme())){
+					zip = Paths.get(remoteUrl).toAbsolutePath();
+				} else {
+					//download it if needed
+					zip = downloadIfNeeded(uri, monitor);
+				}
 			}
-			else if ("file".equals(uri.getScheme())){
-				zip = Paths.get(uri).toAbsolutePath();
-			} else {
-				//download it if needed
-				zip = downloadIfNeeded(uri, monitor);
-			}
+			
 			Path centralFolder =  getCentralFolder();
-			Path localCentralPage;
+			Path localCentralPage = null;
 			try {
-				localCentralPage = extractIfNeeded(zip, centralFolder, false, monitor);
+				if (zip != null) {
+					try {
+						localCentralPage = extractIfNeeded(zip, centralFolder, false, monitor);
+					} catch (Exception e) {
+						JBossCentralActivator.log(e, "An Error occured while extracting "+zip);
+					}
+				}
+				if (localCentralPage == null) {
+					zip = getEmbeddedCentralZipPath();
+					if (!Files.exists(zip)) {
+						//we're ****ed
+						throw new IOException("Can't find embedded central zip");
+					}
+					localCentralPage = extractIfNeeded(zip, centralFolder, false, monitor);
+				}
 			} catch (IOException e) {
 				IStatus status = new Status(IStatus.ERROR, JBossCentralActivator.PLUGIN_ID, "Unable to open "+zip, e);
 				throw new CoreException(status);
@@ -124,9 +135,11 @@ public class CentralHelper {
 			url.append(remoteUrl);
 		}
 		String _url = url.toString();
+		//is the url pointing at the expected page?
 		if (_url.endsWith(page)) {
 			return _url;
 		}
+		//is the url pointing at a different page? then start again from parent dir
 		if (_url.endsWith(".html")) {
 			url = new StringBuilder(_url.substring(0, _url.lastIndexOf("/")));
 		}
@@ -136,6 +149,16 @@ public class CentralHelper {
 		}
 		url.append(page); 
 		return url.toString();
+	}
+
+	private static Path getEmbeddedCentralZipPath() {
+		Bundle bundle = JBossCentralActivator.getDefault().getBundle();
+		URL zip = FileLocator.find(bundle, new org.eclipse.core.runtime.Path("resources/jbosstools-central-webpage.zip"), null);
+		try {
+		  return Paths.get(FileLocator.toFileURL(zip).toURI());
+		} catch (URISyntaxException | IOException e) {
+			throw new RuntimeException(e);
+		}
 	}
 	
 	private static Path getCentralFolder() {
@@ -148,7 +171,10 @@ public class CentralHelper {
 		String url = uri.toString();
 		int lifespan = URLTransportUtility.CACHE_FOREVER;//url.contains("-SNAPSHOT")?URLTransportUtility.CACHE_UNTIL_EXIT:;
 		File zip = new URLTransportUtility().getCachedFileForURL(url, "Download central", lifespan, monitor);
-		return zip.toPath();
+		if (zip != null && zip.exists()) {
+			return zip.toPath();
+		}
+		return null;
 	}
 
 	private static Path extractIfNeeded(Path zip, Path centralFolder, boolean overwrite, IProgressMonitor monitor) throws IOException {
