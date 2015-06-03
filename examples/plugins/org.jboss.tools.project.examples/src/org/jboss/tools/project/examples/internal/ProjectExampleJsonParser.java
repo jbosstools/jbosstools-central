@@ -61,6 +61,10 @@ public class ProjectExampleJsonParser implements IProjectExampleParser {
 	private ProjectExample parse(ModelNode hit) {
 		String id = hit.get("_id").asString();
 		ModelNode fields = hit.get("fields");
+		if (!fields.isDefined() || !fields.get("quickstart_id").isDefined() || !fields.get("git_download").isDefined()) {
+			return null;
+		}
+
 		String name = fields.get("quickstart_id").asString();
 		try {
 			// String github_repo_url =
@@ -90,7 +94,10 @@ public class ProjectExampleJsonParser implements IProjectExampleParser {
 				if (tag.toLowerCase().startsWith(targetProduct)) {
 					productTag.append(tag);
 				} else {
-					productTag.append(targetProduct).append("-").append(tag);
+					productTag.append(targetProduct);
+					if (!tag.isEmpty()) {
+						productTag.append("-").append(tag);
+					}
 				}
 				sys_tags.add(productTag.toString());
 			}
