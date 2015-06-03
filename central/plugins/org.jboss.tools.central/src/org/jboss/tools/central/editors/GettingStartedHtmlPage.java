@@ -246,8 +246,7 @@ public class GettingStartedHtmlPage extends AbstractJBossCentralPage implements 
 				protected IStatus run(IProgressMonitor monitor) {
 					final String url;
 					try {
-						url = browser.isHTML5supported() ? CentralHelper.getCentralUrl(monitor) 
-								                       : CentralHelper.getCentralFallbackUrl(monitor);
+						url = CentralHelper.getCentralUrl(monitor);
 						Display.getDefault().asyncExec(new Runnable() {
 							@Override
 							public void run() {
