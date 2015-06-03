@@ -52,6 +52,10 @@ class GoOfflineScript {
   @Parameter(names =["-s", "--settings"], description = "Path to custom Maven settings.xml")
   File settings = null
 
+  @Parameter(names =["-m", "--maven"], description = "Maven version to use")
+  String mavenVersion = "3.3.3"
+
+
   boolean forceMavenResourcePluginResolution = true //on some OS/maven combos, m-r-p:2.5 is not resolved. It should.
 
   def buildErrors = [:]
@@ -456,11 +460,12 @@ class GoOfflineScript {
              dir: directory,
              executable: "mvn") {
                 arg(value:"io.takari:maven:wrapper")
-                 arg(value:"-N")
+                arg(value:"-N")
                 if (settings) {
                   arg(value:"-s")
                   arg(value:"${settings.absolutePath}")
                 }
+                arg(value:"-Dmaven=$mavenVersion")
                 if (quiet) arg(value:"-q")
                 if (localRepo) arg(value:"-Dmaven.repo.local=${localRepo.absolutePath}")
              }
