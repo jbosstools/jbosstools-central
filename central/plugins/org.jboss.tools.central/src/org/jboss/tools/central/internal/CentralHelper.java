@@ -30,7 +30,6 @@ import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.jboss.tools.central.JBossCentralActivator;
 import org.jboss.tools.central.preferences.PreferenceKeys;
 import org.jboss.tools.foundation.core.digest.DigestUtils;
-import org.jboss.tools.foundation.core.digest.DigestUtils;
 import org.jboss.tools.foundation.core.ecf.URLTransportUtility;
 import org.jboss.tools.foundation.core.properties.PropertiesHelper;
 import org.jboss.tools.project.examples.internal.UnArchiver;
@@ -39,6 +38,8 @@ import org.osgi.framework.Bundle;
 public class CentralHelper {
 	
 	public static final String JBOSS_CENTRAL_WEBPAGE_URL_KEY = "jboss.central.webpage.url";
+
+	private static final String LATEST_WEBPAGE_URL = "https://repository.jboss.org/nexus/service/local/artifact/maven/redirect?r=public-jboss&g=org.jboss.tools.central&a=jbosstools-central-webpage&v=0.0.1-SNAPSHOT&e=zip&mustEndWith=.zip";
 
 	private CentralHelper() {}
 	
@@ -60,7 +61,7 @@ public class CentralHelper {
 	private static String getCentralUrlPropertyValue() {
 		String remoteUrl = System.getProperty(JBOSS_CENTRAL_WEBPAGE_URL_KEY);
 		if (remoteUrl == null) {
-			remoteUrl = PropertiesHelper.getPropertiesProvider().getValue(JBOSS_CENTRAL_WEBPAGE_URL_KEY, "http://central-fredapp.rhcloud.com/");
+			remoteUrl = PropertiesHelper.getPropertiesProvider().getValue(JBOSS_CENTRAL_WEBPAGE_URL_KEY, LATEST_WEBPAGE_URL);
 		}
 		return remoteUrl;
 	}
