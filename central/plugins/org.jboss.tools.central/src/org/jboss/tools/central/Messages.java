@@ -48,6 +48,8 @@ public class Messages extends NLS {
 	public static String noEngineError_message;
 	public static String visualEditorFaq;
 	public static String visualEditorFaqLink;
+	
+	public static String usageEventBrowserLabelDescription;
 
 	static {
 		// initialize resource bundle

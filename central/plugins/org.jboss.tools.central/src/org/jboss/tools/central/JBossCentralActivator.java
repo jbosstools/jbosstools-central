@@ -68,6 +68,9 @@ import org.jboss.tools.central.internal.CentralConfiguratorFactory;
 import org.jboss.tools.central.internal.dnd.JBossCentralDropTarget;
 import org.jboss.tools.central.preferences.PreferenceKeys;
 import org.jboss.tools.project.examples.model.ProjectExample;
+import org.jboss.tools.usage.event.UsageEventType;
+import org.jboss.tools.usage.event.UsageReporter;
+
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
@@ -156,6 +159,8 @@ public class JBossCentralActivator extends AbstractUIPlugin {
 
 	private IJBossCentralConfigurator configurator;
 
+	private UsageEventType usedBrowserEventType;
+	
 	/**
 	 * The constructor
 	 */
@@ -199,8 +204,15 @@ public class JBossCentralActivator extends AbstractUIPlugin {
 			@Override
 			public void windowActivated(IWorkbenchWindow window) {}
 		});
+		
+		usedBrowserEventType = new UsageEventType(this, "browser", Messages.usageEventBrowserLabelDescription); //$NON-NLS-1$
+		UsageReporter.getInstance().registerEvent(usedBrowserEventType);
 	}
 
+	public UsageEventType getUsedBrowserEventType() {
+		return usedBrowserEventType;
+	}
+	
 	/*
 	 * (non-Javadoc)
 	 * 

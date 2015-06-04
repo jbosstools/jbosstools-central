@@ -13,6 +13,9 @@ package org.jboss.tools.central.internal.browser;
 
 import org.eclipse.swt.browser.Browser;
 import org.eclipse.swt.widgets.Composite;
+import org.jboss.tools.central.JBossCentralActivator;
+import org.jboss.tools.usage.event.UsageEventType;
+import org.jboss.tools.usage.event.UsageReporter;
 
 /**
  * 
@@ -22,6 +25,8 @@ import org.eclipse.swt.widgets.Composite;
 public class VersionedBrowser extends Browser {
 	private String name;
 	private String version;
+	
+	private static boolean usageReported = false;
 	
 	public VersionedBrowser(Composite parent, int style) {
 		super(parent, style);
@@ -50,6 +55,12 @@ public class VersionedBrowser extends Browser {
 		String result = (String) evaluate(browserScript);
 		name = result.substring(0, result.indexOf("_")); //$NON-NLS-1$
 		version = result.substring(result.indexOf("_") + 1); //$NON-NLS-1$
+		
+		if (!usageReported) {
+			UsageEventType eventType = JBossCentralActivator.getDefault().getUsedBrowserEventType();
+			UsageReporter.getInstance().trackEvent(eventType.event(result));
+			usageReported = true;
+		}
 	}
 
 	public String getBrowserName() {
