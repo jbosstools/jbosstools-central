@@ -15,8 +15,7 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.m2e.core.ui
 Bundle-Localization: plugin
 Bundle-ActivationPolicy: lazy
-Bundle-RequiredExecutionEnvironment: JavaSE-1.6,
- JavaSE-1.7
+Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Bundle-Vendor: %Bundle-Vendor
 Export-Package: org.jboss.tools.maven.jdt,
  org.jboss.tools.maven.jdt.configurators,

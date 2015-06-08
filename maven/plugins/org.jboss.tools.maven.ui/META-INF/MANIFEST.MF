@@ -25,7 +25,7 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.ui.forms,
  org.apache.commons.io
 Bundle-ActivationPolicy: lazy
-Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Bundle-Vendor: %Bundle-Vendor
 Export-Package: org.jboss.tools.maven.ui,
  org.jboss.tools.maven.ui.internal.libprov,

@@ -146,19 +146,11 @@ public class AttachSourcesActionDelegate implements IEditorActionDelegate {
 			return new File(attachementSource, className).exists();
 		}
 		//we assume it's a jar :
-		ZipFile jar = null;
-		try {
-			jar = new ZipFile(attachementSource);
+		try (ZipFile jar = new ZipFile(attachementSource)){
 			ZipEntry entry = jar.getEntry(className);//$NON-NLS-1$
 			return entry != null;
 		} catch (IOException e) {
 			e.printStackTrace();
-		} finally {
-			try {
-				if (jar != null) jar.close();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
 		}
 		return false;
 	}
