@@ -99,13 +99,6 @@
             id="org.jboss.tools.central.refreshDiscovery">
       </command>
 
-
-      <command
-      		defaultHandler="org.jboss.tools.central.actions.OpenJBossToolsTwitterHandler"
-            name="Twitter"
-            id="org.jboss.tools.central.openJBossToolsTwitter">
-      </command>
-
       <command
       		defaultHandler="org.jboss.tools.central.actions.NewProjectExamplesWizardHandler"
             name="Project Examples Wizard"
@@ -163,11 +156,6 @@
       <image
             commandId="org.jboss.tools.central.refreshDiscovery"
             icon="icons/refresh.gif">
-      </image>
-
-      <image
-            commandId="org.jboss.tools.central.openJBossToolsTwitter"
-            icon="icons/twitter.png">
       </image>
       <image
             commandId="org.jboss.tools.central.favoriteAtEclipseMarketplace"
