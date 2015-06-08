@@ -86,7 +86,7 @@ public class ProjectExampleJsonProvider implements IProjectExampleProvider {
 	}
 
 	protected String getExamplesUrl() {
-		String defaultQuery = "http://dcp.jboss.org/v1/rest/search?content_provider=jboss-developer&content_provider=rht&field=sys_author&field=target_product&field=contributors&field=duration&field=github_repo_url&field=git_download&field=level&field=sys_contributors&field=sys_created&field=sys_description&field=sys_title&field=sys_tags&field=sys_url_view&field=thumbnail&field=sys_type&field=sys_rating_num&field=sys_rating_avg&field=experimental&field=prerequisites&field=quickstart_id&field=git_tag&field=git_commit&query=sys_type:(jbossdeveloper_quickstart)&size=500";
+		String defaultQuery = "http://dcp.jboss.org/v1/rest/search?content_provider=jboss-developer&content_provider=rht&field=target_product&field=github_repo_url&field=sys_description&field=sys_title&field=sys_tags&field=sys_type&field=experimental&field=git_download&field=prerequisites&field=quickstart_id&field=git_tag&field=git_commit&query=sys_type:(quickstart)&size=500";
 		String searchQuery = getPropertiesProvider().getValue("quickstarts.search.query", defaultQuery);
 		return searchQuery;
 	}
