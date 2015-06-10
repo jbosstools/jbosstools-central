@@ -204,9 +204,6 @@ public class JBossCentralEditor extends SharedHeaderFormEditor {
 						"/icons/software.png").createImage();
 			}
 			setPageImage(index, softwareImage);
-			if (Platform.OS_LINUX.equals(Platform.getOS()) && Platform.WS_GTK.equals(Platform.getWS())) {
-				JBossEditorUtil.refreshTheme();
-			}
 		} catch (PartInitException e) {
 			JBossCentralActivator.log(e, "Error adding page");
 		}
