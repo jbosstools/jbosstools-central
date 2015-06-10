@@ -171,7 +171,6 @@ public class ConnectorDescriptorItemUi implements PropertyChangeListener, Runnab
 		// help UI tests
 		checkbox.setData("connectorId", connector.getId()); //$NON-NLS-1$
 		checkbox.setVisible(connector.isInstallable());
-		checkbox.setBackground(background);
 		checkbox.setSelection(connector.isSelected());
 		checkbox.addFocusListener(new FocusAdapter() {
 			@Override

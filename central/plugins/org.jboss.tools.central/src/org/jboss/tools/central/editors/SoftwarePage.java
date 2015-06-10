@@ -371,9 +371,6 @@ public class SoftwarePage extends AbstractJBossCentralPage implements IRunnableC
 				setEnabled(earlyAccessButton, true);
 				setEnabled(deselectAllButton, true);
 				setEnabled(selectAllButton, true);
-				if (Platform.OS_LINUX.equals(Platform.getOS()) && Platform.WS_GTK.equals(Platform.getWS())) {
-					JBossEditorUtil.refreshTheme();
-				}
 			}
 		});
 		
