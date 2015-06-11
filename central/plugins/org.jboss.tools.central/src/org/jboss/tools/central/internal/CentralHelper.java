@@ -169,7 +169,7 @@ public class CentralHelper {
 	}
 
 	private static Path extractIfNeeded(Path zip, Path centralFolder, boolean overwrite, IProgressMonitor monitor) throws IOException {
-		String sha1 = DigestUtils.sha1(zip).substring(0, 6);
+		String sha1 = DigestUtils.sha1(zip).substring(0, 7);
 		Path destinationFolder = centralFolder.resolve(sha1);
 		//if already extracted :
 		if (overwrite) {
