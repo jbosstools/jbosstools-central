@@ -111,6 +111,7 @@ public class ImageUtil {
 			if (!url.getProtocol().equals("jar")) {
 				throw new IllegalArgumentException("Only 'jar:' urls are supported");
 			}
+			this.url = url;
 		}
 		
 		UrlStreamJarProvider(String url) throws MalformedURLException {
