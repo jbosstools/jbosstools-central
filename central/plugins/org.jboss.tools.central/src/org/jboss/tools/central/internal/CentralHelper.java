@@ -91,8 +91,10 @@ public class CentralHelper {
 				zip = getEmbeddedCentralZipPath();
 			}
 			if (uri != null) {
-				if (uri.getScheme() == null || "file".equals(uri.getScheme())){
+				if (uri.getScheme() == null){
 					zip = Paths.get(remoteUrl).toAbsolutePath();
+				} else if ("file".equals(uri.getScheme())) {
+					zip = Paths.get(uri).toAbsolutePath();
 				} else {
 					//download it if needed
 					zip = downloadIfNeeded(uri, monitor);

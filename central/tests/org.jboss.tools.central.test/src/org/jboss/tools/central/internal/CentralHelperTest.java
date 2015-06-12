@@ -60,8 +60,8 @@ public class CentralHelperTest {
 	public void testGetCentralUrlZip() throws Exception {
 		Path zip = Paths.get("test-resources", "central.zip");
 		String url = zip.toUri().toString();
-		String sha1 = "566caf";
-		String expectedEnd = ".metadata"+File.separator+".plugins"+File.separator+"org.jboss.tools.central"+File.separator+"versions"+File.separator+sha1+File.separator+"index.html";
+		String sha1 = "566cafe";
+		String expectedEnd = ".metadata"+File.separator+".plugins"+File.separator+"org.jboss.tools.central"+File.separator+"central"+File.separator+sha1+File.separator+"index.html";
 		IProgressMonitor monitor = new NullProgressMonitor();
 		try {
 			String resolvedUrl = CentralHelper.getCentralUrl(url, monitor);
