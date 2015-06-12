@@ -21,7 +21,7 @@ import java.io.File;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.List;
+import java.util.Collection;
 
 import org.eclipse.core.commands.Command;
 import org.eclipse.core.commands.IParameter;
@@ -65,8 +65,6 @@ import org.jboss.tools.project.examples.internal.ProjectExamplesActivator;
 import org.jboss.tools.project.examples.internal.UnArchiver;
 import org.jboss.tools.project.examples.model.IImportProjectExample;
 import org.jboss.tools.project.examples.model.ProjectExample;
-import org.jboss.tools.project.examples.model.ProjectExampleCategory;
-import org.jboss.tools.project.examples.model.ProjectExampleUtil;
 import org.jboss.tools.project.examples.model.ProjectExampleWorkingCopy;
 import org.jboss.tools.test.util.JobUtils;
 import org.junit.AfterClass;
@@ -88,8 +86,7 @@ public class CheatSheetTest {
 	//private static final String RESOURCES = "resources";
 	private static final String CHEATSHEET_HELLOWORLD_ZIP = "resources/cheatsheet-helloworld.zip";
 	
-	private static final String WEB_APPLICATIONS = "Web Applications";
-	private static final String KITCHENSINK = "jboss-kitchensink";
+	private static final String KITCHENSINK = "kitchensink";
 	
 	private static IPreferenceStore store;
 	private static String originalValue;
@@ -130,17 +127,9 @@ public class CheatSheetTest {
 	}
 
 	private static void importProject(IProgressMonitor monitor) throws MalformedURLException, Exception {
-		List<ProjectExampleCategory> projects = ProjectExampleUtil.getProjects(monitor);
-		ProjectExampleCategory quickstartsCategory = null;
-		for (ProjectExampleCategory category: projects) {
-			if (WEB_APPLICATIONS.equals(category.getName())) {
-				quickstartsCategory = category;
-				break;
-			}
-		}
-		assertNotNull(quickstartsCategory);
+		Collection<ProjectExample> projects = ProjectExamplesActivator.getDefault().getProjectExampleManager().getExamples(monitor);
 		ProjectExampleWorkingCopy projectExample = null;
-		for (ProjectExample project: quickstartsCategory.getProjects()) {
+		for (ProjectExample project: projects) {
 			if (KITCHENSINK.equals(project.getName())) {
 				projectExample = ProjectExamplesActivator.getDefault().getProjectExampleManager().createWorkingCopy(project);
 				break;
@@ -160,7 +149,7 @@ public class CheatSheetTest {
 		JobUtils.waitForIdle();
 		IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();    
 		IProject project = root.getProject(KITCHENSINK);
-		assertTrue("The jboss-kitchensink project is not imported.", project.exists());
+		assertTrue("The "+ KITCHENSINK +"  project is not imported.", project.exists());
 		final IFile file = project.getFile("cheatsheet.xml");
 		Display.getDefault().syncExec(new Runnable() {
 			
@@ -177,7 +166,7 @@ public class CheatSheetTest {
 		JobUtils.waitForIdle();
 		IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();    
 		IProject project = root.getProject(KITCHENSINK);
-		assertTrue("The jboss-kitchensink project is not imported.", project.exists());
+		assertTrue("The "+ KITCHENSINK +" project is not imported.", project.exists());
 		final IFile file = project.getFile("cheatsheet.xml");
 		Display.getDefault().syncExec(new Runnable() {
 			
@@ -266,7 +255,7 @@ public class CheatSheetTest {
  		Command openFile = commandService.getCommand("org.jboss.tools.project.examples.cheatsheet.openFileInEditor");
  		IParameter path = openFile.getParameter("path");
  
- 		Parameterization parm = new Parameterization(path, "/jboss-kitchensink/src/main/java/org/jboss/as/quickstarts/kitchensink/model/Member.java");
+ 		Parameterization parm = new Parameterization(path, "/"+ KITCHENSINK +"/src/main/java/org/jboss/as/quickstarts/kitchensink/model/Member.java");
  		ParameterizedCommand parmCommand = new ParameterizedCommand(
  				openFile, new Parameterization[] { parm });
  
@@ -280,7 +269,7 @@ public class CheatSheetTest {
 		assertTrue("Incorrect editor input.", input instanceof IFileEditorInput);
 		IFileEditorInput fileEditorInput = (IFileEditorInput) input;
 		IFile file = fileEditorInput.getFile();
-		assertEquals("Incorrect file opened.",file.getFullPath().toString(), ("/jboss-kitchensink/src/main/java/org/jboss/as/quickstarts/kitchensink/model/Member.java"));
+		assertEquals("Incorrect file opened.",file.getFullPath().toString(), ("/"+ KITCHENSINK +"/src/main/java/org/jboss/as/quickstarts/kitchensink/model/Member.java"));
 		page.closeAllEditors(false);
 	}
 
