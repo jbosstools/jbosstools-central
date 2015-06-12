@@ -115,7 +115,7 @@ public class UnArchiver {
 	}
 
 	private IPath findSegment(IPath filePath, IPath folder) {
-		for(int i = 0; i < filePath.segmentCount(); i++) {
+		for(int i = 0; i < filePath.segmentCount() && i < 3; i++) {
 			if (filePath.segment(i).equals(folder.toString())) {
 				if (i > 0) {
 					return filePath.removeFirstSegments(i);
