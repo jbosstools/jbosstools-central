@@ -17,6 +17,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.MultiStatus;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.mylyn.commons.core.StatusHandler;
 import org.eclipse.mylyn.internal.discovery.core.DiscoveryCore;
@@ -56,6 +57,9 @@ public class ChainedDiscoveryStrategy extends AbstractDiscoveryStrategy  {
 		MultiStatus status = new MultiStatus(org.jboss.tools.discovery.core.internal.DiscoveryActivator.PLUGIN_ID, 0,
 				"All attempts to discover connectors have failed", null);
 		
+		if (monitor == null) {
+			monitor = new NullProgressMonitor();
+		}
 		for (AbstractDiscoveryStrategy ds : strategies) {
 			try {
 				if (monitor.isCanceled()) {
