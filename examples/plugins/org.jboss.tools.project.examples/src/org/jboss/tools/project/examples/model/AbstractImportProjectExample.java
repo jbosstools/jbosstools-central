@@ -57,11 +57,11 @@ public abstract class AbstractImportProjectExample implements
 			String location = ProjectExamplesActivator.getDefault().getPreferenceStore().
 					getString(ProjectExamplesActivator.PROJECT_EXAMPLES_OUTPUT_DIRECTORY);
 			if (location == null || location.isEmpty()) {
-				return Platform.getLocation();
+				return Platform.getLocation().append("examples");
 			}
 			return new Path(location);
 		}
-		return Platform.getLocation();
+		return Platform.getLocation().append("examples");
 	}
 
 }
