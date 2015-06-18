@@ -129,8 +129,8 @@ public class RequirementModelUtil {
 	public static RequirementModel createServerRuntimeRequirement(String serverId) {
 	    RequirementModel req = createServerRequirement();
 		Map<String, String> properties = new HashMap<>();
-		properties.put("allowed-types", "org.jboss.ide.eclipse.as.runtime.71, org.jboss.ide.eclipse.as.runtime.eap.60, org.jboss.ide.eclipse.as.runtime.eap.61, org.jboss.ide.eclipse.as.runtime.wildfly.80,org.jboss.ide.eclipse.as.runtime.wildfly.90");
-		properties.put("description", "Requires JBoss EAP 6, JBoss AS 7.1 or WildFly 8.x/9.x");
+		properties.put("allowed-types", "org.jboss.ide.eclipse.as.runtime.eap.61, org.jboss.ide.eclipse.as.runtime.eap.70, org.jboss.ide.eclipse.as.runtime.wildfly.80,org.jboss.ide.eclipse.as.runtime.wildfly.90");
+		properties.put("description", "Requires JBoss EAP 6.2+ or WildFly 8.x/9.x");
 		properties.put("downloadId", serverId == null?"wildfly-820finalruntime":serverId);
 		req.setProperties(properties);
 		return req;
