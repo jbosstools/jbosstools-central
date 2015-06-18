@@ -86,7 +86,7 @@ public class CheatSheetTest {
 	//private static final String RESOURCES = "resources";
 	private static final String CHEATSHEET_HELLOWORLD_ZIP = "resources/cheatsheet-helloworld.zip";
 	
-	private static final String KITCHENSINK = "kitchensink";
+	private static final String KITCHENSINK = "jboss-kitchensink";
 	
 	private static IPreferenceStore store;
 	private static String originalValue;
@@ -130,7 +130,7 @@ public class CheatSheetTest {
 		Collection<ProjectExample> projects = ProjectExamplesActivator.getDefault().getProjectExampleManager().getExamples(monitor);
 		ProjectExampleWorkingCopy projectExample = null;
 		for (ProjectExample project: projects) {
-			if (KITCHENSINK.equals(project.getName())) {
+			if ("kitchensink".equals(project.getName())) {
 				projectExample = ProjectExamplesActivator.getDefault().getProjectExampleManager().createWorkingCopy(project);
 				break;
 			}
