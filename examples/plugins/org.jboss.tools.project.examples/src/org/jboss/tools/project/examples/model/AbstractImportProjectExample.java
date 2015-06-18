@@ -14,7 +14,6 @@ package org.jboss.tools.project.examples.model;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Path;
-import org.eclipse.core.runtime.Platform;
 import org.jboss.tools.project.examples.internal.ProjectExamplesActivator;
 
 /**
@@ -56,12 +55,11 @@ public abstract class AbstractImportProjectExample implements
 		if (!isWorkspace) {
 			String location = ProjectExamplesActivator.getDefault().getPreferenceStore().
 					getString(ProjectExamplesActivator.PROJECT_EXAMPLES_OUTPUT_DIRECTORY);
-			if (location == null || location.isEmpty()) {
-				return Platform.getLocation().append("examples");
+			if (location != null && !location.isEmpty()) {
+				return new Path(location);
 			}
-			return new Path(location);
 		}
-		return Platform.getLocation().append("examples");
+		return ProjectExampleUtil.getDefaultExamplesDirectory();
 	}
 
 }
