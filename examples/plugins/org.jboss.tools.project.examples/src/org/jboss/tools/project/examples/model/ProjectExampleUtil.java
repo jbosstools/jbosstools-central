@@ -34,6 +34,8 @@ import java.util.concurrent.ExecutorCompletionService;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import org.eclipse.core.resources.IWorkspaceRoot;
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExtension;
@@ -579,5 +581,16 @@ public class ProjectExampleUtil {
 		if (project != null) {
 			project.setFile(file);		
 		}
-	}	
+	}
+	
+	@SuppressWarnings("nls")
+	public static IPath getDefaultExamplesDirectory() {
+		IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
+		String baseName = "examples";
+		IPath dir = Platform.getLocation().append(baseName);
+		for (int i = 2; root.getContainerForLocation(dir) != null; i++) {
+		 dir = Platform.getLocation().append(baseName + "_"+ i);
+		}
+		return dir;
+	}
 }

@@ -10,12 +10,27 @@
  ************************************************************************************/
 package org.jboss.tools.project.examples.model;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.util.Set;
 
+import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IProjectDescription;
+import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.IWorkspace;
+import org.eclipse.core.resources.IWorkspaceRoot;
+import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.jboss.tools.project.examples.internal.ProjectExamplesActivator;
+import org.jboss.tools.project.examples.tests.ProjectExamplesTestUtil;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -81,6 +96,7 @@ public class ProjectExampleUtilTest {
 		assertNotNull(userSites);
 		assertTrue(userSites.isEmpty());
 	}
+	
 	private void setUserSites(String xml) {
 		if (xml == null) {
 			store.setToDefault(ProjectExamplesActivator.USER_SITES);
@@ -88,4 +104,40 @@ public class ProjectExampleUtilTest {
 			store.putValue(ProjectExamplesActivator.USER_SITES, xml);	
 		}
 	}
+	
+	@Test
+	public void testGetDefaultExamplesDirectory() throws CoreException {
+		ProjectExamplesTestUtil.removeProjects();
+		try {
+		  IPath exampleDir = ProjectExampleUtil.getDefaultExamplesDirectory();
+		  assertEquals("examples", exampleDir.lastSegment());
+		  
+		  int nbProjects = 5;
+		  createExampleProjects("examples", nbProjects);
+		  exampleDir = ProjectExampleUtil.getDefaultExamplesDirectory();
+		  assertEquals("examples_"+(nbProjects+1), exampleDir.lastSegment());
+		} finally {
+		  ProjectExamplesTestUtil.removeProjects();
+		}
+		
+	}
+	
+	private void createExampleProjects(String baseName, int nbProjects) throws CoreException {
+		IProgressMonitor monitor = new NullProgressMonitor();
+		IWorkspace workspace = ResourcesPlugin.getWorkspace();
+		IWorkspaceRoot root = workspace.getRoot();
+		for (int i = 1; i<= nbProjects; i++) {
+		  String projectName = baseName;
+		  if (i > 1) {
+			  projectName += "_"+i; 
+		  }
+		  IProject project = root.getProject(projectName);
+		  if (!project.exists()) {
+			IProjectDescription projectDescription = workspace.newProjectDescription(projectName);
+			project.create(projectDescription, monitor);    
+			project.open(IResource.NONE, monitor);
+		  }
+		}
+	}
+	
 }
