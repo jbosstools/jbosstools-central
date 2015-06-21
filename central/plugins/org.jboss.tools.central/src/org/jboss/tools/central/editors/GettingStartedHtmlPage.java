@@ -290,6 +290,12 @@ public class GettingStartedHtmlPage extends AbstractJBossCentralPage implements 
 					
 					return Status.OK_STATUS;
 				}
+				
+				@Override
+				public boolean belongsTo(Object family) {
+					return family == JBossCentralActivator.JBOSS_CENTRAL_FAMILY;
+				}
+				
 			};
 			centralJob.schedule();
 		}  catch (Throwable t) {
