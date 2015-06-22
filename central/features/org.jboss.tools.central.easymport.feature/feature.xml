@@ -17,34 +17,14 @@
       %license
    </license>
 
-   <plugin
-         id="org.eclipse.e4.ui.importer"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
-         
-   <plugin
-         id="org.eclipse.egit.ui.importer"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
+   <requires>
+     <import plugin="org.eclipse.e4.ui.importer"/>
+     <import plugin="org.eclipse.egit.ui.importer"/>
+     <import plugin="org.eclipse.e4.ui.importer.java"/>
+     <import plugin="org.eclipse.e4.ui.importer.pde"/>
+     <import plugin="org.eclipse.wst.jsdt.ui.importer"/>
+   </requires>
 
-   <plugin
-         id="org.eclipse.e4.ui.importer.java"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
-
-   <plugin
-         id="org.eclipse.e4.ui.importer.pde"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
-         
    <plugin
          id="org.jboss.tools.playground.easymport.maven"
          download-size="0"
@@ -59,11 +39,4 @@
          version="0.0.0"
          unpack="false"/>
          
-   <plugin
-         id="org.jboss.tools.playground.easymport.javascript"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
-
 </feature>
