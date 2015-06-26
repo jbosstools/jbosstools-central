@@ -15,6 +15,7 @@ import java.util.Collection;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.jboss.tools.project.examples.model.ProjectExample;
+import org.jboss.tools.project.examples.model.ProjectExampleCategory;
 import org.jboss.tools.project.examples.model.ProjectExampleWorkingCopy;
 
 /**
@@ -31,5 +32,7 @@ public interface IProjectExampleManager {
 	ProjectExampleWorkingCopy createWorkingCopy(ProjectExample example);
 
 	Collection<ProjectExample> getExamples(IProgressMonitor monitor) throws CoreException;
+
+	Collection<ProjectExampleCategory> getCategorizedExamples(IProgressMonitor monitor) throws CoreException;
 
 }

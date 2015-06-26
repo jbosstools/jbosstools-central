@@ -175,7 +175,7 @@ public class ProjectExample implements ProjectModelElement,
 		return category;
 	}
 
-	void setCategory(String category) {
+	public void setCategory(String category) {
 		this.category = category;
 	}
 
@@ -230,7 +230,7 @@ public class ProjectExample implements ProjectModelElement,
 		return site;
 	}
 
-	void setSite(IProjectExampleSite site) {
+	public void setSite(IProjectExampleSite site) {
 		this.site = site;
 	}
 
@@ -338,7 +338,7 @@ public class ProjectExample implements ProjectModelElement,
 		}
 		return false;
 	}
-
+	
 	void setIconPath(String path) {
 		this.iconPath = path;
 	}

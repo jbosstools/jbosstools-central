@@ -20,6 +20,7 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Set;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.CoreException;
@@ -31,6 +32,7 @@ import org.jboss.tools.foundation.core.ecf.URLTransportUtility;
 import org.jboss.tools.project.examples.IProjectExampleProvider;
 import org.jboss.tools.project.examples.internal.model.RequirementModelUtil;
 import org.jboss.tools.project.examples.model.ProjectExample;
+import org.jboss.tools.project.examples.model.ProjectExampleSite;
 import org.jboss.tools.project.examples.model.RequirementModel;
 
 @SuppressWarnings("nls")
@@ -56,10 +58,17 @@ public class ProjectExampleJsonProvider implements IProjectExampleProvider {
 		}
 			
 		Collection<ProjectExample> examples = null;
+		ProjectExampleSite site = new ProjectExampleSite();
+		site.setEditable(false);
+		site.setExperimental(false);
+		site.setUrl(null);
+		site.setName("JBoss Developer Examples");
 		try (InputStream json = new BufferedInputStream(new FileInputStream(jsonPayload))){
 			examples = parser.parse(json, monitor);
 			if (examples != null) {
 				for (ProjectExample example : examples) {
+					example.setSite(site);
+					inferCategory(example);
 					inferRequirements(example);
 				}
 			}
@@ -78,6 +87,37 @@ public class ProjectExampleJsonProvider implements IProjectExampleProvider {
 		return examples;
 	}
 
+	private void inferCategory(ProjectExample example) {
+		String name = example.getName().toLowerCase();
+		if (name.contains("portlet")) {
+			example.setCategory("Portal Applications");
+			return;
+		}
+		if (name.contains("cordova") || name.contains("android") || name.contains("-ios")) {
+			example.setCategory("Mobile Applications");
+			return;
+		}
+		if (name.contains("jsf") || name.contains("html") || name.contains("servlet")) {
+			example.setCategory("Web Applications");
+			return;
+		}
+		Set<String> tags = example.getTags();
+		if (tags != null) {
+			for (String tag : tags) {
+				if (tag.startsWith("cordova") || tag.startsWith("android") || tag.startsWith("ios")) {
+					example.setCategory("Mobile Applications");
+					return;
+				} else if (tag.startsWith("angular")
+					|| tag.startsWith("servlet")
+					|| tag.startsWith("jsf")) {
+					example.setCategory("Web Applications");
+					return;
+				}
+			}
+		}
+		example.setCategory("JBoss Developer Framework");
+	}
+
 	private void inferRequirements(ProjectExample example) {
 		Collection<RequirementModel> requirements = RequirementModelUtil.getAsRequirements(example.getTags());
 		if (!requirements.isEmpty()) {
@@ -91,4 +131,5 @@ public class ProjectExampleJsonProvider implements IProjectExampleProvider {
 		return searchQuery;
 	}
 
+	
 }

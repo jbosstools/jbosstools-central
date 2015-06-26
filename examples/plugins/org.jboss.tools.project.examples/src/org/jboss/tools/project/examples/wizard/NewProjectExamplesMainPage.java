@@ -12,12 +12,14 @@ package org.jboss.tools.project.examples.wizard;
 
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.MessageDialogWithToggle;
@@ -51,6 +53,7 @@ import org.eclipse.swt.widgets.Tree;
 import org.eclipse.ui.dialogs.FilteredTree;
 import org.eclipse.ui.model.AdaptableList;
 import org.eclipse.wst.server.core.IRuntimeType;
+import org.jboss.tools.project.examples.IProjectExampleManager;
 import org.jboss.tools.project.examples.internal.Messages;
 import org.jboss.tools.project.examples.internal.ProjectExamplesActivator;
 import org.jboss.tools.project.examples.internal.fixes.WTPRuntimeFix;
@@ -191,7 +194,13 @@ public class NewProjectExamplesMainPage extends WizardPage {
 					descriptionText.setText(selectedProject.getDescription());
 					projectName.setText(selectedProject.getName());
 					projectURL.setText(selectedProject.getUrl());
-					projectSize.setText(selectedProject.getSizeAsText());
+					if (selectedProject.getSize() > 0) {
+						projectSize.setEnabled(true);
+						projectSize.setText(selectedProject.getSizeAsText());
+					} else {
+						projectSize.setEnabled(false);
+						projectSize.setText("");						
+					}
 					//readyPage.setProjectExample(selectedProject);
 					projectType = selectedProject.getImportType();
 				} else {
@@ -351,11 +360,18 @@ public class NewProjectExamplesMainPage extends WizardPage {
 		IRunnableWithProgress op = new IRunnableWithProgress() {
 			
 			public void run(IProgressMonitor monitor) {
-				List<ProjectExampleCategory> rawCategories = ProjectExampleUtil.getProjects(monitor);
-				for (ProjectExampleCategory c : rawCategories) {
-					if (c != null && c.getProjects() != null && !c.getProjects().isEmpty()) {
-						nonEmptyCategories.add(c);
+				IProjectExampleManager manager = ProjectExamplesActivator.getDefault().getProjectExampleManager();
+				Collection<ProjectExampleCategory> rawCategories;
+				try {
+					rawCategories = manager.getCategorizedExamples(monitor);
+					for (ProjectExampleCategory c : rawCategories) {
+						if (!c.getProjects().isEmpty()) {
+							nonEmptyCategories.add(c);
+						}
 					}
+				} catch (CoreException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
 				}
 			}
 		};

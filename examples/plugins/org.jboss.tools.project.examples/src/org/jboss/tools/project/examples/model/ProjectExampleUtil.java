@@ -95,7 +95,7 @@ public class ProjectExampleUtil {
 
 	private static HashSet<IProjectExampleSite> invalidSites = new HashSet<IProjectExampleSite>();
 
-	private static Set<URI> categoryUrls;
+	private static Set<URI> categoryUris;
 
 	private ProjectExampleUtil() {
 	}
@@ -257,12 +257,14 @@ public class ProjectExampleUtil {
 		return null;
 	}
 
-	public static List<ProjectExampleCategory> getProjects(
+	@Deprecated
+	public static List<ProjectExampleCategory> getCategories(
 			IProgressMonitor monitor) {
-		return getProjects(getSites(), monitor);
+		return getCategories(getSites(), monitor);
 	}
-
-	public static List<ProjectExampleCategory> getProjects(
+	
+	@Deprecated
+	public static List<ProjectExampleCategory> getCategories(
 			Set<IProjectExampleSite> sites, IProgressMonitor monitor) {
 		
 		monitor.setTaskName(Messages.ProjectUtil_Parsing_project_description_files);
@@ -321,7 +323,7 @@ public class ProjectExampleUtil {
 		return result;
 	}
 
-  private static void addToCategory(ProjectExample example, Map<String, ProjectExampleCategory> categories) {
+  public static void addToCategory(ProjectExample example, Map<String, ProjectExampleCategory> categories) {
 	  String categoryName = example.getCategory();
 	  if (categoryName == null || categoryName.trim().isEmpty()) {
 		  categoryName = ProjectExampleCategory.OTHER;
@@ -335,9 +337,9 @@ public class ProjectExampleUtil {
 	  category.getProjects().add(example);
 	}
 
-  public static Set<URI> getCategoryURLs() {
-    if (categoryUrls == null) {
-      categoryUrls = new HashSet<URI>();
+  public static Set<URI> getCategoryURIs() {
+    if (categoryUris == null) {
+      categoryUris = new HashSet<URI>();
       IExtensionRegistry registry = Platform.getExtensionRegistry();
       IExtensionPoint extensionPoint = registry
           .getExtensionPoint(PROJECT_EXAMPLES_CATEGORIES_EXTENSION_ID);
@@ -360,18 +362,18 @@ public class ProjectExampleUtil {
         String urlString = PropertiesHelper.getPropertiesProvider().getValue(urlKey, urlValue);
         URI url = getURI(urlString);
         if (url != null) {
-          categoryUrls.add(url);
+          categoryUris.add(url);
         }
       }
 
     }
-    return categoryUrls;
+    return categoryUris;
   }
 	
-	private static Map<String, ProjectExampleCategory> fetchCategories(IProgressMonitor monitor) {
+	public static Map<String, ProjectExampleCategory> fetchCategories(IProgressMonitor monitor) {
 		
 		List<ProjectExampleCategory> list = new ArrayList<>();
-		Set<URI> urls = getCategoryURLs();
+		Set<URI> urls = getCategoryURIs();
 		for (URI url:urls) {
 			if (monitor.isCanceled()) {
 				break;
@@ -566,10 +568,11 @@ public class ProjectExampleUtil {
 					for (ProjectExample project : examples) {
 						project.setSite(tuple.key);
 					}
+					tuple.value = examples; 
 				}
-				tuple.value = examples; 
 				
 			} catch (Exception e) {
+				tuple.value = null;
 				ProjectExamplesActivator.log(e);
 			}
 			return tuple;

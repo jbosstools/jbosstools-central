@@ -99,7 +99,7 @@ public class ProjectTest {
 		site.setUrl(uri);
 		Set<IProjectExampleSite> sites = new HashSet<>();
 		sites.add(site);
-		List<ProjectExampleCategory> categories = ProjectExampleUtil.getProjects(sites , new NullProgressMonitor());
+		List<ProjectExampleCategory> categories = ProjectExampleUtil.getCategories(sites , new NullProgressMonitor());
 		ProjectExampleCategory category = categories.get(categories.size()-1);
 		assertTrue("Test".equals(category.getName()));
 		ProjectExample project = category.getProjects().get(0);
@@ -138,7 +138,7 @@ public class ProjectTest {
 		
 		IProjectExampleSite site = ProjectExampleUtil.getSite("http://download.jboss.org/jbosstools/examples/project-examples-community-4.2.Beta2.xml");
 		site.setExperimental(false);
-		List<ProjectExampleCategory> projects = ProjectExampleUtil.getProjects(Collections.singleton(site), monitor);
+		List<ProjectExampleCategory> projects = ProjectExampleUtil.getCategories(Collections.singleton(site), monitor);
 		ProjectExampleCategory seamCategory = null;
 		for (ProjectExampleCategory category: projects) {
 			if ("Seam".equals(category.getName())) {

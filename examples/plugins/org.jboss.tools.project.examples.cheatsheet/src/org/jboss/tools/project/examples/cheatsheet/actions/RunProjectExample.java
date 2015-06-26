@@ -55,7 +55,7 @@ public class RunProjectExample extends Action implements ICheatSheetAction {
 			Activator.log(NLS.bind(Messages.RunProjectExample_Invalid_project_example, params0));
 			return;
 		}
-		List<ProjectExampleCategory> categories = ProjectExampleUtil.getProjects(new NullProgressMonitor());
+		List<ProjectExampleCategory> categories = ProjectExampleUtil.getCategories(new NullProgressMonitor());
 		ProjectExampleWorkingCopy project = null;
 		for (ProjectExampleCategory category:categories) {
 			if (projectExample[0].equals(category.getName())) {

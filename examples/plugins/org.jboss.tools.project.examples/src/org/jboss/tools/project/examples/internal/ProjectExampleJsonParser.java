@@ -125,7 +125,7 @@ public class ProjectExampleJsonParser implements IProjectExampleParser {
 		if (asString.startsWith("[") && asString.endsWith("]")) {
 			results = new HashSet<>();
 			for (ModelNode n : node.asList()) {
-				String value = n.asString();
+				String value = n.asString().toLowerCase();
 				if (isValid(value)) {
 					results.add(value);
 				}

@@ -25,7 +25,7 @@ public class ProjectExampleXmlProvider implements IProjectExampleProvider {
 
 	@Override
 	public Collection<ProjectExample> getExamples(IProgressMonitor monitor) throws CoreException {
-		List<ProjectExampleCategory> categories = ProjectExampleUtil.getProjects(monitor);
+		List<ProjectExampleCategory> categories = ProjectExampleUtil.getCategories(monitor);
 		List<ProjectExample> examples = new ArrayList<>();
 		for (ProjectExampleCategory category : categories) {
 			examples.addAll(category.getProjects());

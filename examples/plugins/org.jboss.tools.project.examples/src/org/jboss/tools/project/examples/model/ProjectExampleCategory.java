@@ -59,6 +59,9 @@ public class ProjectExampleCategory implements ProjectModelElement, Comparable<P
 	}
 
 	public List<ProjectExample> getProjects() {
+		if (projects == null) {
+			projects = new ArrayList<>(0);
+		}
 		return projects;
 	}
 

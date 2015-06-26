@@ -249,7 +249,7 @@ public class OfflineSupportPreferencePage extends PreferencePage implements
 		text.setEditable(false);
 		
 		Collection<String> descriptors = getDescriptors(ProjectExampleUtil.getPluginSites());
-		Collection<String> categories = getAsStringCollection(ProjectExampleUtil.getCategoryURLs());
+		Collection<String> categories = getAsStringCollection(ProjectExampleUtil.getCategoryURIs());
 		StringBuilder command = new StringBuilder("groovy -Dgrape.config=\"") //$NON-NLS-1$
 								.append(OfflineUtil.getGrapeConfigXml().getAbsolutePath())
 								.append("\" \"")

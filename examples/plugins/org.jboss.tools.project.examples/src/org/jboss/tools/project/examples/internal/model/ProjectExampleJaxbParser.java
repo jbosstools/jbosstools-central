@@ -12,6 +12,7 @@ package org.jboss.tools.project.examples.internal.model;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.xml.bind.JAXBContext;
@@ -56,6 +57,6 @@ public class ProjectExampleJaxbParser extends JaxbParser {
 	static class ProjectsWrapper {
 
 		@XmlElement(name = "project")
-		List<ProjectExample> projects;
+		List<ProjectExample> projects = new ArrayList<>();
 	}
 }

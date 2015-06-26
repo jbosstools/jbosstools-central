@@ -49,7 +49,7 @@ public class RefreshTutorialsJob extends Job {
 		if (monitor.isCanceled()) {
 			return Status.CANCEL_STATUS;
 		}
-		List<ProjectExampleCategory> categories = ProjectExampleUtil.getProjects(monitor);
+		List<ProjectExampleCategory> categories = ProjectExampleUtil.getCategories(monitor);
 		Map<String, ProjectExampleCategory> categoriesMap = new LinkedHashMap<>(categories.size());
 		for (ProjectExampleCategory c : categories) {
 			categoriesMap.put(c.getName(), c);
