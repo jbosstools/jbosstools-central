@@ -65,6 +65,9 @@ class GoOfflineScript {
                               "org.jboss.spec.archetypes:jboss-javaee6-webapp-archetype:7.1.3.Final",
                               "org.richfaces.archetypes:richfaces-archetype-kitchensink:4.2.3.Final-2"
                               ]
+  
+  def excludedExamples = ["jboss-errai-kitchensink-archetype"]
+  
 
   public static main(args) {
     def script = new GoOfflineScript()
@@ -222,15 +225,21 @@ class GoOfflineScript {
     def archetypes= projects.findAll{!(it.stacksId.text() || it.stacksType.text())}
 
     archetypes.each{p ->
+		
+		
       File folder = new File(workDir, p.mavenArchetype.archetypeArtifactId.text())
       if (folder.exists()) {
         folder.deleteDir()
       }
       folder.mkdirs()
-      def pid = p.mavenArchetype.archetypeGroupId.text()
       def aid = p.mavenArchetype.archetypeArtifactId.text()
-      def v = p.mavenArchetype.archetypeVersion.text()
 
+      if (excludedExamples.contains(aid)) {
+    	  return
+      }
+      def pid = p.mavenArchetype.archetypeGroupId.text()
+      def v = p.mavenArchetype.archetypeVersion.text()
+	  
       def appName = "myapp."+aid
       execMavenArchetypeBuild (pid, aid, v, folder, localRepo, appName)
       execMavenGoOffline(new File(folder, appName), localRepo)
@@ -250,7 +259,10 @@ class GoOfflineScript {
     Stacks stacks = new StacksClient(config).getStacks();
     stacks.getAvailableArchetypeVersions().each { av ->
       def a = av.archetype
-
+	  if (excludedExamples.contains(a.artifactId)) {
+		  return
+	  }
+	  
       File folder = new File(workDir, a.artifactId)
       if (folder.exists()) {
         folder.deleteDir()
