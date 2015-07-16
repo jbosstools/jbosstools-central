@@ -277,7 +277,7 @@ public class PrepareInstallProfileJob extends AbstractInstallJob {
 			monitor.setWorkRemaining(100);
 			// add repository urls and load meta data
 			List<IMetadataRepository> repositories = addRepositories(monitor.newChild(50));
-			final List<IInstallableUnit> installableUnits = queryInstallableUnits(monitor.newChild(50), repositories);
+			final Collection<IInstallableUnit> installableUnits = queryInstallableUnits(monitor.newChild(50), repositories);
 			removeOldVersions(installableUnits);
 			checkForUnavailable(installableUnits);
 			return installableUnits.toArray(new IInstallableUnit[installableUnits.size()]);
@@ -322,7 +322,7 @@ public class PrepareInstallProfileJob extends AbstractInstallJob {
 	 * longer available on their respective sites. In that case we must inform the user. Unfortunately this is the
 	 * earliest point at which we can know.
 	 */
-	private void checkForUnavailable(final List<IInstallableUnit> installableUnits) throws CoreException {
+	private void checkForUnavailable(final Collection<IInstallableUnit> installableUnits) throws CoreException {
 		// at least one selected connector could not be found in a repository
 		Set<String> foundIds = new HashSet<String>();
 		for (IInstallableUnit unit : installableUnits) {
@@ -380,7 +380,7 @@ public class PrepareInstallProfileJob extends AbstractInstallJob {
 	 * that some repositories will host multiple versions of a particular feature. we assume that the user wants the
 	 * highest version.
 	 */
-	private void removeOldVersions(final List<IInstallableUnit> installableUnits) {
+	private void removeOldVersions(final Collection<IInstallableUnit> installableUnits) {
 		Map<String, Version> symbolicNameToVersion = new HashMap<String, Version>();
 		for (IInstallableUnit unit : installableUnits) {
 			Version version = symbolicNameToVersion.get(unit.getId());
@@ -404,9 +404,9 @@ public class PrepareInstallProfileJob extends AbstractInstallJob {
 	 * unlikely that the same feature id is available from more than one of the selected repositories, and we must
 	 * ensure that the user gets the one that they asked for.
 	 */
-	private List<IInstallableUnit> queryInstallableUnits(SubMonitor monitor, List<IMetadataRepository> repositories)
+	private Set<IInstallableUnit> queryInstallableUnits(SubMonitor monitor, List<IMetadataRepository> repositories)
 			throws URISyntaxException {
-		final List<IInstallableUnit> installableUnits = new ArrayList<IInstallableUnit>();
+		final Set<IInstallableUnit> installableUnits = new HashSet<IInstallableUnit>();
 
 		monitor.setWorkRemaining(repositories.size());
 		for (final IMetadataRepository repository : repositories) {
