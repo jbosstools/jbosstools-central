@@ -178,11 +178,7 @@ public class ImageUtil {
 		protected URL url;
 		
 		protected void setUrl(String sUrl) throws MalformedURLException {
-			try {
-				url = new URL(URLDecoder.decode(sUrl, "utf-8"));
-			} catch (UnsupportedEncodingException cantHappen) {
-				//ignore
-			}
+			url = new URL(sUrl);
 		}
 		
 		abstract void readStream(StreamHandler streamHandler) throws CoreException;
