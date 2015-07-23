@@ -67,6 +67,7 @@ import org.jboss.tools.central.internal.discovery.wizards.ProxyWizard;
 import org.jboss.tools.central.internal.discovery.wizards.ProxyWizardManager;
 import org.jboss.tools.central.internal.discovery.wizards.ProxyWizardManager.ProxyWizardManagerListener;
 import org.jboss.tools.central.internal.discovery.wizards.ProxyWizardManager.UpdateEvent;
+import org.jboss.tools.central.internal.dnd.JBossCentralDropTarget;
 import org.jboss.tools.central.jobs.RefreshBuzzJob;
 import org.jboss.tools.central.model.FeedsEntry;
 import org.jboss.tools.central.preferences.PreferenceKeys;
@@ -216,6 +217,9 @@ public class GettingStartedHtmlPage extends AbstractJBossCentralPage implements 
 						showOnStartup = Boolean.parseBoolean(arg);
 						CentralHelper.setShowOnStartup(showOnStartup);
 						break;
+					case "drop": //$NON-NLS-1$
+						drop(arg);
+						break;
 					default:
 						System.err.println("Function "+ function+"("+ arg+") is not supported");
 					}
@@ -303,6 +307,10 @@ public class GettingStartedHtmlPage extends AbstractJBossCentralPage implements 
 			CentralBrowserErrorWrapper errorWrapper = new CentralBrowserErrorWrapper();
 			errorWrapper.showError(parent, t);
 		}
+	}
+
+	protected void drop(String arg) {
+		JBossCentralDropTarget.install(arg);
 	}
 
 	protected void openQuickstart(final String quickstartId) {
