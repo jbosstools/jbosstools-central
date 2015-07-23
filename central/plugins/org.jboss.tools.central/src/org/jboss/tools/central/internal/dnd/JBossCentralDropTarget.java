@@ -89,26 +89,7 @@ public class JBossCentralDropTarget {
 			}
 			String url = getUrlFromEvent(event);
 			if (url != null) {
-				url = url.trim();
-				final String[] connectorIds = new String[1];
-				if (url.startsWith(DOWNLOAD_JBOSS_ORG_JBOSSTOOLS_CENTRAL_INSTALL_CONNECTORS)) {
-					connectorIds[0] = url.replace(DOWNLOAD_JBOSS_ORG_JBOSSTOOLS_CENTRAL_INSTALL_CONNECTORS, "");
-				} else if (url.startsWith(DEVSTUDIO_REDHAT_COM_CENTRAL_INSTALL_CONNECTORS)) {
-					connectorIds[0] = url.replace(DEVSTUDIO_REDHAT_COM_CENTRAL_INSTALL_CONNECTORS, "");
-				} else if (url.startsWith(LEGACY_DEVSTUDIO_JBOSS_COM_CENTRAL_INSTALL_CONNECTORS)) {
-					connectorIds[0] = url.replace(LEGACY_DEVSTUDIO_JBOSS_COM_CENTRAL_INSTALL_CONNECTORS, "");
-				}
-				
-				if (connectorIds[0] != null && !connectorIds[0].trim().isEmpty()) {
-					Display.getCurrent().asyncExec(new Runnable() {
-						
-						@Override
-						public void run() {
-							dropConnectors(connectorIds[0]);
-						}
-					});
-					
-				} else {
+				if (!install(url)) {
 					if (event.data instanceof String) {
 						String[] urls = ((String)event.data).split(System.getProperty("line.separator")); //$NON-NLS-1$
 						for (String fn:urls) {
@@ -147,6 +128,35 @@ public class JBossCentralDropTarget {
 		}
 	};
 	
+	public static boolean install(String url) {
+		if (url == null || url.isEmpty()) {
+			return true;
+		}
+		url = url.trim();
+		final String[] connectorIds = new String[1];
+		if (!url.startsWith("http://") && !url.startsWith("https://")) {
+			connectorIds[0] = url;
+		} else if (url.startsWith(DOWNLOAD_JBOSS_ORG_JBOSSTOOLS_CENTRAL_INSTALL_CONNECTORS)) {
+			connectorIds[0] = url.replace(DOWNLOAD_JBOSS_ORG_JBOSSTOOLS_CENTRAL_INSTALL_CONNECTORS, "");
+		} else if (url.startsWith(DEVSTUDIO_REDHAT_COM_CENTRAL_INSTALL_CONNECTORS)) {
+			connectorIds[0] = url.replace(DEVSTUDIO_REDHAT_COM_CENTRAL_INSTALL_CONNECTORS, "");
+		} else if (url.startsWith(LEGACY_DEVSTUDIO_JBOSS_COM_CENTRAL_INSTALL_CONNECTORS)) {
+			connectorIds[0] = url.replace(LEGACY_DEVSTUDIO_JBOSS_COM_CENTRAL_INSTALL_CONNECTORS, "");
+		}
+
+		if (connectorIds[0] != null && !connectorIds[0].trim().isEmpty()) {
+			Display.getCurrent().asyncExec(new Runnable() {
+
+				@Override
+				public void run() {
+					dropConnectors(connectorIds[0]);
+				}
+			});
+			return true;
+		}
+		return false;
+	}
+
 	public JBossCentralDropTarget(final Control control) {
 		final DropTarget target = new DropTarget(control, DND.DROP_MOVE | DND.DROP_COPY | DND.DROP_LINK);
 		Transfer[] transfers;
@@ -203,7 +213,7 @@ public class JBossCentralDropTarget {
 		target.addDropListener(listener);
 	}
 
-	private void install(final Set<String> connectorIds) throws InvocationTargetException, InterruptedException {
+	private static void install(final Set<String> connectorIds) throws InvocationTargetException, InterruptedException {
 		if (connectorIds == null || connectorIds.isEmpty()) {
 			JBossCentralActivator.log("No connectors selected for installation");
 			return;
@@ -292,7 +302,7 @@ public class JBossCentralDropTarget {
 		}
 	}
 
-	private void formatConnectors(Collection<ConnectorDescriptor> installedConnectors,
+	private static void formatConnectors(Collection<ConnectorDescriptor> installedConnectors,
 			StringBuilder buffer) {
 		for (ConnectorDescriptor cd:installedConnectors) {
 			buffer.append(" - ");
@@ -303,11 +313,11 @@ public class JBossCentralDropTarget {
 		}
 	}
 
-	private Shell getShell() {
+	private static Shell getShell() {
 		return PlatformUI.getWorkbench().getModalDialogShellProvider().getShell();
 	}
 
-	private void dropConnectors(String connectorIds) {
+	private static void dropConnectors(String connectorIds) {
 		String[] ids = connectorIds.trim().split(",");
 		if (ids != null && ids.length > 0) {
 			Set<String> idSet = new HashSet<String>();
