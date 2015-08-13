@@ -70,7 +70,7 @@ public class ArtifactResolutionHelperTest {
 		
 		assertNotResolved(javaee_web);
 
-		ArtifactRepository repo = maven.createArtifactRepository("redhat-techpreview", "http://maven.repository.redhat.com/techpreview/all");
+		ArtifactRepository repo = maven.createArtifactRepository("redhat-ga-repository", "http://maven.repository.redhat.com/ga");
 
 		assertResolved(javaee_web, Collections.singletonList(repo));
 		

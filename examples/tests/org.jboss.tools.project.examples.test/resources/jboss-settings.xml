@@ -27,12 +27,12 @@
       </pluginRepositories>
     </profile>
     <profile>
-      <id>redhat-techpreview-all-repository</id>
+      <id>redhat-ga-repository</id>
       <repositories>
         <repository>
-          <id>redhat-techpreview-all-repository</id>
-          <name>Red Hat Tech Preview repository (all)</name>
-          <url>http://maven.repository.redhat.com/techpreview/all/</url>
+          <id>redhat-ga-repository</id>
+          <name>Red Hat GA repository</name>
+          <url>http://maven.repository.redhat.com/ga/</url>
           <releases>
             <enabled>true</enabled>
             <updatePolicy>never</updatePolicy>
@@ -45,9 +45,9 @@
       </repositories>
       <pluginRepositories>
         <pluginRepository>
-          <id>redhat-techpreview-all-repository</id>
-          <name>Red Hat Tech Preview repository (all)</name>
-          <url>http://maven.repository.redhat.com/techpreview/all/</url>
+          <id>redhat-ga-repository</id>
+          <name>Red Hat GA repository</name>
+          <url>http://maven.repository.redhat.com/ga/</url>
           <releases>
             <enabled>true</enabled>
             <updatePolicy>never</updatePolicy>
@@ -98,7 +98,7 @@
   </profiles>
   <activeProfiles>
     <activeProfile>jboss-public-repository</activeProfile>
-    <activeProfile>redhat-techpreview-all-repository</activeProfile>
+    <activeProfile>redhat-ga-repository</activeProfile>
     <activeProfile>central</activeProfile>
   </activeProfiles>
 </settings>

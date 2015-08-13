@@ -21,7 +21,6 @@ import java.io.InputStream;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -131,7 +130,7 @@ public class ConfigureMavenRepositoriesWizardPage extends WizardPage implements 
 	private static final String ACTIVE_PROFILES = "activeProfiles"; //$NON-NLS-1$
 
 	private static final String REPOSITORY_APACHE_ORG_ID = "repository-apache-org"; //$NON-NLS-1$
-	
+ 
 	private static final String COM_SPRINGSOURCE_REPOSITORY_BUNDLES_EXTERNAL_ID = "com-springsource-repository-bundles-external"; //$NON-NLS-1$
 
 	private static final String COM_SPRINGSOURCE_REPOSITORY_BUNDLES_RELEASE_ID = "com-springsource-repository-bundles-release"; //$NON-NLS-1$
@@ -139,10 +138,14 @@ public class ConfigureMavenRepositoriesWizardPage extends WizardPage implements 
 	private static final String BINTRAY_ID = "bintray"; //$NON-NLS-1$
 
 	private static final String JAVA_NET_PUBLIC_ID = "java-net-public"; //$NON-NLS-1$
-	
+
 	private static final String JBOSS_PUBLIC_REPOSITORY_ID = "jboss-public-repository"; //$NON-NLS-1$
-	
+
 	private static final String RED_HAT_TECHPREVIEW_ALL_REPOSITORY_ID = "redhat-techpreview-all-repository";//$NON-NLS-1$
+	
+	private static final String RED_HAT_GA_REPOSITORY_ID = "redhat-ga-repository";//$NON-NLS-1$
+
+	private static final String RED_HAT_GA_REPOSITORY_URL = "http://maven.repository.redhat.com/ga/";//$NON-NLS-1$
 	
 	private static final String ERROR_TITLE = "Error";
 
@@ -217,6 +220,9 @@ public class ConfigureMavenRepositoriesWizardPage extends WizardPage implements 
 		setTitle("Configure Maven Repositories");
 		maven = MavenPlugin.getMaven();
 		this.artifactKey = artifactKey;
+		if (RED_HAT_TECHPREVIEW_ALL_REPOSITORY_ID.equals(profileId)) {
+			profileId = RED_HAT_GA_REPOSITORY_ID;
+		}
 		this.preSelectedProfileId = profileId;
 	}
 
@@ -451,21 +457,25 @@ public class ConfigureMavenRepositoriesWizardPage extends WizardPage implements 
 		
 		for (Map.Entry<String, String> entry : preconfiguredRepositoryUrls.entrySet()) {
 			String repoId = entry.getKey();
-			try {
-				URL url = new URL(entry.getValue()); 
-			} catch (Exception e) {
-				Activator.log(e);
-				continue;
-			}
-			RepositoryWrapper preconfiguredRepository = null;
 			String preConfUrl = entry.getValue();
+			if (RED_HAT_TECHPREVIEW_ALL_REPOSITORY_ID.equals(repoId)) {
+				repoId = RED_HAT_GA_REPOSITORY_ID;
+				preConfUrl = RED_HAT_GA_REPOSITORY_URL;
+			}
+			
+			RepositoryWrapper preconfiguredRepository = null;
 			for (RepositoryWrapper repo : allRepos) {
-				if (preConfUrl .equals(repo.getRepository().getUrl())) {
+				if ((preConfUrl == null && repo.getProfileId().equals(repoId))
+				    || repo.getRepository().getUrl().equals(preConfUrl)) {
 					preconfiguredRepository = repo;
 					break;
 				}
 			}
 			if(preconfiguredRepository == null) {
+				if (preConfUrl == null) {
+					continue;
+				}
+				
 				SettingsRepositoryBuilder r = new SettingsRepositoryBuilder();
 				String name = StringUtils.capitaliseAllWords(repoId.replace("redhat", "Red Hat").replace("-", " "));
 				if (!name.endsWith(" Repository")) {
@@ -1018,9 +1028,9 @@ public class ConfigureMavenRepositoriesWizardPage extends WizardPage implements 
 		repositories.add(new RepositoryWrapper(repoBuilder.get()));
 		
 		repoBuilder = new SettingsRepositoryBuilder()
-						.setId(RED_HAT_TECHPREVIEW_ALL_REPOSITORY_ID)
-		               	.setName("Red Hat Tech Preview repository (all)") //$NON-NLS-1$
-						.setUrl("http://maven.repository.redhat.com/techpreview/all/"); //$NON-NLS-1$
+						.setId(RED_HAT_GA_REPOSITORY_ID)
+						.setName("Red Hat GA repository") //$NON-NLS-1$
+						.setUrl(RED_HAT_GA_REPOSITORY_URL); //$NON-NLS-1$
 		repositories.add(new RepositoryWrapper(repoBuilder.get()));
 
 		repoBuilder = new SettingsRepositoryBuilder()

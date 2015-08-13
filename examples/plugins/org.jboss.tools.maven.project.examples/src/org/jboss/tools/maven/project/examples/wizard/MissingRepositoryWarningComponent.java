@@ -59,7 +59,7 @@ public class MissingRepositoryWarningComponent extends Composite {
 					wizard = new ConfigureMavenRepositoriesWizard();
 					wizard.addPreconfiguredRepositories(repositoryUrls); 
 				} else {
-					wizard = new ConfigureMavenRepositoriesWizard(null, "redhat-techpreview-all-repository"); //$NON-NLS-1$
+					wizard = new ConfigureMavenRepositoriesWizard(null, "redhat-ga-repository"); //$NON-NLS-1$
 				}
 				WizardDialog dialog = new WizardDialog(Display.getDefault().getActiveShell(), wizard);
 				wizard.init(null, null);

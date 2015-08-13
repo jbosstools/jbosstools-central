@@ -24,7 +24,7 @@ public class ConfigureRedHatRepositoryMarkerResolution extends ConfigureMavenRep
 
 	@Override
 	protected String getRepositoryProfileId() {
-		return "redhat-techpreview-all-repository"; //$NON-NLS-1$ 
+		return "redhat-ga-repository"; //$NON-NLS-1$ 
 	}
 	
 }
