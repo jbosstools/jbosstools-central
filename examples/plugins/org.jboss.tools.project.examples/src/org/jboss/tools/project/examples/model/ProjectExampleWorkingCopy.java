@@ -77,6 +77,7 @@ public class ProjectExampleWorkingCopy extends ProjectExample {
 				throw new RuntimeException("Error cloning archetypeModel", e); //$NON-NLS-1$
 			}
 		}
+		setVersion(projectExample.getVersion());
 	}
 
 	public List<IProjectExamplesFix> getFixes() {

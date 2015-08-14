@@ -89,7 +89,7 @@ public class NewProjectExamplesJob extends WorkspaceJob {
 				}
 				if (importProjectExample.importProject(project, project.getFile(), propertiesMap, monitor)) {
 					UsageEventType createProjectEvent = ProjectExamplesActivator.getDefault().getCreateProjectFromExampleEventType();
-					UsageReporter.getInstance().trackEvent(createProjectEvent.event(project.getId()));
+					UsageReporter.getInstance().trackEvent(createProjectEvent.event(project.getTrackingId()));
 					
 					importProjectExample.fix(project, monitor);			
 					ProjectExamplesActivator.fixWelcome(project);

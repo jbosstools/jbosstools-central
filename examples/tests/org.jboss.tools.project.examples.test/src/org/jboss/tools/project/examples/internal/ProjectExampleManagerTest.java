@@ -66,11 +66,13 @@ public class ProjectExampleManagerTest {
 		example.setWelcome(true);
 		example.setWelcomeFixRequired(true);
 		example.setWelcomeURL("welcomeURL");
+		example.setVersion("6.6.6");
 		
 		example.getRequirements().add(new RequirementModel("plugin"));
 		example.getRequirements().add(new RequirementModel("unknown"));
 		example.getRequirements().add(new RequirementModel("wtpruntime"));
 		example.getRequirements().add(new RequirementModel("seam"));
+		
 		
 		ProjectExampleWorkingCopy workingCopy = projectExampleManager.createWorkingCopy(example);
 		//assertSame(workingCopy, example);
@@ -100,6 +102,8 @@ public class ProjectExampleManagerTest {
 		assertEquals(example.isWelcome(), workingCopy.isWelcome());
 		assertEquals(example.isURLRequired(), workingCopy.isURLRequired());
 		assertEquals(example.isWelcomeFixRequired(), workingCopy.isWelcomeFixRequired());
+		assertEquals(example.getTrackingId(), workingCopy.getTrackingId());
+		assertEquals("name:6.6.6", workingCopy.getTrackingId());
 	}
 
 }

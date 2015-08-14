@@ -27,6 +27,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
+import org.apache.commons.lang.StringUtils;
 import org.jboss.tools.project.examples.internal.ProjectExamplesActivator;
 import org.jboss.tools.project.examples.internal.model.XmlUnMarshallers.StringToListUnMarshaller;
 import org.jboss.tools.project.examples.internal.model.XmlUnMarshallers.StringToSetUnMarshaller;
@@ -90,6 +91,7 @@ public class ProjectExample implements ProjectModelElement,
 	private String sourceLocation;
 	private String stacksId;
 	private String stacksType;
+	private String version;
 	public ProjectExample() {
 		name = ""; //$NON-NLS-1$
 		shortDescription = ""; //$NON-NLS-1$
@@ -432,10 +434,10 @@ public class ProjectExample implements ProjectModelElement,
 
 	public String getId() {
 		//archetype model is a maven concept, shouldn't be available here
-		ArchetypeModel model = getArchetypeModel();
+		String aid = getArchetypeId();
 		//need to introduce stinky coupling to maven type here
-		if (model != null && "mavenArchetype".equals(getImportType()) && model.getArchetypeArtifactId() != null) {
-			return model.getGAV();
+		if (aid != null) {
+			return aid;
 		}
 		if (id == null) {
 			id = name;
@@ -443,8 +445,38 @@ public class ProjectExample implements ProjectModelElement,
 		return id;
 	}
 
+	public String getTrackingId() {
+		String aid = getArchetypeId();
+		if (aid != null) {
+			return aid;
+		}
+		StringBuilder trackingId =new StringBuilder(getName());
+		String v = getVersion();
+		if (StringUtils.isNotEmpty(v)) {
+			trackingId.append(":").append(v);
+		}
+		return trackingId.toString();
+	}
+	
+	public String getVersion() {
+		return version;
+	}
+
+
+	public void setVersion(String version) {
+		this.version = version;
+	}
 	void setId(String id) {
 		this.id = id;
 	}
 
+	private String getArchetypeId() {
+		//archetype model is a maven concept, shouldn't be available here
+		ArchetypeModel model = getArchetypeModel();
+		//need to introduce stinky coupling to maven type here
+		if (model != null && "mavenArchetype".equals(getImportType()) && model.getArchetypeArtifactId() != null) {
+			return model.getGAV();
+		}
+		return null;
+	}
 }

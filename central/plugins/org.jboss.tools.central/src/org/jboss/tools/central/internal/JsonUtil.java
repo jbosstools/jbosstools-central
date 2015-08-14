@@ -11,7 +11,6 @@
 package org.jboss.tools.central.internal;
 
 import java.util.Collection;
-import java.util.Set;
 
 import org.eclipse.core.runtime.CoreException;
 import org.jboss.tools.central.internal.discovery.wizards.ProxyWizard;
@@ -74,7 +73,7 @@ public class JsonUtil {
 		if (value instanceof Collection) {
 			json.append("[");
 			boolean addComma = false;
-			for (Object o : (Collection)value) {
+			for (Object o : (Collection<?>)value) {
 				if (addComma) {
 					json.append(",");
 				}

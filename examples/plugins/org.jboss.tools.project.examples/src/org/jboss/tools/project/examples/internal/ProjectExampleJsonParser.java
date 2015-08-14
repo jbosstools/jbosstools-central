@@ -84,13 +84,14 @@ public class ProjectExampleJsonParser implements IProjectExampleParser {
 			example.setUrl(downloadUrl);
 			
 			Set<String> sys_tags = new LinkedHashSet<>();
+			String tag = "";
+			if (fields.get("git_tag").isDefined()) {
+				tag = fields.get("git_tag").asString();
+				example.setVersion(tag);
+			}
 			if (fields.get("target_product").isDefined()) {
 				StringBuilder productTag = new StringBuilder("product:");
 				String targetProduct = fields.get("target_product").asString().toLowerCase();
-				String tag = "";
-				if (fields.get("git_tag").isDefined()) {
-					tag = fields.get("git_tag").asString();
-				}
 				if (tag.toLowerCase().startsWith(targetProduct)) {
 					productTag.append(tag);
 				} else {
