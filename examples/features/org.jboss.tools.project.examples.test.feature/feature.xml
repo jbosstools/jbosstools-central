@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<feature id="org.jboss.tools.project.examples.test.feature" label="JBoss Tools - Tests - Project Examples" version="3.0.0.qualifier" provider-name="JBoss by Red Hat"
-    license-feature="org.jboss.tools.foundation.license.feature"
+<feature id="org.jboss.tools.project.examples.test.feature" 
+  label="%featureName"
+  version="3.0.0.qualifier" 
+  provider-name="%providerName"
+  license-feature="org.jboss.tools.foundation.license.feature"
 	license-feature-version="0.0.0">
 
 	<description>
@@ -11,7 +14,7 @@
       %copyright
    </copyright>
 
-	<license>
+	<license url="%licenseURL">
       %license
    </license>
 
