@@ -32,6 +32,7 @@ import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.core.runtime.jobs.JobChangeAdapter;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent;
+import org.eclipse.equinox.p2.core.ProvisionException;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.jface.layout.GridLayoutFactory;
@@ -58,6 +59,7 @@ import org.eclipse.ui.forms.IManagedForm;
 import org.eclipse.ui.forms.editor.FormEditor;
 import org.eclipse.ui.forms.widgets.ScrolledForm;
 import org.jboss.tools.central.JBossCentralActivator;
+import org.jboss.tools.central.installation.InstallationChecker;
 import org.jboss.tools.central.internal.CentralHelper;
 import org.jboss.tools.central.internal.JsonUtil;
 import org.jboss.tools.central.internal.WizardSupport;
@@ -234,7 +236,7 @@ public class GettingStartedHtmlPage extends AbstractJBossCentralPage implements 
 					browser.execute(getLoadBuzzScript());
 					browser.execute(getLoadProxyWizardsScript());
 					browser.execute(getLoadQuickstartsScript());
-					browser.execute(getToggleEarlyAccessScript());
+					scheduleEarlyAccess();
 					browser.execute(getSetShowOnStartupScript());
 					browser.execute(getLoadFavoritesScript());
 					return null;
@@ -309,6 +311,58 @@ public class GettingStartedHtmlPage extends AbstractJBossCentralPage implements 
 		}
 	}
 
+	protected void scheduleEarlyAccess() {
+		// Early access installed
+		Job checkEarlyAccessJob = new Job("Check installation for Early Access") {
+			private Display display = Display.getDefault();
+			
+			@Override
+			public IStatus run(IProgressMonitor monitor) {
+				final InstallationChecker installChecker;
+				try {
+					installChecker = InstallationChecker.getInstance();	
+				} catch (ProvisionException ex) {
+					JBossCentralActivator.log(ex);
+					return Status.CANCEL_STATUS;
+				}
+				this.display.syncExec(new Runnable() {
+					@Override
+					public void run() {
+						updateEarlyAccess(installChecker);
+					}
+
+				});	
+				return Status.OK_STATUS;
+			}
+			
+			@Override
+			public boolean belongsTo(Object family) {
+				return family == JBossCentralActivator.JBOSS_CENTRAL_FAMILY;
+			}
+		};
+		checkEarlyAccessJob.schedule();
+	}
+
+	private void updateEarlyAccess(InstallationChecker installChecker) {
+		boolean isEarlyAccessEnabled = JBossCentralActivator.getDefault().getPreferences().getBoolean(PreferenceKeys.ENABLE_EARLY_ACCESS, PreferenceKeys.ENABLE_EARLY_ACCESS_DEFAULT_VALUE);
+		boolean showEarlyAccessInstalled = installChecker != null && installChecker.hasEarlyAccess();
+		// <em class="highlight">Early Access placeholder</em>
+		String earlyAccess = "<em class=\"highlight\">Early Access ";
+		if (isEarlyAccessEnabled) {
+			earlyAccess += "enabled";
+		}
+		if (isEarlyAccessEnabled && showEarlyAccessInstalled) {
+			earlyAccess += "/";
+		}
+		if (showEarlyAccessInstalled) {
+			earlyAccess += "installed";
+		}
+		earlyAccess += "</em>";
+		boolean earlyAccessEnabled = isEarlyAccessEnabled || showEarlyAccessInstalled;
+		String script = "handleEarlyAccess(" + earlyAccessEnabled + ",'" + earlyAccess + "');"; //$NON-NLS-1$ //$NON-NLS-2$
+		browser.execute(script);
+	}
+	
 	protected void drop(String arg) {
 		JBossCentralDropTarget.install(arg);
 	}
@@ -449,7 +503,7 @@ public class GettingStartedHtmlPage extends AbstractJBossCentralPage implements 
 	@Override
 	public void propertyChange(PropertyChangeEvent event) {
 		if (PreferenceKeys.ENABLE_EARLY_ACCESS.equals(event.getProperty())) {
-			browserExec(getToggleEarlyAccessScript());
+			scheduleEarlyAccess();
 			resetWizards(allWizards);
 		}
 	}
@@ -506,14 +560,7 @@ public class GettingStartedHtmlPage extends AbstractJBossCentralPage implements 
 		String script = "loadBuzz(" + json + ");"; //$NON-NLS-1$ //$NON-NLS-2$
 		return script;
 	}
-	
-	private String getToggleEarlyAccessScript() {
-		boolean earlyAccessEnabled = JBossCentralActivator.getDefault().getPreferences()
-				.getBoolean(PreferenceKeys.ENABLE_EARLY_ACCESS, PreferenceKeys.ENABLE_EARLY_ACCESS_DEFAULT_VALUE);
-		String script = "toggleEarlyAccess(" + earlyAccessEnabled + ");"; //$NON-NLS-1$ //$NON-NLS-2$
-		return script;
-	}
-	
+
 	private String getLoadProxyWizardsScript() {
 		final Collection<ProxyWizard> proxyWizards = displayedWizardsMap.values();
 		String wizardsJson = JsonUtil.jsonifyWizards(proxyWizards);
