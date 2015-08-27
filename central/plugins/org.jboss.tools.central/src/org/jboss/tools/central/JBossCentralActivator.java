@@ -70,7 +70,6 @@ import org.jboss.tools.central.preferences.PreferenceKeys;
 import org.jboss.tools.project.examples.model.ProjectExample;
 import org.jboss.tools.usage.event.UsageEventType;
 import org.jboss.tools.usage.event.UsageReporter;
-
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
@@ -347,7 +346,7 @@ public class JBossCentralActivator extends AbstractUIPlugin {
 					.openError(shell, "Open Location", status.getMessage());
 		} catch (MalformedURLException e) {
 			Status status = new Status(IStatus.ERROR,
-					JBossCentralActivator.PLUGIN_ID, "Invalid URL");
+					JBossCentralActivator.PLUGIN_ID, "Invalid URL "+location);
 			JBossCentralActivator.getDefault().getLog().log(status);
 			MessageDialog
 					.openError(shell, "Open Location", status.getMessage());
