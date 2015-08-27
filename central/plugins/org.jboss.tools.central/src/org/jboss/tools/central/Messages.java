@@ -26,6 +26,8 @@ public class Messages extends NLS {
 	public static String DiscoveryViewer_disableFilters;
 	public static String DiscoveryViewer_configureProxy;
 	public static String DiscoveryViewer_waitingForDiscoveryCompletion;
+	public static String DiscoveryViewer_selectConnectorFlavor_description;
+	public static String DiscoveryViewer_selectConnectorFlavor_title;
 
 	public static String DiscoveryViewer_FilterSelectionDialog_label;
 	public static String DiscoveryViewer_FilterSelectionDialog_title;
@@ -35,12 +37,16 @@ public class Messages extends NLS {
 	public static String updateWithCount;
 	public static String selectAll;
 	public static String deselectAll;
+	public static String manageEarlyAccess;
 	
 	public static String SoftwarePage_earlyAccessSection_Title;
 	public static String SoftwarePage_earlyAccessSection_message;
 	public static String SoftwarePage_nothingToInstall_title;
 	public static String SoftwarePage_nothingToInstall_description;
 	public static String EarlyAccess_Description;
+	public static String EarlyAccessSites_Description;
+	public static String disableEarlyAccess_title;
+	public static String disableEarlyAccess_description;
 
 	public static String remainingEarlyAccessConnectors_title;
 	public static String remainingEarlyAccessConnectors_message;
@@ -50,6 +56,7 @@ public class Messages extends NLS {
 	public static String visualEditorFaqLink;
 	
 	public static String usageEventBrowserLabelDescription;
+
 
 	static {
 		// initialize resource bundle

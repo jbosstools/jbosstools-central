@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2014 Tasktop Technologies and others.
+ * Copyright (c) 2010, 2015 Tasktop Technologies and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -11,11 +11,13 @@
  *      - Extracted from {@link DiscoveryViewer} into own file
  *      - Added support for versions/updates
  *      - UI improvements
+ *      - Make UI reusable out of DiscoveryViewer
  *******************************************************************************/
 package org.jboss.tools.central.editors.xpl;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -69,6 +71,7 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Link;
 import org.eclipse.swt.widgets.ToolBar;
@@ -100,6 +103,45 @@ public class ConnectorDescriptorItemUi implements PropertyChangeListener, Runnab
 		}
 	};
 
+	private final class SelectionHandler extends MouseAdapter implements SelectionListener {
+		@Override
+		public void mouseUp(MouseEvent e) {
+			boolean selected = true;
+			if ((selectionButton.getStyle() & SWT.CHECK) != 0) {
+				selected = !selection;
+			}
+			if (selected != selectionButton.getSelection()) {
+				handleSelectionChange(selected);
+			}
+		}
+
+		private void handleSelectionChange(boolean selected) {
+			if (validateSelection(selected)) {
+				ConnectorDescriptorItemUi.this.selection = selected;
+				selectionButton.setSelection(selected);
+				Event event = new Event();
+				event.data = ConnectorDescriptorItemUi.this;
+				event.widget = selectionButton;
+				SelectionEvent selEvent = new SelectionEvent(event);
+				if (selectionListeners != null) {
+					for (SelectionListener listener : ConnectorDescriptorItemUi.this.selectionListeners) {
+						listener.widgetSelected(selEvent);
+					}
+				}
+			}
+		}
+
+		@Override
+		public void widgetSelected(SelectionEvent e) {
+			handleSelectionChange(((Button)e.getSource()).getSelection());
+		}
+
+		@Override
+		public void widgetDefaultSelected(SelectionEvent e) {
+			widgetSelected(e);
+		}
+	}
+
 	public static enum ConnectorInstallationStatus { UNKNOWN, UP_TO_DATE, UPDATE_AVAILABLE, MORE_RECENT_VERSION_INSTALLED };
 	
 	private DiscoveryConnector connector;
@@ -111,7 +153,7 @@ public class ConnectorDescriptorItemUi implements PropertyChangeListener, Runnab
 	
 	private Job connectorUnitJob;
 
-	private final Button checkbox;
+	private final Button selectionButton;
 	private final Label iconLabel;
 	private final Label nameLabel;
 	private final Label statusLabel;
@@ -122,6 +164,8 @@ public class ConnectorDescriptorItemUi implements PropertyChangeListener, Runnab
 	private final Composite connectorContainer;
 	private final Display display;
 	private Image iconImage;
+	private boolean selection = false;
+	private List<SelectionListener> selectionListeners;
 
 	private static final String COLOR_DARK_GRAY = "DarkGray"; //$NON-NLS-1$
 	private Color colorDisabled;
@@ -130,10 +174,20 @@ public class ConnectorDescriptorItemUi implements PropertyChangeListener, Runnab
 
 	private Set<Resource> disposables = new HashSet<Resource>();
 
+	/**
+	 * 
+	 * @param discoveryViewer May be null
+	 * @param connector
+	 * @param categoryChildrenContainer
+	 * @param background
+	 * @param titleFont
+	 * @param infoImage
+	 * @param selectionType SWT.CHECK or SWT.RADIO
+	 */
 	public ConnectorDescriptorItemUi(DiscoveryViewer discoveryViewer,
 			final DiscoveryConnector connector,
 			Composite categoryChildrenContainer, Color background,
-			Font titleFont, Image infoImage) {
+			Font titleFont, Image infoImage, int selectionType) {
 
 		if (colorDisabled == null) {
 			ColorRegistry colorRegistry = JFaceResources.getColorRegistry();
@@ -151,36 +205,36 @@ public class ConnectorDescriptorItemUi implements PropertyChangeListener, Runnab
 		display = categoryChildrenContainer.getDisplay();
 		connector.addPropertyChangeListener(this);
 
-		connectorContainer = new Composite(categoryChildrenContainer, SWT.NULL);
+		connectorContainer = new Composite(categoryChildrenContainer, SWT.NONE);
 
 		connectorContainer.setBackground(background);
-		GridDataFactory.fillDefaults().grab(true, false).applyTo(connectorContainer);
+		connectorContainer.setLayoutData(new GridData(SWT.FILL, SWT.DEFAULT, true, false));
 		GridLayout layout = new GridLayout(5, false);
 		layout.marginLeft = 7;
 		layout.marginTop = 2;
 		layout.marginBottom = 2;
 		connectorContainer.setLayout(layout);
 
-		checkboxContainer = new Composite(connectorContainer, SWT.NULL);
+		checkboxContainer = new Composite(connectorContainer, SWT.NONE);
 		checkboxContainer.setBackground(background);
 		GridDataFactory.swtDefaults().align(SWT.CENTER, SWT.BEGINNING).span(1, 2).applyTo(checkboxContainer);
-		GridLayoutFactory.fillDefaults().spacing(1, 1).numColumns(2).applyTo(checkboxContainer);
+		GridLayoutFactory.swtDefaults().spacing(1, 1).numColumns(2).applyTo(checkboxContainer);
 
-		checkbox = new Button(checkboxContainer, SWT.CHECK);
-		checkbox.setText(" "); //$NON-NLS-1$
+		selectionButton = new Button(checkboxContainer, selectionType);
+		selectionButton.setText(" "); //$NON-NLS-1$
+		selectionButton.setVisible(connector.isInstallable());
 		// help UI tests
-		checkbox.setData("connectorId", connector.getId()); //$NON-NLS-1$
-		checkbox.setVisible(connector.isInstallable());
-		checkbox.setSelection(connector.isSelected());
-		checkbox.addFocusListener(new FocusAdapter() {
+		selectionButton.setData("connectorId", connector.getId()); //$NON-NLS-1$
+		selectionButton.addFocusListener(new FocusAdapter() {
 			@Override
 			public void focusGained(FocusEvent e) {
-				ConnectorDescriptorItemUi.this.discoveryViewer.showConnectorControl(ConnectorDescriptorItemUi.this);
+				if (ConnectorDescriptorItemUi.this.discoveryViewer != null) {
+					ConnectorDescriptorItemUi.this.discoveryViewer.showConnectorControl(ConnectorDescriptorItemUi.this);
+				}
 			}
 		});
 
-		GridDataFactory.swtDefaults().align(SWT.CENTER, SWT.CENTER)
-				.applyTo(checkbox);
+		GridDataFactory.swtDefaults().align(SWT.CENTER, SWT.CENTER).applyTo(selectionButton);
 
 		iconLabel = new Label(checkboxContainer, SWT.NULL);
 		iconLabel.setBackground(background);
@@ -196,13 +250,13 @@ public class ConnectorDescriptorItemUi implements PropertyChangeListener, Runnab
 
 		nameLabel = new Label(connectorContainer, SWT.NULL);
 		nameLabel.setBackground(background);
-		GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.CENTER).applyTo(nameLabel);
+		GridDataFactory.swtDefaults().align(SWT.BEGINNING, SWT.CENTER).applyTo(nameLabel);
 		nameLabel.setFont(this.titleFont);
 		nameLabel.setText(connector.getName());
 
 		this.statusLabel = new Label(connectorContainer, SWT.NULL);
 		this.statusLabel.setBackground(background);
-		GridDataFactory.fillDefaults().grab(true, false).align(SWT.BEGINNING, SWT.CENTER).applyTo(this.statusLabel);
+		GridDataFactory.swtDefaults().grab(true, false).align(SWT.BEGINNING, SWT.CENTER).applyTo(this.statusLabel);
 		setUpToDateStatus();
 		// As resolution of version is a long operation, we create a job for that
 		if (this.connector.isInstalled()) {
@@ -211,7 +265,7 @@ public class ConnectorDescriptorItemUi implements PropertyChangeListener, Runnab
 
 		providerLabel = new Link(connectorContainer, SWT.RIGHT);
 		providerLabel.setBackground(background);
-		GridDataFactory.fillDefaults().align(SWT.END, SWT.CENTER).applyTo(providerLabel);
+		GridDataFactory.swtDefaults().align(SWT.END, SWT.CENTER).applyTo(providerLabel);
 		if (connector.getCertification() != null) {
 			providerLabel.setText(NLS.bind(org.jboss.tools.central.Messages.DiscoveryViewer_Certification_Label0,
 					new String[] {
@@ -247,7 +301,7 @@ public class ConnectorDescriptorItemUi implements PropertyChangeListener, Runnab
 			DiscoveryViewer.hookTooltip(toolBar, infoButton,
 					connectorContainer, nameLabel, connector.getSource(),
 					connector.getOverview(), null);
-			GridDataFactory.fillDefaults().align(SWT.END, SWT.CENTER).applyTo(toolBar);
+			GridDataFactory.swtDefaults().align(SWT.END, SWT.CENTER).applyTo(toolBar);
 		} else {
 			Label label = new Label(connectorContainer, SWT.NULL);
 			label.setText(" "); //$NON-NLS-1$
@@ -256,8 +310,8 @@ public class ConnectorDescriptorItemUi implements PropertyChangeListener, Runnab
 
 		description = new Label(connectorContainer, SWT.NULL | SWT.WRAP);
 		description.setBackground(background);
-
-		GridDataFactory.fillDefaults().grab(true, false).span(3, 1).hint(100, SWT.DEFAULT).applyTo(description);
+		GridData descriptionLayoutData = new GridData(SWT.FILL, SWT.DEFAULT, true, false, 3, 1);
+		description.setLayoutData(descriptionLayoutData);
 		String descriptionText = connector.getDescription();
 		int maxDescriptionLength = 162;
 		if (descriptionText.length() > maxDescriptionLength) {
@@ -268,32 +322,15 @@ public class ConnectorDescriptorItemUi implements PropertyChangeListener, Runnab
 		// always disabled color to make it less prominent
 		providerLabel.setForeground(this.colorDisabled);
 
-		checkbox.addSelectionListener(new SelectionListener() {
-			public void widgetDefaultSelected(SelectionEvent e) {
-				widgetSelected(e);
-			}
-
-			public void widgetSelected(SelectionEvent e) {
-				boolean selected = checkbox.getSelection();
-				maybeModifySelection(selected);
-			}
-		});
-		MouseListener connectorItemMouseListener = new MouseAdapter() {
-			@Override
-			public void mouseUp(MouseEvent e) {
-				boolean selected = !checkbox.getSelection();
-				if (maybeModifySelection(selected)) {
-					checkbox.setSelection(selected);
-				}
-			}
-		};
-		checkboxContainer.addMouseListener(connectorItemMouseListener);
-		connectorContainer.addMouseListener(connectorItemMouseListener);
-		iconLabel.addMouseListener(connectorItemMouseListener);
-		nameLabel.addMouseListener(connectorItemMouseListener);
+		SelectionHandler selectionHandler = new SelectionHandler();
+		selectionButton.addSelectionListener(selectionHandler);
+		checkboxContainer.addMouseListener(selectionHandler);
+		connectorContainer.addMouseListener(selectionHandler);
+		iconLabel.addMouseListener(selectionHandler);
+		nameLabel.addMouseListener(selectionHandler);
 		// the provider has clickable links
 		// providerLabel.addMouseListener(connectorItemMouseListener);
-		description.addMouseListener(connectorItemMouseListener);
+		description.addMouseListener(selectionHandler);
 	}
 
 	/**
@@ -318,7 +355,7 @@ public class ConnectorDescriptorItemUi implements PropertyChangeListener, Runnab
 								int compare = version.compareTo(connectorUnitVersion); 
 								if (compare == 0) {
 									ConnectorDescriptorItemUi.this.installationStatus = ConnectorInstallationStatus.UP_TO_DATE;
-									discoveryViewer.modifySelection(ConnectorDescriptorItemUi.this, ConnectorDescriptorItemUi.this.connector.isSelected());
+									discoveryViewer.modifySelection(ConnectorDescriptorItemUi.this, getSelection());
 									break;
 								} else if (compare <= 0) {
 									ConnectorDescriptorItemUi.this.installationStatus = ConnectorInstallationStatus.UPDATE_AVAILABLE;
@@ -326,7 +363,7 @@ public class ConnectorDescriptorItemUi implements PropertyChangeListener, Runnab
 									break;
 								} else if (compare >= 0) {
 									ConnectorDescriptorItemUi.this.installationStatus = ConnectorInstallationStatus.MORE_RECENT_VERSION_INSTALLED;
-									discoveryViewer.modifySelection(ConnectorDescriptorItemUi.this, ConnectorDescriptorItemUi.this.connector.isSelected());
+									discoveryViewer.modifySelection(ConnectorDescriptorItemUi.this, getSelection());
 									break;
 								}
 							}
@@ -460,24 +497,23 @@ public class ConnectorDescriptorItemUi implements PropertyChangeListener, Runnab
 				|| this.installationStatus == ConnectorInstallationStatus.UP_TO_DATE;
 	}
 
-	protected boolean maybeModifySelection(boolean selected) {
+	protected boolean validateSelection(boolean selected) {
 		if (selected) {
 			if (!connector.isInstalled() && !connector.isInstallable()) {
 				if (connector.getInstallMessage() != null) {
-					MessageDialog.openInformation(this.checkbox.getShell(),
+					MessageDialog.openInformation(this.selectionButton.getShell(),
 							Messages.DiscoveryViewer_Install_Connector_Title,
 							connector.getInstallMessage());
 				}
 				return false;
 			}
 			if (connector.getAvailable() != null && !connector.getAvailable()) {
-				MessageDialog.openWarning(this.checkbox.getShell(),
+				MessageDialog.openWarning(this.selectionButton.getShell(),
 								Messages.ConnectorDiscoveryWizardMainPage_warningTitleConnectorUnavailable,
 								NLS.bind(Messages.ConnectorDiscoveryWizardMainPage_warningMessageConnectorUnavailable, connector.getName()));
 				return false;
 			}
 		}
-		this.discoveryViewer.modifySelection(this, selected);
 		return true;
 	}
 
@@ -494,7 +530,7 @@ public class ConnectorDescriptorItemUi implements PropertyChangeListener, Runnab
 	public void updateAvailability() {
 		boolean enabled = !connector.isInstalled()	&& (connector.getAvailable() == null || connector.getAvailable());
 
-		checkbox.setEnabled(enabled);
+		selectionButton.setEnabled(enabled);
 		nameLabel.setEnabled(enabled);
 		providerLabel.setEnabled(enabled);
 		description.setEnabled(enabled);
@@ -512,11 +548,12 @@ public class ConnectorDescriptorItemUi implements PropertyChangeListener, Runnab
 		}
 	}
 
-	void select(boolean select) {
-		if (!checkbox.isDisposed() && checkbox.isVisible()	&& checkbox.getSelection() != select) {
-			checkbox.setSelection(select);
-			this.connector.setSelected(select);
-			maybeModifySelection(select);
+	public void setSelection(boolean select) {
+		if (validateSelection(select)) {
+			this.selection = select;
+			if (!selectionButton.isDisposed()) {
+				this.selectionButton.setSelection(select);
+			}
 		}
 	}
 
@@ -579,5 +616,16 @@ public class ConnectorDescriptorItemUi implements PropertyChangeListener, Runnab
 	
 	public boolean isComputingUnits() {
 		return this.connectorUnitJob != null && this.connectorUnitJob.getState() != Job.NONE;
+	}
+	
+	public void addSelectionListener(SelectionListener listener) {
+		if (this.selectionListeners == null) {
+			this.selectionListeners = new ArrayList<SelectionListener>();
+		}
+		this.selectionListeners.add(listener);
+	}
+	
+	public boolean getSelection() {
+		return this.selection;
 	}
 }
