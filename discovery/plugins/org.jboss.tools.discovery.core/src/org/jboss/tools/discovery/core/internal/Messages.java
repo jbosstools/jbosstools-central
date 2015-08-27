@@ -17,6 +17,15 @@ public class Messages extends NLS {
 
 	public static String preparingUninstall;
 	public static String UsageEventTypeInstallLabelDescription;
+	
+	public static String SoftwarePage_earlyAccessSection_Title;
+	public static String SoftwarePage_earlyAccessSection_message;
+	public static String SoftwarePage_nothingToInstall_title;
+	public static String SoftwarePage_nothingToInstall_description;
+	public static String DiscoveryViewer_selectConnectorFlavor_description;
+	public static String DiscoveryViewer_selectConnectorFlavor_title;
+	public static String DiscoveryViewer_Certification_Label0;
+	
 	static {
 		// initialize resource bundle
 		NLS.initializeMessages(BUNDLE_NAME, Messages.class);

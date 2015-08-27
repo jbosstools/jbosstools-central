@@ -15,10 +15,8 @@ import org.eclipse.osgi.util.NLS;
 public class Messages extends NLS {
 	private static final String BUNDLE_NAME = "org.jboss.tools.central.messages"; //$NON-NLS-1$
 
-	public static String DiscoveryViewer_Certification_Label0;
 	public static String DiscoveryViewer_X_installed;
 	public static String DiscoveryViewer_Hide_installed;
-	public static String DiscoveryViewer_Enable_EarlyAccess;
 	public static String DiscoveryViewer_Show_only_most_recent;
 	public static String DiscoveryViewer_filtersLink;
 	public static String DiscoveryViewer_noFeatureToShow;
@@ -35,12 +33,12 @@ public class Messages extends NLS {
 	public static String updateWithCount;
 	public static String selectAll;
 	public static String deselectAll;
+	public static String manageEarlyAccess;
 	
-	public static String SoftwarePage_earlyAccessSection_Title;
-	public static String SoftwarePage_earlyAccessSection_message;
-	public static String SoftwarePage_nothingToInstall_title;
-	public static String SoftwarePage_nothingToInstall_description;
 	public static String EarlyAccess_Description;
+	public static String EarlyAccessSites_Description;
+	public static String disableEarlyAccess_title;
+	public static String disableEarlyAccess_description;
 
 	public static String remainingEarlyAccessConnectors_title;
 	public static String remainingEarlyAccessConnectors_message;
@@ -55,6 +53,7 @@ public class Messages extends NLS {
 	public static String additionalSoftwareRequired_message;
 	public static String unableToInstallConnectors_title;
 	public static String unableToInstallConnectors_message;
+
 
 	static {
 		// initialize resource bundle

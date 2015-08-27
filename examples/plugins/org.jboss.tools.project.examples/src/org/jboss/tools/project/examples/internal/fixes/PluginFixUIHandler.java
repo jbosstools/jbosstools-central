@@ -40,7 +40,7 @@ public class PluginFixUIHandler extends AbstractUIHandler {
 		if (!fix.isSatisfied() && fix instanceof PluginFix) {
 			PluginFix pluginFix = (PluginFix) fix;
 			Collection<String> connectorIds = pluginFix.getConnectorIDs();
-			if (!JBossDiscoveryUi.installByIds(connectorIds, context)) {
+			if (!JBossDiscoveryUi.installByIds(connectorIds, true, context)) {
 				ProjectExamplesActivator.log("Could not install requested connectors"); //$NON-NLS-1$
 			}
 		}

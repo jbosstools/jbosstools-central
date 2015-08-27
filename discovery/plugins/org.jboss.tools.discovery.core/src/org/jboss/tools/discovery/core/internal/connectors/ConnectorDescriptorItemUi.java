@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2014 Tasktop Technologies and others.
+ * Copyright (c) 2010, 2015 Tasktop Technologies and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -11,11 +11,13 @@
  *      - Extracted from {@link DiscoveryViewer} into own file
  *      - Added support for versions/updates
  *      - UI improvements
+ *      - Make UI reusable out of DiscoveryViewer
  *******************************************************************************/
-package org.jboss.tools.central.editors.xpl;
+package org.jboss.tools.discovery.core.internal.connectors;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -43,18 +45,18 @@ import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.resource.ColorRegistry;
 import org.eclipse.jface.resource.JFaceResources;
+import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.mylyn.commons.workbench.browser.BrowserUtil;
 import org.eclipse.mylyn.internal.discovery.core.model.ConnectorDescriptor;
 import org.eclipse.mylyn.internal.discovery.core.model.DiscoveryConnector;
 import org.eclipse.mylyn.internal.discovery.core.model.Overview;
+import org.eclipse.mylyn.internal.discovery.ui.wizards.DiscoveryViewer;
 import org.eclipse.mylyn.internal.discovery.ui.wizards.Messages;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.FocusAdapter;
-import org.eclipse.swt.events.FocusEvent;
+import org.eclipse.swt.events.FocusListener;
 import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
-import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
@@ -69,14 +71,14 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Link;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.ToolItem;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.browser.IWorkbenchBrowserSupport;
-import org.jboss.tools.central.JBossCentralActivator;
-import org.jboss.tools.discovery.core.internal.connectors.JBossDiscoveryUi;
+import org.jboss.tools.discovery.core.internal.DiscoveryActivator;
 
 /**
  * Wraps a {@link DiscoveryConnector} in a UI element and provide additional
@@ -101,6 +103,37 @@ public class ConnectorDescriptorItemUi implements PropertyChangeListener, Runnab
 		}
 	};
 
+	private final class SelectionHandler extends MouseAdapter implements SelectionListener {
+		@Override
+		public void mouseUp(MouseEvent e) {
+			boolean selected = true;
+			if ((selectionButton.getStyle() & SWT.CHECK) != 0) {
+				selected = !selection;
+			}
+			if (selected != selectionButton.getSelection()) {
+				handleSelectionChange(selected);
+			}
+		}
+
+		private void handleSelectionChange(boolean selected) {
+			if (validateSelection(selected)) {
+				ConnectorDescriptorItemUi.this.selection = selected;
+				selectionButton.setSelection(selected);
+				notifySelectionListeners();
+			}
+		}
+
+		@Override
+		public void widgetSelected(SelectionEvent e) {
+			handleSelectionChange(((Button)e.getSource()).getSelection());
+		}
+
+		@Override
+		public void widgetDefaultSelected(SelectionEvent e) {
+			widgetSelected(e);
+		}
+	}
+
 	public static enum ConnectorInstallationStatus { UNKNOWN, UP_TO_DATE, UPDATE_AVAILABLE, MORE_RECENT_VERSION_INSTALLED };
 	
 	private DiscoveryConnector connector;
@@ -109,11 +142,11 @@ public class ConnectorDescriptorItemUi implements PropertyChangeListener, Runnab
 	private boolean visible;
 	private boolean isRealConnector;
 
-	private DiscoveryViewer discoveryViewer;
+	private Viewer discoveryViewer;
 	
 	private Job connectorUnitJob;
 
-	private final Button checkbox;
+	private final Button selectionButton;
 	private final Label iconLabel;
 	private final Label nameLabel;
 	private final Label statusLabel;
@@ -124,6 +157,8 @@ public class ConnectorDescriptorItemUi implements PropertyChangeListener, Runnab
 	private final Composite connectorContainer;
 	private final Display display;
 	private Image iconImage;
+	private boolean selection = false;
+	private List<SelectionListener> selectionListeners;
 
 	private static final String COLOR_DARK_GRAY = "DarkGray"; //$NON-NLS-1$
 	private Color colorDisabled;
@@ -132,10 +167,20 @@ public class ConnectorDescriptorItemUi implements PropertyChangeListener, Runnab
 
 	private Set<Resource> disposables = new HashSet<Resource>();
 
-	public ConnectorDescriptorItemUi(DiscoveryViewer discoveryViewer,
+	/**
+	 * 
+	 * @param discoveryViewer May be null
+	 * @param connector
+	 * @param categoryChildrenContainer
+	 * @param background
+	 * @param titleFont
+	 * @param infoImage
+	 * @param selectionType SWT.CHECK or SWT.RADIO
+	 */
+	public ConnectorDescriptorItemUi(Viewer discoveryViewer,
 			final DiscoveryConnector connector,
 			Composite categoryChildrenContainer, Color background,
-			Font titleFont, Image infoImage) {
+			Font titleFont, Image infoImage, int selectionType) {
 
 		if (colorDisabled == null) {
 			ColorRegistry colorRegistry = JFaceResources.getColorRegistry();
@@ -153,46 +198,39 @@ public class ConnectorDescriptorItemUi implements PropertyChangeListener, Runnab
 		display = categoryChildrenContainer.getDisplay();
 		connector.addPropertyChangeListener(this);
 
-		connectorContainer = new Composite(categoryChildrenContainer, SWT.NULL);
+		connectorContainer = new Composite(categoryChildrenContainer, SWT.NONE);
 
 		connectorContainer.setBackground(background);
-		GridDataFactory.fillDefaults().grab(true, false).applyTo(connectorContainer);
+		connectorContainer.setLayoutData(new GridData(SWT.FILL, SWT.DEFAULT, true, false));
 		GridLayout layout = new GridLayout(5, false);
 		layout.marginLeft = 7;
 		layout.marginTop = 2;
 		layout.marginBottom = 2;
 		connectorContainer.setLayout(layout);
 
-		checkboxContainer = new Composite(connectorContainer, SWT.NULL);
+		checkboxContainer = new Composite(connectorContainer, SWT.NONE);
 		checkboxContainer.setBackground(background);
 		GridDataFactory.swtDefaults().align(SWT.CENTER, SWT.BEGINNING).span(1, 2).applyTo(checkboxContainer);
-		GridLayoutFactory.fillDefaults().spacing(1, 1).numColumns(2).applyTo(checkboxContainer);
+		GridLayoutFactory.swtDefaults().spacing(1, 1).numColumns(2).applyTo(checkboxContainer);
 
-		checkbox = new Button(checkboxContainer, SWT.CHECK);
-		checkbox.setText(" "); //$NON-NLS-1$
+		selectionButton = new Button(checkboxContainer, selectionType);
+		selectionButton.setText(" "); //$NON-NLS-1$
+		selectionButton.setVisible(connector.isInstallable());
 		// help UI tests
-		checkbox.setData("connectorId", connector.getId()); //$NON-NLS-1$
-		checkbox.setVisible(connector.isInstallable());
-		checkbox.setSelection(connector.isSelected());
-		checkbox.addFocusListener(new FocusAdapter() {
-			@Override
-			public void focusGained(FocusEvent e) {
-				ConnectorDescriptorItemUi.this.discoveryViewer.showConnectorControl(ConnectorDescriptorItemUi.this);
-			}
-		});
+		selectionButton.setData("connectorId", connector.getId()); //$NON-NLS-1$
+		
 		this.isRealConnector = JBossDiscoveryUi.isInstallableConnector(connector);
-		checkbox.setVisible(this.isRealConnector);
-		checkbox.setEnabled(this.isRealConnector);
+		this.selectionButton.setVisible(this.isRealConnector);
+		this.selectionButton.setEnabled(this.isRealConnector);
 
-		GridDataFactory.swtDefaults().align(SWT.CENTER, SWT.CENTER)
-				.applyTo(checkbox);
+		GridDataFactory.swtDefaults().align(SWT.CENTER, SWT.CENTER).applyTo(selectionButton);
 
 		iconLabel = new Label(checkboxContainer, SWT.NULL);
 		iconLabel.setBackground(background);
 		GridDataFactory.swtDefaults().align(SWT.CENTER, SWT.CENTER).applyTo(iconLabel);
 
 		if (connector.getIcon() != null) {
-			iconImage = DiscoveryViewer.computeIconImage(connector.getSource(), connector.getIcon(), 32, false);
+			iconImage = JBossDiscoveryUi.computeIconImage(connector.getSource(), connector.getIcon(), 32, false);
 			this.disposables.add(iconImage);
 			if (iconImage != null) {
 				iconLabel.setImage(iconImage);
@@ -201,13 +239,13 @@ public class ConnectorDescriptorItemUi implements PropertyChangeListener, Runnab
 
 		nameLabel = new Label(connectorContainer, SWT.NULL);
 		nameLabel.setBackground(background);
-		GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.CENTER).applyTo(nameLabel);
+		GridDataFactory.swtDefaults().align(SWT.BEGINNING, SWT.CENTER).applyTo(nameLabel);
 		nameLabel.setFont(this.titleFont);
 		nameLabel.setText(connector.getName());
 
 		this.statusLabel = new Label(connectorContainer, SWT.NULL);
 		this.statusLabel.setBackground(background);
-		GridDataFactory.fillDefaults().grab(true, false).align(SWT.BEGINNING, SWT.CENTER).applyTo(this.statusLabel);
+		GridDataFactory.swtDefaults().grab(true, false).align(SWT.BEGINNING, SWT.CENTER).applyTo(this.statusLabel);
 		setUpToDateStatus();
 		// As resolution of version is a long operation, we create a job for that
 		if (this.connector.isInstalled()) {
@@ -216,9 +254,9 @@ public class ConnectorDescriptorItemUi implements PropertyChangeListener, Runnab
 
 		providerLabel = new Link(connectorContainer, SWT.RIGHT);
 		providerLabel.setBackground(background);
-		GridDataFactory.fillDefaults().align(SWT.END, SWT.CENTER).applyTo(providerLabel);
+		GridDataFactory.swtDefaults().align(SWT.END, SWT.CENTER).applyTo(providerLabel);
 		if (connector.getCertification() != null) {
-			providerLabel.setText(NLS.bind(org.jboss.tools.central.Messages.DiscoveryViewer_Certification_Label0,
+			providerLabel.setText(NLS.bind(Messages.DiscoveryViewer_Certification_Label0,
 					new String[] {
 						connector.getProvider(),
 						connector.getLicense(),
@@ -234,8 +272,8 @@ public class ConnectorDescriptorItemUi implements PropertyChangeListener, Runnab
 			Overview overview = new Overview();
 			overview.setSummary(connector.getCertification().getDescription());
 			overview.setUrl(connector.getCertification().getUrl());
-			Image image = DiscoveryViewer.computeIconImage(connector.getSource(), connector.getCertification().getIcon(), 48, true);
-			DiscoveryViewer.hookTooltip(providerLabel, providerLabel,
+			Image image = JBossDiscoveryUi.computeIconImage(connector.getSource(), connector.getCertification().getIcon(), 48, true);
+			JBossDiscoveryUi.hookTooltip(providerLabel, providerLabel,
 					connectorContainer, providerLabel, connector.getSource(),
 					overview, image);
 		} else {
@@ -249,10 +287,10 @@ public class ConnectorDescriptorItemUi implements PropertyChangeListener, Runnab
 			infoButton = new ToolItem(toolBar, SWT.PUSH);
 			infoButton.setImage(this.infoImage);
 			infoButton.setToolTipText(Messages.ConnectorDiscoveryWizardMainPage_tooltip_showOverview);
-			DiscoveryViewer.hookTooltip(toolBar, infoButton,
+			JBossDiscoveryUi.hookTooltip(toolBar, infoButton,
 					connectorContainer, nameLabel, connector.getSource(),
 					connector.getOverview(), null);
-			GridDataFactory.fillDefaults().align(SWT.END, SWT.CENTER).applyTo(toolBar);
+			GridDataFactory.swtDefaults().align(SWT.END, SWT.CENTER).applyTo(toolBar);
 		} else {
 			Label label = new Label(connectorContainer, SWT.NULL);
 			label.setText(" "); //$NON-NLS-1$
@@ -261,8 +299,8 @@ public class ConnectorDescriptorItemUi implements PropertyChangeListener, Runnab
 
 		description = new Label(connectorContainer, SWT.NULL | SWT.WRAP);
 		description.setBackground(background);
-
-		GridDataFactory.fillDefaults().grab(true, false).span(3, 1).hint(100, SWT.DEFAULT).applyTo(description);
+		GridData descriptionLayoutData = new GridData(SWT.FILL, SWT.DEFAULT, true, false, 3, 1);
+		description.setLayoutData(descriptionLayoutData);
 		String descriptionText = connector.getDescription();
 		int maxDescriptionLength = 162;
 		if (descriptionText.length() > maxDescriptionLength) {
@@ -274,33 +312,18 @@ public class ConnectorDescriptorItemUi implements PropertyChangeListener, Runnab
 		providerLabel.setForeground(this.colorDisabled);
 
 		if (this.isRealConnector) {
-			checkbox.addSelectionListener(new SelectionListener() {
-				public void widgetDefaultSelected(SelectionEvent e) {
-					widgetSelected(e);
-				}
-	
-				public void widgetSelected(SelectionEvent e) {
-					boolean selected = checkbox.getSelection();
-					maybeModifySelection(selected);
-				}
-			});
-			MouseListener connectorItemMouseListener = new MouseAdapter() {
-				@Override
-				public void mouseUp(MouseEvent e) {
-					boolean selected = !checkbox.getSelection();
-					if (maybeModifySelection(selected)) {
-						checkbox.setSelection(selected);
-					}
-				}
-			};
-			checkboxContainer.addMouseListener(connectorItemMouseListener);
-			connectorContainer.addMouseListener(connectorItemMouseListener);
-			iconLabel.addMouseListener(connectorItemMouseListener);
-			nameLabel.addMouseListener(connectorItemMouseListener);
-			// the provider has clickable links
-			// providerLabel.addMouseListener(connectorItemMouseListener);
-			description.addMouseListener(connectorItemMouseListener);
+			SelectionHandler handler = new SelectionHandler();
+			this.selectionButton.addSelectionListener(handler);
+			checkboxContainer.addMouseListener(handler);
+			connectorContainer.addMouseListener(handler);
+			iconLabel.addMouseListener(handler);
+			nameLabel.addMouseListener(handler);
+			description.addMouseListener(handler);
 		}
+	}
+	
+	public void addFocusListener(FocusListener listener) {
+		this.selectionButton.addFocusListener(listener);
 	}
 
 	/**
@@ -316,27 +339,27 @@ public class ConnectorDescriptorItemUi implements PropertyChangeListener, Runnab
 				if (connector.isInstalled() && ConnectorDescriptorItemUi.this.connectorUnits != null) {
 					Map<String, org.eclipse.equinox.p2.metadata.Version> profileUnits = resolveProfileUnits(connector.getInstallableUnits());
 					if (profileUnits != null && !profileUnits.isEmpty()) {
+						ConnectorInstallationStatus newStatus = ConnectorInstallationStatus.UP_TO_DATE;
 						for (String unitId : connector.getInstallableUnits()) {
 							Version version = profileUnits.get(unitId);
 							Version connectorUnitVersion = ConnectorDescriptorItemUi.this.connectorUnits.get(unitId);
 							if (connectorUnitVersion == null) {
-								JBossCentralActivator.log("Could not resolve remote IU '" + unitId + "' in repository '" + connector.getSiteUrl() + "'");
+								DiscoveryActivator.log("Could not resolve remote IU '" + unitId + "' in repository '" + connector.getSiteUrl() + "'");
 							} else if (version != null) {
 								int compare = version.compareTo(connectorUnitVersion); 
-								if (compare == 0) {
-									ConnectorDescriptorItemUi.this.installationStatus = ConnectorInstallationStatus.UP_TO_DATE;
-									discoveryViewer.modifySelection(ConnectorDescriptorItemUi.this, ConnectorDescriptorItemUi.this.connector.isSelected());
-									break;
-								} else if (compare <= 0) {
-									ConnectorDescriptorItemUi.this.installationStatus = ConnectorInstallationStatus.UPDATE_AVAILABLE;
-									// default enables update, so no need to change it
+								if (compare <= 0) {
+									newStatus = ConnectorInstallationStatus.UPDATE_AVAILABLE;
 									break;
 								} else if (compare >= 0) {
-									ConnectorDescriptorItemUi.this.installationStatus = ConnectorInstallationStatus.MORE_RECENT_VERSION_INSTALLED;
-									discoveryViewer.modifySelection(ConnectorDescriptorItemUi.this, ConnectorDescriptorItemUi.this.connector.isSelected());
+									newStatus = ConnectorInstallationStatus.MORE_RECENT_VERSION_INSTALLED;
 									break;
 								}
 							}
+						}
+						ConnectorDescriptorItemUi.this.installationStatus = newStatus;
+						if (newStatus != ConnectorInstallationStatus.UPDATE_AVAILABLE) {
+							// notify selection update (to update connector count on install/uninstall buttons)
+							notifySelectionListeners();
 						}
 					}
 					if (this.cancelled) {
@@ -425,9 +448,9 @@ public class ConnectorDescriptorItemUi implements PropertyChangeListener, Runnab
 			}
 			return res;
 		} catch (ProvisionException ex) {
-			JBossCentralActivator.getDefault().getLog().log(new Status(
+			DiscoveryActivator.getDefault().getLog().log(new Status(
 					IStatus.ERROR,
-					JBossCentralActivator.PLUGIN_ID,
+					DiscoveryActivator.PLUGIN_ID,
 					ex.getMessage(),
 					ex));
 			return null;
@@ -467,28 +490,26 @@ public class ConnectorDescriptorItemUi implements PropertyChangeListener, Runnab
 				|| this.installationStatus == ConnectorInstallationStatus.UP_TO_DATE;
 	}
 
-	protected boolean maybeModifySelection(boolean selected) {
-		if (!this.isRealConnector || !checkbox.isEnabled()) {
+	protected boolean validateSelection(boolean selected) {
+		if (!this.isRealConnector || !this.selectionButton.isEnabled()) {
 			return false;
 		}
-
 		if (selected) {
 			if (!connector.isInstalled() && !connector.isInstallable()) {
 				if (connector.getInstallMessage() != null) {
-					MessageDialog.openInformation(this.checkbox.getShell(),
+					MessageDialog.openInformation(this.selectionButton.getShell(),
 							Messages.DiscoveryViewer_Install_Connector_Title,
 							connector.getInstallMessage());
 				}
 				return false;
 			}
 			if (connector.getAvailable() != null && !connector.getAvailable()) {
-				MessageDialog.openWarning(this.checkbox.getShell(),
+				MessageDialog.openWarning(this.selectionButton.getShell(),
 								Messages.ConnectorDiscoveryWizardMainPage_warningTitleConnectorUnavailable,
 								NLS.bind(Messages.ConnectorDiscoveryWizardMainPage_warningMessageConnectorUnavailable, connector.getName()));
 				return false;
 			}
 		}
-		this.discoveryViewer.modifySelection(this, selected);
 		return true;
 	}
 
@@ -505,7 +526,7 @@ public class ConnectorDescriptorItemUi implements PropertyChangeListener, Runnab
 	public void updateAvailability() {
 		boolean enabled = !connector.isInstalled()	&& (connector.getAvailable() == null || connector.getAvailable());
 
-		checkbox.setEnabled(this.isRealConnector);
+		this.selectionButton.setEnabled(this.isRealConnector);
 		nameLabel.setEnabled(enabled);
 		providerLabel.setEnabled(enabled);
 		description.setEnabled(enabled);
@@ -523,11 +544,12 @@ public class ConnectorDescriptorItemUi implements PropertyChangeListener, Runnab
 		}
 	}
 
-	void select(boolean select) {
-		if (!checkbox.isDisposed() && checkbox.isVisible()	&& checkbox.getSelection() != select) {
-			checkbox.setSelection(select);
-			this.connector.setSelected(select);
-			maybeModifySelection(select);
+	public void setSelection(boolean select) {
+		if (validateSelection(select)) {
+			this.selection = select;
+			if (!selectionButton.isDisposed()) {
+				this.selectionButton.setSelection(select);
+			}
 		}
 	}
 
@@ -579,8 +601,8 @@ public class ConnectorDescriptorItemUi implements PropertyChangeListener, Runnab
 				this.connectorUnitJob.setPriority(Job.INTERACTIVE);
 				this.connectorUnitJob.join();
 			} catch (InterruptedException ex) {
-				JBossCentralActivator.getDefault().getLog().log(new Status(IStatus.ERROR,
-					JBossCentralActivator.PLUGIN_ID,
+				DiscoveryActivator.getDefault().getLog().log(new Status(IStatus.ERROR,
+					DiscoveryActivator.PLUGIN_ID,
 					ex.getMessage(),
 					ex));
 			}
@@ -590,5 +612,28 @@ public class ConnectorDescriptorItemUi implements PropertyChangeListener, Runnab
 	
 	public boolean isComputingUnits() {
 		return this.connectorUnitJob != null && this.connectorUnitJob.getState() != Job.NONE;
+	}
+	
+	public void addSelectionListener(SelectionListener listener) {
+		if (this.selectionListeners == null) {
+			this.selectionListeners = new ArrayList<SelectionListener>();
+		}
+		this.selectionListeners.add(listener);
+	}
+	
+	public boolean getSelection() {
+		return this.selection;
+	}
+
+	private void notifySelectionListeners() {
+		Event event = new Event();
+		event.data = ConnectorDescriptorItemUi.this;
+		event.widget = selectionButton;
+		SelectionEvent selEvent = new SelectionEvent(event);
+		if (selectionListeners != null) {
+			for (SelectionListener listener : ConnectorDescriptorItemUi.this.selectionListeners) {
+				listener.widgetSelected(selEvent);
+			}
+		}
 	}
 }

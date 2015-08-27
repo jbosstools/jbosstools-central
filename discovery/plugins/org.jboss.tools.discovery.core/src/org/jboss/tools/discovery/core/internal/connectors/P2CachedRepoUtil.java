@@ -1,4 +1,4 @@
-package org.jboss.tools.central.editors.xpl;
+package org.jboss.tools.discovery.core.internal.connectors;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -15,7 +15,7 @@ import org.eclipse.equinox.p2.repository.metadata.IMetadataRepository;
 import org.eclipse.equinox.p2.repository.metadata.IMetadataRepositoryManager;
 import org.eclipse.mylyn.internal.discovery.core.model.ConnectorDescriptor;
 import org.eclipse.ui.PlatformUI;
-import org.jboss.tools.central.JBossCentralActivator;
+import org.jboss.tools.discovery.core.internal.DiscoveryActivator;
 
 public class P2CachedRepoUtil {
 
@@ -41,15 +41,15 @@ public class P2CachedRepoUtil {
 				repo = metadataManager.loadRepository(new URI(connector.getSiteUrl()), new NullProgressMonitor());
 				cachedRepo.put(connector.getSiteUrl(), repo);
 			} catch (ProvisionException ex) {
-				JBossCentralActivator.getDefault().getLog().log(new Status(
+				DiscoveryActivator.getDefault().getLog().log(new Status(
 						IStatus.ERROR,
-						JBossCentralActivator.PLUGIN_ID,
+						DiscoveryActivator.PLUGIN_ID,
 						ex.getMessage(),
 						ex));
 			} catch (URISyntaxException ex) {
-				JBossCentralActivator.getDefault().getLog().log(new Status(
+				DiscoveryActivator.getDefault().getLog().log(new Status(
 						IStatus.ERROR,
-						JBossCentralActivator.PLUGIN_ID,
+						DiscoveryActivator.PLUGIN_ID,
 						ex.getMessage(),
 						ex));
 			}

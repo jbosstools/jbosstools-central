@@ -10,15 +10,20 @@
  ************************************************************************************/
 package org.jboss.tools.central.installation;
 
+import java.net.URI;
 import java.net.URL;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Hashtable;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
 import org.eclipse.core.runtime.IConfigurationElement;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.equinox.p2.core.IProvisioningAgent;
@@ -28,12 +33,22 @@ import org.eclipse.equinox.p2.engine.IProfile;
 import org.eclipse.equinox.p2.engine.IProfileRegistry;
 import org.eclipse.equinox.p2.metadata.IInstallableUnit;
 import org.eclipse.equinox.p2.metadata.VersionRange;
+import org.eclipse.equinox.p2.operations.ProvisioningSession;
 import org.eclipse.equinox.p2.query.IQuery;
 import org.eclipse.equinox.p2.query.IQueryResult;
 import org.eclipse.equinox.p2.query.QueryUtil;
+import org.eclipse.equinox.p2.ui.ProvisioningUI;
+import org.eclipse.mylyn.internal.discovery.core.model.ConnectorDiscovery;
+import org.eclipse.mylyn.internal.discovery.core.model.DiscoveryConnector;
 import org.eclipse.ui.PlatformUI;
 import org.jboss.tools.central.JBossCentralActivator;
+import org.jboss.tools.central.editors.xpl.filters.EarlyAccessFilter;
+import org.jboss.tools.discovery.core.internal.DiscoveryActivator;
+import org.jboss.tools.discovery.core.internal.connectors.DiscoveryUtil;
+import org.jboss.tools.discovery.core.internal.connectors.JBossDiscoveryUi;
 import org.jboss.tools.foundation.core.properties.PropertiesHelper;
+import org.osgi.framework.Bundle;
+import org.osgi.framework.Version;
 
 public class InstallationChecker {
 	
@@ -45,6 +60,7 @@ public class InstallationChecker {
 	private Map<String, Set<IInstallableUnit>> installedUnitsPerFamily;
 	
 	private IProfile applicationProfile;
+	private IProvisioningAgent agent;
 	
 	private InstallationChecker() throws ProvisionException {
 		this.iuFamilies = new HashMap<String, BundleFamilyExtension>();
@@ -62,12 +78,11 @@ public class InstallationChecker {
 		}
 		
 		IProvisioningAgentProvider provider = (IProvisioningAgentProvider) PlatformUI.getWorkbench().getService(IProvisioningAgentProvider.class);
-		IProvisioningAgent agent;
-		agent = provider.createAgent(null); // null = location for running system
-		if (agent == null) {
+		this.agent = provider.createAgent(null); // null = location for running system
+		if (this.agent == null) {
 			throw new ProvisionException("Location was not provisioned by p2");
 		}
-		IProfileRegistry profileRegistry = (IProfileRegistry) agent.getService(IProfileRegistry.SERVICE_NAME);
+		IProfileRegistry profileRegistry = (IProfileRegistry) this.agent.getService(IProfileRegistry.SERVICE_NAME);
 		if (profileRegistry == null) {
 			throw new ProvisionException("Unable to acquire the profile registry service.");
 		}
@@ -118,4 +133,47 @@ public class InstallationChecker {
 		return Collections.unmodifiableSet(installedUnitsPerFamily.get(family));
 	}
 
+	public Set<String> getActiveEarlyAccessURLs(IProgressMonitor monitor) {
+		Hashtable<Object, Object> environment = new Hashtable<Object, Object>(System.getProperties());
+		// add the installed Mylyn version to the environment so that we can
+		// have connectors that are filtered based on version of Mylyn
+		Bundle bundle = Platform.getBundle("org.eclipse.mylyn.tasks.core"); //$NON-NLS-1$
+		if (bundle == null) {
+			bundle = Platform.getBundle("org.eclipse.mylyn.commons.core"); //$NON-NLS-1$
+		}
+		String versionString = (String) bundle.getHeaders().get("Bundle-Version"); //$NON-NLS-1$
+		if (versionString != null) {
+			Version version = new Version(versionString);
+			environment.put("org.eclipse.mylyn.version", version.toString()); //$NON-NLS-1$
+			environment.put("org.eclipse.mylyn.version.major", version.getMajor()); //$NON-NLS-1$
+			environment.put("org.eclipse.mylyn.version.minor", version.getMinor()); //$NON-NLS-1$
+			environment.put("org.eclipse.mylyn.version.micro", version.getMicro()); //$NON-NLS-1$
+		}
+		
+		Set<String> earlyAccessRepositories = new HashSet<>();
+		ConnectorDiscovery connectorDiscovery = DiscoveryUtil.createConnectorDiscovery(DiscoveryActivator.getDefault().getJBossDiscoveryDirectory());
+		connectorDiscovery.setEnvironment(environment);
+		connectorDiscovery.setVerifyUpdateSiteAvailability(false);
+		try {
+			connectorDiscovery.performDiscovery(monitor);
+		} finally {
+			for (DiscoveryConnector connector : connectorDiscovery.getConnectors()) {
+				if (JBossDiscoveryUi.isEarlyAccess(connector)) {
+					earlyAccessRepositories.add(connector.getSiteUrl());
+				}
+			}
+		}
+		Set<String> res = new HashSet<>();
+		if (!earlyAccessRepositories.isEmpty()) {
+			ProvisioningSession session = new ProvisioningSession(agent);
+			List<URI> knownRepos = Arrays.asList(ProvisioningUI.getDefaultUI().getRepositoryTracker().getKnownRepositories(session));
+			for (String eaRepoUrl : earlyAccessRepositories) {
+				URI eaRepoURI = URI.create(eaRepoUrl);
+				if (knownRepos.contains(eaRepoURI)) {
+					res.add(eaRepoUrl);
+				}
+			}
+		}
+		return res;
+	}
 }

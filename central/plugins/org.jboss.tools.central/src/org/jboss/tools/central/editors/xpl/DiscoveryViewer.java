@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2014 Tasktop Technologies and others.
+ * Copyright (c) 2010, 2015 Tasktop Technologies and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -56,13 +56,11 @@ import org.eclipse.jface.viewers.ViewerFilter;
 import org.eclipse.mylyn.commons.ui.CommonImages;
 import org.eclipse.mylyn.commons.ui.GradientCanvas;
 import org.eclipse.mylyn.commons.ui.compatibility.CommonThemes;
-import org.eclipse.mylyn.internal.discovery.core.model.AbstractDiscoverySource;
 import org.eclipse.mylyn.internal.discovery.core.model.ConnectorDescriptor;
 import org.eclipse.mylyn.internal.discovery.core.model.ConnectorDiscovery;
 import org.eclipse.mylyn.internal.discovery.core.model.DiscoveryCategory;
 import org.eclipse.mylyn.internal.discovery.core.model.DiscoveryConnector;
 import org.eclipse.mylyn.internal.discovery.core.model.Icon;
-import org.eclipse.mylyn.internal.discovery.core.model.Overview;
 import org.eclipse.mylyn.internal.discovery.core.util.DiscoveryCategoryComparator;
 import org.eclipse.mylyn.internal.discovery.core.util.DiscoveryConnectorComparator;
 import org.eclipse.mylyn.internal.discovery.ui.DiscoveryImages;
@@ -80,6 +78,8 @@ import org.eclipse.swt.events.ControlAdapter;
 import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
+import org.eclipse.swt.events.FocusAdapter;
+import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.MouseAdapter;
@@ -96,7 +96,6 @@ import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.RGB;
-import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.graphics.Resource;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -104,14 +103,12 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Link;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.ToolItem;
-import org.eclipse.swt.widgets.Widget;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.dialogs.PreferencesUtil;
 import org.eclipse.ui.forms.IFormColors;
@@ -123,6 +120,7 @@ import org.jboss.tools.central.editors.xpl.filters.EarlyAccessFilter;
 import org.jboss.tools.central.editors.xpl.filters.EarlyAccessOrMostRecentVersionFilter;
 import org.jboss.tools.central.editors.xpl.filters.FiltersSelectionDialog;
 import org.jboss.tools.central.editors.xpl.filters.UserFilterEntry;
+import org.jboss.tools.discovery.core.internal.connectors.ConnectorDescriptorItemUi;
 import org.jboss.tools.discovery.core.internal.connectors.DiscoveryUtil;
 import org.jboss.tools.discovery.core.internal.connectors.JBossDiscoveryUi;
 import org.osgi.framework.Bundle;
@@ -234,38 +232,6 @@ public class DiscoveryViewer extends Viewer {
 	private void clearFilterText() {
 		filterTextWidget.setText(""); //$NON-NLS-1$
 		updateFilters();
-	}
-
-	static Image computeIconImage(AbstractDiscoverySource discoverySource, Icon icon, int dimension, boolean fallback) {
-		String imagePath;
-		switch (dimension) {
-		case 64:
-			imagePath = icon.getImage64();
-			if (imagePath != null || !fallback) {
-				break;
-			}
-		case 48:
-			imagePath = icon.getImage48();
-			if (imagePath != null || !fallback) {
-				break;
-			}
-		case 32:
-			imagePath = icon.getImage32();
-			break;
-		default:
-			throw new IllegalArgumentException();
-		}
-		if (imagePath != null && imagePath.length() > 0) {
-			URL resource = discoverySource.getResource(imagePath);
-			if (resource != null) {
-				ImageDescriptor descriptor = ImageDescriptor.createFromURL(resource);
-				Image image = descriptor.createImage();
-				if (image != null) {
-					return image;
-				}
-			}
-		}
-		return null;
 	}
 
 	private IStatus computeStatus(InvocationTargetException e, String message) {
@@ -714,11 +680,24 @@ public class DiscoveryViewer extends Viewer {
 				List<DiscoveryConnector> connectors = new ArrayList<DiscoveryConnector>(category.getConnectors());
 				Collections.sort(connectors, new DiscoveryConnectorComparator(category));
 				for (final DiscoveryConnector connector : connectors) {
-					ConnectorDescriptorItemUi itemUi = new ConnectorDescriptorItemUi(this, connector,
+					final ConnectorDescriptorItemUi itemUi = new ConnectorDescriptorItemUi(this, connector,
 							categoryChildrenContainer,
 							getBackgroundColor(connector, background),
 							h2Font,
-							infoImage);
+							infoImage,
+							SWT.CHECK);
+					itemUi.addSelectionListener(new SelectionAdapter() {
+						@Override
+						public void widgetSelected(SelectionEvent e) {
+							modifySelection(itemUi, itemUi.getSelection());
+						}
+					});
+					itemUi.addFocusListener(new FocusAdapter() {
+						@Override
+						public void focusGained(FocusEvent e) {
+							DiscoveryViewer.this.showConnectorControl(itemUi);
+						}
+					});
 					itemsUi.put(connector, itemUi);
 					itemUi.updateAvailability();
 					allConnectors.add(connector);
@@ -763,7 +742,7 @@ public class DiscoveryViewer extends Viewer {
 
 		Label iconLabel = new Label(categoryHeaderContainer, SWT.NULL);
 		if (category.getIcon() != null) {
-			Image image = computeIconImage(category.getSource(), category.getIcon(), 48, true);
+			Image image = JBossDiscoveryUi.computeIconImage(category.getSource(), category.getIcon(), 48, true);
 			if (image != null) {
 				iconLabel.setImage(image);
 				this.disposables.add(image);
@@ -784,7 +763,7 @@ public class DiscoveryViewer extends Viewer {
 			ToolItem infoButton = new ToolItem(toolBar, SWT.PUSH);
 			infoButton.setImage(infoImage);
 			infoButton.setToolTipText(Messages.ConnectorDiscoveryWizardMainPage_tooltip_showOverview);
-			hookTooltip(toolBar, infoButton, categoryHeaderContainer, nameLabel, category.getSource(),
+			JBossDiscoveryUi.hookTooltip(toolBar, infoButton, categoryHeaderContainer, nameLabel, category.getSource(),
 					category.getOverview(), null);
 			GridDataFactory.fillDefaults().align(SWT.END, SWT.CENTER).applyTo(toolBar);
 		} else {
@@ -892,8 +871,8 @@ public class DiscoveryViewer extends Viewer {
 		return environment;
 	}
 
-	public Set<ConnectorDescriptor> getInstallableConnectors() {
-		Set<ConnectorDescriptor> res = new HashSet<ConnectorDescriptor>();
+	public Set<DiscoveryConnector> getInstallableConnectors() {
+		Set<DiscoveryConnector> res = new HashSet<DiscoveryConnector>();
 		for (ConnectorDescriptorItemUi item : (List<ConnectorDescriptorItemUi>)getSelection().toList()) {
 			if (!item.getConnector().isInstalled()) {
 				res.add(item.getConnector());
@@ -902,8 +881,8 @@ public class DiscoveryViewer extends Viewer {
 		return res;
 	}
 	
-	public Set<ConnectorDescriptor> getInstalledConnectors() {
-		Set<ConnectorDescriptor> res = new HashSet<ConnectorDescriptor>();
+	public Set<DiscoveryConnector> getInstalledConnectors() {
+		Set<DiscoveryConnector> res = new HashSet<DiscoveryConnector>();
 		for (ConnectorDescriptorItemUi item : (List<ConnectorDescriptorItemUi>)getSelection().toList()) {
 			if (item.getConnector().isInstalled()) {
 				res.add(item.getConnector());
@@ -912,8 +891,8 @@ public class DiscoveryViewer extends Viewer {
 		return res;
 	}
 	
-	public Set<ConnectorDescriptor> getUpdatableConnectors() {
-		Set<ConnectorDescriptor> res = new HashSet<ConnectorDescriptor>();
+	public Set<DiscoveryConnector> getUpdatableConnectors() {
+		Set<DiscoveryConnector> res = new HashSet<DiscoveryConnector>();
 		for (ConnectorDescriptorItemUi item : (List<ConnectorDescriptorItemUi>)getSelection().toList()) {
 			if (item.getConnector().isInstalled() && !item.isUpToDate()) {
 				res.add(item.getConnector());
@@ -929,7 +908,7 @@ public class DiscoveryViewer extends Viewer {
 	public IStructuredSelection getSelection() {
 		List<ConnectorDescriptorItemUi> elements = new ArrayList<ConnectorDescriptorItemUi>();
 		for (ConnectorDescriptorItemUi item : getAllConnectorsItemsUi()) {
-			if (item.getConnector().isSelected() && item.isVisible()) {
+			if (item.getSelection() && item.isVisible()) {
 				elements.add(item);
 			}
 		}
@@ -943,73 +922,6 @@ public class DiscoveryViewer extends Viewer {
 	private boolean hasTooltip(final DiscoveryCategory category) {
 		return category.getOverview() != null && category.getOverview().getSummary() != null
 				&& category.getOverview().getSummary().length() > 0;
-	}
-
-	private static void hookRecursively(Control control, Listener listener) {
-		control.addListener(SWT.Dispose, listener);
-		control.addListener(SWT.MouseHover, listener);
-		control.addListener(SWT.MouseMove, listener);
-		control.addListener(SWT.MouseExit, listener);
-		control.addListener(SWT.MouseDown, listener);
-		control.addListener(SWT.MouseWheel, listener);
-		if (control instanceof Composite) {
-			for (Control child : ((Composite) control).getChildren()) {
-				hookRecursively(child, listener);
-			}
-		}
-	}
-
-	static void hookTooltip(final Control parent, final Widget tipActivator, final Control exitControl,
-			final Control titleControl, AbstractDiscoverySource source, Overview overview, Image image) {
-		final OverviewToolTip toolTip = new OverviewToolTip(parent, source, overview, image);
-		Listener listener = new Listener() {
-			public void handleEvent(Event event) {
-				switch (event.type) {
-				case SWT.MouseHover:
-					toolTip.show(titleControl);
-					break;
-				case SWT.Dispose:
-				case SWT.MouseWheel:
-					toolTip.hide();
-					break;
-				}
-
-			}
-		};
-		tipActivator.addListener(SWT.Dispose, listener);
-		tipActivator.addListener(SWT.MouseWheel, listener);
-		if (image != null) {
-			tipActivator.addListener(SWT.MouseHover, listener);
-		}
-		Listener selectionListener = new Listener() {
-			public void handleEvent(Event event) {
-				toolTip.show(titleControl);
-			}
-		};
-		tipActivator.addListener(SWT.Selection, selectionListener);
-		Listener exitListener = new Listener() {
-			public void handleEvent(Event event) {
-				switch (event.type) {
-				case SWT.MouseWheel:
-					toolTip.hide();
-					break;
-				case SWT.MouseExit:
-					/*
-					 * Check if the mouse exit happened because we move over the tooltip
-					 */
-					Rectangle containerBounds = exitControl.getBounds();
-					Point displayLocation = exitControl.getParent().toDisplay(containerBounds.x, containerBounds.y);
-					containerBounds.x = displayLocation.x;
-					containerBounds.y = displayLocation.y;
-					if (containerBounds.contains(Display.getCurrent().getCursorLocation())) {
-						break;
-					}
-					toolTip.hide();
-					break;
-				}
-			}
-		};
-		hookRecursively(exitControl, exitListener);
 	}
 
 	private void initializeColors() {
@@ -1332,7 +1244,7 @@ public class DiscoveryViewer extends Viewer {
 	public void setSelection(ISelection selection, boolean arg1) {
 		List<ConnectorDescriptorItemUi> selected = (List<ConnectorDescriptorItemUi>) ((IStructuredSelection)selection).toList();
 		for (ConnectorDescriptorItemUi item : this.getAllConnectorsItemsUi()) {
-			item.select(selected.contains(item));
+			item.setSelection(selected.contains(item));
 		}
 	}
 
