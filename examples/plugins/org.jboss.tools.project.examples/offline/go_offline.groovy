@@ -478,7 +478,7 @@ class GoOfflineScript {
 		  return
 	  }
 	  
-	  def slurper = new JsonSlurper(type: JsonParserType.INDEX_OVERLAY)//fast parser
+	  def slurper = new JsonSlurper()//fast parser: new JsonSlurper(type: JsonParserType.INDEX_OVERLAY)
 	  def json = slurper.parse(new URL(searchUrl))
 	  json.hits.hits.each {
 		  def qs = it.fields
