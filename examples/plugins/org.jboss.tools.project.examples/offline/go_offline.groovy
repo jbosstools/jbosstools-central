@@ -459,7 +459,7 @@ class GoOfflineScript {
   
     ant.exec(errorproperty: "cmdErr",
              resultproperty:"cmdExit",
-             failonerror: "true",
+             failonerror: "false",
              dir: directory,
              executable: "mvn") {
                 arg(value:"io.takari:maven:wrapper")
