@@ -322,8 +322,11 @@ class GoOfflineScript {
       profiles = profiles.replace(",minify","")
     }
 
-    addMavenWrapper(directory, localRepo)
-
+    def result = addMavenWrapper(directory, localRepo)
+	if (result != "0") {
+	  return
+	}
+	
      //"arq-jbossas-remote" can't be combined with other arquillian profiles, it would bork dependency resolution
      //so we execute 2 builds. with and without arq-jbossas-remote
      if (profiles.contains("arq-jbossas-remote")) {
