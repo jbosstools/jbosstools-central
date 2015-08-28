@@ -227,7 +227,7 @@ public class OfflineSupportPreferencePage extends PreferencePage implements
 				
 		Link groovylink = new Link(goOfflineGroup, SWT.WRAP);
 		GridDataFactory.fillDefaults().span(2, 1).applyTo(groovylink);
-		groovylink.setText(" - <a>Groovy 2.1.x</a> must be set in your path");
+		groovylink.setText(" - <a>Groovy 2.4.x</a> must be set in your path");
 		groovylink.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
