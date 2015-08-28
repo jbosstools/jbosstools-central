@@ -223,7 +223,7 @@ public class OfflineSupportPreferencePage extends PreferencePage implements
 		
 		Label mvnReq = new Label(goOfflineGroup, SWT.WRAP);
 		GridDataFactory.fillDefaults().span(2, 1).applyTo(mvnReq);
-		mvnReq.setText(" - The version of Maven on your path must be the same embedded in Eclipse");
+		mvnReq.setText(" - The version of Maven on your path must be the same as the one embedded in Eclipse");
 				
 		Link groovylink = new Link(goOfflineGroup, SWT.WRAP);
 		GridDataFactory.fillDefaults().span(2, 1).applyTo(groovylink);

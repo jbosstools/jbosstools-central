@@ -80,7 +80,7 @@ class GoOfflineScript {
       return
     }
     println "Quiet mode : "+script.quiet
-    script.goOffline()
+	script.goOffline()
   }
 
   def goOffline (args) {
@@ -116,26 +116,32 @@ class GoOfflineScript {
 
     def mavenRepoDir = new File(offlineDir, ".m2/repository")
 
-	downloadQuickstartsFromDCP(searchUrl, downloadDir, workDir)
+	try {
+		downloadQuickstartsFromDCP(searchUrl, downloadDir, workDir)
+		
+		descriptors.each { descriptorUrl ->
+		  def archetypeProjects = downloadExamples(descriptorUrl, downloadDir, workDir)
+		  if (archetypeProjects) allArchetypeProjects.addAll archetypeProjects
+		}
+		buildExamplesDir(workDir, mavenRepoDir)
 	
-    descriptors.each { descriptorUrl ->
-      def archetypeProjects = downloadExamples(descriptorUrl, downloadDir, workDir)
-      if (archetypeProjects) allArchetypeProjects.addAll archetypeProjects
-    }
-    buildExamplesDir(workDir, mavenRepoDir)
-
-    buildArchetypesFromExamples(allArchetypeProjects, workDir, mavenRepoDir)
-
-	buildArchetypesFromStacks(workDir, mavenRepoDir)
+		buildArchetypesFromExamples(allArchetypeProjects, workDir, mavenRepoDir)
 	
-    println 'Cleaning up installed artifacts created from archetypes'
-    if (mavenRepoDir) {
-      def installedArtifactfolder = new File(mavenRepoDir, "org/jbosstoolsofflineexamples")
-      if (installedArtifactfolder.exists() && installedArtifactfolder.isDirectory()) {
-        installedArtifactfolder.deleteDir()
-      }
-    }
-
+		buildArchetypesFromStacks(workDir, mavenRepoDir)
+		
+		println 'Cleaning up installed artifacts created from archetypes'
+		if (mavenRepoDir) {
+		  def installedArtifactfolder = new File(mavenRepoDir, "org/jbosstoolsofflineexamples")
+		  if (installedArtifactfolder.exists() && installedArtifactfolder.isDirectory()) {
+			installedArtifactfolder.deleteDir()
+		  }
+		}
+	
+	} catch (Throwable t) {
+	    t.printStackTrace()
+		buildErrors["Error running the script"] = t.message
+	}
+	
     long elapsed = System.currentTimeMillis() -start
 
     def duration = String.format("%d min, %d sec",
