@@ -17,6 +17,7 @@ import org.apache.commons.io.FileUtils
 import static groovyx.gpars.GParsPool.*
 import static groovy.io.FileType.*
 import com.beust.jcommander.*
+import groovy.json.*
 import org.jboss.jdf.stacks.client.*
 import org.jboss.jdf.stacks.model.*
 import java.util.concurrent.TimeUnit
@@ -37,15 +38,6 @@ class GoOfflineScript {
   @Parameter(names =["-od", "--offline-dir"], description = "Base offline directory")
   File offlineDir = new File("offline")
 
-  /*@Parameter(names =["-i", "--interactive"], description = "Interactive mode")
-  boolean interactive = false
-
-  @Parameter(names =["-fcd", "--final-cache-dir"], description = "Final cache directory used by JBoss Tools/JBDS")
-  File finalCacheDir = new File(System.getProperty("user.home"), ".jbosstools/cache")
-
-  @Parameter(names =["-lmr", "--local-maven-repo"], description = "Local Maven repository")
-  File localMavenRepoDir = new File(System.getProperty("user.home"), ".m2/repository")
-  */
   @Parameter(names = ["-h", "--help"], description = "This help", help = true)
   boolean help;
 
@@ -55,6 +47,8 @@ class GoOfflineScript {
   @Parameter(names =["-m", "--maven"], description = "Maven version to use")
   String mavenVersion = "3.3.3"
 
+  @Parameter(names =["-u", "--url"], description = "Quickstarts Search URL")
+  String searchUrl
 
   boolean forceMavenResourcePluginResolution = true //on some OS/maven combos, m-r-p:2.5 is not resolved. It should.
 
@@ -122,8 +116,8 @@ class GoOfflineScript {
 
     def mavenRepoDir = new File(offlineDir, ".m2/repository")
 
-    buildArchetypesFromStacks(workDir, mavenRepoDir)
-
+	downloadQuickstartsFromDCP(searchUrl, downloadDir, workDir)
+	
     descriptors.each { descriptorUrl ->
       def archetypeProjects = downloadExamples(descriptorUrl, downloadDir, workDir)
       if (archetypeProjects) allArchetypeProjects.addAll archetypeProjects
@@ -132,6 +126,8 @@ class GoOfflineScript {
 
     buildArchetypesFromExamples(allArchetypeProjects, workDir, mavenRepoDir)
 
+	buildArchetypesFromStacks(workDir, mavenRepoDir)
+	
     println 'Cleaning up installed artifacts created from archetypes'
     if (mavenRepoDir) {
       def installedArtifactfolder = new File(mavenRepoDir, "org/jbosstoolsofflineexamples")
@@ -167,10 +163,7 @@ class GoOfflineScript {
     }
     //download descriptor
     println "parsing $descriptorUrl"
-    def descrUrl = new URL(descriptorUrl)
-    def localDescriptor = new File(downloadArea, descrUrl.getFile())
-    //Descriptors are cheap to download/update
-    FileUtils.copyURLToFile(descrUrl, localDescriptor)
+    def localDescriptor = download(downloadArea, descriptorUrl)
 
     def root = new XmlSlurper(false,false).parse(localDescriptor)
 
@@ -194,15 +187,7 @@ class GoOfflineScript {
              return archetypeProjects
         }
 
-        URL url = new URL(sUrl)
-        def zip = new File(downloadArea, url.getFile())
-        //println "Starting download of $url"
-        if (!zip.exists()) {
-          FileUtils.copyURLToFile(url, zip)
-          def totalSize = FileUtils.byteCountToDisplaySize(zip.size())
-
-          println "Downloaded $url ($totalSize) to $zip"
-        }
+        def zip = download(downloadArea, sUrl)
 
         if ("maven" == p.importType.text()) {
           def ant = new AntBuilder()   // create an antbuilder
@@ -488,7 +473,46 @@ class GoOfflineScript {
     ant.project.properties.cmdExit
   }
 
+  def downloadQuickstartsFromDCP(searchUrl, downloadArea, workDir) {
+	  if (!searchUrl) {
+		  return
+	  }
+	  
+	  def slurper = new JsonSlurper(type: JsonParserType.INDEX_OVERLAY)//fast parser
+	  def json = slurper.parse(new URL(searchUrl))
+	  json.hits.hits.each {
+		  def qs = it.fields
+		  def id = it._id
+		  def dir = qs.quickstart_id  
+		  def quikstartRepoZip = download(downloadArea, qs.git_download)
+		  extractFromQuickstartRepo(new File(workDir, id+".zip"), quikstartRepoZip, dir)
+	   }
+	  
+  }
 
+  
+  private download(downloadArea, sUrl) {
+	URL url = new URL(sUrl)
+	def file = new File(downloadArea, url.getFile())
+	if (!file.exists()) {
+	  FileUtils.copyURLToFile(url, file)
+	  def totalSize = FileUtils.byteCountToDisplaySize(file.size())
+	  println "Downloaded $url ($totalSize) to $file"
+	}
+	file
+  }
+  
+  private void extractFromQuickstartRepo(workDir, zip, folder) {
+	  println "Extracting ${folder} from ${zip} into ${workDir}"
+	  def ant = new AntBuilder()   // create an antbuilder
+	  ant.unzip(  src: zip, dest: workDir,  overwrite:"false") {
+		  cutdirsmapper (dirs:2)//zip contains extra/unneeded parent folders
+		  patternset() {
+			include(name:"*/"+folder+"/**")
+		  }
+	  }
+  }
+  
 }
 
 

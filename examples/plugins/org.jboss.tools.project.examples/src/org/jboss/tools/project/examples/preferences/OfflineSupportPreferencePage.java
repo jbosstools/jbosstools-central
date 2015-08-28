@@ -55,6 +55,7 @@ import org.eclipse.ui.browser.IWebBrowser;
 import org.eclipse.ui.browser.IWorkbenchBrowserSupport;
 import org.eclipse.ui.internal.browser.WebBrowserPreference;
 import org.eclipse.ui.internal.browser.WorkbenchBrowserSupport;
+import org.jboss.tools.foundation.core.properties.PropertiesHelper;
 import org.jboss.tools.project.examples.internal.Messages;
 import org.jboss.tools.project.examples.internal.ProjectExamplesActivator;
 import org.jboss.tools.project.examples.internal.offline.ExtractScriptJob;
@@ -258,6 +259,7 @@ public class OfflineSupportPreferencePage extends PreferencePage implements
 		                        .append(StringUtils.join(categories, " ")) //$NON-NLS-1$
 		                        .append(" ") //$NON-NLS-1$
 		                        .append(StringUtils.join(descriptors, " "))//$NON-NLS-1$
+		                        .append(" -u \"").append(PropertiesHelper.getPropertiesProvider().getValue("quickstarts.search.query")).append("\"")
 		                        .append(" -q -e"); //$NON-NLS-1$
 		 
 		text.setText(command.toString());
@@ -266,8 +268,8 @@ public class OfflineSupportPreferencePage extends PreferencePage implements
 
 	    Button copy = new Button(goOfflineGroup, SWT.PUSH);
 	    GridDataFactory.fillDefaults().align(SWT.LEFT, SWT.TOP).applyTo(copy);
-		
-	    copy.setText("Copy to clipboard"); //$NON-NLS-1$
+	    copy.setImage(ProjectExamplesActivator.getDefault().getImage("icons/copy-to-clipboard.gif"));
+	    copy.setToolTipText("Copy to clipboard"); //$NON-NLS-1$
 	    copy.addSelectionListener(new SelectionAdapter() {
       @Override
         public void widgetSelected(SelectionEvent e) {
