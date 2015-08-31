@@ -17,7 +17,6 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.equinox.internal.p2.ui.ProvUIMessages;
-import org.eclipse.equinox.internal.p2.ui.actions.UninstallAction;
 import org.eclipse.equinox.internal.p2.ui.dialogs.ILayoutConstants;
 import org.eclipse.equinox.internal.p2.ui.viewers.IUColumnConfig;
 import org.eclipse.equinox.internal.p2.ui.viewers.IUDetailsLabelProvider;
@@ -26,23 +25,23 @@ import org.eclipse.equinox.p2.core.ProvisionException;
 import org.eclipse.equinox.p2.metadata.IInstallableUnit;
 import org.eclipse.equinox.p2.repository.artifact.IArtifactRepositoryManager;
 import org.eclipse.equinox.p2.repository.metadata.IMetadataRepositoryManager;
-import org.eclipse.equinox.p2.ui.ProvisioningUI;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.ITreeContentProvider;
-import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.Viewer;
-import org.eclipse.jface.window.Window;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeColumn;
+import org.eclipse.ui.ISharedImages;
+import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.about.InstallationPage;
 import org.eclipse.ui.dialogs.FilteredTree;
 import org.eclipse.ui.dialogs.PatternFilter;
@@ -97,17 +96,6 @@ public class CentralInstallationPage extends InstallationPage {
 
 	@Override
 	public void createControl(Composite parent) {
-		final Button enableEarlyAccessButton = new Button(parent, SWT.CHECK);
-		enableEarlyAccessButton.setText(Messages.DiscoveryViewer_Enable_EarlyAccess);
-		enableEarlyAccessButton.setToolTipText(Messages.EarlyAccess_Description);
-		enableEarlyAccessButton.setSelection(JBossCentralActivator.getDefault().getPreferences().getBoolean(PreferenceKeys.ENABLE_EARLY_ACCESS, PreferenceKeys.ENABLE_EARLY_ACCESS_DEFAULT_VALUE));
-		enableEarlyAccessButton.addSelectionListener(new SelectionAdapter() {
-	    	@Override
-	    	public void widgetSelected(SelectionEvent e) {
-	    		handleEarlyAccessChanged(enableEarlyAccessButton);
-	    	}
-	    });
-		
 		installChecker = null;
 		try {
 			installChecker = InstallationChecker.getInstance();
@@ -119,11 +107,18 @@ public class CentralInstallationPage extends InstallationPage {
 		}
 
 		{
-			Label earlyAccessLabel = new Label(parent, SWT.WRAP);
-			earlyAccessLabel.setText(Messages.EarlyAccess_Description);
+			Composite header = new Composite(parent, SWT.NONE);
 			GridData layoutData = new GridData(SWT.FILL, SWT.FILL, false, false);
 			layoutData.widthHint = 700;
-			earlyAccessLabel.setLayoutData(layoutData);
+			header.setLayoutData(layoutData);
+			GridLayout headerLayout = new GridLayout(2, false);
+			header.setLayout(headerLayout);
+			Label warningIcon = new Label(header, SWT.NONE);
+			warningIcon.setImage(parent.getDisplay().getSystemImage(SWT.ICON_WARNING));
+			Label earlyAccessLabel = new Label(header, SWT.WRAP);
+			earlyAccessLabel.setText(Messages.EarlyAccess_Description);
+			earlyAccessLabel.setLayoutData(new GridData(SWT.FILL, SWT.DEFAULT, true, false));
+			
 			
 			iusViewer = new FilteredTree(parent, SWT.MULTI | SWT.FULL_SELECTION | SWT.H_SCROLL | SWT.V_SCROLL | SWT.BORDER, new PatternFilter(), false);
 			IUColumnConfig[] columnsConfig = new IUColumnConfig[] {new IUColumnConfig(ProvUIMessages.ProvUI_NameColumnTitle, IUColumnConfig.COLUMN_NAME, ILayoutConstants.DEFAULT_PRIMARY_COLUMN_WIDTH), new IUColumnConfig(ProvUIMessages.ProvUI_VersionColumnTitle, IUColumnConfig.COLUMN_VERSION, ILayoutConstants.DEFAULT_SMALL_COLUMN_WIDTH), new IUColumnConfig(ProvUIMessages.ProvUI_IdColumnTitle, IUColumnConfig.COLUMN_ID, ILayoutConstants.DEFAULT_COLUMN_WIDTH), new IUColumnConfig(ProvUIMessages.ProvUI_ProviderColumnTitle, IUColumnConfig.COLUMN_PROVIDER, ILayoutConstants.DEFAULT_COLUMN_WIDTH)};
@@ -155,55 +150,42 @@ public class CentralInstallationPage extends InstallationPage {
 			sitesViewer.getViewer().setInput(this.earlyAccessSites);
 		}
 		
+		final Button disableEarlyAccessButton = new Button(parent, SWT.PUSH);
+		disableEarlyAccessButton.setText(Messages.disableEarlyAccess_title);
+		disableEarlyAccessButton.setImage(PlatformUI.getWorkbench().getSharedImages().getImage(ISharedImages.IMG_TOOL_DELETE));
+		disableEarlyAccessButton.setToolTipText(Messages.disableEarlyAccess_description);
+		disableEarlyAccessButton.addSelectionListener(new SelectionAdapter() {
+	    	@Override
+	    	public void widgetSelected(SelectionEvent e) {
+	    		disableEarlyAccess(disableEarlyAccessButton);
+	    	}
+	    });
+		disableEarlyAccessButton.setEnabled(JBossCentralActivator.getDefault().getPreferences().getBoolean(PreferenceKeys.ENABLE_EARLY_ACCESS, false));
+		
 	}
 	
-	/**
-	 * @param checkbox
-	 */
-	private void handleEarlyAccessChanged(final Button checkbox) {
-		if (checkbox.getSelection()) {
-			if (MessageDialog.openConfirm(checkbox.getShell(), Messages.SoftwarePage_earlyAccessSection_Title, Messages.SoftwarePage_earlyAccessSection_message)) {
-				JBossCentralActivator.getDefault().getPreferences().putBoolean(PreferenceKeys.ENABLE_EARLY_ACCESS, true);
-			} else {
-				checkbox.setSelection(false);
-			}
-		} else {
-			ProgressMonitorDialog progressMonitorDialog = new ProgressMonitorDialog(checkbox.getShell());
-			// remaining early-access connectors
-			if (MessageDialog.openConfirm(checkbox.getShell(), Messages.disableEarlyAccess_title, Messages.disableEarlyAccess_description)) {
-				// remove early-access sites
-				IProvisioningAgent agent = (IProvisioningAgent)JBossCentralActivator.getDefault().getService(IProvisioningAgent.SERVICE_NAME);
-				final IMetadataRepositoryManager metadataRepositoryManager = (IMetadataRepositoryManager)agent.getService(IMetadataRepositoryManager.SERVICE_NAME);
-				IArtifactRepositoryManager artifactsitoryManager = (IArtifactRepositoryManager)agent.getService(IArtifactRepositoryManager.SERVICE_NAME);
-				for (String site : this.earlyAccessSites) {
-					try {
-						URI repoUri = new URI(site);
-						metadataRepositoryManager.removeRepository(repoUri);
-						artifactsitoryManager.removeRepository(repoUri);
-					} catch (Exception ex) {
-						JBossCentralActivator.getDefault().getLog().log(new Status(IStatus.ERROR,
-							JBossCentralActivator.PLUGIN_ID,
-							ex.getMessage(),
-							ex));
-					}
+	private void disableEarlyAccess(final Button disableEarlyAccessButton) {
+		// remaining early-access connectors
+		if (MessageDialog.openConfirm(disableEarlyAccessButton.getShell(), Messages.disableEarlyAccess_title, Messages.disableEarlyAccess_description)) {
+			// remove early-access sites
+			ProgressMonitorDialog progressMonitorDialog = new ProgressMonitorDialog(disableEarlyAccessButton.getShell());
+			IProvisioningAgent agent = (IProvisioningAgent)JBossCentralActivator.getDefault().getService(IProvisioningAgent.SERVICE_NAME);
+			final IMetadataRepositoryManager metadataRepositoryManager = (IMetadataRepositoryManager)agent.getService(IMetadataRepositoryManager.SERVICE_NAME);
+			IArtifactRepositoryManager artifactsitoryManager = (IArtifactRepositoryManager)agent.getService(IArtifactRepositoryManager.SERVICE_NAME);
+			for (String site : this.earlyAccessSites) {
+				try {
+					URI repoUri = new URI(site);
+					metadataRepositoryManager.removeRepository(repoUri);
+					artifactsitoryManager.removeRepository(repoUri);
+				} catch (Exception ex) {
+					JBossCentralActivator.getDefault().getLog().log(new Status(IStatus.ERROR,
+						JBossCentralActivator.PLUGIN_ID,
+						ex.getMessage(),
+						ex));
 				}
-				
-				// TODO wrap this in some Progress Monitor
-//					iusViewer.getViewer().setSelection(new StructuredSelection(this.earlyAccessUnits.toArray()));
-//					UninstallAction uninstallAction = new UninstallAction(ProvisioningUI.getDefaultUI(), this.iusViewer.getViewer(), ProvisioningUI.getDefaultUI().getProfileId()) {
-//						@Override
-//						public void run() {
-//							super.run();
-//							if (getReturnCode() == Window.OK)
-//								getPageContainer().closeModalContainers();
-//						}
-//					};
-//					uninstallAction.run();
-				JBossCentralActivator.getDefault().getPreferences().putBoolean(PreferenceKeys.ENABLE_EARLY_ACCESS, false);
-			} else {
-				checkbox.setSelection(true);
 			}
+			JBossCentralActivator.getDefault().getPreferences().putBoolean(PreferenceKeys.ENABLE_EARLY_ACCESS, false);
+			disableEarlyAccessButton.setEnabled(false);
 		}
 	}
-
 }

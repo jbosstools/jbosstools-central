@@ -32,9 +32,11 @@ import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
+import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.operation.IRunnableContext;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.operation.ModalContext;
+import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.mylyn.commons.core.DelegatingProgressMonitor;
@@ -58,6 +60,8 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Link;
 import org.eclipse.swt.widgets.Shell;
+import org.eclipse.ui.ISharedImages;
+import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.forms.IManagedForm;
 import org.eclipse.ui.forms.editor.FormEditor;
 import org.eclipse.ui.forms.widgets.ExpandableComposite;
@@ -65,6 +69,7 @@ import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.ScrolledForm;
 import org.eclipse.ui.forms.widgets.Section;
 import org.eclipse.ui.handlers.IHandlerService;
+import org.eclipse.ui.ide.IDE.SharedImages;
 import org.eclipse.ui.internal.about.InstallationDialog;
 import org.eclipse.ui.menus.CommandContributionItem;
 import org.eclipse.ui.part.PageBook;
@@ -236,14 +241,14 @@ public class SoftwarePage extends AbstractJBossCentralPage implements IRunnableC
 		});
 	    
 	    Composite installationButtonsComposite = toolkit.createComposite(featureComposite);
-	    installationButtonsComposite.setLayout(new RowLayout(SWT.HORIZONTAL));
+	    installationButtonsComposite.setLayout(new GridLayout(3, false));
 	    installButton = toolkit.createButton(installationButtonsComposite, NLS.bind(Messages.installWithCount, "0"), SWT.PUSH);
 	    installButton.setEnabled(false);
 	    installButton.setImage(JBossCentralActivator.getDefault().getImage(ICON_INSTALL));
 	    this.installButton.setText(NLS.bind(Messages.installWithCount, 99));
 	    // Allow until 99 connectors since at this point, we can't already know how many connectors are actually there
 	    int installWidthHint = this.installButton.computeSize(SWT.DEFAULT, SWT.DEFAULT).x;
-	    this.installButton.setLayoutData(new RowData(installWidthHint, SWT.DEFAULT));
+	    GridDataFactory.swtDefaults().hint(installWidthHint, SWT.DEFAULT).applyTo(this.installButton);
 	    this.installButton.setText(NLS.bind(Messages.installWithCount, 0));
 	    installButton.addSelectionListener(new SelectionAdapter() {
 			
@@ -257,8 +262,9 @@ public class SoftwarePage extends AbstractJBossCentralPage implements IRunnableC
 	    this.uninstallButton = toolkit.createButton(installationButtonsComposite, NLS.bind(Messages.uninstallWithCount, "0"), SWT.PUSH);
 	    this.uninstallButton.setEnabled(false);
 	    this.uninstallButton.setText(NLS.bind(Messages.uninstallWithCount, 99)); // Allow until 99 connectors
+	    this.uninstallButton.setImage(PlatformUI.getWorkbench().getSharedImages().getImage(ISharedImages.IMG_TOOL_DELETE));
 	    int uninstallWidthHint = this.uninstallButton.computeSize(SWT.DEFAULT, SWT.DEFAULT).x;
-	    this.uninstallButton.setLayoutData(new RowData(uninstallWidthHint, SWT.DEFAULT));
+	    GridDataFactory.swtDefaults().hint(uninstallWidthHint, SWT.DEFAULT).applyTo(this.uninstallButton);
 	    this.uninstallButton.setText(NLS.bind(Messages.uninstallWithCount, 0));
 	    this.discoveryViewer.addSelectionChangedListener(new ISelectionChangedListener() {
 			@Override
