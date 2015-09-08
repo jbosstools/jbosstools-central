@@ -178,6 +178,10 @@ public class ConnectorDescriptorItemUi implements PropertyChangeListener, Runnab
 				ConnectorDescriptorItemUi.this.discoveryViewer.showConnectorControl(ConnectorDescriptorItemUi.this);
 			}
 		});
+		if (connector.getCertificationId() != null && connector.getCertificationId().toLowerCase().contains("notavailable")) {
+			checkbox.setVisible(false);
+			checkbox.setEnabled(false);
+		}
 
 		GridDataFactory.swtDefaults().align(SWT.CENTER, SWT.CENTER)
 				.applyTo(checkbox);
