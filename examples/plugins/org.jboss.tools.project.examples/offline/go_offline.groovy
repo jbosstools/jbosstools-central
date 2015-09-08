@@ -321,7 +321,15 @@ class GoOfflineScript {
     else if (name.contains("kitchensink-backbone")) {
       profiles = profiles.replace(",minify","")
     }
+	
+	//brms/bpm have weird profiles
+	if (name.contains("brms") || name.contains("bpm")) {
+		profiles = profiles.replace("brms","").replace("bpms","").replace("enable-test", "")
+	}
 
+	//some datagrid examples profiles can't be run OOTB
+	profiles = profiles.replace("uitests-clustered","").replace("custom-classpath","").replace("release","");
+	
     def result = addMavenWrapper(directory, localRepo)
 	if (result != "0") {
 	  return
@@ -357,8 +365,13 @@ class GoOfflineScript {
       //this example has non-skippable ITs, and they fail because jetty is not properly configured!!!
       //So we don't go the whole 9 yards
       ultimateGoal = "package"
+    } else if (pomModel.artifactId.text() == "jboss-remote-query-quickstart") {
+	  //this example relies on the protoc tool to be installed in order to compile
+	  //So we don't go the whole 9 yards
+	  ultimateGoal = "validate"
     }
-
+	
+	
     ant.exec(errorproperty: "cmdErr",
              resultproperty:"cmdExit",
              failonerror: "false",
