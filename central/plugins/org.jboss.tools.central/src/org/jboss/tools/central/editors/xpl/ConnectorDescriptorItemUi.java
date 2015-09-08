@@ -233,6 +233,10 @@ public class ConnectorDescriptorItemUi implements PropertyChangeListener, Runnab
 				}
 			}
 		});
+		if (connector.getCertificationId() != null && connector.getCertificationId().toLowerCase().contains("notavailable")) {
+			checkbox.setVisible(false);
+			checkbox.setEnabled(false);
+		}
 
 		GridDataFactory.swtDefaults().align(SWT.CENTER, SWT.CENTER).applyTo(selectionButton);
 
