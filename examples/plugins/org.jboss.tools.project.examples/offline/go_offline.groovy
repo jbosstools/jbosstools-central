@@ -14,6 +14,7 @@
 @Grab('org.apache.httpcomponents:httpcore:4.0.1')
 
 import org.apache.commons.io.FileUtils
+import org.apache.commons.io.FilenameUtils
 import static groovyx.gpars.GParsPool.*
 import static groovy.io.FileType.*
 import com.beust.jcommander.*
@@ -116,14 +117,16 @@ class GoOfflineScript {
 
     def mavenRepoDir = new File(offlineDir, ".m2/repository")
 
+	def unzippedExamples = [] as java.util.concurrent.CopyOnWriteArrayList
+	
 	try {
-		downloadQuickstartsFromDCP(searchUrl, downloadDir, workDir)
+		downloadQuickstartsFromDCP(searchUrl, downloadDir, workDir, unzippedExamples)
 		
 		descriptors.each { descriptorUrl ->
-		  def archetypeProjects = downloadExamples(descriptorUrl, downloadDir, workDir)
+		  def archetypeProjects = downloadExamplesFromDescriptor(descriptorUrl, downloadDir, workDir, unzippedExamples)
 		  if (archetypeProjects) allArchetypeProjects.addAll archetypeProjects
 		}
-		buildExamplesDir(workDir, mavenRepoDir)
+		buildUnzippedExamples(unzippedExamples, mavenRepoDir)
 	
 		buildArchetypesFromExamples(allArchetypeProjects, workDir, mavenRepoDir)
 	
@@ -163,7 +166,7 @@ class GoOfflineScript {
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-  def downloadExamples(descriptorUrl, downloadArea, workDir) {
+  def downloadExamplesFromDescriptor(descriptorUrl, downloadArea, workDir, unzippedExamples) {
     if (!descriptorUrl) {
      return
     }
@@ -197,7 +200,9 @@ class GoOfflineScript {
 
         if ("maven" == p.importType.text()) {
           def ant = new AntBuilder()   // create an antbuilder
-          ant.unzip(  src: zip, dest: new File(workDir, zip.getName()),  overwrite:"false")
+		  def unzipped = new File(workDir, zip.getName())
+          ant.unzip(  src: zip, dest: unzipped,  overwrite:"false")
+		  unzippedExamples << unzipped
         }
       }
     }
@@ -205,8 +210,8 @@ class GoOfflineScript {
     archetypeProjects
   }
 
-  def buildExamplesDir(workDir, localRepo) {
-    workDir.eachFileMatch DIRECTORIES, ~/.*\.zip/, { unzipped ->
+  def buildUnzippedExamples(unzippedExamples, localRepo) {
+    unzippedExamples.each { unzipped ->
          execMavenGoOffline(unzipped, localRepo)
     }
   }
@@ -495,7 +500,7 @@ class GoOfflineScript {
     ant.project.properties.cmdExit
   }
 
-  def downloadQuickstartsFromDCP(searchUrl, downloadArea, workDir) {
+  def downloadQuickstartsFromDCP(searchUrl, downloadArea, workDir, unzippedExamples) {
 	  if (!searchUrl) {
 		  return
 	  }
@@ -505,9 +510,16 @@ class GoOfflineScript {
 	  json.hits.hits.each {
 		  def qs = it.fields
 		  def id = it._id
-		  def dir = qs.quickstart_id  
+		  def exampleDir = qs.quickstart_id  
 		  def quikstartRepoZip = download(downloadArea, qs.git_download)
-		  extractFromQuickstartRepo(new File(workDir, id+".zip"), quikstartRepoZip, dir)
+		  def unzipDir = new File(workDir, quikstartRepoZip.name)
+		  if (!unzipDir.exists()) {
+			  extractQuickstartRepo(unzipDir, quikstartRepoZip)
+		  }
+		  def unzipped = new File(unzipDir, exampleDir)
+		  if (unzipped.exists()) {
+			  unzippedExamples << unzipped
+		  }
 	   }
 	  
   }
@@ -524,14 +536,12 @@ class GoOfflineScript {
 	file
   }
   
-  private void extractFromQuickstartRepo(workDir, zip, folder) {
-	  println "Extracting ${folder} from ${zip} into ${workDir}"
+  private void extractQuickstartRepo(unzipDir, zip) {
+	  println "Extracting ${zip} into ${unzipDir}"
+	  unzipDir.mkdirs()
 	  def ant = new AntBuilder()   // create an antbuilder
-	  ant.unzip(  src: zip, dest: workDir,  overwrite:"false") {
-		  cutdirsmapper (dirs:2)//zip contains extra/unneeded parent folders
-		  patternset() {
-			include(name:"*/"+folder+"/**")
-		  }
+	  ant.unzip(  src: zip, dest: unzipDir,  overwrite:"false") {
+		  cutdirsmapper (dirs:1)//zip contains extra/unneeded parent folders
 	  }
   }
   
