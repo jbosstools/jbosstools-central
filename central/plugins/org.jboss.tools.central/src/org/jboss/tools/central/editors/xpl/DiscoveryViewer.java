@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2015 Tasktop Technologies and others.
+ * Copyright (c) 2010, 2014 Tasktop Technologies and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -713,18 +713,11 @@ public class DiscoveryViewer extends Viewer {
 				List<DiscoveryConnector> connectors = new ArrayList<DiscoveryConnector>(category.getConnectors());
 				Collections.sort(connectors, new DiscoveryConnectorComparator(category));
 				for (final DiscoveryConnector connector : connectors) {
-					final ConnectorDescriptorItemUi itemUi = new ConnectorDescriptorItemUi(this, connector,
+					ConnectorDescriptorItemUi itemUi = new ConnectorDescriptorItemUi(this, connector,
 							categoryChildrenContainer,
 							getBackgroundColor(connector, background),
 							h2Font,
-							infoImage,
-							SWT.CHECK);
-					itemUi.addSelectionListener(new SelectionAdapter() {
-						@Override
-						public void widgetSelected(SelectionEvent e) {
-							modifySelection(itemUi, itemUi.getSelection());
-						}
-					});
+							infoImage);
 					itemsUi.put(connector, itemUi);
 					itemUi.updateAvailability();
 					allConnectors.add(connector);
@@ -898,8 +891,8 @@ public class DiscoveryViewer extends Viewer {
 		return environment;
 	}
 
-	public Set<DiscoveryConnector> getInstallableConnectors() {
-		Set<DiscoveryConnector> res = new HashSet<DiscoveryConnector>();
+	public Set<ConnectorDescriptor> getInstallableConnectors() {
+		Set<ConnectorDescriptor> res = new HashSet<ConnectorDescriptor>();
 		for (ConnectorDescriptorItemUi item : (List<ConnectorDescriptorItemUi>)getSelection().toList()) {
 			if (!item.getConnector().isInstalled()) {
 				res.add(item.getConnector());
@@ -908,8 +901,8 @@ public class DiscoveryViewer extends Viewer {
 		return res;
 	}
 	
-	public Set<DiscoveryConnector> getInstalledConnectors() {
-		Set<DiscoveryConnector> res = new HashSet<DiscoveryConnector>();
+	public Set<ConnectorDescriptor> getInstalledConnectors() {
+		Set<ConnectorDescriptor> res = new HashSet<ConnectorDescriptor>();
 		for (ConnectorDescriptorItemUi item : (List<ConnectorDescriptorItemUi>)getSelection().toList()) {
 			if (item.getConnector().isInstalled()) {
 				res.add(item.getConnector());
@@ -918,8 +911,8 @@ public class DiscoveryViewer extends Viewer {
 		return res;
 	}
 	
-	public Set<DiscoveryConnector> getUpdatableConnectors() {
-		Set<DiscoveryConnector> res = new HashSet<DiscoveryConnector>();
+	public Set<ConnectorDescriptor> getUpdatableConnectors() {
+		Set<ConnectorDescriptor> res = new HashSet<ConnectorDescriptor>();
 		for (ConnectorDescriptorItemUi item : (List<ConnectorDescriptorItemUi>)getSelection().toList()) {
 			if (item.getConnector().isInstalled() && !item.isUpToDate()) {
 				res.add(item.getConnector());
@@ -935,7 +928,7 @@ public class DiscoveryViewer extends Viewer {
 	public IStructuredSelection getSelection() {
 		List<ConnectorDescriptorItemUi> elements = new ArrayList<ConnectorDescriptorItemUi>();
 		for (ConnectorDescriptorItemUi item : getAllConnectorsItemsUi()) {
-			if (item.getSelection() && item.isVisible()) {
+			if (item.getConnector().isSelected() && item.isVisible()) {
 				elements.add(item);
 			}
 		}
@@ -1338,7 +1331,7 @@ public class DiscoveryViewer extends Viewer {
 	public void setSelection(ISelection selection, boolean arg1) {
 		List<ConnectorDescriptorItemUi> selected = (List<ConnectorDescriptorItemUi>) ((IStructuredSelection)selection).toList();
 		for (ConnectorDescriptorItemUi item : this.getAllConnectorsItemsUi()) {
-			item.setSelection(selected.contains(item));
+			item.select(selected.contains(item));
 		}
 	}
 

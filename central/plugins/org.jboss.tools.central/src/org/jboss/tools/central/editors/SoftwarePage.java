@@ -1,5 +1,5 @@
 /*************************************************************************************
- * Copyright (c) 2008-2015 Red Hat, Inc. and others.
+ * Copyright (c) 2008-2014 Red Hat, Inc. and others.
  * All rights reserved. This program and the accompanying materials 
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,26 +10,24 @@
  ************************************************************************************/
 package org.jboss.tools.central.editors;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
+import java.net.URI;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.Dictionary;
 import java.util.List;
-import java.util.SortedSet;
-import java.util.TreeSet;
 
 import org.eclipse.core.commands.common.CommandException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.IJobChangeEvent;
 import org.eclipse.core.runtime.jobs.JobChangeAdapter;
-import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener;
-import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent;
+import org.eclipse.equinox.p2.core.IProvisioningAgent;
+import org.eclipse.equinox.p2.repository.artifact.IArtifactRepositoryManager;
+import org.eclipse.equinox.p2.repository.metadata.IMetadataRepositoryManager;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ToolBarManager;
-import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.jface.operation.IRunnableContext;
@@ -65,7 +63,6 @@ import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.ScrolledForm;
 import org.eclipse.ui.forms.widgets.Section;
 import org.eclipse.ui.handlers.IHandlerService;
-import org.eclipse.ui.internal.about.InstallationDialog;
 import org.eclipse.ui.menus.CommandContributionItem;
 import org.eclipse.ui.part.PageBook;
 import org.jboss.tools.central.JBossCentralActivator;
@@ -73,10 +70,8 @@ import org.jboss.tools.central.Messages;
 import org.jboss.tools.central.editors.xpl.ConnectorDescriptorItemUi;
 import org.jboss.tools.central.editors.xpl.DiscoveryViewer;
 import org.jboss.tools.central.editors.xpl.filters.EarlyAccessFilter;
-import org.jboss.tools.central.editors.xpl.filters.HideEarlyAccessWhenRegularExistsFilter;
-import org.jboss.tools.central.editors.xpl.filters.HideRegularConnectorWhenEAExists;
+import org.jboss.tools.central.editors.xpl.filters.EarlyAccessOrMostRecentVersionFilter;
 import org.jboss.tools.central.editors.xpl.filters.InstalledFilter;
-import org.jboss.tools.central.installation.CentralInstallationPage;
 import org.jboss.tools.central.preferences.PreferenceKeys;
 import org.jboss.tools.discovery.core.internal.DiscoveryActivator;
 import org.jboss.tools.discovery.core.internal.connectors.JBossDiscoveryUi;
@@ -99,9 +94,6 @@ public class SoftwarePage extends AbstractJBossCentralPage implements IRunnableC
 	private Composite loadingComposite;
 	private Composite featureComposite;
 	private DiscoveryViewer discoveryViewer;
-	private HideEarlyAccessWhenRegularExistsFilter preferSupportedFilter = new HideEarlyAccessWhenRegularExistsFilter();
-	private HideRegularConnectorWhenEAExists preferEAFilter = new HideRegularConnectorWhenEAExists();
-	private IPreferenceChangeListener earlyAccessPreferenceListener; 
 	private RefreshJobChangeListener refreshJobChangeListener;
 	private InstallAction installAction = new InstallAction();
 	
@@ -111,6 +103,10 @@ public class SoftwarePage extends AbstractJBossCentralPage implements IRunnableC
 	private Link deselectAllButton;
 
 	private ToolBarManager toolBarManager;
+	
+	private EarlyAccessFilter earlyAccessFilter;
+
+	private Button earlyAccessButton;
 	
 	public SoftwarePage(FormEditor editor) {
 		super(editor, ID, "Software/Update");
@@ -154,14 +150,11 @@ public class SoftwarePage extends AbstractJBossCentralPage implements IRunnableC
 	    
 	    discoveryViewer = new DiscoveryViewer(pageBook, this);
 	    discoveryViewer.addUserFilter(new InstalledFilter(), Messages.DiscoveryViewer_Hide_installed, true);
-	    setUpEarlyAccessFilters();
-	    this.earlyAccessPreferenceListener = new IPreferenceChangeListener() {
-			@Override
-			public void preferenceChange(PreferenceChangeEvent event) {
-				setUpEarlyAccessFilters();
-			}
-		};
-		JBossCentralActivator.getDefault().getPreferences().addPreferenceChangeListener(this.earlyAccessPreferenceListener);
+		this.earlyAccessFilter = new EarlyAccessFilter();
+	    if (!JBossCentralActivator.getDefault().getPreferences().getBoolean(PreferenceKeys.ENABLE_EARLY_ACCESS, PreferenceKeys.ENABLE_EARLY_ACCESS_DEFAULT_VALUE)) {
+	    	discoveryViewer.addSystemFilter(this.earlyAccessFilter);
+	    }
+	    discoveryViewer.addSystemFilter(new EarlyAccessOrMostRecentVersionFilter());
 		discoveryViewer.addDirectoryUrl(DiscoveryActivator.getDefault().getJBossDiscoveryDirectory());
 		discoveryViewer.createControl();
 		discoveryViewer.setEnvironment(getEnvironment());
@@ -235,6 +228,16 @@ public class SoftwarePage extends AbstractJBossCentralPage implements IRunnableC
 			}
 		});
 	    
+	    earlyAccessButton = toolkit.createButton(selectionButtonsComposite, Messages.DiscoveryViewer_Enable_EarlyAccess, SWT.CHECK);
+	    earlyAccessButton.setLayoutData(new GridData(SWT.END, SWT.DEFAULT, true, false));
+	    earlyAccessButton.setSelection(JBossCentralActivator.getDefault().getPreferences().getBoolean(PreferenceKeys.ENABLE_EARLY_ACCESS, PreferenceKeys.ENABLE_EARLY_ACCESS_DEFAULT_VALUE));
+	    earlyAccessButton.addSelectionListener(new SelectionAdapter() {
+	    	@Override
+	    	public void widgetSelected(SelectionEvent e) {
+	    		handleEarlyAccessChanged(earlyAccessButton);
+	    	}
+	    });
+
 	    Composite installationButtonsComposite = toolkit.createComposite(featureComposite);
 	    installationButtonsComposite.setLayout(new RowLayout(SWT.HORIZONTAL));
 	    installButton = toolkit.createButton(installationButtonsComposite, NLS.bind(Messages.installWithCount, "0"), SWT.PUSH);
@@ -277,22 +280,6 @@ public class SoftwarePage extends AbstractJBossCentralPage implements IRunnableC
 				JBossDiscoveryUi.uninstall(new ArrayList<ConnectorDescriptor>(discoveryViewer.getInstalledConnectors()), SoftwarePage.this, false);
 			}
 		});
-	    final Link earlyAccessLink = new Link(installationButtonsComposite, SWT.DEFAULT);
-	    earlyAccessLink.setText("<A>" + Messages.manageEarlyAccess + "</A>");
-	    earlyAccessLink.addSelectionListener(new SelectionAdapter() {
-	    	@Override
-	    	public void widgetSelected(SelectionEvent e) {
-	    		InstallationDialog dialog = new InstallationDialog(earlyAccessLink.getShell(), getSite().getWorkbenchWindow());
-	    		try {
-	    			Field lastTabField = dialog.getClass().getDeclaredField("lastSelectedTabId");
-	    			lastTabField.setAccessible(true);
-					lastTabField.set(null, CentralInstallationPage.PAGE_ID);
-    			} catch (Exception ex) {
-    				JBossCentralActivator.log(ex);
-    			}
-	    		dialog.open();
-	    	}
-	    });
 
 	    features.setClient(featureComposite);
 		showLoading();
@@ -303,17 +290,6 @@ public class SoftwarePage extends AbstractJBossCentralPage implements IRunnableC
 		refreshDiscoveryJob.addJobChangeListener(refreshJobChangeListener);
 		refreshDiscoveryJob.schedule();
 				
-	}
-
-	private void setUpEarlyAccessFilters() {
-		if (JBossCentralActivator.getDefault().getPreferences().getBoolean(PreferenceKeys.ENABLE_EARLY_ACCESS, false)) {
-			discoveryViewer.addSystemFilter(preferEAFilter);
-			discoveryViewer.removeSystemFilter(preferSupportedFilter);
-		} else {
-			discoveryViewer.addSystemFilter(preferSupportedFilter);
-			discoveryViewer.removeSystemFilter(preferEAFilter);
-		}
-		discoveryViewer.updateFilters();
 	}
 
 	private Dictionary<Object, Object> getEnvironment() {
@@ -392,6 +368,7 @@ public class SoftwarePage extends AbstractJBossCentralPage implements IRunnableC
 				form.redraw();
 				updateInstallButton();
 				updateUninstallButton();
+				setEnabled(earlyAccessButton, true);
 				setEnabled(deselectAllButton, true);
 				setEnabled(selectAllButton, true);
 			}
@@ -410,7 +387,6 @@ public class SoftwarePage extends AbstractJBossCentralPage implements IRunnableC
 			toolBarManager.dispose();
 			toolBarManager = null;
 		}
-		JBossCentralActivator.getDefault().getPreferences().removePreferenceChangeListener(this.earlyAccessPreferenceListener);
 		super.dispose();
 	}
 
@@ -437,6 +413,7 @@ public class SoftwarePage extends AbstractJBossCentralPage implements IRunnableC
 		public void scheduled(IJobChangeEvent event) {
 			SoftwarePage.setEnabled(installButton, false);
 			SoftwarePage.setEnabled(uninstallButton, false);
+			SoftwarePage.setEnabled(earlyAccessButton, false);
 			SoftwarePage.setEnabled(selectAllButton, false);
 			SoftwarePage.setEnabled(deselectAllButton, false);
 			showLoading();
@@ -471,52 +448,13 @@ public class SoftwarePage extends AbstractJBossCentralPage implements IRunnableC
 						}
 					}						
 				});
-				List<DiscoveryConnector> toInstall = new ArrayList<DiscoveryConnector>(discoveryViewer.getInstallableConnectors());
+				List<ConnectorDescriptor> toInstall = new ArrayList<ConnectorDescriptor>(discoveryViewer.getInstallableConnectors());
 				toInstall.addAll(discoveryViewer.getUpdatableConnectors());
-				boolean hasEarlyAccessContent = false;
-				for (int i = 0; i < toInstall.size(); i++) {
-					DiscoveryConnector selected = toInstall.get(i);
-					SortedSet<DiscoveryConnector> alternatives = new TreeSet<>(new Comparator<DiscoveryConnector>() {
-						@Override
-						public int compare(DiscoveryConnector arg0, DiscoveryConnector arg1) {
-							if (arg1 == arg0) {
-								return 0;
-							}
-							if (EarlyAccessFilter.isEarlyAccess(arg0)) {
-								return +1;
-							} else {
-								return -1;
-							}
-						}
-					});
-					for (ConnectorDescriptorItemUi otherItem : discoveryViewer.getAllConnectorsItemsUi()) {
-						if (otherItem.getConnector().getId().equals(selected.getId())) {
-							alternatives.add(otherItem.getConnector());
-						}
-					}
-					if (alternatives.size() > 1) {
-						SelectConnectorDialog selectConnectorDialog = new SelectConnectorDialog(getSite(), alternatives);
-						if (selectConnectorDialog.open() == Dialog.OK) {
-							selected = selectConnectorDialog.getSelectedConnector();
-							toInstall.set(i, selected);
-						} else {
-							return;
-						}
-					}
-					hasEarlyAccessContent |= EarlyAccessFilter.isEarlyAccess(selected);
-				}
 				if (toInstall.isEmpty()) {
 					MessageDialog.openInformation(getSite().getShell(), Messages.SoftwarePage_nothingToInstall_title, Messages.SoftwarePage_nothingToInstall_description);
-					return;
+				} else {
+					JBossDiscoveryUi.install(toInstall, dialog);
 				}
-				if (hasEarlyAccessContent) {
-					if (MessageDialog.openConfirm(getSite().getShell(), Messages.SoftwarePage_earlyAccessSection_Title, Messages.SoftwarePage_earlyAccessSection_message)) {
-						JBossCentralActivator.getDefault().getPreferences().putBoolean(PreferenceKeys.ENABLE_EARLY_ACCESS, true);
-					} else {
-						return;
-					}
-				}
-				JBossDiscoveryUi.install(new ArrayList<ConnectorDescriptor>(toInstall), dialog);
 			} catch (InterruptedException ex) {
                 JBossCentralActivator.getDefault().getLog().log(new Status(IStatus.ERROR, JBossCentralActivator.ID, ex.getMessage(), ex));
 			} catch (InvocationTargetException ite) {
@@ -565,6 +503,62 @@ public class SoftwarePage extends AbstractJBossCentralPage implements IRunnableC
 			uninstallButton.setEnabled(installedConnectors > 0);
 			uninstallButton.setText(NLS.bind(Messages.uninstallWithCount, installedConnectors));
 		}
+	}
+
+	/**
+	 * @param checkbox
+	 */
+	private void handleEarlyAccessChanged(final Button checkbox) {
+		if (checkbox.getSelection()) {
+			if (MessageDialog.openQuestion(getEditorSite().getShell(),Messages.SoftwarePage_earlyAccessSection_Title, Messages.SoftwarePage_earlyAccessSection_message)) {
+				JBossCentralActivator.getDefault().getPreferences().putBoolean(PreferenceKeys.ENABLE_EARLY_ACCESS, true);
+				SoftwarePage.this.discoveryViewer.removeSystemFilter(SoftwarePage.this.earlyAccessFilter);
+			} else {
+				checkbox.setSelection(false);
+			}
+		} else {
+			// TODO consider making this a listener on the preference rather than checkbox
+			// if preference comes to be editable in several places
+			List<ConnectorDescriptor> installedEarlyAccess = new ArrayList<ConnectorDescriptor>();
+			for (ConnectorDescriptorItemUi connector : SoftwarePage.this.discoveryViewer.getAllConnectorsItemsUi()) {
+				DiscoveryConnector discoveryConnector = connector.getConnector();
+				if (discoveryConnector.getCertificationId() != null && discoveryConnector.getCertificationId().contains("earlyaccess") && discoveryConnector.isInstalled()) {
+					installedEarlyAccess.add(discoveryConnector);
+				}
+			}
+			// remaining early-access connectors
+			if (!installedEarlyAccess.isEmpty()) {
+				StringBuilder listOfConnectors = new StringBuilder();
+				for (ConnectorDescriptor connector : installedEarlyAccess) {
+					listOfConnectors.append(" - "); //$NON-NLS-1$
+					listOfConnectors.append(connector.getName());
+					listOfConnectors.append('\n'); //$NON-NLS-1$
+				}
+				MessageDialog.openInformation(checkbox.getShell(), Messages.remainingEarlyAccessConnectors_title, NLS.bind(Messages.remainingEarlyAccessConnectors_message, listOfConnectors.toString()));
+			}
+			// remove early-access sites
+			IProvisioningAgent agent = (IProvisioningAgent)JBossCentralActivator.getDefault().getService(IProvisioningAgent.SERVICE_NAME);
+			IMetadataRepositoryManager metadataRepositoryManager = (IMetadataRepositoryManager)agent.getService(IMetadataRepositoryManager.SERVICE_NAME);
+			IArtifactRepositoryManager artifactsitoryManager = (IArtifactRepositoryManager)agent.getService(IArtifactRepositoryManager.SERVICE_NAME);
+			for (ConnectorDescriptorItemUi connector : SoftwarePage.this.discoveryViewer.getAllConnectorsItemsUi()) {
+				if (connector.getConnector().getCertificationId() != null && connector.getConnector().getCertificationId().contains("earlyaccess")) {
+					try {
+						URI repoUri = new URI(connector.getConnector().getSiteUrl());
+						metadataRepositoryManager.removeRepository(repoUri);
+						artifactsitoryManager.removeRepository(repoUri);
+					} catch (Exception ex) {
+						JBossCentralActivator.getDefault().getLog().log(new Status(IStatus.ERROR,
+							JBossCentralActivator.PLUGIN_ID,
+							ex.getMessage(),
+							ex));
+					}
+				}
+			}
+			
+			JBossCentralActivator.getDefault().getPreferences().putBoolean(PreferenceKeys.ENABLE_EARLY_ACCESS, false);
+			SoftwarePage.this.discoveryViewer.addSystemFilter(SoftwarePage.this.earlyAccessFilter);
+		}
+		SoftwarePage.this.discoveryViewer.updateFilters();
 	}
 
 	private static void setEnabled(Control control, boolean enabled) {
