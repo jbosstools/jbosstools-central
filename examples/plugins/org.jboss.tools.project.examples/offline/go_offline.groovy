@@ -328,10 +328,14 @@ class GoOfflineScript {
     }
 	
 	//brms/bpm have weird profiles
-	if (name.contains("brms") || name.contains("bpm")) {
+	else if (name.contains("brms") || name.contains("bpm")) {
 		profiles = profiles.replace("brms","").replace("bpms","").replace("enable-test", "")
 	}
 
+	else if (name.contains("carmart")) {
+		profiles = profiles.replace("uitests-tomcat", "").replace("uitests-jbossas", "")
+	}
+	
 	//some datagrid examples profiles can't be run OOTB
 	profiles = profiles.replace("uitests-clustered","").replace("custom-classpath","").replace("release","");
 	
