@@ -61,7 +61,7 @@ class GoOfflineScript {
                               "org.richfaces.archetypes:richfaces-archetype-kitchensink:4.2.3.Final-2"
                               ]
   
-  def excludedExamples = ["jboss-errai-kitchensink-archetype"]
+  def excludedExamples = ["jboss-errai-kitchensink-archetype", "picketlink-authorization-drools", "jboss-push-contacts-mobile-android", "jboss-push-helloworld-android"]
   
 
   public static main(args) {
@@ -303,6 +303,11 @@ class GoOfflineScript {
     }
 
     def pomModel = new XmlSlurper(false,false).parse(pom)
+	def exId = pomModel?.artifactId?.text()
+	if (excludedExamples.contains(exId)) {
+		return
+	}
+	
     def profiles = pomModel?.profiles?.profile?.id.collect{ it.text()}.findAll{!it.startsWith("aerogearci")}.join(",")
 
     def name = pomModel.name.text().toLowerCase()
@@ -313,7 +318,7 @@ class GoOfflineScript {
     }
 
     //richfaces-archetype-kitchensink 4.5.x has a borked debug profile
-    else if (name.contains("richfaces-archetype-kitchensink")) {
+    else if (name.contains("richfaces-archetype-kitchensink") || name.contains("kitchensink-rf")) {
       profiles = profiles.replace(",debug","")
     }
 
