@@ -338,7 +338,7 @@ class GoOfflineScript {
 	}
 
 	else if (name.contains("carmart")) {
-		profiles = profiles.replace("uitests-tomcat", "").replace("uitests-jbossas", "")
+		profiles = profiles.replace("uitests-tomcat", "").replace("uitests-jbossas", "").replace("uitests-remote", "")
 	}
 	
 	//some datagrid examples profiles can't be run OOTB
