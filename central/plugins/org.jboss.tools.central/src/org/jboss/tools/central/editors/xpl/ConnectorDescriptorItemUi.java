@@ -106,6 +106,7 @@ public class ConnectorDescriptorItemUi implements PropertyChangeListener, Runnab
 	private Map<String, org.eclipse.equinox.p2.metadata.Version> connectorUnits;
 	private ConnectorInstallationStatus installationStatus = ConnectorInstallationStatus.UNKNOWN;
 	private boolean visible;
+	private boolean isRealConnector;
 
 	private DiscoveryViewer discoveryViewer;
 	
@@ -178,10 +179,9 @@ public class ConnectorDescriptorItemUi implements PropertyChangeListener, Runnab
 				ConnectorDescriptorItemUi.this.discoveryViewer.showConnectorControl(ConnectorDescriptorItemUi.this);
 			}
 		});
-		if (connector.getCertificationId() != null && connector.getCertificationId().toLowerCase().contains("notavailable")) {
-			checkbox.setVisible(false);
-			checkbox.setEnabled(false);
-		}
+		this.isRealConnector = (connector.getCertificationId() == null || !connector.getCertificationId().toLowerCase().contains("notavailable"));
+		checkbox.setVisible(this.isRealConnector);
+		checkbox.setEnabled(this.isRealConnector);
 
 		GridDataFactory.swtDefaults().align(SWT.CENTER, SWT.CENTER)
 				.applyTo(checkbox);
@@ -272,32 +272,34 @@ public class ConnectorDescriptorItemUi implements PropertyChangeListener, Runnab
 		// always disabled color to make it less prominent
 		providerLabel.setForeground(this.colorDisabled);
 
-		checkbox.addSelectionListener(new SelectionListener() {
-			public void widgetDefaultSelected(SelectionEvent e) {
-				widgetSelected(e);
-			}
-
-			public void widgetSelected(SelectionEvent e) {
-				boolean selected = checkbox.getSelection();
-				maybeModifySelection(selected);
-			}
-		});
-		MouseListener connectorItemMouseListener = new MouseAdapter() {
-			@Override
-			public void mouseUp(MouseEvent e) {
-				boolean selected = !checkbox.getSelection();
-				if (maybeModifySelection(selected)) {
-					checkbox.setSelection(selected);
+		if (this.isRealConnector) {
+			checkbox.addSelectionListener(new SelectionListener() {
+				public void widgetDefaultSelected(SelectionEvent e) {
+					widgetSelected(e);
 				}
-			}
-		};
-		checkboxContainer.addMouseListener(connectorItemMouseListener);
-		connectorContainer.addMouseListener(connectorItemMouseListener);
-		iconLabel.addMouseListener(connectorItemMouseListener);
-		nameLabel.addMouseListener(connectorItemMouseListener);
-		// the provider has clickable links
-		// providerLabel.addMouseListener(connectorItemMouseListener);
-		description.addMouseListener(connectorItemMouseListener);
+	
+				public void widgetSelected(SelectionEvent e) {
+					boolean selected = checkbox.getSelection();
+					maybeModifySelection(selected);
+				}
+			});
+			MouseListener connectorItemMouseListener = new MouseAdapter() {
+				@Override
+				public void mouseUp(MouseEvent e) {
+					boolean selected = !checkbox.getSelection();
+					if (maybeModifySelection(selected)) {
+						checkbox.setSelection(selected);
+					}
+				}
+			};
+			checkboxContainer.addMouseListener(connectorItemMouseListener);
+			connectorContainer.addMouseListener(connectorItemMouseListener);
+			iconLabel.addMouseListener(connectorItemMouseListener);
+			nameLabel.addMouseListener(connectorItemMouseListener);
+			// the provider has clickable links
+			// providerLabel.addMouseListener(connectorItemMouseListener);
+			description.addMouseListener(connectorItemMouseListener);
+		}
 	}
 
 	/**
@@ -465,6 +467,10 @@ public class ConnectorDescriptorItemUi implements PropertyChangeListener, Runnab
 	}
 
 	protected boolean maybeModifySelection(boolean selected) {
+		if (!this.isRealConnector || !checkbox.isEnabled()) {
+			return false;
+		}
+
 		if (selected) {
 			if (!connector.isInstalled() && !connector.isInstallable()) {
 				if (connector.getInstallMessage() != null) {
@@ -498,7 +504,7 @@ public class ConnectorDescriptorItemUi implements PropertyChangeListener, Runnab
 	public void updateAvailability() {
 		boolean enabled = !connector.isInstalled()	&& (connector.getAvailable() == null || connector.getAvailable());
 
-		checkbox.setEnabled(enabled);
+		checkbox.setEnabled(this.isRealConnector);
 		nameLabel.setEnabled(enabled);
 		providerLabel.setEnabled(enabled);
 		description.setEnabled(enabled);
