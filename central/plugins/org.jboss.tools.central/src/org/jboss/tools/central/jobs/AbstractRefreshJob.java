@@ -25,6 +25,7 @@ import java.util.List;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringEscapeUtils;
+import org.apache.commons.lang.StringUtils;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -126,7 +127,7 @@ public abstract class AbstractRefreshJob extends Job {
 		}
 		title = StringEscapeUtils.escapeHtml(title);
 		String link;
-		if (entry.getUri() == null || entry.getUri().trim().isEmpty()) {
+		if (StringUtils.isBlank(entry.getUri()) || !entry.getUri().startsWith("http")) {
 			link = entry.getLink();
 		} else {
 			link = entry.getUri();
