@@ -419,8 +419,8 @@ public class CheatSheetUtil {
 			} 
 		} else {
 			int kind = MessageDialog.QUESTION;
-			String[] buttonLabels = new String[] { IDialogConstants.YES_LABEL,
-					IDialogConstants.NO_LABEL };
+			String[] buttonLabels = new String[] { IDialogConstants.OK_LABEL,
+					IDialogConstants.CANCEL_LABEL };
 			String title = "Found cheatsheets";
 			String message = "Please select the cheatsheet you want to show:";
 			MyMessageDialogWithToggle dialog = new MyMessageDialogWithToggle(shell, title, 
@@ -433,7 +433,7 @@ public class CheatSheetUtil {
 			if (result == Window.CANCEL || result == SWT.DEFAULT) {
 				throw new OperationCanceledException();
 			}
-			if (dialog.getReturnCode() == IDialogConstants.YES_ID) {
+			if (dialog.getReturnCode() == IDialogConstants.OK_ID) {
 				return dialog.getCheatsheet();
 			}
 		}
