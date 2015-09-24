@@ -50,10 +50,13 @@ public class SourceLookupTest {
 	private static final String TARGET_REQUIREMENTS = "/target/requirements/";
 	private static final String JBOSSTOOLS_TEST_JBOSS_HOME_7_1_1 = "jbosstools.test.jboss.home.7.1.1";
 	private static final String JBOSSTOOLS_TEST_JBOSS_HOME_EAP_6_1 = "jbosstools.test.jboss.home.eap.6.1";
+	private static final String JBOSSTOOLS_TEST_JBOSS_HOME_WILDFLY_9_0 = "jbosstools.test.jboss.home.wildfly.9.0";
 	private static final String DEVICE_C = "C:/";
 	private static final String WELD_BOOTSTRAP_JAVA = "org/jboss/weld/bootstrap/WeldBootstrap.java";
 	private static final String JBOSS_EAP_61 = "jboss-eap-6.1";
 	private static final String JBOSS_AS_7_1_1_FINAL = "jboss-as-7.1.1.Final";
+	private static final String WILDFLY_9_0_0_FINAL = "wildfly-9.0.0.Final";
+	
 
 	@BeforeClass
 	public static void init() throws Exception {
@@ -67,6 +70,8 @@ public class SourceLookupTest {
 		RuntimeDefinition runtimeDefinition = getRuntimeDefinition(delegate, JBOSSTOOLS_TEST_JBOSS_HOME_7_1_1, JBOSS_AS_7_1_1_FINAL);
 		runtimeDefinitions.add(runtimeDefinition);
 		runtimeDefinition = getRuntimeDefinition(delegate, JBOSSTOOLS_TEST_JBOSS_HOME_EAP_6_1, JBOSS_EAP_61);
+		runtimeDefinitions.add(runtimeDefinition);
+		runtimeDefinition = getRuntimeDefinition(delegate, JBOSSTOOLS_TEST_JBOSS_HOME_WILDFLY_9_0, WILDFLY_9_0_0_FINAL);
 		runtimeDefinitions.add(runtimeDefinition);
 		delegate.initializeRuntimes(runtimeDefinitions);
 	}
@@ -101,6 +106,11 @@ public class SourceLookupTest {
 	public void testSourceContainerEAP61() throws Exception {
 		assertServerHasSource("JBoss EAP 6.1",WELD_BOOTSTRAP_JAVA);
 	}
+
+	@Test
+	public void testSourceContainerWildFly9() throws Exception {
+		assertServerHasSource("WildFly 9.0","io/undertow/server/handlers/PredicateHandler.java");
+	}
 	
 	private void assertServerHasSource(String serverName, String sourceName) throws Exception {
 		IServer server = getServerByName(serverName);
@@ -110,8 +120,8 @@ public class SourceLookupTest {
 		String sourcePathComputer = configuration.getAttribute(ISourcePathComputer.ATTR_SOURCE_PATH_COMPUTER_ID, (String)null);
 		assertEquals("The JBoss Maven Source Container is not added." , SourceLookupActivator.JBOSS_LAUNCH_SOURCE_PATH_COMPUTER_ID, sourcePathComputer);
 		ISourceContainer sourceContainer = new JBossSourceContainer(configuration);
-		Object source = sourceContainer.findSourceElements(sourceName);
-		assertNotNull("The '" + sourceName + "' entry is not found.", source);
+		Object[] source = sourceContainer.findSourceElements(sourceName);
+		assertEquals("The '" + sourceName + "' entry is not found.", 1, source.length);
 	}
 
 	private String getServersAsString(IServer[] servers) {

@@ -13,7 +13,7 @@
 	<packaging>eclipse-test-plugin</packaging>
 
 	<properties>
-		<systemProperties>-Djbosstools.test.jboss.home.7.1.1=${requirementsDirectory}/jboss-as-7.1.1.Final -Djbosstools.test.jboss.home.eap.6.1=${requirementsDirectory}/jboss-eap-6.1  -Dusage_reporting_enabled=false -Dorg.jboss.tools.central.donotshow=true -Dorg.jboss.tools.tests.skipPrivateRequirements=${skipPrivateRequirements}</systemProperties>
+		<systemProperties>-Djbosstools.test.jboss.home.7.1.1=${requirementsDirectory}/jboss-as-7.1.1.Final -Djbosstools.test.jboss.home.eap.6.1=${requirementsDirectory}/jboss-eap-6.1 -Djbosstools.test.jboss.home.wildfly.9.0=${requirementsDirectory}/wildfly-9.0.0 -Dusage_reporting_enabled=false -Dorg.jboss.tools.central.donotshow=true -Dorg.jboss.tools.tests.skipPrivateRequirements=${skipPrivateRequirements}</systemProperties>
 	</properties>
 
 	<build>
@@ -27,6 +27,12 @@
 							<groupId>org.jboss.as</groupId>
 							<artifactId>jboss-as-dist</artifactId>
 							<version>7.1.1.Final</version>
+							<type>zip</type>
+						</artifactItem>
+						<artifactItem>
+							<groupId>org.wildfly</groupId>
+						    <artifactId>wildfly-dist</artifactId>
+						    <version>9.0.0.Final</version>
 							<type>zip</type>
 						</artifactItem>
 					</artifactItems>
@@ -50,7 +56,7 @@
 						<artifactId>maven-dependency-plugin</artifactId>
 						<executions>
 							<execution>
-								<id>install-jboss-as-7.1.1</id>
+								<id>install-community-servers</id>
 								<phase>pre-integration-test</phase>
 								<goals>
 									<goal>unpack</goal>
