@@ -267,7 +267,12 @@ public class JBossSourceContainer extends AbstractSourceContainer {
 								iterator.remove();
 							}
 						}
-						break;
+						if (objects != null && objects.length > 0) {
+							break;
+						}
+						//Keep looking if source jar doesn't contain source file
+						//e.g. io.undertow.server.handlers.Predicate.class exists in wildfly-cli.jar (but there's no matching source)
+						//and undertow-core.jar, which actually has the matching source jar
 					} else {
 						// TODO 
 					}
