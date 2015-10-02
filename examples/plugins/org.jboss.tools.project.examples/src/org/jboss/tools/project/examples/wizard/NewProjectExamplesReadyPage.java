@@ -163,26 +163,34 @@ public class NewProjectExamplesReadyPage extends WizardPage {
 		
 		if (projectExample != null) {
 			setTitle(projectExample.getShortDescription());
-			setDescription("'" + projectExample.getShortDescription() + "' Project is now ready");
-			if (showReadme != null) {
-				ProjectExamplesActivator.fixWelcome(projectExample);
-				if (projectExample.isWelcome()) {
-					showReadme.setEnabled(true);
-					showReadme.setSelection(store.getBoolean(ProjectExamplesActivator.SHOW_README));
-					String urlString = projectExample.getWelcomeURL();
-					String welcomeURL = ProjectExamplesActivator.replace(urlString, projectExample);
-					showReadme.setText("Show '" + welcomeURL + "' for further instructions");
-				} else {
-					showReadme.setEnabled(false);
-					showReadme.setSelection(false);
-					showReadme.setText(SHOW_README_FILE_FOR_FURTHER_INSTRUCTIONS);
+			if (projectExample.getIncludedProjects().size() <= 0) {
+				setDescription("'" + projectExample.getShortDescription() + "' project hasn't been imported. Check if it is defined correctly.");
+				showQuickFix.setSelection(false);
+				showQuickFix.setEnabled(false);
+				showReadme.setSelection(false);
+				showReadme.setEnabled(false);
+			} else {
+				setDescription("'" + projectExample.getShortDescription() + "' project is now ready");
+				if (showReadme != null) {
+					ProjectExamplesActivator.fixWelcome(projectExample);
+					if (projectExample.isWelcome()) {
+						showReadme.setEnabled(true);
+						showReadme.setSelection(store.getBoolean(ProjectExamplesActivator.SHOW_README));
+						String urlString = projectExample.getWelcomeURL();
+						String welcomeURL = ProjectExamplesActivator.replace(urlString, projectExample);
+						showReadme.setText("Show '" + welcomeURL + "' for further instructions");
+					} else {
+						showReadme.setEnabled(false);
+						showReadme.setSelection(false);
+						showReadme.setText(SHOW_README_FILE_FOR_FURTHER_INSTRUCTIONS);
+					}
 				}
-			}
-			List<IMarker> markers = ProjectExamplesActivator
+				List<IMarker> markers = ProjectExamplesActivator
 					.getMarkers(projectExamples);
-			if (markers != null && markers.size() > 0) {
-				showQuickFix.setEnabled(true);
-				showQuickFix.setSelection(store.getBoolean(ProjectExamplesActivator.SHOW_QUICK_FIX));
+				if (markers != null && markers.size() > 0) {
+					showQuickFix.setEnabled(true);
+					showQuickFix.setSelection(store.getBoolean(ProjectExamplesActivator.SHOW_QUICK_FIX));
+				}
 			}
 		}
 	}
