@@ -487,13 +487,13 @@ public class ProjectExamplesActivator extends AbstractUIPlugin {
 								view.getCheatSheetViewer().setInput(id, id, finalURL, new DefaultStateManager(), false);
 							} else {
 								try {
-									if (finalURL.toString().endsWith(".htm") || finalURL.toString().endsWith(".html")) {
+									if (finalURL.toString().endsWith(".htm") || finalURL.toString().endsWith(".html")) { //$NON-NLS-1$ //$NON-NLS-2$
 										IWorkbenchBrowserSupport browserSupport = ProjectExamplesActivator.getDefault().getWorkbench().getBrowserSupport();
 										IWebBrowser browser = browserSupport.createBrowser(IWorkbenchBrowserSupport.LOCATION_BAR | IWorkbenchBrowserSupport.NAVIGATION_BAR, 
 												null, null, null);
 										browser.openURL(finalURL);
 									} else {
-										boolean txtFile = finalURL.toString().endsWith(".md") || finalURL.toString().endsWith(".txt");
+										boolean txtFile = finalURL.toString().endsWith(".md") || finalURL.toString().endsWith(".MD") || finalURL.toString().endsWith(".txt"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 										IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
 										IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
 										IFile[] files = null;
@@ -505,7 +505,10 @@ public class ProjectExamplesActivator extends AbstractUIPlugin {
 										}
 										if (files.length > 0) {
 											try {
-												if (txtFile) {
+												IEditorDescriptor descriptor = IDE.getDefaultEditor(files[0], true);
+												if (descriptor != null && !"org.eclipse.ui.systemExternalEditor".equals(descriptor.getId())) { //$NON-NLS-1$
+													IDE.openEditor(page, files[0], descriptor.getId());
+												} else if (txtFile) {
 													IFileEditorInput input = new FileEditorInput(files[0]);
 													IDE.openEditor(page, input, EditorsUI.DEFAULT_TEXT_EDITOR_ID);
 												} else {
