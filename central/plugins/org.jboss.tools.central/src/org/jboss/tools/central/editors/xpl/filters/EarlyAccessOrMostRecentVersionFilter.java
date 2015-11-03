@@ -31,6 +31,7 @@ import org.eclipse.jface.viewers.ViewerFilter;
 import org.eclipse.mylyn.internal.discovery.core.model.ConnectorDescriptor;
 import org.jboss.tools.central.editors.xpl.ConnectorDescriptorItemUi;
 import org.jboss.tools.central.editors.xpl.DiscoveryViewer;
+import org.jboss.tools.discovery.core.internal.connectors.JBossDiscoveryUi;
 
 /**
  * Hides all visible {@link ConnectorDescriptor} that have another visible
@@ -134,10 +135,10 @@ public class EarlyAccessOrMostRecentVersionFilter extends ViewerFilter {
 			if (item1 == item2) {
 				return 0;
 			}
-			if (EarlyAccessFilter.isEarlyAccess(item1.getConnector()) && !EarlyAccessFilter.isEarlyAccess(item2.getConnector())) {
+			if (JBossDiscoveryUi.isEarlyAccess(item1.getConnector()) && !JBossDiscoveryUi.isEarlyAccess(item2.getConnector())) {
 				return -1;
 			}
-			if (EarlyAccessFilter.isEarlyAccess(item2.getConnector()) && !EarlyAccessFilter.isEarlyAccess(item1.getConnector())) {
+			if (JBossDiscoveryUi.isEarlyAccess(item2.getConnector()) && !JBossDiscoveryUi.isEarlyAccess(item1.getConnector())) {
 				return 1;
 			}
 			

@@ -13,6 +13,7 @@ package org.jboss.tools.central.editors.xpl.filters;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerFilter;
 import org.eclipse.mylyn.internal.discovery.core.model.ConnectorDescriptor;
+import org.jboss.tools.discovery.core.internal.connectors.JBossDiscoveryUi;
 
 /**
  * Filter that excludes connector which have certifacte id containing
@@ -28,12 +29,7 @@ public class EarlyAccessFilter extends ViewerFilter {
 			return true;
 		}
 		ConnectorDescriptor connector = (ConnectorDescriptor)element;
-		return !isEarlyAccess(connector);
-	}
-
-	public static boolean isEarlyAccess(ConnectorDescriptor connector) {
-		String cert = connector.getCertificationId();
-		return cert != null && cert.toLowerCase().contains("earlyaccess");
+		return !JBossDiscoveryUi.isEarlyAccess(connector);
 	}
 
 }

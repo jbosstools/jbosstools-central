@@ -151,7 +151,7 @@ public class SoftwarePage extends AbstractJBossCentralPage implements IRunnableC
 	    discoveryViewer = new DiscoveryViewer(pageBook, this);
 	    discoveryViewer.addUserFilter(new InstalledFilter(), Messages.DiscoveryViewer_Hide_installed, true);
 		this.earlyAccessFilter = new EarlyAccessFilter();
-	    if (!JBossCentralActivator.getDefault().getPreferences().getBoolean(PreferenceKeys.ENABLE_EARLY_ACCESS, PreferenceKeys.ENABLE_EARLY_ACCESS_DEFAULT_VALUE)) {
+	    if (!JBossDiscoveryUi.isEarlyAccessEnabled()) {
 	    	discoveryViewer.addSystemFilter(this.earlyAccessFilter);
 	    }
 	    discoveryViewer.addSystemFilter(new EarlyAccessOrMostRecentVersionFilter());
@@ -230,7 +230,7 @@ public class SoftwarePage extends AbstractJBossCentralPage implements IRunnableC
 	    
 	    earlyAccessButton = toolkit.createButton(selectionButtonsComposite, Messages.DiscoveryViewer_Enable_EarlyAccess, SWT.CHECK);
 	    earlyAccessButton.setLayoutData(new GridData(SWT.END, SWT.DEFAULT, true, false));
-	    earlyAccessButton.setSelection(JBossCentralActivator.getDefault().getPreferences().getBoolean(PreferenceKeys.ENABLE_EARLY_ACCESS, PreferenceKeys.ENABLE_EARLY_ACCESS_DEFAULT_VALUE));
+	    earlyAccessButton.setSelection(JBossDiscoveryUi.isEarlyAccessEnabled());
 	    earlyAccessButton.addSelectionListener(new SelectionAdapter() {
 	    	@Override
 	    	public void widgetSelected(SelectionEvent e) {
@@ -511,7 +511,7 @@ public class SoftwarePage extends AbstractJBossCentralPage implements IRunnableC
 	private void handleEarlyAccessChanged(final Button checkbox) {
 		if (checkbox.getSelection()) {
 			if (MessageDialog.openQuestion(getEditorSite().getShell(),Messages.SoftwarePage_earlyAccessSection_Title, Messages.SoftwarePage_earlyAccessSection_message)) {
-				JBossCentralActivator.getDefault().getPreferences().putBoolean(PreferenceKeys.ENABLE_EARLY_ACCESS, true);
+				DiscoveryActivator.getDefault().getPreferences().putBoolean(JBossDiscoveryUi.PreferenceKeys.ENABLE_EARLY_ACCESS, true);
 				SoftwarePage.this.discoveryViewer.removeSystemFilter(SoftwarePage.this.earlyAccessFilter);
 			} else {
 				checkbox.setSelection(false);
@@ -555,7 +555,7 @@ public class SoftwarePage extends AbstractJBossCentralPage implements IRunnableC
 				}
 			}
 			
-			JBossCentralActivator.getDefault().getPreferences().putBoolean(PreferenceKeys.ENABLE_EARLY_ACCESS, false);
+			DiscoveryActivator.getDefault().getPreferences().putBoolean(JBossDiscoveryUi.PreferenceKeys.ENABLE_EARLY_ACCESS, false);
 			SoftwarePage.this.discoveryViewer.addSystemFilter(SoftwarePage.this.earlyAccessFilter);
 		}
 		SoftwarePage.this.discoveryViewer.updateFilters();

@@ -124,6 +124,7 @@ import org.jboss.tools.central.editors.xpl.filters.EarlyAccessOrMostRecentVersio
 import org.jboss.tools.central.editors.xpl.filters.FiltersSelectionDialog;
 import org.jboss.tools.central.editors.xpl.filters.UserFilterEntry;
 import org.jboss.tools.discovery.core.internal.connectors.DiscoveryUtil;
+import org.jboss.tools.discovery.core.internal.connectors.JBossDiscoveryUi;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.Version;
 
@@ -1376,7 +1377,7 @@ public class DiscoveryViewer extends Viewer {
 		// TODO allow to plug computation of color externally, similar to addFilter
 		// something like addConditionalStyle(ConnectorDiscovery)
 		// TODO color is also defined in JBossCentralEditor 
-		if (EarlyAccessFilter.isEarlyAccess(connector)) {
+		if (JBossDiscoveryUi.isEarlyAccess(connector)) {
 			return JFaceResources.getColorRegistry().get(JBossCentralEditor.COLOR_LIGHTYELLOW);
 		}
 		return res;
