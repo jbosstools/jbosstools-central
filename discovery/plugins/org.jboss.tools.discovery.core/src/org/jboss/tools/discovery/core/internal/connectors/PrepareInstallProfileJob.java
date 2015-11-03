@@ -89,13 +89,13 @@ import org.eclipse.ui.PlatformUI;
  */
 public class PrepareInstallProfileJob extends AbstractInstallJob {
 
-	protected final List<ConnectorDescriptor> installableConnectors;
+	protected final Collection<ConnectorDescriptor> installableConnectors;
 
 	protected final ProvisioningUI provisioningUI;
 
 	protected Set<URI> repositoryLocations;
 
-	public PrepareInstallProfileJob(List<ConnectorDescriptor> installableConnectors) {
+	public PrepareInstallProfileJob(Collection<ConnectorDescriptor> installableConnectors) {
 		if (installableConnectors == null) {
 			throw new IllegalArgumentException();
 		}
