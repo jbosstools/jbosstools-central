@@ -15,6 +15,4 @@ public interface PreferenceKeys {
 	public static final String SHOW_JBOSS_CENTRAL_ON_STARTUP = "showJBossCentralOnStartup";
 	public static final boolean SHOW_JBOSS_CENTRAL_ON_STARTUP_DEFAULT_VALUE = true;
 	
-	public static final String ENABLE_EARLY_ACCESS = "enableEarlyAccess";
-	public static final boolean ENABLE_EARLY_ACCESS_DEFAULT_VALUE = false;
 }

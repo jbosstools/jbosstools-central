@@ -30,6 +30,7 @@ public class DiscoveryUtil {
 	
 	/**
 	 * Creates a new {@link ConnectorDiscovery} which looks for remote discovery sites first and falls back on locally defined connectors.
+	 * This will contain ALL discovery content, without filtering, so Early-Access is visible here when although it may not be enabled
 	 */
 	public static ConnectorDiscovery createConnectorDiscovery() {
 		String directoryUrl = DiscoveryActivator.getDefault().getJBossDiscoveryDirectory();

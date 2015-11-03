@@ -50,6 +50,11 @@ public class Messages extends NLS {
 	public static String visualEditorFaqLink;
 	
 	public static String usageEventBrowserLabelDescription;
+	
+	public static String additionalSoftwareRequired_title;
+	public static String additionalSoftwareRequired_message;
+	public static String unableToInstallConnectors_title;
+	public static String unableToInstallConnectors_message;
 
 	static {
 		// initialize resource bundle

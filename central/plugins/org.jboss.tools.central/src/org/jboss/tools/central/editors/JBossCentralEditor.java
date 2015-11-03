@@ -82,6 +82,7 @@ import org.jboss.tools.central.actions.OpenWithBrowserHandler;
 import org.jboss.tools.central.editors.xpl.TextSearchControl;
 import org.jboss.tools.central.installation.InstallationChecker;
 import org.jboss.tools.central.preferences.PreferenceKeys;
+import org.jboss.tools.discovery.core.internal.connectors.JBossDiscoveryUi;
 
 /**
  * 
@@ -487,7 +488,7 @@ public class JBossCentralEditor extends SharedHeaderFormEditor {
 				final IPropertyChangeListener updateTitleOnEAChange = new IPropertyChangeListener() {
 					@Override
 					public void propertyChange(final PropertyChangeEvent event) {
-						if (event.getProperty().equals(PreferenceKeys.ENABLE_EARLY_ACCESS)) {
+						if (event.getProperty().equals(JBossDiscoveryUi.PreferenceKeys.ENABLE_EARLY_ACCESS)) {
 							if (heading.isDisposed()) {
 								return;
 							}
@@ -591,7 +592,7 @@ public class JBossCentralEditor extends SharedHeaderFormEditor {
 			}
 			titleLabel.setForeground(foreground);
 
-			boolean isEarlyAccessEnabled = JBossCentralActivator.getDefault().getPreferences().getBoolean(PreferenceKeys.ENABLE_EARLY_ACCESS, PreferenceKeys.ENABLE_EARLY_ACCESS_DEFAULT_VALUE);
+			boolean isEarlyAccessEnabled = JBossDiscoveryUi.isEarlyAccessEnabled();
 			boolean showEarlyAccessInstalled = this.installChecker != null && this.installChecker.hasEarlyAccess();
 			String title = "Welcome to JBoss";
 			String earlyAccessSuffix = "(Early Access ";

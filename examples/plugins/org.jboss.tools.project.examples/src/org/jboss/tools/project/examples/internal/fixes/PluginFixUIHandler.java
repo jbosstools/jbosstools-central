@@ -40,55 +40,8 @@ public class PluginFixUIHandler extends AbstractUIHandler {
 		if (!fix.isSatisfied() && fix instanceof PluginFix) {
 			PluginFix pluginFix = (PluginFix) fix;
 			Collection<String> connectorIds = pluginFix.getConnectorIDs();
-			try {
-				discoverAndInstall(shell, context, connectorIds);
-			} catch (InvocationTargetException | InterruptedException e) {
-				ProjectExamplesActivator.log(e);
-			}
-		}
-	}
-
-	private void discoverAndInstall(Shell shell, IRunnableContext context, Collection<String> connectorIds) throws InvocationTargetException, InterruptedException {
-		if (connectorIds== null || connectorIds.isEmpty()){
-			return;
-		}
-		final IStatus[] results = new IStatus[1];
-		final ConnectorDiscovery[] connectorDiscoveries = new ConnectorDiscovery[1];
-		IRunnableWithProgress runnable = new IRunnableWithProgress() {
-			public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
-				ConnectorDiscovery connectorDiscovery = DiscoveryUtil.createConnectorDiscovery();
-				connectorDiscoveries[0] = connectorDiscovery;
-				results[0] = connectorDiscoveries[0].performDiscovery(monitor);
-				if (monitor.isCanceled()) {
-					results[0] = Status.CANCEL_STATUS;
-				}
-			}
-		};
-		context.run(true, true, runnable);
-		if (results[0] == null) {
-			return;
-		}
-		if (results[0].isOK()) {
-			List<DiscoveryConnector> connectors = connectorDiscoveries[0].getConnectors();
-			List<ConnectorDescriptor> installableConnectors = new ArrayList<ConnectorDescriptor>();
-			for (DiscoveryConnector connector:connectors) {
-				if (connectorIds.contains(connector.getId())) {
-					installableConnectors.add(connector);
-				}
-			}
-			JBossDiscoveryUi.install(installableConnectors, context);
-		} else {
-			String message = results[0].toString();
-			switch (results[0].getSeverity()) {
-			case IStatus.ERROR:	
-				MessageDialog.openError(shell, "Error", message); //$NON-NLS-1$
-				break;
-			case IStatus.WARNING:
-				MessageDialog.openWarning(shell, "Warning", message); //$NON-NLS-1$
-				break;
-			case IStatus.INFO:
-				MessageDialog.openInformation(shell, "Information", message); //$NON-NLS-1$
-				break;
+			if (!JBossDiscoveryUi.installByIds(connectorIds, context)) {
+				ProjectExamplesActivator.log("Could not install requested connectors"); //$NON-NLS-1$
 			}
 		}
 	}

@@ -76,6 +76,7 @@ import org.eclipse.swt.widgets.ToolItem;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.browser.IWorkbenchBrowserSupport;
 import org.jboss.tools.central.JBossCentralActivator;
+import org.jboss.tools.discovery.core.internal.connectors.JBossDiscoveryUi;
 
 /**
  * Wraps a {@link DiscoveryConnector} in a UI element and provide additional
@@ -179,7 +180,7 @@ public class ConnectorDescriptorItemUi implements PropertyChangeListener, Runnab
 				ConnectorDescriptorItemUi.this.discoveryViewer.showConnectorControl(ConnectorDescriptorItemUi.this);
 			}
 		});
-		this.isRealConnector = (connector.getCertificationId() == null || !connector.getCertificationId().toLowerCase().contains("notavailable"));
+		this.isRealConnector = JBossDiscoveryUi.isInstallableConnector(connector);
 		checkbox.setVisible(this.isRealConnector);
 		checkbox.setEnabled(this.isRealConnector);
 

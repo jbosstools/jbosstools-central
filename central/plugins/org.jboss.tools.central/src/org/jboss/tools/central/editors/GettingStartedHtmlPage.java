@@ -11,7 +11,6 @@
 
 package org.jboss.tools.central.editors;
 
-import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -37,15 +36,11 @@ import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.operation.IRunnableContext;
-import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.window.Window;
 import org.eclipse.jface.wizard.IWizard;
 import org.eclipse.jface.wizard.WizardDialog;
-import org.eclipse.mylyn.internal.discovery.core.model.ConnectorDescriptor;
-import org.eclipse.mylyn.internal.discovery.core.model.ConnectorDiscovery;
-import org.eclipse.mylyn.internal.discovery.core.model.DiscoveryConnector;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.browser.BrowserFunction;
 import org.eclipse.swt.events.DisposeEvent;
@@ -59,6 +54,7 @@ import org.eclipse.ui.forms.IManagedForm;
 import org.eclipse.ui.forms.editor.FormEditor;
 import org.eclipse.ui.forms.widgets.ScrolledForm;
 import org.jboss.tools.central.JBossCentralActivator;
+import org.jboss.tools.central.Messages;
 import org.jboss.tools.central.installation.InstallationChecker;
 import org.jboss.tools.central.internal.CentralHelper;
 import org.jboss.tools.central.internal.JsonUtil;
@@ -73,7 +69,7 @@ import org.jboss.tools.central.internal.dnd.JBossCentralDropTarget;
 import org.jboss.tools.central.jobs.RefreshBuzzJob;
 import org.jboss.tools.central.model.FeedsEntry;
 import org.jboss.tools.central.preferences.PreferenceKeys;
-import org.jboss.tools.discovery.core.internal.connectors.DiscoveryUtil;
+import org.jboss.tools.discovery.core.internal.DiscoveryActivator;
 import org.jboss.tools.discovery.core.internal.connectors.JBossDiscoveryUi;
 import org.jboss.tools.foundation.core.properties.PropertiesHelper;
 import org.jboss.tools.project.examples.FavoriteItem;
@@ -344,7 +340,7 @@ public class GettingStartedHtmlPage extends AbstractJBossCentralPage implements 
 	}
 
 	private void updateEarlyAccess(InstallationChecker installChecker) {
-		boolean isEarlyAccessEnabled = JBossCentralActivator.getDefault().getPreferences().getBoolean(PreferenceKeys.ENABLE_EARLY_ACCESS, PreferenceKeys.ENABLE_EARLY_ACCESS_DEFAULT_VALUE);
+		boolean isEarlyAccessEnabled = JBossDiscoveryUi.isEarlyAccessEnabled();
 		boolean showEarlyAccessInstalled = installChecker != null && installChecker.hasEarlyAccess();
 		// <em class="highlight">Early Access placeholder</em>
 		String earlyAccess = "<em class=\"highlight\">Early Access ";
@@ -412,15 +408,19 @@ public class GettingStartedHtmlPage extends AbstractJBossCentralPage implements 
 					IConfigurationElement element = findWizard(proxyWizard);
 					if (element == null) {
 						// Wizard not installed/completely available
-						installMissingWizard(proxyWizard.getRequiredComponentIds());
+						Shell shell = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();
+						if (!MessageDialog.openQuestion(shell, Messages.additionalSoftwareRequired_title,
+								Messages.additionalSoftwareRequired_message)) {
+							return;
+						}
+						IRunnableContext context = new ProgressMonitorDialog(shell);
+						if (!JBossDiscoveryUi.installByIds(proxyWizard.getRequiredComponentIds(), context)) {
+							MessageDialog.openError(getSite().getShell(), Messages.unableToInstallConnectors_title, Messages.unableToInstallConnectors_message);
+						}
 					} else {
 						WizardSupport.openWizard(element);
 					}
 				} catch (CoreException e1) {
-					JBossCentralActivator.log(e1);
-				} catch (InvocationTargetException e1) {
-					JBossCentralActivator.log(e1);
-				} catch (InterruptedException e1) {
 					JBossCentralActivator.log(e1);
 				}
 			}
@@ -444,65 +444,10 @@ public class GettingStartedHtmlPage extends AbstractJBossCentralPage implements 
 		return element;
 	}
 
-	@SuppressWarnings("restriction")
-	protected void installMissingWizard(final Collection<String> connectorIds) throws InvocationTargetException,
-			InterruptedException {
-
-		Shell shell = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();
-		if (!MessageDialog.openQuestion(shell, "Information",
-				"The required features to use this wizard need to be installed. Do you want to proceed?")) {
-			return;
-		}
-		;
-
-		final IStatus[] results = new IStatus[1];
-		final ConnectorDiscovery[] connectorDiscoveries = new ConnectorDiscovery[1];
-
-		IRunnableWithProgress runnable = new IRunnableWithProgress() {
-			@Override
-			public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
-				connectorDiscoveries[0] = DiscoveryUtil.createConnectorDiscovery();
-				connectorDiscoveries[0].setEnvironment(JBossCentralActivator.getEnvironment());
-				results[0] = connectorDiscoveries[0].performDiscovery(monitor);
-				if (monitor.isCanceled()) {
-					results[0] = Status.CANCEL_STATUS;
-				}
-			}
-		};
-
-		IRunnableContext context = new ProgressMonitorDialog(shell);
-		context.run(true, true, runnable);
-		if (results[0] == null) {
-			return;
-		}
-		if (results[0].isOK()) {
-			List<DiscoveryConnector> connectors = connectorDiscoveries[0].getConnectors();
-			List<ConnectorDescriptor> installableConnectors = new ArrayList<>();
-			for (DiscoveryConnector connector : connectors) {
-				if (connectorIds.contains(connector.getId())) {
-					installableConnectors.add(connector);
-				}
-			}
-			JBossDiscoveryUi.install(installableConnectors, context);
-		} else {
-			String message = results[0].toString();
-			switch (results[0].getSeverity()) {
-			case IStatus.ERROR:
-				MessageDialog.openError(shell, "Error", message);
-				break;
-			case IStatus.WARNING:
-				MessageDialog.openWarning(shell, "Warning", message);
-				break;
-			case IStatus.INFO:
-				MessageDialog.openInformation(shell, "Information", message); 
-				break;
-			}
-		}
-	}
-
+	
 	@Override
 	public void propertyChange(PropertyChangeEvent event) {
-		if (PreferenceKeys.ENABLE_EARLY_ACCESS.equals(event.getProperty())) {
+		if (JBossDiscoveryUi.PreferenceKeys.ENABLE_EARLY_ACCESS.equals(event.getProperty())) {
 			scheduleEarlyAccess();
 			resetWizards(allWizards);
 		}
@@ -514,8 +459,7 @@ public class GettingStartedHtmlPage extends AbstractJBossCentralPage implements 
 			displayedWizardsMap = Collections.emptyMap();
 			return;
 		}
-		boolean earlyAccessEnabled = JBossCentralActivator.getDefault().getPreferences()
-				.getBoolean(PreferenceKeys.ENABLE_EARLY_ACCESS, PreferenceKeys.ENABLE_EARLY_ACCESS_DEFAULT_VALUE);
+		boolean earlyAccessEnabled = JBossDiscoveryUi.isEarlyAccessEnabled();
 		Map<String, ProxyWizard> newWizards = new LinkedHashMap<>(proxyWizards.size());
 		for (ProxyWizard proxyWizard : proxyWizards) {
 			if (earlyAccessEnabled || !proxyWizard.hasTag("earlyaccess") ) { //$NON-NLS-1$
@@ -633,12 +577,12 @@ public class GettingStartedHtmlPage extends AbstractJBossCentralPage implements 
 				}
 			}
 		};
-		JBossCentralActivator.getDefault().getPreferences().addPreferenceChangeListener(prefChangeListener );
+		DiscoveryActivator.getDefault().getPreferences().addPreferenceChangeListener(prefChangeListener );
 		
 		parent.addDisposeListener(new DisposeListener() {
 			@Override
 			public void widgetDisposed(DisposeEvent e) {
-				JBossCentralActivator.getDefault().getPreferences().removePreferenceChangeListener(prefChangeListener);
+				DiscoveryActivator.getDefault().getPreferences().removePreferenceChangeListener(prefChangeListener);
 				parent.removeDisposeListener(this);
 			}
 		});

@@ -12,6 +12,8 @@ package org.jboss.tools.discovery.core.internal;
 
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.preferences.IEclipsePreferences;
+import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.ImageRegistry;
 import org.eclipse.swt.graphics.Image;
@@ -44,7 +46,7 @@ public class DiscoveryActivator extends AbstractUIPlugin {
 	private static final String CENTRAL_COMPONENT_NAME = "central"; //$NON-NLS-1$
 	private static final String INSTALL_ACTION = "install"; //$NON-NLS-1$
 	private UsageEventType installSoftwareEventType;
-
+	
 	/**
 	 * The constructor
 	 */
@@ -139,6 +141,11 @@ public class DiscoveryActivator extends AbstractUIPlugin {
 			logError(String.format("No URL set for discovery catalog. Property %s is missing!", DiscoveryActivator.JBOSS_DISCOVERY_DIRECTORY)); //$NON-NLS-1$
 		}
 		return directory;
+	}
+	
+	public IEclipsePreferences getPreferences() {
+		IEclipsePreferences prefs = InstanceScope.INSTANCE.getNode(PLUGIN_ID);
+		return prefs;
 	}
 
 }
