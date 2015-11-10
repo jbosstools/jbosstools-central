@@ -200,9 +200,13 @@ public class JBossDiscoveryUi {
 				connector.getInstallableUnits() != null &&
 				!connector.getInstallableUnits().isEmpty() &&
 				isInstallableConnector(connector)) {
-				if (isEarlyAccessEnabled() && isEarlyAccess(connector)) {
-					res.put(connector.getId(), connector);
-				} else if (!res.containsKey(connector.getId()) /*no early access so far*/) {
+				if (isEarlyAccess(connector)) {
+					if (isEarlyAccessEnabled()) {
+						// always prefer EA connector when EA available
+						res.put(connector.getId(), connector);
+					}
+					// but never use EA connector when EA not enabled
+				} else if (!res.containsKey(connector.getId()) /*no better connector so far*/) {
 					res.put(connector.getId(), connector);
 				}
 			}
