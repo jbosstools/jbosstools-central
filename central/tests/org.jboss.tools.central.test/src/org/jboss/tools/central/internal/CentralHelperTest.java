@@ -10,9 +10,11 @@ import java.nio.file.Paths;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.jboss.tools.central.ShowJBossCentral;
+import org.jboss.tools.central.test.Activator;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.osgi.framework.Bundle;
 
 public class CentralHelperTest {
 	
@@ -79,5 +81,28 @@ public class CentralHelperTest {
 		}
 	}
 	
-	//TODO setup jetty server to server remote URL and test caching capabilities
+	@Test
+	public void testGetCentralUrlWithSpacesZip() throws Exception {
+		Path zip = Paths.get("test-resources", "folder with spaces", "central.zip");
+		String url = zip.toUri().toString();
+		String sha1 = "566cafe";
+		String expectedEnd = ".metadata"+File.separator+".plugins"+File.separator+"org.jboss.tools.central"+File.separator+"central"+File.separator+sha1+File.separator+"index.html";
+		IProgressMonitor monitor = new NullProgressMonitor();
+		try {
+			String resolvedUrl = CentralHelper.getCentralUrl(url, monitor);
+			assertTrue("Unexpected resolvedUrl" + resolvedUrl, resolvedUrl.endsWith(expectedEnd));
+		} finally {
+			System.clearProperty(CentralHelper.JBOSS_CENTRAL_WEBPAGE_URL_KEY);
+		}
+	}
+
+	@Test
+	public void testGetEmbeddedFilePathWithSpaces() throws Exception {
+		String value = "test-resources/folder with spaces/central.zip";
+		Bundle bundle = Activator.getDefault().getBundle();
+		Path p = CentralHelper.getEmbeddedFilePath(bundle, value);
+		assertTrue("Unexpected path" + p, p.endsWith(value));
+	}
+
+	//TODO setup jetty server to serve remote URL and test caching capabilities
 }

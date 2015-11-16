@@ -145,13 +145,19 @@ public class CentralHelper {
 	}
 
 	private static Path getEmbeddedCentralZipPath() {
-		Bundle bundle = JBossCentralActivator.getDefault().getBundle();
-		URL zip = FileLocator.find(bundle, new org.eclipse.core.runtime.Path("resources/jbosstools-central-webpage.zip"), null);
-		try {
-		  return Paths.get(FileLocator.toFileURL(zip).toURI());
-		} catch (URISyntaxException | IOException e) {
-			throw new RuntimeException(e);
+		return getEmbeddedFilePath(JBossCentralActivator.getDefault().getBundle(), "resources/jbosstools-central-webpage.zip");
+	}
+	
+	/**
+	 * public for testing purposes
+	 */
+	public static Path getEmbeddedFilePath(Bundle bundle, String internalPath) {
+		URL zip = FileLocator.find(bundle, new org.eclipse.core.runtime.Path(internalPath), null);
+		if (zip == null) {
+			throw new IllegalArgumentException(internalPath + " is not a valid file path");
 		}
+		String path = zip.getPath().replace("%20", " ");
+		return Paths.get(path);
 	}
 	
 	private static Path getCentralFolder() {
