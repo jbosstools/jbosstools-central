@@ -4,6 +4,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import java.io.File;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
@@ -101,7 +102,7 @@ public class CentralHelperTest {
 		String value = "test-resources/folder with spaces/central.zip";
 		Bundle bundle = Activator.getDefault().getBundle();
 		Path p = CentralHelper.getEmbeddedFilePath(bundle, value);
-		assertTrue("Unexpected path" + p, p.endsWith(value));
+		assertTrue("Can't find " + p, Files.exists(p));
 	}
 
 	//TODO setup jetty server to serve remote URL and test caching capabilities

@@ -156,8 +156,13 @@ public class CentralHelper {
 		if (zip == null) {
 			throw new IllegalArgumentException(internalPath + " is not a valid file path");
 		}
-		String path = zip.getPath().replace("%20", " ");
-		return Paths.get(path);
+		try {
+		  URL url = FileLocator.toFileURL(zip);
+		  URI uri = new URI(url.toString().replace(" ", "%20"));
+		  return Paths.get(uri);
+		} catch (URISyntaxException | IOException e) {
+			throw new RuntimeException(e);
+		}
 	}
 	
 	private static Path getCentralFolder() {
