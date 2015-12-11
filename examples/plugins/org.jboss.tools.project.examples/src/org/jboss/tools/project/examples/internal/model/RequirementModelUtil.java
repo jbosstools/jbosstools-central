@@ -109,7 +109,7 @@ public class RequirementModelUtil {
 		Map<String, String> properties = new HashMap<>();
 		properties.put("id", "org.jboss.tools.maven.cdi");
 		properties.put("versions", "1.0.0");
-		properties.put("description", "Requires the Maven CDI Configurator");
+		properties.put("description", "This example works best with the Maven CDI Configurator");
 		properties.put("connectorIds", "org.jboss.tools.maven.cdi.feature");
 		req.setProperties(properties);
 		return req;
@@ -120,7 +120,7 @@ public class RequirementModelUtil {
 		Map<String, String> properties = new HashMap<>();
 		properties.put("id", "org.springframework.ide.eclipse");
 		properties.put("versions", "3.5.0");
-		properties.put("description", "Requires Spring IDE");
+		properties.put("description", "This example works best with Spring IDE");
 		properties.put("connectorIds", "org.springframework.ide.eclipse.feature");
 		req.setProperties(properties);
 		return req;
@@ -129,8 +129,8 @@ public class RequirementModelUtil {
 	public static RequirementModel createServerRuntimeRequirement(String serverId) {
 	    RequirementModel req = createServerRequirement();
 		Map<String, String> properties = new HashMap<>();
-		properties.put("allowed-types", "org.jboss.ide.eclipse.as.runtime.eap.61, org.jboss.ide.eclipse.as.runtime.eap.70, org.jboss.ide.eclipse.as.runtime.wildfly.80,org.jboss.ide.eclipse.as.runtime.wildfly.90");
-		properties.put("description", "Requires JBoss EAP 6.2+ or WildFly 8.x/9.x");
+		properties.put("allowed-types", "org.jboss.ide.eclipse.as.runtime.eap.61, org.jboss.ide.eclipse.as.runtime.eap.70, org.jboss.ide.eclipse.as.runtime.wildfly.80,org.jboss.ide.eclipse.as.runtime.wildfly.90,org.jboss.ide.eclipse.as.runtime.wildfly.100");
+		properties.put("description", "This example runs on JBoss EAP 6.2+ or WildFly 8+");
 		properties.put("downloadId", serverId == null?"wildfly-820finalruntime":serverId);
 		req.setProperties(properties);
 		return req;
@@ -142,7 +142,7 @@ public class RequirementModelUtil {
 		Map<String, String> properties = new HashMap<>();
 		properties.put("id", "org.eclipse.angularjs.core");
 		properties.put("versions", "0.8.0");
-		properties.put("description", "Requires AngularJS Eclipse Plugin");
+		properties.put("description", "This example works best with AngularJS Eclipse Plugin");
 		properties.put("connectorIds", "angularjs-eclipse-feature");
 		req.setProperties(properties);
 		return req;
@@ -153,7 +153,7 @@ public class RequirementModelUtil {
 		Map<String, String> properties = new HashMap<>();
 		properties.put("id", "org.eclipse.thym.core");
 		properties.put("versions", "0.1.0");
-		properties.put("description", "Requires Eclipse Hybrid Mobile Tools");
+		properties.put("description", "This example works best with Eclipse Hybrid Mobile Tools");
 		properties.put("connectorIds", "org.jboss.tools.aerogear.hybrid");
 		req.setProperties(properties);
 		return req;
@@ -173,7 +173,7 @@ public class RequirementModelUtil {
 		Map<String, String> properties = new HashMap<>();
 		properties.put("id", "org.eclipse.core.runtime");
 		properties.put("versions", "1.0.0");
-		properties.put("description", "Requires JBoss Fuse Development Tools");
+		properties.put("description", "This example works best with JBoss Fuse Development Tools");
 		properties.put("connectorIds", "jboss.integration-stack.bundle.fuse");
 		req.setProperties(properties);
 		return req;
@@ -184,7 +184,7 @@ public class RequirementModelUtil {
 		Map<String, String> properties = new HashMap<>();
 		properties.put("id", "org.jbpm.eclipse");
 		properties.put("versions", "6.0.0");
-		properties.put("description", "Requires JBoss Business Process and Rules Development Tools");
+		properties.put("description", "This example works best with JBoss Business Process and Rules Development Tools");
 		properties.put("connectorIds", "jboss.integration-stack.bundle.bpr");
 		req.setProperties(properties);
 		return req;
@@ -195,7 +195,7 @@ public class RequirementModelUtil {
 		Map<String, String> properties = new HashMap<>();
 		properties.put("id", "org.jboss.tools.maven.hibernate");
 		properties.put("versions", "1.0.0");
-		properties.put("description", "Requires the Maven Hibernate Configurator");
+		properties.put("description", "This example works best with the Maven Hibernate Configurator");
 		properties.put("connectorIds", "org.jboss.tools.maven.hibernate.feature");
 		req.setProperties(properties);
 		return req;
