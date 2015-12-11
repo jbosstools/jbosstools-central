@@ -180,6 +180,17 @@ public class ImportMavenProjectExampleDelegate extends AbstractImportMavenProjec
 		MavenProjectExamplesActivator.updateMavenConfiguration(projectName, includedProjects, monitor);
 
 		//Import standard projects
+		if (includedProjects.isEmpty() && new File(destination, ".project").exists()) { //$NON-NLS-1$
+			ProjectImportUtil importer = new ProjectImportUtil();
+			List<String> names = new ArrayList<String>();
+			names.add(projectName);
+			Collection<IProject> standardProjects = importer.importProjects(path, names, monitor);
+			if (standardProjects != null) {
+				for (IProject p : standardProjects) {
+					includedProjects.add(p.getName());
+				}
+			}
+		}
 		if (!originalProjects.isEmpty()) {
 			ProjectImportUtil importer = new ProjectImportUtil();
 			Collection<IProject> standardProjects = importer.importProjects(path, originalProjects, monitor);
