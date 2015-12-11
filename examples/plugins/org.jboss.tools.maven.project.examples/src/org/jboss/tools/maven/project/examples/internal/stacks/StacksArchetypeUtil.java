@@ -185,7 +185,7 @@ public class StacksArchetypeUtil {
 			int score = 0;
 			String archetypeTargetProduct= labels.getProperty(ARCHETYPE_TARGET);
 			if (targetProduct.equals(archetypeTargetProduct)) {
-				score+=2;
+				score++;
 			}
 			List<String> supportedEnvironments = ENVIRONMENTS_MAP.get(environment);
 			if (supportedEnvironments != null) {

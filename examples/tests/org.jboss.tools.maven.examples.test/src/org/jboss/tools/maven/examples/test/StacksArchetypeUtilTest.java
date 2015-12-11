@@ -48,6 +48,7 @@ import org.mockito.stubbing.Answer;
 
 public class StacksArchetypeUtilTest {
 
+	private static final String EAP70 = "org.jboss.ide.eclipse.as.runtime.eap.70";
 	private static final String EAP60 = "org.jboss.ide.eclipse.as.runtime.eap.60";
 	private static final String EAP61 = "org.jboss.ide.eclipse.as.runtime.eap.61";
 	private static final String EAP62 = "org.jboss.ide.eclipse.as.runtime.eap.62";
@@ -93,6 +94,7 @@ public class StacksArchetypeUtilTest {
 		frs.add(createMockFacetedRuntime(EAP60, FULL_EE6_FACET_VERSIONS));
 		frs.add(createMockFacetedRuntime(EAP61, FULL_EE6_FACET_VERSIONS));
 		frs.add(createMockFacetedRuntime(EAP62, FULL_EE6_FACET_VERSIONS));
+		frs.add(createMockFacetedRuntime(EAP70, FULL_EE7_FACET_VERSIONS));
 		frs.add(createMockFacetedRuntime("jbossas7", FULL_EE6_FACET_VERSIONS));
 		frs.add(createMockFacetedRuntime("tomcat7", WEB_EE6_FACET_VERSIONS));
 		frs.add(createMockFacetedRuntime("tomcat6", Arrays.asList(IJ2EEFacetConstants.DYNAMIC_WEB_25)));
@@ -155,7 +157,12 @@ public class StacksArchetypeUtilTest {
 		//Dummy EE7 archetype
 		ArchetypeVersion archetypeEE7 = stacksArchetypeUtil.getArchetype("javaee-ear", false, wildfly, stacks);
 		assertEquals("foo-javaee7-webapp-ear-archetype",archetypeEE7.getArchetype().getId());
-		
+
+		org.eclipse.wst.server.core.IRuntime eap7 = createRuntime(EAP70);
+		//Dummy EE7 archetype
+		archetypeEE7 = stacksArchetypeUtil.getArchetype("javaee-ear", false, eap7, stacks);
+		assertEquals("foo-javaee7-webapp-ear-archetype",archetypeEE7.getArchetype().getId());
+
 	}
 	
 	@Test(expected=IllegalArgumentException.class)
