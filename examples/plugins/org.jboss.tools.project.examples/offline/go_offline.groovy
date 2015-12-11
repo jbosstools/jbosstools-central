@@ -60,9 +60,25 @@ class GoOfflineScript {
                               "org.jboss.spec.archetypes:jboss-javaee6-webapp-archetype:7.1.3.Final",
                               "org.richfaces.archetypes:richfaces-archetype-kitchensink:4.2.3.Final-2"
                               ]
-  
-  def excludedExamples = ["jboss-errai-kitchensink-archetype", "picketlink-authorization-drools", "jboss-push-contacts-mobile-android", "jboss-push-helloworld-android"]
-  
+
+  def excludedExamples = ["jboss-errai-kitchensink-archetype",
+                "picketlink-authorization-drools",
+                "jboss-push-contacts-mobile-android",
+                "jboss-push-helloworld-android",
+                "cdi-scopes-portlet",
+                "jsf2-rf4-hello-world-portlet",
+                "cdi-jsf-portlet",
+                "page-composition-api-portlet",
+                "sample-portal",
+                "cdi-generic-portlet",
+                "navigation-api-portlet",
+                "simplest-hello-world-portlet",
+                "portal-extension",
+                "jsf2-hello-world-portlet",
+                "social-portlets",
+                "servlet-security-genericheader-auth"
+              ]
+
 
   public static main(args) {
     def script = new GoOfflineScript()
@@ -81,11 +97,10 @@ class GoOfflineScript {
       return
     }
     println "Quiet mode : "+script.quiet
-	script.goOffline()
+    script.goOffline()
   }
 
   def goOffline (args) {
-
     if (settings) {
       if (!settings.exists()) {
         throw new IllegalArgumentException("${settings.absolutePath} is not a valid settings.xml path")
@@ -117,34 +132,33 @@ class GoOfflineScript {
 
     def mavenRepoDir = new File(offlineDir, ".m2/repository")
 
-	def unzippedExamples = [] as java.util.concurrent.CopyOnWriteArrayList
-	
-	try {
-		downloadQuickstartsFromDCP(searchUrl, downloadDir, workDir, unzippedExamples)
-		
-		descriptors.each { descriptorUrl ->
-		  def archetypeProjects = downloadExamplesFromDescriptor(descriptorUrl, downloadDir, workDir, unzippedExamples)
-		  if (archetypeProjects) allArchetypeProjects.addAll archetypeProjects
-		}
-		buildUnzippedExamples(unzippedExamples, mavenRepoDir)
-	
-		buildArchetypesFromExamples(allArchetypeProjects, workDir, mavenRepoDir)
-	
-		buildArchetypesFromStacks(workDir, mavenRepoDir)
-		
-		println 'Cleaning up installed artifacts created from archetypes'
-		if (mavenRepoDir) {
-		  def installedArtifactfolder = new File(mavenRepoDir, "org/jbosstoolsofflineexamples")
-		  if (installedArtifactfolder.exists() && installedArtifactfolder.isDirectory()) {
-			installedArtifactfolder.deleteDir()
-		  }
-		}
-	
-	} catch (Throwable t) {
-	    t.printStackTrace()
-		buildErrors["Error running the script"] = t.message
-	}
-	
+    def unzippedExamples = [] as java.util.concurrent.CopyOnWriteArrayList
+
+    try {
+      downloadQuickstartsFromDCP(searchUrl, downloadDir, workDir, unzippedExamples)
+      descriptors.each { descriptorUrl ->
+        def archetypeProjects = downloadExamplesFromDescriptor(descriptorUrl, downloadDir, workDir, unzippedExamples)
+        if (archetypeProjects) allArchetypeProjects.addAll archetypeProjects
+      }
+      buildUnzippedExamples(unzippedExamples, mavenRepoDir)
+
+      buildArchetypesFromExamples(allArchetypeProjects, workDir, mavenRepoDir)
+
+      buildArchetypesFromStacks(workDir, mavenRepoDir)
+
+      println 'Cleaning up installed artifacts created from archetypes'
+      if (mavenRepoDir) {
+        def installedArtifactfolder = new File(mavenRepoDir, "org/jbosstoolsofflineexamples")
+        if (installedArtifactfolder.exists() && installedArtifactfolder.isDirectory()) {
+          installedArtifactfolder.deleteDir()
+        }
+      }
+
+    } catch (Throwable t) {
+      t.printStackTrace()
+      buildErrors["Error running the script"] = t.message
+    }
+
     long elapsed = System.currentTimeMillis() -start
 
     def duration = String.format("%d min, %d sec",
@@ -161,7 +175,7 @@ class GoOfflineScript {
         msg += '\r\n\t'+it.key
       }
       throw new ScriptProblems(msg)
-    } 
+    }
   }
 
 
@@ -200,9 +214,9 @@ class GoOfflineScript {
 
         if ("maven" == p.importType.text()) {
           def ant = new AntBuilder()   // create an antbuilder
-		  def unzipped = new File(workDir, zip.getName())
+          def unzipped = new File(workDir, zip.getName())
           ant.unzip(  src: zip, dest: unzipped,  overwrite:"false")
-		  unzippedExamples << unzipped
+          unzippedExamples << unzipped
         }
       }
     }
@@ -221,8 +235,6 @@ class GoOfflineScript {
     def archetypes= projects.findAll{!(it.stacksId.text() || it.stacksType.text())}
 
     archetypes.each{p ->
-		
-		
       File folder = new File(workDir, p.mavenArchetype.archetypeArtifactId.text())
       if (folder.exists()) {
         folder.deleteDir()
@@ -231,11 +243,11 @@ class GoOfflineScript {
       def aid = p.mavenArchetype.archetypeArtifactId.text()
 
       if (excludedExamples.contains(aid)) {
-    	  return
+        return
       }
       def pid = p.mavenArchetype.archetypeGroupId.text()
       def v = p.mavenArchetype.archetypeVersion.text()
-	  
+
       def appName = "myapp."+aid
       execMavenArchetypeBuild (pid, aid, v, folder, localRepo, appName)
       execMavenGoOffline(new File(folder, appName), localRepo)
@@ -255,10 +267,10 @@ class GoOfflineScript {
     Stacks stacks = new StacksClient(config).getStacks();
     stacks.getAvailableArchetypeVersions().each { av ->
       def a = av.archetype
-	  if (excludedExamples.contains(a.artifactId)) {
-		  return
-	  }
-	  
+      if (excludedExamples.contains(a.artifactId)) {
+        return
+      }
+
       File folder = new File(workDir, a.artifactId)
       if (folder.exists()) {
         folder.deleteDir()
@@ -272,8 +284,6 @@ class GoOfflineScript {
       def gav = a.groupId + ":"+ a.artifactId+ ":"+ av.version
       //Only build with enterprise flag when necessary
       if (enterprise && enterpriseArchetypes.contains(gav)){
-
-
         appName += "-enterprise"
         execMavenArchetypeBuild (a.groupId, a.artifactId, a.recommendedVersion, folder, localRepo, appName)
         execMavenGoOffline(new File(folder, appName), localRepo)
@@ -303,11 +313,11 @@ class GoOfflineScript {
     }
 
     def pomModel = new XmlSlurper(false,false).parse(pom)
-	def exId = pomModel?.artifactId?.text()
-	if (excludedExamples.contains(exId)) {
-		return
-	}
-	
+    def exId = pomModel?.artifactId?.text()
+    if (excludedExamples.contains(exId)) {
+      return
+    }
+
     def profiles = pomModel?.profiles?.profile?.id.collect{ it.text()}.findAll{!it.startsWith("aerogearci")}.join(",")
 
     def name = pomModel.name.text().toLowerCase()
@@ -331,34 +341,32 @@ class GoOfflineScript {
     else if (name.contains("kitchensink-backbone")) {
       profiles = profiles.replace(",minify","")
     }
-	
-	//brms/bpm have weird profiles
-	else if (name.contains("brms") || name.contains("bpm")) {
-		profiles = profiles.replace("brms","").replace("bpms","").replace("enable-test", "")
-	}
 
-	else if (name.contains("carmart")) {
-		profiles = profiles.replace("uitests-tomcat", "").replace("uitests-jbossas", "").replace("uitests-remote", "")
-	}
-	
-	//some datagrid examples profiles can't be run OOTB
-	profiles = profiles.replace("uitests-clustered","").replace("custom-classpath","").replace("release","");
-	
+    //brms/bpm have weird profiles
+    else if (name.contains("brms") || name.contains("bpm")) {
+      profiles = profiles.replace("brms","").replace("bpms","").replace("enable-test", "")
+    }
+
+    else if (name.contains("carmart")) {
+      profiles = profiles.replace("uitests-tomcat", "").replace("uitests-jbossas", "").replace("uitests-remote", "")
+    }
+
+    //some datagrid examples profiles can't be run OOTB
+    profiles = profiles.replace("uitests-clustered","").replace("custom-classpath","").replace("release","");
+
     def result = addMavenWrapper(directory, localRepo)
-	if (result != "0") {
-	  return
-	}
-	
+    if (result != "0") {
+      return
+    }
+
      //"arq-jbossas-remote" can't be combined with other arquillian profiles, it would bork dependency resolution
      //so we execute 2 builds. with and without arq-jbossas-remote
-     if (profiles.contains("arq-jbossas-remote")) {
-       execMavenGoOfflineForProfiles (directory, localRepo, pomModel, profiles.replace(",arq-jbossas-remote",""))
-       execMavenGoOfflineForProfiles (directory, localRepo, pomModel, "arq-jbossas-remote")
-     } else {
-       execMavenGoOfflineForProfiles (directory, localRepo, pomModel, profiles)
+    if (profiles.contains("arq-jbossas-remote")) {
+      execMavenGoOfflineForProfiles (directory, localRepo, pomModel, profiles.replace(",arq-jbossas-remote",""))
+      execMavenGoOfflineForProfiles (directory, localRepo, pomModel, "arq-jbossas-remote")
+    } else {
+      execMavenGoOfflineForProfiles (directory, localRepo, pomModel, profiles)
      }
-
-
   }
 
   def execMavenGoOfflineForProfiles (def directory, def localRepo, def pomModel, def profiles) {
@@ -372,7 +380,7 @@ class GoOfflineScript {
     if (!quiet) {
       logger.setMessageOutputLevel(3)
     }
-    
+
     def ultimateGoal = "install"
 
     if (pomModel.groupId.text() == "org.jboss.resteasy.examples" && pomModel.artifactId.text() == "simple") {
@@ -380,12 +388,11 @@ class GoOfflineScript {
       //So we don't go the whole 9 yards
       ultimateGoal = "package"
     } else if (pomModel.artifactId.text() == "jboss-remote-query-quickstart") {
-	  //this example relies on the protoc tool to be installed in order to compile
-	  //So we don't go the whole 9 yards
-	  ultimateGoal = "validate"
+      //this example relies on the protoc tool to be installed in order to compile
+      //So we don't go the whole 9 yards
+      ultimateGoal = "validate"
     }
-	
-	
+
     ant.exec(errorproperty: "cmdErr",
              resultproperty:"cmdExit",
              failonerror: "false",
@@ -439,7 +446,7 @@ class GoOfflineScript {
   def execMavenArchetypeBuild (groupId, artifactId, version, directory, localRepo, appName) {
 
     addMavenWrapper(directory, localRepo)
-    
+
     def ant = new AntBuilder()
     //remove [exec] prefixes
     def logger = ant.project.buildListeners.find { it instanceof org.apache.tools.ant.DefaultLogger }
@@ -447,7 +454,7 @@ class GoOfflineScript {
     if (!quiet) {
       logger.setMessageOutputLevel(3)
     }
-  
+
     ant.exec(errorproperty: "cmdErr",
              resultproperty:"cmdExit",
              failonerror: "false",
@@ -486,7 +493,7 @@ class GoOfflineScript {
     if (!quiet) {
       logger.setMessageOutputLevel(3)
     }
-  
+
     ant.exec(errorproperty: "cmdErr",
              resultproperty:"cmdExit",
              failonerror: "false",
@@ -510,53 +517,51 @@ class GoOfflineScript {
   }
 
   def downloadQuickstartsFromDCP(searchUrl, downloadArea, workDir, unzippedExamples) {
-	  if (!searchUrl) {
-		  return
-	  }
-	  
-	  def slurper = new JsonSlurper()//fast parser: new JsonSlurper(type: JsonParserType.INDEX_OVERLAY)
-	  def json = slurper.parse(new URL(searchUrl))
-	  json.hits.hits.each {
-		  def qs = it.fields
-		  def id = it._id
-		  def exampleDir = qs.quickstart_id  
-		  def quikstartRepoZip = download(downloadArea, qs.git_download)
-		  def unzipDir = new File(workDir, quikstartRepoZip.name)
-		  if (!unzipDir.exists()) {
-			  extractQuickstartRepo(unzipDir, quikstartRepoZip)
-		  }
-		  def unzipped = new File(unzipDir, exampleDir)
-		  if (unzipped.exists()) {
-			  unzippedExamples << unzipped
-		  }
-	   }
-	  
+    if (!searchUrl) {
+      return
+    }
+
+    def slurper = new JsonSlurper()//fast parser: new JsonSlurper(type: JsonParserType.INDEX_OVERLAY)
+    def json = slurper.parse(new URL(searchUrl))
+    json.hits.hits.each {
+      def qs = it.fields
+      def id = it._id
+      def exampleDir = qs.quickstart_id
+      def quikstartRepoZip = download(downloadArea, qs.git_download)
+      def unzipDir = new File(workDir, quikstartRepoZip.name)
+      if (!unzipDir.exists()) {
+        extractQuickstartRepo(unzipDir, quikstartRepoZip)
+      }
+      def unzipped = new File(unzipDir, exampleDir)
+      if (unzipped.exists()) {
+        unzippedExamples << unzipped
+      }
+     }
+
   }
 
-  
+
   private download(downloadArea, sUrl) {
-	URL url = new URL(sUrl)
-	def file = new File(downloadArea, url.getFile())
-	if (!file.exists()) {
-	  FileUtils.copyURLToFile(url, file)
-	  def totalSize = FileUtils.byteCountToDisplaySize(file.size())
-	  println "Downloaded $url ($totalSize) to $file"
-	}
-	file
+    URL url = new URL(sUrl)
+    def file = new File(downloadArea, url.getFile())
+    if (!file.exists()) {
+      FileUtils.copyURLToFile(url, file)
+      def totalSize = FileUtils.byteCountToDisplaySize(file.size())
+      println "Downloaded $url ($totalSize) to $file"
+    }
+    file
   }
-  
+
   private void extractQuickstartRepo(unzipDir, zip) {
-	  println "Extracting ${zip} into ${unzipDir}"
-	  unzipDir.mkdirs()
-	  def ant = new AntBuilder()   // create an antbuilder
-	  ant.unzip(  src: zip, dest: unzipDir,  overwrite:"false") {
-		  cutdirsmapper (dirs:1)//zip contains extra/unneeded parent folders
-	  }
+    println "Extracting ${zip} into ${unzipDir}"
+    unzipDir.mkdirs()
+    def ant = new AntBuilder()   // create an antbuilder
+    ant.unzip(  src: zip, dest: unzipDir,  overwrite:"false") {
+      cutdirsmapper (dirs:1)//zip contains extra/unneeded parent folders
+    }
   }
-  
+
 }
-
-
 
 class ScriptProblems extends RuntimeException {
 
