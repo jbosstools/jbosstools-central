@@ -33,6 +33,7 @@ import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.wizard.IWizard;
 import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.jface.wizard.WizardPage;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -205,7 +206,6 @@ public class NewProjectExamplesRequirementsPage extends WizardPage implements IP
 		}
 
 		tableViewer.setContentProvider(new FixContentProvider(fixes));
-		
 		ColumnViewerToolTipSupport.enableFor(tableViewer);
 		
 		createButtons(fixesGroup, tableViewer);
@@ -404,11 +404,6 @@ public class NewProjectExamplesRequirementsPage extends WizardPage implements IP
 		}
 
 		@Override
-		public boolean useNativeToolTip(Object object) {
-			return super.useNativeToolTip(object);
-		}
-
-		@Override
 		public Image getImage(Object element) {
 			Image image = null;
 			if (columnIndex == 2 && element instanceof IProjectExamplesFix) {
@@ -452,10 +447,26 @@ public class NewProjectExamplesRequirementsPage extends WizardPage implements IP
 			if (Platform.OS_WIN32.equals(Platform.getOS())) {
 				return null;
 			}
-			if (element instanceof IProjectExamplesFix && columnIndex == 1) {
-				return ((IProjectExamplesFix) element).getDescription();
+			String tooltip = null;
+			if (element instanceof IProjectExamplesFix) {
+				IProjectExamplesFix fix = (IProjectExamplesFix) element;
+				if (columnIndex == 1) {
+					tooltip = fix.getDescription();
+				} else if (columnIndex == 2 ) {
+					String label = fix.getLabel();
+					if (fix.isSatisfied()) {
+						String type = fix.isRequired()?"required":"recommended";
+						tooltip = NLS.bind("This {0} {1} is already installed.", type, label);
+					} else {
+						if (fix.isRequired()) {
+							tooltip = NLS.bind("This {0} must be installed to in order to continue.", label);
+						} else {
+							tooltip = NLS.bind("Installing this {0} is recommended but not mandatory.", label);
+						}
+					}
+				}
 			}
-			return null;
+			return tooltip;
 		}
 	}
 
