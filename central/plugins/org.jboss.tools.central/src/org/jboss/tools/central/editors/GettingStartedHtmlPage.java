@@ -143,7 +143,7 @@ public class GettingStartedHtmlPage extends AbstractJBossCentralPage implements 
 	public GettingStartedHtmlPage(FormEditor editor) {
 		super(editor, ID, "Getting Started");
 		ProxyWizardManager.INSTANCE.registerListener(this);
-		JBossCentralActivator.getDefault().getPreferenceStore().addPropertyChangeListener(this);
+		DiscoveryActivator.getDefault().getPreferenceStore().addPropertyChangeListener(this);
 	}
 
 	@Override
@@ -548,7 +548,7 @@ public class GettingStartedHtmlPage extends AbstractJBossCentralPage implements 
 	
 	@Override
 	public void dispose() {
-		JBossCentralActivator.getDefault().getPreferenceStore().removePropertyChangeListener(this);
+		DiscoveryActivator.getDefault().getPreferenceStore().removePropertyChangeListener(this);
 		ProxyWizardManager.INSTANCE.unRegisterListener(this);
 		if (buzzlistener != null) {
 			RefreshBuzzJob.INSTANCE.removeJobChangeListener(buzzlistener);
