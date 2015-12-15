@@ -76,7 +76,7 @@ class GoOfflineScript {
                 "portal-extension",
                 "jsf2-hello-world-portlet",
                 "social-portlets",
-                "servlet-security-genericheader-auth"
+                "jboss-servlet-security-genericheader-auth"
               ]
 
 
