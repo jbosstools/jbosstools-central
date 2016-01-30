@@ -375,16 +375,15 @@ public class AddRepositoryDialog extends TitleAreaDialog {
 					Set<RepositoryWrapper> allRepositories = new HashSet<RepositoryWrapper>();
 					allRepositories.addAll(includedRepositories);
 					allRepositories.addAll(availableRepositories);
-					boolean found = false;
+					RepositoryWrapper w = null;
 					for (RepositoryWrapper wrapper:allRepositories) {
 						if (url.equals(wrapper.getRepository().getUrl())) {
-							found = true;
+							w = wrapper;
 							break;
 						}
 					}
-					if (found) {
-						MessageDialog.openInformation(getShell(), "Information", "No new repository found."); //$NON-NLS-1$ //$NON-NLS-2$
-						return;
+					if (w != null) {
+						repos.add(w);
 					} else {
 						boolean ok = MessageDialog.openQuestion(getShell(), "Confirm Add Repository", "No new repository found. Would you like me to add the '" + url + "' repository."); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 						if (ok) {
