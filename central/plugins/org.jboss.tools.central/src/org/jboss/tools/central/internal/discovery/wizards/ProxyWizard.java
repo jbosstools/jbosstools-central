@@ -117,7 +117,7 @@ public class ProxyWizard implements Comparable<ProxyWizard> {
 		int result = 1;
 		result = prime * result
 				+ ((description == null) ? 0 : description.hashCode());
-		result = prime * result + ((iconUrl == null) ? 0 : iconUrl.hashCode());
+		result = prime * result + ((iconUrl == null) ? 0 : iconUrl.toString().hashCode());
 		result = prime * result + ((id == null) ? 0 : id.hashCode());
 		result = prime * result + ((label == null) ? 0 : label.hashCode());
 		result = prime * result + priority;
