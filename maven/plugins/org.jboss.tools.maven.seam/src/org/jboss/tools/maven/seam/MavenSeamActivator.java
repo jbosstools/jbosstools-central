@@ -303,7 +303,7 @@ public class MavenSeamActivator extends AbstractUIPlugin {
 				
 				resource = new Resource();
 				IProject webProject = ResourcesPlugin.getWorkspace().getRoot().getProject(webProjectName);
-				if (project == null || !project.exists()) {
+				if (!project.exists()) {
 					return;
 				}
 				String webContent = getRootComponent(webProject);
@@ -1276,9 +1276,8 @@ public class MavenSeamActivator extends AbstractUIPlugin {
 						newScope = Artifact.SCOPE_RUNTIME;
 					} else if (compileScope) {
 						newScope = Artifact.SCOPE_COMPILE;
-					} else {
-						// unchanged
 					}
+					// else unchanged
 
 					dependency.setScope(newScope);
 				}
@@ -1289,13 +1288,10 @@ public class MavenSeamActivator extends AbstractUIPlugin {
 
 		@SuppressWarnings("null")
 		private boolean compareNulls(String s1, String s2) {
-			if (s1 == null && s2 == null) {
-				return true;
+			if (s1 != null) {
+				return s1.equals(s2);
 			}
-			if ((s1 == null && s2 != null) || (s2 == null && s1 != null)) {
-				return false;
-			}
-			return s1.equals(s2);
+			return (s1 == null && s2 == null);
 		}
 	}
 

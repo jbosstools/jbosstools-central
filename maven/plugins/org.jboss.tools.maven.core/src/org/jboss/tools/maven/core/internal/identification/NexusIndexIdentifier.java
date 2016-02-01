@@ -54,7 +54,7 @@ public class NexusIndexIdentifier extends AbstractArtifactIdentifier {
 			}
 			monitor.setTaskName("Checking global m2e Nexus index for "+file.getName()); 
 			info = index.identify(file);
-		} catch (Throwable e) {
+		} catch (Exception e) {
 			// ignore
 		}
 		ArtifactKey artifact = null;
@@ -75,7 +75,7 @@ public class NexusIndexIdentifier extends AbstractArtifactIdentifier {
 						}
 						monitor.setTaskName("Checking Nexus index of '"+ repository.getId() + "' repository for "+file.getName()); 
 						info = nexusIndex.identify(file);
-					} catch (Throwable t) {
+					} catch (Exception t) {
 						// ignore
 					}
 					if (info != null) {

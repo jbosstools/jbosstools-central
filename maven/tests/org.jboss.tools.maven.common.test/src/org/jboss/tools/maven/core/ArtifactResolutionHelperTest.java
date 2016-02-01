@@ -35,9 +35,9 @@ import org.junit.Test;
 
 public class ArtifactResolutionHelperTest {
 
-	private static IMavenConfiguration mavenConfiguration;
+	private IMavenConfiguration mavenConfiguration;
 	
-	private static String oldUserSettingsFile;
+	private String oldUserSettingsFile;
 
 	private IArtifactResolutionService resolutionService;
 	

@@ -872,13 +872,13 @@ public class ConfigureMavenRepositoriesWizardPage extends WizardPage implements 
 			name = REPOSITORY_ELEMENT;
 		}
 		Node repository = null;
+		if (url != null && !url.endsWith(RepositoryWrapper.SEPARATOR)) {
+			url = url + RepositoryWrapper.SEPARATOR;
+		}
 		for (int i = 0; i < len; i++) {
 			Node node = repositoryNodeList.item(i);
 			if (node.getNodeType() == Node.ELEMENT_NODE && name.equals(node.getNodeName())) {
 				String urlNode = getRepositoryUrl(node);
-				if (url != null && !url.endsWith(RepositoryWrapper.SEPARATOR)) {
-					url = url + RepositoryWrapper.SEPARATOR;
-				}
 				if (urlNode != null && urlNode.equals(url)) {
 					repository = node;
 					break;
@@ -1435,9 +1435,6 @@ public class ConfigureMavenRepositoriesWizardPage extends WizardPage implements 
 		String url = wrapper.getRepository().getUrl();
 		String profileId = wrapper.getProfileId();
 		Element profile = getProfile(profileId);
-		if (profile == null) {
-			return null;
-		}
 		Element repositoriesElement = getElement(profile, type);
 		if (repositoriesElement != null) {
 			return getRepository(url, repositoriesElement, PLUGIN_REPOSITORIES_ELEMENT.equals(type));
