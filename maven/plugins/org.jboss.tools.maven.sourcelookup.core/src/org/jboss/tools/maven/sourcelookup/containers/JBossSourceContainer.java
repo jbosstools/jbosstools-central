@@ -117,8 +117,11 @@ public class JBossSourceContainer extends AbstractSourceContainer {
 		ServerBean serverBean = loader.getServerBean();
 		JBossServerType type = serverBean.getType();
 		String version = serverBean.getVersion();
-		if (JBossServerType.AS7.equals(type) || JBossServerType.AS72.equals(type) || JBossServerType.EAP61.equals(type)) {	
-			getAS7xJars();
+		if (JBossServerType.AS7.equals(type) || JBossServerType.AS72.equals(type) 
+				|| JBossServerType.EAP6.equals(type) || JBossServerType.EAP61.equals(type) || JBossServerType.EAP70.equals(type)
+				|| JBossServerType.WILDFLY80.equals(type) || JBossServerType.WILDFLY90.equals(type) || JBossServerType.WILDFLY90_WEB.equals(type)
+				|| JBossServerType.WILDFLY100.equals(type) || JBossServerType.WILDFLY100_WEB.equals(type)) {	
+			getJBossModules();
 		}
 		else if (JBossServerType.AS.equals(type)) {
 			if (IJBossToolingConstants.V6_0.equals(version)
@@ -130,16 +133,12 @@ public class JBossSourceContainer extends AbstractSourceContainer {
 				getAS5xJars();
 			}
 		}
-		else if (JBossServerType.EAP6.equals(type)) {
-			getAS7xJars();
-		}
-		else if (JBossServerType.SOAP.equals(type) || JBossServerType.EAP.equals(type) || EPP.equals(type)
+		else if (JBossServerType.SOAP.equals(type) || JBossServerType.EAP.equals(type) || JBossServerType.EPP.equals(type)
 				|| JBossServerType.SOAP_STD.equals(type) || JBossServerType.EWP.equals(type)
 				|| JBossServerType.EAP_STD.equals(type)) {
-
 			getAS5xJars();
 		}
-		if (jars.size() == 0 && homePath != null) {
+		if (jars.isEmpty()) {
 			IPath jarPath = new Path(homePath);
 			addJars(jarPath, jars);
 		}
@@ -176,14 +175,13 @@ public class JBossSourceContainer extends AbstractSourceContainer {
 		addJars(deployers, jars);
 	}
 
-	private void getAS7xJars() {
+	private void getJBossModules() {
 		IPath modules = new Path(homePath)
 				.append(IJBossRuntimeResourceConstants.AS7_MODULES);
 		addJars(modules, jars);
 		IPath bundles = new Path(homePath).append("bundles");
 		addJars(bundles, jars);
-		File modulesFile = new File(homePath,
-				IJBossRuntimeResourceConstants.JBOSS7_MODULES_JAR);
+		File modulesFile = new File(homePath, IJBossRuntimeResourceConstants.JBOSS7_MODULES_JAR);
 		if (modulesFile.exists()) {
 			jars.add(modulesFile);
 		}

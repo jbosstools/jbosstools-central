@@ -584,7 +584,7 @@ public class ProjectExamplesActivator extends AbstractUIPlugin {
 			return defaultDescriptor;
 		}
 
-		IEditorDescriptor editorDesc = defaultDescriptor;
+		IEditorDescriptor editorDesc = null;
 
 		// next check the OS for in-place editor (OLE on Win32)
 		if (editorReg.isSystemInPlaceEditorAvailable(name)) {

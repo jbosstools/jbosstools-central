@@ -533,12 +533,12 @@ public class JBossCentralActivator extends AbstractUIPlugin {
 			new Browser(shell, SWT.NONE);
 			isInternalWebBrowserAvailable = Boolean.TRUE.booleanValue();
 			return true;
-		} catch (Throwable t) {
+		} catch (Exception e) {
 			try {
 				new Browser(shell, SWT.WEBKIT);
 				isInternalWebBrowserAvailable = Boolean.TRUE.booleanValue();
 				return true;
-			} catch (Throwable e) {
+			} catch (Exception e2) {
 				isInternalWebBrowserAvailable = Boolean.FALSE.booleanValue();
 				return false;
 			}
