@@ -29,8 +29,8 @@ import org.eclipse.equinox.p2.metadata.Version;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerFilter;
 import org.eclipse.mylyn.internal.discovery.core.model.ConnectorDescriptor;
-import org.jboss.tools.central.editors.xpl.ConnectorDescriptorItemUi;
 import org.jboss.tools.central.editors.xpl.DiscoveryViewer;
+import org.jboss.tools.discovery.core.internal.connectors.ConnectorDescriptorItemUi;
 import org.jboss.tools.discovery.core.internal.connectors.JBossDiscoveryUi;
 
 /**

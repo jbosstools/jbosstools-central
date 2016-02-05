@@ -414,7 +414,7 @@ public class GettingStartedHtmlPage extends AbstractJBossCentralPage implements 
 							return;
 						}
 						IRunnableContext context = new ProgressMonitorDialog(shell);
-						if (!JBossDiscoveryUi.installByIds(proxyWizard.getRequiredComponentIds(), context)) {
+						if (!JBossDiscoveryUi.installByIds(proxyWizard.getRequiredComponentIds(), true, context)) {
 							MessageDialog.openError(getSite().getShell(), Messages.unableToInstallConnectors_title, Messages.unableToInstallConnectors_message);
 						}
 					} else {

@@ -314,7 +314,7 @@
        <page
              class="org.jboss.tools.central.installation.CentralInstallationPage"
              id="org.jboss.tools.central.installation.centralInstallationPage"
-             name="JBoss Central">
+             name="%earlyAccessInstallationPageTitle">
        </page>
     </extension>
 

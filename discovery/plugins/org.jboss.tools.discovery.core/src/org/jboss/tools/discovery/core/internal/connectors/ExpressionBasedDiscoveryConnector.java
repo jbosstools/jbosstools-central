@@ -15,6 +15,7 @@ import org.eclipse.mylyn.internal.discovery.core.model.ValidationException;
 import org.eclipse.osgi.util.NLS;
 import org.jboss.tools.foundation.core.expressions.ExpressionResolutionException;
 import org.jboss.tools.foundation.core.expressions.ExpressionResolver;
+import org.jboss.tools.foundation.core.expressions.ExpressionResolver.SystemPropertiesVariableResolver;
 import org.jboss.tools.foundation.core.expressions.IVariableResolver;
 import org.jboss.tools.foundation.core.properties.IPropertiesProvider;
 import org.jboss.tools.foundation.core.properties.PropertiesHelper;

@@ -8,7 +8,7 @@
  * Contributors:
  *     Tasktop Technologies - initial API and implementation
  *******************************************************************************/
-package org.jboss.tools.central.editors.xpl;
+package org.jboss.tools.discovery.core.internal.connectors;
 
 import java.net.URL;
 
