@@ -84,6 +84,7 @@ public class RemoteRepositoriesPreferencePage extends PreferencePage implements
 		// Nexus Repositories
 		Group group = new Group(composite, SWT.NONE);
 		GridData gd = new GridData(SWT.FILL, SWT.FILL, true, false);
+		gd.widthHint = 100; //A dirty trick that keeps table from growing unlimitedly 
 		group.setLayoutData(gd);
 		layout = new GridLayout(2, false);
 		group.setLayout(layout);
