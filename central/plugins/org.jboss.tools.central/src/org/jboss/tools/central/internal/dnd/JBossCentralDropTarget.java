@@ -121,10 +121,13 @@ public class JBossCentralDropTarget {
 		}
 
 		private String getUrlFromEvent(DropTargetEvent event) {
-			String eventData = (String) event.data;
-			String[] dataLines = eventData.split(System.getProperty("line.separator")); //$NON-NLS-1$
-			String url = dataLines[0];
-			return url;
+			if (event.data instanceof String) {
+				String eventData = (String) event.data;
+				String[] dataLines = eventData.split(System.getProperty("line.separator")); //$NON-NLS-1$
+				return dataLines[0];
+			} else {
+				return null;
+			}
 		}
 	};
 	
