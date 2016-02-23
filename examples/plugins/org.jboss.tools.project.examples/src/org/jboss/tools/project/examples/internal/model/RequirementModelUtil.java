@@ -10,12 +10,15 @@
  ************************************************************************************/
 package org.jboss.tools.project.examples.internal.model;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang.StringUtils;
 import org.jboss.tools.project.examples.model.RequirementModel;
 
 @SuppressWarnings("nls")
@@ -68,20 +71,23 @@ public class RequirementModelUtil {
 			}
 		} else if (tag.startsWith("product:eap")
 				|| tag.startsWith("product:wfk")
-				|| tag.equals("jsf") || tag.contains("picketlink")) {
+				|| tag.equals("jsf") || tag.contains("picketlink") 
+				|| tag.contains("jaxrs") || tag.contains("jax-rs")) {
 			key = "server";
 			if (!reqMap.containsKey(key)) {
 				String serverId = null;
 				if (tag.startsWith("product:eap")) {
-					if (tag.contains("6.4.")) {
+					if (tag.contains("-6.4")) {
 						serverId = "jbosseap640runtime";
-					} else if  (tag.contains("6.3.")) {
+					} else if  (tag.contains("-6.3")) {
 						serverId = "jbosseap630runtime";
-					} 
+			        } else if  (tag.contains("-7")) {
+			          serverId = "jbosseap700runtime";
+			        } 
 				} else if (tag.startsWith("wfk")) {
-					if (tag.contains("2.7.")) {
+					if (tag.contains("-2.7")) {
 						serverId = "jbosseap640runtime";
-					} else if  (tag.contains("2.6.")) {
+					} else if  (tag.contains("-2.6")) {
 						serverId = "jbosseap630runtime";
 					} 
 				}
@@ -129,9 +135,21 @@ public class RequirementModelUtil {
 	public static RequirementModel createServerRuntimeRequirement(String serverId) {
 	    RequirementModel req = createServerRequirement();
 		Map<String, String> properties = new HashMap<>();
-		properties.put("allowed-types", "org.jboss.ide.eclipse.as.runtime.eap.61, org.jboss.ide.eclipse.as.runtime.eap.70, org.jboss.ide.eclipse.as.runtime.wildfly.80,org.jboss.ide.eclipse.as.runtime.wildfly.90,org.jboss.ide.eclipse.as.runtime.wildfly.100");
-		properties.put("description", "This example runs on JBoss EAP 6.2+ or WildFly 8+");
-		properties.put("downloadId", serverId == null?"wildfly-820finalruntime":serverId);
+		List<String> supportedServerIds = new ArrayList<>();
+		if (serverId == null || !serverId.contains("eap7")) {
+		  properties.put("description", "Requires JBoss EAP 6.2+ or WildFly");
+		  supportedServerIds.add("org.jboss.ide.eclipse.as.runtime.eap.61");
+		} else {
+		  properties.put("description", "Requires JBoss EAP 7+ or WildFly");
+		}
+		supportedServerIds.add("org.jboss.ide.eclipse.as.runtime.eap.70");
+		supportedServerIds.add("org.jboss.ide.eclipse.as.runtime.wildfly.80");
+		supportedServerIds.add("org.jboss.ide.eclipse.as.runtime.wildfly.90");
+		supportedServerIds.add("org.jboss.ide.eclipse.as.runtime.wildfly.100");
+		String allowedTypes = StringUtils.join(supportedServerIds, ",");
+		
+		properties.put("allowed-types", allowedTypes);
+		properties.put("downloadId", serverId == null?"wildfly-1000finalruntime":serverId);
 		req.setProperties(properties);
 		return req;
 	}

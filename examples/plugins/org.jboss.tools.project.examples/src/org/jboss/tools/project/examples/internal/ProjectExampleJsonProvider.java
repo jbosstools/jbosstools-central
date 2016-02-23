@@ -53,25 +53,16 @@ public class ProjectExampleJsonProvider implements IProjectExampleProvider {
 	public Collection<ProjectExample> getExamples(IProgressMonitor monitor) throws CoreException {
 		IPath cacheRoot = ProjectExamplesActivator.getDefault().getStateLocation().append("quickstarts-json");
 		File jsonPayload = new URLTransportUtility().getCachedFileForURL(getExamplesUrl(), "Searching for Quickstarts", URLTransportUtility.CACHE_FOREVER, cacheRoot , monitor);
+		return getExamples(jsonPayload, monitor);
+	}
+
+	public Collection<ProjectExample> getExamples(File jsonPayload, IProgressMonitor monitor) throws CoreException {
 		if (jsonPayload == null || jsonPayload.length() == 0) {
 			return Collections.emptyList();
 		}
-			
 		Collection<ProjectExample> examples = null;
-		ProjectExampleSite site = new ProjectExampleSite();
-		site.setEditable(false);
-		site.setExperimental(false);
-		site.setUrl(null);
-		site.setName("JBoss Developer Examples");
 		try (InputStream json = new BufferedInputStream(new FileInputStream(jsonPayload))){
-			examples = parser.parse(json, monitor);
-			if (examples != null) {
-				for (ProjectExample example : examples) {
-					example.setSite(site);
-					inferCategory(example);
-					inferRequirements(example);
-				}
-			}
+			examples = parseStream(json, monitor);
 		} catch (IOException e) {
 			if (monitor.isCanceled()) {
 				ProjectExamplesActivator.log("Quickstart search was cancelled. Returning an empty list.");
@@ -83,6 +74,24 @@ public class ProjectExampleJsonProvider implements IProjectExampleProvider {
 		}
 		if (examples == null) {
 			examples =  Collections.emptyList();
+		}
+		return examples;
+	}
+	
+	public Collection<ProjectExample> parseStream(InputStream json, IProgressMonitor monitor) throws IOException {
+		Collection<ProjectExample> examples;
+		ProjectExampleSite site = new ProjectExampleSite();
+		site.setEditable(false);
+		site.setExperimental(false);
+		site.setUrl(null);
+		site.setName("JBoss Developer Examples");
+		examples = parser.parse(json, monitor);
+		if (examples != null) {
+			for (ProjectExample example : examples) {
+				example.setSite(site);
+				inferCategory(example);
+				inferRequirements(example);
+			}
 		}
 		return examples;
 	}
@@ -127,7 +136,10 @@ public class ProjectExampleJsonProvider implements IProjectExampleProvider {
 
 	protected String getExamplesUrl() {
 		String defaultQuery = "http://dcp.jboss.org/v1/rest/search?content_provider=jboss-developer&content_provider=rht&field=target_product&field=github_repo_url&field=sys_description&field=sys_title&field=sys_tags&field=sys_type&field=experimental&field=git_download&field=prerequisites&field=quickstart_id&field=git_tag&field=git_commit&query=sys_type:(quickstart)&size=500";
-		String searchQuery = getPropertiesProvider().getValue("quickstarts.search.query", defaultQuery);
+		String searchQuery = System.getProperty("quickstarts.search.query");
+		if (searchQuery == null) {
+			searchQuery = getPropertiesProvider().getValue("quickstarts.search.query", defaultQuery);
+		}
 		return searchQuery;
 	}
 
