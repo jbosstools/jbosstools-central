@@ -95,7 +95,7 @@ public class JBossCentralEditor extends SharedHeaderFormEditor {
 
 	private static final String UTF_8_ENCODING = "UTF-8";
 
-	public static final String JBOSS_CENTRAL = "JBoss Central";
+	public static final String RED_HAT_CENTRAL = "Red Hat Central";
 
 	public static final String ID = "org.jboss.tools.central.editors.JBossCentralEditor";
 
@@ -166,7 +166,7 @@ public class JBossCentralEditor extends SharedHeaderFormEditor {
 			editorInput = JBossCentralEditorInput.INSTANCE;
 		super.init(site, editorInput);
 		initializeColors();
-		setPartName(JBOSS_CENTRAL);
+		setPartName(RED_HAT_CENTRAL);
 	}
 
 	private void initializeColors() {

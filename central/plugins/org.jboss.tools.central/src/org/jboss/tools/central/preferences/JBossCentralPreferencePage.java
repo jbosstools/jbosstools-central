@@ -48,7 +48,7 @@ public class JBossCentralPreferencePage extends PreferencePage implements
 		showOnStartup = new Button(composite, SWT.CHECK);
 		showOnStartup.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
 		showOnStartup.setSelection(JBossCentralActivator.getDefault().showJBossCentralOnStartup());
-		showOnStartup.setText("Show JBoss Central On Startup");
+		showOnStartup.setText("Show Red Hat Central On Startup");
 		
 		return composite;
 	}

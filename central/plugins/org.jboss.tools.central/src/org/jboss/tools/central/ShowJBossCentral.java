@@ -113,7 +113,7 @@ public class ShowJBossCentral implements IStartup {
 	}
 
 	private void registerDropTarget(int delay) {
-		UIJob registerJob = new UIJob(Display.getDefault(), "JBoss Central DND initialization") {
+		UIJob registerJob = new UIJob(Display.getDefault(), "Red Hat Central DND initialization") {
 			{
 				setPriority(Job.DECORATE);
 			}

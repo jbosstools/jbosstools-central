@@ -3,10 +3,10 @@
 <schema targetNamespace="org.jboss.tools.central" xmlns="http://www.w3.org/2001/XMLSchema">
 <annotation>
       <appinfo>
-         <meta.schema plugin="org.jboss.tools.central" id="configurators" name="JBoss Central Configurator"/>
+         <meta.schema plugin="org.jboss.tools.central" id="configurators" name="Red Hat Central Configurator"/>
       </appinfo>
       <documentation>
-         This extension point enables us to define several JBoss Central functionalities.&lt;br/&gt;
+         This extension point enables us to define several Red Hat Central functionalities.&lt;br/&gt;
 It isn&apos;t intended to be extended/implemented by individual plugins.&lt;br/&gt;
 Only one of these extensions points should be active at any given time.
       </documentation>

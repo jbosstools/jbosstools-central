@@ -2,15 +2,15 @@
 <?eclipse version="3.4"?>
 <plugin>
 
-   <extension-point id="configurators" name="JBoss Central Configurator" schema="schema/configurators.exsd"/>
+   <extension-point id="configurators" name="Red Hat Central Configurator" schema="schema/configurators.exsd"/>
    <extension-point id="proxyWizard" name="Proxy Wizard" schema="schemas/org.jboss.tools.central.proxyWizard.exsd"/>
    <extension-point id="iuFamilies" name="iuFamilies" schema="schemas/iuFamilies.exsd"/>
 
    <extension
          point="org.eclipse.ui.editors">
       <editor
-            name="JBoss Central"
-            icon="icons/jboss.png"
+            name="Red Hat Central"
+            icon="icons/shadowman.png"
             contributorClass="org.jboss.tools.central.editors.JBossCentralEditorContributor"
             class="org.jboss.tools.central.editors.JBossCentralEditor"
             id="org.jboss.tools.central.editors.JBossCentralEditor">
@@ -29,7 +29,7 @@
            category="org.jboss.tools.common.model.ui.MainPreferencePage"
            class="org.jboss.tools.central.preferences.JBossCentralPreferencePage"
            id="org.jboss.tools.central.preferences.JBossCentralPreferencePage"
-           name="JBoss Central"/>
+           name="Red Hat Central"/>
    </extension>
 	<extension
 		point="org.eclipse.ui.menus">
@@ -39,8 +39,8 @@
              id="org.jboss.tools.central.toolbar">
           <command
                 commandId="org.jboss.tools.central.show"
-                disabledIcon="$nl$/icons/jboss.png"
-                icon="$nl$/icons/jboss.png"
+                disabledIcon="$nl$/icons/shadowman.png"
+                icon="$nl$/icons/shadowman.png"
                 id="org.jboss.tools.central.actions.ShowJBossCentralHandler"
                 style="push"
                 label="%jboss.central.menu.name"
@@ -53,8 +53,8 @@
           locationURI="menu:help?before=group.intro">
        <command
              commandId="org.jboss.tools.central.show"
-             disabledIcon="$nl$/icons/jboss.png"
-             icon="$nl$/icons/jboss.png"
+             disabledIcon="$nl$/icons/shadowman.png"
+             icon="$nl$/icons/shadowman.png"
              id="org.jboss.tools.central.actions.ShowJBossCentralHandler"
              label="%jboss.central.menu.name"
              style="push"
@@ -67,7 +67,7 @@
          point="org.eclipse.ui.commands">
       <command
       		defaultHandler="org.jboss.tools.central.actions.ShowJBossCentralHandler"
-            name="JBoss Central"
+            name="Red Hat Central"
             id="org.jboss.tools.central.show">
       </command>
       <command
@@ -186,7 +186,7 @@
          point="org.eclipse.ui.newWizards">
       <category
             id="org.jboss.tools.central.ui.wizard.category"
-            name="JBoss Central">
+            name="Red Hat Central">
       </category>
       <wizard
             category="org.jboss.tools.central.ui.wizard.category"
@@ -314,7 +314,7 @@
        <page
              class="org.jboss.tools.central.installation.CentralInstallationPage"
              id="org.jboss.tools.central.installation.centralInstallationPage"
-             name="JBoss Central">
+             name="Red Hat Central">
        </page>
     </extension>
 
