@@ -40,13 +40,13 @@ public class JBossCentralEditorInput implements IEditorInput {
 
 	@Override
 	public String getName() {
-		return "JBoss Central";
+		return JBossCentralEditor.RED_HAT_CENTRAL;
 	}
 
 
 	@Override
 	public String getToolTipText() {
-		return "JBoss Central";
+		return JBossCentralEditor.RED_HAT_CENTRAL;
 	}
 
 	@Override

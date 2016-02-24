@@ -57,7 +57,7 @@ public class DefaultJBossCentralConfigurator implements
 	@Override
 	public Image getHeaderImage() {
 		if (headerImage == null) {
-			headerImage = JBossCentralActivator.getDefault().getImage("/icons/jboss.png"); //$NON-NLS-1$
+			headerImage = JBossCentralActivator.getDefault().getImage("/icons/shadowman.png"); //$NON-NLS-1$
 		}
 		return headerImage;
 	}

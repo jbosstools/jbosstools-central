@@ -77,7 +77,7 @@ public class CentralTest {
 
 	@Test
 	public void testEditorOpen() throws Exception {
-		assertTrue("The JBoss Central editor isn't open", editor != null);
+		assertTrue("The Red Hat Central editor isn't open", editor != null);
 	}
 
 	@Test
@@ -111,7 +111,7 @@ public class CentralTest {
 		waitForJobs();
 		JobUtils.delay(1000);
 		
-		assertTrue("The JBoss Central editor isn't open by default",
+		assertTrue("The Red Hat Central editor isn't open by default",
 				hasOpenEditor());
 		IEclipsePreferences prefs = JBossCentralActivator.getDefault()
 				.getPreferences();
@@ -126,7 +126,7 @@ public class CentralTest {
 		
 		JobUtils.delay(1000);
 		assertFalse(
-				"The JBoss Central editor is open when the Show On Startup property is unchecked",
+				"The Red Hat Central editor is open when the Show On Startup property is unchecked",
 				hasOpenEditor());
 		prefs.putBoolean(
 				PreferenceKeys.SHOW_JBOSS_CENTRAL_ON_STARTUP,

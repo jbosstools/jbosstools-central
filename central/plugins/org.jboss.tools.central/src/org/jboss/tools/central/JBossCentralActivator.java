@@ -551,7 +551,7 @@ public class JBossCentralActivator extends AbstractUIPlugin {
 	/**
 	 * Registers DropTarget on the main Eclipse shell.
 	 * If there is the MPC client or some other plugin has already added DropTarget to the main Eclipse shell, 
-	 * the target is registered on the JBoss Central editor.
+	 * the target is registered on the Red Hat Central editor.
 	 * 
 	 * @param control
 	 * @since 1.2.2
