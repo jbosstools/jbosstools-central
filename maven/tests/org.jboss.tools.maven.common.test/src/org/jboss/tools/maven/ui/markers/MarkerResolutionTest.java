@@ -39,6 +39,11 @@ public class MarkerResolutionTest extends AbstractMavenProjectTestCase {
 								   OpenPageInBrowserMarkerResolution.class);
 	}
 
+	public void testEAPMarkerResolution() throws Exception {
+		testMarkerResolution("p4", ConfigureRedHatRepositoryMarkerResolution.class,
+								   OpenPageInBrowserMarkerResolution.class);
+	}
+	
 	public void testMarkerResolution(String projectName, Class ... markerClasses) throws Exception {
 		IProject project = importProject("projects/markers/"+projectName+"/pom.xml");
 		assertNotNull(project);

@@ -79,6 +79,9 @@ public class MavenDependencyMarkerResolutionGenerator implements
 			if (key.getVersion().contains(REDHAT_SUFFIX)) {
 				return ResolutionType.EAP_REPO;
 			} else if (key.getGroupId().startsWith(ORG_JBOSS_PREFIX)) {
+				if (key.getGroupId().contains(".eap")) {
+					return ResolutionType.EAP_REPO;
+				}
 				return ResolutionType.JBOSS_REPO;
 			}
 		}
