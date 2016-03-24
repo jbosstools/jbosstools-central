@@ -99,7 +99,7 @@ public class SourceLookupTest {
 	
 	@Test
 	public void testSourceContainerEAP61() throws Exception {
-		assertServerHasSource("JBoss EAP 6.1",WELD_BOOTSTRAP_JAVA);
+		assertServerHasSource("Red Hat JBoss EAP 6.1",WELD_BOOTSTRAP_JAVA);
 	}
 	
 	private void assertServerHasSource(String serverName, String sourceName) throws Exception {
