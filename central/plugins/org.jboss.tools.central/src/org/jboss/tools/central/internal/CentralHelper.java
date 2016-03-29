@@ -18,6 +18,8 @@ import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Collection;
+import java.util.HashSet;
 
 import org.apache.commons.io.FileUtils;
 import org.eclipse.core.runtime.CoreException;
@@ -236,5 +238,14 @@ public class CentralHelper {
 		IEclipsePreferences preferences = JBossCentralActivator.getDefault().getPreferences();
 		preferences.putBoolean(PreferenceKeys.SHOW_JBOSS_CENTRAL_ON_STARTUP, value);
 		JBossCentralActivator.getDefault().savePreferences();	
+	}
+	
+	public static Collection<String> getInstalledBundleIds() {
+		Bundle[] bundles = JBossCentralActivator.getDefault().getBundleContext().getBundles();
+		HashSet<String> bundleIds = new HashSet<>(bundles.length);
+		for (Bundle bundle : bundles) {
+			bundleIds.add(bundle.getSymbolicName());
+		}
+		return bundleIds;
 	}
 }
