@@ -95,8 +95,6 @@ public class JsonUtil {
 		json.append(quote).append(value).append(quote);
 		return json;
 	}
-		
-	
 	
 	public static String jsonifyExamples(Collection<ProjectExample> examples) {
 		StringBuilder json = new StringBuilder("[");
@@ -114,6 +112,22 @@ public class JsonUtil {
 				append("description", ex.getDescription(), json);
 				append("tags", ex.getTags(), json);
 				json.append("}");
+			}
+		}
+		json.append("]");
+		return json.toString();
+	}
+	
+	public static String jsonify(Collection<String> strings) {
+		StringBuilder json = new StringBuilder("[");
+		if (strings != null) {
+			boolean addComma = false;
+			for (String s : strings) {
+				if (addComma) {
+					json.append(",");
+				}
+				addComma = true;
+				quote(s, json);
 			}
 		}
 		json.append("]");

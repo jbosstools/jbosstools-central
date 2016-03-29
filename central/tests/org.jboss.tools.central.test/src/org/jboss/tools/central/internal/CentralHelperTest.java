@@ -7,9 +7,11 @@ import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Collection;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
+import org.jboss.tools.central.JBossCentralActivator;
 import org.jboss.tools.central.ShowJBossCentral;
 import org.jboss.tools.central.test.Activator;
 import org.junit.AfterClass;
@@ -105,5 +107,11 @@ public class CentralHelperTest {
 		assertTrue("Can't find " + p, Files.exists(p));
 	}
 
+	@Test
+	public void testGetInstalledBundleIds() {
+		Collection<String> bundleIds = CentralHelper.getInstalledBundleIds();
+		assertTrue(bundleIds.contains(JBossCentralActivator.PLUGIN_ID));
+	}
+	
 	//TODO setup jetty server to serve remote URL and test caching capabilities
 }

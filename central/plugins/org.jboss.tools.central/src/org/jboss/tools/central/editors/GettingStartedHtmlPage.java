@@ -228,6 +228,7 @@ public class GettingStartedHtmlPage extends AbstractJBossCentralPage implements 
 			new BrowserFunction(browser, "initialize") { //$NON-NLS-1$
 				@Override
 				public Object function(Object[] browserArgs) {
+					browser.execute(getSetAvailablePluginsScript());
 					browser.execute(getSetIntegrationStackSupportScript());
 					browser.execute(getLoadBuzzScript());
 					browser.execute(getLoadProxyWizardsScript());
@@ -305,6 +306,13 @@ public class GettingStartedHtmlPage extends AbstractJBossCentralPage implements 
 			CentralBrowserErrorWrapper errorWrapper = new CentralBrowserErrorWrapper();
 			errorWrapper.showError(parent, t);
 		}
+	}
+
+	protected String getSetAvailablePluginsScript() {
+		Collection<String> bundles = CentralHelper.getInstalledBundleIds();
+		String bundlesJson = JsonUtil.jsonify(bundles);
+		String script = "setAvailablePlugins(" + bundlesJson + ");"; //$NON-NLS-1$ //$NON-NLS-2$
+		return script;
 	}
 
 	protected void scheduleEarlyAccess() {

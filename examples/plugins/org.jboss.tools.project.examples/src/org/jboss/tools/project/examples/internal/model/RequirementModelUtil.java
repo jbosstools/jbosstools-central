@@ -189,7 +189,7 @@ public class RequirementModelUtil {
 	public static RequirementModel createFuseRequirement() {
 		RequirementModel req = createPluginRequirement();
 		Map<String, String> properties = new HashMap<>();
-		properties.put("id", "org.eclipse.core.runtime");
+		properties.put("id", "org.fusesource.ide.tooling");
 		properties.put("versions", "1.0.0");
 		properties.put("description", "This example works best with JBoss Fuse Development Tools");
 		properties.put("connectorIds", "jboss.integration-stack.bundle.fuse");
