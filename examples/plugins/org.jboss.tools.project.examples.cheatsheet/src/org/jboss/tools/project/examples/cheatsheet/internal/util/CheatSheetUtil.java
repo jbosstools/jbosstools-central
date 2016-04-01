@@ -412,7 +412,7 @@ public class CheatSheetUtil {
 							store, key);
 			int result = dialog.getReturnCode();
 			if (result == Window.CANCEL || result == SWT.DEFAULT) {
-				throw new OperationCanceledException();
+				return null;
 			}
 			if (dialog.getReturnCode() == IDialogConstants.YES_ID) {
 				return cheatsheets.get(0);
@@ -431,7 +431,7 @@ public class CheatSheetUtil {
 	        dialog.open();
 	        int result = dialog.getReturnCode();
 			if (result == Window.CANCEL || result == SWT.DEFAULT) {
-				throw new OperationCanceledException();
+				return null;
 			}
 			if (dialog.getReturnCode() == IDialogConstants.OK_ID) {
 				return dialog.getCheatsheet();
