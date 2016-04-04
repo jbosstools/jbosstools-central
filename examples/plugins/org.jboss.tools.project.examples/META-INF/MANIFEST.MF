@@ -66,5 +66,5 @@ Export-Package: org.jboss.tools.project.examples,
  org.jboss.tools.project.examples.preferences,
  org.jboss.tools.project.examples.runtimes,
  org.jboss.tools.project.examples.wizard
-Bundle-RequiredExecutionEnvironment: JavaSE-1.7
+Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 

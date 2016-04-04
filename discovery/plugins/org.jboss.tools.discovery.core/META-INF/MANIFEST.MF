@@ -27,5 +27,5 @@ Bundle-Localization: plugin
 Export-Package: org.jboss.tools.discovery.core.internal,
  org.jboss.tools.discovery.core.internal.connectors,
  org.jboss.tools.discovery.core.internal.connectors.xpl;x-internal:=true
-Bundle-RequiredExecutionEnvironment: JavaSE-1.7
+Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 

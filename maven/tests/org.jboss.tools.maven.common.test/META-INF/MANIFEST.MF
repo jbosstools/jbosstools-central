@@ -16,6 +16,6 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.m2e.tests.common,
  org.eclipse.ui.ide
 Bundle-ActivationPolicy: lazy
-Bundle-RequiredExecutionEnvironment: JavaSE-1.7
+Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Eclipse-RegisterBuddy: org.apache.log4j
 

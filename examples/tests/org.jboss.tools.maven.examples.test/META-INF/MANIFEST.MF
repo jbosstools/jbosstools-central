@@ -19,7 +19,7 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.wst.common.project.facet.core;bundle-version="1.4.300",
  org.eclipse.jst.j2ee
 Bundle-ActivationPolicy: lazy
-Bundle-RequiredExecutionEnvironment: JavaSE-1.7
+Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Export-Package: org.jboss.tools.maven.examples.test
 Bundle-Vendor: %BundleVendor
 Bundle-Localization: plugin
