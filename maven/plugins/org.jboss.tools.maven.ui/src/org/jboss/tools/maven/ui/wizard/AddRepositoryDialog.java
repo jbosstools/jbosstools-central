@@ -201,6 +201,7 @@ public class AddRepositoryDialog extends TitleAreaDialog {
 		profileCombo.setText(EMPTY_STRING);
 		profileCombo.addModifyListener(new ModifyListener() {
 			
+			@Override
 			public void modifyText(ModifyEvent e) {
 				validate();
 			}
@@ -268,6 +269,7 @@ public class AddRepositoryDialog extends TitleAreaDialog {
 			artifactImageLabel.setImage(getUnresolvedImage());
 			urlText.addModifyListener(new ModifyListener() {
 				
+				@Override
 				public void modifyText(ModifyEvent e) {
 					if (getErrorMessage() != null) {
 						return;
@@ -281,6 +283,7 @@ public class AddRepositoryDialog extends TitleAreaDialog {
 							final boolean resolved = resolveArtifact(id, url);
 							Display.getDefault().asyncExec(new Runnable() {
 								
+								@Override
 								public void run() {
 									if (resolved) {
 										artifactImageLabel.setImage(getResolvedImage());
@@ -353,6 +356,7 @@ public class AddRepositoryDialog extends TitleAreaDialog {
 				final Set<RepositoryWrapper> repos = new HashSet<>();
 				
 				IRunnableWithProgress runnable = new IRunnableWithProgress() {
+					@Override
 					public void run(IProgressMonitor monitor2) {
 						searchForRepositories(path, repos, monitor2);
 					}
@@ -450,6 +454,7 @@ public class AddRepositoryDialog extends TitleAreaDialog {
 		text.setLayoutData(new GridData(GridData.HORIZONTAL_ALIGN_FILL | GridData.GRAB_HORIZONTAL));
 		text.addModifyListener(new ModifyListener() {
 			
+			@Override
 			public void modifyText(ModifyEvent e) {
 				validate();
 			}
@@ -722,6 +727,7 @@ public class AddRepositoryDialog extends TitleAreaDialog {
 			return;
 		
 		File[] files = directory.listFiles(new FileFilter() {
+			@Override
 			public boolean accept(File file) {
 				return file.isDirectory();
 			}
@@ -996,6 +1002,7 @@ public class AddRepositoryDialog extends TitleAreaDialog {
 		releasesPolicyDecoration = addDecoration(releasesPolicyCombo, FieldDecorationRegistry.DEC_ERROR, INVALID_RELEASES_POLICY);
 		releasesPolicyCombo.addModifyListener(new ModifyListener() {
 			
+			@Override
 			public void modifyText(ModifyEvent e) {
 				validate();
 			}
@@ -1024,6 +1031,7 @@ public class AddRepositoryDialog extends TitleAreaDialog {
 		snapshotsPolicyDecoration = addDecoration(snapshotsPolicyCombo, FieldDecorationRegistry.DEC_ERROR, INVALID_SNAPSHOTS_POLICY);
 		snapshotsPolicyCombo.addModifyListener(new ModifyListener() {
 			
+			@Override
 			public void modifyText(ModifyEvent e) {
 				validate();
 			}
@@ -1032,6 +1040,7 @@ public class AddRepositoryDialog extends TitleAreaDialog {
 		ex.setClient(advancedComposite);
 		
 		ex.addExpansionListener(new ExpansionAdapter() {
+			@Override
 			public void expansionStateChanged(ExpansionEvent e) {
 				parent.getParent().layout();
 			}

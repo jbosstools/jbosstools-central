@@ -24,6 +24,7 @@ import org.eclipse.ui.dialogs.PreferencesUtil;
 */
 public abstract class AbstractPreferencesHandler extends AbstractHandler {
 
+	@Override
 	public Object execute(ExecutionEvent event) throws ExecutionException {
 		Shell shell = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();
 		PreferenceDialog preferenceDialog = PreferencesUtil.createPreferenceDialogOn(shell, getPreferenceId(), null, null);

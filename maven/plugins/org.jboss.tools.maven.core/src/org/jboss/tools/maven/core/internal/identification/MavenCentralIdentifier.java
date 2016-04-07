@@ -35,11 +35,13 @@ public class MavenCentralIdentifier extends AbstractArtifactIdentifier {
 
 	private static final String NAME_VERSION_SEARCH_QUERY = "http://search.maven.org/solrsearch/select?q=a:%22{0}%22%20AND%20v:%22{1}%22&rows=2&wt=json";
 
+	@Override
 	@Deprecated
 	public ArtifactKey identify(File file) throws CoreException {
 		return identify(file, null);
 	}
 
+	@Override
 	public ArtifactKey identify(File file, IProgressMonitor monitor) throws CoreException {
 		ArtifactKey key = sha1Search(file, monitor);
 		if (key == null) {

@@ -275,10 +275,12 @@ public class ConnectorDescriptorItemUi implements PropertyChangeListener, Runnab
 
 		if (this.isRealConnector) {
 			checkbox.addSelectionListener(new SelectionListener() {
+				@Override
 				public void widgetDefaultSelected(SelectionEvent e) {
 					widgetSelected(e);
 				}
 	
+				@Override
 				public void widgetSelected(SelectionEvent e) {
 					boolean selected = checkbox.getSelection();
 					maybeModifySelection(selected);
@@ -492,10 +494,12 @@ public class ConnectorDescriptorItemUi implements PropertyChangeListener, Runnab
 		return true;
 	}
 
+	@Override
 	public void propertyChange(PropertyChangeEvent evt) {
 		display.asyncExec(this);
 	}
 
+	@Override
 	public void run() {
 		if (!connectorContainer.isDisposed()) {
 			updateAvailability();

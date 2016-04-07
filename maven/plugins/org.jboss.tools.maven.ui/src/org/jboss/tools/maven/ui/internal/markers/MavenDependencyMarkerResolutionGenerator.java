@@ -45,6 +45,7 @@ public class MavenDependencyMarkerResolutionGenerator implements
 	public MavenDependencyMarkerResolutionGenerator() {
 	}
 	
+	@Override
 	public IMarkerResolution[] getResolutions(IMarker marker) {
 		ResolutionType type = getResolutionType(marker);
 		ArtifactKey key = getArtifactKey(marker);
@@ -69,6 +70,7 @@ public class MavenDependencyMarkerResolutionGenerator implements
 		}
 	}
 
+	@Override
 	public boolean hasResolutions(IMarker marker) {
 		return ResolutionType.UNSUPPORTED != getResolutionType(marker);
 	}

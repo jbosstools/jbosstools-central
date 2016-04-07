@@ -96,6 +96,7 @@ public class RepositoryWrapper implements Comparable<RepositoryWrapper> {
 		return name + "-" + repository.getUrl(); //$NON-NLS-1$
 	}
 
+	@Override
 	public int compareTo(RepositoryWrapper o) {
 		if (o == null) {
 			return 1;

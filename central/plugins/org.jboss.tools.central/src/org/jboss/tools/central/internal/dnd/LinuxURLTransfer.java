@@ -58,6 +58,7 @@ public class LinuxURLTransfer extends ByteArrayTransfer {
 	 * 
 	 * @see Transfer#nativeToJava
 	 */
+	@Override
 	public void javaToNative(Object object, TransferData transferData) {
 		if (isLinuxGTK()) {
 			try {
@@ -79,6 +80,7 @@ public class LinuxURLTransfer extends ByteArrayTransfer {
 	 * 
 	 * @see Transfer#javaToNative
 	 */
+	@Override
 	public Object nativeToJava(TransferData transferData) {
 		if (transferData == null) {
 			return null;
@@ -113,6 +115,7 @@ public class LinuxURLTransfer extends ByteArrayTransfer {
 		return false;
 	}
 	
+	@Override
 	protected int[] getTypeIds(){
 		return new int[] {URI_LIST_ID};
 	}
@@ -133,6 +136,7 @@ public class LinuxURLTransfer extends ByteArrayTransfer {
 		return super.isSupportedType(transferData);
 	}
 
+	@Override
 	protected String[] getTypeNames(){
 		if (!isLinuxGTK()) {
 			return new String[0];
@@ -144,6 +148,7 @@ public class LinuxURLTransfer extends ByteArrayTransfer {
 		return (object instanceof String) && ((String)object).length() > 0;
 	}
 
+	@Override
 	protected boolean validate(Object object) {
 		return checkURL(object);
 	}

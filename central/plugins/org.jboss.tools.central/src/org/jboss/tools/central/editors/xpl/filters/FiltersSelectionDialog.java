@@ -44,6 +44,7 @@ public class FiltersSelectionDialog extends Dialog {
 		this.toggledFilters = new HashSet<>();
 	}
 	
+	@Override
 	public Control createDialogArea(Composite parent) {
 		getShell().setText(Messages.DiscoveryViewer_FilterSelectionDialog_title);
 		Composite composite = new Composite(parent, SWT.NONE);

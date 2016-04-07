@@ -40,7 +40,8 @@ public class MavenClasspathContainerSaveHelper {
       {
         enableResolveObject(true);
       }
-      protected Object resolveObject(Object o) throws IOException {
+      @Override
+	protected Object resolveObject(Object o) throws IOException {
         if(o instanceof ProjectEntryReplace) {
           return ((ProjectEntryReplace) o).getEntry();
         } else if(o instanceof LibraryEntryReplace) {
@@ -64,7 +65,8 @@ public class MavenClasspathContainerSaveHelper {
         enableReplaceObject(true);
       }
       
-      protected Object replaceObject(Object o) throws IOException {
+      @Override
+	protected Object replaceObject(Object o) throws IOException {
         if(o instanceof IClasspathEntry) {
           IClasspathEntry e = (IClasspathEntry) o;
           if(e.getEntryKind()==IClasspathEntry.CPE_PROJECT) {

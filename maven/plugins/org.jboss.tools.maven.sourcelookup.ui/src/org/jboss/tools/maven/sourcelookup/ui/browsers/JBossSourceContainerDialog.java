@@ -128,6 +128,7 @@ public class JBossSourceContainerDialog extends TitleAreaDialog {
 			}
 		});
 		viewer.addDoubleClickListener(new IDoubleClickListener() {
+			@Override
 			public void doubleClick(DoubleClickEvent event) {
 				okPressed();
 			}

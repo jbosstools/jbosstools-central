@@ -103,6 +103,7 @@ public abstract class ToolTip {
 		this.style = style;
 		this.control.addDisposeListener(new DisposeListener() {
 
+			@Override
 			public void widgetDisposed(DisposeEvent e) {
 				data = null;
 				deactivate();
@@ -112,11 +113,13 @@ public abstract class ToolTip {
 
 		this.listener = new ToolTipOwnerControlListener();
 		this.shellListener = new Listener() {
+			@Override
 			public void handleEvent(final Event event) {
 				if (ToolTip.this.control != null
 						&& !ToolTip.this.control.isDisposed()) {
 					ToolTip.this.control.getDisplay().asyncExec(new Runnable() {
 
+						@Override
 						public void run() {
 							// Check if the new active shell is the tooltip
 							// itself
@@ -489,6 +492,7 @@ public abstract class ToolTip {
 		});
 		if (popupDelay > 0) {
 			control.getDisplay().timerExec(popupDelay, new Runnable() {
+				@Override
 				public void run() {
 					toolTipShow(shell, event);
 				}
@@ -501,6 +505,7 @@ public abstract class ToolTip {
 			control.getDisplay().timerExec(popupDelay + hideDelay,
 					new Runnable() {
 
+						@Override
 						public void run() {
 							toolTipHide(shell, null);
 						}
@@ -609,6 +614,7 @@ public abstract class ToolTip {
 			if (hideOnMouseDown != this.hideOnMouseDown) {
 				control.getDisplay().syncExec(new Runnable() {
 
+					@Override
 					public void run() {
 						if (CURRENT_TOOLTIP != null
 								&& CURRENT_TOOLTIP.isDisposed()) {
@@ -632,6 +638,7 @@ public abstract class ToolTip {
 	}
 
 	private class ToolTipOwnerControlListener implements Listener {
+		@Override
 		public void handleEvent(Event event) {
 			switch (event.type) {
 			case SWT.Dispose:
@@ -663,6 +670,7 @@ public abstract class ToolTip {
 	}
 
 	private class TooltipHideListener implements Listener {
+		@Override
 		public void handleEvent(Event event) {
 			if (event.widget instanceof Control) {
 

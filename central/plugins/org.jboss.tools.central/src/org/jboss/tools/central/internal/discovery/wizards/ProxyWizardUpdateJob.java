@@ -23,11 +23,13 @@ public class ProxyWizardUpdateJob extends Job {
 
 	public static class ProxyWizardUpdaterRule implements ISchedulingRule {
 
-	    public boolean contains(ISchedulingRule rule) {
+	    @Override
+		public boolean contains(ISchedulingRule rule) {
 	      return rule == this;
 	    }
 
-	    public boolean isConflicting(ISchedulingRule rule) {
+	    @Override
+		public boolean isConflicting(ISchedulingRule rule) {
 	      return rule == this;
 	    }
 

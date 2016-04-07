@@ -29,10 +29,12 @@ public class MavenHibernateLibraryProviderInstallOperationConfig extends MavenLi
 
 	private JpaPlatform.Config jpaPlatformDescription;
 	
+	@Override
 	public JpaPlatform.Config getJpaPlatformConfig() {
 		return jpaPlatformDescription;
 	}
 	
+	@Override
 	public void setJpaPlatformConfig(JpaPlatform.Config jpaPlatform) {
 		this.jpaPlatformDescription = jpaPlatform;
 	}	

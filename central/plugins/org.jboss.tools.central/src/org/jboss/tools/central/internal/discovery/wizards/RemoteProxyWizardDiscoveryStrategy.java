@@ -66,6 +66,7 @@ public class RemoteProxyWizardDiscoveryStrategy extends
 		Collections.sort(proxyWizards);
 	}
 	
+	@Override
 	public List<ProxyWizard> getProxyWizards() {
 		return proxyWizards;
 	}

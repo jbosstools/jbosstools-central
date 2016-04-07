@@ -81,6 +81,7 @@ public class OpenBinaryFileTest {
 	public static final String PROTOCOL_PLATFORM = "platform"; //$NON-NLS-1$
 
 	private static final IOverwriteQuery OVERWRITE_ALL_QUERY = new IOverwriteQuery() {
+		@Override
 		public String queryOverwrite(String pathString) {
 			return IOverwriteQuery.ALL;
 		}
@@ -308,6 +309,7 @@ public class OpenBinaryFileTest {
 		final Shell[] ret = new Shell[1];
 		display.syncExec(new Runnable() {
 
+			@Override
 			public void run() {
 				ret[0] = Display.getCurrent().getActiveShell();
 			}

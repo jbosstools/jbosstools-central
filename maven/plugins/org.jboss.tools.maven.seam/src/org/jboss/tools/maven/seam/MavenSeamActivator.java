@@ -118,6 +118,7 @@ public class MavenSeamActivator extends AbstractUIPlugin {
 	 * (non-Javadoc)
 	 * @see org.eclipse.ui.plugin.AbstractUIPlugin#start(org.osgi.framework.BundleContext)
 	 */
+	@Override
 	public void start(BundleContext context) throws Exception {
 		super.start(context);
 		plugin = this;
@@ -127,6 +128,7 @@ public class MavenSeamActivator extends AbstractUIPlugin {
 	 * (non-Javadoc)
 	 * @see org.eclipse.ui.plugin.AbstractUIPlugin#stop(org.osgi.framework.BundleContext)
 	 */
+	@Override
 	public void stop(BundleContext context) throws Exception {
 		plugin = null;
 		super.stop(context);
@@ -979,6 +981,7 @@ public class MavenSeamActivator extends AbstractUIPlugin {
 			webProject = project;
 		}
 
+		@Override
 		public void update(org.eclipse.m2e.model.edit.pom.Model projectModel) {
 			org.eclipse.m2e.model.edit.pom.Build build = projectModel.getBuild();
 			if (build == null) {
@@ -1142,6 +1145,7 @@ public class MavenSeamActivator extends AbstractUIPlugin {
 			this.dependency = dependency;
 		}
 
+		@Override
 		public void update(org.eclipse.m2e.model.edit.pom.Model model) {
 			org.eclipse.m2e.model.edit.pom.Dependency dependency = PomFactory.eINSTANCE
 					.createDependency();

@@ -25,6 +25,7 @@ import org.jboss.tools.central.JBossCentralActivator;
 */
 public class ShowJBossCentralHandler extends AbstractHandler implements IWorkbenchWindowActionDelegate {
 
+	@Override
 	public Object execute(ExecutionEvent event) throws ExecutionException {
 		JBossCentralActivator.getJBossCentralEditor(true);
 		return null;

@@ -29,10 +29,12 @@ public class MavenPropertiesIdentifier extends AbstractArtifactIdentifier {
 		super("Maven Properties identifier");
 	}
 
+	@Override
 	public ArtifactKey identify(File file) throws CoreException {
 		return identify(file, null);
 	}
 	
+	@Override
 	public ArtifactKey identify(File file, IProgressMonitor monitor) throws CoreException {
 		if (monitor == null) {
 			monitor = new NullProgressMonitor();

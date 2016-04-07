@@ -74,6 +74,7 @@ public class FileIdentificationManager implements IFileIdentificationManager {
 		return artifactIdentifiers;
 	}
 
+	@Override
 	public ArtifactKey identify(File file, IProgressMonitor monitor) throws CoreException {
 		if (file == null || !file.exists()) {
 			return null;

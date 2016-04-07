@@ -63,6 +63,7 @@ public class InstalledProxyWizardDiscoveryStrategy extends BundleDiscoveryStrate
 		return false;
 	}
 	
+	@Override
 	public List<ProxyWizard> getProxyWizards() {
 		return proxyWizards;
 	}

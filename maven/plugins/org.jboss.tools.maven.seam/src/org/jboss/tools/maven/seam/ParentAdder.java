@@ -35,7 +35,8 @@ public class ParentAdder extends ProjectUpdater {
       this.relativePath = relativePath;
     }
 
-    public void update(Model model) {
+    @Override
+	public void update(Model model) {
       Parent parent = model.getParent();
       if(parent==null) {
         parent = POM_FACTORY.createParent();

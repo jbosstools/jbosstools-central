@@ -209,6 +209,7 @@ public class TextSearchControl extends Composite {
 					WorkbenchMessages.FilteredTree_ClearToolTip, ICON_CANCEL);
 			addModifyListener(new ModifyListener() {
 
+				@Override
 				public void modifyText(ModifyEvent e) {
 					updateButtonVisibilityAndEnablement();
 
@@ -308,6 +309,7 @@ public class TextSearchControl extends Composite {
 		labelButton.setBackground(parent.getDisplay().getSystemColor(SWT.COLOR_LIST_BACKGROUND));
 		labelButton.setToolTipText(toolTipText);
 		labelButton.addDisposeListener(new DisposeListener() {
+			@Override
 			public void widgetDisposed(DisposeEvent e) {
 				if (nativeImage == null && activeImage != null && !activeImage.isDisposed()) {
 					activeImage.dispose();
@@ -329,6 +331,7 @@ public class TextSearchControl extends Composite {
 				fMoveListener = new MouseMoveListener() {
 					private boolean fMouseInButton = true;
 
+					@Override
 					public void mouseMove(MouseEvent e) {
 						boolean mouseInButton = isMouseInButton(e);
 						if (mouseInButton != fMouseInButton) {
@@ -362,18 +365,21 @@ public class TextSearchControl extends Composite {
 		});
 
 		labelButton.addMouseTrackListener(new MouseTrackListener() {
+			@Override
 			public void mouseEnter(MouseEvent e) {
 				if (labelButton.getImage() != activeImage) {
 					labelButton.setImage(activeImage);
 				}
 			}
 
+			@Override
 			public void mouseExit(MouseEvent e) {
 				if (labelButton.getImage() != inactiveImage) {
 					labelButton.setImage(inactiveImage);
 				}
 			}
 
+			@Override
 			public void mouseHover(MouseEvent e) {
 			}
 		});

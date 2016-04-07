@@ -16,6 +16,7 @@ public class NewRichfacesProjectWizard extends AbstractJBossCentralProjectWizard
 		super("richfaces-archetype-simpleapp");
 	}
 
+	@Override
 	protected String getWizardBackgroundImagePath() {
 		return "icons/richfaces_background.png";
 	}

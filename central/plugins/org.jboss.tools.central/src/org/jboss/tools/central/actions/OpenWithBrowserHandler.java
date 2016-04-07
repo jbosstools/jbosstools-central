@@ -24,6 +24,7 @@ import org.jboss.tools.central.JBossCentralActivator;
 */
 public abstract class OpenWithBrowserHandler extends AbstractHandler {
 
+	@Override
 	public Object execute(ExecutionEvent event) throws ExecutionException {
 		JBossCentralActivator.openUrl(getLocation(), getShell(), asExternal());
 		return null;

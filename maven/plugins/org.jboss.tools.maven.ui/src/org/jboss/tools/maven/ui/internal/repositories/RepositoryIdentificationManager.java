@@ -70,6 +70,7 @@ public class RepositoryIdentificationManager {
 			
 				jsfDir.listFiles(new FileFilter() {
 					
+					@Override
 					public boolean accept(File pathname) {
 						if (pathname != null && pathname.getName() != null && pathname.getName().contains("redhat")) { //$NON-NLS-1$
 							found[0] = true;

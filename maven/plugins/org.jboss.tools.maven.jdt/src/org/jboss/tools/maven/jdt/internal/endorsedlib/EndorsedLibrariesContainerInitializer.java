@@ -36,7 +36,8 @@ import org.jboss.tools.maven.jdt.utils.ClasspathHelpers;
  */
 public class EndorsedLibrariesContainerInitializer extends ClasspathContainerInitializer {
 
-  public void initialize(IPath containerPath, IJavaProject project) {
+  @Override
+public void initialize(IPath containerPath, IJavaProject project) {
     if(ClasspathHelpers.isEndorsedDirsClasspathContainer(containerPath)) {
       try {
         IClasspathContainer mavenContainer = getBuildPathManager().getSavedContainer(project.getProject());

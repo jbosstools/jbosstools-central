@@ -455,6 +455,7 @@ public class SeamProjectConfigurator extends AbstractProjectConfigurator {
 
 	private IProject getReferencingSeamWebProject(IProject earProject)	throws CoreException {
 		Criteria criteria = new Criteria() {
+			@Override
 			public boolean applies(IProject project) {
 				return project != null && JavaEEProjectUtilities.isDynamicWebProject(project);
 			}
@@ -464,6 +465,7 @@ public class SeamProjectConfigurator extends AbstractProjectConfigurator {
 	
 	private IProject getReferencingSeamEJBProject(IProject earProject)	throws CoreException {
 		Criteria criteria = new Criteria() {
+			@Override
 			public boolean applies(IProject project) {
 				return project != null && JavaEEProjectUtilities.isEJBProject(project);
 			}

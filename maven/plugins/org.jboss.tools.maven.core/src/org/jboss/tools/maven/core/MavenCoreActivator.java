@@ -126,6 +126,7 @@ public class MavenCoreActivator extends Plugin {
 	 * (non-Javadoc)
 	 * @see org.eclipse.ui.plugin.AbstractUIPlugin#start(org.osgi.framework.BundleContext)
 	 */
+	@Override
 	public void start(BundleContext context) throws Exception {
 		super.start(context);
 		mavenSettingsListeners.clear();
@@ -136,6 +137,7 @@ public class MavenCoreActivator extends Plugin {
 	 * (non-Javadoc)
 	 * @see org.eclipse.ui.plugin.AbstractUIPlugin#stop(org.osgi.framework.BundleContext)
 	 */
+	@Override
 	public void stop(BundleContext context) throws Exception {
 		artifactResolutionService = null;
 		plugin = null;

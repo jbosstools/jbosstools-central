@@ -29,7 +29,8 @@ public class PluginUpdater extends ProjectUpdater {
       this.plugin = plugin;
     }
 
-    public void update(Model model) {
+    @Override
+	public void update(Model model) {
     	Build build = model.getBuild();
         if(build==null) {
           build = POM_FACTORY.createBuild();

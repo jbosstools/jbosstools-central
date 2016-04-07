@@ -16,6 +16,7 @@ public class NewForgeProjectWizard extends AbstractJBossCentralProjectWizard {
 		super("jboss-forge-html5-archetype");
 	}
 
+	@Override
 	protected String getWizardBackgroundImagePath() {
 		return "icons/forge.png";
 	}

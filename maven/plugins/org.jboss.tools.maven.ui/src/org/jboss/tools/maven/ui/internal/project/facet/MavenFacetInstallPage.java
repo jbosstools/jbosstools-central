@@ -190,6 +190,7 @@ IFacetWizardPage {
 		}
 		getDataModel().addListener(new IDataModelListener() {
 			
+			@Override
 			public void propertyChanged(DataModelEvent event) {
 				String propertyName = event.getPropertyName();
 				if (IFacetProjectCreationDataModelProperties.FACET_PROJECT_NAME.equals(propertyName)) {
@@ -222,6 +223,7 @@ IFacetWizardPage {
 			IJBossMavenConstants.PACKAGING };
 	}
 
+	@Override
 	public void setConfig(Object config) {
 		model.removeListener(this);
 		synchHelper.dispose();
@@ -237,9 +239,11 @@ IFacetWizardPage {
 		super.dispose();
 	}
 
+	@Override
 	public void setWizardContext(IWizardContext context) {
 
 	}
+	@Override
 	public void transferStateToConfig() {
 		
 	}

@@ -20,6 +20,7 @@ import org.jboss.tools.maven.ui.wizard.RepositoryWrapper;
 
 abstract class AbstractRepositoryIdentifier implements ILocalRepositoryIdentifier {
 
+	@Override
 	public RepositoryWrapper identifyRepository(File rootDirectory, IProgressMonitor monitor) {
 		if (matches(rootDirectory)) {
 			return getRepository(rootDirectory);

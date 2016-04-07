@@ -123,6 +123,7 @@ public class JBossCentralEditor extends SharedHeaderFormEditor {
 		useDefaultColors = true;
 	}
 
+	@Override
 	public void dispose() {
 		gettingStartedPage = null;
 		softwarePage = null;
@@ -148,10 +149,12 @@ public class JBossCentralEditor extends SharedHeaderFormEditor {
 		super.dispose();
 	}
 
+	@Override
 	public void doSave(IProgressMonitor monitor) {
 
 	}
 
+	@Override
 	public void doSaveAs() {
 
 	}
@@ -160,6 +163,7 @@ public class JBossCentralEditor extends SharedHeaderFormEditor {
 	 * The <code>MultiPageEditorExample</code> implementation of this method
 	 * checks that the input is an instance of <code>IFileEditorInput</code>.
 	 */
+	@Override
 	public void init(IEditorSite site, IEditorInput editorInput)
 			throws PartInitException {
 		if (!(editorInput instanceof JBossCentralEditorInput))
@@ -182,6 +186,7 @@ public class JBossCentralEditor extends SharedHeaderFormEditor {
 	/*
 	 * (non-Javadoc) Method declared on IEditorPart.
 	 */
+	@Override
 	public boolean isSaveAsAllowed() {
 		return false;
 	}
@@ -536,6 +541,7 @@ public class JBossCentralEditor extends SharedHeaderFormEditor {
 				//titleLabel.setFont(heading.getFont());
 				titleLabel.setFont(font);
 				titleLabel.addFocusListener(new FocusAdapter() {
+					@Override
 					public void focusLost(FocusEvent e) {
 						titleLabel.setSelection(0);
 						Event selectionEvent= new Event();
@@ -558,12 +564,14 @@ public class JBossCentralEditor extends SharedHeaderFormEditor {
 				});
 
 				busyLabel.addControlListener(new ControlAdapter() {
+					@Override
 					public void controlMoved(ControlEvent e) {
 						updateSizeAndLocations();
 					}
 				});
 				titleLabel.moveAbove(busyLabel);
 				titleRegion.addControlListener(new ControlAdapter() {
+					@Override
 					public void controlResized(ControlEvent e) {
 						updateSizeAndLocations();
 					}

@@ -79,6 +79,7 @@ class OverviewToolTip extends GradientToolTip {
 			if (image != null) {
 				final Image fimage = image;
 				container.addDisposeListener(new DisposeListener() {
+					@Override
 					public void widgetDisposed(DisposeEvent e) {
 						fimage.dispose();
 					}
@@ -172,10 +173,12 @@ class OverviewToolTip extends GradientToolTip {
 			link.setBackground(null);
 			link.setToolTipText(NLS.bind(Messages.ConnectorDescriptorToolTip_detailsLink_tooltip, overview.getUrl()));
 			link.addSelectionListener(new SelectionListener() {
+				@Override
 				public void widgetSelected(SelectionEvent e) {
 					BrowserUtil.openUrl(overview.getUrl(), IWorkbenchBrowserSupport.AS_EXTERNAL);
 				}
 
+				@Override
 				public void widgetDefaultSelected(SelectionEvent e) {
 					widgetSelected(e);
 				}
@@ -192,6 +195,7 @@ class OverviewToolTip extends GradientToolTip {
 		// hack: cause the tooltip to gain focus so that we can capture the escape key
 		//       this must be done async since the tooltip is not yet visible.
 		Display.getCurrent().asyncExec(new Runnable() {
+			@Override
 			public void run() {
 				if (!parent.isDisposed()) {
 					parent.setFocus();

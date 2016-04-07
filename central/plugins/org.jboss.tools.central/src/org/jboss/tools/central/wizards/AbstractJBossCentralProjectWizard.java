@@ -85,6 +85,7 @@ public abstract class AbstractJBossCentralProjectWizard extends NewProjectExampl
 	
 	class RunnableLookup implements IRunnableWithProgress {
 		
+		@Override
 		public void run(IProgressMonitor monitor) {
 			monitor.setTaskName("Refreshing project examples");
 			RefreshTutorialsJob refreshTutorialsJob = RefreshTutorialsJob.INSTANCE;	
@@ -100,6 +101,7 @@ public abstract class AbstractJBossCentralProjectWizard extends NewProjectExampl
 		}
 	}
 	
+	@Override
 	protected void initializeDefaultPageImageDescriptor() {
 		String imagePath = getWizardBackgroundImagePath();
 		ImageDescriptor desc = AbstractUIPlugin.imageDescriptorFromPlugin(JBossCentralActivator.PLUGIN_ID, 

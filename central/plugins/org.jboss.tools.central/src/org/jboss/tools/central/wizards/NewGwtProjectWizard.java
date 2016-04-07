@@ -16,6 +16,7 @@ public class NewGwtProjectWizard extends AbstractJBossCentralProjectWizard {
 		super("gwt-webapp");
 	}
 	
+	@Override
 	protected String getWizardBackgroundImagePath() {
 		return "icons/gwt_background.png";
 	}

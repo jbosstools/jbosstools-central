@@ -113,6 +113,7 @@ public class MavenUserLibraryProviderInstallPanel extends
 			config.setModel(model);
 			parent.addDisposeListener(new DisposeListener() {
 				
+				@Override
 				public void widgetDisposed(DisposeEvent e) {
 					parent.removeDisposeListener(this);
 					resource.unload();
@@ -145,6 +146,7 @@ public class MavenUserLibraryProviderInstallPanel extends
 		createDependencyViewer(composite);
 		dependencyViewer.addSelectionChangedListener(new ISelectionChangedListener() {
 			
+			@Override
 			public void selectionChanged(SelectionChangedEvent event) {
 				ISelection sel = event.getSelection();
 				if (sel instanceof IStructuredSelection) {
@@ -257,10 +259,12 @@ public class MavenUserLibraryProviderInstallPanel extends
 		addButton.setText(Messages.MavenUserLibraryProviderInstallPanel_Add);
 		addButton.addSelectionListener(new SelectionListener(){
 
+			@Override
 			public void widgetDefaultSelected(SelectionEvent e) {
 				
 			}
 
+			@Override
 			public void widgetSelected(SelectionEvent e) {
 				Dependency dependency = PomFactory.eINSTANCE.createDependency();
 				dependency.setGroupId("?"); //$NON-NLS-1$
@@ -278,6 +282,7 @@ public class MavenUserLibraryProviderInstallPanel extends
 		
 		removeButton.addSelectionListener(new SelectionListener(){
 		
+			@Override
 			public void widgetSelected(SelectionEvent e) {
 				ISelection sel = dependencyViewer.getSelection();
 				if (sel instanceof IStructuredSelection) {
@@ -294,6 +299,7 @@ public class MavenUserLibraryProviderInstallPanel extends
 				}
 			}
 		
+			@Override
 			public void widgetDefaultSelected(SelectionEvent e) {
 				
 			}
@@ -305,6 +311,7 @@ public class MavenUserLibraryProviderInstallPanel extends
 		
 		restoreDefaults.addSelectionListener(new SelectionListener(){
 		
+			@Override
 			public void widgetSelected(SelectionEvent e) {
 				resource.unload();
 				MavenLibraryProviderInstallOperationConfig config = (MavenLibraryProviderInstallOperationConfig) getOperationConfig();
@@ -337,6 +344,7 @@ public class MavenUserLibraryProviderInstallPanel extends
 				}
 			}
 		
+			@Override
 			public void widgetDefaultSelected(SelectionEvent e) {
 				
 			}
@@ -344,6 +352,7 @@ public class MavenUserLibraryProviderInstallPanel extends
 		
 		dependencyViewer.addSelectionChangedListener(new ISelectionChangedListener() {
 			
+			@Override
 			public void selectionChanged(SelectionChangedEvent event) {
 				ISelection sel = dependencyViewer.getSelection();
 				if (sel instanceof IStructuredSelection) {
@@ -372,10 +381,12 @@ public class MavenUserLibraryProviderInstallPanel extends
 		addButton.setText(Messages.MavenUserLibraryProviderInstallPanel_Add);
 		addButton.addSelectionListener(new SelectionListener(){
 
+			@Override
 			public void widgetDefaultSelected(SelectionEvent e) {
 				
 			}
 
+			@Override
 			public void widgetSelected(SelectionEvent e) {
 				Exclusion exclusion = PomFactory.eINSTANCE.createExclusion();
 				exclusion.setGroupId("?"); //$NON-NLS-1$
@@ -406,6 +417,7 @@ public class MavenUserLibraryProviderInstallPanel extends
 		
 		removeButton.addSelectionListener(new SelectionListener(){
 		
+			@Override
 			public void widgetSelected(SelectionEvent e) {
 				ISelection sel = exclusionViewer.getSelection();
 				if (sel instanceof IStructuredSelection) {
@@ -422,12 +434,14 @@ public class MavenUserLibraryProviderInstallPanel extends
 				}
 			}
 		
+			@Override
 			public void widgetDefaultSelected(SelectionEvent e) {
 				
 			}
 		});
 		exclusionViewer.addSelectionChangedListener(new ISelectionChangedListener() {
 			
+			@Override
 			public void selectionChanged(SelectionChangedEvent event) {
 				ISelection sel = exclusionViewer.getSelection();
 				if (sel instanceof IStructuredSelection) {
@@ -444,6 +458,7 @@ public class MavenUserLibraryProviderInstallPanel extends
 	private static class TableContentProvider implements
 			IStructuredContentProvider {
 
+		@Override
 		public Object[] getElements(Object inputElement) {
 			if (inputElement instanceof Object[]) {
 				return (Object[]) inputElement;
@@ -454,10 +469,12 @@ public class MavenUserLibraryProviderInstallPanel extends
 			return new Object[0];
 		}
 
+		@Override
 		public void dispose() {
 
 		}
 
+		@Override
 		public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
 
 		}
@@ -471,6 +488,7 @@ public class MavenUserLibraryProviderInstallPanel extends
 			this.columnIndex = columnIndex;
 		}
 
+		@Override
 		public String getText(Object element) {
 			if (element instanceof Dependency) {
 				Dependency dependency = (Dependency) element;
@@ -499,6 +517,7 @@ public class MavenUserLibraryProviderInstallPanel extends
 			this.columnIndex = columnIndex;
 		}
 
+		@Override
 		public String getText(Object element) {
 			if (element instanceof Exclusion) {
 				Exclusion exclusion = (Exclusion) element;

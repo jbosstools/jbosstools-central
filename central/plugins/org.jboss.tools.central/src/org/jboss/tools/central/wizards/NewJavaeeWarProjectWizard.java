@@ -16,6 +16,7 @@ public class NewJavaeeWarProjectWizard extends AbstractJBossCentralProjectWizard
 		super("jboss-javaee6-webapp");
 	}
 
+	@Override
 	protected String getWizardBackgroundImagePath() {
 		return "icons/web_background.gif";
 	}

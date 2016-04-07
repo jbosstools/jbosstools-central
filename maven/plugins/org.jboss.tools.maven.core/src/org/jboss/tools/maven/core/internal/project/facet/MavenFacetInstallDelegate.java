@@ -51,6 +51,7 @@ public class MavenFacetInstallDelegate implements IDelegate {
 
 	private static final String SEAM_FACET_ID = "jst.seam"; //$NON-NLS-1$
 
+	@Override
 	public void execute(IProject project, IProjectFacetVersion fv, Object cfg,
 			IProgressMonitor monitor) throws CoreException {
 		IDataModel config = null;

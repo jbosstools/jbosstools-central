@@ -37,10 +37,12 @@ public class NexusIndexIdentifier extends AbstractArtifactIdentifier {
 		globalRepositories = initGlobalRepositories();
 	}
 	
+	@Override
 	public ArtifactKey identify(File file) throws CoreException {
 		return identify(file, null);
 	}
 		
+	@Override
 	public ArtifactKey identify(File file, IProgressMonitor monitor) throws CoreException {
 		if (monitor == null) {
 			monitor = new NullProgressMonitor();

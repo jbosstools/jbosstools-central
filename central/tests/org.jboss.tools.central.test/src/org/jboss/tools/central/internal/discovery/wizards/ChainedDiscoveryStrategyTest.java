@@ -43,6 +43,7 @@ public class ChainedDiscoveryStrategyTest {
 				throws CoreException {
 		}
 
+		@Override
 		public List<ProxyWizard> getProxyWizards() {
 			return wizards;
 		}

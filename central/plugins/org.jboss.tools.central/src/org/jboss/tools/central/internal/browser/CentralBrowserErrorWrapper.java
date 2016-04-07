@@ -81,6 +81,7 @@ public class CentralBrowserErrorWrapper {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				BusyIndicator.showWhile(link.getDisplay(), new Runnable() {
+					@Override
 					public void run() {
 						JBossCentralActivator.openUrl(Messages.visualEditorFaqLink,
 								Display.getDefault().getActiveShell(), true);

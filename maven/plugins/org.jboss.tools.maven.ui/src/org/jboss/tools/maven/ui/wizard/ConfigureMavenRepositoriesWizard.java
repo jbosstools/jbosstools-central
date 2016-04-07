@@ -52,6 +52,7 @@ public class ConfigureMavenRepositoriesWizard extends Wizard implements
 		this.preSelectedProfileId = profileId;
 	}
 
+	@Override
 	public void init(IWorkbench workbench, IStructuredSelection selection) {
 		initializeDefaultPageImageDescriptor();
 	}

@@ -29,18 +29,22 @@ public class ExecuteDependencyCopyMarkerResolution implements IMarkerResolution,
 		this.phase = phaseToExecute;
 	}
 
+	@Override
 	public String getDescription() {
 		return getLabel();
 	}
 
+	@Override
 	public Image getImage() {					
 		return null;
 	}
 
+	@Override
 	public String getLabel() {
 		return "Run 'mvn "+ phase +"' to execute dependency:copy";
 	}
 
+	@Override
 	public void run(IMarker marker) {
 		ExecutePhaseJob job = new ExecutePhaseJob("Run 'mvn "+ phase +"'", mavenProjectFacade, phase);
 		job.schedule();

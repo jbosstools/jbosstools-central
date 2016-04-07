@@ -31,18 +31,22 @@ public class ConfigureMavenRepositoriesMarkerResolution implements IMarkerResolu
 		this.artifactKey = artifactKey;
 	}
 
+	@Override
 	public String getDescription() {
 		return getLabel();
 	}
 
+	@Override
 	public Image getImage() {					
 		return null;
 	}
 
+	@Override
 	public String getLabel() {
 		return "Configure Maven Repositories";
 	}
 
+	@Override
 	public void run(IMarker marker) {
 
 		ConfigureMavenRepositoriesWizard wizard = new ConfigureMavenRepositoriesWizard(artifactKey, getRepositoryProfileId());

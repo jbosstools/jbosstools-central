@@ -189,6 +189,7 @@ public class ConfiguratorPreferencePage extends PreferencePage implements
 		return bundle != null;
 	}
 
+	@Override
 	public void init(IWorkbench workbench) {
 	}
 

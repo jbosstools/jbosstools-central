@@ -226,6 +226,7 @@ public class ConfigureMavenRepositoriesWizardPage extends WizardPage implements 
 		this.preSelectedProfileId = profileId;
 	}
 
+	@Override
 	public void createControl(Composite parent) {
 		Composite composite = new Composite(parent, SWT.NONE);
 		composite.setLayout(new GridLayout(1, false));
@@ -356,6 +357,7 @@ public class ConfigureMavenRepositoriesWizardPage extends WizardPage implements 
 		
 		includedRepositoriesViewer.addSelectionChangedListener(new ISelectionChangedListener() {
 			
+			@Override
 			public void selectionChanged(SelectionChangedEvent event) {
 				ISelection sel = event.getSelection();
 				selectedIncludedRepositories.clear();
@@ -937,6 +939,7 @@ public class ConfigureMavenRepositoriesWizardPage extends WizardPage implements 
 		gd.minimumHeight = 200;
 		control.setLayoutData(gd);
 		control.addDisposeListener(new DisposeListener() {
+			@Override
 			public void widgetDisposed(DisposeEvent e) {
 				if (compareConfiguration != null)
 					compareConfiguration.dispose();
@@ -1083,6 +1086,7 @@ public class ConfigureMavenRepositoriesWizardPage extends WizardPage implements 
 
 	class RepositoryLabelProvider extends StyledCellLabelProvider {
 		
+		@Override
 		public String getToolTipText(Object element) {
 			if (element instanceof RepositoryWrapper) {
 				return ((RepositoryWrapper) element).getDisplayName();
@@ -1090,14 +1094,17 @@ public class ConfigureMavenRepositoriesWizardPage extends WizardPage implements 
 			return null;
 		}
 
+		@Override
 		public Point getToolTipShift(Object object) {
 			return new Point(10, 10);
 		}
 
+		@Override
 		public int getToolTipDisplayDelayTime(Object object) {
 			return 1000;
 		}
 
+		@Override
 		public int getToolTipTimeDisplayed(Object object) {
 			return 5000;
 		}
@@ -1153,6 +1160,7 @@ public class ConfigureMavenRepositoriesWizardPage extends WizardPage implements 
 			fContent= content;
 		}
 		
+		@Override
 		public InputStream getContents() {
 			return new ByteArrayInputStream(getBytes(fContent, UTF_8));
 		}
@@ -1163,18 +1171,23 @@ public class ConfigureMavenRepositoriesWizardPage extends WizardPage implements 
 		PreviewerInput() {
 		}
 		
+		@Override
 		public Image getImage() {
 			return null;
 		}
+		@Override
 		public String getName() {
 			return "no name";	//$NON-NLS-1$
 		}
+		@Override
 		public String getType() {
 			return "xml";	//$NON-NLS-1$
 		}
+		@Override
 		public InputStream getContents() {
 			return new ByteArrayInputStream(getBytes(getNewSettings(), UTF_8));
 		}
+		@Override
 		public String getCharset() {
 			return UTF_8;
 		}
@@ -1262,6 +1275,7 @@ public class ConfigureMavenRepositoriesWizardPage extends WizardPage implements 
 		final String userSettings = getUserSettings();
 
 		Job job = new Job("Updating Maven settings...") { //$NON-NLS-1$
+			@Override
 			protected IStatus run(IProgressMonitor monitor) {
 				try {
 					MavenPlugin.getMaven().reloadSettings();

@@ -16,6 +16,7 @@ public class NewSpringMvcProjectWizard extends AbstractJBossCentralProjectWizard
 		super("spring-mvc-webapp");
 	}
 
+	@Override
 	protected String getWizardBackgroundImagePath() {
 		return "icons/spring_background.png";
 	}

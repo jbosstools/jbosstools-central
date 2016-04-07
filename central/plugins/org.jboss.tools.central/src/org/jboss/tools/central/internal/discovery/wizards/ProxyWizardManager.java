@@ -252,7 +252,8 @@ public class ProxyWizardManager {
 		}
 		//Put most recent folders first
 		Arrays.sort(files, new Comparator<File>(){
-		    public int compare(File f1, File f2){
+		    @Override
+			public int compare(File f1, File f2){
 		    	return f2.getName().compareTo(f1.getName());
 		        //return Long.valueOf(f2.lastModified()).compareTo(f1.lastModified());
 		    } 

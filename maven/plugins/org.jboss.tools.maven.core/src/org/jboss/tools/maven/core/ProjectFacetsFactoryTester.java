@@ -25,6 +25,7 @@ import org.eclipse.wst.common.project.facet.core.internal.ProjectFacetVersion;
  */
 public class ProjectFacetsFactoryTester extends PropertyTester {
 
+	@Override
 	public boolean test(Object receiver, String property, Object[] args,
 			Object expectedValue) {
 		

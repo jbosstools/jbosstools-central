@@ -48,6 +48,7 @@ public class EndorsedLibrariesManager implements IEndorsedLibrariesManager {
 	/* (non-Javadoc)
 	 * @see org.jboss.tools.maven.jdt.endorsedlib.IEndorsedLibrariesManager#configureEndorsedLibs(org.eclipse.jdt.core.IJavaProject, org.eclipse.m2e.jdt.IClasspathDescriptor, java.io.File[], org.eclipse.core.runtime.IProgressMonitor)
 	 */
+	@Override
 	public void configureEndorsedLibs(IJavaProject javaProject, IClasspathDescriptor classpath, File[] endorsedDirs,
 			IProgressMonitor monitor) throws CoreException {
 	
@@ -117,6 +118,7 @@ public class EndorsedLibrariesManager implements IEndorsedLibrariesManager {
 	/* (non-Javadoc)
 	 * @see org.jboss.tools.maven.jdt.endorsedlib.IEndorsedLibrariesManager#getSavedContainer(org.eclipse.core.resources.IProject)
 	 */
+	@Override
 	public IClasspathContainer getSavedContainer(IProject project)
 			throws CoreException {
 		File containerStateFile = getContainerStateFile(project);

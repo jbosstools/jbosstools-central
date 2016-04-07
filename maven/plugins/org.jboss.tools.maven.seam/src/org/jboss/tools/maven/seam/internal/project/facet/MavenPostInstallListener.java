@@ -38,6 +38,7 @@ public class MavenPostInstallListener implements IFacetedProjectListener {
 	
 	private Map<IFacetedProject, IDataModel> mavenModels = new WeakHashMap<>(1);
 	
+	@Override
 	public void handleEvent(IFacetedProjectEvent event) {
 		if (!(event instanceof IProjectFacetActionEvent)) {
 			return;

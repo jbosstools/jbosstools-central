@@ -16,6 +16,7 @@ public class NewHtml5ProjectWizard extends AbstractJBossCentralProjectWizard {
 		super("jboss-javaee6-poh5-archetype");
 	}
 
+	@Override
 	protected String getWizardBackgroundImagePath() {
 		return "icons/html5_background.png";
 	}

@@ -54,6 +54,7 @@ public class MissingEndorsedLibMarkerResolutionGenerator implements	IMarkerResol
 		
 	}
 	
+	@Override
 	public IMarkerResolution[] getResolutions(IMarker marker) {
 		String phase;
 		try {
@@ -69,6 +70,7 @@ public class MissingEndorsedLibMarkerResolutionGenerator implements	IMarkerResol
 		return new IMarkerResolution[0];
 	}
 
+	@Override
 	public boolean hasResolutions(IMarker marker) {
 		try {
 			return null != getPhaseToExecute(marker, new NullProgressMonitor());

@@ -110,6 +110,7 @@ public class CheatSheetTest {
 	private static void importKitchensink() throws Exception {
 		WorkspaceJob workspaceJob = new WorkspaceJob(Messages.NewProjectExamplesWizard_Downloading) {
 
+			@Override
 			public IStatus runInWorkspace(IProgressMonitor monitor)
 					throws CoreException {
 				try {

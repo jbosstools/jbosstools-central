@@ -19,6 +19,7 @@ import org.jboss.tools.maven.core.MavenCoreActivator;
 
 public class HibernateLibValidator implements LibraryValidator {
 
+	@Override
 	@SuppressWarnings("nls")
 	public IStatus validate(JptLibraryProviderInstallOperationConfig config) {
 		JpaLibraryProviderInstallOperationConfig jpaConfig = (JpaLibraryProviderInstallOperationConfig) config;

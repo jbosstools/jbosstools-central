@@ -56,6 +56,7 @@ public abstract class AbstractMavenConfiguratorTest extends
 		super.setUp();
 	}
 
+	@Override
 	@After
 	public void tearDown() throws Exception {
 		super.tearDown();

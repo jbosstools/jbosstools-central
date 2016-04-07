@@ -53,6 +53,7 @@ public class JBossCentralEditorContributor extends MultiPageEditorActionBarContr
 	 * Method declared in AbstractMultiPageEditorActionBarContributor.
 	 */
 
+	@Override
 	public void setActivePage(IEditorPart part) {
 		if (activeEditorPart == part)
 			return;
@@ -95,9 +96,11 @@ public class JBossCentralEditorContributor extends MultiPageEditorActionBarContr
 		}
 	}
 	
+	@Override
 	public void contributeToMenu(IMenuManager manager) {
 	}
 
+	@Override
 	public void contributeToToolBar(IToolBarManager manager) {
 	}
 }

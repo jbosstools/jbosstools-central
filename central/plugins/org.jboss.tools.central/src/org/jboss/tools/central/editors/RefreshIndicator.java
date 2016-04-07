@@ -53,6 +53,7 @@ public class RefreshIndicator extends Canvas {
 		images = getImages(parent, imagePath);
 	
 		addPaintListener(new PaintListener() {
+			@Override
 			public void paintControl(PaintEvent event) {
 				onPaint(event);
 			}
@@ -87,6 +88,7 @@ public class RefreshIndicator extends Canvas {
 		return images;
 	}
 
+	@Override
 	public Point computeSize(int wHint, int hHint, boolean changed) {
 		return new Point(25, 25);
 	}
@@ -101,12 +103,14 @@ public class RefreshIndicator extends Canvas {
 		stop = false;
 		busyThread = new Thread() {
 			protected int count;
+			@Override
 			public void run() {
 				try {
 					final int maxCount = images.length;
 					count = 1;
 					while (!stop) {
 						Display.getDefault().syncExec(new Runnable() {
+							@Override
 							public void run() {
 								if (isDisposed() || getParent() == null || getParent().isDisposed()) {
 									setBusy(false);
@@ -132,6 +136,7 @@ public class RefreshIndicator extends Canvas {
 					}
 					if (busyThread == null)
 						Display.getDefault().syncExec(new Thread() {
+							@Override
 							public void run() {
 								setImage(images[0]);
 							}
@@ -147,6 +152,7 @@ public class RefreshIndicator extends Canvas {
 		busyThread.start();
 	}
 	
+	@Override
 	public void dispose() {
 		stop = true;
 		busyThread = null;

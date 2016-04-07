@@ -85,7 +85,8 @@ public class UpdateMavenProjectJob extends WorkspaceJob {
     setRule(MavenPlugin.getProjectConfigurationManager().getRule());
   }
 
-  public IStatus runInWorkspace(IProgressMonitor monitor) {
+  @Override
+public IStatus runInWorkspace(IProgressMonitor monitor) {
     IProjectConfigurationManager configurationManager = MavenPlugin.getProjectConfigurationManager();
     IMavenProjectRegistry projectRegistry = MavenPlugin.getMavenProjectRegistry();
     boolean autoBuilding = ResourcesPlugin.getWorkspace().isAutoBuilding();
@@ -150,7 +151,8 @@ public class UpdateMavenProjectJob extends WorkspaceJob {
     final Display display = Display.getDefault();
     if(display != null) {
       display.asyncExec(new Runnable() {
-        public void run() {
+        @Override
+		public void run() {
           M2EUIUtils.showErrorsForProjectsDialog(display.getActiveShell(), Messages.UpdateSourcesAction_error_title,
               Messages.UpdateSourcesAction_error_message, updateErrors);
         }

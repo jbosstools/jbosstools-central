@@ -370,6 +370,7 @@ public class DiscoveryViewer extends Viewer {
 				fMoveListener = new MouseMoveListener() {
 					private boolean fMouseInButton = true;
 
+					@Override
 					public void mouseMove(MouseEvent e) {
 						boolean mouseInButton = isMouseInButton(e);
 						if (mouseInButton != fMouseInButton) {
@@ -396,18 +397,22 @@ public class DiscoveryViewer extends Viewer {
 			}
 		});
 		clearButton.addMouseTrackListener(new MouseTrackListener() {
+			@Override
 			public void mouseEnter(MouseEvent e) {
 				clearButton.setImage(activeImage);
 			}
 
+			@Override
 			public void mouseExit(MouseEvent e) {
 				clearButton.setImage(inactiveImage);
 			}
 
+			@Override
 			public void mouseHover(MouseEvent e) {
 			}
 		});
 		clearButton.addDisposeListener(new DisposeListener() {
+			@Override
 			public void widgetDisposed(DisposeEvent e) {
 				inactiveImage.dispose();
 				activeImage.dispose();
@@ -436,6 +441,7 @@ public class DiscoveryViewer extends Viewer {
 	public void createControl() {
 		Composite container = new Composite(parent, SWT.NULL);
 		container.addDisposeListener(new DisposeListener() {
+			@Override
 			public void widgetDisposed(DisposeEvent e) {
 				if (disposables != null) {
 					for (Resource resource : disposables) {
@@ -490,6 +496,7 @@ public class DiscoveryViewer extends Viewer {
 					}
 
 					filterTextWidget.addModifyListener(new ModifyListener() {
+						@Override
 						public void modifyText(ModifyEvent e) {
 							updateFilters();
 						}
@@ -517,10 +524,12 @@ public class DiscoveryViewer extends Viewer {
 					checkbox.setSelection(!theFilter.isEnabled());
 					checkbox.setText(theFilter.getLabel());
 					checkbox.addSelectionListener(new SelectionListener() {
+						@Override
 						public void widgetDefaultSelected(SelectionEvent e) {
 							widgetSelected(e);
 						}
 
+						@Override
 						public void widgetSelected(SelectionEvent e) {
 							theFilter.setEnabled(!checkbox.getSelection());
 							updateFilters();
@@ -879,6 +888,7 @@ public class DiscoveryViewer extends Viewer {
 		}
 	}
 
+	@Override
 	public Control getControl() {
 		return topLevelControl;
 	}
@@ -963,6 +973,7 @@ public class DiscoveryViewer extends Viewer {
 			final Control titleControl, AbstractDiscoverySource source, Overview overview, Image image) {
 		final OverviewToolTip toolTip = new OverviewToolTip(parent, source, overview, image);
 		Listener listener = new Listener() {
+			@Override
 			public void handleEvent(Event event) {
 				switch (event.type) {
 				case SWT.MouseHover:
@@ -982,12 +993,14 @@ public class DiscoveryViewer extends Viewer {
 			tipActivator.addListener(SWT.MouseHover, listener);
 		}
 		Listener selectionListener = new Listener() {
+			@Override
 			public void handleEvent(Event event) {
 				toolTip.show(titleControl);
 			}
 		};
 		tipActivator.addListener(SWT.Selection, selectionListener);
 		Listener exitListener = new Listener() {
+			@Override
 			public void handleEvent(Event event) {
 				switch (event.type) {
 				case SWT.MouseWheel:
@@ -1175,6 +1188,7 @@ public class DiscoveryViewer extends Viewer {
 		try {
 			final IStatus[] result = new IStatus[1];
 			context.run(true, true, new IRunnableWithProgress() {
+				@Override
 				public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
 					resetState();
 					if (DiscoveryViewer.this.installedFeatures == null) {
@@ -1226,6 +1240,7 @@ public class DiscoveryViewer extends Viewer {
 			if (verifyUpdateSiteAvailability) {
 				try {
 					context.run(true, true, new IRunnableWithProgress() {
+						@Override
 						public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
 							// TODO parallelize
 							for (ConnectorDiscovery discovery : DiscoveryViewer.this.discoveries.values()) {

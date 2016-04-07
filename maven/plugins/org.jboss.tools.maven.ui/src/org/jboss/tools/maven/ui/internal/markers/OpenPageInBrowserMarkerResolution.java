@@ -35,18 +35,22 @@ public class OpenPageInBrowserMarkerResolution implements IMarkerResolution,
 		this.url = url;
 	}
 	
+	@Override
 	public String getDescription() {
 		return getLabel();
 	}
 
+	@Override
 	public Image getImage() {					
 		return null;
 	}
 
+	@Override
 	public String getLabel() {
 		return label;
 	}
 
+	@Override
 	public void run(IMarker arg0) {
 
 		IWorkbenchBrowserSupport browserSupport = PlatformUI.getWorkbench().getBrowserSupport();

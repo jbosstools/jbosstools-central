@@ -40,10 +40,12 @@ public class NexusRepositoryIdentifier extends AbstractArtifactIdentifier {
 		super("Nexus repository identifier");
 	}
 	
+	@Override
 	public ArtifactKey identify(File file) throws CoreException {
 		return getArtifactFromRemoteNexusRepository(file, null);
 	}
 
+	@Override
 	public ArtifactKey identify(File file, IProgressMonitor monitor) throws CoreException {
 		return getArtifactFromRemoteNexusRepository(file, monitor);
 	}

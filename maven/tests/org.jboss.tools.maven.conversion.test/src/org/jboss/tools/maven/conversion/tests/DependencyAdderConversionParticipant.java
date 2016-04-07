@@ -34,11 +34,13 @@ public class DependencyAdderConversionParticipant extends AbstractProjectConvers
 		                                                     "JBIDE-13781-java");	
 	
 	
-  public boolean accept(IProject project) {
+  @Override
+public boolean accept(IProject project) {
     return project != null && PROJECT_NAMES.contains(project.getName());
   }
 
-  public void convert(IProject project, Model model, IProgressMonitor monitor) {
+  @Override
+public void convert(IProject project, Model model, IProgressMonitor monitor) {
 	  String name = project.getName();
 	  if ("JBIDE-13781-ear".equals(name) || 
 	      "JBIDE-13781-web".equals(name) ||

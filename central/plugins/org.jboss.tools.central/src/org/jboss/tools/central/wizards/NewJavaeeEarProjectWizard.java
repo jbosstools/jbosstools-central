@@ -16,6 +16,7 @@ public class NewJavaeeEarProjectWizard extends AbstractJBossCentralProjectWizard
 		super("multi-javaee6-archetype");
 	}
 
+	@Override
 	protected String getWizardBackgroundImagePath() {
 		return "icons/ear_background.gif";
 	}

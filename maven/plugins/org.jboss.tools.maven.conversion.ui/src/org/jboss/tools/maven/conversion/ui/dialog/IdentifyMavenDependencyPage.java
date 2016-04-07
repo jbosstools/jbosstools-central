@@ -182,6 +182,7 @@ public class IdentifyMavenDependencyPage extends WizardPage {
 	    }
 	}
 
+	@Override
 	public void dispose() {
 		dialogSettings.put("isDeleteJars", isDeleteJars());
 		if (jarImage != null) jarImage.dispose();
@@ -219,7 +220,8 @@ public class IdentifyMavenDependencyPage extends WizardPage {
 		warningImg.setImage(JFaceResources.getImage(Dialog.DLG_IMG_MESSAGE_WARNING));
 		warningLink.setText("Some selected dependencies can not be resolved. Click <a>here</a> to configure repositories in your settings.xml.");
 		warningLink.addSelectionListener(new SelectionListener() {
-	        public void widgetSelected(SelectionEvent e) {
+	        @Override
+			public void widgetSelected(SelectionEvent e) {
 	          openSettingsRepositoriesWizard();
 	        }
 
@@ -231,6 +233,7 @@ public class IdentifyMavenDependencyPage extends WizardPage {
 				dialog.open(); 
 			}
 
+			@Override
 			public void widgetDefaultSelected(SelectionEvent e) {
 	        	widgetSelected(e);
 	        }
@@ -264,11 +267,13 @@ public class IdentifyMavenDependencyPage extends WizardPage {
 		GridData gd = new GridData(SWT.FILL, SWT.FILL, true, true, 3, 1);
 		remoteRepoPrefsLink.setLayoutData(gd);
 		remoteRepoPrefsLink.addSelectionListener(new SelectionListener() {
-	        public void widgetSelected(SelectionEvent e) {
+	        @Override
+			public void widgetSelected(SelectionEvent e) {
 	          openRemoteRepoPrefs();
 	        }
 
-	        public void widgetDefaultSelected(SelectionEvent e) {
+	        @Override
+			public void widgetDefaultSelected(SelectionEvent e) {
 	        	widgetSelected(e);
 	        }
 	      });
@@ -276,6 +281,7 @@ public class IdentifyMavenDependencyPage extends WizardPage {
 		deleteJars = dialogSettings.getBoolean("isDeleteJars");
 		deleteJarsBtn = addCheckButton(container, "Delete original references from project", deleteJars);
 		deleteJarsBtn.addSelectionListener(new SelectionAdapter() {
+			@Override
 			public void widgetSelected(SelectionEvent e) {
 				deleteJars = deleteJarsBtn.getSelection();
 			}
@@ -369,6 +375,7 @@ public class IdentifyMavenDependencyPage extends WizardPage {
 
 		dependenciesViewer.setContentProvider(ArrayContentProvider.getInstance());
 		dependenciesViewer.addCheckStateListener(new ICheckStateListener() {
+			@Override
 			public void checkStateChanged(CheckStateChangedEvent event) {
 				dependencyCheckStateMap.put((ProjectDependency)event.getElement(), event.getChecked());
 				refresh();
@@ -412,6 +419,7 @@ public class IdentifyMavenDependencyPage extends WizardPage {
 
 		final DependencyPatternFilter filter = new DependencyPatternFilter();
 		filterText.addModifyListener(new ModifyListener() {
+			@Override
 			public void modifyText(ModifyEvent e) {
 				if (filterText != null && !filterText.isDisposed()) {
 					filter.setPattern(filterText.getText());
@@ -587,6 +595,7 @@ public class IdentifyMavenDependencyPage extends WizardPage {
 		button.setLayoutData(new GridData(SWT.FILL, SWT.UP, false, false, 1, 1));
 		button.setText(label);
 		button.addSelectionListener(new SelectionListener() {
+			@Override
 			public void widgetSelected(SelectionEvent e) {
 				Collection<ProjectDependency> selection = new ArrayList<>(dependenciesViewer.getTable().getItems().length);
 				for (TableItem item : dependenciesViewer.getTable().getItems()) {
@@ -594,6 +603,7 @@ public class IdentifyMavenDependencyPage extends WizardPage {
 				}
 				select(selection, ischecked);
 			}
+			@Override
 			public void widgetDefaultSelected(SelectionEvent e) {
 
 			}
@@ -615,6 +625,7 @@ public class IdentifyMavenDependencyPage extends WizardPage {
 		button.setLayoutData(new GridData(SWT.FILL, SWT.UP, false, false, 1, 1));
 		button.setText(label);
 		button.addSelectionListener(new SelectionListener() {
+			@Override
 			public void widgetSelected(SelectionEvent e) {
 				TableItem[] selection = dependenciesViewer.getTable().getSelection();
 				
@@ -632,6 +643,7 @@ public class IdentifyMavenDependencyPage extends WizardPage {
 				ProjectDependency[] pdArray = new ProjectDependency[selectedDeps.size()];
 				openDependencyDetails(selectedDeps.toArray(pdArray ));
 			}
+			@Override
 			public void widgetDefaultSelected(SelectionEvent e) {
 
 			}
@@ -645,11 +657,13 @@ public class IdentifyMavenDependencyPage extends WizardPage {
 		stopButton.setLayoutData(new GridData(SWT.FILL, SWT.UP, false, false, 1, 1));
 		stopButton.setText(label);
 		stopButton.addSelectionListener(new SelectionListener() {
+			@Override
 			public void widgetSelected(SelectionEvent e) {
 				cancel();
 				refresh();
 			}
 
+			@Override
 			public void widgetDefaultSelected(SelectionEvent e) {
 				widgetSelected(e);
 			}
@@ -662,10 +676,12 @@ public class IdentifyMavenDependencyPage extends WizardPage {
 		startIdentification.setLayoutData(new GridData(SWT.FILL, SWT.UP, false, false, 1, 1));
 		startIdentification.setText(label);
 		startIdentification.addSelectionListener(new SelectionListener() {
+			@Override
 			public void widgetSelected(SelectionEvent e) {
 				runIdentificationJobs(null);
 			}
 
+			@Override
 			public void widgetDefaultSelected(SelectionEvent e) {
 				widgetSelected(e);
 			}

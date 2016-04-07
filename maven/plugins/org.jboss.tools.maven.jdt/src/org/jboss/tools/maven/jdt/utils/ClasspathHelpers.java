@@ -64,6 +64,7 @@ public class ClasspathHelpers {
 	public static void removeEndorsedLibClasspathContainer(	IClasspathDescriptor classpath ) {
 		// remove any old endorsed dirs container entries
 		classpath.removeEntry(new ClasspathDescriptor.EntryFilter() {
+			@Override
 			public boolean accept(IClasspathEntryDescriptor entry) {
 				return isEndorsedDirsClasspathContainer(entry.getPath());
 			}

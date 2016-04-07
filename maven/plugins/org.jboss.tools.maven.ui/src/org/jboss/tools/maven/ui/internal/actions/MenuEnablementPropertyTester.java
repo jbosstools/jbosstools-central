@@ -24,7 +24,8 @@ public class MenuEnablementPropertyTester extends PropertyTester {
 
   private static final String IS_CLEAN_VERIFY_MENU_ENABLED_NODE = "isCleanVerifyMenuEnabled"; //$NON-NLS-1$
 
-  public boolean test(Object receiver, String property, Object[] args, Object expectedValue) {
+  @Override
+public boolean test(Object receiver, String property, Object[] args, Object expectedValue) {
 
 	boolean enabled = true;
 	if(IS_CLEAN_VERIFY_MENU_ENABLED_NODE.equals(property)) {

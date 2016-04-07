@@ -81,6 +81,7 @@ public class FeedsToolTip extends ToolTip {
 			}
 		});
 		browser[0].addOpenWindowListener(new OpenWindowListener() {
+			@Override
 			public void open(WindowEvent event) {
 				event.required= true;
 				event.browser = browser[0];

@@ -349,6 +349,7 @@ public class HackedCTabRendering extends CTabFolderRenderer {
 		return value;
 	}
 
+	@Override
 	protected Point computeSize(int part, int state, GC gc, int wHint, int hHint) {
 		wHint += paddingLeft + paddingRight;
 		hHint += paddingTop + paddingBottom;
@@ -361,6 +362,7 @@ public class HackedCTabRendering extends CTabFolderRenderer {
 		return super.computeSize(part, state, gc, wHint, hHint);
 	}
 
+	@Override
 	protected Rectangle computeTrim(int part, int state, int x, int y,
 			int width, int height) {
 		GC gc = new GC(parent);
@@ -484,6 +486,7 @@ public class HackedCTabRendering extends CTabFolderRenderer {
 			display.setData(E4_SHADOW_IMAGE, shadowImage);
 			tmpImage.dispose();
 			display.disposeExec(new Runnable() {
+				@Override
 				public void run() {
 					Object obj = display.getData(E4_SHADOW_IMAGE);
 					if (obj != null) {
@@ -496,10 +499,12 @@ public class HackedCTabRendering extends CTabFolderRenderer {
 		}
 	}
 
+	@Override
 	protected void dispose() {
 		super.dispose();
 	}
 
+	@Override
 	protected void draw(int part, int state, Rectangle bounds, GC gc) {
 		switch (part) {
 

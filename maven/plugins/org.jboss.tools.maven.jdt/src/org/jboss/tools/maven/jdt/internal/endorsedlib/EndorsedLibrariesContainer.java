@@ -30,19 +30,23 @@ public class EndorsedLibrariesContainer implements IClasspathContainer, Serializ
     this.entries = entries;
   }
   
-  public String getDescription() {
+  @Override
+public String getDescription() {
     return "Endorsed Libraries"; 
   }
   
-  public int getKind() {
+  @Override
+public int getKind() {
     return IClasspathContainer.K_APPLICATION;
   }
   
-  public synchronized IClasspathEntry[] getClasspathEntries() {
+  @Override
+public synchronized IClasspathEntry[] getClasspathEntries() {
     return entries;
   }
 
-  public IPath getPath() {
+  @Override
+public IPath getPath() {
     return path; 
   }
   

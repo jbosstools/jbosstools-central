@@ -129,6 +129,7 @@ public class RemoteRepositoriesPreferencePage extends PreferencePage implements
 		}
 		tableViewer.addCheckStateListener(new ICheckStateListener() {
 
+			@Override
 			public void checkStateChanged(CheckStateChangedEvent event) {
 				NexusRepository repository = (NexusRepository) event
 						.getElement();
@@ -155,10 +156,12 @@ public class RemoteRepositoriesPreferencePage extends PreferencePage implements
 		addButton.setText("Add...");
 		addButton.addSelectionListener(new SelectionListener(){
 
+			@Override
 			public void widgetDefaultSelected(SelectionEvent e) {
 				
 			}
 
+			@Override
 			public void widgetSelected(SelectionEvent e) {
 				EditNexusRepositoryDialog dialog = new EditNexusRepositoryDialog(getShell(), null);
 				int ok = dialog.open();
@@ -181,6 +184,7 @@ public class RemoteRepositoriesPreferencePage extends PreferencePage implements
 		
 		editButton.addSelectionListener(new SelectionListener(){
 		
+			@Override
 			public void widgetSelected(SelectionEvent e) {
 				ISelection sel = viewer.getSelection();
 				if (sel instanceof IStructuredSelection) {
@@ -203,6 +207,7 @@ public class RemoteRepositoriesPreferencePage extends PreferencePage implements
 				}
 			}
 		
+			@Override
 			public void widgetDefaultSelected(SelectionEvent e) {
 				
 			}
@@ -215,6 +220,7 @@ public class RemoteRepositoriesPreferencePage extends PreferencePage implements
 		
 		removeButton.addSelectionListener(new SelectionListener(){
 		
+			@Override
 			public void widgetSelected(SelectionEvent e) {
 				ISelection sel = viewer.getSelection();
 				if (sel instanceof IStructuredSelection) {
@@ -227,6 +233,7 @@ public class RemoteRepositoriesPreferencePage extends PreferencePage implements
 				}
 			}
 		
+			@Override
 			public void widgetDefaultSelected(SelectionEvent e) {
 				
 			}
@@ -244,6 +251,7 @@ public class RemoteRepositoriesPreferencePage extends PreferencePage implements
 		
 		upButton.addSelectionListener(new SelectionListener(){
 		
+			@Override
 			public void widgetSelected(SelectionEvent e) {
 				ISelection sel = viewer.getSelection();
 				if (sel instanceof IStructuredSelection) {
@@ -278,6 +286,7 @@ public class RemoteRepositoriesPreferencePage extends PreferencePage implements
 				}
 			}
 		
+			@Override
 			public void widgetDefaultSelected(SelectionEvent e) {
 				
 			}
@@ -285,6 +294,7 @@ public class RemoteRepositoriesPreferencePage extends PreferencePage implements
 		
 		downButton.addSelectionListener(new SelectionListener(){
 		
+			@Override
 			public void widgetSelected(SelectionEvent e) {
 				ISelection sel = viewer.getSelection();
 				if (sel instanceof IStructuredSelection) {
@@ -318,6 +328,7 @@ public class RemoteRepositoriesPreferencePage extends PreferencePage implements
 				}
 			}
 		
+			@Override
 			public void widgetDefaultSelected(SelectionEvent e) {
 				
 			}
@@ -325,6 +336,7 @@ public class RemoteRepositoriesPreferencePage extends PreferencePage implements
 		
 		viewer.addSelectionChangedListener(new ISelectionChangedListener() {
 			
+			@Override
 			public void selectionChanged(SelectionChangedEvent event) {
 				ISelection sel = viewer.getSelection();
 				if (sel instanceof IStructuredSelection) {
@@ -404,10 +416,12 @@ public class RemoteRepositoriesPreferencePage extends PreferencePage implements
 	private class NexusRepositoryLabelProvider extends LabelProvider implements
 			ITableLabelProvider {
 
+		@Override
 		public Image getColumnImage(Object element, int columnIndex) {
 			return null;
 		}
 
+		@Override
 		public String getColumnText(Object element, int columnIndex) {
 			if (element instanceof NexusRepository) {
 				NexusRepository nr = (NexusRepository) element;
@@ -431,14 +445,17 @@ public class RemoteRepositoriesPreferencePage extends PreferencePage implements
 			this.repositories = repositories;
 		}
 
+		@Override
 		public Object[] getElements(Object inputElement) {
 			return repositories.toArray();
 		}
 
+		@Override
 		public void dispose() {
 
 		}
 
+		@Override
 		public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
 			repositories = (Set<NexusRepository>) newInput;
 		}

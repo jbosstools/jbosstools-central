@@ -57,6 +57,7 @@ public class CSSClasses {
 				newStyleClasses.toString());
 	}
 
+	@Override
 	public String toString() {
 		if (classes.isEmpty())
 			return "";

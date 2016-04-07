@@ -18,6 +18,7 @@ public class ConfigureRedHatRepositoryMarkerResolution extends ConfigureMavenRep
 		super(artifactKey);
 	}
 
+	@Override
 	public String getLabel() {
 		return "Configure the Red Hat Maven repository"; //$NON-NLS-1$
 	}

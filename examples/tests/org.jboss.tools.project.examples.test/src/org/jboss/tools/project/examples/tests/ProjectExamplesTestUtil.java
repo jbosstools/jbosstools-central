@@ -123,6 +123,7 @@ public class ProjectExamplesTestUtil {
 	public static void removeProjects() throws CoreException {
 		final IWorkspace workspace = ResourcesPlugin.getWorkspace();
 		workspace.run(new IWorkspaceRunnable() {
+			@Override
 			public void run(IProgressMonitor monitor) throws CoreException {
 				IProject[] projects = workspace.getRoot().getProjects();
 				for (int i = 0; i < projects.length; i++) {
@@ -135,6 +136,7 @@ public class ProjectExamplesTestUtil {
 	protected static void switchPerspective(final String pid) {
 		Display.getDefault().syncExec(new Runnable() {
 
+			@Override
 			public void run() {
 				IWorkbench workbench = PlatformUI.getWorkbench();
 				IPerspectiveRegistry perspectiveRegistry = workbench

@@ -115,6 +115,7 @@ public class ProjectTest {
 	public void importNumberguess() throws Exception {
 		WorkspaceJob workspaceJob = new WorkspaceJob(Messages.NewProjectExamplesWizard_Downloading) {
 
+			@Override
 			public IStatus runInWorkspace(IProgressMonitor monitor)
 					throws CoreException {
 				try {

@@ -65,6 +65,7 @@ public class CachedProxyWizardDiscoveryStrategy extends ExternalBundleDiscoveryS
 		Collections.sort(proxyWizards);
 	}
 	
+	@Override
 	public List<ProxyWizard> getProxyWizards() {
 		return proxyWizards;
 	}

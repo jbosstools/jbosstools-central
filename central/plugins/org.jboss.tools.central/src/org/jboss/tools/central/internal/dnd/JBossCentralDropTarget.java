@@ -224,6 +224,7 @@ public class JBossCentralDropTarget {
 		final IStatus[] results = new IStatus[1];
 		final ConnectorDiscovery[] connectorDiscoveries = new ConnectorDiscovery[1];
 		IRunnableWithProgress runnable = new IRunnableWithProgress() {
+			@Override
 			public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
 				ConnectorDiscovery connectorDiscovery = DiscoveryUtil.createConnectorDiscovery();
 				connectorDiscoveries[0] = connectorDiscovery;
