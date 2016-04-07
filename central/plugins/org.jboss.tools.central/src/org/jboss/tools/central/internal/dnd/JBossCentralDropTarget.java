@@ -240,8 +240,8 @@ public class JBossCentralDropTarget {
 		}
 		if (results[0].isOK()) {
 			List<DiscoveryConnector> connectors = connectorDiscoveries[0].getConnectors();
-			List<ConnectorDescriptor> installableConnectors = new ArrayList<ConnectorDescriptor>();
-			List<String> notFoundConnectors = new ArrayList<String>(connectorIds);
+			List<ConnectorDescriptor> installableConnectors = new ArrayList<>();
+			List<String> notFoundConnectors = new ArrayList<>(connectorIds);
 			for (DiscoveryConnector connector:connectors) {
 				if (connectorIds.contains(connector.getId())) {
 					installableConnectors.add(connector);
@@ -249,7 +249,7 @@ public class JBossCentralDropTarget {
 				} 
 			}
 			Set<String> installedFeatures = JBossDiscoveryUi.createInstallJob(installableConnectors).getInstalledFeatures(new NullProgressMonitor());
-			Set<ConnectorDescriptor> installedConnectors = new HashSet<ConnectorDescriptor>();
+			Set<ConnectorDescriptor> installedConnectors = new HashSet<>();
 			Iterator<ConnectorDescriptor> iter = installableConnectors.iterator();
 			while (iter.hasNext()) {
 				ConnectorDescriptor connector = iter.next();
@@ -323,7 +323,7 @@ public class JBossCentralDropTarget {
 	private static void dropConnectors(String connectorIds) {
 		String[] ids = connectorIds.trim().split(",");
 		if (ids != null && ids.length > 0) {
-			Set<String> idSet = new HashSet<String>();
+			Set<String> idSet = new HashSet<>();
 			for (String id : ids) {
 				id = id.trim();
 				if (!id.isEmpty()) {

@@ -65,7 +65,7 @@ public class JBossSourceContainerDialog extends TitleAreaDialog {
 
 	public List<IJBossServerRuntime> getRuntimes() {
 		IServer[] servers = ServerCore.getServers();
-		List<IJBossServerRuntime> runtimes = new ArrayList<IJBossServerRuntime>();
+		List<IJBossServerRuntime> runtimes = new ArrayList<>();
 		if (servers != null) {
 			for (IServer server : servers) {
 				IJBossServer jbossServer = null;

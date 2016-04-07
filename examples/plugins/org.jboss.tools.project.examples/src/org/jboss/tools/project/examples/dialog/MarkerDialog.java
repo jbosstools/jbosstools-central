@@ -240,7 +240,7 @@ public class MarkerDialog extends TitleAreaDialog {
 
 	private void openQuickFixWizard(final IMarker selected)
 			throws ExecutionException {
-		final Map<IMarkerResolution, Collection<IMarker>> resolutions = new LinkedHashMap<IMarkerResolution, Collection<IMarker>>();
+		final Map<IMarkerResolution, Collection<IMarker>> resolutions = new LinkedHashMap<>();
 
 		IRunnableWithProgress resolutionsRunnable = new IRunnableWithProgress() {
 			public void run(IProgressMonitor monitor) {
@@ -259,14 +259,14 @@ public class MarkerDialog extends TitleAreaDialog {
 					if (markerResolution instanceof WorkbenchMarkerResolution) {
 						IMarker[] other = ((WorkbenchMarkerResolution) markerResolution)
 								.findOtherMarkers(allMarkers);
-						Collection<IMarker> markers = new ArrayList<IMarker>(other.length+1);
+						Collection<IMarker> markers = new ArrayList<>(other.length+1);
 						markers.add(selected);
 						for (int j = 0; j < other.length; j++) {
 							markers.add(other[j]);
 						}
 						resolutions.put(markerResolution, markers);
 					} else {
-						Collection<IMarker> markers = new ArrayList<IMarker>();
+						Collection<IMarker> markers = new ArrayList<>();
 						markers.add(selected);
 						resolutions.put(markerResolution, markers);
 					}

@@ -36,7 +36,7 @@ public class ProjectFacetsFactoryTester extends PropertyTester {
 		}
 		String requiredFacets = (String) expectedValue;
 		Collection collection = (Collection) receiver;
-		List<String> facets = new ArrayList<String>();
+		List<String> facets = new ArrayList<>();
 		for (Iterator iterator = collection.iterator(); iterator.hasNext();) {
 			Object object = iterator.next();
 			if ( ! (object instanceof ProjectFacetVersion)) {

@@ -94,8 +94,8 @@ public class ImportDefaultProjectExample extends
 
 				Enumeration<? extends ZipEntry> entries = sourceFile.entries();
 				ZipEntry entry = null;
-				List<ZipEntry> filesToImport = new ArrayList<ZipEntry>();
-				List<ZipEntry> directories = new ArrayList<ZipEntry>();
+				List<ZipEntry> filesToImport = new ArrayList<>();
+				List<ZipEntry> directories = new ArrayList<>();
 				String prefix = projectName + "/"; //$NON-NLS-1$
 				while (entries.hasMoreElements()) {
 					entry = entries.nextElement();
@@ -170,8 +170,8 @@ public class ImportDefaultProjectExample extends
 		
 		Enumeration<? extends ZipEntry> entries = sourceFile.entries();
 		ZipEntry entry = null;
-		List<ZipEntry> filesToImport = new ArrayList<ZipEntry>();
-		List<ZipEntry> directories = new ArrayList<ZipEntry>();
+		List<ZipEntry> filesToImport = new ArrayList<>();
+		List<ZipEntry> directories = new ArrayList<>();
 		String prefix = projectName + "/"; //$NON-NLS-1$
 		while (entries.hasMoreElements()) {
 			entry = entries.nextElement();

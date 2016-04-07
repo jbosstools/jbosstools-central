@@ -115,7 +115,7 @@ public class ChainedDiscoveryStrategyTest {
 	}
 	
 	private List<ProxyWizard> createMockProxyWizards(int n) {
-	   List<ProxyWizard> list = new ArrayList<ProxyWizard>(n); 
+	   List<ProxyWizard> list = new ArrayList<>(n); 
 	   for (int i = 0; i < n; i++) {
 		   ProxyWizard pw = new ProxyWizard();
 		   String id = "wizard-"+i;

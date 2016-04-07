@@ -44,7 +44,7 @@ public class CachedProxyWizardDiscoveryStrategy extends ExternalBundleDiscoveryS
 	@Override
 	protected void processExtensions(IProgressMonitor monitor, IExtension[] extensions) {
 		ProxyWizardExtensionReader extensionReader = new ProxyWizardExtensionReader();
-		proxyWizards = new ArrayList<ProxyWizard>();
+		proxyWizards = new ArrayList<>();
 		for (IExtension extension : extensions) {
 			IContributor contributor = extension.getContributor();
 			if (JBossCentralActivator.PLUGIN_ID.equals(contributor.getName())) {

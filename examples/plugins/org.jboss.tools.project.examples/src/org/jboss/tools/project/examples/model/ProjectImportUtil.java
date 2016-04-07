@@ -49,8 +49,8 @@ public class ProjectImportUtil {
 			return Collections.emptyList();
 		}
 		File directory = baseDir.makeAbsolute().toFile();
-		Set<String> projectsToLookFor = new HashSet<String>(projectNames);
-		Map<String, IPath> projectPaths = new HashMap<String, IPath>(); 
+		Set<String> projectsToLookFor = new HashSet<>(projectNames);
+		Map<String, IPath> projectPaths = new HashMap<>(); 
 		collectProjects(projectPaths, projectsToLookFor, directory, monitor);
 		List<IProject> projects = importProjects(projectPaths, monitor);
 		return projects;
@@ -59,7 +59,7 @@ public class ProjectImportUtil {
 	
 	private List<IProject> importProjects(Map<String, IPath> projectPaths,
 			IProgressMonitor monitor) throws CoreException {
-		List<IProject> projects = new ArrayList<IProject>(projectPaths.size());
+		List<IProject> projects = new ArrayList<>(projectPaths.size());
 		for (Entry<String, IPath> e : projectPaths.entrySet()) {
 			if (monitor.isCanceled()) {
 				break;

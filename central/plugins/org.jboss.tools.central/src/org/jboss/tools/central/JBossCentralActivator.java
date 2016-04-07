@@ -470,7 +470,7 @@ public class JBossCentralActivator extends AbstractUIPlugin {
 	}
 
 	public static Dictionary<Object, Object> getEnvironment() {
-		Dictionary<Object, Object> environment = new Hashtable<Object, Object>(
+		Dictionary<Object, Object> environment = new Hashtable<>(
 				System.getProperties());
 		Bundle bundle = Platform.getBundle("org.jboss.tools.central"); //$NON-NLS-1$
 		Version version = bundle.getVersion();
@@ -509,7 +509,7 @@ public class JBossCentralActivator extends AbstractUIPlugin {
 	private void fixEditors(IWorkbenchPage page) {
 		IEditorReference[] references = page.getEditorReferences();
 		if (references != null) {
-			List<IEditorReference> l = new ArrayList<IEditorReference>();
+			List<IEditorReference> l = new ArrayList<>();
 			for (IEditorReference reference : references) {
 				String id = reference.getId();
 				if ((JBossCentralEditor.ID.equals(id) && reference.getEditor(false) == null)

@@ -48,7 +48,7 @@ public class DeleteExistingClasspathEntriesJob extends Job {
 	    if(javaProject != null) {
 	        // remove classpatch containers from JavaProject
 	    	try {
-		      ArrayList<IClasspathEntry> newEntries = new ArrayList<IClasspathEntry>();
+		      ArrayList<IClasspathEntry> newEntries = new ArrayList<>();
 		      for(IClasspathEntry entry : javaProject.getRawClasspath()) {
 		        //Keep Source/ JRE / Maven containers 
 		    	if(isKept(entry)) {

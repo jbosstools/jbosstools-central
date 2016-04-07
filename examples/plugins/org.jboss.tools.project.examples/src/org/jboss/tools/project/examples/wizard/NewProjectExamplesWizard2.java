@@ -49,7 +49,7 @@ public class NewProjectExamplesWizard2 extends Wizard implements INewWizard {
 	private NewProjectExamplesLocationPage locationPage;
 	private IStructuredSelection fSelection;
 	//private NewProjectExamplesReadyPage readyPage;
-	List<IProjectExamplesWizardPage> contributedPages = new LinkedList<IProjectExamplesWizardPage>();
+	List<IProjectExamplesWizardPage> contributedPages = new LinkedList<>();
 	private ProjectExampleWorkingCopy projectExample;
 
 	private WizardContext wizardContext = new WizardContext();
@@ -88,9 +88,9 @@ public class NewProjectExamplesWizard2 extends Wizard implements INewWizard {
 	 */
 	@Override
 	public boolean performFinish() {
-		final List<ProjectExampleWorkingCopy> selectedProjects = new ArrayList<ProjectExampleWorkingCopy>();
+		final List<ProjectExampleWorkingCopy> selectedProjects = new ArrayList<>();
 		IWorkingSet[] workingSets = new IWorkingSet[0];
-		Map<String, Object> propertiesMap = new HashMap<String, Object>();
+		Map<String, Object> propertiesMap = new HashMap<>();
 		String showCheatsheets = ProjectExamplesActivator.getDefault().getShowCheatsheets();
 		try {
 			ProjectExamplesActivator.getDefault().getPreferenceStore().putValue(ProjectExamplesActivator.SHOW_CHEATSHEETS, 
@@ -251,7 +251,7 @@ public class NewProjectExamplesWizard2 extends Wizard implements INewWizard {
 			return Collections.emptyList();
 		}
 		
-		List<IProjectExamplesWizardPage> filteredPages = new ArrayList<IProjectExamplesWizardPage>();
+		List<IProjectExamplesWizardPage> filteredPages = new ArrayList<>();
 		
 		for (IProjectExamplesWizardPage p : contributedPages) {
 			if (pageType.equals(p.getPageType())) {

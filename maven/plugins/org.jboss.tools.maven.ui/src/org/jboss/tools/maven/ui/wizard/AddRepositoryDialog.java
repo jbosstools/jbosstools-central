@@ -350,7 +350,7 @@ public class AddRepositoryDialog extends TitleAreaDialog {
 				dialog.open();
 				final IProgressMonitor monitor = dialog.getProgressMonitor();
 				monitor.beginTask("Searching...", 110); //$NON-NLS-1$
-				final Set<RepositoryWrapper> repos = new HashSet<RepositoryWrapper>();
+				final Set<RepositoryWrapper> repos = new HashSet<>();
 				
 				IRunnableWithProgress runnable = new IRunnableWithProgress() {
 					public void run(IProgressMonitor monitor2) {
@@ -372,7 +372,7 @@ public class AddRepositoryDialog extends TitleAreaDialog {
 					if (!url.endsWith(RepositoryWrapper.SEPARATOR)) {
 						url = url + RepositoryWrapper.SEPARATOR;
 					}
-					Set<RepositoryWrapper> allRepositories = new HashSet<RepositoryWrapper>();
+					Set<RepositoryWrapper> allRepositories = new HashSet<>();
 					allRepositories.addAll(includedRepositories);
 					allRepositories.addAll(availableRepositories);
 					RepositoryWrapper w = null;
@@ -434,7 +434,7 @@ public class AddRepositoryDialog extends TitleAreaDialog {
 
 	private boolean resolveArtifact(String id, String url) {
 		try {
-			List<ArtifactRepository> repos = new ArrayList<ArtifactRepository>();
+			List<ArtifactRepository> repos = new ArrayList<>();
 			repos.add(MavenPlugin.getMaven().createArtifactRepository(id, url));
 			repos.addAll(MavenPlugin.getMaven().getArtifactRepositories());
 			IArtifactResolutionService artifactResolutionService = MavenCoreActivator.getDefault().getArtifactResolutionService();
@@ -604,7 +604,7 @@ public class AddRepositoryDialog extends TitleAreaDialog {
 	}
 
 	private String[] getProfileIds() {
-		Set<String> ids = new TreeSet<String>();
+		Set<String> ids = new TreeSet<>();
 		if (!isEditing) {
 			ids.add(EMPTY_STRING);
 			for (RepositoryWrapper wrapper : availableRepositories) {
@@ -745,7 +745,7 @@ public class AddRepositoryDialog extends TitleAreaDialog {
 
 		if (repoWrapper != null) {
 			Repository repo = repoWrapper.getRepository();
-			Set<RepositoryWrapper> allRepositories = new HashSet<RepositoryWrapper>();
+			Set<RepositoryWrapper> allRepositories = new HashSet<>();
 			allRepositories.addAll(repos);
 			allRepositories.addAll(includedRepositories);
 			allRepositories.addAll(availableRepositories);

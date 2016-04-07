@@ -43,7 +43,7 @@ public class JavaDependencyCollector extends DependencyCollector {
 			return null;
 		}
 		IClasspathEntry[] classpath = javaProject.getRawClasspath();
-		List<ProjectDependency> classpathDependencies = new ArrayList<ProjectDependency>(classpath.length);
+		List<ProjectDependency> classpathDependencies = new ArrayList<>(classpath.length);
 		extractDependencies(javaProject, classpath, classpathDependencies);
 		return classpathDependencies;
 	}

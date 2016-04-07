@@ -31,7 +31,7 @@ import org.jboss.tools.maven.ui.wizard.RepositoryWrapper;
  */
 public class RepositoryIdentificationManager {
 	
-	List<ILocalRepositoryIdentifier> identifiers = new ArrayList<ILocalRepositoryIdentifier>(3);
+	List<ILocalRepositoryIdentifier> identifiers = new ArrayList<>(3);
 	
 	public RepositoryIdentificationManager() {
 		identifiers.add(new MarkedRepoIdentifier());

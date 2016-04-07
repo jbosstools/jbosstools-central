@@ -66,7 +66,7 @@ public class ProjectUtil {
 		try {
 			int count = 0;
 			final IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
-			final List<IProject> projects = new ArrayList<IProject>(Arrays.asList(root.getProjects()));
+			final List<IProject> projects = new ArrayList<>(Arrays.asList(root.getProjects()));
 			
 			final IPath rootLocation = root.getLocation();
 			IPath basedirPath = new Path(basedir.getAbsolutePath());
@@ -162,7 +162,7 @@ public class ProjectUtil {
 		    IJavaProject javaProject = JavaCore.create(project);
 		    if(javaProject != null) {
 		      // remove classpatch container from JavaProject
-		      ArrayList<IClasspathEntry> newEntries = new ArrayList<IClasspathEntry>();
+		      ArrayList<IClasspathEntry> newEntries = new ArrayList<>();
 		      for(IClasspathEntry entry : javaProject.getRawClasspath()) {
 		    	String path = entry.getPath().toString();
 		        if(path != null && !path.startsWith("org.eclipse.jst.j2ee.internal.")) { //$NON-NLS-1$
@@ -206,7 +206,7 @@ public class ProjectUtil {
 		if (projects == null || projects.isEmpty()) {
 			return;
 		}
-		List<IProject> projectsTorUpdate = new ArrayList<IProject>(
+		List<IProject> projectsTorUpdate = new ArrayList<>(
 				projects.size());
 
 		for (IProject project : projects) {
@@ -251,7 +251,7 @@ public class ProjectUtil {
 		if (projectNames == null) {
 			return null;
 		}
-		List<IProject> projects = new ArrayList<IProject>(projectNames.size());
+		List<IProject> projects = new ArrayList<>(projectNames.size());
 		for (String name : projectNames) {
 			IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject(name);
 			if (project != null) {

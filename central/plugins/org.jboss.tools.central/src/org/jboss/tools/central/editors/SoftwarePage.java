@@ -277,7 +277,7 @@ public class SoftwarePage extends AbstractJBossCentralPage implements IRunnableC
 	    this.uninstallButton.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				JBossDiscoveryUi.uninstall(new ArrayList<ConnectorDescriptor>(discoveryViewer.getInstalledConnectors()), SoftwarePage.this, false);
+				JBossDiscoveryUi.uninstall(new ArrayList<>(discoveryViewer.getInstalledConnectors()), SoftwarePage.this, false);
 			}
 		});
 
@@ -448,7 +448,7 @@ public class SoftwarePage extends AbstractJBossCentralPage implements IRunnableC
 						}
 					}						
 				});
-				List<ConnectorDescriptor> toInstall = new ArrayList<ConnectorDescriptor>(discoveryViewer.getInstallableConnectors());
+				List<ConnectorDescriptor> toInstall = new ArrayList<>(discoveryViewer.getInstallableConnectors());
 				toInstall.addAll(discoveryViewer.getUpdatableConnectors());
 				if (toInstall.isEmpty()) {
 					MessageDialog.openInformation(getSite().getShell(), Messages.SoftwarePage_nothingToInstall_title, Messages.SoftwarePage_nothingToInstall_description);
@@ -519,7 +519,7 @@ public class SoftwarePage extends AbstractJBossCentralPage implements IRunnableC
 		} else {
 			// TODO consider making this a listener on the preference rather than checkbox
 			// if preference comes to be editable in several places
-			List<ConnectorDescriptor> installedEarlyAccess = new ArrayList<ConnectorDescriptor>();
+			List<ConnectorDescriptor> installedEarlyAccess = new ArrayList<>();
 			for (ConnectorDescriptorItemUi connector : SoftwarePage.this.discoveryViewer.getAllConnectorsItemsUi()) {
 				DiscoveryConnector discoveryConnector = connector.getConnector();
 				if (discoveryConnector.getCertificationId() != null && discoveryConnector.getCertificationId().contains("earlyaccess") && discoveryConnector.isInstalled()) {

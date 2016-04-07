@@ -43,7 +43,7 @@ public class WizardSupport {
 	    IExtensionRegistry extensionRegistry = Platform.getExtensionRegistry();
 	    IExtensionPoint extensionPoint = extensionRegistry.getExtensionPoint("org.eclipse.ui.newWizards");
 	    IExtension[] extensions = extensionPoint.getExtensions();
-	    Map<String, IConfigurationElement> installedWizards = new HashMap<String, IConfigurationElement>(extensions.length);
+	    Map<String, IConfigurationElement> installedWizards = new HashMap<>(extensions.length);
 		for (IExtension extension : extensions) {
 			IConfigurationElement[] elements = extension.getConfigurationElements();
 			for (IConfigurationElement element : elements) {

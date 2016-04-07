@@ -141,9 +141,9 @@ public class ImportMavenProjectExampleDelegate extends AbstractImportMavenProjec
 		
 		List<String> originalProjects = projectDescription.getIncludedProjects();
 		if (originalProjects == null) {
-			originalProjects = new ArrayList<String>();
+			originalProjects = new ArrayList<>();
 		} 
-		List<String> includedProjects = new ArrayList<String>();
+		List<String> includedProjects = new ArrayList<>();
 		
 		IPreferenceStore store = Activator.getDefault().getPreferenceStore();
 		boolean configureSeam = store.getBoolean(Activator.CONFIGURE_SEAM);
@@ -182,7 +182,7 @@ public class ImportMavenProjectExampleDelegate extends AbstractImportMavenProjec
 		//Import standard projects
 		if (includedProjects.isEmpty() && new File(destination, ".project").exists()) { //$NON-NLS-1$
 			ProjectImportUtil importer = new ProjectImportUtil();
-			List<String> names = new ArrayList<String>();
+			List<String> names = new ArrayList<>();
 			names.add(projectName);
 			Collection<IProject> standardProjects = importer.importProjects(path, names, monitor);
 			if (standardProjects != null) {
@@ -229,15 +229,15 @@ public class ImportMavenProjectExampleDelegate extends AbstractImportMavenProjec
 
 	private List<String> importMavenProjects(final File destination,
 			final ProjectExample projectDescription, IProgressMonitor monitor) {
-		List<String> projectNames = new ArrayList<String>();
+		List<String> projectNames = new ArrayList<>();
 		try {
 			AbstractProjectScanner<MavenProjectInfo> projectScanner = getProjectScanner(destination);
 			projectScanner.run(monitor);
 			List<MavenProjectInfo> mavenProjects = projectScanner.getProjects();
-			List<MavenProjectInfo> infos = new ArrayList<MavenProjectInfo>();
+			List<MavenProjectInfo> infos = new ArrayList<>();
 			infos.addAll(mavenProjects);
 			addMavenProjects(infos, mavenProjects);
-			final List<IProject> existingProjects = new ArrayList<IProject>();
+			final List<IProject> existingProjects = new ArrayList<>();
 			ProjectImportConfiguration importConfiguration = new ProjectImportConfiguration();
 			String profiles = projectDescription.getDefaultProfiles();
 			if (profiles != null && profiles.trim().length() > 0) {
@@ -280,7 +280,7 @@ public class ImportMavenProjectExampleDelegate extends AbstractImportMavenProjec
 			List<String> includedProjects = projectDescription
 					.getIncludedProjects();
 			if (includedProjects != null && includedProjects.size() > 0) {
-				List<MavenProjectInfo> newInfos = new ArrayList<MavenProjectInfo>();
+				List<MavenProjectInfo> newInfos = new ArrayList<>();
 				for (MavenProjectInfo info : infos) {
 					Model model = info.getModel();
 					if (model != null && model.getArtifactId() != null
@@ -331,7 +331,7 @@ public class ImportMavenProjectExampleDelegate extends AbstractImportMavenProjec
 				for(MavenProjectInfo info:projects) {
 					infos.add(info);
 				}
-				List<MavenProjectInfo> childProjects = new ArrayList<MavenProjectInfo>();
+				List<MavenProjectInfo> childProjects = new ArrayList<>();
 				childProjects.addAll(projects);
 				addMavenProjects(infos, childProjects);
 			}
@@ -372,7 +372,7 @@ public class ImportMavenProjectExampleDelegate extends AbstractImportMavenProjec
 	}
 
 	private List<IProject> getExistingProjects(final File destination) {
-		List<IProject> existingProjects = new ArrayList<IProject>();
+		List<IProject> existingProjects = new ArrayList<>();
 		IProject[] projects = ResourcesPlugin.getWorkspace().getRoot().getProjects();
 		for (IProject project:projects) {
 			if (project != null && project.exists()) {

@@ -98,7 +98,7 @@ public class UpdateMavenProjectJob extends WorkspaceJob {
 
     MultiStatus status = null;
     //project names to the errors encountered when updating them
-    Map<String, Throwable> updateErrors = new HashMap<String, Throwable>();
+    Map<String, Throwable> updateErrors = new HashMap<>();
 
     for(IProject project : projects) {
       if(monitor.isCanceled()) {

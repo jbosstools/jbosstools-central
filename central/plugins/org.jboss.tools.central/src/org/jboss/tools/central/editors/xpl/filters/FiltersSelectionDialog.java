@@ -41,7 +41,7 @@ public class FiltersSelectionDialog extends Dialog {
 	public FiltersSelectionDialog(Shell parentShell, Collection<UserFilterEntry> filters) {
 		super(parentShell);
 		this.filters = filters;
-		this.toggledFilters = new HashSet<UserFilterEntry>();
+		this.toggledFilters = new HashSet<>();
 	}
 	
 	public Control createDialogArea(Composite parent) {

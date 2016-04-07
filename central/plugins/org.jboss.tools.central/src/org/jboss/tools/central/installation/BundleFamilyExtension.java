@@ -62,11 +62,11 @@ public class BundleFamilyExtension {
 			JBossCentralActivator.log(ex);
 		}
 		closeStream(stream);
-		Map<String, Set<VersionRange>> res = new HashMap<String, Set<VersionRange>>();
+		Map<String, Set<VersionRange>> res = new HashMap<>();
 		for (Entry<Object, Object> entry : props.entrySet()) {
 			String id = (String) entry.getKey();
 			String rangeAsString = (String) entry.getValue();
-			Set<VersionRange> ranges = new HashSet<VersionRange>();
+			Set<VersionRange> ranges = new HashSet<>();
 			for (String rangeString : rangeAsString.split(";")) {
 				VersionRange range = new VersionRange(rangeString);
 				ranges.add(range);

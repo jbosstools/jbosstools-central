@@ -66,7 +66,7 @@ public class SourceLookupTest {
 				true);
 		SourceLookupActivator.getDefault().savePreferences();
 		IRuntimeDetectorDelegate delegate = getJBossASHandler();
-		List<RuntimeDefinition> runtimeDefinitions = new ArrayList<RuntimeDefinition>();
+		List<RuntimeDefinition> runtimeDefinitions = new ArrayList<>();
 		RuntimeDefinition runtimeDefinition = getRuntimeDefinition(delegate, JBOSSTOOLS_TEST_JBOSS_HOME_7_1_1, JBOSS_AS_7_1_1_FINAL);
 		runtimeDefinitions.add(runtimeDefinition);
 		runtimeDefinition = getRuntimeDefinition(delegate, JBOSSTOOLS_TEST_JBOSS_HOME_EAP_6_1, JBOSS_EAP_61);

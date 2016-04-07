@@ -297,7 +297,7 @@ public class OfflineSupportPreferencePage extends PreferencePage implements
 	}
 	
 	private Collection<String> getDescriptors(Collection<IProjectExampleSite> pluginSites) {
-		List<String> descriptorUrls = new ArrayList<String>(pluginSites.size());
+		List<String> descriptorUrls = new ArrayList<>(pluginSites.size());
 		for (IProjectExampleSite site : pluginSites) {
 			if (!site.isExperimental()) {
 				descriptorUrls.add(site.getUrl().toString());
@@ -307,7 +307,7 @@ public class OfflineSupportPreferencePage extends PreferencePage implements
 	}
 
 	private Collection<String> getAsStringCollection(Collection<?> objects) {
-		List<String> collection = new ArrayList<String>(objects.size());
+		List<String> collection = new ArrayList<>(objects.size());
 		for (Object u : objects) {
 		   collection.add(u.toString());
 		}

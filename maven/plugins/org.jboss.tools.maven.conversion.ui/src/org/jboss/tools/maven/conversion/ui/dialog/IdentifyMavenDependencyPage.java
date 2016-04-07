@@ -149,14 +149,14 @@ public class IdentifyMavenDependencyPage extends WizardPage {
 		super("");
 		this.project = project;
 		initialEntries = Collections.unmodifiableList(entries);
-		dependencyResolution = new ConcurrentHashMap<String, Boolean>();
+		dependencyResolution = new ConcurrentHashMap<>();
 		initDependencyMaps();
 		initDialogSettings();
 	}
 
 	private void initDependencyMaps() {
-		dependencyMap = new LinkedHashMap<ProjectDependency, Dependency>(initialEntries.size());
-		dependencyCheckStateMap = new LinkedHashMap<ProjectDependency, Boolean>(initialEntries.size());
+		dependencyMap = new LinkedHashMap<>(initialEntries.size());
+		dependencyCheckStateMap = new LinkedHashMap<>(initialEntries.size());
 		for (ProjectDependency entry : initialEntries) {
 			dependencyMap.put(entry, null);
 			dependencyCheckStateMap.put(entry, Boolean.TRUE);
@@ -588,7 +588,7 @@ public class IdentifyMavenDependencyPage extends WizardPage {
 		button.setText(label);
 		button.addSelectionListener(new SelectionListener() {
 			public void widgetSelected(SelectionEvent e) {
-				Collection<ProjectDependency> selection = new ArrayList<ProjectDependency>(dependenciesViewer.getTable().getItems().length);
+				Collection<ProjectDependency> selection = new ArrayList<>(dependenciesViewer.getTable().getItems().length);
 				for (TableItem item : dependenciesViewer.getTable().getItems()) {
 					selection.add((ProjectDependency)item.getData());
 				}
@@ -618,7 +618,7 @@ public class IdentifyMavenDependencyPage extends WizardPage {
 			public void widgetSelected(SelectionEvent e) {
 				TableItem[] selection = dependenciesViewer.getTable().getSelection();
 				
-				List<ProjectDependency> selectedDeps = new ArrayList<ProjectDependency>(selection.length);
+				List<ProjectDependency> selectedDeps = new ArrayList<>(selection.length);
 				
 				for (TableItem item : selection) {
 				  ProjectDependency projectDep = (ProjectDependency) item.getData();
@@ -737,7 +737,7 @@ public class IdentifyMavenDependencyPage extends WizardPage {
 	
     private void initJobs() {
     	if (identificationJobs == null) {
-    		identificationJobs = new HashMap<ProjectDependency, IdentificationJob>(dependencyMap.size());
+    		identificationJobs = new HashMap<>(dependencyMap.size());
     		
     		Table t = dependenciesViewer.getTable();
     		IFileIdentificationManager fileIdentificationManager = new FileIdentificationManager();
@@ -846,7 +846,7 @@ public class IdentifyMavenDependencyPage extends WizardPage {
 
 	public List<Dependency> getDependencies() {
 		List<ProjectDependency> checkedProjectDependencies = getCheckedProjectDependencies();
-		List<Dependency> dependencies = new ArrayList<Dependency>(checkedProjectDependencies.size());
+		List<Dependency> dependencies = new ArrayList<>(checkedProjectDependencies.size());
 		for (ProjectDependency projectDep : checkedProjectDependencies) {
 			Dependency d = dependencyMap.get(projectDep);
 			if (d != null) {
@@ -857,7 +857,7 @@ public class IdentifyMavenDependencyPage extends WizardPage {
 	}
 
 	public List<ProjectDependency> getCheckedProjectDependencies() {
-		List<ProjectDependency> selectedDeps = new ArrayList<ProjectDependency>(dependencyCheckStateMap.size());
+		List<ProjectDependency> selectedDeps = new ArrayList<>(dependencyCheckStateMap.size());
 		for (Entry<ProjectDependency, Boolean> entry : dependencyCheckStateMap.entrySet()) {
 			if (entry.getValue() != null && entry.getValue()) {
 				selectedDeps.add(entry.getKey());
@@ -940,7 +940,7 @@ public class IdentifyMavenDependencyPage extends WizardPage {
 	}
 
 	public IResource[] getResourcesToDelete() {
-		List<IResource> resources = new ArrayList<IResource>(dependencyMap.size());
+		List<IResource> resources = new ArrayList<>(dependencyMap.size());
 		IPath projectPath = project.getLocation();
 		IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
 		for (ProjectDependency pd : dependencyMap.keySet()) {

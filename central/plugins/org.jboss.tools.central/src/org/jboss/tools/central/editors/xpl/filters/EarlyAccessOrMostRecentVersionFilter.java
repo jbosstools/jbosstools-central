@@ -97,11 +97,11 @@ public class EarlyAccessOrMostRecentVersionFilter extends ViewerFilter {
 	private void initializeDiscoveryViewer(final DiscoveryViewer viewer) {
 		this.discoveryViewer = viewer;
 		this.comparator = new EarlyAccessThenBiggestVersionComparator();
-		this.sortedConnectorsById = new HashMap<String, SortedSet<ConnectorDescriptorItemUi>>();
-		final Set<ConnectorDescriptorItemUi> invisibleOnes = new HashSet<ConnectorDescriptorItemUi>();
+		this.sortedConnectorsById = new HashMap<>();
+		final Set<ConnectorDescriptorItemUi> invisibleOnes = new HashSet<>();
 		for (ConnectorDescriptorItemUi item : viewer.getAllConnectorsItemsUi()) {
 			if (this.sortedConnectorsById.get(item.getConnector().getId()) == null) {
-				this.sortedConnectorsById.put(item.getConnector().getId(), new TreeSet<ConnectorDescriptorItemUi>(this.comparator));
+				this.sortedConnectorsById.put(item.getConnector().getId(), new TreeSet<>(this.comparator));
 			}
 			// Only process visible connectors synchronously. Insertion can be a long operation as it requires versions to be resolved
 			if (item.isVisible()) {

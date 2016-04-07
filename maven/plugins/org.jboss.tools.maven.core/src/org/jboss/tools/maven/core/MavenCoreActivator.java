@@ -98,7 +98,7 @@ public class MavenCoreActivator extends Plugin {
 	
 	public static final String ENCODING = "UTF-8"; //$NON-NLS-1$
 	
-	public static final List<LibraryProviderOperationConfig> libraryProviderOperationConfigs = new ArrayList<LibraryProviderOperationConfig>();
+	public static final List<LibraryProviderOperationConfig> libraryProviderOperationConfigs = new ArrayList<>();
 
 	private static final String DEFAULT_COMPILER_LEVEL = "1.5"; //$NON-NLS-1$
 
@@ -266,7 +266,7 @@ public class MavenCoreActivator extends Plugin {
 			if (IClasspathEntry.CPE_CONTAINER == cp[i].getEntryKind()
 					&& cp[i].getPath() != null && cp[i].getPath().segmentCount() > 0
 					&& IClasspathManager.CONTAINER_ID.equals(cp[i].getPath().segment(0))) {
-				LinkedHashMap<String, IClasspathAttribute> attrs = new LinkedHashMap<String, IClasspathAttribute>();
+				LinkedHashMap<String, IClasspathAttribute> attrs = new LinkedHashMap<>();
 				for (IClasspathAttribute attr : cp[i].getExtraAttributes()) {
 					attrs.put(attr.getName(), attr);
 				}
@@ -348,7 +348,7 @@ public class MavenCoreActivator extends Plugin {
 		}
 		if (sourceDirectory != null) {
 			resource.setDirectory(sourceDirectory);
-			List<String> excludes = new ArrayList<String>();
+			List<String> excludes = new ArrayList<>();
 			excludes.add("**/*.java"); //$NON-NLS-1$
 			resource.setExcludes(excludes);
 		}

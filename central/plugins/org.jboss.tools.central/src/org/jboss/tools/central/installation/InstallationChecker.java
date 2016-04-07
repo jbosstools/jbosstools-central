@@ -47,7 +47,7 @@ public class InstallationChecker {
 	private IProfile applicationProfile;
 	
 	private InstallationChecker() throws ProvisionException {
-		this.iuFamilies = new HashMap<String, BundleFamilyExtension>();
+		this.iuFamilies = new HashMap<>();
 		for (IConfigurationElement extension : Platform.getExtensionRegistry().getConfigurationElementsFor(EXTENSION_POINT_ID)) {
 			String familyId = extension.getAttribute("familyId"); //$NON-NLS-1$
 			String label = extension.getAttribute("label"); //$NON-NLS-1$
@@ -76,7 +76,7 @@ public class InstallationChecker {
 			throw new ProvisionException("Current Eclipse instance does not support software installation.");
 		}
 		
-		this.installedUnitsPerFamily = new HashMap<String, Set<IInstallableUnit>>();
+		this.installedUnitsPerFamily = new HashMap<>();
 	}
 	
 	public synchronized static InstallationChecker getInstance() throws ProvisionException {
@@ -102,7 +102,7 @@ public class InstallationChecker {
 			Set<IInstallableUnit> foundFamilyUnits = Collections.emptySet();
 			BundleFamilyExtension entry = this.iuFamilies.get(family);
 			Map<String, Set<VersionRange>> iusForFamily = entry.loadBundleList();
-			foundFamilyUnits = new HashSet<IInstallableUnit>();
+			foundFamilyUnits = new HashSet<>();
 			for (Entry<String, Set<VersionRange>> iuVersions : iusForFamily.entrySet()) {
 				String iuId = iuVersions.getKey();
 				for (VersionRange versionRange : iuVersions.getValue()) {

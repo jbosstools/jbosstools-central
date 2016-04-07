@@ -82,7 +82,7 @@ public class RequirementModel {
 	
 	public Map<String, String> getProperties() {
 		if (properties == null) {
-			properties = new LinkedHashMap<String,String>();
+			properties = new LinkedHashMap<>();
 			if (xmlProperties != null) {
 				for (XmlProperty property : xmlProperties) {
 					properties.put(property.key, property.body);

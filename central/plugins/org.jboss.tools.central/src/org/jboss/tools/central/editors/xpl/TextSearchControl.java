@@ -119,7 +119,7 @@ public class TextSearchControl extends Composite {
 
 	private Control findControl;
 
-	private final Set<SelectionListener> selectionListeners = new HashSet<SelectionListener>();
+	private final Set<SelectionListener> selectionListeners = new HashSet<>();
 
 	private static Boolean useNativeSearchField;
 	
@@ -549,7 +549,7 @@ public class TextSearchControl extends Composite {
 				}
 				contents = contents.trim();
 			}
-			List<IContentProposal> contentProposals = new ArrayList<IContentProposal>();
+			List<IContentProposal> contentProposals = new ArrayList<>();
 			for (String proposal:proposals) {
 				if (proposal != null && proposal.startsWith(contents)) {
 					contentProposals.add(new ContentProposal(proposal));

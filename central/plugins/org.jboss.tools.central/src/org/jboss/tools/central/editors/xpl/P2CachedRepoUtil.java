@@ -22,7 +22,7 @@ public class P2CachedRepoUtil {
 	/**
 	 * Cache resolved p2 repositories as it's a very long operation
 	 */
-	private static Map<String, IMetadataRepository> cachedRepo = new HashMap<String, IMetadataRepository>();
+	private static Map<String, IMetadataRepository> cachedRepo = new HashMap<>();
 	
 
 	/**

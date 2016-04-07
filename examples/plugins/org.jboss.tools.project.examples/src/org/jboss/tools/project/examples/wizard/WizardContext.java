@@ -27,8 +27,8 @@ public class WizardContext {
 	private Set<IWizardContextChangeListener> listeners;
 	
 	public WizardContext() {
-		context = new HashMap<String, Object>();
-		listeners = new LinkedHashSet<IWizardContextChangeListener>();
+		context = new HashMap<>();
+		listeners = new LinkedHashSet<>();
 	}
 	
 	public void addListener(IWizardContextChangeListener newListener) {

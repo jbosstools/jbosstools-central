@@ -108,7 +108,7 @@ public class ArtifactResolutionService implements IArtifactResolutionService {
 			VersionRange versionRange = VersionRange.createFromVersionSpec(versionRangeSpec); 
 			artifact.setVersionRange(versionRange);
 			List<ArtifactVersion> fullVersions = source.retrieveAvailableVersions(artifact, localRepository, repositories);
-			List<String> versions = new ArrayList<String>(fullVersions.size());
+			List<String> versions = new ArrayList<>(fullVersions.size());
 			for (ArtifactVersion aVersion : fullVersions) {
 				String version = aVersion.toString();
 				if (version.endsWith("-SNAPSHOT")) { //$NON-NLS-1$

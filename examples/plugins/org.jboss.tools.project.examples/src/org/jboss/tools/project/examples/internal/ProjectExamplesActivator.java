@@ -296,7 +296,7 @@ public class ProjectExamplesActivator extends AbstractUIPlugin {
 	}
 
 	public static List<IMarker> getMarkers(List<? extends ProjectExample> projects) {
-		List<IMarker> markers = new ArrayList<IMarker>();
+		List<IMarker> markers = new ArrayList<>();
 		for (ProjectExample project : projects) {
 			try {
 				if (project.getIncludedProjects() == null) {
@@ -339,7 +339,7 @@ public class ProjectExamplesActivator extends AbstractUIPlugin {
 		String pName = fix.getProperties().get(RequirementModel.ECLIPSE_PROJECTS);
 		if (pName == null) {
 			List<String> projectNames = project.getIncludedProjects();
-			List<IProject> projects = new ArrayList<IProject>();
+			List<IProject> projects = new ArrayList<>();
 			if (projectNames != null) {
 				for (String projectName : projectNames) {
 					IProject eclipseProject = ResourcesPlugin.getWorkspace()
@@ -390,7 +390,7 @@ public class ProjectExamplesActivator extends AbstractUIPlugin {
 	private void initImportProjectExamples() {
 		if (importProjectExamplesMap == null) {
 			defaultImportProjectExample = new ImportDefaultProjectExample();
-			importProjectExamplesMap = new HashMap<String,IImportProjectExample>();
+			importProjectExamplesMap = new HashMap<>();
 			IExtensionRegistry registry = Platform.getExtensionRegistry();
 			IExtensionPoint extensionPoint = registry
 					.getExtensionPoint(IMPORT_PROJECT_EXAMPLES_EXTENSION_ID);
@@ -986,7 +986,7 @@ public class ProjectExamplesActivator extends AbstractUIPlugin {
 	
 	public Map<String, List<ContributedPage>> getContributedPages() {
 		if (contributedPages == null) {
-			contributedPages = new HashMap<String, List<ContributedPage>>();
+			contributedPages = new HashMap<>();
 			IExtensionRegistry registry = Platform.getExtensionRegistry();
 			IExtensionPoint extensionPoint = registry
 					.getExtensionPoint(WIZARDPAGES_EXTENSION_ID);
@@ -1012,7 +1012,7 @@ public class ProjectExamplesActivator extends AbstractUIPlugin {
 					ContributedPage contributedPage = new ContributedPage(configurationElement, type, pageType, priority, clazz);
 					List<ContributedPage> contributions = contributedPages.get(type);
 					if (contributions == null) {
-						contributions = new ArrayList<ContributedPage>();
+						contributions = new ArrayList<>();
 						contributedPages.put(type, contributions);
 					}
 					contributions.add(contributedPage);

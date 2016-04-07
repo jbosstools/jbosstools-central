@@ -32,7 +32,7 @@ public class TokenizerUtilTest {
 	public void testSplitToSet() {
 		assertNull(TokenizerUtil.splitToSet(null));
 		assertEquals(Collections.emptySet(), TokenizerUtil.splitToSet("  "));
-		assertEquals(new LinkedHashSet<String>(Arrays.asList("a","b","c")), TokenizerUtil.splitToSet("a,b ,   c, b,"));
+		assertEquals(new LinkedHashSet<>(Arrays.asList("a","b","c")), TokenizerUtil.splitToSet("a,b ,   c, b,"));
 	}
 
 }

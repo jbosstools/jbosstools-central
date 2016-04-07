@@ -44,7 +44,7 @@ public class ImportMavenArchetypeProjectExampleDelegate extends AbstractImportMa
 	@Override
 	public boolean importProject(final ProjectExampleWorkingCopy projectDescription, File file, 
 			Map<String, Object> propertiesMap, final IProgressMonitor monitor) throws Exception {
-		List<String> includedProjects = new ArrayList<String>();
+		List<String> includedProjects = new ArrayList<>();
 		projectDescription.setIncludedProjects(includedProjects);
 		//JBIDE-12711 : reset welcomeURL for maven archetypes. 
 		projectDescription.setWelcomeURL(null);

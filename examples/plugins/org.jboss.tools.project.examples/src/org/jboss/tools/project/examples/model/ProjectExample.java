@@ -313,7 +313,7 @@ public class ProjectExample implements ProjectModelElement,
 
 	public Set<String> getTags() {
 		if (tags == null) {
-			tags = new HashSet<String>();
+			tags = new HashSet<>();
 		}
 		return tags;
 	}
@@ -324,7 +324,7 @@ public class ProjectExample implements ProjectModelElement,
 
 	public Set<String> getImportFilter() {
 		if (importFilter == null) {
-			importFilter = new HashSet<String>();
+			importFilter = new HashSet<>();
 		}
 		return importFilter;
 	}

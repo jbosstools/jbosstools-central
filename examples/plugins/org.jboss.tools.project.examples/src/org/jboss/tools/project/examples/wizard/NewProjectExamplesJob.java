@@ -39,7 +39,7 @@ public class NewProjectExamplesJob extends WorkspaceJob {
 
 	private static final String WORKING_SETS = "workingSets"; //$NON-NLS-1$
 	private List<ProjectExampleWorkingCopy> selectedProjects;
-	private List<ProjectExampleWorkingCopy> projects = new ArrayList<ProjectExampleWorkingCopy>();
+	private List<ProjectExampleWorkingCopy> projects = new ArrayList<>();
 	private IWorkingSet[] workingSets;
 	private Map<String, Object> propertiesMap;
 

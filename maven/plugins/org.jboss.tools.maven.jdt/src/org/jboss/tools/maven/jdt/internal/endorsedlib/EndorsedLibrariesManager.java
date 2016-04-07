@@ -72,7 +72,7 @@ public class EndorsedLibrariesManager implements IEndorsedLibrariesManager {
 	 * Returns the classpath entries found under the endorsed directories
 	 */
 	private IClasspathEntry[] getClasspathEntries(IJavaProject javaProject, File[] endorsedDirs, IProgressMonitor monitor) {
-		List<IClasspathEntry> cpes = new ArrayList<IClasspathEntry>();
+		List<IClasspathEntry> cpes = new ArrayList<>();
 		for (File dir : endorsedDirs) {
 			if (dir.isDirectory() && dir.canRead()) {
 				setEntries(dir, cpes);

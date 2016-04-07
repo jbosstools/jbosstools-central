@@ -86,7 +86,7 @@ public class MavenLibraryProviderInstallOperation extends
 			Model libraryModel = mavenConfig.getModel();
 			try {
 				MavenCoreActivator.mergeModel(projectModel, libraryModel);
-				Map<String,String> options = new HashMap<String,String>();
+				Map<String,String> options = new HashMap<>();
 				options.put(XMIResource.OPTION_ENCODING, MavenCoreActivator.ENCODING);
 				resource.save(options);
 			} catch (IOException e) {
@@ -143,7 +143,7 @@ public class MavenLibraryProviderInstallOperation extends
 	}
 
 	private List<org.apache.maven.model.Dependency> convertDependencies(EList<Dependency> pomDependencies) {
-		List<org.apache.maven.model.Dependency> dependencies = new ArrayList<org.apache.maven.model.Dependency>(pomDependencies.size());
+		List<org.apache.maven.model.Dependency> dependencies = new ArrayList<>(pomDependencies.size());
 		for (Dependency pomDependency:pomDependencies) {
 	    	org.apache.maven.model.Dependency dependency = new org.apache.maven.model.Dependency();
 	    	dependency.setArtifactId(pomDependency.getArtifactId());

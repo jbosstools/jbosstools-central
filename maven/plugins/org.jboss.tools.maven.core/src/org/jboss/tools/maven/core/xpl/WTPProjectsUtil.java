@@ -348,7 +348,7 @@ public class WTPProjectsUtil {
     IJavaProject javaProject = JavaCore.create(project);
     if(javaProject != null) {
       // remove classpatch container from JavaProject
-      ArrayList<IClasspathEntry> newEntries = new ArrayList<IClasspathEntry>();
+      ArrayList<IClasspathEntry> newEntries = new ArrayList<>();
       for(IClasspathEntry entry : javaProject.getRawClasspath()) {
     	String path = entry.getPath().toString();
         if(!"org.eclipse.jst.j2ee.internal.module.container".equals(path)
@@ -494,7 +494,7 @@ public class WTPProjectsUtil {
     for(int i = 0; i < cp.length; i++ ) {
       if(IClasspathEntry.CPE_CONTAINER == cp[i].getEntryKind()
           && MavenClasspathHelpers.isMaven2ClasspathContainer(cp[i].getPath())) {
-        LinkedHashMap<String, IClasspathAttribute> attrs = new LinkedHashMap<String, IClasspathAttribute>();
+        LinkedHashMap<String, IClasspathAttribute> attrs = new LinkedHashMap<>();
         for(IClasspathAttribute attr : cp[i].getExtraAttributes()) {
           if (!attr.getName().equals(attributeToDelete)) {
             attrs.put(attr.getName(), attr);            

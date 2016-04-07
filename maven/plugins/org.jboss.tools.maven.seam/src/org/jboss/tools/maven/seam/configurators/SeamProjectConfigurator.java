@@ -505,7 +505,7 @@ public class SeamProjectConfigurator extends AbstractProjectConfigurator {
 
 
 	private String getSeamVersion(MavenProject mavenProject) {
-		List<Artifact> artifacts = new ArrayList<Artifact>();
+		List<Artifact> artifacts = new ArrayList<>();
 		ArtifactFilter filter = new ScopeArtifactFilter(Artifact.SCOPE_TEST);
 		for (Artifact artifact : mavenProject.getArtifacts()) {
 			if (filter.include(artifact) && artifact.isResolved()) {
@@ -552,7 +552,7 @@ public class SeamProjectConfigurator extends AbstractProjectConfigurator {
 			config.setStringProperty(ISeamFacetDataModelProperties.WEB_CONTENTS_FOLDER, viewFolder);
 		}
 		IJavaProject javaProject = JavaCore.create(project);
-		List<IPath> sourcePaths = new ArrayList<IPath>();
+		List<IPath> sourcePaths = new ArrayList<>();
 		if (javaProject != null && javaProject.isOpen()) {
 			try {
 				IClasspathEntry[] entries = javaProject.getRawClasspath();

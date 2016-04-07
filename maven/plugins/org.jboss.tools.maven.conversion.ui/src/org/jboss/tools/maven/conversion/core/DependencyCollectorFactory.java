@@ -22,7 +22,7 @@ public class DependencyCollectorFactory {
 
 	public static final DependencyCollectorFactory INSTANCE = new DependencyCollectorFactory();
 	
-	Set<DependencyCollector> dependencyCollectors = new HashSet<DependencyCollector>();
+	Set<DependencyCollector> dependencyCollectors = new HashSet<>();
 	
 	private DependencyCollectorFactory() {
 		initDependencyCollectors();

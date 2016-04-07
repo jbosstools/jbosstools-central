@@ -34,9 +34,9 @@ public class MavenPostInstallListener implements IFacetedProjectListener {
 			
 	private static final IProjectFacet SEAM_FACET = ProjectFacetsManager.getProjectFacet("jst.seam"); //$NON-NLS-1$
 	
-	private Map<IFacetedProject, IDataModel> seamModels = new WeakHashMap<IFacetedProject, IDataModel>(1);
+	private Map<IFacetedProject, IDataModel> seamModels = new WeakHashMap<>(1);
 	
-	private Map<IFacetedProject, IDataModel> mavenModels = new WeakHashMap<IFacetedProject, IDataModel>(1);
+	private Map<IFacetedProject, IDataModel> mavenModels = new WeakHashMap<>(1);
 	
 	public void handleEvent(IFacetedProjectEvent event) {
 		if (!(event instanceof IProjectFacetActionEvent)) {

@@ -29,7 +29,7 @@ public class MavenArtifactHelperTest {
 		IStatus status = MavenArtifactHelper.checkRequirementsAvailable(project);
 		assertEquals(Status.OK_STATUS, status);
 
-		Set<String> deps = new LinkedHashSet<String>(2);
+		Set<String> deps = new LinkedHashSet<>(2);
 		deps.add("org.wildfly.bom:jboss-javaee-7.0-with-tools:pom:8.0.0.Final");
 		deps.add("foo.bar.bom.eap:jboss-javaee-6.0-with-tools:pom:6.2.0-build-5");
 		

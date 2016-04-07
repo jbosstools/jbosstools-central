@@ -35,7 +35,7 @@ public class ChromeTabRendering extends HackedCTabRendering {
 	private CTabFolder tabFolder;
 	private int lastKnownTabHeight = -1;
 
-	private static Set<ChromeTabRendering> INSTANCES = new HashSet<ChromeTabRendering>();
+	private static Set<ChromeTabRendering> INSTANCES = new HashSet<>();
 
 	public static Set<ChromeTabRendering> getInstances() {
 		return INSTANCES;

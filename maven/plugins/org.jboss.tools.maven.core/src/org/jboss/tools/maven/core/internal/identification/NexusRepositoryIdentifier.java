@@ -62,7 +62,7 @@ public class NexusRepositoryIdentifier extends AbstractArtifactIdentifier {
 			return null;
 		}
 		 RemoteRepositoryManager repoManager = MavenCoreActivator.getDefault().getRepositoryManager();
-		Set<NexusRepository> nexusRepositories = new LinkedHashSet<NexusRepository>(repoManager.getNexusRepositories());
+		Set<NexusRepository> nexusRepositories = new LinkedHashSet<>(repoManager.getNexusRepositories());
 		for (NexusRepository repository : nexusRepositories) {
 			if (monitor.isCanceled()) {
 				return null;

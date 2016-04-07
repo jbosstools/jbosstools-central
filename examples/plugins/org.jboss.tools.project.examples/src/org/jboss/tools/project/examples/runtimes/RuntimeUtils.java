@@ -28,7 +28,7 @@ public class RuntimeUtils {
 	 * @return all configured {@link IRuntimeType}
 	 */
 	public static Set<IRuntimeType> getInstalledRuntimeTypes() {
-		Set<IRuntimeType> runtimeTypes = new HashSet<IRuntimeType>();
+		Set<IRuntimeType> runtimeTypes = new HashSet<>();
 		for (IServer server : ServerCore.getServers()) {
 			IRuntime runtime = server.getRuntime();
 			if (runtime != null && runtime.getRuntimeType() != null) {

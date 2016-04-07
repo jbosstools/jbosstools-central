@@ -34,7 +34,7 @@ public class MissingEndorsedLibMarkerResolutionGenerator implements	IMarkerResol
 	private static Set<String> INTERESTING_PHASES;
 	
 	static {
-		INTERESTING_PHASES = new LinkedHashSet<String>(
+		INTERESTING_PHASES = new LinkedHashSet<>(
 			 Arrays.asList("validate",
 			      "initialize",
 			      "generate-sources",

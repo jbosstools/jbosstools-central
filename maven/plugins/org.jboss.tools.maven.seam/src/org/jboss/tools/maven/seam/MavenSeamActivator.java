@@ -296,7 +296,7 @@ public class MavenSeamActivator extends AbstractUIPlugin {
 				Resource resource = new Resource();
 				
 				resource.setDirectory(MavenCoreActivator.BASEDIR + "/bootstrap"); //$NON-NLS-1$
-				List<String> excludes = new ArrayList<String>();
+				List<String> excludes = new ArrayList<>();
 				excludes.add("**/*.java"); //$NON-NLS-1$
 				resource.setExcludes(excludes);
 				build.getResources().add(resource);
@@ -308,7 +308,7 @@ public class MavenSeamActivator extends AbstractUIPlugin {
 				}
 				String webContent = getRootComponent(webProject);
 				resource.setDirectory(MavenCoreActivator.BASEDIR + "/../" + webProjectName + "/" + webContent); //$NON-NLS-1$ //$NON-NLS-2$
-				excludes = new ArrayList<String>();
+				excludes = new ArrayList<>();
 				excludes.add("**/*.java"); //$NON-NLS-1$
 				resource.setExcludes(excludes);
 				build.getResources().add(resource);
@@ -1005,8 +1005,8 @@ public class MavenSeamActivator extends AbstractUIPlugin {
 				MavenSeamActivator.log(e);
 				return;
 			}
-			List<IPath> sources = new ArrayList<IPath>();
-			List<IPath> outputs = new ArrayList<IPath>();
+			List<IPath> sources = new ArrayList<>();
+			List<IPath> outputs = new ArrayList<>();
 			for (int i = 0; i < entries.length; i++) {
 				if (entries[i].getEntryKind() == IClasspathEntry.CPE_SOURCE) {
 					IPath path = entries[i].getPath();

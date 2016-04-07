@@ -25,7 +25,7 @@ import org.eclipse.swt.widgets.Widget;
 @SuppressWarnings("restriction")
 public class CSSClasses {
 
-	private List<String> classes = new ArrayList<String>();
+	private List<String> classes = new ArrayList<>();
 
 	public CSSClasses(String source) {
 		if (source != null && !source.trim().isEmpty())

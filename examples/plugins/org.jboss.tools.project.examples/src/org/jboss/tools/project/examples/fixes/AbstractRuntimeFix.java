@@ -48,7 +48,7 @@ public abstract class AbstractRuntimeFix extends AbstractProjectFix implements I
 		if (allRuntimeKeys == null || allRuntimeKeys.trim().isEmpty()) {
 			return Collections.emptyList();
 		}
-		List<String> runtimeKeys = new ArrayList<String>();
+		List<String> runtimeKeys = new ArrayList<>();
 		Matcher m = RUNTIMES_PATTERN.matcher(allRuntimeKeys);
 		while (m.find()) {
 			String group = m.group(0);

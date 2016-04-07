@@ -26,7 +26,7 @@ import org.junit.Test;
 
 public class NexusRepositoryIdentifierTest extends AbstractIdentificationTest {
 
-	Map<NexusRepository, Boolean> initialRepoState = new HashMap<NexusRepository, Boolean>();
+	Map<NexusRepository, Boolean> initialRepoState = new HashMap<>();
 	
 	@Before
 	public void setupRepositories() {

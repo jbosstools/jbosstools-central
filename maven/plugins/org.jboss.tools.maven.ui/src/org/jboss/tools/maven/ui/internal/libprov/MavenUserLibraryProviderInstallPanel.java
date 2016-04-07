@@ -126,7 +126,7 @@ public class MavenUserLibraryProviderInstallPanel extends
 		}
 		
 		if (dependencies == null) {
-			dependencies = new ArrayList<Dependency>();
+			dependencies = new ArrayList<>();
 		}
 		
 		Composite composite = new Composite(parent, SWT.NONE);

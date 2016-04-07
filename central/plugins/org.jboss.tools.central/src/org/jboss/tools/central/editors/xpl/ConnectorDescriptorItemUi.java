@@ -130,7 +130,7 @@ public class ConnectorDescriptorItemUi implements PropertyChangeListener, Runnab
 	private Font titleFont;
 	private Image infoImage;
 
-	private Set<Resource> disposables = new HashSet<Resource>();
+	private Set<Resource> disposables = new HashSet<>();
 
 	public ConnectorDescriptorItemUi(DiscoveryViewer discoveryViewer,
 			final DiscoveryConnector connector,
@@ -413,7 +413,7 @@ public class ConnectorDescriptorItemUi implements PropertyChangeListener, Runnab
 				throw new RuntimeException("Unable to acquire the profile registry service.");
 			}
 			IProfile profile = profileRegistry.getProfile(IProfileRegistry.SELF);
-			Map<String, org.eclipse.equinox.p2.metadata.Version> res = new HashMap<String, org.eclipse.equinox.p2.metadata.Version>();
+			Map<String, org.eclipse.equinox.p2.metadata.Version> res = new HashMap<>();
 			for (String installableUnit : installableUnits) {
 				IQueryResult<IInstallableUnit> queryResult = profile.query(QueryUtil.createIUQuery(installableUnit), new NullProgressMonitor());
 				for (IInstallableUnit unit : queryResult) {
@@ -444,7 +444,7 @@ public class ConnectorDescriptorItemUi implements PropertyChangeListener, Runnab
 		if (repo == null) {
 			return null;
 		}
-		Map<String, org.eclipse.equinox.p2.metadata.Version> res = new HashMap<String, org.eclipse.equinox.p2.metadata.Version>();
+		Map<String, org.eclipse.equinox.p2.metadata.Version> res = new HashMap<>();
 		for (String unitId : connector.getInstallableUnits()) {
 			IQueryResult<IInstallableUnit> queryResult = repo.query(QueryUtil.createIUQuery(unitId), new NullProgressMonitor());
 			for (IInstallableUnit unit : queryResult) {

@@ -90,7 +90,7 @@ public class StacksArchetypeUtilTest {
 	
 	private Set<org.eclipse.wst.common.project.facet.core.runtime.IRuntime> createMockFacetedRuntimes() {
 
-		Set<org.eclipse.wst.common.project.facet.core.runtime.IRuntime> frs = new HashSet<IRuntime>();
+		Set<org.eclipse.wst.common.project.facet.core.runtime.IRuntime> frs = new HashSet<>();
 		frs.add(createMockFacetedRuntime(EAP60, FULL_EE6_FACET_VERSIONS));
 		frs.add(createMockFacetedRuntime(EAP61, FULL_EE6_FACET_VERSIONS));
 		frs.add(createMockFacetedRuntime(EAP62, FULL_EE6_FACET_VERSIONS));

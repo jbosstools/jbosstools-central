@@ -53,7 +53,7 @@ public class ExecutePhaseJob extends WorkspaceJob {
 		if (result.hasExceptions()) {
 			IStatus errorStatus; 
 			if (result.getExceptions().size() > 1) {
-				ArrayList<IStatus> errors = new ArrayList<IStatus>();
+				ArrayList<IStatus> errors = new ArrayList<>();
 				for (Throwable t : result.getExceptions()) {
 					errors.add(toStatus(t));
 				}

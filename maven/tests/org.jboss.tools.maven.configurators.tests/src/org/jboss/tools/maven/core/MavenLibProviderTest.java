@@ -33,7 +33,7 @@ public class MavenLibProviderTest {
 	@Parameters
 	public static Collection<?> loadLibProviders() {
 	
-		List<ILibraryProvider[]> mavenProviders = new ArrayList<ILibraryProvider[]>();
+		List<ILibraryProvider[]> mavenProviders = new ArrayList<>();
 		for (ILibraryProvider lp : LibraryProviderFramework.getProviders() ) {
             if (!lp.isAbstract() && "maven-library-provider".equals(lp.getRootProvider().getId())) {
             	mavenProviders.add(new ILibraryProvider[]{lp});

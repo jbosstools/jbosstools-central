@@ -89,7 +89,7 @@ public class ClasspathHelpers {
 	    IJavaProject javaProject = JavaCore.create(project);
 	    if(javaProject != null) {
 	      // remove classpatch container from JavaProject
-	      ArrayList<IClasspathEntry> newEntries = new ArrayList<IClasspathEntry>();
+	      ArrayList<IClasspathEntry> newEntries = new ArrayList<>();
 	      for(IClasspathEntry entry : javaProject.getRawClasspath()) {
 	        if(!isEndorsedDirsClasspathContainer(entry.getPath())) {
 	          newEntries.add(entry);

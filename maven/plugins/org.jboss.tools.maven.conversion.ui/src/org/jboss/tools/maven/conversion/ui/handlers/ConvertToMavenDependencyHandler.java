@@ -70,7 +70,7 @@ public class ConvertToMavenDependencyHandler extends AbstractHandler {
     Set<IClasspathEntry> files = null;
     if (selection instanceof IStructuredSelection) {
       IStructuredSelection structuredSelection = (IStructuredSelection) selection;
-      files = new LinkedHashSet<IClasspathEntry>(structuredSelection.size());
+      files = new LinkedHashSet<>(structuredSelection.size());
       Iterator<?> ite = structuredSelection.iterator();
       while(ite.hasNext()) {
     	  Object o = ite.next();

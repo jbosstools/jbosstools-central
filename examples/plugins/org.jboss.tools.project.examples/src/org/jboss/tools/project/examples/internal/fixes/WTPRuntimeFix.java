@@ -340,7 +340,7 @@ public class WTPRuntimeFix extends AbstractRuntimeFix {
 	
 
 	public static Set<IRuntimeType> getTargetedServerRuntimes(ProjectExample example) {
-		Set<IRuntimeType> targetedRuntimes = new HashSet<IRuntimeType>();
+		Set<IRuntimeType> targetedRuntimes = new HashSet<>();
 		List<RequirementModel> fixes = example.getRequirements();
 		if (fixes != null && !fixes.isEmpty()) {
 			IRuntime[] runtimes = ServerCore.getRuntimes();
@@ -367,7 +367,7 @@ public class WTPRuntimeFix extends AbstractRuntimeFix {
 		if (runtimes == null || runtimes.length == 0) {
 			return Collections.emptyList();
 		}
-		List<IRuntimeType> runtimesTypes = new ArrayList<IRuntimeType>(runtimes.length);
+		List<IRuntimeType> runtimesTypes = new ArrayList<>(runtimes.length);
 		for (IRuntime r : runtimes) {
 			IRuntimeType rt = r.getRuntimeType();
 			if (rt != null) {

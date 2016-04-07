@@ -73,7 +73,7 @@ public class NewProjectExamplesRequirementsPage extends WizardPage implements IP
 	protected Text projectSize;
 	protected WizardContext wizardContext;
 	protected TableViewer tableViewer;
-	protected List<IProjectExamplesFix> fixes = new ArrayList<IProjectExamplesFix>();
+	protected List<IProjectExamplesFix> fixes = new ArrayList<>();
 	private Image fulfilledRequirement;
 	private Image missingRecommendation;
 	private Image missingRequirement;

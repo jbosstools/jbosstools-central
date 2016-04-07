@@ -26,7 +26,7 @@ public class AutoResizeTableLayout extends TableLayout implements
         ControlListener {
     
     private final Table table;
-    private List<ColumnLayoutData> columns = new ArrayList<ColumnLayoutData>();
+    private List<ColumnLayoutData> columns = new ArrayList<>();
     private boolean autosizing = false;
     
     public AutoResizeTableLayout(Table table) {

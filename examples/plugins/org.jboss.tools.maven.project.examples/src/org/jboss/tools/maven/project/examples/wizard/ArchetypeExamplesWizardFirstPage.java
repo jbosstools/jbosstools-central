@@ -388,7 +388,7 @@ public class ArchetypeExamplesWizardFirstPage extends MavenProjectWizardLocation
 			field.setAccessible(true);
 			Object object = field.get(this);
 			if (object instanceof List<?>) {
-				Map<String, Object> propertiesMap = new HashMap<String, Object>();
+				Map<String, Object> propertiesMap = new HashMap<>();
 				propertiesMap.put(WORKING_SETS, object); 
 				return propertiesMap;
 			}

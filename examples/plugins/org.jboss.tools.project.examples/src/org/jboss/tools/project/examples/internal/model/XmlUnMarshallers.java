@@ -41,7 +41,7 @@ public class XmlUnMarshallers {
 	//@XmlType(name="property") 
 	public static class XmlProperties {
 	    @XmlElement(name="property") 
-	    public Collection<XmlProperty> properties = new ArrayList<XmlProperty>();
+	    public Collection<XmlProperty> properties = new ArrayList<>();
 	}
 
 	private static abstract class AbstractUnMarshaller<ValueType,BoundType> extends XmlAdapter<ValueType,BoundType> {

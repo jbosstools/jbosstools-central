@@ -72,7 +72,7 @@ public class StacksArchetypeUtil {
 
 	private static final String UNDEFINED_EE = "undefined";
 	
-	private static Map<String, List<String>> ENVIRONMENTS_MAP = new HashMap<String, List<String>>(4);
+	private static Map<String, List<String>> ENVIRONMENTS_MAP = new HashMap<>(4);
 	static {
 		ENVIRONMENTS_MAP.put(FULL_EE7, Arrays.asList(FULL_EE7, WEB_EE7, FULL_EE6, WEB_EE6));
 		ENVIRONMENTS_MAP.put(WEB_EE7, Arrays.asList(WEB_EE7, WEB_EE6));
@@ -172,7 +172,7 @@ public class StacksArchetypeUtil {
 
 
 	private Map<ArchetypeVersion, Integer> getBestMatchingArchetype(String archetypeType, boolean isBlank, String targetProduct /*community or product*/, String environment /* *-ee6 or *-ee7 */, IRuntime server, Stacks stacks) {
-		Map<ArchetypeVersion, Integer> matchingArchetypes = new HashMap<ArchetypeVersion, Integer>();
+		Map<ArchetypeVersion, Integer> matchingArchetypes = new HashMap<>();
 		if (targetProduct == null) {
 			targetProduct = TARGET_COMMUNITY;
 		}
@@ -219,7 +219,7 @@ public class StacksArchetypeUtil {
 		}
 		
 		//Yuck!
-		List<Entry<ArchetypeVersion, Integer>> entries = new ArrayList<Map.Entry<ArchetypeVersion,Integer>>(matchingArchetypes.entrySet());
+		List<Entry<ArchetypeVersion, Integer>> entries = new ArrayList<>(matchingArchetypes.entrySet());
 		//Sort higher scores first, then higher versions of identical archetypes first
 		Collections.sort(entries, new Comparator<Map.Entry<ArchetypeVersion,Integer>>() {
 			@Override
@@ -238,7 +238,7 @@ public class StacksArchetypeUtil {
 				return compare;
 			}
 		});
-		Map<ArchetypeVersion, Integer> result = new LinkedHashMap<ArchetypeVersion, Integer>(entries.size());
+		Map<ArchetypeVersion, Integer> result = new LinkedHashMap<>(entries.size());
 		for (Entry<ArchetypeVersion, Integer> e: entries) {
 			result.put(e.getKey(), e.getValue());
 		}
@@ -256,11 +256,11 @@ public class StacksArchetypeUtil {
 		if (archetype != null) {
 			Object additionalRepos = archetype.getLabels().get("additionalRepositories");
 			if (additionalRepos instanceof Map<?,?>) {
-				return new LinkedHashMap<String, String>((Map<String, String>)additionalRepos);
+				return new LinkedHashMap<>((Map<String, String>)additionalRepos);
 			} else if (additionalRepos instanceof Collection<?>) {
 				//In case we ca
 				Collection<String> additionalReposList = (Collection<String>) additionalRepos;
-				Map<String, String> additionalReposMap = new LinkedHashMap<String, String>(additionalReposList.size());
+				Map<String, String> additionalReposMap = new LinkedHashMap<>(additionalReposList.size());
 				for(String url : additionalReposList) {
 					String id = inferIdFromUrl(url);
 					if (id != null) {
@@ -295,7 +295,7 @@ public class StacksArchetypeUtil {
 		if (archetype != null) {
 			Object essentialDeps = archetype.getLabels().get("essentialDependencies");
 			if (essentialDeps instanceof Collection<?>) {
-				return new LinkedHashSet<String>((Collection<String>) essentialDeps);
+				return new LinkedHashSet<>((Collection<String>) essentialDeps);
 			}
 		}
 		return null;
@@ -331,7 +331,7 @@ public class StacksArchetypeUtil {
 			return null;
 		}
 
-		List<Runtime> candidates = new ArrayList<Runtime>();
+		List<Runtime> candidates = new ArrayList<>();
 		
 		for (Runtime runtime : stacks.getAvailableRuntimes()) {
 			Properties p = runtime.getLabels();

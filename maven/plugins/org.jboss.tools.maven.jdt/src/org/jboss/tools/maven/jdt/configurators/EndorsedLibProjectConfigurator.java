@@ -89,7 +89,7 @@ public class EndorsedLibProjectConfigurator extends AbstractProjectConfigurator 
 	}
 
 	private Set<File> checkMissingDirs(File[] endorsedDirs) {
-		Set<File> missingDirs = new HashSet<File>(endorsedDirs.length);
+		Set<File> missingDirs = new HashSet<>(endorsedDirs.length);
 		for (File dir : endorsedDirs) {
 			if (!dir.exists()) {
 				missingDirs.add(dir);
@@ -184,7 +184,7 @@ public class EndorsedLibProjectConfigurator extends AbstractProjectConfigurator 
 		String[] paths = endorsedDirs.split(""+File.pathSeparatorChar);
 
 		//Convert dir paths to Files
-		List<File> dirs = new ArrayList<File>(paths.length);
+		List<File> dirs = new ArrayList<>(paths.length);
 		for (String path : paths) {
 			IPath p = new Path(useSystemSeparator(path));
 			if (!p.isAbsolute()) {

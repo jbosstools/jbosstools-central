@@ -55,7 +55,7 @@ public class FileIdentificationManager implements IFileIdentificationManager {
 	public synchronized void addArtifactIdentifier(ArtifactIdentifier identifier) {
 		Assert.isNotNull(identifier, "Artifact identifier can not be null");
 		if (artifactIdentifiers == null) {
-			artifactIdentifiers = new ArrayList<ArtifactIdentifier>();
+			artifactIdentifiers = new ArrayList<>();
 		}
 		artifactIdentifiers.add(identifier);
 		//System.err.println("Added "+ identifier);

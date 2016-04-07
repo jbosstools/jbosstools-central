@@ -90,7 +90,7 @@ public class SarProjectConfigurator extends AbstractProjectConfigurator {
 		
 		IFacetedProject facetedProject = ProjectFacetsManager.create(project, true, monitor);
 
-		Set<Action> actions = new LinkedHashSet<Action>();
+		Set<Action> actions = new LinkedHashSet<>();
 		
 		IMavenProjectFacade facade = request.getMavenProjectFacade();
 		
@@ -182,7 +182,7 @@ public class SarProjectConfigurator extends AbstractProjectConfigurator {
 			return;
 		}
 
-		Set<IVirtualReference> newRefs = new LinkedHashSet<IVirtualReference>();
+		Set<IVirtualReference> newRefs = new LinkedHashSet<>();
 
 		JBossPackagingPluginConfiguration config = new JBossPackagingPluginConfiguration(mavenProject);
 
@@ -236,7 +236,7 @@ public class SarProjectConfigurator extends AbstractProjectConfigurator {
 		for (int i = 0; i < cp.length; i++) {
 			if (IClasspathEntry.CPE_CONTAINER == cp[i].getEntryKind()
 					&& MavenClasspathHelpers.isMaven2ClasspathContainer(cp[i].getPath())) {
-				LinkedHashMap<String, IClasspathAttribute> attrs = new LinkedHashMap<String, IClasspathAttribute>();
+				LinkedHashMap<String, IClasspathAttribute> attrs = new LinkedHashMap<>();
 				for (IClasspathAttribute attr : cp[i].getExtraAttributes()) {
 					if (!attr.getName().equals(attributeToDelete)) {
 						attrs.put(attr.getName(), attr);
@@ -275,7 +275,7 @@ public class SarProjectConfigurator extends AbstractProjectConfigurator {
 		    }
 
 		    IFacetedProject facetedProject = ProjectFacetsManager.create(project, true, monitor);
-		    Set<Action> actions = new LinkedHashSet<Action>();
+		    Set<Action> actions = new LinkedHashSet<>();
 
 		    WTPProjectsUtil.installJavaFacet(actions, project, facetedProject);
 
@@ -320,7 +320,7 @@ public class SarProjectConfigurator extends AbstractProjectConfigurator {
 	    if (cpEntries == null) {
 	      return false;
 	    }
-	    Set<IPath> currentPaths = new HashSet<IPath>();
+	    Set<IPath> currentPaths = new HashSet<>();
 	    for (IClasspathEntry entry  : cpEntries) {
 	      if (IClasspathEntry.CPE_SOURCE == entry.getEntryKind()){
 	        currentPaths.add(entry.getPath().makeRelativeTo(project.getFullPath()));

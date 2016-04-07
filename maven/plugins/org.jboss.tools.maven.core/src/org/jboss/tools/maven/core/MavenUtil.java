@@ -97,7 +97,7 @@ public class MavenUtil {
 	}
 
 	public static String getDependencyVersion(MavenProject mavenProject, String gid, String aid) {
-		List<Artifact> artifacts = new ArrayList<Artifact>();
+		List<Artifact> artifacts = new ArrayList<>();
 		ArtifactFilter filter = new org.apache.maven.artifact.resolver.filter.ScopeArtifactFilter(
 				Artifact.SCOPE_TEST);
 		for (Artifact artifact : mavenProject.getArtifacts()) {

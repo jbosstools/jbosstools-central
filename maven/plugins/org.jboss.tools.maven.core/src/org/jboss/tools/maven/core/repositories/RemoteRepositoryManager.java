@@ -59,7 +59,7 @@ public class RemoteRepositoryManager {
 		IMemento[] nodes = memento.getChildren(NEXUS_REPOSITORY);
 		for (IMemento node:nodes) {
 			if (nexusRepositories == null) {
-				nexusRepositories = new LinkedHashSet<NexusRepository>();
+				nexusRepositories = new LinkedHashSet<>();
 			}
 			String name = node.getString(NAME);
 			String url = node.getString(URL);
@@ -71,7 +71,7 @@ public class RemoteRepositoryManager {
 	}
 
 	public Set<NexusRepository> getDefaultRepositories() {
-		nexusRepositories = new LinkedHashSet<NexusRepository>();
+		nexusRepositories = new LinkedHashSet<>();
 		addRepository("JBoss Nexus Repository", "https://repository.jboss.org/nexus", true);
 		addRepository("Sonatype Nexus Repository", "http://repository.sonatype.org", false);
 		addRepository("Apache Nexus Repository", "https://repository.apache.org", false);

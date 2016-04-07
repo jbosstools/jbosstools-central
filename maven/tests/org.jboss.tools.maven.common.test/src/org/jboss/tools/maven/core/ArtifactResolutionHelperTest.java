@@ -41,7 +41,7 @@ public class ArtifactResolutionHelperTest {
 
 	private IArtifactResolutionService resolutionService;
 	
-	private List<ArtifactRepository> repositories = new ArrayList<ArtifactRepository>();
+	private List<ArtifactRepository> repositories = new ArrayList<>();
 	
 	private IMaven maven;
 	

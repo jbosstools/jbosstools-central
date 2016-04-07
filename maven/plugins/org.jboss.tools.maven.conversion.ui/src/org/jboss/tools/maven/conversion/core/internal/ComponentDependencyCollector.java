@@ -36,7 +36,7 @@ public class ComponentDependencyCollector extends DependencyCollector {
 		if (!appliesTo(project)) {
 			return null;
 		}
-		List<ProjectDependency> moduleDependencies = new ArrayList<ProjectDependency>();
+		List<ProjectDependency> moduleDependencies = new ArrayList<>();
 		collectReferences(project, moduleDependencies);
 		return moduleDependencies;
 	}

@@ -43,7 +43,7 @@ public class ProxyWizardManager {
 
 	private List<ProxyWizard> proxyWizards;
 	
-	private List<ProxyWizardManagerListener> listeners = new CopyOnWriteArrayList<ProxyWizardManager.ProxyWizardManagerListener>();
+	private List<ProxyWizardManagerListener> listeners = new CopyOnWriteArrayList<>();
 
 	private String discoveryUrl;
 
@@ -281,7 +281,7 @@ public class ProxyWizardManager {
 	}
 
 	private Dictionary<Object, Object> createEnvironment() {
-		Hashtable<Object, Object> environment = new Hashtable<Object, Object>(System.getProperties());
+		Hashtable<Object, Object> environment = new Hashtable<>(System.getProperties());
 		return environment;
 	}
 

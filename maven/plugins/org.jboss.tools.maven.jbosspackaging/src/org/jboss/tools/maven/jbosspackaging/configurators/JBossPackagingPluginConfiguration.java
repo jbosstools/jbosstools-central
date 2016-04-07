@@ -105,7 +105,7 @@ public class JBossPackagingPluginConfiguration {
 
 	private Set<String> getExcludes() {
 		if (excludes == null) {
-			excludes = new HashSet<String>();
+			excludes = new HashSet<>();
 			if (configuration != null) {
 				Xpp3Dom excludesDom = configuration.getChild("excludes");
 				if(excludesDom != null) {

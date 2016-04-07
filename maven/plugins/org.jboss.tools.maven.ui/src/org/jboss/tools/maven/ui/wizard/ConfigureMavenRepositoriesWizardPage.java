@@ -193,7 +193,7 @@ public class ConfigureMavenRepositoriesWizardPage extends WizardPage implements 
 	private TableViewer includedRepositoriesViewer;
 	private Set<RepositoryWrapper> includedRepositories;
 	private Set<RepositoryWrapper> availableRepositories;
-	private Set<RepositoryWrapper> selectedIncludedRepositories = new HashSet<RepositoryWrapper>();
+	private Set<RepositoryWrapper> selectedIncludedRepositories = new HashSet<>();
 
 	private Document document;
 
@@ -344,7 +344,7 @@ public class ConfigureMavenRepositoriesWizardPage extends WizardPage implements 
         
 		includedRepositories = getIncludedRepositories();
 		availableRepositories = getAvailableRepositories();
-		List<RepositoryWrapper> remove = new ArrayList<RepositoryWrapper>();
+		List<RepositoryWrapper> remove = new ArrayList<>();
 		for (RepositoryWrapper availableRepository:availableRepositories) {
 			if (includedRepositories.contains(availableRepository)) {
 				remove.add(availableRepository);
@@ -397,7 +397,7 @@ public class ConfigureMavenRepositoriesWizardPage extends WizardPage implements 
 				if (!ok) {
 					return;
 				}
-				List<RepositoryWrapper> list = new ArrayList<RepositoryWrapper>();
+				List<RepositoryWrapper> list = new ArrayList<>();
 				for (RepositoryWrapper wrapper : includedRepositories) {
 					list.add(wrapper);
 					removeRepository(wrapper);
@@ -449,11 +449,11 @@ public class ConfigureMavenRepositoriesWizardPage extends WizardPage implements 
 		if (preconfiguredRepositoryUrls == null || preconfiguredRepositoryUrls.isEmpty()) {
 			return new RepositoryWrapper[0];
 		}
-		Set<RepositoryWrapper> allRepos = new HashSet<RepositoryWrapper>();
+		Set<RepositoryWrapper> allRepos = new HashSet<>();
 		allRepos.addAll(availableRepositories);
 		allRepos.addAll(includedRepositories);
 		
-		List<RepositoryWrapper> newRepos = new ArrayList<RepositoryWrapper>();
+		List<RepositoryWrapper> newRepos = new ArrayList<>();
 		
 		for (Map.Entry<String, String> entry : preconfiguredRepositoryUrls.entrySet()) {
 			String repoId = entry.getKey();
@@ -1002,7 +1002,7 @@ public class ConfigureMavenRepositoriesWizardPage extends WizardPage implements 
 	}
 
 	private Set<RepositoryWrapper> getIncludedRepositories() {
-		Set<RepositoryWrapper> repositories = new TreeSet<RepositoryWrapper>();
+		Set<RepositoryWrapper> repositories = new TreeSet<>();
         try {
 			List<Profile> profiles = getProfiles();
 			for (Profile profile:profiles) {
@@ -1019,7 +1019,7 @@ public class ConfigureMavenRepositoriesWizardPage extends WizardPage implements 
 	}
 	
 	private Set<RepositoryWrapper> getAvailableRepositories() {
-		Set<RepositoryWrapper> repositories = new TreeSet<RepositoryWrapper>();
+		Set<RepositoryWrapper> repositories = new TreeSet<>();
         
 		SettingsRepositoryBuilder repoBuilder = new SettingsRepositoryBuilder() 
 		 											.setId(JBOSS_PUBLIC_REPOSITORY_ID)

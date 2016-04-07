@@ -163,7 +163,7 @@ public class GenericCommandActionDelegate implements
 				// command not defined? no problem ...
 				return;
 			}
-			ArrayList<Parameterization> parameters = new ArrayList<Parameterization>();
+			ArrayList<Parameterization> parameters = new ArrayList<>();
 			Iterator<?> i = parameterMap.keySet().iterator();
 			while (i.hasNext()) {
 				String parmName = (String) i.next();

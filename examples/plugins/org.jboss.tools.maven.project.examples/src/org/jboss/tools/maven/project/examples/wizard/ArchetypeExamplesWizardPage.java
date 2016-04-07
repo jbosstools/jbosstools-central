@@ -76,7 +76,7 @@ public class ArchetypeExamplesWizardPage extends
 	private ProjectExample projectDescription;
 	private ProjectExample projectExample;
 	private boolean initialized = false;
-	private Map<String, Object> propertiesMap = new HashMap<String, Object>();
+	private Map<String, Object> propertiesMap = new HashMap<>();
 	private WizardContext context;
 	private MissingRepositoryWarningComponent warningComponent;
 	private IStatus enterpriseRepoStatus;
@@ -253,7 +253,7 @@ public class ArchetypeExamplesWizardPage extends
 			String version, ArtifactRepository archetypeRepository,
 			List<ArtifactRepository> repositories) throws CoreException {
 		IMaven maven = MavenPlugin.getMaven();
-	    ArrayList<ArtifactRepository> repos = new ArrayList<ArtifactRepository>();
+	    ArrayList<ArtifactRepository> repos = new ArrayList<>();
 	    if (archetypeRepository != null) {
 		    repos.add(archetypeRepository);
 	    }
@@ -394,7 +394,7 @@ public class ArchetypeExamplesWizardPage extends
             private void ensureArchetyperCacheIsLoaded(Archetype archetype) throws CoreException {
                 IMaven maven = MavenPlugin.getMaven();
 
-                ArrayList<ArtifactRepository> repos = new ArrayList<ArtifactRepository>();
+                ArrayList<ArtifactRepository> repos = new ArrayList<>();
                 repos.addAll(maven.getArtifactRepositories());     
 
                 ArtifactRepository archetypeRepository = null;

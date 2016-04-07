@@ -192,29 +192,29 @@ public class DiscoveryViewer extends Viewer {
 	private final IRunnableContext context;
 
 	private Set<String> directoryUrls;
-	private volatile HashMap<String, ConnectorDiscovery> discoveries = new LinkedHashMap<String, ConnectorDiscovery>();
+	private volatile HashMap<String, ConnectorDiscovery> discoveries = new LinkedHashMap<>();
 	private List<DiscoveryConnector> allConnectors;
-	private Map<DiscoveryConnector, ConnectorDescriptorItemUi> itemsUi = new HashMap<DiscoveryConnector, ConnectorDescriptorItemUi>();
-	private Map<String, Control> categories = new HashMap<String, Control>();
+	private Map<DiscoveryConnector, ConnectorDescriptorItemUi> itemsUi = new HashMap<>();
+	private Map<String, Control> categories = new HashMap<>();
 	private Link nothingToShowLink;
 
 	private int minimumHeight;
 
-	private final List<UserFilterEntry> userFilters = new ArrayList<UserFilterEntry>();
-	private final List<ViewerFilter> systemFilters = new ArrayList<ViewerFilter>();
+	private final List<UserFilterEntry> userFilters = new ArrayList<>();
+	private final List<ViewerFilter> systemFilters = new ArrayList<>();
 
 	public DiscoveryViewer(Composite parent, IRunnableContext context) {
 		this.parent = parent;
 		this.context = context;
 		this.allConnectors = Collections.emptyList();
-		this.disposables = new ArrayList<Resource>();
+		this.disposables = new ArrayList<>();
 		setShowConnectorDescriptorTextFilter(true);
 		setMinimumHeight(MINIMUM_HEIGHT);
 		createEnvironment();
 	}
 
 	public void selectAllVisible() {
-		this.setSelection(new StructuredSelection(new ArrayList<ConnectorDescriptorItemUi>(this.getAllConnectorsItemsUi())));
+		this.setSelection(new StructuredSelection(new ArrayList<>(this.getAllConnectorsItemsUi())));
 	}
 	
 	public void deselectAll() {
@@ -297,7 +297,7 @@ public class DiscoveryViewer extends Viewer {
 			child.dispose();
 		}
 		clearDisposables();
-		allConnectors = new ArrayList<DiscoveryConnector>();
+		allConnectors = new ArrayList<>();
 		this.itemsUi.clear();
 		initializeCursors();
 		initializeImages();
@@ -603,13 +603,13 @@ public class DiscoveryViewer extends Viewer {
 			}
 		}
 		
-		Set<String> visibleCategories = new HashSet<String>();
+		Set<String> visibleCategories = new HashSet<>();
 		for (ConnectorDescriptorItemUi item : this.itemsUi.values()) {
 			if (item.isVisible()) {
 				visibleCategories.add(item.getConnector().getCategoryId());
 			}
 		}
-		Set<String> invisibleCategories = new HashSet<String>(this.categories.keySet());
+		Set<String> invisibleCategories = new HashSet<>(this.categories.keySet());
 		invisibleCategories.removeAll(visibleCategories);
 		for (String invisibleCategoryId : invisibleCategories) {
 			Control categoryControl = this.categories.get(invisibleCategoryId);
@@ -679,7 +679,7 @@ public class DiscoveryViewer extends Viewer {
 		this.nothingToShowLink.setVisible(this.allConnectors == null || this.allConnectors.isEmpty());
 
 		GridLayoutFactory.fillDefaults().numColumns(2).spacing(0, 0).applyTo(container);
-		Map<String, LinkedHashSet<DiscoveryCategory>> categoriesById = new HashMap<String, LinkedHashSet<DiscoveryCategory>>();
+		Map<String, LinkedHashSet<DiscoveryCategory>> categoriesById = new HashMap<>();
 		// necessary because categories from != discovery are not equal, whereas we want them unified in UI
 		for (ConnectorDiscovery discovery : this.discoveries.values()) {
 			for (DiscoveryCategory category : discovery.getCategories()) {
@@ -691,7 +691,7 @@ public class DiscoveryViewer extends Viewer {
 		}
 		
 		// Sort by 1st category
-		SortedSet<LinkedHashSet<DiscoveryCategory>> sortedCategories = new TreeSet<LinkedHashSet<DiscoveryCategory>>(new Comparator<LinkedHashSet<DiscoveryCategory>>() {
+		SortedSet<LinkedHashSet<DiscoveryCategory>> sortedCategories = new TreeSet<>(new Comparator<LinkedHashSet<DiscoveryCategory>>() {
 			private DiscoveryCategoryComparator comparator = new DiscoveryCategoryComparator();
 			
 			@Override
@@ -711,7 +711,7 @@ public class DiscoveryViewer extends Viewer {
 			categoryChildrenContainer = createCategoryHeaderAndContainer(container, firstCategory, background);
 			// Populate category
 			for (DiscoveryCategory category : categories) {
-				List<DiscoveryConnector> connectors = new ArrayList<DiscoveryConnector>(category.getConnectors());
+				List<DiscoveryConnector> connectors = new ArrayList<>(category.getConnectors());
 				Collections.sort(connectors, new DiscoveryConnectorComparator(category));
 				for (final DiscoveryConnector connector : connectors) {
 					ConnectorDescriptorItemUi itemUi = new ConnectorDescriptorItemUi(this, connector,
@@ -808,7 +808,7 @@ public class DiscoveryViewer extends Viewer {
 	}
 
 	private void createEnvironment() {
-		environment = new Hashtable<Object, Object>(System.getProperties());
+		environment = new Hashtable<>(System.getProperties());
 		// add the installed Mylyn version to the environment so that we can
 		// have connectors that are filtered based on version of Mylyn
 		Bundle bundle = Platform.getBundle("org.eclipse.mylyn.tasks.core"); //$NON-NLS-1$
@@ -893,7 +893,7 @@ public class DiscoveryViewer extends Viewer {
 	}
 
 	public Set<ConnectorDescriptor> getInstallableConnectors() {
-		Set<ConnectorDescriptor> res = new HashSet<ConnectorDescriptor>();
+		Set<ConnectorDescriptor> res = new HashSet<>();
 		for (ConnectorDescriptorItemUi item : (List<ConnectorDescriptorItemUi>)getSelection().toList()) {
 			if (!item.getConnector().isInstalled()) {
 				res.add(item.getConnector());
@@ -903,7 +903,7 @@ public class DiscoveryViewer extends Viewer {
 	}
 	
 	public Set<ConnectorDescriptor> getInstalledConnectors() {
-		Set<ConnectorDescriptor> res = new HashSet<ConnectorDescriptor>();
+		Set<ConnectorDescriptor> res = new HashSet<>();
 		for (ConnectorDescriptorItemUi item : (List<ConnectorDescriptorItemUi>)getSelection().toList()) {
 			if (item.getConnector().isInstalled()) {
 				res.add(item.getConnector());
@@ -913,7 +913,7 @@ public class DiscoveryViewer extends Viewer {
 	}
 	
 	public Set<ConnectorDescriptor> getUpdatableConnectors() {
-		Set<ConnectorDescriptor> res = new HashSet<ConnectorDescriptor>();
+		Set<ConnectorDescriptor> res = new HashSet<>();
 		for (ConnectorDescriptorItemUi item : (List<ConnectorDescriptorItemUi>)getSelection().toList()) {
 			if (item.getConnector().isInstalled() && !item.isUpToDate()) {
 				res.add(item.getConnector());
@@ -927,7 +927,7 @@ public class DiscoveryViewer extends Viewer {
 	 */
 	@Override
 	public IStructuredSelection getSelection() {
-		List<ConnectorDescriptorItemUi> elements = new ArrayList<ConnectorDescriptorItemUi>();
+		List<ConnectorDescriptorItemUi> elements = new ArrayList<>();
 		for (ConnectorDescriptorItemUi item : getAllConnectorsItemsUi()) {
 			if (item.getConnector().isSelected() && item.isVisible()) {
 				elements.add(item);
@@ -1100,7 +1100,7 @@ public class DiscoveryViewer extends Viewer {
 	 */
 	public void addDirectoryUrl(String directoryUrl) {
 		if (this.directoryUrls == null) {
-			this.directoryUrls = new HashSet<String>();
+			this.directoryUrls = new HashSet<>();
 		}
 		this.directoryUrls.add(directoryUrl);
 	}
@@ -1137,7 +1137,7 @@ public class DiscoveryViewer extends Viewer {
 	
 	public void addDirectoryUrls(Collection<String> urls) {
 		if (this.directoryUrls == null) {
-			this.directoryUrls = new HashSet<String>();
+			this.directoryUrls = new HashSet<>();
 		}
 		this.directoryUrls.addAll(urls);
 	}
@@ -1181,7 +1181,7 @@ public class DiscoveryViewer extends Viewer {
 						DiscoveryViewer.this.installedFeatures = getInstalledFeatures(monitor);
 					}
 					// TODO parallize this loop
-					Map<String, Set<DiscoveryConnector>> connectorsById = new HashMap<String, Set<DiscoveryConnector>>();
+					Map<String, Set<DiscoveryConnector>> connectorsById = new HashMap<>();
 					for (String directoryUrl : DiscoveryViewer.this.directoryUrls) {
 						ConnectorDiscovery connectorDiscovery = DiscoveryUtil.createConnectorDiscovery(directoryUrl);
 						connectorDiscovery.setEnvironment(environment);

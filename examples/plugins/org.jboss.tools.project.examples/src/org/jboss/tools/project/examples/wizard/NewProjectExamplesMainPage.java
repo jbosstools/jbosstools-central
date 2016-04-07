@@ -323,7 +323,7 @@ public class NewProjectExamplesMainPage extends WizardPage {
 		targetRuntimeTypesCombo.add(ProjectExamplesActivator.ALL_RUNTIMES);
 		
 		Set<IRuntimeType> installedRuntimeTypes = RuntimeUtils.getInstalledRuntimeTypes();
-		List<IRuntimeType> sortedTypes = new ArrayList<IRuntimeType>();
+		List<IRuntimeType> sortedTypes = new ArrayList<>();
 		
 		for (ProjectExampleCategory category : categories) {
 			for (ProjectExample project : category.getProjects()) {
@@ -399,7 +399,7 @@ public class NewProjectExamplesMainPage extends WizardPage {
 	
 	private String[] getItems() {
 		//List<Category> categories = getCategories(true);
-		Set<String> sites = new TreeSet<String>();
+		Set<String> sites = new TreeSet<>();
 		sites.add(ProjectExamplesActivator.ALL_SITES);
 		for (ProjectExampleCategory category:categories) {
 			List<ProjectExample> projects = category.getProjects();

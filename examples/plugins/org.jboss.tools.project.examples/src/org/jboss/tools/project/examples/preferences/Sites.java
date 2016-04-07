@@ -49,7 +49,7 @@ public class Sites {
 			runtimeSite.setSites(runtimeSites);
 			siteCategories[2]= runtimeSite;
 			
-			sites = new HashSet<IProjectExampleSite>();
+			sites = new HashSet<>();
 			sites.addAll(pluginSites);
 			sites.addAll(userSites);
 			sites.addAll(runtimeSites);

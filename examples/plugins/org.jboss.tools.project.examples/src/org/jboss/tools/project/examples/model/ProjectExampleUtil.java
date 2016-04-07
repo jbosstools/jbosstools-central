@@ -93,7 +93,7 @@ public class ProjectExampleUtil {
 
 	private static Set<IProjectExampleSite> pluginSites;
 
-	private static HashSet<IProjectExampleSite> invalidSites = new HashSet<IProjectExampleSite>();
+	private static HashSet<IProjectExampleSite> invalidSites = new HashSet<>();
 
 	private static Set<URI> categoryUris;
 
@@ -102,7 +102,7 @@ public class ProjectExampleUtil {
 
 	public static Set<IProjectExampleSite> getPluginSites() {
 		if (pluginSites == null) {
-			pluginSites = new HashSet<IProjectExampleSite>();
+			pluginSites = new HashSet<>();
 			IExtensionRegistry registry = Platform.getExtensionRegistry();
 			IExtensionPoint extensionPoint = registry.getExtensionPoint(PROJECT_EXAMPLES_XML_EXTENSION_ID);
 			IExtension[] extensions = extensionPoint.getExtensions();
@@ -142,7 +142,7 @@ public class ProjectExampleUtil {
 	}
 	
 	public static Set<IProjectExampleSite> getRuntimeSites(boolean force) {
-		Set<IProjectExampleSite> sites = new HashSet<IProjectExampleSite>();
+		Set<IProjectExampleSite> sites = new HashSet<>();
 		if (!force) {
 			IPreferenceStore store = ProjectExamplesActivator.getDefault()
 					.getPreferenceStore();
@@ -200,7 +200,7 @@ public class ProjectExampleUtil {
 	}
 
 	public static Set<IProjectExampleSite> getUserSites() {
-		Set<IProjectExampleSite> sites = new LinkedHashSet<IProjectExampleSite>();
+		Set<IProjectExampleSite> sites = new LinkedHashSet<>();
 		ProjectExampleSite site = getSite(getProjectExamplesXml());
 		if (site != null) {
 			sites.add(site);
@@ -221,7 +221,7 @@ public class ProjectExampleUtil {
 	}
 
 	private static Set<IProjectExampleSite> getSites() {
-		Set<IProjectExampleSite> sites = new HashSet<IProjectExampleSite>();
+		Set<IProjectExampleSite> sites = new HashSet<>();
 		sites.addAll(getPluginSites());
 		sites.addAll(getUserSites());
 		sites.addAll(getRuntimeSites());
@@ -274,7 +274,7 @@ public class ProjectExampleUtil {
 		
 		int threads = Runtime.getRuntime().availableProcessors();
 		ExecutorService service = Executors.newFixedThreadPool(threads);
-		CompletionService<Tuple<IProjectExampleSite, List<ProjectExample>>> pool = new ExecutorCompletionService<Tuple<IProjectExampleSite, List<ProjectExample>>>(service);
+		CompletionService<Tuple<IProjectExampleSite, List<ProjectExample>>> pool = new ExecutorCompletionService<>(service);
 		try {
 			boolean showExperimentalSites = ProjectExamplesActivator
 					.getDefault()
@@ -339,7 +339,7 @@ public class ProjectExampleUtil {
 
   public static Set<URI> getCategoryURIs() {
     if (categoryUris == null) {
-      categoryUris = new HashSet<URI>();
+      categoryUris = new HashSet<>();
       IExtensionRegistry registry = Platform.getExtensionRegistry();
       IExtensionPoint extensionPoint = registry
           .getExtensionPoint(PROJECT_EXAMPLES_CATEGORIES_EXTENSION_ID);
@@ -518,7 +518,7 @@ public class ProjectExampleUtil {
 		if (categories == null) {
 			return null;
 		}
-		List<ProjectExample> selection = new ArrayList<ProjectExample>();
+		List<ProjectExample> selection = new ArrayList<>();
 		for (ProjectExampleCategory c : categories) {
 			for (ProjectExample p : c.getProjects()) {
 				if (p.hasTags(tags) && !selection.contains(p)) {
@@ -550,7 +550,7 @@ public class ProjectExampleUtil {
 		Tuple<IProjectExampleSite, List<ProjectExample>> tuple; 
 		
 		public FetchProjectExampleDocumentTask(IProjectExampleSite site) {
-			 tuple = new Tuple<IProjectExampleSite,  List<ProjectExample>>(site);
+			 tuple = new Tuple<>(site);
 		}
 
 		@Override
