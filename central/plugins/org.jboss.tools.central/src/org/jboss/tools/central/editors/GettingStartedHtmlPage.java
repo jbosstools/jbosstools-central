@@ -364,7 +364,9 @@ public class GettingStartedHtmlPage extends AbstractJBossCentralPage implements 
 		earlyAccess += "</em>";
 		boolean earlyAccessEnabled = isEarlyAccessEnabled || showEarlyAccessInstalled;
 		String script = "handleEarlyAccess(" + earlyAccessEnabled + ",'" + earlyAccess + "');"; //$NON-NLS-1$ //$NON-NLS-2$
-		browser.execute(script);
+		if (!browser.isDisposed()) {
+			browser.execute(script);
+		}
 	}
 	
 	protected void drop(String arg) {
