@@ -21,12 +21,8 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.OperationCanceledException;
-import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
-import org.eclipse.core.runtime.preferences.IEclipsePreferences;
-import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener;
-import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent;
 import org.eclipse.equinox.p2.core.ProvisionException;
 import org.eclipse.jface.action.ControlContribution;
 import org.eclipse.jface.action.GroupMarker;
@@ -59,7 +55,6 @@ import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
@@ -81,7 +76,6 @@ import org.jboss.tools.central.JBossCentralActivator;
 import org.jboss.tools.central.actions.OpenWithBrowserHandler;
 import org.jboss.tools.central.editors.xpl.TextSearchControl;
 import org.jboss.tools.central.installation.InstallationChecker;
-import org.jboss.tools.central.preferences.PreferenceKeys;
 import org.jboss.tools.discovery.core.internal.connectors.JBossDiscoveryUi;
 
 /**

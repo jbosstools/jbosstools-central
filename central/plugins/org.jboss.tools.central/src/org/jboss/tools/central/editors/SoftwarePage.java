@@ -19,7 +19,6 @@ import java.util.List;
 import org.eclipse.core.commands.common.CommandException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.IJobChangeEvent;
 import org.eclipse.core.runtime.jobs.JobChangeAdapter;
@@ -72,7 +71,6 @@ import org.jboss.tools.central.editors.xpl.DiscoveryViewer;
 import org.jboss.tools.central.editors.xpl.filters.EarlyAccessFilter;
 import org.jboss.tools.central.editors.xpl.filters.EarlyAccessOrMostRecentVersionFilter;
 import org.jboss.tools.central.editors.xpl.filters.InstalledFilter;
-import org.jboss.tools.central.preferences.PreferenceKeys;
 import org.jboss.tools.discovery.core.internal.DiscoveryActivator;
 import org.jboss.tools.discovery.core.internal.connectors.JBossDiscoveryUi;
 
