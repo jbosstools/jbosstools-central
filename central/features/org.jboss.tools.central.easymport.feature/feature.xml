@@ -21,18 +21,13 @@
 
    <requires>
      <import plugin="org.eclipse.e4.ui.importer"/>
+     <!-- Those are in TP but not part of an included feature yet -->
      <import plugin="org.eclipse.egit.ui.importer"/>
      <import plugin="org.eclipse.e4.ui.importer.java"/>
      <import plugin="org.eclipse.e4.ui.importer.pde"/>
      <import plugin="org.eclipse.wst.jsdt.ui.importer"/>
+     <import plugin="org.eclipse.m2e.importer"/>
    </requires>
-
-   <plugin
-         id="org.jboss.tools.playground.easymport.maven"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
 
    <plugin
          id="org.jboss.tools.playground.easymport.jee"
