@@ -330,7 +330,7 @@
 	      </description>
 	      <param
       			name="url"
-      			value="http://dcp.jboss.org/v1/rest/search?query={expression}+AND+sys_type%3A(blogpost+article+webpage+solution)&amp;size=100">
+      			value="http://dcp2.jboss.org/v2/rest/search?size=100&amp;query={expression}&amp;sys_type=blogpost&amp;sys_type=article&amp;sys_type=solution&amp;sys_type=webpage">
       	  </param>
 	</engine>
   </extension>
