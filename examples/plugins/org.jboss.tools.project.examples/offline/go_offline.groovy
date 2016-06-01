@@ -526,8 +526,8 @@ class GoOfflineScript {
     json.hits.hits.each {
       def qs = it.fields
       def id = it._id
-      def exampleDir = qs.quickstart_id
-      def quikstartRepoZip = download(downloadArea, qs.git_download)
+      def exampleDir = getValue(qs.quickstart_id)
+      def quikstartRepoZip = download(downloadArea, getValue(qs.git_download))
       def unzipDir = new File(workDir, quikstartRepoZip.name)
       if (!unzipDir.exists()) {
         extractQuickstartRepo(unzipDir, quikstartRepoZip)
@@ -540,6 +540,9 @@ class GoOfflineScript {
 
   }
 
+  def getValue(obj) {
+    obj in List? obj[0]:obj
+  }
 
   private download(downloadArea, sUrl) {
     URL url = new URL(sUrl)

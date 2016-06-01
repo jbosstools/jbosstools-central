@@ -22,6 +22,7 @@ import java.util.Set;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.jboss.dmr.ModelNode;
+import org.jboss.dmr.ModelType;
 import org.jboss.tools.project.examples.model.ProjectExample;
 import org.jboss.tools.project.examples.model.ProjectExampleWorkingCopy;
 
@@ -32,7 +33,6 @@ public class ProjectExampleJsonParser implements IProjectExampleParser {
 
 	@Override
 	public Collection<ProjectExample> parse(InputStream json, IProgressMonitor monitor) throws IOException {
-
 		ModelNode results = ModelNode.fromJSONStream(json);
 		List<ProjectExample> examples = null;
 		if (results.isDefined()) {
@@ -54,7 +54,6 @@ public class ProjectExampleJsonParser implements IProjectExampleParser {
 				}
 			}
 		}
-
 		return examples == null ? Collections.<ProjectExample> emptyList() : Collections.unmodifiableList(examples);
 	}
 
@@ -65,13 +64,11 @@ public class ProjectExampleJsonParser implements IProjectExampleParser {
 			return null;
 		}
 
-		String name = fields.get("quickstart_id").asString();
+		String name = getAsString(fields, "quickstart_id");
 		try {
-			// String github_repo_url =
-			// fields.get("github_repo_url").asString();
-			String downloadUrl = fields.get("git_download").asString();
-			String title = fields.get("sys_title").asString();
-			String description = fields.get("sys_description").asString();
+			String downloadUrl = getAsString(fields, "git_download");
+			String title = getAsString(fields, "sys_title");
+			String description = getAsString(fields, "sys_description");
 
 			ProjectExampleWorkingCopy example = new ProjectExampleWorkingCopy();
 			example.setId(id);
@@ -86,12 +83,12 @@ public class ProjectExampleJsonParser implements IProjectExampleParser {
 			Set<String> sys_tags = new LinkedHashSet<>();
 			String tag = "";
 			if (fields.get("git_tag").isDefined()) {
-				tag = fields.get("git_tag").asString();
+				tag = getAsString(fields, "git_tag");
 				example.setVersion(tag);
 			}
 			if (fields.get("target_product").isDefined()) {
 				StringBuilder productTag = new StringBuilder("product:");
-				String targetProduct = fields.get("target_product").asString().toLowerCase();
+				String targetProduct = getAsString(fields, "target_product").toLowerCase();
 				if (tag.toLowerCase().startsWith(targetProduct)) {
 					productTag.append(tag);
 				} else {
@@ -139,5 +136,18 @@ public class ProjectExampleJsonParser implements IProjectExampleParser {
 
 	private boolean isValid(String value) {
 		return !"".equals(value) && !"none".equalsIgnoreCase(value);
+	}
+	
+	private String getAsString(ModelNode fields, String name) {
+		ModelNode field = fields.get(name);
+		if (ModelType.LIST == field.getType()) {
+			List<ModelNode> list = field.asList();
+			if (!list.isEmpty()) {
+				return list.get(0).asString();
+			}
+		} else {
+			return field.asString();
+		}
+		return "";
 	}
 }

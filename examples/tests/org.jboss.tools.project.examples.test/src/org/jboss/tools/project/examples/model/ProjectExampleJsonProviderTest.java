@@ -71,4 +71,32 @@ public class ProjectExampleJsonProviderTest {
 			assertEquals("org.jboss.tools.maven.cdi", pluginReq.getProperties().get(RequirementModel.ID));
 		}
 	}
+	
+	@Test
+	public void testExamplesDCP2() throws CoreException {
+		File searchJson = new File("resources", "search-dcp2.json");
+		List<ProjectExample> examples = new ArrayList<>(provider.getExamples(searchJson, monitor));
+		assertEquals(239, examples.size());
+		{
+			ProjectExample exampleFuse = examples.get(0);
+			assertEquals("jms", exampleFuse.getShortDescription());
+			assertEquals("Demonstrates how to connect to the local ActiveMQ broker and use JMS messaging between two Camel routes", exampleFuse.getDescription());
+			List<RequirementModel> reqs = exampleFuse.getRequirements();
+			assertEquals(1, reqs.size());
+			RequirementModel pluginReq = reqs.get(0);
+			assertEquals("plugin", pluginReq.getType());
+			assertEquals("org.fusesource.ide.tooling", pluginReq.getProperties().get(RequirementModel.ID));
+		}
+		{
+			ProjectExample exampleEAP7 = examples.get(6);
+			assertEquals("ejb-in-war", exampleEAP7.getShortDescription());
+			assertEquals("The `ejb-in-war` quickstart demonstrates how to package an *EJB* bean in a WAR archive and deploy it to JBoss EAP. Arquillian tests are also provided.", exampleEAP7.getDescription());
+			List<RequirementModel> reqs = exampleEAP7.getRequirements();
+			assertEquals(1, reqs.size());
+			RequirementModel serverReq = reqs.get(0);
+			assertEquals("wtpruntime", serverReq.getType());
+			assertEquals("jbosseap700runtime", serverReq.getProperties().get(RequirementModel.DOWNLOAD_ID));
+			assertEquals("org.jboss.ide.eclipse.as.runtime.eap.70,org.jboss.ide.eclipse.as.runtime.wildfly.80,org.jboss.ide.eclipse.as.runtime.wildfly.90,org.jboss.ide.eclipse.as.runtime.wildfly.100", serverReq.getProperties().get(RequirementModel.ALLOWED_TYPES));
+		}
+	}
 }
