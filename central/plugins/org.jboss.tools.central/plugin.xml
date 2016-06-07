@@ -10,7 +10,7 @@
          point="org.eclipse.ui.editors">
       <editor
             name="Red Hat Central"
-            icon="icons/shadowman.png"
+            icon="icons/rhd.png"
             contributorClass="org.jboss.tools.central.editors.JBossCentralEditorContributor"
             class="org.jboss.tools.central.editors.JBossCentralEditor"
             id="org.jboss.tools.central.editors.JBossCentralEditor">
@@ -39,8 +39,8 @@
              id="org.jboss.tools.central.toolbar">
           <command
                 commandId="org.jboss.tools.central.show"
-                disabledIcon="$nl$/icons/shadowman.png"
-                icon="$nl$/icons/shadowman.png"
+                disabledIcon="$nl$/icons/rhd.png"
+                icon="$nl$/icons/rhd.png"
                 id="org.jboss.tools.central.actions.ShowJBossCentralHandler"
                 style="push"
                 label="%jboss.central.menu.name"
@@ -53,8 +53,8 @@
           locationURI="menu:help?before=group.intro">
        <command
              commandId="org.jboss.tools.central.show"
-             disabledIcon="$nl$/icons/shadowman.png"
-             icon="$nl$/icons/shadowman.png"
+             disabledIcon="$nl$/icons/rhd.png"
+             icon="$nl$/icons/rhd.png"
              id="org.jboss.tools.central.actions.ShowJBossCentralHandler"
              label="%jboss.central.menu.name"
              style="push"
