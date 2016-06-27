@@ -238,6 +238,7 @@ public class ConnectorDescriptorItemUi implements PropertyChangeListener, Runnab
 			DiscoveryViewer.hookTooltip(providerLabel, providerLabel,
 					connectorContainer, providerLabel, connector.getSource(),
 					overview, image);
+			disposables.add(image);
 		} else {
 			providerLabel.setText(NLS.bind(Messages.ConnectorDiscoveryWizardMainPage_provider_and_license, connector.getProvider(), connector.getLicense()));
 		}
