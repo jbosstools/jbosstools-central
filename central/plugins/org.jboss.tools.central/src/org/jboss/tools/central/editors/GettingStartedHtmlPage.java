@@ -364,7 +364,7 @@ public class GettingStartedHtmlPage extends AbstractJBossCentralPage implements 
 		earlyAccess += "</em>";
 		boolean earlyAccessEnabled = isEarlyAccessEnabled || showEarlyAccessInstalled;
 		String script = "handleEarlyAccess(" + earlyAccessEnabled + ",'" + earlyAccess + "');"; //$NON-NLS-1$ //$NON-NLS-2$
-		if (!browser.isDisposed()) {
+		if ( browser != null && !browser.isDisposed()) {
 			browser.execute(script);
 		}
 	}
@@ -577,7 +577,7 @@ public class GettingStartedHtmlPage extends AbstractJBossCentralPage implements 
 			public void preferenceChange(PreferenceChangeEvent event) {
 				if (PreferenceKeys.SHOW_JBOSS_CENTRAL_ON_STARTUP.equals(event.getKey())) {
 					Object value = event.getNewValue();
-					if (value instanceof String && !browser.isDisposed()) {
+					if (value instanceof String && browser != null && !browser.isDisposed()) {
 						boolean show = Boolean.parseBoolean((String)value);
 						if (show != showOnStartup) {
 							showOnStartup = show;
