@@ -380,7 +380,7 @@ public class JBossCentralActivator extends AbstractUIPlugin {
 
 	public static JBossCentralEditor getJBossCentralEditor(boolean activate) {
 		final WorkbenchWindow window = (WorkbenchWindow) PlatformUI.getWorkbench().getActiveWorkbenchWindow();
-		if (window == null) {
+		if (window == null || window.getActivePage() == null) {
 			return null;
 		}
 		final IWorkbenchPage page = window.getActivePage();
@@ -565,7 +565,7 @@ public class JBossCentralActivator extends AbstractUIPlugin {
 		Object dropTarget = control.getData(DND.DROP_TARGET_KEY);
 		if (dropTarget != null) {
 			if ( !(dropTarget instanceof DropTarget)) {
-				JBossCentralActivator.log("Cannot initialize JBoss DND");
+				JBossCentralActivator.log("Cannot initialize JBoss DND with "+dropTarget.getClass());
 				return;
 			}
 			Object object = ((DropTarget)dropTarget).getData(JBossCentralDropTarget.JBOSS_DROP_TARGET_ID);
