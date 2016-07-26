@@ -1,5 +1,5 @@
 /*************************************************************************************
- * Copyright (c) 2008-2015 Red Hat, Inc. and others.
+ * Copyright (c) 2008-2016 Red Hat, Inc. and others.
  * All rights reserved. This program and the accompanying materials 
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -20,9 +20,10 @@ import org.jboss.tools.usage.event.UsageReporter;
 /**
  * 
  * @author Konstantin Marmalyukov
- *
+ * @author Ilya Buziuk (ibuziuk)
  */
 public class VersionedBrowser extends Browser {
+	private static final String UNKNOWN_BROWSER = "Unknown Browser"; //$NON-NLS-1$
 	private String name;
 	private String version;
 	
@@ -30,12 +31,7 @@ public class VersionedBrowser extends Browser {
 	
 	public VersionedBrowser(Composite parent, int style) {
 		super(parent, style);
-		if (System.getProperty("os.name", "generic").toLowerCase().indexOf("win") >= 0) { //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-			//workaround for https://bugs.eclipse.org/bugs/show_bug.cgi?id=465822
-			//this bug should be fixed into 4.6 (Eclipse Neon)
-			setUrl(getUrl());
-		}
-		//TODO Check Project Spartan/Edge
+		//TODO Check Project Spartan / Edge
 		String browserScript =
 				   "var ua = navigator.userAgent,tem,M=ua.match(/(opera|chrome|safari|firefox|msie|trident(?=\\/))\\/?\\s*(\\d+)/i) || [];" +  //$NON-NLS-1$
 				   "if(/trident/i.test(M[1])){" + //$NON-NLS-1$
@@ -53,8 +49,14 @@ public class VersionedBrowser extends Browser {
 				   	"}"+ //$NON-NLS-1$
 				   	"return M[0] + '_' + M[1];" ; //$NON-NLS-1$
 		String result = (String) evaluate(browserScript);
-		name = result.substring(0, result.indexOf("_")); //$NON-NLS-1$
-		version = result.substring(result.indexOf("_") + 1); //$NON-NLS-1$
+
+		if (result != null) {
+			name = result.substring(0, result.indexOf("_")); //$NON-NLS-1$
+			version = result.substring(result.indexOf("_") + 1); //$NON-NLS-1$
+		} else {
+			// script failed to detect browser name / version
+			result = UNKNOWN_BROWSER;
+		}
 		
 		if (!usageReported) {
 			UsageEventType eventType = JBossCentralActivator.getDefault().getUsedBrowserEventType();
@@ -72,13 +74,16 @@ public class VersionedBrowser extends Browser {
 	}
 	
 	/**
-	 * @return true if browser supports HTML5 content
+	 * @return false if detected browser does not support HTML5 content 
+	 * (Mozilla / IE version 9 and below), true otherwise
 	 */
 	public boolean isHTML5supported() {
-		double browserVersion = Double.parseDouble(version);
-		if (("Mozilla".equals(name) && browserVersion < 10) //$NON-NLS-1$
-			|| ("IE".equals(name) && browserVersion < 10)) { //$NON-NLS-1$
-			return false;
+		if (name != null && version != null) {
+			double browserVersion = Double.parseDouble(version);
+			if (("Mozilla".equals(name) && browserVersion < 10) //$NON-NLS-1$
+					|| ("IE".equals(name) && browserVersion < 10)) { //$NON-NLS-1$
+				return false;
+			}
 		}
 		return true;
 	}
@@ -89,6 +94,6 @@ public class VersionedBrowser extends Browser {
 	
 	@Override
 	public String toString() {
-		return getClass().getSimpleName() + ": " + name +" v"+version;
+		return getClass().getSimpleName() + ": " + name + " version " + version; //$NON-NLS-1$//$NON-NLS-2$
 	}
 }
