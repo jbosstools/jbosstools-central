@@ -50,7 +50,7 @@ public class HibernateProjectConfigurator extends AbstractProjectConfigurator {
 	
 	private void configureInternal(MavenProject mavenProject,IProject project,
 			IProgressMonitor monitor) throws CoreException {
-		if (!isHibernateConfigurable(mavenProject) || project.hasNature(HibernatePropertiesConstants.HIBERNATE_NATURE)) {
+		if (!isHibernateConfigurable(mavenProject) || !project.isAccessible() || project.hasNature(HibernatePropertiesConstants.HIBERNATE_NATURE)) {
 			return;
 		}
 		
