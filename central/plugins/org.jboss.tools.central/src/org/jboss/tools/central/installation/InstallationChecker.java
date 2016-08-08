@@ -99,17 +99,22 @@ public class InstallationChecker {
 	
 	public Set<IInstallableUnit> getUnits(String family) {
 		if (! installedUnitsPerFamily.containsKey(family)) {
-			Set<IInstallableUnit> foundFamilyUnits = Collections.emptySet();
+			Set<IInstallableUnit> foundFamilyUnits;
 			BundleFamilyExtension entry = this.iuFamilies.get(family);
-			Map<String, Set<VersionRange>> iusForFamily = entry.loadBundleList();
-			foundFamilyUnits = new HashSet<>();
-			for (Entry<String, Set<VersionRange>> iuVersions : iusForFamily.entrySet()) {
-				String iuId = iuVersions.getKey();
-				for (VersionRange versionRange : iuVersions.getValue()) {
-					IQuery<IInstallableUnit> query = QueryUtil.createIUQuery(iuId, versionRange);
-					// can use null progress monitor as querying against installed profile is immediate
-					IQueryResult<IInstallableUnit> res = this.applicationProfile.query(query, new NullProgressMonitor());
-					foundFamilyUnits.addAll(res.toSet());
+			if (entry == null) {
+				foundFamilyUnits = Collections.emptySet();
+				JBossCentralActivator.logWarning("No BundleFamilyExtension found for " + family);
+			} else {
+				foundFamilyUnits = new HashSet<>();
+				Map<String, Set<VersionRange>> iusForFamily = entry.loadBundleList();
+				for (Entry<String, Set<VersionRange>> iuVersions : iusForFamily.entrySet()) {
+					String iuId = iuVersions.getKey();
+					for (VersionRange versionRange : iuVersions.getValue()) {
+						IQuery<IInstallableUnit> query = QueryUtil.createIUQuery(iuId, versionRange);
+						// can use null progress monitor as querying against installed profile is immediate
+						IQueryResult<IInstallableUnit> res = this.applicationProfile.query(query, new NullProgressMonitor());
+						foundFamilyUnits.addAll(res.toSet());
+					}
 				}
 			}
 
