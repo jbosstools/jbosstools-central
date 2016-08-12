@@ -386,9 +386,9 @@ class GoOfflineScript {
     if (profiles.contains("arq-jbossas-remote")) {
       execMavenGoOfflineForProfiles (directory, localRepo, pomModel, profiles.replace(",arq-jbossas-remote",""))
       execMavenGoOfflineForProfiles (directory, localRepo, pomModel, "arq-jbossas-remote")
-    } else if (profiles.contains("arq-wildlfy-remote")) {
-      execMavenGoOfflineForProfiles (directory, localRepo, pomModel, profiles.replace(",arq-wildlfy-remote",""))
-      execMavenGoOfflineForProfiles (directory, localRepo, pomModel, "arq-wildlfy-remote")
+    } else if (profiles.contains("arq-wildfly-remote")) {
+      execMavenGoOfflineForProfiles (directory, localRepo, pomModel, profiles.replace(",arq-wildfly-remote",""))
+      execMavenGoOfflineForProfiles (directory, localRepo, pomModel, "arq-wildfly-remote")
     } else {
       execMavenGoOfflineForProfiles (directory, localRepo, pomModel, profiles)
     }
