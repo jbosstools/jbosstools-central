@@ -8,13 +8,15 @@
  * Contributors:
  *     JBoss by Red Hat - Initial implementation.
  ************************************************************************************/
-@Grab('org.jboss.jdf:stacks-client:1.0.1.Final')
-@Grab('commons-io:commons-io:2.4')
-@Grab('com.beust:jcommander:1.30')
-@Grab('org.apache.httpcomponents:httpcore:4.0.1')
+@Grab('org.jboss.jdf:stacks-client:1.0.3.Final')
+@Grab('commons-io:commons-io:2.5')
+@Grab('com.beust:jcommander:1.48')
+@Grab('org.apache.httpcomponents:httpcore:4.4.5')
+@Grab('org.apache.commons:commons-lang3:3.4')
 
 import org.apache.commons.io.FileUtils
 import org.apache.commons.io.FilenameUtils
+import static org.apache.commons.lang3.StringEscapeUtils.*
 import static groovyx.gpars.GParsPool.*
 import static groovy.io.FileType.*
 import com.beust.jcommander.*
@@ -24,6 +26,9 @@ import org.jboss.jdf.stacks.model.*
 import java.util.concurrent.TimeUnit
 
 class GoOfflineScript {
+
+  private static final String NEW_LINE_TAB = System.lineSeparator() + '\t'
+
   @Parameter(description = "<descriptor url list>")
   def descriptors = [];
 
@@ -76,7 +81,10 @@ class GoOfflineScript {
                 "portal-extension",
                 "jsf2-hello-world-portlet",
                 "social-portlets",
-                "jboss-servlet-security-genericheader-auth"
+                "jboss-servlet-security-genericheader-auth",
+                "camel",
+                "custom",
+                "."
               ]
 
 
@@ -85,7 +93,12 @@ class GoOfflineScript {
     def cmd = new JCommander();
     try {
       cmd.addObject(script);
-      cmd.parse(args)
+      def cleanArgs = new String[args.length]
+      args.eachWithIndex { a, i ->
+        cleanArgs[i] = unescapeJava a
+      }
+
+      cmd.parse(cleanArgs)
     } catch (ParameterException e) {
       println e.getLocalizedMessage()
       cmd.usage();
@@ -136,10 +149,12 @@ class GoOfflineScript {
 
     try {
       downloadQuickstartsFromDCP(searchUrl, downloadDir, workDir, unzippedExamples)
+      
       descriptors.each { descriptorUrl ->
         def archetypeProjects = downloadExamplesFromDescriptor(descriptorUrl, downloadDir, workDir, unzippedExamples)
         if (archetypeProjects) allArchetypeProjects.addAll archetypeProjects
       }
+      
       buildUnzippedExamples(unzippedExamples, mavenRepoDir)
 
       buildArchetypesFromExamples(allArchetypeProjects, workDir, mavenRepoDir)
@@ -170,11 +185,14 @@ class GoOfflineScript {
     println "Script executed in $duration with ${buildErrors.size()} error(s)"
 
     if (buildErrors.size()) {
-      def msg = ""
+      def summary = ""
+      def details = ""
       buildErrors.each {
-        msg += '\r\n\t'+it.key
+        def msg = NEW_LINE_TAB+it.key
+        summary += msg
+        details += msg + NEW_LINE_TAB +it.value
       }
-      throw new ScriptProblems(msg)
+      throw new ScriptProblems("Errors: $summary $NEW_LINE_TAB Details: $details")
     }
   }
 
@@ -351,6 +369,10 @@ class GoOfflineScript {
       profiles = profiles.replace("uitests-tomcat", "").replace("uitests-jbossas", "").replace("uitests-remote", "")
     }
 
+    else if (name == "jsonp" || name == "batch-processing") {
+      profiles = profiles.replace("arq-wildfly-remote", "").replace("arq-wildfly-managed", "")
+    }
+
     //some datagrid examples profiles can't be run OOTB
     profiles = profiles.replace("uitests-clustered","").replace("custom-classpath","").replace("release","");
 
@@ -359,14 +381,17 @@ class GoOfflineScript {
       return
     }
 
-     //"arq-jbossas-remote" can't be combined with other arquillian profiles, it would bork dependency resolution
-     //so we execute 2 builds. with and without arq-jbossas-remote
+     //"arq-*-remote" can't be combined with other arquillian profiles, it would bork dependency resolution
+     //so we execute 2 builds. with and without arq-*-remote
     if (profiles.contains("arq-jbossas-remote")) {
       execMavenGoOfflineForProfiles (directory, localRepo, pomModel, profiles.replace(",arq-jbossas-remote",""))
       execMavenGoOfflineForProfiles (directory, localRepo, pomModel, "arq-jbossas-remote")
+    } else if (profiles.contains("arq-wildlfy-remote")) {
+      execMavenGoOfflineForProfiles (directory, localRepo, pomModel, profiles.replace(",arq-wildlfy-remote",""))
+      execMavenGoOfflineForProfiles (directory, localRepo, pomModel, "arq-wildlfy-remote")
     } else {
       execMavenGoOfflineForProfiles (directory, localRepo, pomModel, profiles)
-     }
+    }
   }
 
   def execMavenGoOfflineForProfiles (def directory, def localRepo, def pomModel, def profiles) {
@@ -393,7 +418,7 @@ class GoOfflineScript {
       ultimateGoal = "validate"
     }
 
-    ant.exec(errorproperty: "cmdErr",
+    ant.exec(outputproperty: "cmdErr",
              resultproperty:"cmdExit",
              failonerror: "false",
              dir: directory,
@@ -409,6 +434,7 @@ class GoOfflineScript {
                 if (forceMavenResourcePluginResolution) arg(value:"org.apache.maven.plugins:maven-resources-plugin:2.5:resources")
                 arg(value:ultimateGoal)
                 arg(value:"-DskipTests=true")
+                arg(value:"-Ddeploy.skip=true")
                 if (profiles)  arg(value:"-P$profiles")
                 if (localRepo) arg(value:"-Dmaven.repo.local=${localRepo.absolutePath}")
                 if(directory.toString().contains("jboss-html5-mobile-archetype")) {
@@ -455,7 +481,7 @@ class GoOfflineScript {
       logger.setMessageOutputLevel(3)
     }
 
-    ant.exec(errorproperty: "cmdErr",
+    ant.exec(outputproperty: "cmdErr",
              resultproperty:"cmdExit",
              failonerror: "false",
              dir: directory,
@@ -494,7 +520,7 @@ class GoOfflineScript {
       logger.setMessageOutputLevel(3)
     }
 
-    ant.exec(errorproperty: "cmdErr",
+    ant.exec(outputproperty: "cmdErr",
              resultproperty:"cmdExit",
              failonerror: "false",
              dir: directory,
@@ -527,6 +553,10 @@ class GoOfflineScript {
       def qs = it.fields
       def id = it._id
       def exampleDir = getValue(qs.quickstart_id)
+      if (excludedExamples.contains(exampleDir)) {
+        return
+      }
+
       def quikstartRepoZip = download(downloadArea, getValue(qs.git_download))
       def unzipDir = new File(workDir, quikstartRepoZip.name)
       if (!unzipDir.exists()) {

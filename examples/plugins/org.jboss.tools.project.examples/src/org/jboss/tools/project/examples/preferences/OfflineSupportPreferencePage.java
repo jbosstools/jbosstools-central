@@ -256,10 +256,10 @@ public class OfflineSupportPreferencePage extends PreferencePage implements
 								.append("\" \"")
 								.append(OfflineUtil.getGoOfflineScript().getAbsolutePath())
 		                        .append("\" ") //$NON-NLS-1$
-		                        .append(StringUtils.join(categories, " ")) //$NON-NLS-1$
+		                        .append(escapeArgs(StringUtils.join(categories, " "))) //$NON-NLS-1$
 		                        .append(" ") //$NON-NLS-1$
-		                        .append(StringUtils.join(descriptors, " "))//$NON-NLS-1$
-		                        .append(" -u \"").append(PropertiesHelper.getPropertiesProvider().getValue("quickstarts.search.query")).append("\"")
+		                        .append(escapeArgs(StringUtils.join(descriptors, " ")))//$NON-NLS-1$
+		                        .append(" -u \"").append(escapeArgs(PropertiesHelper.getPropertiesProvider().getValue("quickstarts.search.query"))).append("\"")
 		                        .append(" -q -e"); //$NON-NLS-1$
 		 
 		text.setText(command.toString());
@@ -405,4 +405,8 @@ public class OfflineSupportPreferencePage extends PreferencePage implements
 		}
 	}
 
+	private String escapeArgs(String arg) {
+		return arg.replaceAll("&", "\\\\u0026");
+	}
+	
 }
