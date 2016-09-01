@@ -3,3 +3,4 @@ cache/
 target/
 pmd-eclipse.log
 .DS_Store
+hs_err_pid*.log
