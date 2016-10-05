@@ -14,6 +14,7 @@ package org.jboss.tools.discovery.core.internal.connectors.xpl;
 import java.io.File;
 import java.io.IOException;
 import java.io.Reader;
+import java.lang.reflect.InvocationTargetException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.UnknownHostException;
@@ -108,9 +109,13 @@ public class RemoteExternalBundleDiscoveryStrategy extends ExternalBundleDiscove
 									"Cannot access {0}: unknown host: please check your Internet connection and try again.",
 									e.getMessage()), e));
 		} catch (IOException e) {
-			throw new CoreException(new Status(IStatus.ERROR,
-					DiscoveryCore.ID_PLUGIN,
-					"IO failure: cannot load discovery directory", e));
+		    if (monitor.isCanceled()) {
+		        return null;
+		    } else {
+	            throw new CoreException(new Status(IStatus.ERROR,
+	                    DiscoveryCore.ID_PLUGIN,
+	                    "IO failure: cannot load discovery directory", e));
+		    }
 		} catch (URISyntaxException e) {
 			throw new CoreException(new Status(IStatus.ERROR,
 					DiscoveryCore.ID_PLUGIN,
@@ -157,6 +162,9 @@ public class RemoteExternalBundleDiscoveryStrategy extends ExternalBundleDiscove
 					monitor.worked(futureSize);
 				} catch (ExecutionException e) {
 					Throwable cause = e.getCause();
+					if ((cause instanceof RuntimeException) && (cause.getCause() instanceof InvocationTargetException)) {
+					    cause = ((InvocationTargetException)cause.getCause()).getTargetException();
+					}
 					if (cause instanceof OperationCanceledException) {
 						monitor.setCanceled(true);
 						return null;
@@ -233,13 +241,15 @@ public class RemoteExternalBundleDiscoveryStrategy extends ExternalBundleDiscove
 					file = new File(target.getParentFile(), target.getName().replace("downloading", "jar"));
 					FileUtils.moveFile(target, file);
 				} catch (IOException e) {
-					StatusHandler.log(new Status(IStatus.ERROR,
-							DiscoveryCore.ID_PLUGIN, NLS.bind(
-									"Cannot download bundle at {0}: {1}",
-									bundleUrl, e.getMessage()), e));
-					if (isUnknownHostException(e)) {
-						break;
-					}
+				    if (!monitor.isCanceled()) {
+	                    StatusHandler.log(new Status(IStatus.ERROR,
+	                            DiscoveryCore.ID_PLUGIN, NLS.bind(
+	                                    "Cannot download bundle at {0}: {1}",
+	                                    bundleUrl, e.getMessage()), e));
+	                    if (isUnknownHostException(e)) {
+	                        break;
+	                    }
+				    }
 				}
 			}
 			return this;
