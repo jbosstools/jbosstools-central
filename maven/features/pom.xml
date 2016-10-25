@@ -20,7 +20,6 @@
 		<module>org.jboss.tools.maven.portlet.feature</module>
 		<module>org.jboss.tools.maven.test.feature</module>
 		<module>org.jboss.tools.maven.jbosspackaging.feature</module>	
-		<!-- JBIDE-16960 remove <module>org.jboss.tools.maven.gwt.feature</module> -->
 		<module>org.jboss.tools.maven.sourcelookup.feature</module>
 		<module>org.jboss.tools.maven.jdt.feature</module>
 	</modules>

@@ -20,7 +20,6 @@
 		<module>org.jboss.tools.maven.hibernate</module>
 		<module>org.jboss.tools.maven.portlet</module>
 		<module>org.jboss.tools.maven.jbosspackaging</module>
-		<!-- JBIDE-16960 remove <module>org.jboss.tools.maven.gwt</module> -->
 		<module>org.jboss.tools.maven.sourcelookup.core</module>
 		<module>org.jboss.tools.maven.sourcelookup.ui</module> 
 		<module>org.jboss.tools.maven.conversion.ui</module>
