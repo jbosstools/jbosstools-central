@@ -64,9 +64,6 @@ public class ConfiguratorPreferencesInitializer extends
 				Activator.CONFIGURE_JPA,
 				Activator.CONFIGURE_JPA_VALUE);
 		node.putBoolean(
-				Activator.CONFIGURE_GWT,
-				Activator.CONFIGURE_GWT_VALUE);
-		node.putBoolean(
 				Activator.ENABLE_MAVEN_CLEAN_VERIFY_MENU,
 				Activator.ENABLE_MAVEN_CLEAN_VERIFY_MENU_VALUE);
 		node.putBoolean(

@@ -46,7 +46,6 @@ public class ConfiguratorPreferencePage extends PreferencePage implements
 	private static final String ORG_JBOSS_TOOLS_MAVEN_CDI = "org.jboss.tools.maven.cdi"; //$NON-NLS-1$
 	private static final String ORG_JBOSS_TOOLS_MAVEN_HIBERNATE = "org.jboss.tools.maven.hibernate"; //$NON-NLS-1$
 	private static final String ORG_JBOSS_TOOLS_MAVEN_SEAM = "org.jboss.tools.maven.seam"; //$NON-NLS-1$
-	private static final String ORG_JBOSS_TOOLS_MAVEN_GWT = "org.jboss.tools.maven.gwt"; //$NON-NLS-1$
 	private static final String ORG_JBOSS_TOOLS_MAVEN_ARQUILLIAN = "org.jboss.tools.arquillian.core"; //$NON-NLS-1$
 
 	private Button configureSeamButton;
@@ -57,8 +56,7 @@ public class ConfiguratorPreferencePage extends PreferencePage implements
 	private Button configureSeamPortletButton;
 	private Button configureCDIButton;
 	private Button configureHibernateButton;
-	private Button configureGwtButton;
-  private Button enableMavenCleanVerifyMenuButton;
+  	private Button enableMavenCleanVerifyMenuButton;
 	private Image jbossImage;
 	private Button configureArquillianButton;
 	
@@ -133,13 +131,6 @@ public class ConfiguratorPreferencePage extends PreferencePage implements
 			configureHibernateButton.setText(Messages.ConfiguratorPreferencePage_Configure_Hibernate);
 			boolean configureHibernate = store.getBoolean(Activator.CONFIGURE_HIBERNATE);
 			configureHibernateButton.setSelection(configureHibernate);
-		}
-		
-		if (bundleExists(ORG_JBOSS_TOOLS_MAVEN_GWT)) { 
-			configureGwtButton = new Button(composite,SWT.CHECK);
-			configureGwtButton.setText(Messages.ConfiguratorPreferencePage_Configure_GWT);
-			boolean configureJpa = store.getBoolean(Activator.CONFIGURE_GWT);
-			configureGwtButton.setSelection(configureJpa);
 		}
 		
 		if (bundleExists(ORG_JBOSS_TOOLS_MAVEN_ARQUILLIAN)) { 
@@ -239,9 +230,6 @@ public class ConfiguratorPreferencePage extends PreferencePage implements
 			store.setValue(Activator.CONFIGURE_HIBERNATE, Activator.CONFIGURE_HIBERNATE_VALUE);
 		}
 
-		if (bundleExists(ORG_JBOSS_TOOLS_MAVEN_GWT)) { 
-			store.setValue(Activator.CONFIGURE_GWT, Activator.CONFIGURE_GWT_VALUE);
-		}
 		if (bundleExists(ORG_JBOSS_TOOLS_MAVEN_ARQUILLIAN)) { 
 			store.setValue(Activator.CONFIGURE_ARQUILLIAN, Activator.CONFIGURE_ARQUILLIAN_VALUE);
 		}
@@ -273,10 +261,6 @@ public class ConfiguratorPreferencePage extends PreferencePage implements
 		
 		if (bundleExists(ORG_JBOSS_TOOLS_MAVEN_HIBERNATE)) {
 			store.setValue(Activator.CONFIGURE_HIBERNATE, configureHibernateButton.getSelection());
-		}
-
-		if (bundleExists(ORG_JBOSS_TOOLS_MAVEN_GWT)) { 
-			store.setValue(Activator.CONFIGURE_GWT, configureGwtButton.getSelection());
 		}
 		
 		if (bundleExists(ORG_JBOSS_TOOLS_MAVEN_ARQUILLIAN)) { 
