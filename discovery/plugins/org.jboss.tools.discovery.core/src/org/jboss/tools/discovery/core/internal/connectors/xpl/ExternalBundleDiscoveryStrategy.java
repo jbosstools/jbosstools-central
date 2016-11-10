@@ -115,28 +115,29 @@ public class ExternalBundleDiscoveryStrategy extends BundleDiscoveryStrategy {
 			}
 
 			Map<File, Entry> bundleFileToDirectoryEntry = loadRegistry(storageDirectory, monitor);
-
-			try {
-				registryStrategy = new DiscoveryRegistryStrategy(
-						new File[] { registryCacheFolder },
-						new boolean[] { false }, this);
-				registryStrategy.setExtensionPointProviderBundleIds(getExtensionPointProviderBundleIds());
-				registryStrategy.setBundles(bundleFileToDirectoryEntry);
-				IExtensionRegistry extensionRegistry = new ExtensionRegistry(registryStrategy, this, this);
-				try {
-					IExtensionPoint extensionPoint = extensionRegistry.getExtensionPoint(getExtensionPointId());
-					if (extensionPoint != null) {
-						IExtension[] extensions = extensionPoint.getExtensions();
-						if (extensions.length > 0) {
-							processExtensions(new SubProgressMonitor(monitor, ticksTenPercent * 3), extensions);
-						}
-					}
-				} finally {
-					extensionRegistry.stop(this);
-				}
-			} finally {
-				registryStrategy = null;
-			}
+			
+			if (bundleFileToDirectoryEntry != null) {
+                try {
+                    registryStrategy = new DiscoveryRegistryStrategy(new File[] { registryCacheFolder },
+                            new boolean[] { false }, this);
+                    registryStrategy.setExtensionPointProviderBundleIds(getExtensionPointProviderBundleIds());
+                    registryStrategy.setBundles(bundleFileToDirectoryEntry);
+                    IExtensionRegistry extensionRegistry = new ExtensionRegistry(registryStrategy, this, this);
+                    try {
+                        IExtensionPoint extensionPoint = extensionRegistry.getExtensionPoint(getExtensionPointId());
+                        if (extensionPoint != null) {
+                            IExtension[] extensions = extensionPoint.getExtensions();
+                            if (extensions.length > 0) {
+                                processExtensions(new SubProgressMonitor(monitor, ticksTenPercent * 3), extensions);
+                            }
+                        }
+                    } finally {
+                        extensionRegistry.stop(this);
+                    }
+                } finally {
+                    registryStrategy = null;
+                } 
+            }
 		}catch (CoreException e){
 			if (deleteStorageFolderOnFailure && storageDirectory != null) {
 				delete(storageDirectory);
