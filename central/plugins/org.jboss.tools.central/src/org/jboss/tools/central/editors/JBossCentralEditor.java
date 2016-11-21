@@ -199,7 +199,7 @@ public class JBossCentralEditor extends SharedHeaderFormEditor {
 			setPageImage(index, gettingStartedImage);
 
 			String applicationName = JBossToolsUsageActivator.getDefault().getJBossToolsEclipseEnvironment().getEclipseUserAgent().getApplicationName();
-			if (!applicationName.contains("|")) { // Most likely RPM
+			if (!applicationName.contains("|Devstudio")) { // Installed via RPM. Do not add "Software/Update" tab to Central. See https://issues.jboss.org/browse/JBDS-4195
 				softwarePage = new SoftwarePage(this);
 				index = addPage(softwarePage);
 				if (softwareImage == null) {
