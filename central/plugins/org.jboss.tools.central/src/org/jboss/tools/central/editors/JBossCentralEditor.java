@@ -207,6 +207,8 @@ public class JBossCentralEditor extends SharedHeaderFormEditor {
 							"/icons/software.png").createImage();
 				}
 				setPageImage(index, softwareImage);
+			} else {
+				JBossCentralActivator.logWarning("JBoss Tools installed via a package manager. \"Software/Update\" is disabled for Red Hat Central. Detected application name with installed packages: \"" + applicationName + "\"");
 			}
 		} catch (PartInitException e) {
 			JBossCentralActivator.log(e, "Error adding page");
