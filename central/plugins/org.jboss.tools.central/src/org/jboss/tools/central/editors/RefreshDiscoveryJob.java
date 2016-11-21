@@ -45,7 +45,10 @@ public class RefreshDiscoveryJob extends Job {
 			}
 		});
 		if (editors[0] != null) {
-			editors[0].getSoftwarePage().getDiscoveryViewer().updateDiscovery();
+			SoftwarePage softwarePage = editors[0].getSoftwarePage();
+			if (softwarePage != null) {
+				softwarePage.getDiscoveryViewer().updateDiscovery();
+			}
 		}
 		return Status.OK_STATUS;
 	}

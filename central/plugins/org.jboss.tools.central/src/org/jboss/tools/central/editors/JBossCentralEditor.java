@@ -77,6 +77,7 @@ import org.jboss.tools.central.actions.OpenWithBrowserHandler;
 import org.jboss.tools.central.editors.xpl.TextSearchControl;
 import org.jboss.tools.central.installation.InstallationChecker;
 import org.jboss.tools.discovery.core.internal.connectors.JBossDiscoveryUi;
+import org.jboss.tools.usage.internal.JBossToolsUsageActivator;
 
 /**
  * 
@@ -197,13 +198,16 @@ public class JBossCentralEditor extends SharedHeaderFormEditor {
 			}
 			setPageImage(index, gettingStartedImage);
 
-			softwarePage = new SoftwarePage(this);
-			index = addPage(softwarePage);
-			if (softwareImage == null) {
-				softwareImage = JBossCentralActivator.getImageDescriptor(
-						"/icons/software.png").createImage();
+			String applicationName = JBossToolsUsageActivator.getDefault().getJBossToolsEclipseEnvironment().getEclipseUserAgent().getApplicationName();
+			if (!applicationName.contains("|")) { // Most likely RPM
+				softwarePage = new SoftwarePage(this);
+				index = addPage(softwarePage);
+				if (softwareImage == null) {
+					softwareImage = JBossCentralActivator.getImageDescriptor(
+							"/icons/software.png").createImage();
+				}
+				setPageImage(index, softwareImage);
 			}
-			setPageImage(index, softwareImage);
 		} catch (PartInitException e) {
 			JBossCentralActivator.log(e, "Error adding page");
 		}
