@@ -77,6 +77,7 @@ import org.jboss.tools.central.actions.OpenWithBrowserHandler;
 import org.jboss.tools.central.editors.xpl.TextSearchControl;
 import org.jboss.tools.central.installation.InstallationChecker;
 import org.jboss.tools.discovery.core.internal.connectors.JBossDiscoveryUi;
+import org.jboss.tools.usage.internal.JBossToolsUsageActivator;
 
 /**
  * 
@@ -197,13 +198,18 @@ public class JBossCentralEditor extends SharedHeaderFormEditor {
 			}
 			setPageImage(index, gettingStartedImage);
 
-			softwarePage = new SoftwarePage(this);
-			index = addPage(softwarePage);
-			if (softwareImage == null) {
-				softwareImage = JBossCentralActivator.getImageDescriptor(
-						"/icons/software.png").createImage();
+			String applicationName = JBossToolsUsageActivator.getDefault().getJBossToolsEclipseEnvironment().getEclipseUserAgent().getApplicationName();
+			if (!applicationName.contains("|Devstudio")) { // Installed via RPM. Do not add "Software/Update" tab to Central. See https://issues.jboss.org/browse/JBDS-4195
+				softwarePage = new SoftwarePage(this);
+				index = addPage(softwarePage);
+				if (softwareImage == null) {
+					softwareImage = JBossCentralActivator.getImageDescriptor(
+							"/icons/software.png").createImage();
+				}
+				setPageImage(index, softwareImage);
+			} else {
+				JBossCentralActivator.logWarning("JBoss Tools installed via a package manager. \"Software/Update\" is disabled for Red Hat Central. Detected application name with installed packages: \"" + applicationName + "\"");
 			}
-			setPageImage(index, softwareImage);
 		} catch (PartInitException e) {
 			JBossCentralActivator.log(e, "Error adding page");
 		}
