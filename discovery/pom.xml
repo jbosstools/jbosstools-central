@@ -5,11 +5,11 @@
 	<parent>
 		<groupId>org.jboss.tools</groupId>
 		<artifactId>central.maven.examples</artifactId>
-		<version>4.4.2-SNAPSHOT</version>
+		<version>4.4.3-SNAPSHOT</version>
 	</parent>
 	<groupId>org.jboss.tools</groupId>
 	<artifactId>discovery</artifactId>
-	<version>1.2.2-SNAPSHOT</version>
+	<version>1.2.3-SNAPSHOT</version>
 	<name>discovery.all</name>
 	<packaging>pom</packaging>
 	<modules>
