@@ -136,7 +136,7 @@ public class GettingStartedHtmlPage extends AbstractJBossCentralPage implements 
 	private Collection<FavoriteItem> favorites;
 
 	private Map<String, ProjectExample> examples;
-	private Map<String, ProxyWizard> displayedWizardsMap;
+	private Map<String, ProxyWizard> displayedWizardsMap = new HashMap<>();
 	private RefreshBuzzJobChangeListener buzzlistener;
 	private boolean showOnStartup;
 	
