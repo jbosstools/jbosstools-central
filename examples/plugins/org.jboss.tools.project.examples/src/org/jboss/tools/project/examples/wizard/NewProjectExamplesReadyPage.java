@@ -163,8 +163,8 @@ public class NewProjectExamplesReadyPage extends WizardPage {
 		
 		if (projectExample != null) {
 			setTitle(projectExample.getShortDescription());
-			if (projectExample.getIncludedProjects().isEmpty()) {
-				setDescription("'" + projectExample.getShortDescription() + "' project hasn't been imported. Check if it is defined correctly.");
+			if (projectExample.getIncludedProjects() == null || projectExample.getIncludedProjects().isEmpty()) {
+				setDescription("'" + projectExample.getShortDescription() + "' project has not been fully imported. Check if it is defined correctly.");
 				showQuickFix.setSelection(false);
 				showQuickFix.setEnabled(false);
 				showReadme.setSelection(false);
