@@ -20,6 +20,7 @@ import org.eclipse.core.resources.WorkspaceJob;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.dialogs.MessageDialogWithToggle;
@@ -114,6 +115,9 @@ public class NewProjectExamplesJob extends WorkspaceJob {
 					}
 				}
 			}
+		} catch (final OperationCanceledException oce) {
+			// ignore
+			ProjectExamplesActivator.log("Example import was cancelled");
 		} catch (final Exception e) {
 			Display.getDefault().syncExec(new Runnable() {
 
