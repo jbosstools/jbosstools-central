@@ -1,0 +1,22 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Maven Reddeer
+Bundle-SymbolicName: org.jboss.tools.maven.reddeer;singleton:=true
+Bundle-Version: 1.8.3.qualifier
+Bundle-Activator: org.jboss.tools.maven.reddeer.Activator
+Require-Bundle:  org.jboss.reddeer.go;bundle-version="[1.2.0,2.0.0)",
+ org.jboss.tools.runtime.reddeer;bundle-version="[3.2.3,3.3.0)",
+ org.jboss.tools.runtime.ui;bundle-version="3.0.0",
+ org.jboss.tools.foundation.ui;bundle-version="1.1.0"
+Export-Package: 
+ org.jboss.tools.maven.reddeer.apt.ui.preferences,
+ org.jboss.tools.maven.reddeer.maven.sourcelookup.ui.preferences,
+ org.jboss.tools.maven.reddeer.maven.ui.preferences,
+ org.jboss.tools.maven.reddeer.preferences,
+ org.jboss.tools.maven.reddeer.profiles,
+ org.jboss.tools.maven.reddeer.project.examples.wait,
+ org.jboss.tools.maven.reddeer.project.examples.wizard,
+ org.jboss.tools.maven.reddeer.requirement,
+ org.jboss.tools.maven.reddeer.wizards
+Bundle-ActivationPolicy: lazy
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6

@@ -16,6 +16,7 @@
 		<module>features</module>
 		<module>plugins</module>
 		<module>tests</module>
+		<module>test-framework</module>
 	</modules>
 	<build>
 		<pluginManagement>

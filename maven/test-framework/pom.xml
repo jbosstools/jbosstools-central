@@ -1,0 +1,20 @@
+<project
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"
+	xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>org.jboss.tools</groupId>
+		<artifactId>maven</artifactId>
+		<version>1.8.3-SNAPSHOT</version>
+	</parent>
+	<groupId>org.jboss.tools.maven</groupId>
+	<artifactId>test-framework</artifactId>
+	
+	<name>maven.test-framework</name>
+	<packaging>pom</packaging>
+	<modules>
+		<module>org.jboss.tools.maven.reddeer</module>
+	</modules>
+	
+</project>
+	
