@@ -419,6 +419,7 @@ public class ProjectExampleUtil {
 
 	public static File getProjectExamplesFile(URL url, String prefix,
 			String suffix, IProgressMonitor monitor) {
+		
 		File file = null;
 		if (PROTOCOL_FILE.equals(url.getProtocol())
 				|| PROTOCOL_PLATFORM.equalsIgnoreCase(url.getProtocol())) {
@@ -433,78 +434,137 @@ public class ProjectExampleUtil {
 			if (!file.exists())
 				return null;
 		} else {
-			try {
-				if (OfflineUtil.isOfflineEnabled()) {
-					return OfflineUtil.getOfflineFile(url);
-				}
-				if (monitor.isCanceled()) {
-					return null;
-				}						
-				long urlModified = -1;
-				file = getFile(url);
-				try {
-					urlModified = new URLTransportUtility().getLastModified(url);
-				} catch (CoreException e) {
-					if (file.exists()) {
-						return file;
-					}
-				}
-				//!!! urlModified == 0 when querying files from github 
-				//It means that files from github can not be cached! 
-				if (file.exists()) {
-					long modified = file.lastModified();
-					if (modified > 0 && //file already exists and doesn't come from github (or other server sending lastmodified = 0) 
-							(urlModified == 0 //and now there is a problem downloading the file
-							|| 
-							urlModified == modified)) {//or the file hasn't changed
-						return file;
-					}
-					//Attention fugly hack following this, please close your eyes :-/
-					//if .GA.zip or .Final.zip from github, assume cache can be safely reused
-					if (modified == 0 && urlModified==modified && (file.getName().endsWith("GA.zip") || file.getName().endsWith("Final.zip"))) {
-						return file;
-					}
-					
-				}
-				// file = File.createTempFile(prefix, suffix);
-				// file.deleteOnExit();
-				boolean fileAlreadyExists = file.exists();
-				file.getParentFile().mkdirs();
-				if (monitor.isCanceled()) {
-					return null;
-				}
-				BufferedOutputStream destination = new BufferedOutputStream(
-						new FileOutputStream(file));
-				IStatus result = new URLTransportUtility().download(prefix,
-						url.toExternalForm(), destination, TIME_OUT, monitor);
-				if (!result.isOK()) {
-					ProjectExamplesActivator.getDefault().getLog().log(result);
-					if (!fileAlreadyExists && file.exists()) {
-						file.delete();
-					}
-					return null;
-				} else {
-					if (file.exists()) {
-						file.setLastModified(urlModified);
-					}
-				}
-			} catch (FileNotFoundException e) {
-				ProjectExamplesActivator.log(e);
+			
+			if (OfflineUtil.isOfflineEnabled()) {
+				return OfflineUtil.getOfflineFile(url);
+			}
+			if (monitor.isCanceled()) {
+				return null;
+			}						
+			file = getCacheFile(url);
+			long urlModified = getRemoteTimestamp(url);
+			if( canReuseCache(file, url, urlModified)) {
+				return file;
+			}
+
+			file.getParentFile().mkdirs();
+			if (monitor.isCanceled()) {
 				return null;
 			}
+			
+			file = downloadExamplesFile(file, prefix, url, urlModified, monitor);
 		}
 		return file;
 	}
-
-	private static File getFile(URL url) {
-		IPath location = ProjectExamplesActivator.getDefault()
-				.getStateLocation();
-		File root = location.toFile();
-		String urlFile = url.getFile();
-		File file = new File(root, urlFile);
-		return file;
+	
+	private static File downloadExamplesFile(File finalDestination, String prefix, URL url, long urlModified, IProgressMonitor monitor){ 
+		File tmpFile = getTemporaryFile(url);
+		if( tmpFile.exists()) {
+			tmpFile.delete();
+		}
+		try {
+			BufferedOutputStream destination = new BufferedOutputStream(
+					new FileOutputStream(tmpFile));
+			IStatus result = new URLTransportUtility().download(prefix,
+					url.toExternalForm(), destination, TIME_OUT, monitor);
+			if (!result.isOK()) {
+				// The download failed. Cleanup the tmp file and try to return the last download
+				ProjectExamplesActivator.getDefault().getLog().log(result);
+				if (tmpFile.exists()) {
+					tmpFile.delete();
+				}
+				
+				if( finalDestination.exists()) {
+					return finalDestination;
+				}
+				return null;
+			} else {
+				// Download was a success
+				// renameTo will fail on some OS if a file is hogging the new destination spot
+				File cacheBackup = getFile(url.getFile() + ".tmp2");
+				if( cacheBackup.exists() )
+					cacheBackup.delete();
+				
+				if( finalDestination.exists()) {
+					boolean bak = finalDestination.renameTo(cacheBackup);
+					if( !bak ) {
+						// backup failed... odds are similar renameTo will fail and we don't want to lose our existing cache
+						// So let's just return the tmpFile we downloaded
+						cacheBackup.delete();
+						tmpFile.setLastModified(urlModified);
+						return tmpFile;
+					}
+					// cache backup succeeded, so we can delete our final destination here 
+					// and rename our newly dl'd file to this final destination
+					finalDestination.delete();
+				}
+				boolean renameSuccess = tmpFile.renameTo(finalDestination);
+				File retval = null;
+				if( renameSuccess ) {
+					// the new DL'd file is in final destination, so cache backup is useless now
+					cacheBackup.delete();
+					retval = finalDestination;
+				} else { 
+					// the rename failed... but we still have a new successful DL, so return that
+					retval = tmpFile;
+				}
+				retval.setLastModified(urlModified);
+				return retval;
+			}
+		} catch(FileNotFoundException fnfe) {
+			ProjectExamplesActivator.log(fnfe);
+			return null;
+		}
+	}
+	
+	private static long getRemoteTimestamp(URL url) {
+		long urlModified = -1;
+		try {
+			urlModified = new URLTransportUtility().getLastModified(url);
+		} catch (CoreException e) {
+			// Ignore this and just return the -1 
+		}
+		return urlModified;
+	}
+	private static boolean canReuseCache(File file, URL url, long urlModified) {
+		if( urlModified == -1 && file.exists()) {
+			return true;
+		}
+		//!!! urlModified == 0 when querying files from github 
+		//It means that files from github can not be cached! 
+		if (file.exists()) {
+			long modified = file.lastModified();
+			if (modified > 0 && //file already exists and doesn't come from github (or other server sending lastmodified = 0) 
+					(urlModified == 0 //and now there is a problem downloading the file
+					|| 
+					urlModified == modified)) {//or the file hasn't changed
+				return true;
+			}
+			//Attention fugly hack following this, please close your eyes :-/
+			//if .GA.zip or .Final.zip from github, assume cache can be safely reused
+			if (modified == 0 && urlModified==modified && (file.getName().endsWith("GA.zip") || file.getName().endsWith("Final.zip"))) {
+				return true;
+			}
+		}
+		return false;
 	}
 
+	private static File getCacheFile(URL url) {
+		return getFile(url.getFile());
+	}
+
+	private static File getTemporaryFile(URL url) {
+		return getFile(url.getFile() + ".tmp");
+	}
+
+	private static File getFile(String name) {
+		IPath location = ProjectExamplesActivator.getDefault().getStateLocation();
+		File root = location.toFile();
+		File file = new File(root, name);
+		return file;
+
+	}
+	
 	public static String getAsXML(Set<IProjectExampleSite> sites) throws CoreException {
 		return new ProjectExampleSiteParser().serialize(sites);			
 	}
