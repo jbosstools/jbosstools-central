@@ -61,14 +61,15 @@ public class NewProjectExamplesJob extends WorkspaceJob {
 			if (success) {
 				projects.add(selectedProject);
 			} else {
-				final String message = "Unable to download the '" + selectedProject.getName() + "' quickstart.\r\nPlease check your Internet connection and/or Proxy Settings";
-				Display.getDefault().syncExec(new Runnable() {
-					
-					@Override
-					public void run() {
-						MessageDialog.openError(getShell(), "Error",message); 
-					}
-				});
+				if( !monitor.isCanceled()) {
+					final String message = "Unable to download the '" + selectedProject.getName() + "' quickstart.\r\nPlease check your Internet connection and/or Proxy Settings";
+					Display.getDefault().syncExec(new Runnable() {
+						@Override
+						public void run() {
+							MessageDialog.openError(getShell(), "Error",message); 
+						}
+					});
+				}
 				return Status.CANCEL_STATUS;
 			}
 		}
