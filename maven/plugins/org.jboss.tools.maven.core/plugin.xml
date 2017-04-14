@@ -238,6 +238,10 @@
     <extension point="org.eclipse.m2e.core.archetypeCatalogs">
       <remote url="http://repo1.maven.org/maven2/"
               description="Maven Central"/>
+      <remote
+            description="Red Hat"
+            url="https://maven.repository.redhat.com/ga/archetype-catalog.xml">
+      </remote>
     </extension>
   	
 </plugin>
