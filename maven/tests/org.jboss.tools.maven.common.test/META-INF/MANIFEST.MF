@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: JBoss Maven (Core+UI) Tests
 Bundle-SymbolicName: org.jboss.tools.maven.common.test;singleton:=true
-Bundle-Version: 1.8.3.qualifier
+Bundle-Version: 1.8.4.qualifier
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
  org.eclipse.core.resources,
