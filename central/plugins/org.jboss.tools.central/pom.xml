@@ -9,7 +9,8 @@
 	</parent>
 	<groupId>org.jboss.tools.central.plugins</groupId>
 	<artifactId>org.jboss.tools.central</artifactId>
-
+	<version>2.1.100-SNAPSHOT</version>
+	
 	<packaging>eclipse-plugin</packaging>
 
 	<build>
