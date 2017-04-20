@@ -5,11 +5,10 @@
 	<parent>
 		<groupId>org.jboss.tools.maven</groupId>
 		<artifactId>test-framework</artifactId>
-		<version>1.8.3-SNAPSHOT</version>
+		<version>1.8.100-SNAPSHOT</version>
 	</parent>
 	
 	<groupId>org.jboss.tools.maven</groupId>
 	<artifactId>org.jboss.tools.maven.reddeer</artifactId>
-	<version>1.8.100-SNAPSHOT</version>
 	<packaging>eclipse-plugin</packaging>
 </project>
