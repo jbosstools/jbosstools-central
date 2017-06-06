@@ -186,6 +186,7 @@ public class PrepareInstallProfileJob extends AbstractInstallJob {
 		WizardDialog dialog = new ProvisioningWizardDialog(ProvUI.getDefaultParentShell(), wizard);
 		dialog.create();
 		PlatformUI.getWorkbench().getHelpSystem().setHelp(dialog.getShell(), IProvHelpContextIds.INSTALL_WIZARD);
+		dialog.setBlockOnOpen(true);
 		return dialog.open();
 	}
 	
