@@ -40,7 +40,7 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
-import org.apache.maven.cli.MavenCli;
+import org.apache.maven.cli.configuration.SettingsXmlConfigurationProcessor;
 import org.apache.maven.settings.Profile;
 import org.apache.maven.settings.Repository;
 import org.apache.maven.settings.RepositoryPolicy;
@@ -984,8 +984,8 @@ public class ConfigureMavenRepositoriesWizardPage extends WizardPage implements 
 	
 	public static String getUserSettings() {
 		String userSettings = MavenPlugin.getMavenConfiguration().getUserSettingsFile();
-	    if(userSettings == null || userSettings.length() == 0) {
-	    	userSettings = MavenCli.DEFAULT_USER_SETTINGS_FILE.getAbsolutePath();
+	    if(userSettings == null || userSettings.isEmpty()) {
+	        userSettings = SettingsXmlConfigurationProcessor.DEFAULT_USER_SETTINGS_FILE.getAbsolutePath();
 	    }
 		return userSettings;
 	}
