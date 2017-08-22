@@ -5,10 +5,9 @@
 	<parent>
 		<groupId>org.jboss.tools.discovery</groupId>
 		<artifactId>plugins</artifactId>
-		<version>1.2.3-SNAPSHOT</version>
+		<version>1.2.101-SNAPSHOT</version>
 	</parent>
 	<groupId>org.jboss.tools.discovery.plugins</groupId>
 	<artifactId>org.jboss.tools.discovery.core</artifactId>
-	<version>1.2.100-SNAPSHOT</version>
 	<packaging>eclipse-plugin</packaging>
 </project>

@@ -9,7 +9,7 @@
 	</parent>
 	<groupId>org.jboss.tools</groupId>
 	<artifactId>maven</artifactId>
-	<version>1.8.100-SNAPSHOT</version>
+	<version>1.8.101-SNAPSHOT</version>
 	<name>maven.all</name>
 	<packaging>pom</packaging>
 	<modules>

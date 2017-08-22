@@ -2,7 +2,7 @@
 <feature
       id="org.jboss.tools.maven.sourcelookup.feature"
       label="%featureName"
-      version="1.8.100.qualifier"
+      version="1.8.101.qualifier"
       provider-name="%providerName"
       plugin="org.jboss.tools.maven.sourcelookup.core"
       license-feature="org.jboss.tools.foundation.license.feature"
