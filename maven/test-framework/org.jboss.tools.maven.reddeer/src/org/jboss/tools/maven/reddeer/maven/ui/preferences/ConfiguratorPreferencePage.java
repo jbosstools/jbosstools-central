@@ -10,13 +10,14 @@
  ******************************************************************************/
 package org.jboss.tools.maven.reddeer.maven.ui.preferences;
 
-import org.jboss.reddeer.jface.preference.PreferencePage;
+import org.eclipse.reddeer.core.reference.ReferencedComposite;
+import org.eclipse.reddeer.jface.preference.PreferencePage;
 import org.jboss.tools.maven.reddeer.wizards.ConfigureMavenRepositoriesWizard;
 
 public class ConfiguratorPreferencePage extends PreferencePage{
 	
-	public ConfiguratorPreferencePage(){
-		super("JBoss Tools","JBoss Maven Integration");
+	public ConfiguratorPreferencePage(ReferencedComposite referencedComposite){
+		super(referencedComposite, "JBoss Tools","JBoss Maven Integration");
 	}
 	
 	public ConfigureMavenRepositoriesWizard configureRepositories(){

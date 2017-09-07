@@ -10,12 +10,17 @@
  ******************************************************************************/
 package org.jboss.tools.maven.reddeer.core.ui.wizards;
 
-import org.jboss.reddeer.jface.wizard.WizardPage;
-import org.jboss.reddeer.swt.impl.combo.LabeledCombo;
-import org.jboss.reddeer.swt.impl.group.DefaultGroup;
+import org.eclipse.reddeer.core.reference.ReferencedComposite;
+import org.eclipse.reddeer.jface.wizard.WizardPage;
+import org.eclipse.reddeer.swt.impl.combo.LabeledCombo;
+import org.eclipse.reddeer.swt.impl.group.DefaultGroup;
 
 public class MavenProjectWizardArtifactPage extends WizardPage{
 	
+	public MavenProjectWizardArtifactPage(ReferencedComposite referencedComposite) {
+		super(referencedComposite);
+	}
+
 	/**
 	 * Set project group id
 	 * @param groupId

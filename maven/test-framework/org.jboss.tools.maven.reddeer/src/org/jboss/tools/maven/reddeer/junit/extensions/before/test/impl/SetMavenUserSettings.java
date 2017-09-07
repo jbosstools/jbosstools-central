@@ -12,9 +12,9 @@ package org.jboss.tools.maven.reddeer.junit.extensions.before.test.impl;
 
 import java.io.File;
 
-import org.jboss.reddeer.common.logging.Logger;
-import org.jboss.reddeer.junit.extensionpoint.IBeforeTest;
-import org.jboss.reddeer.workbench.ui.dialogs.WorkbenchPreferenceDialog;
+import org.eclipse.reddeer.common.logging.Logger;
+import org.eclipse.reddeer.junit.extensionpoint.IBeforeTest;
+import org.eclipse.reddeer.workbench.ui.dialogs.WorkbenchPreferenceDialog;
 import org.jboss.tools.maven.reddeer.preferences.MavenUserPreferencePage;
 import org.junit.runners.model.FrameworkMethod;
 import org.junit.runners.model.TestClass;
@@ -56,7 +56,7 @@ public class SetMavenUserSettings implements IBeforeTest {
 		log.debug("Setting maven user settings to "+mavenSettingsPath);
 		WorkbenchPreferenceDialog preferenceDialog = new WorkbenchPreferenceDialog();
 		preferenceDialog.open();
-		MavenUserPreferencePage mpreferences = new MavenUserPreferencePage();
+		MavenUserPreferencePage mpreferences = new MavenUserPreferencePage(preferenceDialog);
 		preferenceDialog.select(mpreferences);
 		if(!mpreferences.getUserSettings().equals(mavenSettingsPath)){
 			mpreferences.setUserSettings(mavenSettingsPath);

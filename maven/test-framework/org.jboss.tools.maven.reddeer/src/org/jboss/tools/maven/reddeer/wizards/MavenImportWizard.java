@@ -13,23 +13,23 @@ package org.jboss.tools.maven.reddeer.wizards;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.jboss.reddeer.jface.wizard.WizardDialog;
-import org.jboss.reddeer.swt.api.Shell;
-import org.jboss.reddeer.swt.api.Tree;
-import org.jboss.reddeer.swt.api.TreeItem;
-import org.jboss.reddeer.core.condition.JobIsRunning;
-import org.jboss.reddeer.core.condition.ShellWithTextIsActive;
-import org.jboss.reddeer.core.condition.ShellWithTextIsAvailable;
-import org.jboss.reddeer.common.exception.RedDeerException;
-import org.jboss.reddeer.common.exception.WaitTimeoutExpiredException;
-import org.jboss.reddeer.swt.impl.button.PushButton;
-import org.jboss.reddeer.swt.impl.menu.ShellMenu;
-import org.jboss.reddeer.swt.impl.shell.DefaultShell;
-import org.jboss.reddeer.swt.impl.tree.DefaultTree;
-import org.jboss.reddeer.swt.impl.tree.DefaultTreeItem;
-import org.jboss.reddeer.common.wait.TimePeriod;
-import org.jboss.reddeer.common.wait.WaitUntil;
-import org.jboss.reddeer.common.wait.WaitWhile;
+import org.eclipse.reddeer.jface.wizard.WizardDialog;
+import org.eclipse.reddeer.swt.api.Shell;
+import org.eclipse.reddeer.swt.api.Tree;
+import org.eclipse.reddeer.swt.api.TreeItem;
+import org.eclipse.reddeer.swt.condition.ShellIsActive;
+import org.eclipse.reddeer.swt.condition.ShellIsAvailable;
+import org.eclipse.reddeer.common.exception.RedDeerException;
+import org.eclipse.reddeer.common.exception.WaitTimeoutExpiredException;
+import org.eclipse.reddeer.swt.impl.button.PushButton;
+import org.eclipse.reddeer.swt.impl.menu.ShellMenuItem;
+import org.eclipse.reddeer.swt.impl.shell.DefaultShell;
+import org.eclipse.reddeer.swt.impl.tree.DefaultTree;
+import org.eclipse.reddeer.swt.impl.tree.DefaultTreeItem;
+import org.eclipse.reddeer.workbench.core.condition.JobIsRunning;
+import org.eclipse.reddeer.common.wait.TimePeriod;
+import org.eclipse.reddeer.common.wait.WaitUntil;
+import org.eclipse.reddeer.common.wait.WaitWhile;
 
 public class MavenImportWizard extends WizardDialog {
 
@@ -38,12 +38,12 @@ public class MavenImportWizard extends WizardDialog {
 	}
 
 	public void open() {
-		new ShellMenu("File", "Import...").select();
-		new WaitUntil(new ShellWithTextIsAvailable("Import"));
+		new ShellMenuItem("File", "Import...").select();
+		new WaitUntil(new ShellIsAvailable("Import"));
 		new DefaultShell("Import");
 		new DefaultTreeItem("Maven", "Existing Maven Projects").select();
 		new PushButton("Next >").click();
-		new WaitUntil(new ShellWithTextIsAvailable("Import Maven Projects"));
+		new WaitUntil(new ShellIsAvailable("Import Maven Projects"));
 		new DefaultShell("Import Maven Projects");
 	}
 
@@ -68,10 +68,10 @@ public class MavenImportWizard extends WizardDialog {
 	}
 
 	private void waitForShellToDisappear(){
-			new WaitWhile(new ShellWithTextIsActive("Import Maven Projects"));
+			new WaitWhile(new ShellIsActive("Import Maven Projects"));
 		try{
 			//try to wait for another shell (with errors after import)
-			new WaitUntil(new ShellWithTextIsActive("Import Maven Projects"));
+			new WaitUntil(new ShellIsActive("Import Maven Projects"));
 			throw new MavenImportWizardException(new DefaultShell());
 		}catch(WaitTimeoutExpiredException ex){
 			//everything is fine
