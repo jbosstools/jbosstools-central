@@ -23,31 +23,33 @@ import org.hamcrest.Description;
 import org.hamcrest.Matcher;
 import org.hamcrest.TypeSafeMatcher;
 import org.jboss.ide.eclipse.as.reddeer.server.view.JBossServerModule;
-import org.jboss.ide.eclipse.as.reddeer.server.view.JBossServerView;
-import org.jboss.reddeer.common.condition.AbstractWaitCondition;
-import org.jboss.reddeer.common.exception.WaitTimeoutExpiredException;
-import org.jboss.reddeer.common.logging.Logger;
-import org.jboss.reddeer.common.matcher.RegexMatcher;
-import org.jboss.reddeer.common.wait.TimePeriod;
-import org.jboss.reddeer.common.wait.WaitUntil;
-import org.jboss.reddeer.common.wait.WaitWhile;
-import org.jboss.reddeer.core.condition.JobIsRunning;
-import org.jboss.reddeer.core.condition.ShellWithTextIsActive;
-import org.jboss.reddeer.core.handler.WidgetHandler;
-import org.jboss.reddeer.eclipse.condition.ConsoleHasNoChange;
-import org.jboss.reddeer.eclipse.exception.EclipseLayerException;
-import org.jboss.reddeer.eclipse.ui.browser.BrowserEditor;
-import org.jboss.reddeer.eclipse.ui.console.ConsoleView;
-import org.jboss.reddeer.eclipse.ui.problems.Problem;
-import org.jboss.reddeer.eclipse.ui.problems.ProblemsView;
-import org.jboss.reddeer.eclipse.ui.problems.ProblemsView.ProblemType;
-import org.jboss.reddeer.eclipse.wst.server.ui.view.ServersViewEnums.ServerPublishState;
-import org.jboss.reddeer.eclipse.wst.server.ui.view.ServersViewEnums.ServerState;
-import org.jboss.reddeer.eclipse.wst.server.ui.wizard.ModifyModulesDialog;
-import org.jboss.reddeer.eclipse.wst.server.ui.wizard.ModifyModulesPage;
-import org.jboss.reddeer.swt.impl.link.DefaultLink;
-import org.jboss.reddeer.swt.impl.tree.DefaultTreeItem;
-import org.jboss.reddeer.workbench.impl.editor.DefaultEditor;
+import org.eclipse.reddeer.common.condition.AbstractWaitCondition;
+import org.eclipse.reddeer.common.exception.WaitTimeoutExpiredException;
+import org.eclipse.reddeer.common.logging.Logger;
+import org.eclipse.reddeer.common.matcher.RegexMatcher;
+import org.eclipse.reddeer.common.wait.TimePeriod;
+import org.eclipse.reddeer.common.wait.WaitUntil;
+import org.eclipse.reddeer.common.wait.WaitWhile;
+import org.eclipse.reddeer.core.handler.TreeItemHandler;
+import org.eclipse.reddeer.core.handler.WidgetHandler;
+import org.eclipse.reddeer.eclipse.condition.ConsoleHasNoChange;
+import org.eclipse.reddeer.eclipse.exception.EclipseLayerException;
+import org.eclipse.reddeer.eclipse.ui.browser.BrowserEditor;
+import org.eclipse.reddeer.eclipse.ui.console.ConsoleView;
+import org.eclipse.reddeer.eclipse.ui.problems.Problem;
+import org.eclipse.reddeer.eclipse.ui.views.markers.ProblemsView;
+import org.eclipse.reddeer.eclipse.ui.views.markers.ProblemsView.ProblemType;
+import org.eclipse.reddeer.eclipse.wst.server.ui.cnf.ServerModule;
+import org.eclipse.reddeer.eclipse.wst.server.ui.cnf.ServersView2;
+import org.eclipse.reddeer.eclipse.wst.server.ui.cnf.ServersViewEnums.ServerPublishState;
+import org.eclipse.reddeer.eclipse.wst.server.ui.cnf.ServersViewEnums.ServerState;
+import org.eclipse.reddeer.eclipse.wst.server.ui.wizard.ModifyModulesDialog;
+import org.eclipse.reddeer.eclipse.wst.server.ui.wizard.ModifyModulesPage;
+import org.eclipse.reddeer.swt.condition.ShellIsActive;
+import org.eclipse.reddeer.swt.impl.link.DefaultLink;
+import org.eclipse.reddeer.swt.impl.tree.DefaultTreeItem;
+import org.eclipse.reddeer.workbench.core.condition.JobIsRunning;
+import org.eclipse.reddeer.workbench.impl.editor.DefaultEditor;
 import org.jboss.tools.central.reddeer.projects.ArchetypeProject;
 import org.jboss.tools.central.reddeer.projects.CentralExampleProject;
 import org.jboss.tools.central.reddeer.wizards.JBossCentralProjectWizard;
@@ -91,12 +93,12 @@ public class ExamplesOperator {
 	 */
 
 	public void deployProject(String projectName, String serverName) {
-		JBossServerView serversView = new JBossServerView();
+		ServersView2 serversView = new ServersView2();
 		serversView.open();
 		ModifyModulesDialog modulesDialog = serversView.getServer(serverName).addAndRemoveModules();
 		String moduleName = new DefaultTreeItem(new TreeItemTextMatcher(new RegexMatcher(".*" + projectName + ".*")))
 				.getText();
-		new ModifyModulesPage().add(moduleName);
+		new ModifyModulesPage(modulesDialog).add(moduleName);
 		modulesDialog.finish();
 		new WaitUntil(new WaitForProjectToStartAndSynchronize(moduleName, serverName), TimePeriod.LONG);
 	}
@@ -112,7 +114,7 @@ public class ExamplesOperator {
 		log.step("Import project start");
 		JBossCentralProjectWizard dialog = new JBossCentralProjectWizard(project);
 		dialog.open();
-		NewProjectExamplesStacksRequirementsPage firstPage = new NewProjectExamplesStacksRequirementsPage();
+		NewProjectExamplesStacksRequirementsPage firstPage = new NewProjectExamplesStacksRequirementsPage(dialog);
 		firstPage.setTargetRuntime(0);
 		log.step("Import project first page");
 		new DefaultLink();
@@ -121,10 +123,10 @@ public class ExamplesOperator {
 		}
 		checkRequirements(firstPage.getRequirements());
 		dialog.next();
-		ArchetypeExamplesWizardFirstPage secondPage = new ArchetypeExamplesWizardFirstPage();
+		ArchetypeExamplesWizardFirstPage secondPage = new ArchetypeExamplesWizardFirstPage(dialog);
 		assertFalse("Project Name cannot be empty", secondPage.getProjectName().equals(""));
 		dialog.next();
-		ArchetypeExamplesWizardPage thirdPage = new ArchetypeExamplesWizardPage();
+		ArchetypeExamplesWizardPage thirdPage = new ArchetypeExamplesWizardPage(dialog);
 		assertFalse("Group ID cannot be empty", thirdPage.getGroupID().equals(""));
 		NewProjectExamplesReadyPage projectReadyPage = dialog.finishAndWait();
 		checkProjectReadyPage(projectReadyPage, project);
@@ -142,7 +144,7 @@ public class ExamplesOperator {
 	public void importExampleProjectFromCentral(CentralExampleProject project) {
 		NewProjectExamplesWizardDialogCentral dialog = new NewProjectExamplesWizardDialogCentral();
 		dialog.open(project);
-		MavenExamplesRequirementPage reqPage = new MavenExamplesRequirementPage();
+		MavenExamplesRequirementPage reqPage = new MavenExamplesRequirementPage(dialog);
 		checkRequirements(reqPage.getRequirements());
 		try {
 			new WaitUntil(new MavenRepositoryNotFound());
@@ -156,7 +158,7 @@ public class ExamplesOperator {
 			dialog.finish(project.getProjectName());
 		} catch (WaitTimeoutExpiredException ex) { // waiting in dialog.finish()
 													// is not enough!
-			new WaitWhile(new ShellWithTextIsActive("New Project Example"), TimePeriod.VERY_LONG);
+			new WaitWhile(new ShellIsActive("New Project Example"), TimePeriod.VERY_LONG);
 			new WaitWhile(new JobIsRunning(), TimePeriod.LONG);
 		}
 		checkForErrors();
@@ -173,7 +175,7 @@ public class ExamplesOperator {
 		if (!projectName.equals("jboss-ejb-timer")) {
 			new WaitUntil(new ConsoleHasNoChange(), TimePeriod.LONG);
 		}
-		JBossServerView serversView = new JBossServerView();
+		ServersView2 serversView = new ServersView2();
 		serversView.open();
 		JBossServerModule module = (JBossServerModule) serversView.getServer(serverNameLabel)
 				.getModule(new RegexMatcher(".*" + projectName + ".*"));
@@ -295,10 +297,10 @@ public class ExamplesOperator {
 		private JBossServerModule getModule() {
 			int counter = 0;
 			while (module == null && counter < 5) {
-				JBossServerView serversView = new JBossServerView();
+				ServersView2 serversView = new ServersView2();
 				serversView.open();
 				try {
-					module = serversView.getServer(serverName).getModule(projectName);
+					module = (JBossServerModule) serversView.getServer(serverName).getModule(projectName);
 				} catch (EclipseLayerException ex) {
 					// module not found
 					counter++;
@@ -341,7 +343,7 @@ public class ExamplesOperator {
 
 		@Override
 		protected boolean matchesSafely(TreeItem item) {
-			return matcher.matches(WidgetHandler.getInstance().getText(item));
+			return matcher.matches(TreeItemHandler.getInstance().getText(item));
 		}
 
 	}

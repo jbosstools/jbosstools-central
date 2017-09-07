@@ -11,9 +11,10 @@
 
 package org.jboss.tools.central.reddeer.preferences;
 
-import org.jboss.reddeer.jface.preference.PreferencePage;
-import org.jboss.reddeer.swt.impl.group.DefaultGroup;
-import org.jboss.reddeer.swt.impl.styledtext.DefaultStyledText;
+import org.eclipse.reddeer.core.reference.ReferencedComposite;
+import org.eclipse.reddeer.jface.preference.PreferencePage;
+import org.eclipse.reddeer.swt.impl.group.DefaultGroup;
+import org.eclipse.reddeer.swt.impl.styledtext.DefaultStyledText;
 
 /**
  * 
@@ -23,8 +24,8 @@ import org.jboss.reddeer.swt.impl.styledtext.DefaultStyledText;
 
 public class OfflineSupportPreferencePage extends PreferencePage {
 
-	public OfflineSupportPreferencePage() {
-		super(new String[] {"JBoss Tools", "Project Examples", "Offline Support"});
+	public OfflineSupportPreferencePage(ReferencedComposite referencedComposite) {
+		super(referencedComposite, new String[] {"JBoss Tools", "Project Examples", "Offline Support"});
 	}
 	
 	public String getCommand(){

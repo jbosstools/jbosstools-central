@@ -10,10 +10,10 @@
  ******************************************************************************/
 package org.jboss.tools.maven.reddeer.project.examples.wait;
 
-import org.jboss.reddeer.swt.api.Link;
-import org.jboss.reddeer.common.condition.AbstractWaitCondition;
-import org.jboss.reddeer.swt.exception.SWTLayerException;
-import org.jboss.reddeer.swt.impl.link.DefaultLink;
+import org.eclipse.reddeer.swt.api.Link;
+import org.eclipse.reddeer.common.condition.AbstractWaitCondition;
+import org.eclipse.reddeer.swt.exception.SWTLayerException;
+import org.eclipse.reddeer.swt.impl.link.DefaultLink;
 
 /**
  * Waits for link with information about RH enterprise maven repo not being in settings.xml.

@@ -10,18 +10,19 @@
  ******************************************************************************/
 package org.jboss.tools.maven.reddeer.maven.sourcelookup.ui.preferences;
 
-import org.jboss.reddeer.jface.preference.PreferencePage;
-import org.jboss.reddeer.swt.api.Group;
-import org.jboss.reddeer.swt.impl.button.CheckBox;
-import org.jboss.reddeer.swt.impl.button.RadioButton;
-import org.jboss.reddeer.swt.impl.group.DefaultGroup;
+import org.eclipse.reddeer.core.reference.ReferencedComposite;
+import org.eclipse.reddeer.jface.preference.PreferencePage;
+import org.eclipse.reddeer.swt.api.Group;
+import org.eclipse.reddeer.swt.impl.button.CheckBox;
+import org.eclipse.reddeer.swt.impl.button.RadioButton;
+import org.eclipse.reddeer.swt.impl.group.DefaultGroup;
 
 public class SourceLookupPreferencePage extends PreferencePage{
 	
 	private static final String ADD_JBOSS="Automatically add the JBoss Maven source container to all JBoss AS launch configurations";
 	
-	public SourceLookupPreferencePage(){
-		super("JBoss Tools","Source Lookup");
+	public SourceLookupPreferencePage(ReferencedComposite referencedComposite){
+		super(referencedComposite, "JBoss Tools","Source Lookup");
 	}
 	
 	public void toggleAutomaticallyAddJBossMavenContainer(boolean toggle){

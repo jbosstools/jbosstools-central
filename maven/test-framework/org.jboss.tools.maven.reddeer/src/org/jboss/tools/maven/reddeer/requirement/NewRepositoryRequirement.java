@@ -17,14 +17,14 @@ import java.lang.annotation.Target;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.jboss.reddeer.junit.requirement.PropertyConfiguration;
-import org.jboss.reddeer.junit.requirement.Requirement;
-import org.jboss.reddeer.workbench.ui.dialogs.WorkbenchPreferenceDialog;
+import org.eclipse.reddeer.junit.requirement.Requirement;
+import org.eclipse.reddeer.requirements.property.PropertyConfiguration;
+import org.eclipse.reddeer.workbench.ui.dialogs.WorkbenchPreferenceDialog;
 import org.jboss.tools.maven.reddeer.maven.ui.preferences.ConfiguratorPreferencePage;
 import org.jboss.tools.maven.reddeer.requirement.NewRepositoryRequirement.DefineMavenRepository;
 import org.jboss.tools.maven.reddeer.wizards.ConfigureMavenRepositoriesWizard;
 
-public class NewRepositoryRequirement implements Requirement<DefineMavenRepository>, PropertyConfiguration{
+public class NewRepositoryRequirement extends PropertyConfiguration implements Requirement<DefineMavenRepository> {
 	
 	private DefineMavenRepository repo;
 	private List<String> repositoriesToDelete;
@@ -53,11 +53,6 @@ public class NewRepositoryRequirement implements Requirement<DefineMavenReposito
 		MavenRepository[] newRepositories() default {};
 		PredefinedMavenRepository[] predefinedRepositories() default {};
 		PropertyDefinedMavenRepository[] propDefMavenRepo() default {};
-	}
-
-	@Override
-	public boolean canFulfill() {
-		return true;
 	}
 
 	@Override
@@ -97,7 +92,7 @@ public class NewRepositoryRequirement implements Requirement<DefineMavenReposito
 	private ConfigureMavenRepositoriesWizard openRepositoriesWizard(){
 		WorkbenchPreferenceDialog preferenceDialog = new WorkbenchPreferenceDialog();
 		preferenceDialog.open();
-		ConfiguratorPreferencePage jm = new ConfiguratorPreferencePage();
+		ConfiguratorPreferencePage jm = new ConfiguratorPreferencePage(preferenceDialog);
 		preferenceDialog.select(jm);
 		return jm.configureRepositories();
 	}
@@ -106,6 +101,11 @@ public class NewRepositoryRequirement implements Requirement<DefineMavenReposito
 		ConfigureMavenRepositoriesWizard mr = new ConfigureMavenRepositoriesWizard();
 		mr.confirm();
 		new WorkbenchPreferenceDialog().ok();
+	}
+
+	@Override
+	public DefineMavenRepository getDeclaration() {
+		return this.repo;
 	}
 	
 	

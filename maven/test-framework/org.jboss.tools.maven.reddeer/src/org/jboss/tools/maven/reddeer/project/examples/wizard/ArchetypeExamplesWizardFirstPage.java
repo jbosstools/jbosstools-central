@@ -10,12 +10,17 @@
  ******************************************************************************/
 package org.jboss.tools.maven.reddeer.project.examples.wizard;
 
-import org.jboss.reddeer.jface.wizard.WizardPage;
-import org.jboss.reddeer.swt.impl.button.CheckBox;
-import org.jboss.reddeer.swt.impl.combo.LabeledCombo;
+import org.eclipse.reddeer.core.reference.ReferencedComposite;
+import org.eclipse.reddeer.jface.wizard.WizardPage;
+import org.eclipse.reddeer.swt.impl.button.CheckBox;
+import org.eclipse.reddeer.swt.impl.combo.LabeledCombo;
 
 public class ArchetypeExamplesWizardFirstPage extends WizardPage{
 	
+	public ArchetypeExamplesWizardFirstPage(ReferencedComposite referencedComposite) {
+		super(referencedComposite);
+	}
+
 	public String getProjectName(){
 		return new  LabeledCombo("Project name").getText();
 	}

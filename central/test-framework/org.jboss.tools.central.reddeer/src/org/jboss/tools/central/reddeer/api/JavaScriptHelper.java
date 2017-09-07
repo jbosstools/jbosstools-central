@@ -14,9 +14,9 @@ import java.io.File;
 import java.io.IOException;
 
 import org.apache.commons.io.FileUtils;
-import org.jboss.reddeer.common.condition.AbstractWaitCondition;
-import org.jboss.reddeer.common.wait.WaitUntil;
-import org.jboss.reddeer.swt.api.Browser;
+import org.eclipse.reddeer.common.condition.AbstractWaitCondition;
+import org.eclipse.reddeer.common.wait.WaitUntil;
+import org.eclipse.reddeer.swt.api.Browser;
 
 /**
  * Singleton helper for executing javascript functions (from file resources/functions.js). These functions should work with JBoss Central.

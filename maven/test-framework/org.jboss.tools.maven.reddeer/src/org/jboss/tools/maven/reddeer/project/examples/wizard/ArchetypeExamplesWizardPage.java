@@ -10,13 +10,18 @@
  ******************************************************************************/
 package org.jboss.tools.maven.reddeer.project.examples.wizard;
 
-import org.jboss.reddeer.jface.wizard.WizardPage;
-import org.jboss.reddeer.swt.api.Table;
-import org.jboss.reddeer.swt.impl.combo.LabeledCombo;
-import org.jboss.reddeer.swt.impl.table.DefaultTable;
+import org.eclipse.reddeer.core.reference.ReferencedComposite;
+import org.eclipse.reddeer.jface.wizard.WizardPage;
+import org.eclipse.reddeer.swt.api.Table;
+import org.eclipse.reddeer.swt.impl.combo.LabeledCombo;
+import org.eclipse.reddeer.swt.impl.table.DefaultTable;
 
 public class ArchetypeExamplesWizardPage extends WizardPage{
 	
+	public ArchetypeExamplesWizardPage(ReferencedComposite referencedComposite) {
+		super(referencedComposite);
+	}
+
 	public String getGroupID(){
 		return new LabeledCombo("Group Id:").getText();
 	}

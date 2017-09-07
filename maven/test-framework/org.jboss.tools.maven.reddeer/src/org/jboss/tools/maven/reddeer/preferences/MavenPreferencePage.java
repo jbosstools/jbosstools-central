@@ -10,13 +10,14 @@
  ******************************************************************************/
 package org.jboss.tools.maven.reddeer.preferences;
 
-import org.jboss.reddeer.jface.preference.PreferencePage;
-import org.jboss.reddeer.swt.impl.button.CheckBox;
+import org.eclipse.reddeer.core.reference.ReferencedComposite;
+import org.eclipse.reddeer.jface.preference.PreferencePage;
+import org.eclipse.reddeer.swt.impl.button.CheckBox;
 
 public class MavenPreferencePage extends PreferencePage{
 	
-	public MavenPreferencePage(){
-		super("Maven");
+	public MavenPreferencePage(ReferencedComposite referencedComposite){
+		super(referencedComposite, "Maven");
 	}
 	
 	public void updateIndexesOnStartup(boolean update){

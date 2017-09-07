@@ -10,27 +10,28 @@
  ******************************************************************************/
 package org.jboss.tools.maven.reddeer.preferences;
 
-import org.jboss.reddeer.common.logging.Logger;
-import org.jboss.reddeer.swt.api.Button;
-import org.jboss.reddeer.swt.api.Text;
-import org.jboss.reddeer.core.condition.JobIsRunning;
-import org.jboss.reddeer.jface.preference.PreferencePage;
-import org.jboss.reddeer.swt.exception.SWTLayerException;
-import org.jboss.reddeer.swt.impl.button.PushButton;
-import org.jboss.reddeer.swt.impl.link.AnchorLink;
-import org.jboss.reddeer.swt.impl.shell.DefaultShell;
-import org.jboss.reddeer.swt.impl.text.DefaultText;
-import org.jboss.reddeer.workbench.ui.dialogs.WorkbenchPreferenceDialog;
-import org.jboss.reddeer.common.wait.TimePeriod;
-import org.jboss.reddeer.common.wait.WaitUntil;
-import org.jboss.reddeer.common.wait.WaitWhile;
+import org.eclipse.reddeer.common.logging.Logger;
+import org.eclipse.reddeer.swt.api.Button;
+import org.eclipse.reddeer.swt.api.Text;
+import org.eclipse.reddeer.jface.preference.PreferencePage;
+import org.eclipse.reddeer.swt.exception.SWTLayerException;
+import org.eclipse.reddeer.swt.impl.button.PushButton;
+import org.eclipse.reddeer.swt.impl.link.AnchorLink;
+import org.eclipse.reddeer.swt.impl.shell.DefaultShell;
+import org.eclipse.reddeer.swt.impl.text.DefaultText;
+import org.eclipse.reddeer.workbench.core.condition.JobIsRunning;
+import org.eclipse.reddeer.workbench.ui.dialogs.WorkbenchPreferenceDialog;
+import org.eclipse.reddeer.common.wait.TimePeriod;
+import org.eclipse.reddeer.common.wait.WaitUntil;
+import org.eclipse.reddeer.common.wait.WaitWhile;
+import org.eclipse.reddeer.core.reference.ReferencedComposite;
 
 public class MavenUserPreferencePage extends PreferencePage{
 	
 	private static final Logger log = Logger.getLogger(MavenUserPreferencePage.class);
 	
-	public MavenUserPreferencePage(){
-		super("Maven","User Settings");
+	public MavenUserPreferencePage(ReferencedComposite referencedComposite){
+		super(referencedComposite, "Maven","User Settings");
 	}
 	
 	public void setUserSettings(String pathToSettings){
@@ -52,7 +53,7 @@ public class MavenUserPreferencePage extends PreferencePage{
 	        } catch(SWTLayerException ex){
 	            log.debug("'Update project required' shell not found.");
 	        } finally {
-	            new WaitUntil(new JobIsRunning(),TimePeriod.NORMAL,false);
+	            new WaitUntil(new JobIsRunning(),TimePeriod.DEFAULT,false);
 	            new WaitWhile(new JobIsRunning(),TimePeriod.VERY_LONG);
 	        }
 		}
@@ -73,7 +74,7 @@ public class MavenUserPreferencePage extends PreferencePage{
 		return text.getMessage();
 	}
 	
-	public void apply(){
+	public PreferencePage apply(){
 		new PushButton("Apply").click();
 		try{
 		    new DefaultShell("Update project required");
@@ -83,6 +84,7 @@ public class MavenUserPreferencePage extends PreferencePage{
 		} catch(SWTLayerException ex){
 			log.info("Update project required shell was not found.");
 		}
+		return this;
 	}
 	
 	public void openUserSettings(){

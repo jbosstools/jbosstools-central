@@ -10,19 +10,20 @@
  ******************************************************************************/
 package org.jboss.tools.maven.reddeer.maven.ui.preferences;
 
-import org.jboss.reddeer.core.exception.CoreLayerException;
-import org.jboss.reddeer.jface.preference.PreferencePage;
-import org.jboss.reddeer.swt.impl.button.CheckBox;
-import org.jboss.reddeer.swt.impl.button.PushButton;
-import org.jboss.reddeer.swt.impl.shell.DefaultShell;
-import org.jboss.reddeer.swt.impl.table.DefaultTable;
-import org.jboss.reddeer.swt.impl.text.LabeledText;
+import org.eclipse.reddeer.core.exception.CoreLayerException;
+import org.eclipse.reddeer.core.reference.ReferencedComposite;
+import org.eclipse.reddeer.jface.preference.PreferencePage;
+import org.eclipse.reddeer.swt.impl.button.CheckBox;
+import org.eclipse.reddeer.swt.impl.button.PushButton;
+import org.eclipse.reddeer.swt.impl.shell.DefaultShell;
+import org.eclipse.reddeer.swt.impl.table.DefaultTable;
+import org.eclipse.reddeer.swt.impl.text.LabeledText;
 import org.jboss.tools.maven.reddeer.wizards.Repository;
 
 public class RemoteRepositoriesPreferencePage extends PreferencePage{
 	
-	public RemoteRepositoriesPreferencePage(){
-		super("JBoss Tools","Remote Repositories");
+	public RemoteRepositoriesPreferencePage(ReferencedComposite referencedComposite){
+		super(referencedComposite, "JBoss Tools","Remote Repositories");
 	}
 	
 	public void addRepository(Repository repository){

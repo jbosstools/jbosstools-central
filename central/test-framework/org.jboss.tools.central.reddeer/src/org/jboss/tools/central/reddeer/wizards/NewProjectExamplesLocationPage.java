@@ -10,10 +10,11 @@
  ******************************************************************************/
 package org.jboss.tools.central.reddeer.wizards;
 
-import org.jboss.reddeer.jface.wizard.WizardPage;
-import org.jboss.reddeer.swt.api.Text;
-import org.jboss.reddeer.swt.impl.button.CheckBox;
-import org.jboss.reddeer.swt.impl.text.DefaultText;
+import org.eclipse.reddeer.core.reference.ReferencedComposite;
+import org.eclipse.reddeer.jface.wizard.WizardPage;
+import org.eclipse.reddeer.swt.api.Text;
+import org.eclipse.reddeer.swt.impl.button.CheckBox;
+import org.eclipse.reddeer.swt.impl.text.DefaultText;
 import org.jboss.tools.central.reddeer.exception.CentralException;
 
 /**
@@ -25,6 +26,10 @@ import org.jboss.tools.central.reddeer.exception.CentralException;
 
 public class NewProjectExamplesLocationPage extends WizardPage{
 	
+	public NewProjectExamplesLocationPage(ReferencedComposite referencedComposite) {
+		super(referencedComposite);
+	}
+
 	public void toggleDefaultLocation(boolean checked){
 		new CheckBox(0).toggle(checked);
 	}
