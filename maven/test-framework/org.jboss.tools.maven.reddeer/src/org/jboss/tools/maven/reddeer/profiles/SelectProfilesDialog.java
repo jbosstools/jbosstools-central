@@ -12,6 +12,9 @@ package org.jboss.tools.maven.reddeer.profiles;
 
 import java.util.ArrayList;
 
+import org.eclipse.reddeer.common.wait.TimePeriod;
+import org.eclipse.reddeer.common.wait.WaitWhile;
+import org.eclipse.reddeer.eclipse.ui.navigator.resources.ProjectExplorer;
 import org.eclipse.reddeer.jface.wizard.WizardDialog;
 import org.eclipse.reddeer.swt.impl.button.PushButton;
 import org.eclipse.reddeer.swt.impl.menu.ContextMenuItem;
@@ -19,9 +22,6 @@ import org.eclipse.reddeer.swt.impl.shell.DefaultShell;
 import org.eclipse.reddeer.swt.impl.table.DefaultTable;
 import org.eclipse.reddeer.swt.impl.text.DefaultText;
 import org.eclipse.reddeer.workbench.core.condition.JobIsRunning;
-import org.eclipse.reddeer.common.wait.TimePeriod;
-import org.eclipse.reddeer.common.wait.WaitWhile;
-import org.eclipse.reddeer.eclipse.ui.navigator.resources.ProjectExplorer;
 
 public class SelectProfilesDialog extends WizardDialog{
 	
@@ -79,6 +79,11 @@ public class SelectProfilesDialog extends WizardDialog{
 	
 	public String getActiveProfilesText(){
 		return new DefaultText(0).getText();//("Active profiles for "+projectName+":").getText();
+	}
+	
+	public void cancel(){
+		new PushButton("Cancel").click();
+		new WaitWhile(new JobIsRunning(),TimePeriod.LONG);
 	}
 
 }

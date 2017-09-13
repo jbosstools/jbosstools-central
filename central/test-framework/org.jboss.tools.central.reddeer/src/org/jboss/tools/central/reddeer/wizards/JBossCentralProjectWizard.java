@@ -18,6 +18,7 @@ import org.eclipse.reddeer.jface.wizard.WizardDialog;
 import org.eclipse.reddeer.swt.api.Button;
 import org.eclipse.reddeer.swt.condition.ShellIsActive;
 import org.eclipse.reddeer.swt.impl.browser.InternalBrowser;
+import org.eclipse.reddeer.swt.impl.button.NextButton;
 import org.eclipse.reddeer.swt.impl.button.PushButton;
 import org.eclipse.reddeer.swt.impl.shell.DefaultShell;
 import org.eclipse.reddeer.workbench.core.condition.JobIsRunning;
@@ -85,6 +86,17 @@ public class JBossCentralProjectWizard extends WizardDialog {
 	public void finish() {
 		NewProjectExamplesReadyPage projectReadyPage = finishAndWait();
 		projectReadyPage.finish();
+	}
+	
+	/**
+	 * Click the next button in wizard dialog.
+	 */
+	public WizardDialog next() {
+		log.info("Go to next wizard page");
+
+		Button button = new NextButton(getShell());
+		button.click();
+		return this;
 	}
 
 }
