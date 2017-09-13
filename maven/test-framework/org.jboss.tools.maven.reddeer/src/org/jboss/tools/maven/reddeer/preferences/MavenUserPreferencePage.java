@@ -11,20 +11,19 @@
 package org.jboss.tools.maven.reddeer.preferences;
 
 import org.eclipse.reddeer.common.logging.Logger;
+import org.eclipse.reddeer.common.wait.TimePeriod;
+import org.eclipse.reddeer.common.wait.WaitUntil;
+import org.eclipse.reddeer.common.wait.WaitWhile;
+import org.eclipse.reddeer.core.exception.CoreLayerException;
+import org.eclipse.reddeer.core.reference.ReferencedComposite;
+import org.eclipse.reddeer.jface.preference.PreferencePage;
 import org.eclipse.reddeer.swt.api.Button;
 import org.eclipse.reddeer.swt.api.Text;
-import org.eclipse.reddeer.jface.preference.PreferencePage;
-import org.eclipse.reddeer.swt.exception.SWTLayerException;
 import org.eclipse.reddeer.swt.impl.button.PushButton;
 import org.eclipse.reddeer.swt.impl.link.AnchorLink;
 import org.eclipse.reddeer.swt.impl.shell.DefaultShell;
 import org.eclipse.reddeer.swt.impl.text.DefaultText;
 import org.eclipse.reddeer.workbench.core.condition.JobIsRunning;
-import org.eclipse.reddeer.workbench.ui.dialogs.WorkbenchPreferenceDialog;
-import org.eclipse.reddeer.common.wait.TimePeriod;
-import org.eclipse.reddeer.common.wait.WaitUntil;
-import org.eclipse.reddeer.common.wait.WaitWhile;
-import org.eclipse.reddeer.core.reference.ReferencedComposite;
 
 public class MavenUserPreferencePage extends PreferencePage{
 	
@@ -50,7 +49,7 @@ public class MavenUserPreferencePage extends PreferencePage{
 	            new DefaultShell("Update project required");
 	            new PushButton("Yes").click();
 	            new DefaultShell("Preferences");
-	        } catch(SWTLayerException ex){
+	        } catch(CoreLayerException ex){
 	            log.debug("'Update project required' shell not found.");
 	        } finally {
 	            new WaitUntil(new JobIsRunning(),TimePeriod.DEFAULT,false);
@@ -81,7 +80,7 @@ public class MavenUserPreferencePage extends PreferencePage{
 		    new PushButton("Yes").click();
 		    new DefaultShell("Preferences");
 		    new WaitWhile(new JobIsRunning(),TimePeriod.VERY_LONG);
-		} catch(SWTLayerException ex){
+		} catch(CoreLayerException ex){
 			log.info("Update project required shell was not found.");
 		}
 		return this;
