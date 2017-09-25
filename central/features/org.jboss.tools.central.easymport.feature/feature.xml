@@ -20,10 +20,8 @@
    </license>
 
    <requires>
-     <!-- Those are in TP but not part of an included feature yet -->
+     <!-- This is in the TP but not part of an included feature yet, so require it here -->
      <import plugin="org.eclipse.egit.ui.smartimport"/>
-     <import plugin="org.eclipse.e4.ui.importer.java"/>
-     <import plugin="org.eclipse.e4.ui.importer.pde"/>
    </requires>
 
 </feature>
