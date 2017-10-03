@@ -32,8 +32,8 @@ public class VersionedBrowser extends Browser {
 	public VersionedBrowser(Composite parent, int style) {
 		super(parent, style);
 		//TODO Check Project Spartan / Edge
-		String browserScript =
-				   "var ua = navigator.userAgent,tem,M=ua.match(/(opera|chrome|safari|firefox|msie|trident(?=\\/))\\/?\\s*(\\d+)/i) || [];" +  //$NON-NLS-1$
+		execute("function detectNameVersionOfBrowser() {" +  //$NON-NLS-$1
+				"var ua = navigator.userAgent,tem,M=ua.match(/(opera|chrome|safari|firefox|msie|trident(?=\\/))\\/?\\s*(\\d+)/i) || [];" +  //$NON-NLS-1$
 				   "if(/trident/i.test(M[1])){" + //$NON-NLS-1$
 				   		"tem=/\\brv[ :]+(\\d+)/g.exec(ua) || [];" +  //$NON-NLS-1$
 				   		"return 'IE '+ '_' + (tem[1]||'');" + //$NON-NLS-1$
@@ -46,9 +46,10 @@ public class VersionedBrowser extends Browser {
 				   	"M=M[2]? [M[1], M[2]]: [navigator.appName, navigator.appVersion, '-?'];" + //$NON-NLS-1$
 				   	"if((tem=ua.match(/version\\/(\\d+)/i))!=null) {" + //$NON-NLS-1$
 				   		"M.splice(1,1,tem[1]);" + //$NON-NLS-1$
-				   	"}"+ //$NON-NLS-1$
-				   	"return M[0] + '_' + M[1];" ; //$NON-NLS-1$
-		String result = (String) evaluate(browserScript);
+				   	"}" + //$NON-NLS-1$
+					"return M[0] + '_' + M[1];" + //$NON-NLS-1$
+				"}");
+		String result = (String) evaluate("return detectNameVersionOfBrowser()"); //$NON-NLS-$1	
 
 		if (result != null) {
 			name = result.substring(0, result.indexOf("_")); //$NON-NLS-1$
