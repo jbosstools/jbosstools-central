@@ -32,7 +32,7 @@ public class VersionedBrowser extends Browser {
 	public VersionedBrowser(Composite parent, int style) {
 		super(parent, style);
 		//TODO Check Project Spartan / Edge
-		execute("function detectNameVersionOfBrowser() {" +  //$NON-NLS-$1
+		execute("window.detectNameVersionOfBrowser = function() {" +  //$NON-NLS-$1
 				"var ua = navigator.userAgent,tem,M=ua.match(/(opera|chrome|safari|firefox|msie|trident(?=\\/))\\/?\\s*(\\d+)/i) || [];" +  //$NON-NLS-1$
 				   "if(/trident/i.test(M[1])){" + //$NON-NLS-1$
 				   		"tem=/\\brv[ :]+(\\d+)/g.exec(ua) || [];" +  //$NON-NLS-1$
