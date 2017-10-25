@@ -1,5 +1,7 @@
 # The JBoss Central project
 
+TEST TEST
+
 ## Summary
 
 JBoss Central contains the key components/extensions for driving the JBoss Central editor/view and the project examples plus it currently contains the Maven extensions JBoss Tools provides on top of m2e.
