@@ -1506,5 +1506,15 @@ public class ConfigureMavenRepositoriesWizardPage extends WizardPage implements 
 				this.preconfiguredRepositoryUrls = preconfiguredRepositories;
 	}
 	
+	@Override
+	public void setVisible(boolean visible) {
+		super.setVisible(visible);
+		Control control = getControl();
+		if (visible && control != null && control.getParent() != null && !control.isDisposed()) {
+			control.getParent().layout(true, true);
+			control.getParent().redraw();
+		}
+	}
+
 }
 
