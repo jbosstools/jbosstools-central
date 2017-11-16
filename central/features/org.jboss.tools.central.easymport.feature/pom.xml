@@ -10,7 +10,7 @@
 	<groupId>org.jboss.tools.central.features</groupId>
 	<artifactId>org.jboss.tools.central.easymport.feature</artifactId>
 	<packaging>eclipse-feature</packaging>
-	<version>4.4.101-SNAPSHOT</version>
+	<version>4.4.102-SNAPSHOT</version>
 	
 	<build>
 		<plugins>
