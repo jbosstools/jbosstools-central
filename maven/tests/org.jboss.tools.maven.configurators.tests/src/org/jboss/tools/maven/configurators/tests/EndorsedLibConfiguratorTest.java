@@ -102,7 +102,7 @@ public class EndorsedLibConfiguratorTest extends AbstractMavenConfiguratorTest {
 		assertEquals(1, resolutions.length);
 		//Execute quick fix
 		resolutions[0].run(marker);
-		waitForJobsToComplete();
+		waitForJobsToComplete(4);
 		endorsing.build(IncrementalProjectBuilder.INCREMENTAL_BUILD, monitor);
 		waitForJobsToComplete();
 		
