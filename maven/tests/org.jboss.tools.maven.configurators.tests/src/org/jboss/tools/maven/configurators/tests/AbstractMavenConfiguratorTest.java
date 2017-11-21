@@ -142,4 +142,17 @@ public abstract class AbstractMavenConfiguratorTest extends
 	    }
 	    Assert.assertEquals("Unexpected error markers " + toString(markers), 0, markers.size());
     }
+	
+	protected void waitForJobsToComplete(int loop) throws InterruptedException, CoreException {
+		while (loop-- > 0) {
+			try {
+				waitForJobsToComplete();
+				loop = 0;
+			} catch (AssertionError e) {
+				if (loop == 0) {
+					throw e;
+				}
+			}
+		}
+	}
 }
