@@ -19,8 +19,10 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.io.FileUtils;
 import org.eclipse.mylyn.internal.discovery.core.model.DiscoveryCategory;
 import org.eclipse.mylyn.internal.discovery.core.model.DiscoveryConnector;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -38,6 +40,11 @@ public class CachedProxyWizardDiscoveryStrategyTest extends AbstractProxyWizardD
 		strategy.setStorageFolder(storageArea);
 		strategy.setConnectors(new ArrayList<DiscoveryConnector>());
 		strategy.setCategories(new ArrayList<DiscoveryCategory>());
+	}
+	
+	@After
+	public void tearDown() throws IOException {
+		FileUtils.deleteDirectory(new File(storageArea, ".rcache"));
 	}
 
 	@Test
