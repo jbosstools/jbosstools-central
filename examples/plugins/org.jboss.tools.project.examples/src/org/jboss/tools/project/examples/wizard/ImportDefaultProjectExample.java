@@ -229,7 +229,7 @@ public class ImportDefaultProjectExample extends
 				// copied from JavaProject.buildStructure(...)
 				OpenableElementInfo info = (OpenableElementInfo) object;
 				IClasspathEntry[] resolvedClasspath = ((JavaProject) javaProject).getResolvedClasspath();
-				IPackageFragmentRoot[] children = ((JavaProject) javaProject).computePackageFragmentRoots(resolvedClasspath,false, null /* no reverse map */);
+				IPackageFragmentRoot[] children = ((JavaProject) javaProject).computePackageFragmentRoots(resolvedClasspath,false, false, null /* no reverse map */);
 				info.setChildren(children);
 				((JavaProject) javaProject).getPerProjectInfo().rememberExternalLibTimestamps();
 			}
