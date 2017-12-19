@@ -15,6 +15,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.regex.Pattern;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipException;
 import java.util.zip.ZipFile;
@@ -38,15 +39,13 @@ import org.eclipse.debug.core.sourcelookup.containers.ExternalArchiveSourceConta
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.embedder.ArtifactKey;
 import org.eclipse.m2e.core.embedder.IMaven;
+import org.eclipse.wst.server.core.IRuntime;
 import org.eclipse.wst.server.core.IServer;
 import org.eclipse.wst.server.core.ServerUtil;
+import org.jboss.ide.eclipse.as.classpath.core.runtime.RuntimeJarUtility;
 import org.jboss.ide.eclipse.as.core.server.IJBossServer;
 import org.jboss.ide.eclipse.as.core.server.IJBossServerRuntime;
-import org.jboss.ide.eclipse.as.core.server.bean.JBossServerType;
-import org.jboss.ide.eclipse.as.core.server.bean.ServerBean;
-import org.jboss.ide.eclipse.as.core.server.bean.ServerBeanLoader;
 import org.jboss.ide.eclipse.as.core.util.IJBossRuntimeResourceConstants;
-import org.jboss.ide.eclipse.as.core.util.IJBossToolingConstants;
 import org.jboss.ide.eclipse.as.core.util.ServerConverter;
 import org.jboss.tools.maven.core.identification.IFileIdentificationManager;
 import org.jboss.tools.maven.core.identification.IdentificationUtil;
@@ -63,19 +62,12 @@ public class JBossSourceContainer extends AbstractSourceContainer {
 	private static final String PATH_SEPARATOR = "/"; //$NON-NLS-1$
 	public static final String TYPE_ID = "org.jboss.tools.maven.sourcelookup.containerType"; //$NON-NLS-1$
 
-	public static final String EAP = "EAP"; //$NON-NLS-1$
-	public static final String EAP_STD = "EAP_STD"; //$NON-NLS-1$
-	public static final String SOA_P = "SOA-P"; //$NON-NLS-1$
-	public static final String SOA_P_STD = "SOA-P-STD"; //$NON-NLS-1$
-	public static final String EPP = "EPP"; //$NON-NLS-1$
-	public static final String EWP = "EWP"; //$NON-NLS-1$
-
 	private List<File> jars;
 	private List<ISourceContainer> sourceContainers = new ArrayList<ISourceContainer>();
-	protected static File resolvedFile;
 	private String homePath;
+	private IRuntime runtime;
 
-	private IFileIdentificationManager fileIdentificationManager;
+	private static IFileIdentificationManager fileIdentificationManager = new FileIdentificationManager();
 	
 	public JBossSourceContainer(ILaunchConfiguration configuration)
 			throws CoreException {
@@ -86,62 +78,45 @@ public class JBossSourceContainer extends AbstractSourceContainer {
 			if (jbossServer != null) {
 				IJBossServerRuntime runtime = jbossServer.getRuntime();
 				if (runtime != null) {
-					IPath location = runtime.getRuntime().getLocation();
-					this.homePath = location.toOSString();
+					this.runtime = runtime.getRuntime();
 				}
 			}
 		}
-		if (this.homePath == null) {
+		if (this.runtime == null) {
 			IStatus status = new Status(IStatus.ERROR,
 					SourceLookupActivator.PLUGIN_ID, "Invalid configuration");
 			throw new CoreException(status);
 		}
-		fileIdentificationManager = new FileIdentificationManager();
 	}
 
+	public JBossSourceContainer(IRuntime runtime) {
+		this.runtime = runtime;
+	}
+	
 	public JBossSourceContainer(String homePath) {
 		this.homePath = homePath;
-		fileIdentificationManager = new FileIdentificationManager();
 	}
 
-	private List<File> getJars() throws CoreException {
+	public List<File> getJars() throws CoreException {
 		if (jars != null) {
 			return jars;
 		}
 		jars = new ArrayList<File>();
+		if (runtime != null) {
+			IPath[] paths = new RuntimeJarUtility().getJarsForRuntime(runtime, RuntimeJarUtility.ALL_JARS);
+			if (paths != null && paths.length > 0) {
+				for (IPath path:paths) {
+					addFile(jars, path.toFile());
+				}
+				return jars;
+			}
+		}
 		if (homePath == null) {
 			return jars;
 		}
-		File location = new File(homePath);
-		ServerBeanLoader loader = new ServerBeanLoader(location);
-		ServerBean serverBean = loader.getServerBean();
-		JBossServerType type = serverBean.getType();
-		String version = serverBean.getVersion();
-		if (JBossServerType.AS7.equals(type) || JBossServerType.AS72.equals(type) 
-				|| JBossServerType.EAP6.equals(type) || JBossServerType.EAP61.equals(type) || JBossServerType.EAP70.equals(type)
-				|| JBossServerType.WILDFLY80.equals(type) || JBossServerType.WILDFLY90.equals(type) || JBossServerType.WILDFLY90_WEB.equals(type)
-				|| JBossServerType.WILDFLY100.equals(type) || JBossServerType.WILDFLY100_WEB.equals(type)) {	
-			getJBossModules();
-		}
-		else if (JBossServerType.AS.equals(type)) {
-			if (IJBossToolingConstants.V6_0.equals(version)
-					|| IJBossToolingConstants.V6_1.equals(version)) {
-				getAS6xJars();
-			}
-			else if (IJBossToolingConstants.V5_0.equals(version)
-					|| IJBossToolingConstants.V5_1.equals(version)) {
-				getAS5xJars();
-			}
-		}
-		else if (JBossServerType.SOAP.equals(type) || JBossServerType.EAP.equals(type) || JBossServerType.EPP.equals(type)
-				|| JBossServerType.SOAP_STD.equals(type) || JBossServerType.EWP.equals(type)
-				|| JBossServerType.EAP_STD.equals(type)) {
-			getAS5xJars();
-		}
-		if (jars.isEmpty()) {
-			IPath jarPath = new Path(homePath);
-			addJars(jarPath, jars);
-		}
+		IPath jarPath = new Path(homePath);
+		addJars(jarPath, jars);
+		
 		return jars;
 	}
 
@@ -196,10 +171,36 @@ public class JBossSourceContainer extends AbstractSourceContainer {
 		for (File file : files) {
 			if (file.isDirectory()) {
 				addJars(path.append(file.getName()), jars);
+			}			
+			
+			addFile(jars, file);
+		}
+	}
+
+	private void addFile(List<File> jars, File file) {
+		if (file != null && file.isFile() && file.getName().endsWith(".jar") && !jars.contains(file)) { //$NON-NLS-1$
+			boolean include = true;
+			String includeFilter = SourceLookupActivator.getDefault().getIncludePattern();
+			if (includeFilter != null && !includeFilter.isEmpty()) {
+				try {
+					include = Pattern.matches(includeFilter, file.getAbsolutePath());
+				} catch (Exception e) {
+					SourceLookupActivator.log(e);
+				}
 			}
-			if (file.isFile()
-					&& file.getName().endsWith(".jar") && !jars.contains(file)) { //$NON-NLS-1$
-				jars.add(file);
+			if (include) {
+				boolean exclude = false;
+				String excludeFilter = SourceLookupActivator.getDefault().getExcludePattern();
+				if (excludeFilter != null && !excludeFilter.isEmpty()) {
+					try {
+						exclude = Pattern.matches(excludeFilter, file.getAbsolutePath());
+					} catch (Exception e) {
+						SourceLookupActivator.log(e);
+					}
+				}
+				if (!exclude) {
+					jars.add(file);
+				}
 			}
 		}
 	}
@@ -207,11 +208,11 @@ public class JBossSourceContainer extends AbstractSourceContainer {
 	public String getName() {
 		String name;
 		if (homePath != null) {
-			name = "JBoss Source Container (" + homePath + ")";
+			name = "JBoss Maven Source Container (" + homePath + ")";
 		} else {
-			name = "JBoss Source Container";
+			name = "JBoss Maven Source Container";
 		}
-		return name; //$NON-NLS-1$
+		return name;
 	}
 
 	@Override
@@ -233,9 +234,9 @@ public class JBossSourceContainer extends AbstractSourceContainer {
 					continue;
 				}
 				jar = new ZipFile(file);
-				String className = name.replace(".java", ".class");
-				className = className.replace("\\", PATH_SEPARATOR);
-				ZipEntry entry = jar.getEntry(className);//$NON-NLS-1$
+				String className = name.replace(".java", ".class"); //$NON-NLS-1$ //$NON-NLS-2$
+				className = className.replace("\\", PATH_SEPARATOR); //$NON-NLS-1$
+				ZipEntry entry = jar.getEntry(className);
 				if (entry != null) {
 					ArtifactKey artifact = getArtifact(file);
 					if (artifact != null) {
@@ -246,6 +247,11 @@ public class JBossSourceContainer extends AbstractSourceContainer {
 								job.join();
 							} catch (InterruptedException e) {
 								continue;
+							}
+							Artifact resolved = resolveArtifact(artifact, new NullProgressMonitor());
+							File resolvedFile = null;
+							if (resolved != null) {
+								resolvedFile = resolved.getFile();
 							}
 							if (resolvedFile != null) {
 								ISourceContainer container = new ExternalArchiveSourceContainer(
@@ -306,14 +312,12 @@ public class JBossSourceContainer extends AbstractSourceContainer {
 				artifact.getGroupId(), artifact.getArtifactId(),
 				artifact.getVersion(),
 				IdentificationUtil.getSourcesClassifier(artifact.getClassifier()));
-		//FIXME static variable, What The ...!!!
-		resolvedFile = null;
 		Job job = new Job("Downloading sources for " + file.getName()) {
 
 			@Override
 			public IStatus run(IProgressMonitor monitor) {
 				try {
-					resolvedFile = download(sourcesArtifact, monitor);
+					download(sourcesArtifact, monitor);
 				} catch (CoreException e) {
 					//We couldn't find sources, no need to make a fuss about it
 					SourceLookupActivator.logInfo(e.getLocalizedMessage());
@@ -395,5 +399,9 @@ public class JBossSourceContainer extends AbstractSourceContainer {
 
 	public String getHomePath() {
 		return homePath;
+	}
+	
+	public IRuntime getRuntime() {
+		return runtime;
 	}
 }
