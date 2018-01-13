@@ -24,6 +24,7 @@
 		<module>org.jboss.tools.maven.sourcelookup.ui</module> 
 		<module>org.jboss.tools.maven.conversion.ui</module>
 		<module>org.jboss.tools.maven.jdt</module>
+		<module>org.jboss.tools.maven.springboot</module>
      </modules>
 </project>
 	

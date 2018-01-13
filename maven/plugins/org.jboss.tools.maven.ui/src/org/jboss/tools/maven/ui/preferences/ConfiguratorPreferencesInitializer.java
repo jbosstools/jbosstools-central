@@ -69,6 +69,9 @@ public class ConfiguratorPreferencesInitializer extends
 		node.putBoolean(
 				Activator.CONFIGURE_ARQUILLIAN,
 				Activator.CONFIGURE_ARQUILLIAN_VALUE);
+		node.putBoolean(
+				Activator.CONFIGURE_SPRING_BOOT,
+				Activator.CONFIGURE_SPRING_BOOT_VALUE);
 		
 	}
 

@@ -58,6 +58,7 @@ public class Messages extends NLS {
 	public static String ConfiguratorPreferencePage_When_importing_Maven_projects_configure_the_following;
 	public static String ConfiguratorPreferencePage_Configure_GWT;
 	public static String ConfiguratorPreferencePage_Configure_Arquillian;
+	public static String ConfiguratorPreferencePage_Configure_Spring_Boot;
 	public static String ProfileManager_Updating_maven_profiles;
 	
 	public static String ProfileSelectionHandler_Loading_maven_profiles;
