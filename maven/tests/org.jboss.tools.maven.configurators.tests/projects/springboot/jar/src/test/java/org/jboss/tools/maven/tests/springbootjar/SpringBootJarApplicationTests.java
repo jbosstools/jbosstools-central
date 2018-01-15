@@ -8,16 +8,19 @@
  * Contributors:
  *     JBoss by Red Hat - Initial implementation.
  ************************************************************************************/
-package org.jboss.tools.maven.tests.springbootwar;
+package org.jboss.tools.maven.tests.springbootjar;
 
-import org.springframework.boot.builder.SpringApplicationBuilder;
-import org.springframework.boot.web.support.SpringBootServletInitializer;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-public class ServletInitializer extends SpringBootServletInitializer {
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class SpringBootJarApplicationTests {
 
-	@Override
-	protected SpringApplicationBuilder configure(SpringApplicationBuilder application) {
-		return application.sources(SpringBootWarApplication.class);
+	@Test
+	public void contextLoads() {
 	}
 
 }

@@ -78,9 +78,4 @@ public class MavenSpringBootActivator extends AbstractUIPlugin {
 		IStatus status = new Status(IStatus.WARNING, PLUGIN_ID, message, null);
 		getDefault().getLog().log(status);
 	}
-
-	public IDataModel createJarUtilityDataModel(IFacetedProject fproj, IProjectFacetVersion facetVersion) {
-		return (IDataModel) new UtilityFacetInstallDataModelProvider().create();
-	}
-
 }

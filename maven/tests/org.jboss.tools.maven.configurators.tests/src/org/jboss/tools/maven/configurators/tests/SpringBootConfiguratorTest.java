@@ -13,6 +13,7 @@ package org.jboss.tools.maven.configurators.tests;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jst.common.project.facet.core.JavaFacet;
+import org.eclipse.wst.common.componentcore.internal.util.IModuleConstants;
 import org.eclipse.wst.common.project.facet.core.IFacetedProject;
 import org.eclipse.wst.common.project.facet.core.IProjectFacet;
 import org.eclipse.wst.common.project.facet.core.ProjectFacetsManager;
@@ -25,7 +26,7 @@ import org.junit.Test;
 public class SpringBootConfiguratorTest extends AbstractMavenConfiguratorTest {
 
 	protected static final IProjectFacet JAVA_FACET = JavaFacet.FACET;
-	protected static final IProjectFacet UTILITY_FACET = ProjectFacetsManager.getProjectFacet("jst.utility"); //$NON-NLS-1$
+	protected static final IProjectFacet UTILITY_FACET = ProjectFacetsManager.getProjectFacet(IModuleConstants.JST_UTILITY_MODULE); //$NON-NLS-1$
 
 	@Before
 	@After

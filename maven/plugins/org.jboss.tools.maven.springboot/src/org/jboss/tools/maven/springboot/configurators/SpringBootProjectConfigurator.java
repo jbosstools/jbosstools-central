@@ -18,31 +18,34 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.jst.j2ee.internal.project.facet.UtilityFacetInstallDataModelProvider;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.project.MavenProjectChangedEvent;
 import org.eclipse.m2e.core.project.configurator.AbstractProjectConfigurator;
 import org.eclipse.m2e.core.project.configurator.ProjectConfigurationRequest;
 import org.eclipse.m2e.wtp.WTPProjectsUtil;
+import org.eclipse.wst.common.componentcore.internal.util.IModuleConstants;
 import org.eclipse.wst.common.frameworks.datamodel.IDataModel;
 import org.eclipse.wst.common.project.facet.core.IFacetedProject;
 import org.eclipse.wst.common.project.facet.core.IFacetedProject.Action;
 import org.eclipse.wst.common.project.facet.core.IProjectFacet;
 import org.eclipse.wst.common.project.facet.core.IProjectFacetVersion;
 import org.eclipse.wst.common.project.facet.core.ProjectFacetsManager;
-import org.jboss.tools.maven.springboot.MavenSpringBootActivator;
 import org.jboss.tools.maven.ui.Activator;
 
 /**
  * 
- * @author snjeza
+ * Spring Boot projects configurator.
  *
  */
 public class SpringBootProjectConfigurator extends AbstractProjectConfigurator {
 
 	protected static final IProjectFacet jarUtilityFacet;
+	
+	private static final String ACTIVATION_PROPERTY = "m2e.springboot.activation";
 
 	static {
-		jarUtilityFacet = ProjectFacetsManager.getProjectFacet("jst.utility"); //$NON-NLS-1$
+		jarUtilityFacet = ProjectFacetsManager.getProjectFacet(IModuleConstants.JST_UTILITY_MODULE);
 	}
 
 	@Override
@@ -66,7 +69,7 @@ public class SpringBootProjectConfigurator extends AbstractProjectConfigurator {
 	}
 
 	private boolean isSpringBootConfigurable(MavenProject mavenProject) {
-		String springBootActivation = mavenProject.getProperties().getProperty("m2e.springboot.activation");
+		String springBootActivation = mavenProject.getProperties().getProperty(ACTIVATION_PROPERTY);
 
 		boolean configureSpringBoot;
 		if (springBootActivation == null) {
@@ -95,7 +98,7 @@ public class SpringBootProjectConfigurator extends AbstractProjectConfigurator {
 			if (facetVersion != null) { // $NON-NLS-1$
 				Set<Action> actions = new HashSet<>();
 				WTPProjectsUtil.installJavaFacet(actions, fproj.getProject(), fproj);
-				IDataModel model = MavenSpringBootActivator.getDefault().createJarUtilityDataModel(fproj, facetVersion);
+				IDataModel model = (IDataModel) new UtilityFacetInstallDataModelProvider().create();
 				actions.add(new Action(Action.Type.INSTALL, facetVersion, model));
 				fproj.modify(actions, monitor);
 			}
