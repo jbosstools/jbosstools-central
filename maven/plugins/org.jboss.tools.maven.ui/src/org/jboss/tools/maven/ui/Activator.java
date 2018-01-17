@@ -84,6 +84,10 @@ public class Activator extends AbstractUIPlugin {
 	public static final String CONFIGURE_ARQUILLIAN = "configureArquillian"; //$NON-NLS-1$
 
 	public static final boolean CONFIGURE_ARQUILLIAN_VALUE = true;
+	
+	public static final String CONFIGURE_SPRING_BOOT = "configureSpringBoot"; //$NON-NLS-1$
+	
+	public static final boolean CONFIGURE_SPRING_BOOT_VALUE = true;
 
 	/**
 	 * @since 1.6.0

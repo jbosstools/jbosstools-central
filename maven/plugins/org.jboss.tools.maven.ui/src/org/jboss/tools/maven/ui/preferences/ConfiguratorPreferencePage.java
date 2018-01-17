@@ -47,6 +47,7 @@ public class ConfiguratorPreferencePage extends PreferencePage implements
 	private static final String ORG_JBOSS_TOOLS_MAVEN_HIBERNATE = "org.jboss.tools.maven.hibernate"; //$NON-NLS-1$
 	private static final String ORG_JBOSS_TOOLS_MAVEN_SEAM = "org.jboss.tools.maven.seam"; //$NON-NLS-1$
 	private static final String ORG_JBOSS_TOOLS_MAVEN_ARQUILLIAN = "org.jboss.tools.arquillian.core"; //$NON-NLS-1$
+	private static final String ORG_JBOSS_TOOLS_MAVEN_SPRING_BOOT = "org.jboss.tools.maven.springboot"; //$NON-NLS-1$
 
 	private Button configureSeamButton;
 	private Button configureSeamRuntimeButton;
@@ -59,6 +60,7 @@ public class ConfiguratorPreferencePage extends PreferencePage implements
   	private Button enableMavenCleanVerifyMenuButton;
 	private Image jbossImage;
 	private Button configureArquillianButton;
+	private Button configureSpringBootButton;
 	
 	@Override
 	protected Control createContents(Composite parent) {
@@ -138,6 +140,13 @@ public class ConfiguratorPreferencePage extends PreferencePage implements
 			configureArquillianButton.setText(Messages.ConfiguratorPreferencePage_Configure_Arquillian);
 			boolean configureArquillian = store.getBoolean(Activator.CONFIGURE_ARQUILLIAN);
 			configureArquillianButton.setSelection(configureArquillian);
+		}
+
+		if (bundleExists(ORG_JBOSS_TOOLS_MAVEN_SPRING_BOOT)) { 
+			configureSpringBootButton = new Button(composite,SWT.CHECK);
+			configureSpringBootButton.setText(Messages.ConfiguratorPreferencePage_Configure_Spring_Boot);
+			boolean configureSpringBoot = store.getBoolean(Activator.CONFIGURE_SPRING_BOOT);
+			configureSpringBootButton.setSelection(configureSpringBoot);
 		}
 
 		Button configureMavenButton = new Button(composite, SWT.PUSH);

@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+
+	<extension
+         point="org.eclipse.m2e.core.lifecycleMappingMetadataSource">
+    </extension>
+   
+    <extension
+         point="org.eclipse.m2e.core.lifecycleMappings">
+      <lifecycleMapping
+            class="org.jboss.tools.maven.springboot.SpringBootLifecycleMapping"
+            id="org.jboss.tools.maven.springboot.SpringBootLifecycleMapping"
+            name="SpringBoot Lifecycle mapping">
+      </lifecycleMapping>
+    </extension>
+    
+    <extension point="org.eclipse.m2e.core.projectConfigurators">
+      <configurator 
+          id="org.jboss.tools.maven.springboot.configurator.jdt"
+          class="org.jboss.tools.maven.springboot.configurators.SpringBootProjectConfigurator"
+          name="%SpringBoot_Project_configurator" 
+          secondaryTo="org.eclipse.m2e.jdt.javaConfigurator"/>
+    </extension>
+    <extension point="org.eclipse.ui.editors.templates">
+    <template id="org.jboss.tools.maven.springboot.xml.templates.springBootActivationProperty"
+         contextTypeId="org.eclipse.m2e.editor.xml.templates.contextType.properties"
+         name="m2e-springboot activation" 
+         description="Enable or disable automatic SpringBoot configuration">
+      <pattern>&lt;m2e.springboot.activation&gt;${cursor}${false}&lt;/m2e.springboot.activation&gt;</pattern>
+    </template>
+   </extension> 
+    
+    
+</plugin>
