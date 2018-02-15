@@ -25,7 +25,17 @@ public class AppClientDependencyConversionParticipantTest extends
 
 	@Test
 	public void testAddMavenAcrPluginToEar() throws Exception {
-		checkJBIDE13781_MavenAcrPlugin("JBIDE-13781-ear");
+		String previous = System.getProperty("org.eclipse.m2e.wtp.conversion.earplugin.version");
+		System.setProperty("org.eclipse.m2e.wtp.conversion.earplugin.version", "2.9.1");
+		try {
+			checkJBIDE13781_MavenAcrPlugin("JBIDE-13781-ear");
+		} finally {
+			if (previous != null) {
+				System.setProperty("org.eclipse.m2e.wtp.conversion.earplugin.version", previous);
+			} else {
+				System.clearProperty("org.eclipse.m2e.wtp.conversion.earplugin.version");
+			}
+		}
 	}
 
 	@Test
