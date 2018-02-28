@@ -9,5 +9,6 @@
 	</parent>
 	<groupId>org.jboss.tools.maven.features</groupId>
 	<artifactId>org.jboss.tools.maven.portlet.feature</artifactId>
+	<version>1.8.103-SNAPSHOT</version>
 	<packaging>eclipse-feature</packaging>
 </project>
