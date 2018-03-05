@@ -154,15 +154,15 @@ public class CentralHelper {
 	 * public for testing purposes
 	 */
 	public static Path getEmbeddedFilePath(Bundle bundle, String internalPath) {
-		URL zip = FileLocator.find(bundle, new org.eclipse.core.runtime.Path(internalPath), null);
+		URL zip = bundle.getEntry(internalPath);
 		if (zip == null) {
 			throw new IllegalArgumentException(internalPath + " is not a valid file path");
 		}
 		try {
 		  URL url = FileLocator.toFileURL(zip);
-		  URI uri = new URI(url.toString().replace(" ", "%20"));
-		  return Paths.get(uri);
-		} catch (URISyntaxException | IOException e) {
+		  File f = new File(url.getPath());
+		  return f.toPath();
+		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
 	}
