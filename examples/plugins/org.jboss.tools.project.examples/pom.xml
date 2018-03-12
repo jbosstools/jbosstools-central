@@ -9,5 +9,6 @@
 	</parent>
 	<groupId>org.jboss.tools.examples.plugins</groupId>
 	<artifactId>org.jboss.tools.project.examples</artifactId>
+	<version>3.1.103-SNAPSHOT</version>
 	<packaging>eclipse-plugin</packaging>
 </project>
