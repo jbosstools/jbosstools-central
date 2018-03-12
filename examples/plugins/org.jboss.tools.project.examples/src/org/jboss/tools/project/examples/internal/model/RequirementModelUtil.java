@@ -192,7 +192,7 @@ public class RequirementModelUtil {
 		properties.put("id", "org.fusesource.ide.tooling");
 		properties.put("versions", "1.0.0");
 		properties.put("description", "This example works best with JBoss Fuse Development Tools");
-		properties.put("connectorIds", "jboss.integration-stack.bundle.fuse");
+		properties.put("connectorIds", "org.fusesource.ide");
 		req.setProperties(properties);
 		return req;
 	}
