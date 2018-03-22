@@ -291,15 +291,6 @@
           requiredComponentIds="org.jboss.tools.openshift.feature">
       </proxyWizard>
       <proxyWizard
-          id="hybrid.mobile.wizard"
-          description="%hybrid.mobile.wizard.description"
-          label="Hybrid Mobile Project"
-          priority="6"
-          iconPath="icons/newcordovaprj_wiz.png"
-          requiredComponentIds="org.jboss.tools.aerogear.hybrid"
-          wizardId="org.eclipse.thym.ui.NewHybridProjectWizard">
-      </proxyWizard>
-      <proxyWizard
           id="maven.wizard"
           description="%maven.wizard.description"
           label="Maven Project"
