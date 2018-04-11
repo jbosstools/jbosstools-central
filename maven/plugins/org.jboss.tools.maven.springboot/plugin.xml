@@ -19,8 +19,8 @@
       <configurator 
           id="org.jboss.tools.maven.springboot.configurator.jdt"
           class="org.jboss.tools.maven.springboot.configurators.SpringBootProjectConfigurator"
-          name="%SpringBoot_Project_configurator" 
-          secondaryTo="org.eclipse.m2e.jdt.javaConfigurator"/>
+          name="%SpringBoot_Project_configurator"
+          runsAfter="org.eclipse.m2e.jdt.javaConfigurator"/>
     </extension>
     <extension point="org.eclipse.ui.editors.templates">
     <template id="org.jboss.tools.maven.springboot.xml.templates.springBootActivationProperty"
@@ -30,6 +30,5 @@
       <pattern>&lt;m2e.springboot.activation&gt;${cursor}${false}&lt;/m2e.springboot.activation&gt;</pattern>
     </template>
    </extension> 
-    
     
 </plugin>
