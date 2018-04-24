@@ -29,3 +29,4 @@ Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Bundle-Localization: plugin
 Bundle-Vendor: %BundleVendor
+Provide-Capability: osgi.extender; osgi.extender=osgi.serviceloader.processor
