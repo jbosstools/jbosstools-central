@@ -11,4 +11,5 @@
 	<artifactId>org.jboss.tools.central.test</artifactId>
 
 	<packaging>eclipse-test-plugin</packaging>
+<version>2.1.200-SNAPSHOT</version>
 </project>
