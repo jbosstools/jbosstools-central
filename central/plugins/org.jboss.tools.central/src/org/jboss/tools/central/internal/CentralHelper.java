@@ -41,7 +41,10 @@ public class CentralHelper {
 	
 	public static final String JBOSS_CENTRAL_WEBPAGE_URL_KEY = "jboss.central.webpage.url";
 
+	/* JBIDE-25969 don't use nexus, use Akamai mirrored file instead
 	private static final String LATEST_WEBPAGE_URL = "https://repository.jboss.org/nexus/service/local/artifact/maven/redirect?r=public-jboss&g=org.jboss.tools.central&a=jbosstools-central-webpage&v=2.0.0-SNAPSHOT&e=zip&mustEndWith=.zip";
+	*/
+	private static final String LATEST_WEBPAGE_URL = "http://download.jboss.org/jbosstools/static/redhat-central/jbosstools-central-webpage-2.0.0-20170214.190953-14.zip";
 
 	private CentralHelper() {}
 	
