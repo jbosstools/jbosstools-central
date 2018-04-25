@@ -93,4 +93,5 @@
 			</plugins>
 		</pluginManagement>
 	</build>
+<version>2.1.200-SNAPSHOT</version>
 </project>
