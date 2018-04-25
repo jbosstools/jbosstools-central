@@ -10,4 +10,5 @@
 	<groupId>org.jboss.central.features</groupId>
 	<artifactId>org.jboss.tools.central.test.feature</artifactId>
 	<packaging>eclipse-feature</packaging>
+<version>2.1.200-SNAPSHOT</version>
 </project>
