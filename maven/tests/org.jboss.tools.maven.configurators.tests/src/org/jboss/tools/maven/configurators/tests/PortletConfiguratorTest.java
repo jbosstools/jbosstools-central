@@ -24,30 +24,6 @@ import org.junit.Test;
 @SuppressWarnings("restriction")
 public class PortletConfiguratorTest extends AbstractMavenConfiguratorTest {
 
-  private static final IProjectFacet        PORTLET_FACET    = ProjectFacetsManager
-      .getProjectFacet(IPortletConstants.PORTLET_FACET_ID);
-  private static final IProjectFacetVersion PORTLET_FACET_10 = PORTLET_FACET
-      .getVersion(IPortletConstants.PORTLET_FACET_VERSION_10);
-  private static final IProjectFacetVersion PORTLET_FACET_20 = PORTLET_FACET
-      .getVersion(IPortletConstants.PORTLET_FACET_VERSION_20);
+// portlet stuff removed from JBoss Tools 4.6, so no tests here!
 
-	protected void assertIsNotPortletProject(IProject project) throws Exception {
-		assertNoErrors(project);
-		IFacetedProject facetedProject = ProjectFacetsManager.create(project);
-		if (facetedProject != null) {
-			assertNull("Portlet Facet should be missing ", facetedProject.getInstalledVersion(PORTLET_FACET));
-		}
-	}
-  
-  private void assertIsPortletProject(IProject project,
-      IProjectFacetVersion expectedPortletVersion) throws Exception {
-    assertNoErrors(project);
-    IFacetedProject facetedProject = ProjectFacetsManager.create(project);
-    assertNotNull(project.getName() + " is not a faceted project",
-        facetedProject);
-    assertEquals("Unexpected Portlet Facet Version", expectedPortletVersion,
-        facetedProject.getInstalledVersion(PORTLET_FACET));
-    assertTrue("Java Facet is missing",
-        facetedProject.hasProjectFacet(JavaFacet.FACET));
-  }
 }

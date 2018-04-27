@@ -10,4 +10,5 @@
 	<groupId>org.jboss.tools.maven.features</groupId>
 	<artifactId>org.jboss.tools.maven.feature</artifactId>
 	<packaging>eclipse-feature</packaging>
+<version>1.8.103-SNAPSHOT</version>
 </project>
