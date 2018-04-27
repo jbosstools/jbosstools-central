@@ -10,4 +10,5 @@
 	<groupId>org.jboss.tools.examples.plugins</groupId>
 	<artifactId>org.jboss.tools.project.examples</artifactId>
 	<packaging>eclipse-plugin</packaging>
+<version>3.1.104-SNAPSHOT</version>
 </project>
