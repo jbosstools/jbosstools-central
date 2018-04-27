@@ -17,7 +17,6 @@
 		<module>org.jboss.tools.maven.seam.feature</module>
 		<module>org.jboss.tools.maven.cdi.feature</module>
 		<module>org.jboss.tools.maven.hibernate.feature</module>
-		<module>org.jboss.tools.maven.portlet.feature</module>
 		<module>org.jboss.tools.maven.test.feature</module>
 		<module>org.jboss.tools.maven.jbosspackaging.feature</module>	
 		<module>org.jboss.tools.maven.sourcelookup.feature</module>

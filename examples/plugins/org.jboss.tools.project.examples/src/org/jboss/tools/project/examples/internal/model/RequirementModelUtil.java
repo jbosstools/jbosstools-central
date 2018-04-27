@@ -54,11 +54,6 @@ public class RequirementModelUtil {
 			if (!reqMap.containsKey(key)) {
 				req = createMavenCDIRequirement();
 			}
-		} else if (tag.contains("cordova")) {
-			key = "cordova";
-			if (!reqMap.containsKey(key)) {
-				req = createThymRequirement();
-			}
 		} else if (tag.contains("angular")) {
 			key = "angular";
 			if (!reqMap.containsKey(key)) {
@@ -162,17 +157,6 @@ public class RequirementModelUtil {
 		properties.put("versions", "0.8.0");
 		properties.put("description", "This example works best with AngularJS Eclipse Plugin");
 		properties.put("connectorIds", "angularjs-eclipse-feature");
-		req.setProperties(properties);
-		return req;
-	}
-	
-	public static RequirementModel createThymRequirement() {
-		RequirementModel req = createPluginRequirement();
-		Map<String, String> properties = new HashMap<>();
-		properties.put("id", "org.eclipse.thym.core");
-		properties.put("versions", "0.1.0");
-		properties.put("description", "This example works best with Eclipse Hybrid Mobile Tools");
-		properties.put("connectorIds", "org.jboss.tools.aerogear.hybrid");
 		req.setProperties(properties);
 		return req;
 	}

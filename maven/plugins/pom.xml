@@ -18,7 +18,6 @@
 		<module>org.jboss.tools.maven.ui</module>
 		<module>org.jboss.tools.maven.cdi</module>
 		<module>org.jboss.tools.maven.hibernate</module>
-		<module>org.jboss.tools.maven.portlet</module>
 		<module>org.jboss.tools.maven.jbosspackaging</module>
 		<module>org.jboss.tools.maven.sourcelookup.core</module>
 		<module>org.jboss.tools.maven.sourcelookup.ui</module> 
