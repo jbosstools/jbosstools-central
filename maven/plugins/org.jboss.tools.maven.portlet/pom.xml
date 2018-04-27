@@ -9,6 +9,7 @@
 	</parent>
 	<groupId>org.jboss.tools.maven.plugins</groupId>
 	<artifactId>org.jboss.tools.maven.portlet</artifactId>
-	
+	<version>1.8.103-SNAPSHOT</version>
+
 	<packaging>eclipse-plugin</packaging>
 </project>

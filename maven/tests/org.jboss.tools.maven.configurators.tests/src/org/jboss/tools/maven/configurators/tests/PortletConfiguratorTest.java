@@ -1,5 +1,5 @@
 /*************************************************************************************
- * Copyright (c) 2012-2014 Red Hat, Inc. and others.
+ * Copyright (c) 2012-2014,2018 Red Hat, Inc. and others.
  * All rights reserved. This program and the accompanying materials 
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -19,7 +19,6 @@ import org.eclipse.wst.common.project.facet.core.IFacetedProject;
 import org.eclipse.wst.common.project.facet.core.IProjectFacet;
 import org.eclipse.wst.common.project.facet.core.IProjectFacetVersion;
 import org.eclipse.wst.common.project.facet.core.ProjectFacetsManager;
-import org.jboss.tools.portlet.core.IPortletConstants;
 import org.junit.Test;
 
 @SuppressWarnings("restriction")
@@ -32,26 +31,6 @@ public class PortletConfiguratorTest extends AbstractMavenConfiguratorTest {
   private static final IProjectFacetVersion PORTLET_FACET_20 = PORTLET_FACET
       .getVersion(IPortletConstants.PORTLET_FACET_VERSION_20);
 
-  @Test
-  public void testImportPortlet10() throws Exception {
-    IProject project = importProject("projects/portlets/portlet10/pom.xml");
-    assertIsPortletProject(project, PORTLET_FACET_10);
-  }
-
-  @Test
-  public void testImportPortlet20() throws Exception {
-    IProject project = importProject("projects/portlets/portlet20/pom.xml");
-    assertIsPortletProject(project, PORTLET_FACET_20);
-  }
-  
-  @Test
-  public void testDisablePortletViaProperty() throws Exception {
-    String projectLocation = "projects/portlets/deactivated-portlet";
-    IProject notPortletProject = importProject(projectLocation+"/pom.xml");
-    waitForJobsToComplete();
-    assertIsNotPortletProject(notPortletProject);
-  }
-
 	protected void assertIsNotPortletProject(IProject project) throws Exception {
 		assertNoErrors(project);
 		IFacetedProject facetedProject = ProjectFacetsManager.create(project);
@@ -60,20 +39,6 @@ public class PortletConfiguratorTest extends AbstractMavenConfiguratorTest {
 		}
 	}
   
-  @Test
-  public void testImportError() throws Exception {
-    IProject project = importProject("projects/portlets/piglet/pom.xml");
-    List<IMarker> errors = findErrorMarkers(project);
-    assertFalse(errors.isEmpty());
-    for (IMarker m : errors) {
-      String msg = m.getAttribute(IMarker.MESSAGE).toString();
-      // Should not contain Portlet error messages because configuration was
-      // skipped
-      // due to missing Dyn Web facet constraint.
-      assertFalse(msg, msg.contains("Portlet"));
-    }
-  }
-
   private void assertIsPortletProject(IProject project,
       IProjectFacetVersion expectedPortletVersion) throws Exception {
     assertNoErrors(project);
