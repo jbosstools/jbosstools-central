@@ -1,5 +1,5 @@
 /*************************************************************************************
- * Copyright (c) 2013-2014 Red Hat, Inc. and others.
+ * Copyright (c) 2013-2018 Red Hat, Inc. and others.
  * All rights reserved. This program and the accompanying materials 
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -371,24 +371,14 @@ public class CheatSheetUtil {
 		}
 		final IFile[] file = new IFile[1];
 		file[0] = cheatsheets.get(0);
-		if (ProjectExamplesActivator.SHOW_CHEATSHEETS_PROMPT.equals(value) || cheatsheets.size() > 0) {
-			Display.getDefault().syncExec(new Runnable() {
-				
-				public void run() {
-					file[0] = promptToShowCheatsheets(cheatsheets);
-				}
-
-			});
-		}
-		if (file[0] != null) {
-			Display.getDefault().asyncExec(new Runnable() {
-				
-				public void run() {
-					showCheatsheet(file[0]);
-				}
-			});
-			
-		}
+		Display.getDefault().asyncExec(() -> {
+			if (ProjectExamplesActivator.SHOW_CHEATSHEETS_PROMPT.equals(value) || cheatsheets.size() > 0) {
+				file[0] = promptToShowCheatsheets(cheatsheets);
+			}
+			if (file[0] != null) {
+				showCheatsheet(file[0]);
+			}
+		});
 	}
 	
 	private static IFile promptToShowCheatsheets(List<IFile> cheatsheets) {
