@@ -47,12 +47,18 @@ public class SpringBootConfiguratorTest extends AbstractMavenConfiguratorTest {
 	}
 
 	@Test
-	public void shouildAddUtilityFacetToDependencyOfSpringBootProject() throws Exception {
+	public void shouildAddUtilityFacetToDependencyOfSpringBootProjectIfDependencyLoadedFirst() throws Exception {
 		IProject dependency = loadProject(JAR_SPRINGBOOT_PROJECT_DEPENDENCY);
 		loadProject(JAR_SPRINGBOOT_PROJECT);
 		assertHasUtilityFacet(dependency);
 	}
 
+	@Test
+	public void shouildAddUtilityFacetToDependencyOfSpringBootProjectIfSpringBootLoadedFirst() throws Exception {
+		loadProject(JAR_SPRINGBOOT_PROJECT, false);
+		IProject dependency = loadProject(JAR_SPRINGBOOT_PROJECT_DEPENDENCY);
+		assertHasUtilityFacet(dependency);
+	}
 	@Test
 	public void shouldNotAddUtilityFacetToDependencyOnly() throws Exception {
 		IProject dependency = loadProject(JAR_SPRINGBOOT_PROJECT_DEPENDENCY);
@@ -66,10 +72,16 @@ public class SpringBootConfiguratorTest extends AbstractMavenConfiguratorTest {
 	}
 
 	protected IProject loadProject(String projectName) throws Exception {
+		return loadProject(projectName, true);
+	}
+
+	protected IProject loadProject(String projectName, boolean assertNoErrors) throws Exception {
 		String projectLocation = SPRINGBOOT_PROJECTS + projectName;
 		IProject springBootProject = importProject(projectLocation + "/pom.xml");
 		waitForJobsToComplete();
-		assertNoErrors(springBootProject);
+		if (assertNoErrors) {
+			assertNoErrors(springBootProject);
+		}
 		return springBootProject;
 	}
 
