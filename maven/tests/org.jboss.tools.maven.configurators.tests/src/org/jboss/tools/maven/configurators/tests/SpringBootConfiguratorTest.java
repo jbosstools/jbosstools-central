@@ -13,57 +13,89 @@ package org.jboss.tools.maven.configurators.tests;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jst.common.project.facet.core.JavaFacet;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.wst.common.componentcore.internal.util.IModuleConstants;
 import org.eclipse.wst.common.project.facet.core.IFacetedProject;
 import org.eclipse.wst.common.project.facet.core.IProjectFacet;
 import org.eclipse.wst.common.project.facet.core.ProjectFacetsManager;
 import org.jboss.tools.maven.ui.Activator;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
 @SuppressWarnings("restriction")
 public class SpringBootConfiguratorTest extends AbstractMavenConfiguratorTest {
 
+	protected static final String SPRINGBOOT_PROJECTS = "projects/springboot/";
+
+	protected static final String JAR_SPRINGBOOT_PROJECT = "jar";
+	protected static final String JAR_SPRINGBOOT_PROJECT_DEPENDENCY = "dependency";
+	protected static final String WAR_SPRINGBOOT_PROJECT = "war";
 	protected static final IProjectFacet JAVA_FACET = JavaFacet.FACET;
-	protected static final IProjectFacet UTILITY_FACET = ProjectFacetsManager.getProjectFacet(IModuleConstants.JST_UTILITY_MODULE); //$NON-NLS-1$
+	protected static final IProjectFacet UTILITY_FACET = 
+			ProjectFacetsManager.getProjectFacet(IModuleConstants.JST_UTILITY_MODULE); //$NON-NLS-1$
 
 	@Before
-	@After
 	public void activateCDIConfiguration() {
 		setGlobalSpringBootConfigurationActivation(true);
 	}
 
 	@Test
-	public void testThatJarProjectIsUtility() throws Exception {
-		IProject project = loadSpringBootProject("jar");
-		assertIsUtilityJarProject(project);
+	public void shouldAddUtilityFacetToJaredSpringbootProject() throws Exception {
+		loadProject(JAR_SPRINGBOOT_PROJECT_DEPENDENCY);
+		IProject project = loadProject(JAR_SPRINGBOOT_PROJECT);
+		assertHasUtilityFacet(project);
 	}
 
 	@Test
-	public void testThatWarProjectIsNotUtility() throws Exception {
-		IProject project = loadSpringBootProject("war");
-		assertIsNotUtilityJarProject(project);
+	public void shouildAddUtilityFacetToDependencyOfSpringBootProjectIfDependencyLoadedFirst() throws Exception {
+		IProject dependency = loadProject(JAR_SPRINGBOOT_PROJECT_DEPENDENCY);
+		loadProject(JAR_SPRINGBOOT_PROJECT);
+		assertHasUtilityFacet(dependency);
 	}
 
-	protected IProject loadSpringBootProject(String projectName) throws Exception {
-		String projectLocation = "projects/springboot/" + projectName;
+	@Test
+	public void shouildAddUtilityFacetToDependencyOfSpringBootProjectIfSpringBootLoadedFirst() throws Exception {
+		loadProject(JAR_SPRINGBOOT_PROJECT, false);
+		IProject dependency = loadProject(JAR_SPRINGBOOT_PROJECT_DEPENDENCY);
+		assertHasUtilityFacet(dependency);
+	}
+	@Test
+	public void shouldNotAddUtilityFacetToDependencyOnly() throws Exception {
+		IProject dependency = loadProject(JAR_SPRINGBOOT_PROJECT_DEPENDENCY);
+		assertHasNotUtilityFacet(dependency);
+	}
+
+	@Test
+	public void shouldNotAddUtilityFacetToWaredSpringBootProject() throws Exception {
+		IProject project = loadProject(WAR_SPRINGBOOT_PROJECT);
+		assertHasNotUtilityFacet(project);
+	}
+
+	protected IProject loadProject(String projectName) throws Exception {
+		return loadProject(projectName, true);
+	}
+
+	protected IProject loadProject(String projectName, boolean assertNoErrors) throws Exception {
+		String projectLocation = SPRINGBOOT_PROJECTS + projectName;
 		IProject springBootProject = importProject(projectLocation + "/pom.xml");
 		waitForJobsToComplete();
-		assertNoErrors(springBootProject);
+		if (assertNoErrors) {
+			assertNoErrors(springBootProject);
+		}
 		return springBootProject;
 	}
 
-	protected void assertIsUtilityJarProject(IProject project) throws Exception {
+	protected void assertHasUtilityFacet(IProject project) throws Exception {
 		assertNoErrors(project);
 		IFacetedProject facetedProject = ProjectFacetsManager.create(project);
-		if (facetedProject != null) {
-			assertTrue("Utility JAR Facet is missing", facetedProject.hasProjectFacet(UTILITY_FACET));
-			assertTrue("Java Facet is missing", facetedProject.hasProjectFacet(JAVA_FACET));
-		}
+		assertTrue(NLS.bind("Project {0} is not a faceted project", project.getName()), facetedProject != null);
+		assertTrue(NLS.bind("Utility JAR Facet is missing for project {0}", project.getName()),
+				facetedProject.hasProjectFacet(UTILITY_FACET));
+		assertTrue(NLS.bind("Java Facet is missing for project {0}", project.getName()),
+				facetedProject.hasProjectFacet(JAVA_FACET));
 	}
 
-	protected void assertIsNotUtilityJarProject(IProject project) throws Exception {
+	protected void assertHasNotUtilityFacet(IProject project) throws Exception {
 		assertNoErrors(project);
 
 		IFacetedProject facetedProject = ProjectFacetsManager.create(project);
