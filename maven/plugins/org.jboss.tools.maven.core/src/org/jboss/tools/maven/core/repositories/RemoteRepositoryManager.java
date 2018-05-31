@@ -40,7 +40,7 @@ public class RemoteRepositoryManager {
 			try {
 				nexusRepositories = loadNexusRepositoriesFromPreferences();
 			} catch (WorkbenchException e) {
-				MavenCoreActivator.log(e);
+				MavenCoreActivator.logError(e);
 			}
 			if (nexusRepositories == null) {
 				getDefaultRepositories();
@@ -109,7 +109,7 @@ public class RemoteRepositoryManager {
 			getPreferences().put(NEXUS_REPOSITORIES, repositories);
 			getPreferences().flush();
 		} catch (Exception e) {
-			MavenCoreActivator.log(e);
+			MavenCoreActivator.logError(e);
 		} finally {
 			if (writer != null) {
 				try {

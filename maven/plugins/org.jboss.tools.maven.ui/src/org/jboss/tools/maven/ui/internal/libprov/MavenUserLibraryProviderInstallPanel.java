@@ -121,9 +121,9 @@ public class MavenUserLibraryProviderInstallPanel extends
 				}
 			});
 		} catch (CoreException e) {
-			MavenCoreActivator.log(e);
+			MavenCoreActivator.logError(e);
 		} catch (IOException e) {
-			MavenCoreActivator.log(e);
+			MavenCoreActivator.logError(e);
 		}
 		
 		if (dependencies == null) {
@@ -336,11 +336,11 @@ public class MavenUserLibraryProviderInstallPanel extends
 					exclusionViewer.setInput(exclusions);
 					exclusionViewer.refresh();
 				} catch (MalformedURLException e1) {
-					MavenCoreActivator.log(e1);
+					MavenCoreActivator.logError(e1);
 				} catch (IOException e1) {
-					MavenCoreActivator.log(e1);
+					MavenCoreActivator.logError(e1);
 				} catch (CoreException e1) {
-					MavenCoreActivator.log(e1);
+					MavenCoreActivator.logError(e1);
 				}
 			}
 		

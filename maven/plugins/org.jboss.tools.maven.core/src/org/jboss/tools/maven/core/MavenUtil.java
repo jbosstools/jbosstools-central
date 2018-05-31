@@ -147,7 +147,7 @@ public class MavenUtil {
 		    	//log errors
 		    	if (result.hasExceptions()) {
 		    		for (Throwable e : result.getExceptions()) {
-		    			MavenCoreActivator.log(e);
+		    			MavenCoreActivator.logError(e);
 		    		}
 		    	} else {
 		    		mavenProject = result.getProject();
@@ -160,7 +160,7 @@ public class MavenUtil {
 		    	}
 			} catch (CoreException e) {
 				//Don't crash on failures to read the dependency version
-				MavenCoreActivator.log(e);
+				MavenCoreActivator.logError(e);
 			} 
 	    }
     	return version; 	

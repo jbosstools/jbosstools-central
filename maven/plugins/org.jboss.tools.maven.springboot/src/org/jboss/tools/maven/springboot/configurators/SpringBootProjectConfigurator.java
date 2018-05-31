@@ -220,7 +220,7 @@ public class SpringBootProjectConfigurator extends AbstractProjectConfigurator {
 						}
 						return Status.OK_STATUS;
 					} catch (Exception e) {
-						MavenCoreActivator.log(e);
+						MavenCoreActivator.logError(e);
 						return StatusFactory.errorStatus(MavenCoreActivator.PLUGIN_ID, 
 								NLS.bind("Could not add utility facet to project {0}.", facade.getProject().getName()));
 					}
