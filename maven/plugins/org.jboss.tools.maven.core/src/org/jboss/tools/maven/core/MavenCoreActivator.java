@@ -633,13 +633,13 @@ public class MavenCoreActivator extends Plugin {
 		return false;
 	}
 
-	public static void log(Throwable e) {
+	public static void logError(Throwable e) {
 		IStatus status = new Status(IStatus.ERROR, PLUGIN_ID, e.getLocalizedMessage(), e);
 		getDefault().getLog().log(status);
 	}
 
-	public static void log(String message) {
-		IStatus status = new Status(IStatus.ERROR, PLUGIN_ID, message);
+	public static void log(int severity, String message) {
+		IStatus status = new Status(severity, PLUGIN_ID, message);
 		getDefault().getLog().log(status);
 	}
 	
@@ -669,7 +669,7 @@ public class MavenCoreActivator extends Plugin {
 					URL tempURL = temp.toURL();
 					uri = URI.createURI(tempURL.toString());
 				} catch (Exception e) {
-					log(e);
+					logError(e);
 					throw new CoreException(new Status(IStatus.ERROR,
 							PLUGIN_ID, -1, e.getMessage(), e));
 				} finally {
@@ -690,7 +690,7 @@ public class MavenCoreActivator extends Plugin {
 			resource.load(Collections.EMPTY_MAP);
 			return (PomResourceImpl) resource;
 		} catch (Exception ex) {
-			log(ex);
+			logError(ex);
 			throw new CoreException(new Status(IStatus.ERROR,
 					PLUGIN_ID, -1, ex.getMessage(), ex));
 		}
@@ -752,7 +752,7 @@ public class MavenCoreActivator extends Plugin {
 			return (PomResourceImpl) pomResource;
 		} catch (Exception ex) {
 			String msg = "Can't load model " + pomFile;
-			log(ex);
+			logError(ex);
 			throw new CoreException(new Status(IStatus.ERROR,
 					IMavenConstants.PLUGIN_ID, -1, msg, ex));
 		}
@@ -776,7 +776,7 @@ public class MavenCoreActivator extends Plugin {
 		try {
 			prefs.flush();
 		} catch (BackingStoreException e) {
-			log(e);
+			logError(e);
 		}
 	}
 	
@@ -785,7 +785,7 @@ public class MavenCoreActivator extends Plugin {
 			try {
 				mscl.onSettingsChanged();
 			} catch(Exception e) {
-				log(e);
+				logError(e);
 			}
 		}
 	}

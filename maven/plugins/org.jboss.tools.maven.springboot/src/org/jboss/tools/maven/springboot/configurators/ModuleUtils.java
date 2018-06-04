@@ -157,7 +157,10 @@ public class ModuleUtils {
 	 */
 	public static void addChildModule(IProject dependency, IProject project, IProgressMonitor monitor) 
 			throws CoreException {
+		SubMonitor subMonitor = SubMonitor.convert(monitor, 
+				NLS.bind("Adding child module {0} to project {1}.", dependency.getName(), project.getName()), 1);
 		addChildModule(dependency, ModuleUtils.createVirtualComponent(project), monitor);
+		subMonitor.done();
 	}
 
 	/**
@@ -171,8 +174,6 @@ public class ModuleUtils {
 	 */
 	private static void addChildModule(IProject dependency, IVirtualComponent project, IProgressMonitor monitor) 
 			throws CoreException {
-		MavenCoreActivator.log(NLS.bind("Adding child module {0} to project {1}.",
-				dependency.getName(), project.getName()));
 		IVirtualComponent dependencyComponent = createVirtualComponent(dependency);
 		IVirtualReference dependencyReference = new VirtualReference(project, dependencyComponent);
 		addReference(dependencyReference, project, monitor);
@@ -181,7 +182,7 @@ public class ModuleUtils {
 	private static void addReference(IVirtualReference dependency, IVirtualComponent project, IProgressMonitor monitor) 
 			throws CoreException {
 		if (hasReference(project, dependency)) {
-			MavenCoreActivator.log(NLS.bind("Project {0} already has a child module for {1}. Skipping.",
+			log(NLS.bind("Project {0} already has a child module for {1}. Skipping.",
 					project.getName(), dependency.getReferencedComponent().getName()));
 			return;
 		}
@@ -224,4 +225,8 @@ public class ModuleUtils {
 		}
 	}
 
+	private static void log(String message) {
+		IStatus status = StatusFactory.infoStatus(MavenCoreActivator.PLUGIN_ID, message);
+		MavenCoreActivator.getDefault().getLog().log(status);
+	}
 }

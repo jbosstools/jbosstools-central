@@ -90,7 +90,7 @@ public class MavenLibraryProviderInstallOperation extends
 				options.put(XMIResource.OPTION_ENCODING, MavenCoreActivator.ENCODING);
 				resource.save(options);
 			} catch (IOException e) {
-				MavenCoreActivator.log(e);
+				MavenCoreActivator.logError(e);
 			} finally {
 				resource.unload();
 			}
@@ -216,7 +216,7 @@ public class MavenLibraryProviderInstallOperation extends
 	    	  is = new ByteArrayInputStream(buf.toByteArray());
 	    	  MavenCoreActivator.copy(is, os);
 	      } catch (Exception e) {
-				MavenCoreActivator.log(e);
+				MavenCoreActivator.logError(e);
 				throw new CoreException(new Status(IStatus.ERROR,
 						MavenCoreActivator.PLUGIN_ID, -1, e.getMessage(), e));
 			} finally {
@@ -267,7 +267,7 @@ public class MavenLibraryProviderInstallOperation extends
 
 		} catch (Exception ex) {
 			String msg = "Can't load model " + pomFile;
-			MavenCoreActivator.log(ex);
+			MavenCoreActivator.logError(ex);
 			throw new CoreException(new Status(IStatus.ERROR,
 					MavenCoreActivator.PLUGIN_ID, -1, msg, ex));
 		}
