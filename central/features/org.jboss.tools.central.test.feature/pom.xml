@@ -5,10 +5,9 @@
 	<parent>
 		<groupId>org.jboss.tools.central</groupId>
 		<artifactId>features</artifactId>
-		<version>2.1.103-SNAPSHOT</version>
+		<version>2.1.200-SNAPSHOT</version>
 	</parent>
 	<groupId>org.jboss.central.features</groupId>
 	<artifactId>org.jboss.tools.central.test.feature</artifactId>
 	<packaging>eclipse-feature</packaging>
-<version>2.1.200-SNAPSHOT</version>
 </project>
