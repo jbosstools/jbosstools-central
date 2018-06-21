@@ -1,5 +1,5 @@
 /*************************************************************************************
- * Copyright (c) 2008-2015 Red Hat, Inc. and others.
+ * Copyright (c) 2008-2018 Red Hat, Inc. and others.
  * All rights reserved. This program and the accompanying materials 
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -509,7 +509,7 @@ public class GettingStartedHtmlPage extends AbstractJBossCentralPage implements 
 	//Javascript providers
 	private String getLoadBuzzScript() {
 		List<FeedsEntry> buzz = RefreshBuzzJob.INSTANCE.getEntries();
-		buzz = buzz.size() > 5 ? buzz.subList(0, 5) : buzz;
+		buzz = buzz.size() > 10 ? buzz.subList(0, 10) : buzz;
 		String json = JsonUtil.jsonifyBuzz(buzz);
 		String script = "loadBuzz(" + json + ");"; //$NON-NLS-1$ //$NON-NLS-2$
 		return script;
