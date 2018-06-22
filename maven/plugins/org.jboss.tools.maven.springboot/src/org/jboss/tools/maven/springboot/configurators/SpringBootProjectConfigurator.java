@@ -36,6 +36,7 @@ import org.eclipse.m2e.core.project.MavenProjectChangedEvent;
 import org.eclipse.m2e.core.project.configurator.AbstractProjectConfigurator;
 import org.eclipse.m2e.core.project.configurator.ProjectConfigurationRequest;
 import org.eclipse.osgi.util.NLS;
+import org.eclipse.wst.common.componentcore.ModuleCoreNature;
 import org.jboss.tools.foundation.core.plugin.log.StatusFactory;
 import org.jboss.tools.maven.core.MavenCoreActivator;
 import org.jboss.tools.maven.springboot.MavenSpringBootActivator;
@@ -131,6 +132,7 @@ public class SpringBootProjectConfigurator extends AbstractProjectConfigurator {
 						// not built yet, delay facet installation
 						return true;
 					}
+					ModuleCoreNature.addModuleCoreNatureIfNecessary(facade.getProject(), monitor);
 					addUtilityFacet(facade.getMavenProject(), facade.getProject(), monitor);
 					return false;
 				} catch (CoreException e) {
@@ -210,6 +212,7 @@ public class SpringBootProjectConfigurator extends AbstractProjectConfigurator {
 				public IStatus runInWorkspace(IProgressMonitor monitor) throws CoreException {
 					try {
 						MavenProject mavenProject = facade.getMavenProject(monitor);
+						ModuleCoreNature.addModuleCoreNatureIfNecessary(facade.getProject(), monitor);
 						addUtilityFacet(mavenProject, facade.getProject(), monitor);
 						if (ModuleUtils.hasModuleCoreNature(project)) {
 							ModuleUtils.addChildModule(facade.getProject(), project, monitor);
