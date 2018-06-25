@@ -36,6 +36,7 @@ import org.eclipse.m2e.core.project.MavenProjectChangedEvent;
 import org.eclipse.m2e.core.project.configurator.AbstractProjectConfigurator;
 import org.eclipse.m2e.core.project.configurator.ProjectConfigurationRequest;
 import org.eclipse.osgi.util.NLS;
+import org.eclipse.wst.common.componentcore.ModuleCoreNature;
 import org.jboss.tools.foundation.core.plugin.log.StatusFactory;
 import org.jboss.tools.maven.core.MavenCoreActivator;
 import org.jboss.tools.maven.springboot.MavenSpringBootActivator;
@@ -148,7 +149,7 @@ public class SpringBootProjectConfigurator extends AbstractProjectConfigurator {
 				|| !MavenUtils.isJarPackaginging(mavenProject.getPackaging())) {
 			return;
 		}
-
+		ModuleCoreNature.addModuleCoreNatureIfNecessary(project, monitor);
 		ModuleUtils.addUtilityFacet(project, monitor);
 	}
 
@@ -211,9 +212,7 @@ public class SpringBootProjectConfigurator extends AbstractProjectConfigurator {
 					try {
 						MavenProject mavenProject = facade.getMavenProject(monitor);
 						addUtilityFacet(mavenProject, facade.getProject(), monitor);
-						if (ModuleUtils.hasModuleCoreNature(project)) {
-							ModuleUtils.addChildModule(facade.getProject(), project, monitor);
-						}
+						ModuleUtils.addChildModule(facade.getProject(), project, monitor);
 						unconfiguredDependencies.remove(facade);
 						if (unconfiguredDependencies.isEmpty()) {
 							stop();
