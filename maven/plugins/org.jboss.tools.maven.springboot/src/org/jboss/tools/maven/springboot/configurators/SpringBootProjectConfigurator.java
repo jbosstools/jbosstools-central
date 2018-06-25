@@ -132,7 +132,6 @@ public class SpringBootProjectConfigurator extends AbstractProjectConfigurator {
 						// not built yet, delay facet installation
 						return true;
 					}
-					ModuleCoreNature.addModuleCoreNatureIfNecessary(facade.getProject(), monitor);
 					addUtilityFacet(facade.getMavenProject(), facade.getProject(), monitor);
 					return false;
 				} catch (CoreException e) {
@@ -150,7 +149,7 @@ public class SpringBootProjectConfigurator extends AbstractProjectConfigurator {
 				|| !MavenUtils.isJarPackaginging(mavenProject.getPackaging())) {
 			return;
 		}
-
+		ModuleCoreNature.addModuleCoreNatureIfNecessary(project, monitor);
 		ModuleUtils.addUtilityFacet(project, monitor);
 	}
 
@@ -212,11 +211,8 @@ public class SpringBootProjectConfigurator extends AbstractProjectConfigurator {
 				public IStatus runInWorkspace(IProgressMonitor monitor) throws CoreException {
 					try {
 						MavenProject mavenProject = facade.getMavenProject(monitor);
-						ModuleCoreNature.addModuleCoreNatureIfNecessary(facade.getProject(), monitor);
 						addUtilityFacet(mavenProject, facade.getProject(), monitor);
-						if (ModuleUtils.hasModuleCoreNature(project)) {
-							ModuleUtils.addChildModule(facade.getProject(), project, monitor);
-						}
+						ModuleUtils.addChildModule(facade.getProject(), project, monitor);
 						unconfiguredDependencies.remove(facade);
 						if (unconfiguredDependencies.isEmpty()) {
 							stop();
