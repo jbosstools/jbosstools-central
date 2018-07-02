@@ -1,5 +1,5 @@
 /*************************************************************************************
- * Copyright (c) 2008-2015 Red Hat, Inc. and others.
+ * Copyright (c) 2008-2018 Red Hat, Inc. and others.
  * All rights reserved. This program and the accompanying materials 
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -81,10 +81,10 @@ public class UnArchiver {
 					skip = true;
 					filePath = new Path(fileName);
 					for (IPath folder : filters) {
-						IPath matchingPath = findSegment(filePath, folder);
+						IPath matchingPath = findSegment2(filePath, folder);
 						if (matchingPath != null) {
 							if (filterCount == 1) {
-								fileName = matchingPath.removeFirstSegments(1).toOSString();
+								fileName = matchingPath.removeFirstSegments(folder.segmentCount()).toOSString();
 							} else {
 								fileName = matchingPath.toOSString();
 							}
@@ -114,18 +114,28 @@ public class UnArchiver {
 		return true;
 	}
 
-	private IPath findSegment(IPath filePath, IPath folder) {
-		for(int i = 0; i < filePath.segmentCount() && i < 3; i++) {
-			if (filePath.segment(i).equals(folder.toString())) {
-				if (i > 0) {
-					return filePath.removeFirstSegments(i);
-				} else {
-					return filePath;
-				}
-			}
-		}
-		return null;
-	}
+	private IPath findSegment2(IPath source, IPath target) {
+
+        String first = target.segments()[0];
+        int max = source.segmentCount() - target.segmentCount();
+
+        for (int i = 0; i <= max; i++) {
+            if (!source.segment(i).equals(first)) {
+                while (++i <= max && !source.segment(i).equals(first));
+            }
+
+            if (i <= max) {
+                int j = i + 1;
+                int end = j + target.segmentCount() - 1;
+                for (int k = 1; j < end && source.segment(j).equals(target.segment(k)); j++, k++);
+
+                if (j == end) {
+                    return source.removeFirstSegments(i);
+                }
+            }
+        }
+        return null;
+    }
 
 	public void setFilters(Set<String> filters) {
 		if (filters == null) {

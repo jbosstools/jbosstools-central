@@ -1,5 +1,5 @@
 /*************************************************************************************
- * Copyright (c) 2008-2014 Red Hat, Inc. and others.
+ * Copyright (c) 2008-2018 Red Hat, Inc. and others.
  * All rights reserved. This program and the accompanying materials 
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -200,6 +200,9 @@ public class MavenProjectExamplesActivator extends AbstractUIPlugin {
 	}
 	
 	public static void updateMavenConfiguration(String projectName, List<String> includedProjects,final IProgressMonitor monitor) {
+		if (projectName.indexOf('/') != (-1)) {
+			projectName = projectName.substring(projectName.lastIndexOf('/')+1);
+		}
 		IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject(projectName);
 		if (project != null && project.isAccessible()) {
 			try {
