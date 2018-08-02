@@ -2,7 +2,7 @@
 <feature
       id="org.jboss.tools.maven.springboot.feature"
       label="%featureName"
-      version="1.9.0.qualifier"
+      version="1.9.1.qualifier"
       provider-name="%providerName"
       plugin="org.jboss.tools.maven.springboot"
       license-feature="org.jboss.tools.foundation.license.feature"

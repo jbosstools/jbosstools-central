@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Maven Reddeer
 Bundle-SymbolicName: org.jboss.tools.maven.reddeer;singleton:=true
-Bundle-Version: 1.9.0.qualifier
+Bundle-Version: 1.9.1.qualifier
 Bundle-Activator: org.jboss.tools.maven.reddeer.Activator
 Require-Bundle: org.eclipse.reddeer.go;bundle-version="2.0.0",
  org.jboss.tools.runtime.reddeer;bundle-version="3.4.0",

@@ -5,10 +5,10 @@
 	<parent>
 		<groupId>org.jboss.tools.maven</groupId>
 		<artifactId>plugins</artifactId>
-		<version>1.9.0-SNAPSHOT</version>
+		<version>1.9.1-SNAPSHOT</version>
 	</parent>
 	<groupId>org.jboss.tools.maven.plugins</groupId>
 	<artifactId>org.jboss.tools.maven.core</artifactId>
 	<packaging>eclipse-plugin</packaging>
-	<version>1.9.0-SNAPSHOT</version>
+	<version>1.9.1-SNAPSHOT</version>
 </project>
