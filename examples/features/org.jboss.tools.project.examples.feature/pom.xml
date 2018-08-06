@@ -10,5 +10,5 @@
 	<groupId>org.jboss.tools.examples.features</groupId>
 	<artifactId>org.jboss.tools.project.examples.feature</artifactId>
 	<packaging>eclipse-feature</packaging>
-<version>3.1.104-SNAPSHOT</version>
+<version>3.1.201-SNAPSHOT</version>
 </project>
