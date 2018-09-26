@@ -41,6 +41,12 @@
 	<feature id="org.jboss.tools.project.examples.seam.feature.source"><category name="AllSources"/></feature>
 	<feature id="org.jboss.tools.project.examples.test.feature.source"><category name="AllSources"/></feature>
 
+<!-- launcher -->
+
+	<feature id="org.jboss.tools.common.launcher.feature"><category name="AllFeatures"/></feature>
+	<!-- Sources -->
+	<feature id="org.jboss.tools.common.launcher.feature.source"><category name="AllSources"/></feature>
+
 <!-- maven -->
 
 	<feature id="org.jboss.tools.maven.feature"><category name="AllFeatures"/></feature>
