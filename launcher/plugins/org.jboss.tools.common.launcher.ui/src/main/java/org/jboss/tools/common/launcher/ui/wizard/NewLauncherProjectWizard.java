@@ -35,7 +35,7 @@ public class NewLauncherProjectWizard extends AbstractModelWizard<NewLauncherPro
 	@Override
 	public boolean performFinish() {
 		Job.create("Creating launcher project...", 
-				new NewLauncherProjectWizardController(getModel())::run);
+				new NewLauncherProjectWizardController(getModel())::run).schedule();
 		return true;
 	}
 }
