@@ -72,7 +72,7 @@ public class NewLauncherProjectModel extends ObservablePojo {
 	 */
 	private void updateLocation() {
 		if (isUseDefaultLocation()) {
-			setLocation(ROOT.append(getProjectName()));
+			setLocation(ROOT.append(getProjectName() == null ? "" : getProjectName()));
 		}
 	}
 
