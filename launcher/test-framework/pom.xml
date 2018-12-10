@@ -3,20 +3,16 @@
 	xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
-		<groupId>org.jboss.tools</groupId>
-		<artifactId>central.maven.examples</artifactId>
-		<version>4.4.3-SNAPSHOT</version>
+		<groupId>org.jboss.tools.common.launcher</groupId>
+		<artifactId>launcher</artifactId>
+		<version>3.10.2-SNAPSHOT</version>
 	</parent>
 	<groupId>org.jboss.tools.common.launcher</groupId>
-	<artifactId>launcher</artifactId>
-	<version>3.10.2-SNAPSHOT</version>
-	<name>launcher.all</name>
+	<artifactId>test-framework</artifactId>
+	<name>launcher.test-framework</name>
 	<packaging>pom</packaging>
 	<modules>
-		<module>features</module>
-		<module>plugins</module>
-		<module>tests</module>
-		<module>test-framework</module>
+		<module>org.jboss.tools.common.launcher.reddeer</module>
 	</modules>
 </project>
 	
