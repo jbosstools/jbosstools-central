@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: %BundleName
 Bundle-SymbolicName: org.jboss.tools.project.examples;singleton:=true
-Bundle-Version: 3.1.201.qualifier
+Bundle-Version: 3.1.202.qualifier
 Bundle-Activator: org.jboss.tools.project.examples.internal.ProjectExamplesActivator
 Bundle-Vendor: %BundleVendor
 Require-Bundle: org.eclipse.ui,
@@ -52,7 +52,8 @@ Require-Bundle: org.eclipse.ui,
  org.jboss.tools.discovery.core;bundle-version="1.0.0",
  org.eclipse.ui.editors,
  org.jboss.ide.eclipse.as.dmr;bundle-version="3.1.0",
- org.jboss.ide.eclipse.as.classpath.core
+ org.jboss.ide.eclipse.as.classpath.core,
+ javax.xml.bind
 Bundle-ActivationPolicy: lazy
 Bundle-Localization: plugin
 Export-Package: org.jboss.tools.project.examples,
