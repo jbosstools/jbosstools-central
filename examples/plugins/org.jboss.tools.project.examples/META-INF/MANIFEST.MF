@@ -53,7 +53,7 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.ui.editors,
  org.jboss.ide.eclipse.as.dmr;bundle-version="3.1.0",
  org.jboss.ide.eclipse.as.classpath.core,
- javax.xml.bind
+ org.jboss.tools.common.jaxb;resolution:=optional
 Bundle-ActivationPolicy: lazy
 Bundle-Localization: plugin
 Export-Package: org.jboss.tools.project.examples,
