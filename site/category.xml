@@ -44,8 +44,10 @@
 <!-- launcher -->
 
 	<feature id="org.jboss.tools.common.launcher.feature"><category name="AllFeatures"/></feature>
+    <feature id="org.jboss.tools.common.launcher.test.feature"><category name="AllFeatures"/></feature>
 	<!-- Sources -->
 	<feature id="org.jboss.tools.common.launcher.feature.source"><category name="AllSources"/></feature>
+    <feature id="org.jboss.tools.common.launcher.test.feature.source"><category name="AllSources"/></feature>
 
 <!-- maven -->
 
