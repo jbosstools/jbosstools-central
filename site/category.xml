@@ -73,10 +73,4 @@
 	<feature id="org.jboss.tools.maven.sourcelookup.feature.source"><category name="AllSources"/></feature>
 	<feature id="org.jboss.tools.maven.jdt.feature.source"><category name="AllSources"/></feature>
 
-<!-- easymport -->
-
-	<feature id="org.jboss.tools.central.easymport.feature"><category name="AllFeatures"/></feature>    
-	<!-- Sources --> 
-	<!-- feature contains bundles for which there is no source so cannot yet produce source feature <feature id="org.jboss.tools.easymport.feature.source"><category name="AllSources"/> </feature> -->
-
 </site>
