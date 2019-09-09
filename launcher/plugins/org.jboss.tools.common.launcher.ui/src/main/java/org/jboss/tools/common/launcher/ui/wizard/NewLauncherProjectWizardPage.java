@@ -14,8 +14,8 @@ import java.lang.reflect.InvocationTargetException;
 
 import org.eclipse.core.databinding.Binding;
 import org.eclipse.core.databinding.DataBindingContext;
-import org.eclipse.core.databinding.beans.BeanProperties;
-import org.eclipse.core.databinding.beans.PojoProperties;
+import org.eclipse.core.databinding.beans.typed.BeanProperties;
+import org.eclipse.core.databinding.beans.typed.PojoProperties;
 import org.eclipse.core.databinding.conversion.IConverter;
 import org.eclipse.core.databinding.observable.value.IObservableValue;
 import org.eclipse.core.databinding.validation.IValidator;
@@ -24,9 +24,9 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.databinding.fieldassist.ControlDecorationSupport;
-import org.eclipse.jface.databinding.swt.WidgetProperties;
+import org.eclipse.jface.databinding.swt.typed.WidgetProperties;
 import org.eclipse.jface.databinding.viewers.ObservableListContentProvider;
-import org.eclipse.jface.databinding.viewers.ViewerProperties;
+import org.eclipse.jface.databinding.viewers.typed.ViewerProperties;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.resource.ImageDescriptor;
@@ -144,7 +144,7 @@ public class NewLauncherProjectWizardPage extends AbstractDataBindingWizardPage 
 			}
 		});
 		IObservableValue<Booster> selectedBoosterObservable = 
-				BeanProperties.value(NewLauncherProjectModel.SELECTED_BOOSTER_PROPERTY).observe(model);
+				BeanProperties.<NewLauncherProjectModel, Booster>value(NewLauncherProjectModel.SELECTED_BOOSTER_PROPERTY).observe(model);
 		ValueBindingBuilder.bind(ViewerProperties.singleSelection().observe(comboBoostersViewer))
 			.to(selectedBoosterObservable)
 			.in(dbc);
@@ -175,7 +175,7 @@ public class NewLauncherProjectWizardPage extends AbstractDataBindingWizardPage 
 		GridDataFactory.fillDefaults()
 			.span(2, 1).align(SWT.LEFT, SWT.CENTER)
 			.applyTo(buttonUseDefaultLocation);
-		IObservableValue<Boolean> useDefaultLocationButtonObservable = WidgetProperties.selection().observe(buttonUseDefaultLocation);
+		IObservableValue<Boolean> useDefaultLocationButtonObservable = WidgetProperties.buttonSelection().observe(buttonUseDefaultLocation);
 		ValueBindingBuilder.bind(useDefaultLocationButtonObservable)
 				.to(BeanProperties.value(NewLauncherProjectModel.USE_DEFAULT_LOCATION_PROPERTY).observe(model))
 				.in(dbc);
