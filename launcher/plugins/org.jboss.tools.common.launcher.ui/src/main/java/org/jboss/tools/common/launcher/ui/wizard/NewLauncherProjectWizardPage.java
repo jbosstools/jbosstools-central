@@ -19,6 +19,7 @@ import org.eclipse.core.databinding.beans.PojoProperties;
 import org.eclipse.core.databinding.conversion.IConverter;
 import org.eclipse.core.databinding.observable.value.IObservableValue;
 import org.eclipse.core.databinding.validation.IValidator;
+import org.eclipse.core.runtime.ICoreRunnable;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.jobs.Job;
@@ -255,7 +256,7 @@ public class NewLauncherProjectWizardPage extends AbstractDataBindingWizardPage 
 	private void loadCatalog() {
 		try {
 			WizardUtils.runInWizard(Job.create("Loading launcher catalog", 
-					monitor -> model.setCatalog(CatalogManager.getDefault().getCatalog(monitor))), getContainer());
+					(ICoreRunnable) monitor -> model.setCatalog(CatalogManager.getDefault().getCatalog(monitor))), getContainer());
 		} catch (InvocationTargetException | InterruptedException e) {
 			// ignore
 		}
