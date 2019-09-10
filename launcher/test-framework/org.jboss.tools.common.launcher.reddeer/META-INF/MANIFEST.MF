@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Launcher Reddeer
 Bundle-SymbolicName: org.jboss.tools.common.launcher.reddeer
-Bundle-Version: 3.10.3.qualifier
+Bundle-Version: 3.10.4.qualifier
 Require-Bundle: org.eclipse.reddeer.go;bundle-version="2.3.0",
  org.jboss.tools.central.reddeer
 Bundle-ActivationPolicy: lazy
