@@ -252,36 +252,6 @@
    <!-- for offline access to the wizards -->
     <extension point="org.jboss.tools.central.proxyWizard">
       <proxyWizard
-          id="html5.wizard"
-          description="%html5.wizard.description"
-          label="HTML5 Project"
-          priority="1"
-          iconPath="icons/html5.png"
-          wizardId="org.jboss.tools.central.wizards.NewHtml5ProjectWizard"
-          >
-      </proxyWizard>
-      <proxyWizard
-          id="javaee.wizard"
-          description="%javaeeweb.wizard.description"
-          label="Java EE Web Project"
-          priority="5"
-          iconPath="icons/newwebprj_wiz.gif"
-          wizardId="org.jboss.tools.central.wizards.NewJavaeeWarProjectWizard"
-          >
-      </proxyWizard>
-
-      <proxyWizard
-          id="forge.wizard"
-          description="%forge.wizard.description"
-          label="AngularJS Forge"
-          priority="4"
-          iconPath="icons/jbossforge_icon_16px.png"
-          wizardId="org.jboss.tools.central.wizards.NewForgeProjectWizard"
-          requiredPluginIds="org.jboss.tools.forge.ui"
-          requiredComponentIds="forge-tools-feature"
-          >
-      </proxyWizard>
-      <proxyWizard
           id="openshift.wizard"
           description="%openshift.wizard.description"
           label="OpenShift Application"
