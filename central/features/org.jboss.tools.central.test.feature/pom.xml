@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>org.jboss.tools.central</groupId>
 		<artifactId>features</artifactId>
-		<version>2.1.300-SNAPSHOT</version>
+		<version>2.1.301-SNAPSHOT</version>
 	</parent>
 	<groupId>org.jboss.central.features</groupId>
 	<artifactId>org.jboss.tools.central.test.feature</artifactId>
