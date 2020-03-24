@@ -10,6 +10,10 @@
  ************************************************************************************/
 package org.jboss.tools.maven.configurators.tests;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertFalse;
+
 import java.util.List;
 
 import org.eclipse.core.resources.IMarker;

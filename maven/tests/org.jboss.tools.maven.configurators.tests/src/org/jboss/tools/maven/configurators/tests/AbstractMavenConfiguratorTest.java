@@ -10,11 +10,14 @@
  ************************************************************************************/
 package org.jboss.tools.maven.configurators.tests;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import java.io.File;
 import java.util.Iterator;
 import java.util.List;
-
-import junit.framework.Assert;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
@@ -140,7 +143,7 @@ public abstract class AbstractMavenConfiguratorTest extends
 	    		ite.remove();
 	    	}
 	    }
-	    Assert.assertEquals("Unexpected error markers " + toString(markers), 0, markers.size());
+	    assertEquals("Unexpected error markers " + toString(markers), 0, markers.size());
     }
 	
 	protected void waitForJobsToComplete(int loop) throws InterruptedException, CoreException {
