@@ -10,6 +10,8 @@
  ************************************************************************************/
 package org.jboss.tools.maven.core;
 
+import static org.junit.Assert.assertEquals;
+
 import java.io.File;
 import java.io.IOException;
 

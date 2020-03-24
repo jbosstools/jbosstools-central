@@ -20,6 +20,7 @@ import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.e4.ui.internal.workspace.markers.Translation;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.operation.IRunnableWithProgress;
@@ -383,7 +384,7 @@ public class QuickFixPage extends WizardPage {
 			 */
 			public String getColumnText(Object element, int columnIndex) {
 				if (columnIndex == 0)
-					return Util.getResourceName((IMarker) element);
+					return new Translation().name((IMarker) element).orElse("");
 				int line = ((IMarker) element).getAttribute(
 						IMarker.LINE_NUMBER, -1);
 				if (line < 0) {

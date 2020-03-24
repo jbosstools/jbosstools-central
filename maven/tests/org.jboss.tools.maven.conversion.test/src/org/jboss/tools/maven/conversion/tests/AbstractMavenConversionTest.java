@@ -10,6 +10,8 @@
  ************************************************************************************/
 package org.jboss.tools.maven.conversion.tests;
 
+import static org.junit.Assert.fail;
+
 import java.io.File;
 
 import org.apache.maven.model.Model;

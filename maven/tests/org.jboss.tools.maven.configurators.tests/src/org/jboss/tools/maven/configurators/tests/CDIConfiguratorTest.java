@@ -10,6 +10,11 @@
  ************************************************************************************/
 package org.jboss.tools.maven.configurators.tests;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertFalse;
+
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IWorkspaceDescription;
 import org.eclipse.jface.preference.IPreferenceStore;
