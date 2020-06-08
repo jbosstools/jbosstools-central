@@ -81,7 +81,7 @@ import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.dialogs.PreferencesUtil;
-import org.eclipse.ui.internal.ide.StringMatcher;
+import org.eclipse.core.text.StringMatcher;
 import org.jboss.tools.foundation.core.digest.DigestUtils;
 import org.jboss.tools.maven.conversion.core.ProjectDependency;
 import org.jboss.tools.maven.conversion.core.ProjectDependency.DependencyKind;
