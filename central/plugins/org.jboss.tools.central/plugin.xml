@@ -261,6 +261,15 @@
           requiredComponentIds="org.jboss.tools.openshift.feature">
       </proxyWizard>
       <proxyWizard
+          id="quarkus.wizard"
+          description="%quarkus.wizard.description"
+          label="Quarkus Project"
+          priority="2"
+          iconPath="icons/quarkus_icon_rgb_16px_default.png"
+          wizardId="org.jboss.tools.quarkus.ui.wizard.createProject"
+          requiredComponentIds="org.jboss.tools.quarkus.feature">
+      </proxyWizard>
+      <proxyWizard
           id="launcher.wizard"
           description="%launcher.wizard.description"
           label="Launcher Application"
