@@ -28,7 +28,7 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.embedder.IMaven;
-import org.eclipse.m2e.core.internal.MavenPluginActivator;
+import org.eclipse.m2e.core.internal.embedder.MavenImpl;
 import org.jboss.tools.maven.core.IArtifactResolutionService;
 import org.jboss.tools.maven.core.MavenCoreActivator;
 import org.jboss.tools.maven.core.MavenUtil;
@@ -163,11 +163,11 @@ public class ArtifactResolutionService implements IArtifactResolutionService {
 	private static ArtifactMetadataSource getArtifactMetadataSource() {
 		ArtifactMetadataSource artifactMetadataSource;
 		try {
-			artifactMetadataSource = MavenPluginActivator.getDefault().getPlexusContainer()
+			artifactMetadataSource = ((MavenImpl)MavenPlugin.getMaven()).getPlexusContainer()
 					.lookup(ArtifactMetadataSource.class, 
 							org.apache.maven.artifact.metadata.ArtifactMetadataSource.class.getName(), 
 							"maven");
-		} catch (ComponentLookupException toughLuck) {
+		} catch (Exception toughLuck) {
 			throw new RuntimeException(toughLuck);
 		}
 		return artifactMetadataSource;

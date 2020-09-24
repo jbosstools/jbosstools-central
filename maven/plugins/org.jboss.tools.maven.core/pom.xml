@@ -10,5 +10,5 @@
 	<groupId>org.jboss.tools.maven.plugins</groupId>
 	<artifactId>org.jboss.tools.maven.core</artifactId>
 	<packaging>eclipse-plugin</packaging>
-	<version>1.9.100-SNAPSHOT</version>
+	<version>1.9.200-SNAPSHOT</version>
 </project>
