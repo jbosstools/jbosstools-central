@@ -26,7 +26,6 @@ import org.apache.maven.model.Model;
 import org.apache.maven.model.Parent;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.repository.RepositorySystem;
-import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.util.StringUtils;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
@@ -37,7 +36,6 @@ import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.embedder.MavenModelManager;
 import org.eclipse.m2e.core.internal.IMavenConstants;
-import org.eclipse.m2e.core.internal.MavenPluginActivator;
 import org.eclipse.m2e.core.internal.embedder.MavenImpl;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 
@@ -229,9 +227,8 @@ public class MavenUtil {
 	public static RepositorySystem getRepositorySystem() {
 		RepositorySystem repositorySystem;
 		try {
-			repositorySystem = MavenPluginActivator.getDefault().getPlexusContainer()
-					.lookup(RepositorySystem.class);
-		} catch (ComponentLookupException e) {
+			repositorySystem = MavenPlugin.getMaven().lookup(RepositorySystem.class);
+		} catch (CoreException e) {
 			throw new RuntimeException(e);
 		}
 		return repositorySystem;

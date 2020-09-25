@@ -2,11 +2,11 @@
 <feature
       id="org.jboss.tools.maven.feature"
       label="%featureName"
-      version="1.9.100.qualifier"
+      version="1.9.200.qualifier"
       provider-name="%providerName"
       plugin="org.jboss.tools.maven.ui"
       license-feature="org.jboss.tools.foundation.license.feature"
-	  license-feature-version="0.0.0">
+      license-feature-version="0.0.0">
 
    <description>
       %description
@@ -23,10 +23,6 @@
    <requires>
       <import feature="org.eclipse.m2e.feature" version="1.5.0" match="greaterOrEqual"/>
       <import feature="org.eclipse.m2e.wtp.feature" version="1.1.0" match="greaterOrEqual"/>
-
-      <!-- JBIDE-16574 : force m2eclipse-egit to be installed if available
-           Since it's not a real build requirement, we make it optional by tweaking p2.inf
-      -->
       <import feature="org.sonatype.m2e.egit.feature" version="0.14.0" match="greaterOrEqual"/>
    </requires>
 
