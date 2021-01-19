@@ -11,21 +11,21 @@
 package org.jboss.tools.common.launcher.reddeer.wizards;
 
 
-import org.eclipse.reddeer.jface.wizard.WizardDialog;
+import org.eclipse.reddeer.common.exception.RedDeerException;
 import org.eclipse.reddeer.common.wait.TimePeriod;
 import org.eclipse.reddeer.common.wait.WaitUntil;
 import org.eclipse.reddeer.common.wait.WaitWhile;
-import org.eclipse.reddeer.swt.api.Button;
+import org.eclipse.reddeer.eclipse.ui.dialogs.NewWizard;
+import org.eclipse.reddeer.jface.wizard.WizardDialog;
 import org.eclipse.reddeer.swt.impl.browser.InternalBrowser;
+import org.eclipse.reddeer.swt.impl.button.FinishButton;
 import org.eclipse.reddeer.swt.impl.button.NextButton;
-import org.eclipse.reddeer.swt.impl.button.PushButton;
 import org.eclipse.reddeer.swt.impl.shell.DefaultShell;
 import org.eclipse.reddeer.swt.impl.tree.DefaultTreeItem;
 import org.eclipse.reddeer.workbench.core.condition.JobIsRunning;
 import org.eclipse.reddeer.workbench.impl.shell.WorkbenchShell;
 import org.jboss.tools.central.reddeer.api.JavaScriptHelper;
 import org.jboss.tools.central.reddeer.wait.CentralIsLoaded;
-import org.eclipse.reddeer.eclipse.ui.dialogs.NewWizard;
 
 
 /**
@@ -69,10 +69,13 @@ public class NewLauncherProjectWizard extends WizardDialog {
 	 * Finishes this wizard
 	 */
 	@Override
-	public void finish(TimePeriod period) {	
-		Button button = new PushButton("Finish");
-		button.click();
-		new WaitWhile(new JobIsRunning(), period);
+	public void finish(TimePeriod period) {
+		if (isFinishEnabled()) {
+			new FinishButton().click();
+			new WaitWhile(new JobIsRunning(), period);
+		} else {
+			throw new RedDeerException("Finish button is not enabled!");
+		}
 	}
 	
 	/**
@@ -81,7 +84,6 @@ public class NewLauncherProjectWizard extends WizardDialog {
 	 */
 	@Override
 	public boolean isFinishEnabled() {
-		PushButton finishButton = new PushButton("Finish");
-		return (finishButton.isEnabled());
+		return new FinishButton().isEnabled();
 	}
 }
