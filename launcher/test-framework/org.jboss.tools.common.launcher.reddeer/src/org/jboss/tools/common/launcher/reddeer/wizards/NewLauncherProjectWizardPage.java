@@ -11,6 +11,9 @@
 package org.jboss.tools.common.launcher.reddeer.wizards;
 
 import org.eclipse.reddeer.jface.wizard.WizardPage;
+
+import java.util.List;
+
 import org.eclipse.reddeer.common.logging.Logger;
 import org.eclipse.reddeer.core.reference.ReferencedComposite;
 import org.eclipse.reddeer.swt.impl.button.CheckBox;
@@ -39,6 +42,14 @@ public class NewLauncherProjectWizardPage extends WizardPage {
 	public void setTargetMission(String targetMissionName) {
 		new DefaultCombo(0).setSelection(targetMissionName);
 	}
+	
+	/**
+	 * Returns target missions
+	 * @return list of target missions
+	 */
+	public List<String> getTargetMissions() {
+		return new DefaultCombo(0).getItems();
+	}
 
 	/**
 	 * Sets nth target mission
@@ -53,7 +64,17 @@ public class NewLauncherProjectWizardPage extends WizardPage {
 	 * @param targetRuntimeName
 	 */
 	public void setTargetRuntime(String targetRuntimeName) {
-		new DefaultCombo(1).setSelection(targetRuntimeName);
+		if (!new DefaultCombo(1).getItems().isEmpty()) {
+			new DefaultCombo(1).setSelection(targetRuntimeName);
+		}
+	}
+	
+	/**
+	 * Returns target runtimes
+	 * @return list of target runtimes
+	 */
+	public List<String> getTargetRuntimes() {
+		return new DefaultCombo(1).getItems();
 	}
 	
 	/**
