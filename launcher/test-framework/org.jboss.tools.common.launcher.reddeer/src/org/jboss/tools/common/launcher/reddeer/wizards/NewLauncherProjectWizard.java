@@ -41,7 +41,6 @@ public class NewLauncherProjectWizard extends WizardDialog {
 	public void openWizardFromShellMenu() {
 		new WorkbenchShell().setFocus();
 		new NewWizard().open();
-		new DefaultShell("New").setFocus(); 
 		new DefaultTreeItem("Launcher", "Launcher project").select(); 
 		new NextButton().click();
 		new DefaultShell("New Launcher project");
