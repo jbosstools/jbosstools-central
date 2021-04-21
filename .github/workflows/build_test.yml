@@ -19,6 +19,7 @@ jobs:
       uses: actions/checkout@v2
       with:
         ref: ${{ github.event.pull_request.head.sha }}
+        fetch-depth: 0
 
     # Checkout global JBT settings.xml
     - name: Checkout JBoss Tools Build CI
@@ -50,7 +51,7 @@ jobs:
       with:
         run: >
           mvn clean verify -U -fae --settings build-ci/maven-settings.xml -DskipITests=true
-          -Dmaven.test.error.ignore=true -Dmaven.test.failure.ignore=true --quiet
+          -Dmaven.test.error.ignore=true -Dmaven.test.failure.ignore=true --no-transfer-progress
 
     # Archive artifacts to be applied in Publish Reports workflow
     - name: Archiving test artifacts
