@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <feature id="org.jboss.tools.project.examples.test.feature" 
   label="%featureName"
-  version="3.1.300.qualifier" 
+  version="3.1.400.qualifier" 
   provider-name="%providerName"
   license-feature="org.jboss.tools.foundation.license.feature"
 	license-feature-version="0.0.0">
