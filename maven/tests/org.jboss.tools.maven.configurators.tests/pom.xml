@@ -9,7 +9,6 @@
 	</parent>
 	<groupId>org.jboss.tools.maven.tests</groupId>
 	<artifactId>org.jboss.tools.maven.configurators.tests</artifactId>
-	<version>1.9.300-SNAPSHOT</version>
 	<packaging>eclipse-test-plugin</packaging>
 
 	<properties>
