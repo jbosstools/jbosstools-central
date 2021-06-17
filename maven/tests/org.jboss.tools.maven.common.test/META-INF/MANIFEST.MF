@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: JBoss Maven (Core+UI) Tests
 Bundle-SymbolicName: org.jboss.tools.maven.common.test;singleton:=true
-Bundle-Version: 1.9.100.qualifier
+Bundle-Version: 1.9.300.qualifier
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
  org.eclipse.core.resources,
@@ -15,7 +15,7 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.m2e.launching,
  org.eclipse.m2e.tests.common,
  org.eclipse.ui.ide,
- org.jboss.tools.common.jaxb;resolution:=optional
+ org.jboss.tools.common.jaxb
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Eclipse-RegisterBuddy: org.apache.log4j

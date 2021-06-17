@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: %Bundle-Name
 Bundle-SymbolicName: org.jboss.tools.maven.core; singleton:=true
-Bundle-Version: 1.9.200.qualifier
+Bundle-Version: 1.9.300.qualifier
 Bundle-Localization: plugin
 Bundle-Activator: org.jboss.tools.maven.core.MavenCoreActivator
 Require-Bundle: org.eclipse.core.runtime,
@@ -28,7 +28,7 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.wst.common.emfworkbench.integration,
  org.eclipse.m2e.wtp;bundle-version="0.16.0";resolution:=optional,
  org.eclipse.m2e.core.ui,
- org.jboss.tools.common.jaxb;resolution:=optional
+ org.jboss.tools.common.jaxb
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Bundle-Vendor: %Bundle-Vendor
