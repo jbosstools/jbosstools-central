@@ -2,7 +2,7 @@
 <?eclipse version="3.4"?>
 <plugin>
 
-   <extension-point id="configurators" name="Red Hat Central Configurator" schema="schema/configurators.exsd"/>
+   <extension-point id="configurators" name="Red Hat Central Configurator" schema="schemas/configurators.exsd"/>
    <extension-point id="proxyWizard" name="Proxy Wizard" schema="schemas/org.jboss.tools.central.proxyWizard.exsd"/>
    <extension-point id="iuFamilies" name="iuFamilies" schema="schemas/iuFamilies.exsd"/>
 
@@ -299,18 +299,18 @@
 
   <extension
          point="org.eclipse.help.ui.searchEngine">
-	<engine
-	      enabled="true"
-	      engineTypeId="org.jboss.tools.foundation.help.ui.search.SearchiskoSearchEngine"
-	      id="org.jboss.tools.developer.search"
-	      label="JBoss Developer Search">
-	      <description>
-	        Searches blog posts, articles, web pages and solutions on JBoss Community and Red Hat websites.
-	      </description>
-	      <param
-      			name="url"
-      			value="http://dcp2.jboss.org/v2/rest/search?size=100&amp;query={expression}&amp;sys_type=blogpost&amp;sys_type=article&amp;sys_type=solution&amp;sys_type=webpage">
-      	  </param>
-	</engine>
+    <engine
+          enabled="true"
+          engineTypeId="org.jboss.tools.foundation.help.ui.search.SearchiskoSearchEngine"
+          id="org.jboss.tools.developer.search"
+          label="Red Hat Developer Search">
+          <description>
+            Searches blog posts, articles, web pages and solutions on JBoss Community and Red Hat websites.
+          </description>
+          <param
+            name="url"
+            value="https://api.developers.redhat.com/search/v1/?type=web_page,books,blogpost,article,solution&amp;rows=100&amp;q={expression}">
+          </param>
+    </engine>
   </extension>
 </plugin>
