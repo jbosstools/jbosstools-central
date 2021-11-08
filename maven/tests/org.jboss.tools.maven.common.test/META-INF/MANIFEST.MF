@@ -14,9 +14,9 @@ Require-Bundle: org.eclipse.ui,
  org.jboss.tools.tests,
  org.eclipse.m2e.launching,
  org.eclipse.m2e.tests.common,
- org.eclipse.ui.ide,
- org.jboss.tools.common.jaxb
+ org.eclipse.ui.ide
 Bundle-ActivationPolicy: lazy
-Bundle-RequiredExecutionEnvironment: JavaSE-1.8
+Bundle-RequiredExecutionEnvironment: JavaSE-11
 Eclipse-RegisterBuddy: org.apache.log4j
+Import-Package: javax.xml.bind
 
