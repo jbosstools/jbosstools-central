@@ -42,7 +42,8 @@ Export-Package: org.jboss.tools.maven.core,
 Bundle-ClassPath: lib/nexus-indexer-lucene-rest-api-client.jar,
  lib/jboss-dmr-1.1.1.Final.jar,
  .
-Import-Package: javax.xml.bind,
- javax.xml.bind.annotation,
- javax.xml.bind.annotation.adapters,
+Import-Package: com.sun.xml.bind;version="2.3.3",
+ javax.xml.bind;version="2.3.3",
+ javax.xml.bind.annotation;version="2.3.3",
+ javax.xml.bind.annotation.adapters;version="2.3.3",
  org.eclipse.jem.util.emf.workbench
