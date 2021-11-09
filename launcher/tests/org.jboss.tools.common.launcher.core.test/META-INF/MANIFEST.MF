@@ -7,7 +7,7 @@ Bundle-Localization: plugin
 Bundle-Version: 3.10.4.qualifier
 Bundle-ActivationPolicy: lazy
 Bundle-ManifestVersion: 2
-Bundle-RequiredExecutionEnvironment: JavaSE-1.8
+Bundle-RequiredExecutionEnvironment: JavaSE-11
 Automatic-Module-Name: org.jboss.tools.common.launcher.core.test
 Require-Bundle: org.jboss.tools.common.launcher.core,
  com.fasterxml.jackson.core.jackson-core;bundle-version="2.9.2",

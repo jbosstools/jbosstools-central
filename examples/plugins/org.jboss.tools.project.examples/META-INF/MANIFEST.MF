@@ -68,7 +68,8 @@ Export-Package: org.jboss.tools.project.examples,
  org.jboss.tools.project.examples.runtimes,
  org.jboss.tools.project.examples.wizard
 Bundle-RequiredExecutionEnvironment: JavaSE-11
-Import-Package: javax.xml.bind,
- javax.xml.bind.annotation,
- javax.xml.bind.annotation.adapters
+Import-Package: com.sun.xml.bind;version="2.3.3",
+ javax.xml.bind;version="2.3.3",
+ javax.xml.bind.annotation;version="2.3.3",
+ javax.xml.bind.annotation.adapters;version="2.3.3"
 
