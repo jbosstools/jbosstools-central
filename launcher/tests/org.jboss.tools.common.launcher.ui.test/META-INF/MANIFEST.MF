@@ -7,7 +7,7 @@ Bundle-Localization: plugin
 Bundle-Version: 3.10.100.qualifier
 Bundle-ActivationPolicy: lazy
 Bundle-ManifestVersion: 2
-Bundle-RequiredExecutionEnvironment: JavaSE-1.8
+Bundle-RequiredExecutionEnvironment: JavaSE-11
 Automatic-Module-Name: org.jboss.tools.common.launcher.ui.test
 Require-Bundle: org.jboss.tools.common.launcher.ui,
  org.junit;bundle-version="4.12.0",

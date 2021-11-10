@@ -9,5 +9,5 @@
 	</parent>
 	<groupId>org.jboss.tools.common.tests</groupId>
 	<artifactId>org.jboss.tools.common.launcher.ui.test</artifactId>
-	<packaging>eclipse-plugin</packaging>
+	<packaging>eclipse-test-plugin</packaging>
 </project>
