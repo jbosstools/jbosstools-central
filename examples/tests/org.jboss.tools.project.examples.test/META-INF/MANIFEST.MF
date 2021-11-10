@@ -45,5 +45,5 @@ Bundle-RequiredExecutionEnvironment: JavaSE-11
 Export-Package: org.jboss.tools.project.examples.model
 Bundle-Vendor: %BundleVendor
 Bundle-Localization: plugin
-Import-Package: com.sun.xml.bind;version="2.3.3",
+Import-Package: com.sun.xml.bind.v2;version="2.3.3",
  javax.xml.bind;version="2.3.3"
