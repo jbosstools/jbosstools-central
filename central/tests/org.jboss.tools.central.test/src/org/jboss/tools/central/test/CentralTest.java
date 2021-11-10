@@ -84,11 +84,10 @@ public class CentralTest {
 	@Test
 	public void testTutorials() throws Exception {
 		waitForJobs();
-		JobUtils.delay(1000);
+		JobUtils.delay(3000);
 		Map<ProjectExampleCategory, List<ProjectExample>> categories = RefreshTutorialsJob.INSTANCE
 				.getTutorialCategories();
-		assertNotNull("No one tutorial is found", categories);
-		assertTrue("No one tutorial is found", categories.size() > 0);
+		assertFalse("No tutorial found", categories.isEmpty());
 	}
 
 	@Test
