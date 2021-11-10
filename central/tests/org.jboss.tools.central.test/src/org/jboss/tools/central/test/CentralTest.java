@@ -11,7 +11,9 @@
 package org.jboss.tools.central.test;
 
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
@@ -27,7 +29,6 @@ import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.internal.WorkbenchWindow;
 import org.jboss.tools.central.JBossCentralActivator;
 import org.jboss.tools.central.ShowJBossCentral;
 import org.jboss.tools.central.actions.RefreshJBossBuzzHandler;
@@ -58,7 +59,7 @@ public class CentralTest {
 
 	@BeforeClass
 	public static void init() throws Exception {
-		final WorkbenchWindow window = (WorkbenchWindow) PlatformUI
+		final IWorkbenchWindow window = PlatformUI
 				.getWorkbench().getActiveWorkbenchWindow();
 		final IWorkbenchPage page = window.getActivePage();
 		IViewPart welcomeView = page.findView(ORG_ECLIPSE_UI_INTERNAL_INTROVIEW);
@@ -77,14 +78,16 @@ public class CentralTest {
 
 	@Test
 	public void testEditorOpen() throws Exception {
-		assertTrue("The Red Hat Central editor isn't open", editor != null);
+		assertNotNull("The Red Hat Central editor isn't open", editor);
 	}
 
 	@Test
 	public void testTutorials() throws Exception {
 		waitForJobs();
+		JobUtils.delay(1000);
 		Map<ProjectExampleCategory, List<ProjectExample>> categories = RefreshTutorialsJob.INSTANCE
 				.getTutorialCategories();
+		assertNotNull("No one tutorial is found", categories);
 		assertTrue("No one tutorial is found", categories.size() > 0);
 	}
 
@@ -165,9 +168,9 @@ public class CentralTest {
 						}
 					});
 		} catch (InvocationTargetException e) {
-			assertTrue("InvocationTargetException", false);
+			fail(e.getMessage());
 		} catch (InterruptedException e) {
-			assertTrue("InterruptedException", false);
+			fail(e.getMessage());
 		}
 	}
 

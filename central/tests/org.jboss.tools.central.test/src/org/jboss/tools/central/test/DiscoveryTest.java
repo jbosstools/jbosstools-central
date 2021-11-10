@@ -22,8 +22,8 @@ import java.util.Set;
 
 import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IWorkbenchPage;
+import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.internal.WorkbenchWindow;
 import org.jboss.tools.central.JBossCentralActivator;
 import org.jboss.tools.central.editors.JBossCentralEditor;
 import org.jboss.tools.central.editors.SoftwarePage;
@@ -50,7 +50,7 @@ public class DiscoveryTest {
 		System.setProperty("central.URL", TEST_URL);
 		//Need to allow bundle discovery AND remote discovery hence :
 		System.setProperty(DiscoveryConnectorCollector.ALLOW_DUPLICATE_DISCOVERY_CONNECTORS_KEY, Boolean.TRUE.toString());
-		final WorkbenchWindow window = (WorkbenchWindow) PlatformUI
+		final IWorkbenchWindow window = PlatformUI
 				.getWorkbench().getActiveWorkbenchWindow();
 		final IWorkbenchPage page = window.getActivePage();
 		IViewPart welcomeView = page.findView(CentralTest.ORG_ECLIPSE_UI_INTERNAL_INTROVIEW);
