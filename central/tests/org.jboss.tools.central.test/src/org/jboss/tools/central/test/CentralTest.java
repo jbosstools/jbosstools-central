@@ -84,7 +84,6 @@ public class CentralTest {
 	@Test
 	public void testTutorials() throws Exception {
 		waitForJobs();
-		JobUtils.delay(3000);
 		Map<ProjectExampleCategory, List<ProjectExample>> categories = RefreshTutorialsJob.INSTANCE
 				.getTutorialCategories();
 		assertFalse("No tutorial found", categories.isEmpty());

@@ -18,6 +18,8 @@ import java.io.File;
 import java.util.Collections;
 import java.util.List;
 
+import javax.xml.bind.UnmarshalException;
+
 import org.eclipse.core.runtime.CoreException;
 import org.jboss.tools.project.examples.model.ProjectExampleCategory;
 import org.junit.Before;
@@ -56,7 +58,7 @@ public class ProjectExampleCategoryParserTest {
 			fail("Should not be able to parse file");
 		} catch (CoreException e) {
 			assertEquals("Unable to parse categories in resources/broken-categories.xml",e.getMessage().replace('\\', '/'));
-			assertEquals("javax.xml.bind.UnmarshalException", e.getCause().getClass().getName());
+			assertEquals(UnmarshalException.class, e.getCause().getClass());
 		}
 	}
 }

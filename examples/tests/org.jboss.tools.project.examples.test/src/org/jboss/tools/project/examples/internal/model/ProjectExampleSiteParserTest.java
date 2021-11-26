@@ -19,6 +19,8 @@ import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
+import javax.xml.bind.UnmarshalException;
+
 import org.eclipse.core.runtime.CoreException;
 import org.jboss.tools.project.examples.model.IProjectExampleSite;
 import org.jboss.tools.project.examples.model.ProjectExampleSite;
@@ -63,7 +65,7 @@ public class ProjectExampleSiteParserTest {
 			parser.parse("<sites>");
 		} catch (CoreException e) {
 			assertEquals("Unable to parse user example sites",e.getMessage().replace('\\', '/'));
-			assertEquals("javax.xml.bind.UnmarshalException", e.getCause().getClass().getName());
+			assertEquals(UnmarshalException.class, e.getCause().getClass());
 		}
 	}
 	

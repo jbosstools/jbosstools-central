@@ -19,6 +19,8 @@ import static org.junit.Assert.fail;
 import java.io.File;
 import java.util.List;
 
+import javax.xml.bind.UnmarshalException;
+
 import org.eclipse.core.runtime.CoreException;
 import org.jboss.tools.project.examples.model.ArchetypeModel;
 import org.jboss.tools.project.examples.model.ProjectExample;
@@ -125,7 +127,7 @@ public class ProjectExampleParserTest {
 			fail("Should not be able to parse file");
 		} catch (CoreException e) {
 			assertEquals("Unable to parse examples in resources/broken-examples.xml",e.getMessage().replace('\\', '/'));
-			assertEquals("javax.xml.bind.UnmarshalException", e.getCause().getClass().getName());
+			assertEquals(UnmarshalException.class, e.getCause().getClass());
 		}
 	}	
 }
