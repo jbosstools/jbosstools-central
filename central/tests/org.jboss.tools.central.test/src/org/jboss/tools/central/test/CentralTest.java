@@ -86,6 +86,7 @@ public class CentralTest {
 		waitForJobs();
 		Map<ProjectExampleCategory, List<ProjectExample>> categories = RefreshTutorialsJob.INSTANCE
 				.getTutorialCategories();
+		assertNotNull(categories);
 		assertFalse("No tutorial found", categories.isEmpty());
 	}
 
