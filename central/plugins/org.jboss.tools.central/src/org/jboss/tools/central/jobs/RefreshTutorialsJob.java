@@ -46,6 +46,7 @@ public class RefreshTutorialsJob extends Job {
 
 	@Override
 	public IStatus run(IProgressMonitor monitor) {
+		JBossCentralActivator.log("RefreshTutorialsJob started");
 		if (monitor.isCanceled()) {
 			return Status.CANCEL_STATUS;
 		}
@@ -69,6 +70,7 @@ public class RefreshTutorialsJob extends Job {
 		}
 
 		tutorialCategories = newTutorialCategories;
+		JBossCentralActivator.log("RefreshTutorialsJob stopped");
 		return Status.OK_STATUS;
 	}
 
