@@ -46,6 +46,7 @@ public class RefreshTutorialsJob extends Job {
 
 	@Override
 	public IStatus run(IProgressMonitor monitor) {
+		JBossCentralActivator.log("RefreshTutorialsJob started");
 		if (monitor.isCanceled()) {
 			return Status.CANCEL_STATUS;
 		}
@@ -56,22 +57,20 @@ public class RefreshTutorialsJob extends Job {
 		}
 		wizardProjects = ProjectExampleUtil.getProjectsByTags(categories, "wizard");
 		List<ProjectExample> tutorials = ProjectExampleUtil.getProjectsByTags(categories, "central");
-		if (tutorialCategories == null) {
-			tutorialCategories = new HashMap<>();
-		} else {
-			tutorialCategories.clear();
-		}
+		Map<ProjectExampleCategory, List<ProjectExample>> newTutorialCategories = new HashMap<>();
 
 		for (ProjectExample project : tutorials) {
 			ProjectExampleCategory category = categoriesMap.get(project.getCategory());
-			List<ProjectExample> projects = tutorialCategories.get(category);
+			List<ProjectExample> projects = newTutorialCategories.get(category);
 			if (projects == null) {
 				projects = new ArrayList<>();
-				tutorialCategories.put(category, projects);
+				newTutorialCategories.put(category, projects);
 			}
 			projects.add(project);
 		}
 
+		tutorialCategories = newTutorialCategories;
+		JBossCentralActivator.log("RefreshTutorialsJob stopped");
 		return Status.OK_STATUS;
 	}
 

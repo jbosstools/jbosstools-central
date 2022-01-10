@@ -11,10 +11,15 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest]
-        java: ["11"]
+        java: ["11", "17"]
       fail-fast: false
 
     steps:
+    - name: Setup Locale
+      run: |
+          sudo locale-gen en_US.UTF-8
+          sudo update-locale LANG=en_US.UTF-8
+    
     - name: Checkout PR branch
       uses: actions/checkout@v2
       with:
@@ -45,19 +50,25 @@ jobs:
         restore-keys: |
           jbosstools-${{ runner.os }}-maven-
 
+    # install webkit with gtk 3 for tests
+    - name: Install WebKit
+      run: |
+        sudo apt-get update -y
+        sudo apt-get install libwebkit2gtk-4.0-37
+
     # Build and compile using Maven
     - name: Build/Compile and run unit tests
       uses: GabrielBB/xvfb-action@v1
       with:
         run: >
           mvn clean verify -U -fae --settings build-ci/maven-settings.xml -DskipITests=true
-          -Dmaven.test.error.ignore=true -Dmaven.test.failure.ignore=true --no-transfer-progress
+          -Dmaven.test.error.ignore=true -Dmaven.test.failure.ignore=true -ntp
 
     # Archive artifacts to be applied in Publish Reports workflow
     - name: Archiving test artifacts
       uses: actions/upload-artifact@v2
       with: 
-        name: ${{ matrix.os }}-test-reports
+        name: ${{ matrix.os }}-${{ matrix.java }}-test-reports
         path: |
           *tests/*/target/surefire-reports/
           */*tests/*/target/surefire-reports/

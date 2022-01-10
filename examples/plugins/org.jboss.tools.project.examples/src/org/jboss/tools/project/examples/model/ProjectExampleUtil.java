@@ -258,7 +258,7 @@ public class ProjectExampleUtil {
 	}
 
 	@Deprecated
-	public static List<ProjectExampleCategory> getCategories(
+	public static synchronized List<ProjectExampleCategory> getCategories(
 			IProgressMonitor monitor) {
 		return getCategories(getSites(), monitor);
 	}

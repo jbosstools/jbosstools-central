@@ -11,6 +11,23 @@
   		<version>1.2_15</version>
   	</dependency>   
   </dependencies>
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-war-plugin</artifactId>
+				<version>3.3.1</version>
+				<configuration>
+					<failOnMissingWebXml>false</failOnMissingWebXml>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>3.8.1</version>
+			</plugin>
+		</plugins>
+	</build>
   <repositories>
   <!-- You should seriously consider using a repository manager or declare repositories in your settings.xml.
               See http://www.sonatype.com/people/2009/02/why-putting-repositories-in-your-poms-is-a-bad-idea/   -->
