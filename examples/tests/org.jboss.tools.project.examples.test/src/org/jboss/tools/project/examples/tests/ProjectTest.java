@@ -137,7 +137,7 @@ public class ProjectTest {
 
 	private void importProject(IProgressMonitor monitor) throws MalformedURLException, Exception {
 		
-		IProjectExampleSite site = ProjectExampleUtil.getSite("http://download.jboss.org/jbosstools/examples/project-examples-community-4.2.Beta2.xml");
+		IProjectExampleSite site = ProjectExampleUtil.getSite("https://download.jboss.org/jbosstools/examples/project-examples-community-4.2.Beta2.xml");
 		site.setExperimental(false);
 		List<ProjectExampleCategory> projects = ProjectExampleUtil.getCategories(Collections.singleton(site), monitor);
 		ProjectExampleCategory seamCategory = null;

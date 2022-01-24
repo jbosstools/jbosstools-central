@@ -26,7 +26,7 @@
 						</goals>
 						<configuration>
 							<skip>false</skip>
-							<url>http://download.jboss.org/jbosstools/${eclipseReleaseName}/snapshots/updates/earlyaccess.properties/${jbosstools_site_stream}/jbosstools-earlyaccess.properties</url>
+							<url>https://download.jboss.org/jbosstools/${eclipseReleaseName}/snapshots/updates/earlyaccess.properties/${jbosstools_site_stream}/jbosstools-earlyaccess.properties</url>
 							<overwrite>true</overwrite>
 							<skipCache>true</skipCache>
 							<outputDirectory>${project.basedir}</outputDirectory>
