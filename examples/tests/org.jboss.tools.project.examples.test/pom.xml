@@ -71,7 +71,7 @@
 							<goal>wget</goal>
 						</goals>
 						<configuration>
-							<url>http://repository.jboss.org/sourceforge/jboss-seam-2.0.1.GA.zip</url>
+							<url>https://repository.jboss.org/sourceforge/jboss-seam-2.0.1.GA.zip</url>
 							<unpack>true</unpack>
 							<md5>0a1accf94fd37e40ab1091ee593b8b75</md5>
 						</configuration>
