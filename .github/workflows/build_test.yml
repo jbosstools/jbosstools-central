@@ -61,7 +61,7 @@ jobs:
       uses: GabrielBB/xvfb-action@v1
       with:
         run: >
-          mvn clean verify -U -fae --settings build-ci/maven-settings.xml -DskipITests=true
+          mvn clean verify -B -U -fae -e -X --settings build-ci/maven-settings.xml -DskipITests=true
           -Dmaven.test.error.ignore=true -Dmaven.test.failure.ignore=true -ntp
 
     # Archive artifacts to be applied in Publish Reports workflow
