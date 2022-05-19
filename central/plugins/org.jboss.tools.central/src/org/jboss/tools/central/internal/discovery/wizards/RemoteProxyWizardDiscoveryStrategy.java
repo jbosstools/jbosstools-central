@@ -18,7 +18,7 @@ import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IContributor;
 import org.eclipse.core.runtime.IExtension;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.mylyn.internal.discovery.core.model.AbstractDiscoverySource;
+import org.eclipse.equinox.internal.p2.discovery.AbstractCatalogSource;
 import org.jboss.tools.central.JBossCentralActivator;
 import org.jboss.tools.discovery.core.internal.connectors.xpl.RemoteExternalBundleDiscoveryStrategy;
 
@@ -51,7 +51,7 @@ public class RemoteProxyWizardDiscoveryStrategy extends
 			if (JBossCentralActivator.PLUGIN_ID.equals(contributor.getName())) {
 				continue;
 			}
-			AbstractDiscoverySource discoverySource = computeDiscoverySource(contributor);
+			AbstractCatalogSource discoverySource = computeDiscoverySource(contributor);
 			IConfigurationElement[] elements = extension.getConfigurationElements();
 			for (IConfigurationElement e : elements) {
 				if (PROXY_WIZARD_EXTENSION_POINT_NAME.equals(e.getName())) {

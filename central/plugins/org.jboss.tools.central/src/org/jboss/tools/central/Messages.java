@@ -55,6 +55,14 @@ public class Messages extends NLS {
 	public static String additionalSoftwareRequired_message;
 	public static String unableToInstallConnectors_title;
 	public static String unableToInstallConnectors_message;
+	
+	public static String ConnectorDiscoveryWizardMainPage_message_with_cause;
+	public static String ConnectorDiscoveryWizardMainPage_clearButton_toolTip;
+	public static String ConnectorDiscoveryWizardMainPage_clearButton_accessibleListener;
+	public static String ConnectorDiscoveryWizardMainPage_filterLabel;
+
+	public static String TextControl_AccessibleListenerFindButton;
+	public static String TextControl_FindToolTip;
 
 	static {
 		// initialize resource bundle

@@ -10,9 +10,9 @@
  *******************************************************************************/
 package org.jboss.tools.central.editors.xpl.filters;
 
+import org.eclipse.equinox.internal.p2.discovery.model.CatalogItem;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerFilter;
-import org.eclipse.mylyn.internal.discovery.core.model.ConnectorDescriptor;
 import org.jboss.tools.discovery.core.internal.connectors.JBossDiscoveryUi;
 
 /**
@@ -21,14 +21,15 @@ import org.jboss.tools.discovery.core.internal.connectors.JBossDiscoveryUi;
  * @author mistria
  *
  */
+@SuppressWarnings("restriction")
 public class EarlyAccessFilter extends ViewerFilter {
 
 	@Override
 	public boolean select(Viewer viewer, Object parentElement, Object element) {
-		if (! (element instanceof ConnectorDescriptor)) {
+		if (! (element instanceof CatalogItem)) {
 			return true;
 		}
-		ConnectorDescriptor connector = (ConnectorDescriptor)element;
+		CatalogItem connector = (CatalogItem)element;
 		return !JBossDiscoveryUi.isEarlyAccess(connector);
 	}
 

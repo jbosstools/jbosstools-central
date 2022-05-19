@@ -33,7 +33,7 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
-import org.eclipse.core.runtime.SubProgressMonitor;
+import org.eclipse.equinox.internal.p2.discovery.model.CatalogItem;
 import org.eclipse.equinox.internal.p2.ui.IProvHelpContextIds;
 import org.eclipse.equinox.internal.p2.ui.ProvUI;
 import org.eclipse.equinox.internal.p2.ui.dialogs.InstallWizard;
@@ -41,6 +41,9 @@ import org.eclipse.equinox.internal.p2.ui.dialogs.PreselectedIUInstallWizard;
 import org.eclipse.equinox.internal.p2.ui.dialogs.ProvisioningWizardDialog;
 import org.eclipse.equinox.internal.p2.ui.dialogs.RemediationPage;
 import org.eclipse.equinox.internal.p2.ui.dialogs.SelectableIUsPage;
+import org.eclipse.equinox.internal.p2.ui.discovery.DiscoveryUi;
+import org.eclipse.equinox.internal.p2.ui.discovery.util.WorkbenchUtil;
+import org.eclipse.equinox.internal.p2.ui.discovery.wizards.Messages;
 import org.eclipse.equinox.p2.core.ProvisionException;
 import org.eclipse.equinox.p2.engine.IProfile;
 import org.eclipse.equinox.p2.engine.IProvisioningPlan;
@@ -62,13 +65,6 @@ import org.eclipse.equinox.p2.ui.ProvisioningUI;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.jface.wizard.WizardDialog;
-import org.eclipse.mylyn.internal.discovery.core.model.ConnectorDescriptor;
-import org.eclipse.mylyn.internal.discovery.ui.AbstractInstallJob;
-import org.eclipse.mylyn.internal.discovery.ui.DiscoveryUi;
-import org.eclipse.mylyn.internal.discovery.ui.InstalledItem;
-import org.eclipse.mylyn.internal.discovery.ui.UninstallRequest;
-import org.eclipse.mylyn.internal.discovery.ui.util.DiscoveryUiUtil;
-import org.eclipse.mylyn.internal.discovery.ui.wizards.Messages;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.PlatformUI;
@@ -87,19 +83,20 @@ import org.eclipse.ui.PlatformUI;
  * 
  * @since 1.5.3
  */
+@SuppressWarnings("restriction")
 public class PrepareInstallProfileJob extends AbstractInstallJob {
 
-	protected final Collection<ConnectorDescriptor> installableConnectors;
+	protected final Collection<CatalogItem> installableConnectors;
 
 	protected final ProvisioningUI provisioningUI;
 
 	protected Set<URI> repositoryLocations;
 
-	public PrepareInstallProfileJob(Collection<ConnectorDescriptor> installableConnectors) {
+	public PrepareInstallProfileJob(Collection<CatalogItem> installableConnectors) {
 		if (installableConnectors == null) {
 			throw new IllegalArgumentException();
 		}
-		this.installableConnectors = new ArrayList<ConnectorDescriptor>(installableConnectors);
+		this.installableConnectors = new ArrayList<CatalogItem>(installableConnectors);
 		this.provisioningUI = ProvisioningUI.getDefaultUI();
 	}
 
@@ -255,7 +252,7 @@ public class PrepareInstallProfileJob extends AbstractInstallJob {
 			URI[] repositories) throws CoreException {
 		final UninstallOperation uninstallOperation = provisioningUI.getUninstallOperation(Arrays.asList(ius),
 				repositories);
-		IStatus operationStatus = uninstallOperation.resolveModal(new SubProgressMonitor(monitor,
+		IStatus operationStatus = uninstallOperation.resolveModal(SubMonitor.convert(monitor,
 				installableConnectors.size()));
 		if (operationStatus.getSeverity() > IStatus.WARNING) {
 			throw new CoreException(operationStatus);
@@ -266,7 +263,7 @@ public class PrepareInstallProfileJob extends AbstractInstallJob {
 	private InstallOperation resolveInstall(IProgressMonitor monitor, final IInstallableUnit[] ius, URI[] repositories)
 			throws CoreException {
 		final InstallOperation installOperation = provisioningUI.getInstallOperation(Arrays.asList(ius), repositories);
-		installOperation.resolveModal(new SubProgressMonitor(monitor,
+		installOperation.resolveModal(SubMonitor.convert(monitor,
 				installableConnectors.size()));
 //		if (operationStatus.getSeverity() > IStatus.WARNING) {
 //			throw new CoreException(operationStatus);
@@ -333,7 +330,7 @@ public class PrepareInstallProfileJob extends AbstractInstallJob {
 
 		StringBuilder message = new StringBuilder(); //$NON-NLS-1$
 		StringBuilder detailedMessage = new StringBuilder(); //$NON-NLS-1$
-		for (ConnectorDescriptor descriptor : installableConnectors) {
+		for (CatalogItem descriptor : installableConnectors) {
 			StringBuilder unavailableIds = null;
 			for (String id : descriptor.getInstallableUnits()) {
 				if (!foundIds.contains(id)) {
@@ -365,7 +362,7 @@ public class PrepareInstallProfileJob extends AbstractInstallJob {
 			final String finalMessage = message.toString();
 			Display.getDefault().syncExec(new Runnable() {
 				public void run() {
-					okayToProceed[0] = MessageDialog.openQuestion(DiscoveryUiUtil.getShell(),
+					okayToProceed[0] = MessageDialog.openQuestion(WorkbenchUtil.getShell(),
 							Messages.InstallConnectorsJob_questionProceed,
 							NLS.bind(Messages.InstallConnectorsJob_questionProceed_long, new Object[] { finalMessage }));
 				}
@@ -433,7 +430,7 @@ public class PrepareInstallProfileJob extends AbstractInstallJob {
 		RepositoryTracker repositoryTracker = ProvisioningUI.getDefaultUI().getRepositoryTracker();
 		repositoryLocations = new HashSet<URI>();
 		monitor.setWorkRemaining(installableConnectors.size() * 5);
-		for (ConnectorDescriptor descriptor : installableConnectors) {
+		for (CatalogItem descriptor : installableConnectors) {
 			URI uri = new URL(descriptor.getSiteUrl()).toURI();
 			if (repositoryLocations.add(uri)) {
 				checkCancelled(monitor);
@@ -468,7 +465,7 @@ public class PrepareInstallProfileJob extends AbstractInstallJob {
 	private Set<String> getDescriptorIds(final IMetadataRepository repository) throws URISyntaxException {
 		final Set<String> installableUnitIdsThisRepository = new HashSet<String>();
 		// determine all installable units for this repository
-		for (ConnectorDescriptor descriptor : installableConnectors) {
+		for (CatalogItem descriptor : installableConnectors) {
 			try {
 				if (repository.getLocation().equals(new URL(descriptor.getSiteUrl()).toURI())) {
 					installableUnitIdsThisRepository.addAll(descriptor.getInstallableUnits());

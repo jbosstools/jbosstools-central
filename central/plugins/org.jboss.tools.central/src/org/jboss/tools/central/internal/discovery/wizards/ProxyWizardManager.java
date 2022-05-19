@@ -23,7 +23,7 @@ import org.apache.commons.io.FileUtils;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.mylyn.internal.discovery.core.model.ConnectorDiscovery;
+import org.eclipse.equinox.internal.p2.discovery.Catalog;
 import org.jboss.tools.central.JBossCentralActivator;
 import org.jboss.tools.discovery.core.internal.DiscoveryActivator;
 import org.jboss.tools.discovery.core.internal.connectors.ChainedDiscoveryStrategy;
@@ -70,7 +70,7 @@ public class ProxyWizardManager {
 	 */
 	void loadWizards(boolean searchRemote, IProgressMonitor monitor) {
 		//long start = System.currentTimeMillis();
-		ConnectorDiscovery connectorDiscovery = getConnectorDiscovery();
+		Catalog catalog = getCatalog();
 		
 		ProxyWizardDataCollector dataCollector = new ProxyWizardDataCollector();
 
@@ -99,12 +99,12 @@ public class ProxyWizardManager {
 		//Finally, look for installed data
 		proxyWizardDiscoveryStrategy.addStrategy(new InstalledProxyWizardDiscoveryStrategy());
 		
-		connectorDiscovery.getDiscoveryStrategies().add(proxyWizardDiscoveryStrategy);
+		catalog.getDiscoveryStrategies().add(proxyWizardDiscoveryStrategy);
 
 		if (monitor.isCanceled()) {
 			return;
 		}
-		connectorDiscovery.performDiscovery(monitor);
+		catalog.performDiscovery(monitor);
 		if (monitor.isCanceled()) {
 			return;
 		}
@@ -263,11 +263,11 @@ public class ProxyWizardManager {
 	}
 
 	
-	private ConnectorDiscovery getConnectorDiscovery() {
-		ConnectorDiscovery connectorDiscovery = new ConnectorDiscovery();
-		connectorDiscovery.setEnvironment(createEnvironment());
-		connectorDiscovery.setVerifyUpdateSiteAvailability(false);
-		return connectorDiscovery;
+	private Catalog getCatalog() {
+		Catalog catalog = new Catalog();
+		catalog.setEnvironment(createEnvironment());
+		catalog.setVerifyUpdateSiteAvailability(false);
+		return catalog;
 	}
 	
 	private void notifyListeners(List<ProxyWizard> newProxyWizards) {

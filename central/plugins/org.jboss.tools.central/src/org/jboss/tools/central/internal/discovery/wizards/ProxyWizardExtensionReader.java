@@ -15,16 +15,17 @@ import java.util.Collections;
 import java.util.List;
 
 import org.eclipse.core.runtime.IConfigurationElement;
-import org.eclipse.mylyn.internal.discovery.core.model.AbstractDiscoverySource;
+import org.eclipse.equinox.internal.p2.discovery.AbstractCatalogSource;
 
 /**
  * 
  * @author Fred Bricon
  *
  */
+@SuppressWarnings("restriction")
 public class ProxyWizardExtensionReader {
 
-	public ProxyWizard readProxyWizardElement(IConfigurationElement element, AbstractDiscoverySource discoverySource) {
+	public ProxyWizard readProxyWizardElement(IConfigurationElement element, AbstractCatalogSource discoverySource) {
 		ProxyWizard pw = new ProxyWizard();
 		List<String> requiredComponentIds = split(element.getAttribute("requiredComponentIds"));
 		List<String> requiredPluginIds = split(element.getAttribute("requiredPluginIds"));

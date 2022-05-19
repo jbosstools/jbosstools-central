@@ -13,7 +13,7 @@ package org.jboss.tools.discovery.core.internal.connectors;
 import org.eclipse.core.runtime.IContributor;
 import org.eclipse.core.runtime.IExtension;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.mylyn.internal.discovery.core.model.AbstractDiscoverySource;
+import org.eclipse.equinox.internal.p2.discovery.AbstractCatalogSource;
 import org.jboss.tools.discovery.core.internal.connectors.xpl.RemoteExternalBundleDiscoveryStrategy;
 
 /**
@@ -23,11 +23,12 @@ import org.jboss.tools.discovery.core.internal.connectors.xpl.RemoteExternalBund
  * @see org.eclipse.mylyn.internal.discovery.core.model.RemoteBundleDiscoveryStrategy
  * @author snjeza
  */
+@SuppressWarnings("restriction")
 public class ExpressionBasedRemoteBundleDiscoveryStrategy extends RemoteExternalBundleDiscoveryStrategy {
 
 	private ExpressionBasedDiscoveryExtensionProcessor processor = new ExpressionBasedDiscoveryExtensionProcessor() {
 		@Override
-		public AbstractDiscoverySource computeDiscoverySource(
+		public AbstractCatalogSource computeDiscoverySource(
 				IContributor contributor) {
 			return ExpressionBasedRemoteBundleDiscoveryStrategy.this.computeDiscoverySource(contributor);
 		}
@@ -36,7 +37,7 @@ public class ExpressionBasedRemoteBundleDiscoveryStrategy extends RemoteExternal
 	@Override
 	protected void processExtensions(IProgressMonitor monitor,
 			IExtension[] extensions) {
-		processor.processExtensions(monitor, extensions, connectors,
+		processor.processExtensions(monitor, extensions, items,
 				categories, certifications);
 	}
 }

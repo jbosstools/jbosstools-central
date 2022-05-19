@@ -28,6 +28,10 @@ import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.ISchedulingRule;
 import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.equinox.internal.p2.discovery.model.CatalogItem;
+import org.eclipse.equinox.internal.p2.discovery.model.Overview;
+import org.eclipse.equinox.internal.p2.ui.discovery.util.WorkbenchUtil;
+import org.eclipse.equinox.internal.p2.ui.discovery.wizards.Messages;
 import org.eclipse.equinox.p2.core.IProvisioningAgent;
 import org.eclipse.equinox.p2.core.IProvisioningAgentProvider;
 import org.eclipse.equinox.p2.core.ProvisionException;
@@ -43,11 +47,6 @@ import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.resource.ColorRegistry;
 import org.eclipse.jface.resource.JFaceResources;
-import org.eclipse.mylyn.commons.workbench.browser.BrowserUtil;
-import org.eclipse.mylyn.internal.discovery.core.model.ConnectorDescriptor;
-import org.eclipse.mylyn.internal.discovery.core.model.DiscoveryConnector;
-import org.eclipse.mylyn.internal.discovery.core.model.Overview;
-import org.eclipse.mylyn.internal.discovery.ui.wizards.Messages;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.FocusAdapter;
@@ -84,6 +83,7 @@ import org.jboss.tools.discovery.core.internal.connectors.JBossDiscoveryUi;
  * @author mistria
  *
  */
+@SuppressWarnings("restriction")
 public class ConnectorDescriptorItemUi implements PropertyChangeListener, Runnable {
 
 	/**
@@ -103,7 +103,7 @@ public class ConnectorDescriptorItemUi implements PropertyChangeListener, Runnab
 
 	public static enum ConnectorInstallationStatus { UNKNOWN, UP_TO_DATE, UPDATE_AVAILABLE, MORE_RECENT_VERSION_INSTALLED };
 	
-	private DiscoveryConnector connector;
+	private CatalogItem connector;
 	private Map<String, org.eclipse.equinox.p2.metadata.Version> connectorUnits;
 	private ConnectorInstallationStatus installationStatus = ConnectorInstallationStatus.UNKNOWN;
 	private boolean visible;
@@ -133,7 +133,7 @@ public class ConnectorDescriptorItemUi implements PropertyChangeListener, Runnab
 	private Set<Resource> disposables = new HashSet<>();
 
 	public ConnectorDescriptorItemUi(DiscoveryViewer discoveryViewer,
-			final DiscoveryConnector connector,
+			final CatalogItem connector,
 			Composite categoryChildrenContainer, Color background,
 			Font titleFont, Image infoImage) {
 
@@ -172,7 +172,7 @@ public class ConnectorDescriptorItemUi implements PropertyChangeListener, Runnab
 		checkbox.setText(" "); //$NON-NLS-1$
 		// help UI tests
 		checkbox.setData("connectorId", connector.getId()); //$NON-NLS-1$
-		checkbox.setVisible(connector.isInstallable());
+		checkbox.setVisible(true);
 		checkbox.setSelection(connector.isSelected());
 		checkbox.addFocusListener(new FocusAdapter() {
 			@Override
@@ -227,7 +227,7 @@ public class ConnectorDescriptorItemUi implements PropertyChangeListener, Runnab
 				providerLabel.addSelectionListener(new SelectionAdapter() {
 					@Override
 					public void widgetSelected(SelectionEvent e) {
-						BrowserUtil.openUrl(connector.getCertification().getUrl(), IWorkbenchBrowserSupport.AS_EXTERNAL);
+						WorkbenchUtil.openUrl(connector.getCertification().getUrl(), IWorkbenchBrowserSupport.AS_EXTERNAL);
 					}
 				});
 			}
@@ -442,7 +442,7 @@ public class ConnectorDescriptorItemUi implements PropertyChangeListener, Runnab
 	 * @param connector
 	 * @return the map of id/version for installation units or null if connector repo can't be resolved.
 	 */
-	private static Map<String, org.eclipse.equinox.p2.metadata.Version> resolveConnectorUnits(	ConnectorDescriptor connector) {
+	private static Map<String, org.eclipse.equinox.p2.metadata.Version> resolveConnectorUnits(CatalogItem connector) {
 		IMetadataRepository repo = P2CachedRepoUtil.getRepoForConnector(connector);
 		if (repo == null) {
 			return null;
@@ -476,14 +476,6 @@ public class ConnectorDescriptorItemUi implements PropertyChangeListener, Runnab
 		}
 
 		if (selected) {
-			if (!connector.isInstalled() && !connector.isInstallable()) {
-				if (connector.getInstallMessage() != null) {
-					MessageDialog.openInformation(this.checkbox.getShell(),
-							Messages.DiscoveryViewer_Install_Connector_Title,
-							connector.getInstallMessage());
-				}
-				return false;
-			}
 			if (connector.getAvailable() != null && !connector.getAvailable()) {
 				MessageDialog.openWarning(this.checkbox.getShell(),
 								Messages.ConnectorDiscoveryWizardMainPage_warningTitleConnectorUnavailable,
@@ -536,7 +528,7 @@ public class ConnectorDescriptorItemUi implements PropertyChangeListener, Runnab
 		}
 	}
 
-	boolean hasTooltip(final DiscoveryConnector connector) {
+	boolean hasTooltip(final CatalogItem connector) {
 		return connector.getOverview() != null
 				&& connector.getOverview().getSummary() != null
 				&& connector.getOverview().getSummary().length() > 0;
@@ -555,7 +547,7 @@ public class ConnectorDescriptorItemUi implements PropertyChangeListener, Runnab
 		return this.connectorContainer;
 	}
 
-	public DiscoveryConnector getConnector() {
+	public CatalogItem getConnector() {
 		return this.connector;
 	}
 

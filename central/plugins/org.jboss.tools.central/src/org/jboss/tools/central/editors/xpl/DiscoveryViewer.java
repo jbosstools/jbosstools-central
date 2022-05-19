@@ -36,6 +36,19 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.MultiStatus;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.equinox.internal.p2.discovery.AbstractCatalogSource;
+import org.eclipse.equinox.internal.p2.discovery.Catalog;
+import org.eclipse.equinox.internal.p2.discovery.compatibility.SiteVerifier;
+import org.eclipse.equinox.internal.p2.discovery.model.CatalogCategory;
+import org.eclipse.equinox.internal.p2.discovery.model.CatalogItem;
+import org.eclipse.equinox.internal.p2.discovery.model.Icon;
+import org.eclipse.equinox.internal.p2.discovery.model.Overview;
+import org.eclipse.equinox.internal.p2.discovery.util.CatalogCategoryComparator;
+import org.eclipse.equinox.internal.p2.discovery.util.CatalogItemComparator;
+import org.eclipse.equinox.internal.p2.ui.discovery.DiscoveryImages;
+import org.eclipse.equinox.internal.p2.ui.discovery.DiscoveryUi;
+import org.eclipse.equinox.internal.p2.ui.discovery.util.GradientCanvas;
+import org.eclipse.equinox.internal.p2.ui.discovery.wizards.Messages;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.layout.GridDataFactory;
@@ -53,21 +66,6 @@ import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerFilter;
-import org.eclipse.mylyn.commons.ui.CommonImages;
-import org.eclipse.mylyn.commons.ui.GradientCanvas;
-import org.eclipse.mylyn.commons.ui.compatibility.CommonThemes;
-import org.eclipse.mylyn.internal.discovery.core.model.AbstractDiscoverySource;
-import org.eclipse.mylyn.internal.discovery.core.model.ConnectorDescriptor;
-import org.eclipse.mylyn.internal.discovery.core.model.ConnectorDiscovery;
-import org.eclipse.mylyn.internal.discovery.core.model.DiscoveryCategory;
-import org.eclipse.mylyn.internal.discovery.core.model.DiscoveryConnector;
-import org.eclipse.mylyn.internal.discovery.core.model.Icon;
-import org.eclipse.mylyn.internal.discovery.core.model.Overview;
-import org.eclipse.mylyn.internal.discovery.core.util.DiscoveryCategoryComparator;
-import org.eclipse.mylyn.internal.discovery.core.util.DiscoveryConnectorComparator;
-import org.eclipse.mylyn.internal.discovery.ui.DiscoveryImages;
-import org.eclipse.mylyn.internal.discovery.ui.DiscoveryUi;
-import org.eclipse.mylyn.internal.discovery.ui.wizards.Messages;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.accessibility.ACC;
@@ -124,6 +122,7 @@ import org.jboss.tools.central.editors.xpl.filters.FiltersSelectionDialog;
 import org.jboss.tools.central.editors.xpl.filters.UserFilterEntry;
 import org.jboss.tools.discovery.core.internal.connectors.DiscoveryUtil;
 import org.jboss.tools.discovery.core.internal.connectors.JBossDiscoveryUi;
+import org.jboss.tools.discovery.core.internal.connectors.PrepareInstallProfileJob;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.Version;
 
@@ -134,6 +133,7 @@ import org.osgi.framework.Version;
  * @author Steffen Pingel
  * @author Mickael Istria - Refactorings and feature additions
  */
+@SuppressWarnings("restriction")
 public class DiscoveryViewer extends Viewer {
 
 	private static final int MINIMUM_HEIGHT = 100;
@@ -191,9 +191,9 @@ public class DiscoveryViewer extends Viewer {
 	private final IRunnableContext context;
 
 	private Set<String> directoryUrls;
-	private volatile HashMap<String, ConnectorDiscovery> discoveries = new LinkedHashMap<>();
-	private List<DiscoveryConnector> allConnectors;
-	private Map<DiscoveryConnector, ConnectorDescriptorItemUi> itemsUi = new HashMap<>();
+	protected volatile HashMap<String, Catalog> catalogs = new LinkedHashMap<>();
+	private List<CatalogItem> allConnectors;
+	private Map<CatalogItem, ConnectorDescriptorItemUi> itemsUi = new HashMap<>();
 	private Map<String, Control> categories = new HashMap<>();
 	private Link nothingToShowLink;
 
@@ -235,7 +235,7 @@ public class DiscoveryViewer extends Viewer {
 		updateFilters();
 	}
 
-	static Image computeIconImage(AbstractDiscoverySource discoverySource, Icon icon, int dimension, boolean fallback) {
+	static Image computeIconImage(AbstractCatalogSource discoverySource, Icon icon, int dimension, boolean fallback) {
 		String imagePath;
 		switch (dimension) {
 		case 64:
@@ -346,14 +346,14 @@ public class DiscoveryViewer extends Viewer {
 	}
 
 	private Label createClearFilterTextControl(Composite filterContainer, final Text filterText) {
-		final Image inactiveImage = CommonImages.FIND_CLEAR_DISABLED.createImage();
-		final Image activeImage = CommonImages.FIND_CLEAR.createImage();
+		final Image inactiveImage = DiscoveryImages.FIND_CLEAR_DISABLED.createImage();
+		final Image activeImage = DiscoveryImages.FIND_CLEAR.createImage();
 		final Image pressedImage = new Image(filterContainer.getDisplay(), activeImage, SWT.IMAGE_GRAY);
 
 		final Label clearButton = new Label(filterContainer, SWT.NONE);
 		clearButton.setLayoutData(new GridData(SWT.BEGINNING, SWT.CENTER, false, false));
 		clearButton.setImage(inactiveImage);
-		clearButton.setToolTipText(Messages.ConnectorDiscoveryWizardMainPage_clearButton_toolTip);
+		clearButton.setToolTipText(org.jboss.tools.central.Messages.ConnectorDiscoveryWizardMainPage_clearButton_toolTip);
 		clearButton.setBackground(filterContainer.getDisplay().getSystemColor(SWT.COLOR_LIST_BACKGROUND));
 		clearButton.addMouseListener(new MouseAdapter() {
 			private MouseMoveListener fMoveListener;
@@ -421,7 +421,7 @@ public class DiscoveryViewer extends Viewer {
 		clearButton.getAccessible().addAccessibleListener(new AccessibleAdapter() {
 			@Override
 			public void getName(AccessibleEvent e) {
-				e.result = Messages.ConnectorDiscoveryWizardMainPage_clearButton_accessibleListener;
+				e.result = org.jboss.tools.central.Messages.ConnectorDiscoveryWizardMainPage_clearButton_accessibleListener;
 			}
 		});
 		clearButton.getAccessible().addAccessibleControlListener(new AccessibleControlAdapter() {
@@ -448,8 +448,8 @@ public class DiscoveryViewer extends Viewer {
 					}
 					clearDisposables();
 				}
-				if (DiscoveryViewer.this.discoveries != null) {
-					for (ConnectorDiscovery discovery : DiscoveryViewer.this.discoveries.values()) {
+				if (DiscoveryViewer.this.catalogs != null) {
+					for (Catalog discovery : DiscoveryViewer.this.catalogs.values()) {
 						discovery.dispose();
 					}
 					for (ConnectorDescriptorItemUi item : itemsUi.values()) {
@@ -581,7 +581,7 @@ public class DiscoveryViewer extends Viewer {
 		}
 		// First apply text filter
 		for (ConnectorDescriptorItemUi item : this.itemsUi.values()) {
-			ConnectorDescriptor descriptor = item.getConnector();
+			CatalogItem descriptor = item.getConnector();
 			if (!this.filterTextWidget.getText().isEmpty()) {
 				if (!(filterMatches(descriptor.getName()) || filterMatches(descriptor.getDescription())
 						|| filterMatches(descriptor.getProvider()) || filterMatches(descriptor.getLicense()))) {
@@ -687,23 +687,23 @@ public class DiscoveryViewer extends Viewer {
 		this.nothingToShowLink.setVisible(this.allConnectors == null || this.allConnectors.isEmpty());
 
 		GridLayoutFactory.fillDefaults().numColumns(2).spacing(0, 0).applyTo(container);
-		Map<String, LinkedHashSet<DiscoveryCategory>> categoriesById = new HashMap<>();
+		Map<String, LinkedHashSet<CatalogCategory>> categoriesById = new HashMap<>();
 		// necessary because categories from != discovery are not equal, whereas we want them unified in UI
-		for (ConnectorDiscovery discovery : this.discoveries.values()) {
-			for (DiscoveryCategory category : discovery.getCategories()) {
+		for (Catalog discovery : this.catalogs.values()) {
+			for (CatalogCategory category : discovery.getCategories()) {
 				if (categoriesById.get(category.getId()) == null) {
-					categoriesById.put(category.getId(), new LinkedHashSet<DiscoveryCategory>());
+					categoriesById.put(category.getId(), new LinkedHashSet<CatalogCategory>());
 				}
 				categoriesById.get(category.getId()).add(category);
 			}
 		}
 		
 		// Sort by 1st category
-		SortedSet<LinkedHashSet<DiscoveryCategory>> sortedCategories = new TreeSet<>(new Comparator<LinkedHashSet<DiscoveryCategory>>() {
-			private DiscoveryCategoryComparator comparator = new DiscoveryCategoryComparator();
+		SortedSet<LinkedHashSet<CatalogCategory>> sortedCategories = new TreeSet<>(new Comparator<LinkedHashSet<CatalogCategory>>() {
+			private CatalogCategoryComparator comparator = new CatalogCategoryComparator();
 			
 			@Override
-			public int compare(LinkedHashSet<DiscoveryCategory> o1, LinkedHashSet<DiscoveryCategory> o2) {
+			public int compare(LinkedHashSet<CatalogCategory> o1, LinkedHashSet<CatalogCategory> o2) {
 				if (o1 == o2) {
 					return 0;
 				}
@@ -713,15 +713,15 @@ public class DiscoveryViewer extends Viewer {
 		sortedCategories.addAll(categoriesById.values());
 
 		Composite categoryChildrenContainer = null;
-		for (LinkedHashSet<DiscoveryCategory> categories : sortedCategories) {
+		for (LinkedHashSet<CatalogCategory> categories : sortedCategories) {
 			boolean isEmpty = true;
-			DiscoveryCategory firstCategory = categories.iterator().next();
+			CatalogCategory firstCategory = categories.iterator().next();
 			categoryChildrenContainer = createCategoryHeaderAndContainer(container, firstCategory, background);
 			// Populate category
-			for (DiscoveryCategory category : categories) {
-				List<DiscoveryConnector> connectors = new ArrayList<>(category.getConnectors());
-				Collections.sort(connectors, new DiscoveryConnectorComparator(category));
-				for (final DiscoveryConnector connector : connectors) {
+			for (CatalogCategory category : categories) {
+				List<CatalogItem> connectors = new ArrayList<>(category.getItems());
+				Collections.sort(connectors, new CatalogItemComparator());
+				for (final CatalogItem connector : connectors) {
 					ConnectorDescriptorItemUi itemUi = new ConnectorDescriptorItemUi(this, connector,
 							categoryChildrenContainer,
 							getBackgroundColor(connector, background),
@@ -750,7 +750,7 @@ public class DiscoveryViewer extends Viewer {
 	 * @param background
 	 * @return
 	 */
-	private Composite createCategoryHeaderAndContainer(Composite container, DiscoveryCategory category, Color background) {
+	private Composite createCategoryHeaderAndContainer(Composite container, CatalogCategory category, Color background) {
 		Composite categoryChildrenContainer;
 		// category header
 		final GradientCanvas categoryHeaderContainer = new GradientCanvas(container, SWT.NONE);
@@ -857,10 +857,10 @@ public class DiscoveryViewer extends Viewer {
 				if (body == null || body.isDisposed()) {
 					return;
 				}
-				if (DiscoveryViewer.this.discoveries != null && !wasCancelled) {
-					for (ConnectorDiscovery discovery : DiscoveryViewer.this.discoveries.values()) {
-						for (DiscoveryCategory category : discovery.getCategories()) {
-							if (! category.getConnectors().isEmpty()) {
+				if (DiscoveryViewer.this.catalogs != null && !wasCancelled) {
+					for (Catalog discovery : DiscoveryViewer.this.catalogs.values()) {
+						for (CatalogCategory category : discovery.getCategories()) {
+							if (! category.getItems().isEmpty()) {
 								return;
 							}
 						}
@@ -901,8 +901,8 @@ public class DiscoveryViewer extends Viewer {
 		return environment;
 	}
 
-	public Set<ConnectorDescriptor> getInstallableConnectors() {
-		Set<ConnectorDescriptor> res = new HashSet<>();
+	public Set<CatalogItem> getInstallableConnectors() {
+		Set<CatalogItem> res = new HashSet<>();
 		for (ConnectorDescriptorItemUi item : (List<ConnectorDescriptorItemUi>)getSelection().toList()) {
 			if (!item.getConnector().isInstalled()) {
 				res.add(item.getConnector());
@@ -911,8 +911,8 @@ public class DiscoveryViewer extends Viewer {
 		return res;
 	}
 	
-	public Set<ConnectorDescriptor> getInstalledConnectors() {
-		Set<ConnectorDescriptor> res = new HashSet<>();
+	public Set<CatalogItem> getInstalledConnectors() {
+		Set<CatalogItem> res = new HashSet<>();
 		for (ConnectorDescriptorItemUi item : (List<ConnectorDescriptorItemUi>)getSelection().toList()) {
 			if (item.getConnector().isInstalled()) {
 				res.add(item.getConnector());
@@ -921,8 +921,8 @@ public class DiscoveryViewer extends Viewer {
 		return res;
 	}
 	
-	public Set<ConnectorDescriptor> getUpdatableConnectors() {
-		Set<ConnectorDescriptor> res = new HashSet<>();
+	public Set<CatalogItem> getUpdatableConnectors() {
+		Set<CatalogItem> res = new HashSet<>();
 		for (ConnectorDescriptorItemUi item : (List<ConnectorDescriptorItemUi>)getSelection().toList()) {
 			if (item.getConnector().isInstalled() && !item.isUpToDate()) {
 				res.add(item.getConnector());
@@ -949,7 +949,7 @@ public class DiscoveryViewer extends Viewer {
 		return verifyUpdateSiteAvailability;
 	}
 
-	private boolean hasTooltip(final DiscoveryCategory category) {
+	private boolean hasTooltip(final CatalogCategory category) {
 		return category.getOverview() != null && category.getOverview().getSummary() != null
 				&& category.getOverview().getSummary().length() > 0;
 	}
@@ -969,7 +969,7 @@ public class DiscoveryViewer extends Viewer {
 	}
 
 	static void hookTooltip(final Control parent, final Widget tipActivator, final Control exitControl,
-			final Control titleControl, AbstractDiscoverySource source, Overview overview, Image image) {
+			final Control titleControl, AbstractCatalogSource source, Overview overview, Image image) {
 		final OverviewToolTip toolTip = new OverviewToolTip(parent, source, overview, image);
 		Listener listener = new Listener() {
 			@Override
@@ -1034,12 +1034,8 @@ public class DiscoveryViewer extends Viewer {
 			colorWhite = colorRegistry.get(COLOR_WHITE);
 		}
 		if (colorCategoryGradientStart == null) {
-			colorCategoryGradientStart = themeManager.getCurrentTheme()
-					.getColorRegistry()
-					.get(CommonThemes.COLOR_CATEGORY_GRADIENT_START);
-			colorCategoryGradientEnd = themeManager.getCurrentTheme()
-					.getColorRegistry()
-					.get(CommonThemes.COLOR_CATEGORY_GRADIENT_END);
+			colorCategoryGradientStart = DiscoveryUi.getCommonsColors().getGradientBegin();
+			colorCategoryGradientEnd = DiscoveryUi.getCommonsColors().getGradientEnd();
 		}
 	}
 
@@ -1089,7 +1085,7 @@ public class DiscoveryViewer extends Viewer {
 	}
 
 	void modifySelection(final ConnectorDescriptorItemUi item, boolean selected) {
-		DiscoveryConnector connector = item.getConnector();
+		CatalogItem connector = item.getConnector();
 		connector.setSelected(selected);
 		fireSelectionChanged(new SelectionChangedEvent(this, getSelection()));
 	}
@@ -1194,22 +1190,22 @@ public class DiscoveryViewer extends Viewer {
 						DiscoveryViewer.this.installedFeatures = getInstalledFeatures(monitor);
 					}
 					// TODO parallize this loop
-					Map<String, Set<DiscoveryConnector>> connectorsById = new HashMap<>();
+					Map<String, Set<CatalogItem>> connectorsById = new HashMap<>();
 					for (String directoryUrl : DiscoveryViewer.this.directoryUrls) {
-						ConnectorDiscovery connectorDiscovery = DiscoveryUtil.createConnectorDiscovery(directoryUrl);
-						connectorDiscovery.setEnvironment(environment);
-						connectorDiscovery.setVerifyUpdateSiteAvailability(false);
+						Catalog catalog = DiscoveryUtil.createCatalog(directoryUrl);
+						catalog.setEnvironment(environment);
+						catalog.setVerifyUpdateSiteAvailability(false);
 						try {
-							result[0] = connectorDiscovery.performDiscovery(monitor);
+							result[0] = catalog.performDiscovery(monitor);
 						} finally {
 							if (monitor.isCanceled()) {
 								return;
 							}
-							DiscoveryViewer.this.discoveries.put(directoryUrl, connectorDiscovery);
-							for (DiscoveryConnector connector : connectorDiscovery.getConnectors()) {
+							DiscoveryViewer.this.catalogs.put(directoryUrl, catalog);
+							for (CatalogItem connector : catalog.getItems()) {
 								connector.setInstalled(installedFeatures != null && installedFeatures.containsAll(connector.getInstallableUnits()));
 								if (connectorsById.get(connector.getId()) == null) {
-									connectorsById.put(connector.getId(), new HashSet<DiscoveryConnector>());
+									connectorsById.put(connector.getId(), new HashSet<CatalogItem>());
 								}
 								connectorsById.get(connector.getId()).add(connector);
 							}
@@ -1234,7 +1230,7 @@ public class DiscoveryViewer extends Viewer {
 			wasCancelled = true;
 			return;
 		}
-		if (this.discoveries != null && !this.discoveries.isEmpty()) {
+		if (this.catalogs != null && !this.catalogs.isEmpty()) {
 			discoveryUpdated(wasCancelled);
 			if (verifyUpdateSiteAvailability) {
 				try {
@@ -1242,9 +1238,10 @@ public class DiscoveryViewer extends Viewer {
 						@Override
 						public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
 							// TODO parallelize
-							for (ConnectorDiscovery discovery : DiscoveryViewer.this.discoveries.values()) {
-								if (!discovery.getConnectors().isEmpty()) {
-									discovery.verifySiteAvailability(monitor);
+							for (Catalog catalog : DiscoveryViewer.this.catalogs.values()) {
+								if (!catalog.getItems().isEmpty()) {
+									SiteVerifier verifier = new SiteVerifier(catalog);
+									verifier.verifySiteAvailability(monitor);
 								}
 							}
 						}
@@ -1282,10 +1279,10 @@ public class DiscoveryViewer extends Viewer {
 				}
 				DiscoveryViewer.this.categories.clear();
 
-				for (ConnectorDiscovery discovery : DiscoveryViewer.this.discoveries.values()) {
+				for (Catalog discovery : DiscoveryViewer.this.catalogs.values()) {
 					discovery.dispose();
 				}
-				DiscoveryViewer.this.discoveries.clear();
+				DiscoveryViewer.this.catalogs.clear();
 
 				for (ConnectorDescriptorItemUi itemUI : DiscoveryViewer.this.itemsUi.values()) {
 					itemUI.dispose();
@@ -1295,12 +1292,8 @@ public class DiscoveryViewer extends Viewer {
 		});
 	}
 
-	protected void postDiscovery(ConnectorDiscovery connectorDiscovery) {
-		
-	}
-
 	protected Set<String> getInstalledFeatures(IProgressMonitor monitor) throws InterruptedException {
-		return DiscoveryUi.createInstallJob().getInstalledFeatures(monitor);
+		return new PrepareInstallProfileJob(Collections.emptyList()).getInstalledFeatures(monitor);
 	}
 
 	@Override
@@ -1386,7 +1379,7 @@ public class DiscoveryViewer extends Viewer {
 		this.systemFilters.remove(filter);
 	}
 	
-	private Color getBackgroundColor(DiscoveryConnector connector, Color defaultColor) {
+	private Color getBackgroundColor(CatalogItem connector, Color defaultColor) {
 		Color res = defaultColor;
 		// TODO allow to plug computation of color externally, similar to addFilter
 		// something like addConditionalStyle(ConnectorDiscovery)

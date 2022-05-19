@@ -13,15 +13,15 @@ package org.jboss.tools.central.editors.xpl;
 import java.net.URL;
 
 import org.eclipse.core.runtime.Assert;
+import org.eclipse.equinox.internal.p2.discovery.AbstractCatalogSource;
+import org.eclipse.equinox.internal.p2.discovery.model.Overview;
+import org.eclipse.equinox.internal.p2.ui.discovery.util.GradientToolTip;
+import org.eclipse.equinox.internal.p2.ui.discovery.util.WorkbenchUtil;
+import org.eclipse.equinox.internal.p2.ui.discovery.wizards.Messages;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.window.ToolTip;
-import org.eclipse.mylyn.commons.ui.GradientToolTip;
-import org.eclipse.mylyn.commons.workbench.browser.BrowserUtil;
-import org.eclipse.mylyn.internal.discovery.core.model.AbstractDiscoverySource;
-import org.eclipse.mylyn.internal.discovery.core.model.Overview;
-import org.eclipse.mylyn.internal.discovery.ui.wizards.Messages;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.StyledText;
@@ -44,17 +44,19 @@ import org.eclipse.ui.browser.IWorkbenchBrowserSupport;
 /**
  * @author David Green
  */
+@SuppressWarnings("restriction")
 class OverviewToolTip extends GradientToolTip {
 
-	private final Overview overview;
 
-	private final AbstractDiscoverySource source;
+	private final AbstractCatalogSource source;
 
 	private final Control parent;
 
 	private final Image leftImage;
+	
+	private final Overview overview;
 
-	public OverviewToolTip(Control control, AbstractDiscoverySource source, Overview overview, Image leftImage) {
+	public OverviewToolTip(Control control, AbstractCatalogSource source, Overview overview, Image leftImage) {
 		super(control, ToolTip.RECREATE, true);
 		Assert.isNotNull(source);
 		Assert.isNotNull(overview);
@@ -175,7 +177,7 @@ class OverviewToolTip extends GradientToolTip {
 			link.addSelectionListener(new SelectionListener() {
 				@Override
 				public void widgetSelected(SelectionEvent e) {
-					BrowserUtil.openUrl(overview.getUrl(), IWorkbenchBrowserSupport.AS_EXTERNAL);
+					WorkbenchUtil.openUrl(overview.getUrl(), IWorkbenchBrowserSupport.AS_EXTERNAL);
 				}
 
 				@Override
@@ -205,7 +207,7 @@ class OverviewToolTip extends GradientToolTip {
 		return container;
 	}
 
-	private Image computeImage(AbstractDiscoverySource discoverySource, String imagePath) {
+	private Image computeImage(AbstractCatalogSource discoverySource, String imagePath) {
 		URL resource = discoverySource.getResource(imagePath);
 		if (resource != null) {
 			ImageDescriptor descriptor = ImageDescriptor.createFromURL(resource);

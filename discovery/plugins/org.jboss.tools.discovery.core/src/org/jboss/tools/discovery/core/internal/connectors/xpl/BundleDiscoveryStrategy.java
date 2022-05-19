@@ -21,19 +21,19 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.core.runtime.SubProgressMonitor;
-import org.eclipse.mylyn.commons.core.StatusHandler;
-import org.eclipse.mylyn.internal.discovery.core.DiscoveryCore;
-import org.eclipse.mylyn.internal.discovery.core.model.AbstractDiscoverySource;
-import org.eclipse.mylyn.internal.discovery.core.model.AbstractDiscoveryStrategy;
-import org.eclipse.mylyn.internal.discovery.core.model.BundleDiscoverySource;
-import org.eclipse.mylyn.internal.discovery.core.model.ConnectorDiscoveryExtensionReader;
-import org.eclipse.mylyn.internal.discovery.core.model.DiscoveryCategory;
-import org.eclipse.mylyn.internal.discovery.core.model.DiscoveryCertification;
-import org.eclipse.mylyn.internal.discovery.core.model.DiscoveryConnector;
-import org.eclipse.mylyn.internal.discovery.core.model.Policy;
-import org.eclipse.mylyn.internal.discovery.core.model.ValidationException;
+import org.eclipse.core.runtime.SubMonitor;
+import org.eclipse.equinox.internal.p2.discovery.AbstractCatalogSource;
+import org.eclipse.equinox.internal.p2.discovery.AbstractDiscoveryStrategy;
+import org.eclipse.equinox.internal.p2.discovery.DiscoveryCore;
+import org.eclipse.equinox.internal.p2.discovery.Policy;
+import org.eclipse.equinox.internal.p2.discovery.compatibility.BundleDiscoverySource;
+import org.eclipse.equinox.internal.p2.discovery.compatibility.ConnectorDiscoveryExtensionReader;
+import org.eclipse.equinox.internal.p2.discovery.model.CatalogCategory;
+import org.eclipse.equinox.internal.p2.discovery.model.CatalogItem;
+import org.eclipse.equinox.internal.p2.discovery.model.Certification;
+import org.eclipse.equinox.internal.p2.discovery.model.ValidationException;
 import org.eclipse.osgi.util.NLS;
+import org.jboss.tools.discovery.core.internal.DiscoveryActivator;
 import org.osgi.framework.Bundle;
 
 /**
@@ -45,11 +45,12 @@ import org.osgi.framework.Bundle;
  * @author David Green
  * @author Fred Bricon
  */
+@SuppressWarnings("restriction")
 public class BundleDiscoveryStrategy extends AbstractDiscoveryStrategy {
 
 	@Override
 	public void performDiscovery(IProgressMonitor monitor) throws CoreException {
-		if (connectors == null || categories == null) {
+		if (items == null || categories == null) {
 			throw new IllegalStateException();
 		}
 		IExtensionPoint extensionPoint = getExtensionRegistry().getExtensionPoint(getExtensionPointId());
@@ -59,7 +60,7 @@ public class BundleDiscoveryStrategy extends AbstractDiscoveryStrategy {
 				: extensions.length);
 		try {
 			if (extensions.length > 0) {
-				processExtensions(new SubProgressMonitor(monitor, extensions.length), extensions);
+				processExtensions(SubMonitor.convert(monitor).split(extensions.length), extensions);
 			}
 		} finally {
 			monitor.done();
@@ -74,7 +75,7 @@ public class BundleDiscoveryStrategy extends AbstractDiscoveryStrategy {
 			ConnectorDiscoveryExtensionReader extensionReader = new ConnectorDiscoveryExtensionReader();
 
 			for (IExtension extension : extensions) {
-				AbstractDiscoverySource discoverySource = computeDiscoverySource(extension.getContributor());
+				AbstractCatalogSource discoverySource = computeDiscoverySource(extension.getContributor());
 				IConfigurationElement[] elements = extension.getConfigurationElements();
 				for (IConfigurationElement element : elements) {
 					if (monitor.isCanceled()) {
@@ -82,16 +83,16 @@ public class BundleDiscoveryStrategy extends AbstractDiscoveryStrategy {
 					}
 					try {
 						if (ConnectorDiscoveryExtensionReader.CONNECTOR_DESCRIPTOR.equals(element.getName())) {
-							DiscoveryConnector descriptor = extensionReader.readConnectorDescriptor(element,
-									DiscoveryConnector.class);
+							CatalogItem descriptor = extensionReader.readConnectorDescriptor(element,
+									CatalogItem.class);
 							descriptor.setSource(discoverySource);
-							connectors.add(descriptor);
+							items.add(descriptor);
 						} else if (ConnectorDiscoveryExtensionReader.CONNECTOR_CATEGORY.equals(element.getName())) {
-							DiscoveryCategory category = extensionReader.readConnectorCategory(element,
-									DiscoveryCategory.class);
+							CatalogCategory category = extensionReader.readConnectorCategory(element,
+									CatalogCategory.class);
 							category.setSource(discoverySource);
 							if (!discoverySource.getPolicy().isPermitCategories()) {
-								StatusHandler.log(new Status(IStatus.ERROR, DiscoveryCore.ID_PLUGIN, NLS.bind(
+								DiscoveryActivator.getDefault().getLog().log(new Status(IStatus.ERROR, DiscoveryCore.ID_PLUGIN, NLS.bind(
 										"Cannot create category ''{0}'' with id ''{1}'' from {2}: disallowed",
 										new Object[] { category.getName(), category.getId(),
 												element.getContributor().getName() }), null));
@@ -99,8 +100,8 @@ public class BundleDiscoveryStrategy extends AbstractDiscoveryStrategy {
 								categories.add(category);
 							}
 						} else if (ConnectorDiscoveryExtensionReader.CERTIFICATION.equals(element.getName())) {
-							DiscoveryCertification certification = extensionReader.readCertification(element,
-									DiscoveryCertification.class);
+							Certification certification = extensionReader.readCertification(element,
+									Certification.class);
 							certification.setSource(discoverySource);
 							certifications.add(certification);
 						} else {
@@ -108,7 +109,7 @@ public class BundleDiscoveryStrategy extends AbstractDiscoveryStrategy {
 									element.getName()));
 						}
 					} catch (ValidationException e) {
-						StatusHandler.log(new Status(IStatus.ERROR, DiscoveryCore.ID_PLUGIN,
+						DiscoveryActivator.getDefault().getLog().log(new Status(IStatus.ERROR, DiscoveryCore.ID_PLUGIN,
 								NLS.bind("{0}: {1}", element.getContributor().getName(),
 										e.getMessage()), e));
 					}
@@ -120,7 +121,7 @@ public class BundleDiscoveryStrategy extends AbstractDiscoveryStrategy {
 		}
 	}
 
-	protected AbstractDiscoverySource computeDiscoverySource(IContributor contributor) {
+	protected AbstractCatalogSource computeDiscoverySource(IContributor contributor) {
 		Policy policy = new Policy(true);
 		BundleDiscoverySource bundleDiscoverySource = new BundleDiscoverySource(
 				Platform.getBundle(contributor.getName()));

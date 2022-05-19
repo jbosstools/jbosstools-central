@@ -22,6 +22,7 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.IJobChangeEvent;
 import org.eclipse.core.runtime.jobs.JobChangeAdapter;
+import org.eclipse.equinox.internal.p2.discovery.model.CatalogItem;
 import org.eclipse.equinox.p2.core.IProvisioningAgent;
 import org.eclipse.equinox.p2.repository.artifact.IArtifactRepositoryManager;
 import org.eclipse.equinox.p2.repository.metadata.IMetadataRepositoryManager;
@@ -34,9 +35,6 @@ import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.operation.ModalContext;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
-import org.eclipse.mylyn.commons.core.DelegatingProgressMonitor;
-import org.eclipse.mylyn.internal.discovery.core.model.ConnectorDescriptor;
-import org.eclipse.mylyn.internal.discovery.core.model.DiscoveryConnector;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ControlAdapter;
@@ -79,6 +77,7 @@ import org.jboss.tools.discovery.core.internal.connectors.JBossDiscoveryUi;
  * @author snjeza
  *
  */
+@SuppressWarnings("restriction")
 public class SoftwarePage extends AbstractJBossCentralPage implements IRunnableContext {
 
 	public static final String ID = ID_PREFIX + "SoftwarePage";
@@ -108,7 +107,7 @@ public class SoftwarePage extends AbstractJBossCentralPage implements IRunnableC
 	
 	public SoftwarePage(FormEditor editor) {
 		super(editor, ID, "Software/Update");
-		monitor = new DelegatingProgressMonitor();
+		monitor = new org.jboss.tools.foundation.core.jobs.DelegatingProgressMonitor();
 	}
 	
 	@Override
@@ -446,7 +445,7 @@ public class SoftwarePage extends AbstractJBossCentralPage implements IRunnableC
 						}
 					}						
 				});
-				List<ConnectorDescriptor> toInstall = new ArrayList<>(discoveryViewer.getInstallableConnectors());
+				List<CatalogItem> toInstall = new ArrayList<>(discoveryViewer.getInstallableConnectors());
 				toInstall.addAll(discoveryViewer.getUpdatableConnectors());
 				if (toInstall.isEmpty()) {
 					MessageDialog.openInformation(getSite().getShell(), Messages.SoftwarePage_nothingToInstall_title, Messages.SoftwarePage_nothingToInstall_description);
@@ -517,9 +516,9 @@ public class SoftwarePage extends AbstractJBossCentralPage implements IRunnableC
 		} else {
 			// TODO consider making this a listener on the preference rather than checkbox
 			// if preference comes to be editable in several places
-			List<ConnectorDescriptor> installedEarlyAccess = new ArrayList<>();
+			List<CatalogItem> installedEarlyAccess = new ArrayList<>();
 			for (ConnectorDescriptorItemUi connector : SoftwarePage.this.discoveryViewer.getAllConnectorsItemsUi()) {
-				DiscoveryConnector discoveryConnector = connector.getConnector();
+				CatalogItem discoveryConnector = connector.getConnector();
 				if (discoveryConnector.getCertificationId() != null && discoveryConnector.getCertificationId().contains("earlyaccess") && discoveryConnector.isInstalled()) {
 					installedEarlyAccess.add(discoveryConnector);
 				}
@@ -527,7 +526,7 @@ public class SoftwarePage extends AbstractJBossCentralPage implements IRunnableC
 			// remaining early-access connectors
 			if (!installedEarlyAccess.isEmpty()) {
 				StringBuilder listOfConnectors = new StringBuilder();
-				for (ConnectorDescriptor connector : installedEarlyAccess) {
+				for (CatalogItem connector : installedEarlyAccess) {
 					listOfConnectors.append(" - "); //$NON-NLS-1$
 					listOfConnectors.append(connector.getName());
 					listOfConnectors.append('\n'); //$NON-NLS-1$
