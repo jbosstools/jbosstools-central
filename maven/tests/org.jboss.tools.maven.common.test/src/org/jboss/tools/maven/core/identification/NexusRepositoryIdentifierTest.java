@@ -59,7 +59,7 @@ public class NexusRepositoryIdentifierTest extends AbstractIdentificationTest {
 		
 		key= identifier.identify(jansi);
 		assertEquals("jansi", key.getArtifactId());
-		assertEquals("1.6", key.getVersion());
+		assertEquals("1.7", key.getVersion());
 		
 		key = identifier.identify(arquillian);
 		assertEquals("arquillian-core-spi", key.getArtifactId());

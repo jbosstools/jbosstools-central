@@ -71,6 +71,7 @@ import org.jboss.tools.central.editors.xpl.filters.EarlyAccessOrMostRecentVersio
 import org.jboss.tools.central.editors.xpl.filters.InstalledFilter;
 import org.jboss.tools.discovery.core.internal.DiscoveryActivator;
 import org.jboss.tools.discovery.core.internal.connectors.JBossDiscoveryUi;
+import org.jboss.tools.foundation.core.jobs.DelegatingProgressMonitor;
 
 /**
  * 
@@ -107,7 +108,7 @@ public class SoftwarePage extends AbstractJBossCentralPage implements IRunnableC
 	
 	public SoftwarePage(FormEditor editor) {
 		super(editor, ID, "Software/Update");
-		monitor = new org.jboss.tools.foundation.core.jobs.DelegatingProgressMonitor();
+		monitor = new DelegatingProgressMonitor();
 	}
 	
 	@Override
