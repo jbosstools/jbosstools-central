@@ -16,6 +16,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.eclipse.equinox.internal.p2.ui.discovery.DiscoveryUi;
 import org.eclipse.jface.bindings.keys.KeyStroke;
 import org.eclipse.jface.bindings.keys.ParseException;
 import org.eclipse.jface.dialogs.IDialogSettings;
@@ -30,8 +31,6 @@ import org.eclipse.jface.fieldassist.TextContentAdapter;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.JFaceResources;
-import org.eclipse.mylyn.internal.commons.ui.CommonsUiPlugin;
-import org.eclipse.mylyn.internal.commons.workbench.Messages;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.accessibility.ACC;
 import org.eclipse.swt.accessibility.AccessibleAdapter;
@@ -65,11 +64,13 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.internal.WorkbenchMessages;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.jboss.tools.central.JBossCentralActivator;
+import org.jboss.tools.central.Messages;
 
 /**
  * @author Shawn Minto
  * @author snjeza
  */
+@SuppressWarnings("restriction")
 public class TextSearchControl extends Composite {
 
 	private static final int MAX_PROPOSAL_ITEMS = 50;
@@ -106,7 +107,7 @@ public class TextSearchControl extends Composite {
 			JFaceResources.getImageRegistry().put(CLEAR_ICON, descriptor);
 		}
 
-		descriptor = AbstractUIPlugin.imageDescriptorFromPlugin(CommonsUiPlugin.ID_PLUGIN,
+		descriptor = AbstractUIPlugin.imageDescriptorFromPlugin(DiscoveryUi.ID_PLUGIN,
 				"$nl$/icons/etool16/find.png"); //$NON-NLS-1$
 		if (descriptor != null) {
 			JFaceResources.getImageRegistry().put(FIND_ICON, descriptor);

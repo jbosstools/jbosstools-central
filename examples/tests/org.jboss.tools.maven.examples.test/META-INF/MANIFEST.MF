@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: %BundleName
 Bundle-SymbolicName: org.jboss.tools.maven.examples.test;singleton:=true
-Bundle-Version: 3.1.600.qualifier
+Bundle-Version: 3.1.700.qualifier
 Require-Bundle: org.eclipse.core.runtime,
  org.jboss.tools.project.examples,
  org.jboss.tools.community.project.examples,
@@ -24,6 +24,4 @@ Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Export-Package: org.jboss.tools.maven.examples.test
 Bundle-Vendor: %BundleVendor
 Bundle-Localization: plugin
-Bundle-ClassPath: lib/mockito-core-1.9.5.jar,
- lib/objenesis-1.0.jar,
- .
+Bundle-ClassPath: .

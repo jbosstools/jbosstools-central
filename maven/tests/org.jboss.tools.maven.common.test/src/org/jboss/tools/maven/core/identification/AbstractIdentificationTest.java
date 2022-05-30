@@ -26,7 +26,7 @@ public abstract class AbstractIdentificationTest {
 	public void initFiles() {
 		junit = new File("resources/junit_4_10.jar");
 		arquillian = new File("resources/arquillian-core-spi.jar");
-		jansi = new File("resources/jansi-1.6.jar");
+		jansi = new File("resources/jansi-1.7.jar");
 		groovy_jsr223 = new File("resources/groovy-jsr223-2.0.4.jar");
 	}
 	

@@ -20,8 +20,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.io.FileUtils;
-import org.eclipse.mylyn.internal.discovery.core.model.DiscoveryCategory;
-import org.eclipse.mylyn.internal.discovery.core.model.DiscoveryConnector;
+import org.eclipse.equinox.internal.p2.discovery.model.CatalogCategory;
+import org.eclipse.equinox.internal.p2.discovery.model.CatalogItem;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -38,8 +38,8 @@ public class RemoteProxyWizardDiscoveryStrategyTest extends AbstractProxyWizardD
 		downloadArea = createDownloadArea();
 		strategy = new RemoteProxyWizardDiscoveryStrategy();
 		strategy.setStorageFolder(downloadArea);
-		strategy.setConnectors(new ArrayList<DiscoveryConnector>());
-		strategy.setCategories(new ArrayList<DiscoveryCategory>());
+		strategy.setItems(new ArrayList<CatalogItem>());
+		strategy.setCategories(new ArrayList<CatalogCategory>());
 	}
 	
 	@Test

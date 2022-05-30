@@ -13,8 +13,8 @@ package org.jboss.tools.discovery.core.internal.connectors;
 import org.eclipse.core.runtime.IContributor;
 import org.eclipse.core.runtime.IExtension;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.mylyn.internal.discovery.core.model.AbstractDiscoverySource;
-import org.eclipse.mylyn.internal.discovery.core.model.BundleDiscoveryStrategy;
+import org.eclipse.equinox.internal.p2.discovery.AbstractCatalogSource;
+import org.eclipse.equinox.internal.p2.discovery.compatibility.BundleDiscoveryStrategy;
 
 /**
  * A subclass of BundleDiscoveryStrategy to avoid validation fails when property expressions are used in connector description 
@@ -23,11 +23,12 @@ import org.eclipse.mylyn.internal.discovery.core.model.BundleDiscoveryStrategy;
  * @see org.eclipse.mylyn.internal.discovery.core.model.BundleDiscoveryStrategy
  * @author snjeza
  */
+@SuppressWarnings("restriction")
 public class ExpressionBasedBundleDiscoveryStrategy extends BundleDiscoveryStrategy {
 
 	private ExpressionBasedDiscoveryExtensionProcessor processor = new ExpressionBasedDiscoveryExtensionProcessor() {
 		@Override
-		public AbstractDiscoverySource computeDiscoverySource(
+		public AbstractCatalogSource computeDiscoverySource(
 				IContributor contributor) {
 			return ExpressionBasedBundleDiscoveryStrategy.this.computeDiscoverySource(contributor);
 		}
@@ -36,7 +37,7 @@ public class ExpressionBasedBundleDiscoveryStrategy extends BundleDiscoveryStrat
 	@Override
 	protected void processExtensions(IProgressMonitor monitor,
 			IExtension[] extensions) {
-		processor.processExtensions(monitor, extensions, connectors,
+		processor.processExtensions(monitor, extensions, items,
 				categories, certifications);
 	}
 }

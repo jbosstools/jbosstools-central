@@ -10,20 +10,21 @@
  *******************************************************************************/
 package org.jboss.tools.central.editors.xpl.filters;
 
+import org.eclipse.equinox.internal.p2.discovery.model.CatalogItem;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerFilter;
-import org.eclipse.mylyn.internal.discovery.core.model.ConnectorDescriptor;
 
 /**
  * Excludes {@link ConnectorDescriptor} that are already installed
  * @author mistria
  *
  */
+@SuppressWarnings("restriction")
 public class InstalledFilter extends ViewerFilter {
 
 	@Override
 	public boolean select(Viewer viewer, Object parentElement, Object element) {
-		return element instanceof ConnectorDescriptor && ! ((ConnectorDescriptor)element).isInstalled();
+		return element instanceof CatalogItem && ! ((CatalogItem)element).isInstalled();
 	}
 
 }

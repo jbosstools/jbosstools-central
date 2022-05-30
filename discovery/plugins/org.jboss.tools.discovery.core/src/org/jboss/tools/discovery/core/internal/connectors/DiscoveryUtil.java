@@ -13,7 +13,7 @@ package org.jboss.tools.discovery.core.internal.connectors;
 import java.util.Dictionary;
 import java.util.Hashtable;
 
-import org.eclipse.mylyn.internal.discovery.core.model.ConnectorDiscovery;
+import org.eclipse.equinox.internal.p2.discovery.Catalog;
 import org.jboss.tools.discovery.core.internal.DiscoveryActivator;
 import org.jboss.tools.discovery.core.internal.connectors.ChainedDiscoveryStrategy.DiscoveryConnectorCollector;
 
@@ -23,25 +23,26 @@ import org.jboss.tools.discovery.core.internal.connectors.ChainedDiscoveryStrate
  * @author Fred Bricon
  *
  */
+@SuppressWarnings("restriction")
 public class DiscoveryUtil {
 
 	private DiscoveryUtil() {
 	}
 	
 	/**
-	 * Creates a new {@link ConnectorDiscovery} which looks for remote discovery sites first and falls back on locally defined connectors.
+	 * Creates a new {@link Catalog} which looks for remote discovery sites first and falls back on locally defined connectors.
 	 * This will contain ALL discovery content, without filtering, so Early-Access is visible here when although it may not be enabled
 	 */
-	public static ConnectorDiscovery createConnectorDiscovery() {
+	public static Catalog createCatalog() {
 		String directoryUrl = DiscoveryActivator.getDefault().getJBossDiscoveryDirectory();
-		return createConnectorDiscovery(directoryUrl);
+		return createCatalog(directoryUrl);
 	}
 
 	/**
-	 * Creates a new {@link ConnectorDiscovery} which looks for a remote discovery site first and falls back on locally defined connectors.
+	 * Creates a new {@link Catalog} which looks for a remote discovery site first and falls back on locally defined connectors.
 	 */
-	public static ConnectorDiscovery createConnectorDiscovery(String directoryUrl) {
-		ConnectorDiscovery connectorDiscovery = new ConnectorDiscovery();
+	public static Catalog createCatalog(String directoryUrl) {
+		Catalog catalog = new Catalog();
 		ChainedDiscoveryStrategy chainedDiscoveryStrategy = new ChainedDiscoveryStrategy(new DiscoveryConnectorCollector());
 
 		// look for remote descriptor first
@@ -54,10 +55,10 @@ public class DiscoveryUtil {
 		// look for descriptors from installed bundles
 		chainedDiscoveryStrategy.addStrategy(new ExpressionBasedBundleDiscoveryStrategy());
 
-		connectorDiscovery.getDiscoveryStrategies().add(chainedDiscoveryStrategy);
-		connectorDiscovery.setVerifyUpdateSiteAvailability(true);
-		connectorDiscovery.setEnvironment(getEnvironment());
-		return connectorDiscovery;
+		catalog.getDiscoveryStrategies().add(chainedDiscoveryStrategy);
+		catalog.setVerifyUpdateSiteAvailability(true);
+		catalog.setEnvironment(getEnvironment());
+		return catalog;
 	}
 	
 	private static Dictionary<Object, Object> getEnvironment() {

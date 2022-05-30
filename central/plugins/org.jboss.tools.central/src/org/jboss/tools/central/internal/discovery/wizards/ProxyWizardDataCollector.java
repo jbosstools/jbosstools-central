@@ -13,7 +13,7 @@ package org.jboss.tools.central.internal.discovery.wizards;
 import java.util.Collections;
 import java.util.List;
 
-import org.eclipse.mylyn.internal.discovery.core.model.AbstractDiscoveryStrategy;
+import org.eclipse.equinox.internal.p2.discovery.AbstractDiscoveryStrategy;
 import org.jboss.tools.discovery.core.internal.connectors.ChainedDiscoveryStrategy.DataCollector;
 
 /**

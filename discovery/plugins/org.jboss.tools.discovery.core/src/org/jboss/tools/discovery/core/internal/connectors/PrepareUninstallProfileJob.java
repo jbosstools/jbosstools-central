@@ -19,18 +19,17 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.SubMonitor;
+import org.eclipse.equinox.internal.p2.discovery.model.CatalogItem;
 import org.eclipse.equinox.p2.metadata.IInstallableUnit;
 import org.eclipse.equinox.p2.operations.RemediationOperation;
 import org.eclipse.equinox.p2.operations.UninstallOperation;
 import org.eclipse.equinox.p2.ui.ProvisioningUI;
-import org.eclipse.mylyn.internal.discovery.core.model.ConnectorDescriptor;
-import org.eclipse.mylyn.internal.discovery.ui.UninstallRequest;
 import org.eclipse.swt.widgets.Display;
 import org.jboss.tools.discovery.core.internal.Messages;
 
 public class PrepareUninstallProfileJob extends PrepareInstallProfileJob {
 
-	public PrepareUninstallProfileJob(List<ConnectorDescriptor> connectors, UninstallRequest request) {
+	public PrepareUninstallProfileJob(List<CatalogItem> connectors, UninstallRequest request) {
 		super(connectors);
 	}
 	

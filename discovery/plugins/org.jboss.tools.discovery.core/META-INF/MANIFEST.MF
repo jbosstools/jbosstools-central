@@ -2,15 +2,13 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: %BundleName
 Bundle-SymbolicName: org.jboss.tools.discovery.core;singleton:=true
-Bundle-Version: 1.2.201.qualifier
+Bundle-Version: 1.2.300.qualifier
 Bundle-Activator: org.jboss.tools.discovery.core.internal.DiscoveryActivator
 Bundle-Vendor: %BundleVendor
 Require-Bundle: org.jboss.tools.foundation.core;bundle-version="1.1.0",
  org.jboss.tools.usage;bundle-version="2.0.0",
  org.eclipse.ui.workbench,
  org.eclipse.core.runtime;bundle-version="3.10.0",
- org.eclipse.mylyn.discovery.ui,
- org.eclipse.mylyn.discovery.core,
  org.eclipse.equinox.p2.ui,
  org.eclipse.equinox.p2.metadata,
  org.eclipse.equinox.p2.operations,
@@ -20,12 +18,14 @@ Require-Bundle: org.jboss.tools.foundation.core;bundle-version="1.1.0",
  org.eclipse.equinox.p2.repository,
  org.eclipse.equinox.p2.core,
  org.eclipse.equinox.p2.director;bundle-version="2.3.100",
- org.eclipse.mylyn.commons.core,
- org.apache.commons.io
+ org.apache.commons.io,
+ org.eclipse.equinox.p2.discovery;bundle-version="1.2.0",
+ org.eclipse.equinox.p2.ui.discovery;bundle-version="1.2.300",
+ org.eclipse.equinox.p2.discovery.compatibility;bundle-version="1.2.200"
 Bundle-ActivationPolicy: lazy
 Bundle-Localization: plugin
 Export-Package: org.jboss.tools.discovery.core.internal,
  org.jboss.tools.discovery.core.internal.connectors,
- org.jboss.tools.discovery.core.internal.connectors.xpl;x-internal:=true
+ org.jboss.tools.discovery.core.internal.connectors.xpl;x-friends:="org.jboss.tools.central"
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 

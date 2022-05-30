@@ -25,15 +25,12 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.preferences.InstanceScope;
+import org.eclipse.equinox.internal.p2.discovery.Catalog;
+import org.eclipse.equinox.internal.p2.discovery.model.CatalogItem;
+import org.eclipse.equinox.internal.p2.ui.discovery.DiscoveryUi;
+import org.eclipse.equinox.internal.p2.ui.discovery.wizards.Messages;
 import org.eclipse.jface.operation.IRunnableContext;
 import org.eclipse.jface.operation.IRunnableWithProgress;
-import org.eclipse.mylyn.internal.discovery.core.model.ConnectorDescriptor;
-import org.eclipse.mylyn.internal.discovery.core.model.ConnectorDiscovery;
-import org.eclipse.mylyn.internal.discovery.core.model.DiscoveryFeedbackJob;
-import org.eclipse.mylyn.internal.discovery.ui.DiscoveryUi;
-import org.eclipse.mylyn.internal.discovery.ui.InstalledItem;
-import org.eclipse.mylyn.internal.discovery.ui.UninstallRequest;
-import org.eclipse.mylyn.internal.discovery.ui.wizards.Messages;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.ui.preferences.ScopedPreferenceStore;
 import org.eclipse.ui.statushandlers.StatusManager;
@@ -48,9 +45,12 @@ import org.jboss.tools.usage.event.UsageReporter;
  * @author snjeza
  * @since 1.5.3
  */
+@SuppressWarnings("restriction")
 public class JBossDiscoveryUi {
 	
 	//private static final String MPC_CORE_PLUGIN_ID = "org.eclipse.epp.mpc.core"; //$NON-NLS-1$
+	
+	public static final String PREF_LAST_INSTALLED = "lastInstalled"; //$NON-NLS-1$
 	
 	public static final class PreferenceKeys {
 		/**
@@ -70,8 +70,8 @@ public class JBossDiscoveryUi {
 	 * @param context
 	 * @return true if installation performed successfully
 	 */
-	public static boolean install(Collection<ConnectorDescriptor> descriptors, IRunnableContext context) {
-		for (ConnectorDescriptor toInstall : descriptors) {
+	public static boolean install(Collection<CatalogItem> descriptors, IRunnableContext context) {
+		for (CatalogItem toInstall : descriptors) {
 			if (toInstall.getInstallableUnits() == null || toInstall.getInstallableUnits().isEmpty()) {
 				return false;
 			}
@@ -85,7 +85,7 @@ public class JBossDiscoveryUi {
 			}
 
 			// update stats
-			new DiscoveryFeedbackJob(descriptors instanceof List ? (List<ConnectorDescriptor>)descriptors : new ArrayList<>(descriptors)).schedule();
+			new DiscoveryFeedbackJob(descriptors instanceof List ? (List<CatalogItem>)descriptors : new ArrayList<>(descriptors)).schedule();
 			recordInstalled(descriptors);
 		} catch (InvocationTargetException e) {
 			IStatus status = new Status(IStatus.ERROR, DiscoveryActivator.PLUGIN_ID, NLS.bind(
@@ -100,12 +100,12 @@ public class JBossDiscoveryUi {
 		return true;
 	}
 	
-	public static boolean uninstall(final List<ConnectorDescriptor> descriptors, IRunnableContext context, boolean fork) {
+	public static boolean uninstall(final List<CatalogItem> descriptors, IRunnableContext context, boolean fork) {
 		try {
 			UninstallRequest request = new UninstallRequest() {
 				@Override
 				public boolean select(InstalledItem item) {
-					for (ConnectorDescriptor desc : descriptors) {
+					for (CatalogItem desc : descriptors) {
 						for (String id : desc.getInstallableUnits()) {
 							if (id.equals(desc.getId())) {
 								return true;
@@ -139,13 +139,13 @@ public class JBossDiscoveryUi {
 	}
 	
 	
-	public static PrepareInstallProfileJob createInstallJob(Collection<ConnectorDescriptor> descriptors) {
+	public static PrepareInstallProfileJob createInstallJob(Collection<CatalogItem> descriptors) {
 		return new PrepareInstallProfileJob(descriptors);
 	}
 	
-	private static void recordInstalled(Collection<ConnectorDescriptor> descriptors) {
+	private static void recordInstalled(Collection<CatalogItem> descriptors) {
 		StringBuilder sb = new StringBuilder();
-		for (ConnectorDescriptor descriptor : descriptors) {
+		for (CatalogItem descriptor : descriptors) {
 			UsageEventType eventType = DiscoveryActivator.getDefault().getInstallSoftwareEventType();
 			UsageReporter.getInstance().trackEvent(eventType.event(descriptor.getId()));
 
@@ -155,7 +155,7 @@ public class JBossDiscoveryUi {
 			sb.append(descriptor.getId());
 		}
 		ScopedPreferenceStore store = new ScopedPreferenceStore(new InstanceScope(), DiscoveryUi.ID_PLUGIN);
-		store.putValue(DiscoveryUi.PREF_LAST_INSTALLED, sb.toString());
+		store.putValue(PREF_LAST_INSTALLED, sb.toString());
 		try {
 			store.save();
 		} catch (IOException e) {
@@ -163,12 +163,12 @@ public class JBossDiscoveryUi {
 		}
 	}
 
-	public static boolean isEarlyAccess(ConnectorDescriptor connector) {
+	public static boolean isEarlyAccess(CatalogItem connector) {
 		String cert = connector.getCertificationId();
 		return cert != null && cert.toLowerCase().contains("earlyaccess");
 	}
 	
-	public static boolean isInstallableConnector(final ConnectorDescriptor connector) {
+	public static boolean isInstallableConnector(final CatalogItem connector) {
 		return connector.getCertificationId() == null || !connector.getCertificationId().toLowerCase().contains("notavailable");
 	}
 
@@ -180,9 +180,9 @@ public class JBossDiscoveryUi {
 	 * @return the set of resolved connector. In case a connector wasn't resolved, it's simply absent in the set, so you
 	 *         should check size or the output for completeness. 
 	 */
-	public static Collection<ConnectorDescriptor> resolveToConnectors(Collection<String> connectorsId, IRunnableContext context) {
-		Map<String, ConnectorDescriptor> res = new HashMap<>();
-		final ConnectorDiscovery catalog = DiscoveryUtil.createConnectorDiscovery();
+	public static Collection<CatalogItem> resolveToConnectors(Collection<String> connectorsId, IRunnableContext context) {
+		Map<String, CatalogItem> res = new HashMap<>();
+		final Catalog catalog = DiscoveryUtil.createCatalog();
 		try {
 			context.run(true, true, new IRunnableWithProgress() {
 				@Override
@@ -195,7 +195,7 @@ public class JBossDiscoveryUi {
 		} catch (InvocationTargetException ex) {
 			DiscoveryActivator.getDefault().getLog().log(new Status(IStatus.ERROR, DiscoveryActivator.getDefault().getBundle().getSymbolicName(), ex.getMessage(), ex));
 		}
-		for (ConnectorDescriptor connector : catalog.getConnectors()) {
+		for (CatalogItem connector : catalog.getItems()) {
 			if (connectorsId.contains(connector.getId()) &&
 				connector.getInstallableUnits() != null &&
 				!connector.getInstallableUnits().isEmpty() &&
@@ -230,7 +230,7 @@ public class JBossDiscoveryUi {
 	 * @param context
 	 */
 	public static boolean installByIds(Collection<String> connectorIds, IRunnableContext context) {
-		Collection<ConnectorDescriptor> connectorsToInstall = resolveToConnectors(connectorIds, context);
+		Collection<CatalogItem> connectorsToInstall = resolveToConnectors(connectorIds, context);
 		if (connectorsToInstall == null || connectorsToInstall.size() != connectorIds.size()) {
 			return false;
 		}

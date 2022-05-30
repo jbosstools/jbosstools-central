@@ -29,12 +29,11 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.equinox.internal.p2.discovery.Catalog;
+import org.eclipse.equinox.internal.p2.discovery.model.CatalogItem;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
-import org.eclipse.mylyn.internal.discovery.core.model.ConnectorDescriptor;
-import org.eclipse.mylyn.internal.discovery.core.model.ConnectorDiscovery;
-import org.eclipse.mylyn.internal.discovery.core.model.DiscoveryConnector;
 import org.eclipse.swt.dnd.DND;
 import org.eclipse.swt.dnd.DropTarget;
 import org.eclipse.swt.dnd.DropTargetAdapter;
@@ -58,6 +57,7 @@ import org.jboss.tools.discovery.core.internal.connectors.JBossDiscoveryUi;
  * @author snjeza
  *
  */
+@SuppressWarnings("restriction")
 public class JBossCentralDropTarget {
 
 	public static final String JBOSS_DROP_TARGET = "jbossDropTarget"; //$NON-NLS-1$
@@ -222,13 +222,13 @@ public class JBossCentralDropTarget {
 			return;
 		}
 		final IStatus[] results = new IStatus[1];
-		final ConnectorDiscovery[] connectorDiscoveries = new ConnectorDiscovery[1];
+		final Catalog[] catalogs = new Catalog[1];
 		IRunnableWithProgress runnable = new IRunnableWithProgress() {
 			@Override
 			public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
-				ConnectorDiscovery connectorDiscovery = DiscoveryUtil.createConnectorDiscovery();
-				connectorDiscoveries[0] = connectorDiscovery;
-				results[0] = connectorDiscoveries[0].performDiscovery(monitor);
+				Catalog catalog = DiscoveryUtil.createCatalog();
+				catalogs[0] = catalog;
+				results[0] = catalogs[0].performDiscovery(monitor);
 				if (monitor.isCanceled()) {
 					results[0] = Status.CANCEL_STATUS;
 				}
@@ -240,20 +240,20 @@ public class JBossCentralDropTarget {
 			return;
 		}
 		if (results[0].isOK()) {
-			List<DiscoveryConnector> connectors = connectorDiscoveries[0].getConnectors();
-			List<ConnectorDescriptor> installableConnectors = new ArrayList<>();
+			List<CatalogItem> connectors = catalogs[0].getItems();
+			List<CatalogItem> installableConnectors = new ArrayList<>();
 			List<String> notFoundConnectors = new ArrayList<>(connectorIds);
-			for (DiscoveryConnector connector:connectors) {
+			for (CatalogItem connector:connectors) {
 				if (connectorIds.contains(connector.getId())) {
 					installableConnectors.add(connector);
 					notFoundConnectors.remove(connector.getId());
 				} 
 			}
 			Set<String> installedFeatures = JBossDiscoveryUi.createInstallJob(installableConnectors).getInstalledFeatures(new NullProgressMonitor());
-			Set<ConnectorDescriptor> installedConnectors = new HashSet<>();
-			Iterator<ConnectorDescriptor> iter = installableConnectors.iterator();
+			Set<CatalogItem> installedConnectors = new HashSet<>();
+			Iterator<CatalogItem> iter = installableConnectors.iterator();
 			while (iter.hasNext()) {
-				ConnectorDescriptor connector = iter.next();
+				CatalogItem connector = iter.next();
 				connector.setInstalled(installedFeatures != null
 						&& installedFeatures.containsAll(connector.getInstallableUnits()));
 				if (connector.isInstalled()) {
@@ -306,9 +306,9 @@ public class JBossCentralDropTarget {
 		}
 	}
 
-	private static void formatConnectors(Collection<ConnectorDescriptor> installedConnectors,
+	private static void formatConnectors(Collection<CatalogItem> installedConnectors,
 			StringBuilder buffer) {
-		for (ConnectorDescriptor cd:installedConnectors) {
+		for (CatalogItem cd:installedConnectors) {
 			buffer.append(" - ");
 			buffer.append(cd.getId());
 			buffer.append(" : ");

@@ -31,11 +31,11 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.spi.IDynamicExtensionRegistry;
 import org.eclipse.core.runtime.spi.RegistryContributor;
 import org.eclipse.core.runtime.spi.RegistryStrategy;
-import org.eclipse.mylyn.commons.core.StatusHandler;
-import org.eclipse.mylyn.internal.discovery.core.DiscoveryCore;
-import org.eclipse.mylyn.internal.discovery.core.model.Directory;
-import org.eclipse.mylyn.internal.discovery.core.model.Directory.Entry;
+import org.eclipse.equinox.internal.p2.discovery.DiscoveryCore;
+import org.eclipse.equinox.internal.p2.discovery.compatibility.Directory;
+import org.eclipse.equinox.internal.p2.discovery.compatibility.Directory.Entry;
 import org.eclipse.osgi.util.NLS;
+import org.jboss.tools.discovery.core.internal.DiscoveryActivator;
 import org.osgi.framework.Bundle;
 
 /**
@@ -46,6 +46,7 @@ import org.osgi.framework.Bundle;
  * @author David Green
  * @author Fred Bricon
  */
+@SuppressWarnings("restriction")
 public class DiscoveryRegistryStrategy extends RegistryStrategy {
 
 	private final List<JarFile> jars = new ArrayList<JarFile>();
@@ -99,7 +100,7 @@ public class DiscoveryRegistryStrategy extends RegistryStrategy {
 		try {
 			Bundle bundle = Platform.getBundle(bundleId);
 			if (bundle == null) {
-				StatusHandler.log(new Status(IStatus.ERROR, DiscoveryCore.ID_PLUGIN, NLS.bind(
+				DiscoveryActivator.getDefault().getLog().log(new Status(IStatus.ERROR, DiscoveryCore.ID_PLUGIN, NLS.bind(
 						"Cannot load bundle {0}", bundleId)));
 				return;
 			}
@@ -125,7 +126,7 @@ public class DiscoveryRegistryStrategy extends RegistryStrategy {
 			try {
 				processBundle(registry, bundleFile.getValue(), bundleFile.getKey());
 			} catch (Exception e) {
-				StatusHandler.log(new Status(IStatus.ERROR, DiscoveryCore.ID_PLUGIN, NLS.bind(
+				DiscoveryActivator.getDefault().getLog().log(new Status(IStatus.ERROR, DiscoveryCore.ID_PLUGIN, NLS.bind(
 						"Cannot load bundle {0} from url {1}: {2}", new Object[] {
 								bundleFile.getKey().getName(), bundleFile.getValue().getLocation(), e.getMessage() }),
 						e));

@@ -37,14 +37,13 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.core.runtime.SubProgressMonitor;
-import org.eclipse.mylyn.commons.core.StatusHandler;
-import org.eclipse.mylyn.internal.discovery.core.DiscoveryCore;
-import org.eclipse.mylyn.internal.discovery.core.model.Directory;
-import org.eclipse.mylyn.internal.discovery.core.model.Directory.Entry;
-import org.eclipse.mylyn.internal.discovery.core.model.DirectoryParser;
-import org.eclipse.mylyn.internal.discovery.core.util.WebUtil;
-import org.eclipse.mylyn.internal.discovery.core.util.WebUtil.TextContentProcessor;
+import org.eclipse.core.runtime.SubMonitor;
+import org.eclipse.equinox.internal.p2.discovery.DiscoveryCore;
+import org.eclipse.equinox.internal.p2.discovery.compatibility.Directory;
+import org.eclipse.equinox.internal.p2.discovery.compatibility.Directory.Entry;
+import org.eclipse.equinox.internal.p2.discovery.compatibility.DirectoryParser;
+import org.eclipse.equinox.internal.p2.discovery.compatibility.util.TransportUtil;
+import org.eclipse.equinox.internal.p2.discovery.compatibility.util.TransportUtil.TextContentProcessor;
 import org.eclipse.osgi.util.NLS;
 import org.jboss.tools.discovery.core.internal.DiscoveryActivator;
 
@@ -89,13 +88,13 @@ public class RemoteExternalBundleDiscoveryStrategy extends ExternalBundleDiscove
 		try {
 			final Directory[] temp = new Directory[1];
 			final URI uri = new URI(directoryUrl);
-			WebUtil.readResource(uri, new TextContentProcessor() {
+			TransportUtil.readResource(uri, new TextContentProcessor() {
 				public void process(Reader reader) throws IOException {
 					DirectoryParser parser = new DirectoryParser();
-					parser.setBaseUri(uri);
+					//parser.setBaseUri(uri);
 					temp[0] = parser.parse(reader);
 				}
-			}, new SubProgressMonitor(monitor, ticksTenPercent));
+			}, SubMonitor.convert(monitor, ticksTenPercent));
 			directory = temp[0];
 			if (directory == null) {
 				throw new IllegalStateException();
@@ -178,7 +177,7 @@ public class RemoteExternalBundleDiscoveryStrategy extends ExternalBundleDiscove
 								cause);
 					}
 					// log errors but continue on
-					StatusHandler.log(status);
+					DiscoveryActivator.getDefault().getLog().log(status);
 				} catch (InterruptedException e) {
 					monitor.setCanceled(true);
 					return null;
@@ -211,7 +210,7 @@ public class RemoteExternalBundleDiscoveryStrategy extends ExternalBundleDiscove
 			for (int attemptCount = 0; attemptCount < maxDiscoveryJarDownloadAttempts; ++attemptCount) {
 				try {
 					if (!bundleUrl.startsWith("http://") && !bundleUrl.startsWith("https://") && !bundleUrl.startsWith("file:")) { //$NON-NLS-1$//$NON-NLS-2$//$NON-NLS-3$
-						StatusHandler
+						DiscoveryActivator.getDefault().getLog()
 								.log(new Status(
 										IStatus.WARNING,
 										DiscoveryCore.ID_PLUGIN,
@@ -228,7 +227,7 @@ public class RemoteExternalBundleDiscoveryStrategy extends ExternalBundleDiscove
 					}
 
 					try {
-						WebUtil.download(new URI(bundleUrl), target,
+						TransportUtil.downloadResource(new URI(bundleUrl), target,
 								new NullProgressMonitor() {
 									@Override
 									public boolean isCanceled() {
@@ -236,13 +235,13 @@ public class RemoteExternalBundleDiscoveryStrategy extends ExternalBundleDiscove
 												|| monitor.isCanceled();
 									}
 								}/* don't use sub progress monitor here */);
-					} catch (URISyntaxException e) {
+					} catch (URISyntaxException | CoreException e) {
 					}
 					file = new File(target.getParentFile(), target.getName().replace("downloading", "jar"));
 					FileUtils.moveFile(target, file);
 				} catch (IOException e) {
 				    if (!monitor.isCanceled()) {
-	                    StatusHandler.log(new Status(IStatus.ERROR,
+				    	DiscoveryActivator.getDefault().getLog().log(new Status(IStatus.ERROR,
 	                            DiscoveryCore.ID_PLUGIN, NLS.bind(
 	                                    "Cannot download bundle at {0}: {1}",
 	                                    bundleUrl, e.getMessage()), e));

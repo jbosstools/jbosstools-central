@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: %BundleName
 Bundle-SymbolicName: org.jboss.tools.central.test;singleton:=true
-Bundle-Version: 2.1.600.qualifier
+Bundle-Version: 2.2.0.qualifier
 Bundle-Activator: org.jboss.tools.central.test.Activator
 Require-Bundle: org.eclipse.ui;bundle-version="3.7.0",
  org.eclipse.core.runtime;bundle-version="3.7.0",
@@ -16,14 +16,15 @@ Require-Bundle: org.eclipse.ui;bundle-version="3.7.0",
  org.eclipse.ui.editors;bundle-version="3.7.0",
  org.eclipse.ui.ide;bundle-version="3.7.0",
  org.eclipse.ui.forms;bundle-version="3.5.100",
- org.eclipse.mylyn.discovery.core;bundle-version="3.9.0",
  org.eclipse.equinox.p2.transport.ecf;bundle-version="1.1.0",
  org.apache.commons.io;bundle-version="2.0.0",
  org.eclipse.jetty.server;bundle-version="8.0.0",
  org.eclipse.jetty.util;bundle-version="8.0.0",
  org.jboss.tools.foundation.core;bundle-version="1.1.0",
  org.jboss.tools.discovery.core;bundle-version="1.0.0",
- org.glassfish.hk2.osgi-resource-locator
+ org.glassfish.hk2.osgi-resource-locator,
+ org.eclipse.equinox.p2.discovery;bundle-version="1.2.0",
+ org.eclipse.equinox.p2.discovery.compatibility;bundle-version="1.2.200"
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-11
 Bundle-Localization: plugin

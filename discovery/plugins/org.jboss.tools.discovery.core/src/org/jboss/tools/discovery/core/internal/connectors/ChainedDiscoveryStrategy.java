@@ -19,13 +19,13 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.MultiStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.mylyn.commons.core.StatusHandler;
-import org.eclipse.mylyn.internal.discovery.core.DiscoveryCore;
-import org.eclipse.mylyn.internal.discovery.core.model.AbstractDiscoveryStrategy;
-import org.eclipse.mylyn.internal.discovery.core.model.DiscoveryCategory;
-import org.eclipse.mylyn.internal.discovery.core.model.DiscoveryCertification;
-import org.eclipse.mylyn.internal.discovery.core.model.DiscoveryConnector;
+import org.eclipse.equinox.internal.p2.discovery.AbstractDiscoveryStrategy;
+import org.eclipse.equinox.internal.p2.discovery.DiscoveryCore;
+import org.eclipse.equinox.internal.p2.discovery.model.CatalogCategory;
+import org.eclipse.equinox.internal.p2.discovery.model.CatalogItem;
+import org.eclipse.equinox.internal.p2.discovery.model.Certification;
 import org.eclipse.osgi.util.NLS;
+import org.jboss.tools.discovery.core.internal.DiscoveryActivator;
 
 
 /**
@@ -33,6 +33,7 @@ import org.eclipse.osgi.util.NLS;
  * @author Fred Bricon
  *
  */
+@SuppressWarnings("restriction")
 public class ChainedDiscoveryStrategy extends AbstractDiscoveryStrategy  {
 
 	private List<AbstractDiscoveryStrategy> strategies;
@@ -54,7 +55,7 @@ public class ChainedDiscoveryStrategy extends AbstractDiscoveryStrategy  {
 			throw new IllegalStateException("At least one AbstractDiscoveryStrategy must be added");
 		}
 		
-		MultiStatus status = new MultiStatus(org.jboss.tools.discovery.core.internal.DiscoveryActivator.PLUGIN_ID, 0,
+		MultiStatus status = new MultiStatus(DiscoveryActivator.PLUGIN_ID, 0,
 				"All attempts to discover connectors have failed", null);
 		
 		if (monitor == null) {
@@ -80,24 +81,24 @@ public class ChainedDiscoveryStrategy extends AbstractDiscoveryStrategy  {
 			throw new CoreException(status);
 		}
 		if (status.getChildren().length > 0) {
-			StatusHandler.log(status);
+			DiscoveryActivator.getDefault().getLog().log(status);
 		}
 	}
 	
 	@Override
-	public void setCategories(List<DiscoveryCategory> categories) {
+	public void setCategories(List<CatalogCategory> categories) {
 		for (AbstractDiscoveryStrategy ds : strategies) 
 		  ds.setCategories(categories);
 	}
 	
 	@Override
-	public void setConnectors(List<DiscoveryConnector> connectors) {
+	public void setItems(List<CatalogItem> connectors) {
 		for (AbstractDiscoveryStrategy ds : strategies) 
-		  ds.setConnectors(connectors);
+		  ds.setItems(connectors);
 	}
 
 	@Override
-	public void setCertifications(List<DiscoveryCertification> certifications) {
+	public void setCertifications(List<Certification> certifications) {
 		for (AbstractDiscoveryStrategy ds : strategies) 
   		  ds.setCertifications(certifications);
 	}
@@ -154,7 +155,7 @@ public class ChainedDiscoveryStrategy extends AbstractDiscoveryStrategy  {
 
 		@Override
 		public void collectData(AbstractDiscoveryStrategy ds) {
-			List<DiscoveryConnector> collected = ds.getConnectors();
+			List<CatalogItem> collected = ds.getItems();
 			isComplete = (collected != null && !collected.isEmpty());
 		}		
 	}

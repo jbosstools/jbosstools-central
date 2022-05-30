@@ -24,10 +24,11 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.MultiStatus;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.mylyn.internal.discovery.core.model.AbstractDiscoveryStrategy;
+import org.eclipse.equinox.internal.p2.discovery.AbstractDiscoveryStrategy;
 import org.jboss.tools.discovery.core.internal.connectors.ChainedDiscoveryStrategy;
 import org.junit.Test;
 
+@SuppressWarnings("restriction")
 public class ChainedDiscoveryStrategyTest {
 
 	private static class MockDiscoveryStrategy extends AbstractDiscoveryStrategy implements ProxyWizardDiscoveryStrategy{

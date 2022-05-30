@@ -18,13 +18,14 @@ import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IContributor;
 import org.eclipse.core.runtime.IExtension;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.mylyn.internal.discovery.core.model.AbstractDiscoverySource;
+import org.eclipse.equinox.internal.p2.discovery.AbstractCatalogSource;
 import org.jboss.tools.central.JBossCentralActivator;
 import org.jboss.tools.discovery.core.internal.connectors.xpl.ExternalBundleDiscoveryStrategy;
 
 /**
  * @author Fred Bricon
  */
+@SuppressWarnings("restriction")
 public class CachedProxyWizardDiscoveryStrategy extends ExternalBundleDiscoveryStrategy implements ProxyWizardDiscoveryStrategy {
 
 	private static final String PROXY_WIZARD_EXTENSION_POINT = "org.jboss.tools.central.proxyWizard";
@@ -50,7 +51,7 @@ public class CachedProxyWizardDiscoveryStrategy extends ExternalBundleDiscoveryS
 			if (JBossCentralActivator.PLUGIN_ID.equals(contributor.getName())) {
 				continue;
 			}
-			AbstractDiscoverySource discoverySource = computeDiscoverySource(contributor);
+			AbstractCatalogSource discoverySource = computeDiscoverySource(contributor);
 			IConfigurationElement[] elements = extension.getConfigurationElements();
 			for (IConfigurationElement e : elements) {
 				if ("proxyWizard".equals(e.getName())) {

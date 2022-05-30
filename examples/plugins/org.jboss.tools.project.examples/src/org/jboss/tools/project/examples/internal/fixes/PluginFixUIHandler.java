@@ -10,23 +10,12 @@
  ************************************************************************************/
 package org.jboss.tools.project.examples.internal.fixes;
 
-import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Status;
-import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.operation.IRunnableContext;
-import org.eclipse.jface.operation.IRunnableWithProgress;
-import org.eclipse.mylyn.internal.discovery.core.model.ConnectorDescriptor;
-import org.eclipse.mylyn.internal.discovery.core.model.ConnectorDiscovery;
-import org.eclipse.mylyn.internal.discovery.core.model.DiscoveryConnector;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Shell;
-import org.jboss.tools.discovery.core.internal.connectors.DiscoveryUtil;
 import org.jboss.tools.discovery.core.internal.connectors.JBossDiscoveryUi;
 import org.jboss.tools.project.examples.fixes.AbstractUIHandler;
 import org.jboss.tools.project.examples.fixes.IProjectExamplesFix;
