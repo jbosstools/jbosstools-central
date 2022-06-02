@@ -39,7 +39,8 @@ Require-Bundle: org.eclipse.core.runtime,
  org.jboss.tools.runtime.seam.detector;bundle-version="3.7.0",
  org.eclipse.jst.common.project.facet.core;bundle-version="1.0.0",
  org.eclipse.jst.jsf.core,
- org.eclipse.jst.j2ee
+ org.eclipse.jst.j2ee,
+ org.apache.commons.lang;bundle-version="2.6.0"
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-11
 Export-Package: org.jboss.tools.project.examples.model
