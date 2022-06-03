@@ -817,20 +817,6 @@ public class DiscoveryViewer extends Viewer {
 
 	private void createEnvironment() {
 		environment = new Hashtable<>(System.getProperties());
-		// add the installed Mylyn version to the environment so that we can
-		// have connectors that are filtered based on version of Mylyn
-		Bundle bundle = Platform.getBundle("org.eclipse.mylyn.tasks.core"); //$NON-NLS-1$
-		if (bundle == null) {
-			bundle = Platform.getBundle("org.eclipse.mylyn.commons.core"); //$NON-NLS-1$
-		}
-		String versionString = (String) bundle.getHeaders().get("Bundle-Version"); //$NON-NLS-1$
-		if (versionString != null) {
-			Version version = new Version(versionString);
-			environment.put("org.eclipse.mylyn.version", version.toString()); //$NON-NLS-1$
-			environment.put("org.eclipse.mylyn.version.major", version.getMajor()); //$NON-NLS-1$
-			environment.put("org.eclipse.mylyn.version.minor", version.getMinor()); //$NON-NLS-1$
-			environment.put("org.eclipse.mylyn.version.micro", version.getMicro()); //$NON-NLS-1$
-		}
 	}
 
 	protected Pattern createPattern(String filterText) {
