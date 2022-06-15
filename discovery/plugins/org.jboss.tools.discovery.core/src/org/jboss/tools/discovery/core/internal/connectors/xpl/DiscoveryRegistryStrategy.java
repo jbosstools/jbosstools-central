@@ -32,6 +32,7 @@ import org.eclipse.core.runtime.spi.IDynamicExtensionRegistry;
 import org.eclipse.core.runtime.spi.RegistryContributor;
 import org.eclipse.core.runtime.spi.RegistryStrategy;
 import org.eclipse.equinox.internal.p2.discovery.DiscoveryCore;
+import org.eclipse.equinox.internal.p2.discovery.compatibility.Activator;
 import org.eclipse.equinox.internal.p2.discovery.compatibility.Directory;
 import org.eclipse.equinox.internal.p2.discovery.compatibility.Directory.Entry;
 import org.eclipse.osgi.util.NLS;
@@ -91,7 +92,7 @@ public class DiscoveryRegistryStrategy extends RegistryStrategy {
 	
 	public String[] getExtensionPointProviderBundleIds() {
 		if (bundleIds == null) {
-			bundleIds = new String[]{DiscoveryCore.ID_PLUGIN};
+			bundleIds = new String[]{Activator.ID};
 		}
 		return bundleIds;
 	}

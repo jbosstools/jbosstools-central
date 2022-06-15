@@ -31,6 +31,7 @@ import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.equinox.internal.p2.discovery.AbstractCatalogSource;
 import org.eclipse.equinox.internal.p2.discovery.DiscoveryCore;
 import org.eclipse.equinox.internal.p2.discovery.Policy;
+import org.eclipse.equinox.internal.p2.discovery.compatibility.Activator;
 import org.eclipse.equinox.internal.p2.discovery.compatibility.Directory;
 import org.eclipse.equinox.internal.p2.discovery.compatibility.Directory.Entry;
 import org.eclipse.equinox.internal.p2.discovery.compatibility.JarDiscoverySource;
@@ -244,6 +245,6 @@ public class ExternalBundleDiscoveryStrategy extends BundleDiscoveryStrategy {
 	
 
 	protected String[] getExtensionPointProviderBundleIds() {
-		return new String[] { DiscoveryCore.ID_PLUGIN };
+		return new String[] { Activator.ID };
 	}
 }
