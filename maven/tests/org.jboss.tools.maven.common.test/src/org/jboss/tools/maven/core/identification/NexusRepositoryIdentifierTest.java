@@ -33,7 +33,7 @@ public class NexusRepositoryIdentifierTest extends AbstractIdentificationTest {
 		RemoteRepositoryManager repoManager = MavenCoreActivator.getDefault().getRepositoryManager();
 		for (NexusRepository repo : repoManager.getDefaultRepositories()) {
 			initialRepoState.put(repo, repo.isEnabled());
-			if (repo.getName().toLowerCase().contains("jboss")) {
+			if (repo.getName().toLowerCase().contains("oss")) {
 				repo.setEnabled(true);
 			}
 			else {
@@ -59,11 +59,11 @@ public class NexusRepositoryIdentifierTest extends AbstractIdentificationTest {
 		
 		key= identifier.identify(jansi);
 		assertEquals("jansi", key.getArtifactId());
-		assertEquals("1.6", key.getVersion());
+		assertEquals("1.7", key.getVersion());
 		
 		key = identifier.identify(arquillian);
 		assertEquals("arquillian-core-spi", key.getArtifactId());
-		assertEquals("1.0.1.Final", key.getVersion());
+		assertEquals("1.7.0.Final-SNAPSHOT", key.getVersion());
 	}
 
 	

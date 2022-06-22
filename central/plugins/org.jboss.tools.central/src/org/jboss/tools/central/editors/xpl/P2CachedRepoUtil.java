@@ -8,15 +8,16 @@ import java.util.Map;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.equinox.internal.p2.discovery.model.CatalogItem;
 import org.eclipse.equinox.p2.core.IProvisioningAgent;
 import org.eclipse.equinox.p2.core.IProvisioningAgentProvider;
 import org.eclipse.equinox.p2.core.ProvisionException;
 import org.eclipse.equinox.p2.repository.metadata.IMetadataRepository;
 import org.eclipse.equinox.p2.repository.metadata.IMetadataRepositoryManager;
-import org.eclipse.mylyn.internal.discovery.core.model.ConnectorDescriptor;
 import org.eclipse.ui.PlatformUI;
 import org.jboss.tools.central.JBossCentralActivator;
 
+@SuppressWarnings("restriction")
 public class P2CachedRepoUtil {
 
 	/**
@@ -29,7 +30,7 @@ public class P2CachedRepoUtil {
 	 * @param connector
 	 * @return
 	 */
-	public static IMetadataRepository getRepoForConnector(ConnectorDescriptor connector) {
+	public static IMetadataRepository getRepoForConnector(CatalogItem connector) {
 		IProvisioningAgentProvider provider = (IProvisioningAgentProvider) PlatformUI.getWorkbench().getService(IProvisioningAgentProvider.class);
 		IMetadataRepository repo = cachedRepo.get(connector.getSiteUrl());
 		if (repo == null) {

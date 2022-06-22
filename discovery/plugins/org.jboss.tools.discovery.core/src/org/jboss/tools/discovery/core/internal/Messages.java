@@ -17,6 +17,8 @@ public class Messages extends NLS {
 
 	public static String preparingUninstall;
 	public static String UsageEventTypeInstallLabelDescription;
+
+	public static String DiscoveryFeedbackJob_Job_Label;
 	static {
 		// initialize resource bundle
 		NLS.initializeMessages(BUNDLE_NAME, Messages.class);

@@ -10,8 +10,8 @@
  ************************************************************************************/
 package org.jboss.tools.discovery.core.internal.connectors;
 
-import org.eclipse.mylyn.internal.discovery.core.model.DiscoveryConnector;
-import org.eclipse.mylyn.internal.discovery.core.model.ValidationException;
+import org.eclipse.equinox.internal.p2.discovery.model.CatalogItem;
+import org.eclipse.equinox.internal.p2.discovery.model.ValidationException;
 import org.eclipse.osgi.util.NLS;
 import org.jboss.tools.foundation.core.expressions.ExpressionResolutionException;
 import org.jboss.tools.foundation.core.expressions.ExpressionResolver;
@@ -24,7 +24,8 @@ import org.jboss.tools.foundation.core.properties.PropertiesHelper;
  * expressions in siteUrl property
  * @author snjeza
  */
-public class ExpressionBasedDiscoveryConnector extends DiscoveryConnector {
+@SuppressWarnings("restriction")
+public class ExpressionBasedDiscoveryConnector extends CatalogItem {
 
   @Override
   public void validate() throws ValidationException {

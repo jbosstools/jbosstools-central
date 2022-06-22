@@ -25,10 +25,10 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.equinox.internal.p2.discovery.model.CatalogItem;
 import org.eclipse.equinox.p2.metadata.Version;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerFilter;
-import org.eclipse.mylyn.internal.discovery.core.model.ConnectorDescriptor;
 import org.jboss.tools.central.editors.xpl.ConnectorDescriptorItemUi;
 import org.jboss.tools.central.editors.xpl.DiscoveryViewer;
 import org.jboss.tools.discovery.core.internal.connectors.JBossDiscoveryUi;
@@ -43,6 +43,7 @@ import org.jboss.tools.discovery.core.internal.connectors.JBossDiscoveryUi;
  * @author mistria
  *
  */
+@SuppressWarnings("restriction")
 public class EarlyAccessOrMostRecentVersionFilter extends ViewerFilter {
 
 	private DiscoveryViewer discoveryViewer;
@@ -57,11 +58,11 @@ public class EarlyAccessOrMostRecentVersionFilter extends ViewerFilter {
 		if (! (viewer instanceof DiscoveryViewer)) {
 			throw new IllegalArgumentException("This filter only applies on DiscoveryViewer");
 		}
-		if (! (item instanceof ConnectorDescriptor)) {
+		if (! (item instanceof CatalogItem)) {
 			return true;
 		}
 
-		ConnectorDescriptor desc = (ConnectorDescriptor)item;
+		CatalogItem desc = (CatalogItem)item;
 		if (this.discoveryViewer == null || stateOutdated()) {
 			initializeDiscoveryViewer((DiscoveryViewer)viewer);
 		}

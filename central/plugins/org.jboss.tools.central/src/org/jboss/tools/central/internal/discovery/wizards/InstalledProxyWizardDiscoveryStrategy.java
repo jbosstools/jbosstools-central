@@ -18,12 +18,13 @@ import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IContributor;
 import org.eclipse.core.runtime.IExtension;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.mylyn.internal.discovery.core.model.AbstractDiscoverySource;
+import org.eclipse.equinox.internal.p2.discovery.AbstractCatalogSource;
 import org.jboss.tools.discovery.core.internal.connectors.xpl.BundleDiscoveryStrategy;
 
 /**
  * @author Fred Bricon
  */
+@SuppressWarnings("restriction")
 public class InstalledProxyWizardDiscoveryStrategy extends BundleDiscoveryStrategy implements ProxyWizardDiscoveryStrategy {
 
 	private List<ProxyWizard> proxyWizards;
@@ -39,7 +40,7 @@ public class InstalledProxyWizardDiscoveryStrategy extends BundleDiscoveryStrate
 		proxyWizards = new ArrayList<>();
 		for (IExtension extension : extensions) {
 			IContributor contributor = extension.getContributor();
-			AbstractDiscoverySource discoverySource = computeDiscoverySource(contributor);
+			AbstractCatalogSource discoverySource = computeDiscoverySource(contributor);
 			IConfigurationElement[] elements = extension.getConfigurationElements();
 			for (IConfigurationElement e : elements) {
 				if ("proxyWizard".equals(e.getName())) {

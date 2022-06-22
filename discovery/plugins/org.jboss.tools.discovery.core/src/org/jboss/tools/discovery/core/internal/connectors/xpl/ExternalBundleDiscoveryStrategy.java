@@ -27,13 +27,14 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.core.runtime.SubProgressMonitor;
-import org.eclipse.mylyn.internal.discovery.core.DiscoveryCore;
-import org.eclipse.mylyn.internal.discovery.core.model.AbstractDiscoverySource;
-import org.eclipse.mylyn.internal.discovery.core.model.Directory;
-import org.eclipse.mylyn.internal.discovery.core.model.Directory.Entry;
-import org.eclipse.mylyn.internal.discovery.core.model.JarDiscoverySource;
-import org.eclipse.mylyn.internal.discovery.core.model.Policy;
+import org.eclipse.core.runtime.SubMonitor;
+import org.eclipse.equinox.internal.p2.discovery.AbstractCatalogSource;
+import org.eclipse.equinox.internal.p2.discovery.DiscoveryCore;
+import org.eclipse.equinox.internal.p2.discovery.Policy;
+import org.eclipse.equinox.internal.p2.discovery.compatibility.Activator;
+import org.eclipse.equinox.internal.p2.discovery.compatibility.Directory;
+import org.eclipse.equinox.internal.p2.discovery.compatibility.Directory.Entry;
+import org.eclipse.equinox.internal.p2.discovery.compatibility.JarDiscoverySource;
 
 /**
  * 
@@ -81,7 +82,7 @@ public class ExternalBundleDiscoveryStrategy extends BundleDiscoveryStrategy {
 
 	@Override
 	public void performDiscovery(IProgressMonitor monitor) throws CoreException {
-		if (connectors == null || categories == null) {
+		if (items == null || categories == null) {
 			throw new IllegalStateException();
 		}
 		if (registryStrategy != null) {
@@ -128,7 +129,7 @@ public class ExternalBundleDiscoveryStrategy extends BundleDiscoveryStrategy {
                         if (extensionPoint != null) {
                             IExtension[] extensions = extensionPoint.getExtensions();
                             if (extensions.length > 0) {
-                                processExtensions(new SubProgressMonitor(monitor, ticksTenPercent * 3), extensions);
+                                processExtensions(SubMonitor.convert(monitor, ticksTenPercent * 3), extensions);
                             }
                         }
                     } finally {
@@ -210,7 +211,7 @@ public class ExternalBundleDiscoveryStrategy extends BundleDiscoveryStrategy {
 	}
 
 	@Override
-	protected AbstractDiscoverySource computeDiscoverySource(
+	protected AbstractCatalogSource computeDiscoverySource(
 			IContributor contributor) {
 		Entry directoryEntry = registryStrategy.getDirectoryEntry(contributor);
 		Policy policy = new Policy(directoryEntry.isPermitCategories());
@@ -244,6 +245,6 @@ public class ExternalBundleDiscoveryStrategy extends BundleDiscoveryStrategy {
 	
 
 	protected String[] getExtensionPointProviderBundleIds() {
-		return new String[] { DiscoveryCore.ID_PLUGIN };
+		return new String[] { Activator.ID };
 	}
 }

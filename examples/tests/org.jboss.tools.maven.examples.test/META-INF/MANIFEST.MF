@@ -24,6 +24,4 @@ Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Export-Package: org.jboss.tools.maven.examples.test
 Bundle-Vendor: %BundleVendor
 Bundle-Localization: plugin
-Bundle-ClassPath: lib/mockito-core-1.9.5.jar,
- lib/objenesis-1.0.jar,
- .
+Bundle-ClassPath: .
