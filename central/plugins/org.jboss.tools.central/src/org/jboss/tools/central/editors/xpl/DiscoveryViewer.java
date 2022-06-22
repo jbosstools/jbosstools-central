@@ -263,6 +263,7 @@ public class DiscoveryViewer extends Viewer {
 					return image;
 				}
 			}
+			return ImageDescriptor.getMissingImageDescriptor().createImage();
 		}
 		return null;
 	}
