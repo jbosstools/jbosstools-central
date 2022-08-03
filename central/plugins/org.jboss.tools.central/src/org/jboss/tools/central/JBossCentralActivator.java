@@ -183,7 +183,9 @@ public class JBossCentralActivator extends AbstractUIPlugin {
 			
 			@Override
 			public void run() {
-				PlatformUI.getWorkbench().getActiveWorkbenchWindow().addPerspectiveListener(perspectiveListener);
+				if (!PlatformUI.getWorkbench().isClosing()) {
+					PlatformUI.getWorkbench().getActiveWorkbenchWindow().addPerspectiveListener(perspectiveListener);
+				}
 			}
 		});
 		PlatformUI.getWorkbench().addWindowListener(new IWindowListener() {
