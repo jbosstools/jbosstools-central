@@ -17,6 +17,7 @@ import static org.jboss.tools.maven.core.ProjectUtil.updateOutOfDateMavenProject
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -32,7 +33,6 @@ import org.eclipse.m2e.core.project.LocalProjectScanner;
 import org.eclipse.m2e.core.project.MavenProjectInfo;
 import org.eclipse.m2e.core.project.ProjectImportConfiguration;
 import org.jboss.tools.project.examples.internal.ProjectExamplesActivator;
-import org.jboss.tools.project.examples.model.ProjectExample;
 import org.jboss.tools.project.examples.model.ProjectExampleWorkingCopy;
 
 /**
@@ -52,13 +52,10 @@ public class ImportMavenArchetypeProjectExampleDelegate extends AbstractImportMa
 		
 		String projectName = (String) propertiesMap.get(ProjectExamplesActivator.PROPERTY_PROJECT_NAME);
 		includedProjects.add(projectName);
-		String artifactId = (String) propertiesMap.get(ProjectExamplesActivator.PROPERTY_ARTIFACT_ID);
 		IPath location = (IPath) propertiesMap.get(ProjectExamplesActivator.PROPERTY_LOCATION_PATH);
-		String projectFolder = location.append(artifactId).toFile().getAbsolutePath();
 		MavenModelManager mavenModelManager = MavenPlugin.getMavenModelManager();
 		
-		LocalProjectScanner scanner = new LocalProjectScanner(location.toFile(),
-						projectFolder, true, mavenModelManager);
+		LocalProjectScanner scanner = new LocalProjectScanner(Collections.singletonList(location.toFile().getAbsolutePath()), true, mavenModelManager);
 		try {
 			scanner.run(monitor);
 		} catch (InterruptedException e1) {

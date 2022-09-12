@@ -13,6 +13,7 @@ package org.jboss.tools.maven.jbosspackaging.configurators;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Set;
 
 import org.apache.maven.artifact.Artifact;
@@ -79,8 +80,8 @@ public class SarProjectConfigurator extends AbstractProjectConfigurator {
 	@Override
 	public void configure(ProjectConfigurationRequest request, IProgressMonitor monitor) throws CoreException {
 		
-		MavenProject mavenProject = request.getMavenProject();
-		IProject project = request.getProject();
+		MavenProject mavenProject = request.mavenProject();
+		IProject project = request.mavenProjectFacade().getProject();
 		
 		markerManager.deleteMarkers(project, MavenSarConstants.SAR_CONFIGURATION_ERROR_MARKER_ID);
 		
@@ -92,12 +93,12 @@ public class SarProjectConfigurator extends AbstractProjectConfigurator {
 
 		Set<Action> actions = new LinkedHashSet<>();
 		
-		IMavenProjectFacade facade = request.getMavenProjectFacade();
+		IMavenProjectFacade facade = request.mavenProjectFacade();
 		
 		ResourceCleaner fileCleaner = new ResourceCleaner(project);
 		addFoldersToClean(fileCleaner, facade);
 		
-		IPath source = facade.getResourceLocations()[0];
+		IPath source = facade.getResourceLocations().get(0);
 		
 		WTPProjectsUtil.installJavaFacet(actions, project, facetedProject);
 		if (!actions.isEmpty()) {
@@ -267,8 +268,8 @@ public class SarProjectConfigurator extends AbstractProjectConfigurator {
 		      return;
 		    }
 		    
-		    IPath[] sourceRoots = MavenProjectUtils.getSourceLocations(project, mavenProject.getCompileSourceRoots());
-		    IPath[] resourceRoots = MavenProjectUtils.getResourceLocations(project, mavenProject.getResources());
+		    List<IPath> sourceRoots = MavenProjectUtils.getSourceLocations(project, mavenProject.getCompileSourceRoots());
+		    List<IPath> resourceRoots = MavenProjectUtils.getResourceLocations(project, mavenProject.getResources());
 		    
 		    if (!checkJavaConfiguration(project, sourceRoots, resourceRoots)) {
 		      return;
@@ -311,7 +312,7 @@ public class SarProjectConfigurator extends AbstractProjectConfigurator {
 	  /**
 	   * Checks the maven source folders are correctly added to the project classpath
 	   */
-	  private boolean checkJavaConfiguration(IProject project, IPath[] sourceRoots, IPath[] resourceRoots) throws JavaModelException {
+	  private boolean checkJavaConfiguration(IProject project, List<IPath> sourceRoots, List<IPath> resourceRoots) throws JavaModelException {
 	    IJavaProject javaProject = JavaCore.create(project);
 	    if (javaProject == null) {
 	      return false;

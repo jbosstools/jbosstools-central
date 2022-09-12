@@ -86,7 +86,6 @@ import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.embedder.ArtifactKey;
 import org.eclipse.m2e.core.embedder.IMaven;
 import org.eclipse.m2e.core.embedder.IMavenConfiguration;
-import org.eclipse.m2e.core.internal.index.IndexManager;
 import org.eclipse.m2e.core.project.MavenUpdateRequest;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.ScrolledComposite;
@@ -1279,9 +1278,6 @@ public class ConfigureMavenRepositoriesWizardPage extends WizardPage implements 
 			protected IStatus run(IProgressMonitor monitor) {
 				try {
 					MavenPlugin.getMaven().reloadSettings();
-					final File localRepositoryDir = new File(maven
-							.getLocalRepository().getBasedir());
-
 					IMavenConfiguration mavenConfiguration = MavenPlugin
 							.getMavenConfiguration();
 					if (userSettings.length() > 0) {
@@ -1292,17 +1288,9 @@ public class ConfigureMavenRepositoriesWizardPage extends WizardPage implements 
 					
 					MavenCoreActivator.getDefault().notifyMavenSettingsChanged();
 
-					File newRepositoryDir = new File(maven.getLocalRepository()
-							.getBasedir());
-					if (!newRepositoryDir.equals(localRepositoryDir)) {
-						IndexManager indexManager = MavenPlugin
-								.getIndexManager();
-						indexManager.getWorkspaceIndex().updateIndex(true, monitor);
-					}
-
 					IProject[] projects = ResourcesPlugin.getWorkspace().getRoot().getProjects();
 					if (projects != null && projects.length > 0) {
-						MavenUpdateRequest updateRequest = new MavenUpdateRequest(projects, mavenConfiguration.isOffline(),true);
+						MavenUpdateRequest updateRequest = new MavenUpdateRequest(mavenConfiguration.isOffline(),true);
 						MavenPlugin.getMavenProjectRegistry().refresh(updateRequest);
 					}
 					return Status.OK_STATUS;
@@ -1371,7 +1359,7 @@ public class ConfigureMavenRepositoriesWizardPage extends WizardPage implements 
 		AddRepositoryDialog dialog = new AddRepositoryDialog(getShell(), availableRepositories, 
 				includedRepositories, maven, artifactKey, editWrapper, isActive(editWrapper));
 		
-		dialog.setPreSelectedProfile(selectedWrapper.getProfileId());;
+		dialog.setPreSelectedProfile(selectedWrapper.getProfileId());
 		int ok = dialog.open();
 		if (ok == Window.OK) {
 			RepositoryWrapper wrapper = dialog.getRepositoryWrapper();

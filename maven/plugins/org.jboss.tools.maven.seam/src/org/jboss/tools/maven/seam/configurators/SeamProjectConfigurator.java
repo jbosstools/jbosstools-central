@@ -42,10 +42,10 @@ import org.eclipse.jst.j2ee.project.EarUtilities;
 import org.eclipse.jst.j2ee.project.JavaEEProjectUtilities;
 import org.eclipse.jst.jsf.core.internal.project.facet.IJSFFacetInstallDataModelProperties;
 import org.eclipse.jst.jsf.core.internal.project.facet.JSFFacetInstallDataModelProvider;
+import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.internal.IMavenConstants;
-import org.eclipse.m2e.core.internal.MavenPluginActivator;
-import org.eclipse.m2e.core.internal.project.registry.MavenProjectManager;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
+import org.eclipse.m2e.core.project.IMavenProjectRegistry;
 import org.eclipse.m2e.core.project.MavenProjectChangedEvent;
 import org.eclipse.m2e.core.project.configurator.AbstractProjectConfigurator;
 import org.eclipse.m2e.core.project.configurator.ILifecycleMappingConfiguration;
@@ -126,8 +126,8 @@ public class SeamProjectConfigurator extends AbstractProjectConfigurator {
 	public void configure(ProjectConfigurationRequest request,
 			IProgressMonitor monitor) throws CoreException {
 		// adds Seam capabilities if there are Seam dependencies
-		MavenProject mavenProject = request.getMavenProject();
-		IProject project = request.getProject();
+		MavenProject mavenProject = request.mavenProject();
+		IProject project = request.mavenProjectFacade().getProject();
 		configureInternal(mavenProject,project, monitor);
 
 	}
@@ -485,7 +485,7 @@ public class SeamProjectConfigurator extends AbstractProjectConfigurator {
 					if (refProject.hasNature(IMavenConstants.NATURE_ID)) {
 						IFile pom = refProject.getFile(IMavenConstants.POM_FILE_NAME);
 						if (pom.exists()) {
-							MavenProjectManager projectManager = MavenPluginActivator.getDefault().getMavenProjectManager();
+							IMavenProjectRegistry projectManager = MavenPlugin.getMavenProjectRegistry();
 						     IMavenProjectFacade facade = projectManager.create(pom, true, null);
 						      if(facade!=null) {
 						        MavenProject mavenProject = facade.getMavenProject(null);

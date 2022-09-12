@@ -13,6 +13,7 @@ package org.jboss.tools.maven.project.examples;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -341,11 +342,8 @@ public class ImportMavenProjectExampleDelegate extends AbstractImportMavenProjec
 
 	private AbstractProjectScanner<MavenProjectInfo> getProjectScanner(
 			File folder) {
-		File root = ResourcesPlugin.getWorkspace().getRoot().getLocation()
-				.toFile();
-		MavenPlugin mavenPlugin = MavenPlugin.getDefault();
-		MavenModelManager modelManager = mavenPlugin.getMavenModelManager();
-		return new LocalProjectScanner(root, folder.getAbsolutePath(), false,
+		MavenModelManager modelManager = MavenPlugin.getMavenModelManager();
+		return new LocalProjectScanner(Collections.singletonList(folder.getAbsolutePath()), false,
 				modelManager);
 	}
 	

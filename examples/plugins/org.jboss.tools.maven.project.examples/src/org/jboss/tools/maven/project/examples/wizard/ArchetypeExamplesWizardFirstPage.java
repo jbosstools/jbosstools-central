@@ -29,6 +29,7 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.wizard.IWizard;
 import org.eclipse.jface.wizard.IWizardPage;
+import org.eclipse.m2e.core.internal.project.ProjectConfigurationManager;
 import org.eclipse.m2e.core.project.ProjectImportConfiguration;
 import org.eclipse.m2e.core.ui.internal.wizards.MavenProjectWizardLocationPage;
 import org.eclipse.osgi.util.NLS;
@@ -176,7 +177,8 @@ public class ArchetypeExamplesWizardFirstPage extends MavenProjectWizardLocation
 	      return Messages.ArchetypeExamplesWizardFirstPage_ProjectName_Cant_Be_Empty;
 	    }
 	    
-	    final String resolvedName = getImportConfiguration().getProjectName(getModel());
+	    final String resolvedName = ProjectConfigurationManager.getProjectName(getImportConfiguration(), getModel());
+	    
 	    
 	    // check whether the project name is valid
 	    final IStatus nameStatus = workspace.validateName(resolvedName, IResource.PROJECT);

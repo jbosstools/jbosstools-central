@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: JBoss Maven Configurators Tests
 Bundle-SymbolicName: org.jboss.tools.maven.configurators.tests;singleton:=true
-Bundle-Version: 1.9.400.qualifier
+Bundle-Version: 1.10.0.qualifier
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
  org.eclipse.core.resources,
@@ -23,7 +23,6 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.jst.jee.ejb,
  org.eclipse.jst.jee.ui,
  org.eclipse.jst.jee.web,
- org.eclipse.m2e.lifecyclemapping.defaults;bundle-version="1.0.0",
  org.eclipse.m2e.launching;bundle-version="1.0.0",
  org.eclipse.m2e.tests.common;bundle-version="1.0.0",
  org.eclipse.jpt.jpa.core;bundle-version="3.0.1",
@@ -32,9 +31,10 @@ Require-Bundle: org.eclipse.ui,
  org.jboss.tools.cdi.core,
  org.jboss.tools.maven.jdt,
  org.eclipse.ui.ide,
- org.eclipse.m2e.wtp;bundle-version="1.0.0",
- org.eclipse.m2e.wtp.jsf;bundle-version="1.0.0",
- org.hibernate.eclipse.console
+ org.eclipse.m2e.wtp;bundle-version="1.5.0",
+ org.hibernate.eclipse.console,
+ org.eclipse.m2e.wtp.jpa;bundle-version="1.5.0",
+ org.eclipse.m2e.wtp.jsf;bundle-version="1.5.0"
 Bundle-ActivationPolicy: lazy
-Bundle-RequiredExecutionEnvironment: JavaSE-11
+Bundle-RequiredExecutionEnvironment: JavaSE-17
 Eclipse-RegisterBuddy: org.apache.log4j

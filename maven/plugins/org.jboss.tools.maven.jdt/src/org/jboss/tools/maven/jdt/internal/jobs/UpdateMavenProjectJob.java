@@ -24,7 +24,7 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.MultiStatus;
 import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.core.runtime.SubProgressMonitor;
+import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.project.IMavenProjectRegistry;
 import org.eclipse.m2e.core.project.IProjectConfigurationManager;
@@ -107,21 +107,20 @@ public IStatus runInWorkspace(IProgressMonitor monitor) {
       }
 
       monitor.subTask(project.getName());
-      SubProgressMonitor submonitor = new SubProgressMonitor(monitor, 1, SubProgressMonitor.SUPPRESS_SUBTASK_LABEL);
-
+      SubMonitor subMonitor = SubMonitor.convert(monitor, 100);
       try {
         MavenUpdateRequest request = new MavenUpdateRequest(project, offline, forceUpdateDependencies);
         if(updateConfiguration) {
-          configurationManager.updateProjectConfiguration(request, submonitor);
+          configurationManager.updateProjectConfiguration(request, subMonitor);
         } else {
-          projectRegistry.refresh(request, submonitor);
+          projectRegistry.refresh(request);
         }
         // only rebuild projects that were successfully updated
         if(rebuild) {
-          project.build(IncrementalProjectBuilder.CLEAN_BUILD, submonitor);
+          project.build(IncrementalProjectBuilder.CLEAN_BUILD, subMonitor);
           if(autoBuilding) {
             // TODO this is not enough, in most cases we need to re-run the build several times
-            project.build(IncrementalProjectBuilder.INCREMENTAL_BUILD, submonitor);
+            project.build(IncrementalProjectBuilder.INCREMENTAL_BUILD, subMonitor);
           }
         }
       } catch(CoreException ex) {

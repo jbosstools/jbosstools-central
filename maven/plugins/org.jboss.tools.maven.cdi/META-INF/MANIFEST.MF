@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: %Bundle-Name
 Bundle-SymbolicName: org.jboss.tools.maven.cdi;singleton:=true
-Bundle-Version: 1.9.400.qualifier
+Bundle-Version: 1.10.0.qualifier
 Bundle-Activator: org.jboss.tools.maven.cdi.MavenCDIActivator
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
@@ -16,6 +16,6 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.m2e.wtp;bundle-version="1.0.0";resolution:=optional
 Bundle-Localization: plugin
 Bundle-ActivationPolicy: lazy
-Bundle-RequiredExecutionEnvironment: JavaSE-1.8
+Bundle-RequiredExecutionEnvironment: JavaSE-17
 Bundle-Vendor: %Bundle-Vendor
 Export-Package: org.jboss.tools.maven.cdi.internal;x-friends:="org.jboss.tools.maven.configurators.tests"

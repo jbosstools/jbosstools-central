@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: %Bundle-Name
 Bundle-SymbolicName: org.jboss.tools.maven.seam;singleton:=true
-Bundle-Version: 1.9.400.qualifier
+Bundle-Version: 1.10.0.qualifier
 Bundle-Localization: plugin
 Bundle-Activator: org.jboss.tools.maven.seam.MavenSeamActivator
 Require-Bundle: org.eclipse.ui,
@@ -17,7 +17,7 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.wst.common.emfworkbench.integration,
  org.eclipse.jst.jsf.core
 Bundle-ActivationPolicy: lazy
-Bundle-RequiredExecutionEnvironment: JavaSE-1.8
+Bundle-RequiredExecutionEnvironment: JavaSE-17
 Bundle-Vendor: %Bundle-Vendor
 Export-Package: org.jboss.tools.maven.seam.utils
 Import-Package: org.eclipse.jem.util.emf.workbench

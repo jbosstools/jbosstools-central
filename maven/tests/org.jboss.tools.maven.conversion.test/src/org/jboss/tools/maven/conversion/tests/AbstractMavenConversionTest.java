@@ -13,6 +13,7 @@ package org.jboss.tools.maven.conversion.tests;
 import static org.junit.Assert.fail;
 
 import java.io.File;
+import java.util.List;
 
 import org.apache.maven.model.Model;
 import org.eclipse.core.resources.IFile;
@@ -75,9 +76,9 @@ public abstract class AbstractMavenConversionTest extends
 				.getProjectConversionManager().getConversionEnablerForProject(
 						project);
 		if (enabler != null) {
-			String[] types = enabler.getPackagingTypes(project);
-			if (types != null && types.length > 0) {
-			  packaging = types[0];
+			List<String> types = enabler.getPackagingTypes(project);
+			if (types != null && !types.isEmpty()) {
+			  packaging = types.get(0);
 			}
 		}
 		return convert(project, packaging);

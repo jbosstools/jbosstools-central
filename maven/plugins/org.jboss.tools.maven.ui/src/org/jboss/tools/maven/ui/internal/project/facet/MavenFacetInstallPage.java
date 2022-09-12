@@ -100,7 +100,7 @@ IFacetWizardPage {
 				if (hasMavenNature && pom.exists()) {
 					getDataModel().setBooleanProperty(IJBossMavenConstants.MAVEN_PROJECT_EXISTS, true);
 					mavenProjectExists = true;
-					MavenModelManager modelManager = MavenPlugin.getDefault().getMavenModelManager();
+					MavenModelManager modelManager = MavenPlugin.getMavenModelManager();
 					Model mavenModel = modelManager.readMavenModel(pom);
 					String groupId = mavenModel.getGroupId();
 					model.setStringProperty(IJBossMavenConstants.GROUP_ID, groupId);

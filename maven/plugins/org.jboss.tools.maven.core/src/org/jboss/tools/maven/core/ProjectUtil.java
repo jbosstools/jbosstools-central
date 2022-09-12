@@ -13,6 +13,7 @@ package org.jboss.tools.maven.core;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
@@ -206,7 +207,7 @@ public class ProjectUtil {
 		if (projects == null || projects.isEmpty()) {
 			return;
 		}
-		List<IProject> projectsTorUpdate = new ArrayList<>(
+		List<IProject> projectsToUpdate = new ArrayList<>(
 				projects.size());
 
 		for (IProject project : projects) {
@@ -214,15 +215,14 @@ public class ProjectUtil {
 				return;
 			}
 			if (hasOutOfDateMavenMarker(project)) {
-				projectsTorUpdate.add(project);
+				projectsToUpdate.add(project);
 			}
 		}
-		if (projectsTorUpdate.isEmpty()) {
+		if (projectsToUpdate.isEmpty()) {
 			return;
 		}
-		refreshProjects(projectsTorUpdate, IResource.DEPTH_INFINITE, monitor);
-		IProject[] selectedProjects = new IProject[projectsTorUpdate.size()];
-		Job updateJob = new UpdateMavenProjectJob(selectedProjects);
+		refreshProjects(projectsToUpdate, IResource.DEPTH_INFINITE, monitor);
+		Job updateJob = new UpdateMavenProjectJob(projectsToUpdate);
 		updateJob.schedule();
 	}
 

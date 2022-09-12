@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<feature id="org.jboss.tools.maven.test.feature" label="%featureName" version="1.9.400.qualifier" provider-name="%featureProvider"
+<feature id="org.jboss.tools.maven.test.feature" label="%featureName" version="1.10.0.qualifier" provider-name="%featureProvider"
     license-feature="org.jboss.tools.foundation.license.feature"
 	license-feature-version="0.0.0">
 
@@ -21,9 +21,4 @@
 	<plugin id="org.jboss.tools.maven.conversion.test" download-size="0" install-size="0" version="0.0.0" />
 	<plugin id="org.jboss.tools.maven.sourcelookup.test" download-size="0" install-size="0" version="0.0.0" />
 
-  <!-- JBIDE-17019 ; make sure m2eclipse-egit is available in TP -->
-   <requires>
-      <import feature="org.sonatype.m2e.egit.feature" version="0.14.0" match="greaterOrEqual"/>
-   </requires>
-  
 </feature>

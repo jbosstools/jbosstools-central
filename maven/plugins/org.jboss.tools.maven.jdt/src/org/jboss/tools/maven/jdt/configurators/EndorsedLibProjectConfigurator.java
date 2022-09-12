@@ -19,11 +19,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.lifecycle.MavenExecutionPlan;
 import org.apache.maven.plugin.MojoExecution;
-import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
@@ -32,6 +30,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.JavaCore;
+import org.eclipse.m2e.core.embedder.IMavenExecutionContext;
 import org.eclipse.m2e.core.internal.markers.SourceLocation;
 import org.eclipse.m2e.core.internal.markers.SourceLocationHelper;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
@@ -59,9 +58,9 @@ public class EndorsedLibProjectConfigurator extends AbstractProjectConfigurator 
 	@Override
 	public void configure(ProjectConfigurationRequest request, IProgressMonitor monitor) throws CoreException {
 
-		markerManager.deleteMarkers(request.getProject(), MISSING_ENDORSED_DIRS_MARKER);
+		markerManager.deleteMarkers(request.mavenProjectFacade().getProject(), MISSING_ENDORSED_DIRS_MARKER);
 		
-		IMavenProjectFacade mavenProjectFacade = request.getMavenProjectFacade();
+		IMavenProjectFacade mavenProjectFacade = request.mavenProjectFacade();
 		File[] endorsedDirs = getEndorsedDirs(mavenProjectFacade, monitor);
 		if (endorsedDirs == null || endorsedDirs.length == 0) {
 			return;
@@ -72,7 +71,7 @@ public class EndorsedLibProjectConfigurator extends AbstractProjectConfigurator 
 			MojoExecutionKey key = new MojoExecutionKey("org.apache.maven.plugins","maven-compiler-plugin",null,null,null,null); 
 			SourceLocation sourceLocation = SourceLocationHelper.findLocation(mavenProjectFacade.getMavenProject(), key);
 			for (File dir : missingEndorsedDir) {
-				addMissingDirWarning(request.getProject(), sourceLocation, dir);
+				addMissingDirWarning(request.mavenProjectFacade().getProject(), sourceLocation, dir);
 			}
 		}
     }
@@ -110,12 +109,12 @@ public class EndorsedLibProjectConfigurator extends AbstractProjectConfigurator 
 			IClasspathDescriptor classpath, IProgressMonitor monitor)
 			throws CoreException {
 
-		IJavaProject javaProject = JavaCore.create(request.getProject());
+		IJavaProject javaProject = JavaCore.create(request.mavenProjectFacade().getProject());
 		if (javaProject == null) {
 			return;
 		}
 
-		File[] endorsedDirs = getEndorsedDirs(request.getMavenProjectFacade(), monitor);
+		File[] endorsedDirs = getEndorsedDirs(request.mavenProjectFacade(), monitor);
 		
 		if (endorsedDirs == null || endorsedDirs.length == 0){
 			ClasspathHelpers.removeEndorsedLibClasspathContainer(classpath);
@@ -126,16 +125,16 @@ public class EndorsedLibProjectConfigurator extends AbstractProjectConfigurator 
 	}
 	
 	private File[] getEndorsedDirs(IMavenProjectFacade mavenProjectFacade, IProgressMonitor monitor) throws CoreException {
-		MavenSession session =  createSession(mavenProjectFacade, monitor);
-		MojoExecution mojoExecution = getCompilerMojoExecution(mavenProjectFacade, session, monitor);
+		MavenSession session = IMavenExecutionContext.getThreadContext().get().getSession();
+		MojoExecution mojoExecution = getCompilerMojoExecution(mavenProjectFacade, monitor);
 		
 		//Parse <compilerArgument> for -Djava.endorsed.dirs 
-		String compilerArgument  = maven.getMojoParameterValue(session, mojoExecution, "compilerArgument", String.class);//
+		String compilerArgument  = maven.getMojoParameterValue(session.getCurrentProject(), mojoExecution, "compilerArgument", String.class, monitor);//
 		File[] javaEndorsedDirs = parseJavaEndorsedDirs(mavenProjectFacade.getProject(), compilerArgument);
 
 		//Check <compilerArguments> for <endorseddirs>
 		@SuppressWarnings("unchecked")
-		Map<String, String> compilerArguments = maven.getMojoParameterValue(session, mojoExecution, "compilerArguments", Map.class); 
+		Map<String, String> compilerArguments = maven.getMojoParameterValue(session.getCurrentProject(), mojoExecution, "compilerArguments", Map.class, monitor); 
 		String endorsedDirsArg = (compilerArguments == null)?null:compilerArguments.get("endorseddirs");
 		File[] endorsedDirs = parseEndorsedDirs(mavenProjectFacade.getProject(), endorsedDirsArg);
 		
@@ -207,34 +206,23 @@ public class EndorsedLibProjectConfigurator extends AbstractProjectConfigurator 
 	}
 	
 	private MojoExecution getCompilerMojoExecution(IMavenProjectFacade mavenProjectFacade, 
-												   MavenSession session, 
-												   IProgressMonitor monitor) throws CoreException {
-		MavenExecutionPlan executionPlan = maven.calculateExecutionPlan(session, 
-        mavenProjectFacade.getMavenProject(monitor),
+													IProgressMonitor monitor) throws CoreException {
+		MavenExecutionPlan executionPlan = maven.calculateExecutionPlan(mavenProjectFacade.getMavenProject(monitor),
 																		Collections.singletonList("compile"), 
 																		true, 
 																		monitor);
-	    MojoExecution mojoExecution = getExecution(executionPlan, "maven-compiler-plugin", "compile");
+		MojoExecution mojoExecution = getExecution(executionPlan, "maven-compiler-plugin", "compile");
 		return mojoExecution;
 	}
 
-	private MavenSession createSession(IMavenProjectFacade mavenProjectFacade, IProgressMonitor monitor) throws CoreException {
-		IFile pomResource = mavenProjectFacade.getPom();
-	    MavenExecutionRequest request = projectManager.createExecutionRequest(pomResource, 
-	    																	  mavenProjectFacade.getResolverConfiguration(), 
-	    																	  monitor);
-	    MavenSession session = maven.createSession(request, mavenProjectFacade.getMavenProject());
-		return session;
-	}
-	
-    private MojoExecution getExecution(MavenExecutionPlan executionPlan, String artifactId, String goal) throws CoreException {
+    private MojoExecution getExecution(MavenExecutionPlan executionPlan, String artifactId, String goal) {
       for(MojoExecution execution : executionPlan.getMojoExecutions()) {
         if(artifactId.equals(execution.getArtifactId()) && goal.equals(execution.getGoal())) {
           return execution;
         }
       }
       return null;
-    }	
+    }
 	
 	private static <T> T[] concat(T[] first, T[] second) {
 	  if (second == null) {
@@ -255,7 +243,7 @@ public class EndorsedLibProjectConfigurator extends AbstractProjectConfigurator 
 	@Override
   public void unconfigure(ProjectConfigurationRequest request, IProgressMonitor monitor) throws CoreException {
 		super.unconfigure(request, monitor);
-		ClasspathHelpers.removeEndorsedLibClasspathContainer(request.getProject());		 
+		ClasspathHelpers.removeEndorsedLibClasspathContainer(request.mavenProjectFacade().getProject());
     }
 	
 }

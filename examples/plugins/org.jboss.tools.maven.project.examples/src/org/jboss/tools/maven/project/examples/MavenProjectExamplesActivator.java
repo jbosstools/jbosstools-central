@@ -32,7 +32,7 @@ import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.m2e.core.MavenPlugin;
-import org.eclipse.m2e.core.embedder.IMaven;
+import org.eclipse.m2e.core.internal.project.ProjectConfigurationManager;
 import org.eclipse.m2e.core.project.MavenProjectInfo;
 import org.eclipse.m2e.core.project.ProjectImportConfiguration;
 import org.eclipse.ui.PlatformUI;
@@ -170,13 +170,12 @@ public class MavenProjectExamplesActivator extends AbstractUIPlugin {
 
 		File pomFile = projectInfo.getPomFile();
 		Model model = projectInfo.getModel();
-		IMaven maven = MavenPlugin.getMaven();
 		if (model == null) {
-			model = maven.readModel(pomFile);
+			model = MavenPlugin.getMavenModelManager().readMavenModel(pomFile);
 			projectInfo.setModel(model);
 		}
 
-		String projectName = configuration.getProjectName(model);
+		String projectName = ProjectConfigurationManager.getProjectName(configuration, model);
 
 		File projectDir = pomFile.getParentFile();
 		String projectParent = projectDir.getParentFile().getAbsolutePath();
