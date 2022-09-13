@@ -62,7 +62,7 @@ jobs:
       with:
         run: >
           mvn clean verify -U -fae --settings build-ci/maven-settings.xml -DskipITests=true
-          -Dmaven.test.error.ignore=true -Dmaven.test.failure.ignore=true -ntp -X -DtychoVersion=2.7.5
+          -Dmaven.test.error.ignore=true -Dmaven.test.failure.ignore=true -ntp -DtychoVersion=2.7.5
 
     # Archive artifacts to be applied in Publish Reports workflow
     - name: Archiving test artifacts
