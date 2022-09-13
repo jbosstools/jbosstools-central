@@ -138,8 +138,8 @@ public abstract class AbstractMavenConfiguratorTest extends
 	    List<IMarker> markers = WorkspaceHelpers.findErrorMarkers(project);
 	    Iterator<IMarker> ite = markers.iterator();
 	    while (ite.hasNext()) {
-	    	IMarker m  =ite.next();
-	    	if (getMessage(m).contains("Referenced file contains errors (http://java.sun.com/xml/ns/javaee/web-facesconfig_2_1.xsd)")) {
+	    	IMarker m  = ite.next();
+	    	if (getMessage(m) != null && getMessage(m).contains("Referenced file contains errors (http://java.sun.com/xml/ns/javaee/web-facesconfig_2_1.xsd)")) {
 	    		ite.remove();
 	    	}
 	    }
