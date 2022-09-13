@@ -13,11 +13,11 @@ Require-Bundle: org.eclipse.ui;bundle-version="3.7.0",
  org.eclipse.jst.j2ee,
  org.eclipse.wst.common.emfworkbench.integration;bundle-version="1.2.100",
  org.jboss.ide.eclipse.as.ui.mbeans;bundle-version="2.3.0",
- org.eclipse.m2e.wtp;bundle-version="1.1.0",
- org.eclipse.m2e.mavenarchiver;bundle-version="2.0.1",
- org.eclipse.m2e.maven.runtime,
- org.eclipse.m2e.core,
- org.eclipse.m2e.jdt
+ org.eclipse.m2e.wtp;bundle-version="1.5.0",
+ org.eclipse.m2e.mavenarchiver;bundle-version="2.0.0",
+ org.eclipse.m2e.maven.runtime;bundle-version="3.8.0",
+ org.eclipse.m2e.core;bundle-version="2.0.0",
+ org.eclipse.m2e.jdt;bundle-version="2.0.0"
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-17
 Bundle-Vendor: %Bundle-Vendor

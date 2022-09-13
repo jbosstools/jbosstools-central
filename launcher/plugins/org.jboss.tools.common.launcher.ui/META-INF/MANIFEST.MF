@@ -20,6 +20,6 @@ Require-Bundle: org.eclipse.ui,
  org.jboss.tools.common.launcher.core,
  org.apache.commons.io;bundle-version="2.2.0",
  org.jboss.tools.common,
- org.eclipse.m2e.core
+ org.eclipse.m2e.core;bundle-version="2.0.0"
 Export-Package: org.jboss.tools.common.launcher.ui.wizard
 Bundle-Activator: org.jboss.tools.common.launcher.ui.LauncherUIPlugin

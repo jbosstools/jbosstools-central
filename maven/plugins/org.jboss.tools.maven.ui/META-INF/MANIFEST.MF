@@ -20,7 +20,7 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.compare;bundle-version="3.5.202",
  org.eclipse.jst.j2ee.ui;bundle-version="1.1.503",
  org.eclipse.jst.jee.ui;bundle-version="1.0.401",
- org.eclipse.m2e.launching;bundle-version="1.5.0",
+ org.eclipse.m2e.launching;bundle-version="2.0.0",
  org.eclipse.core.expressions,
  org.eclipse.ui.forms,
  org.apache.commons.io

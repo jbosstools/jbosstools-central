@@ -10,25 +10,8 @@
  ************************************************************************************/
 package org.jboss.tools.maven.configurators.tests;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-
-import java.io.File;
-
-import org.eclipse.core.resources.IFile;
-import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
-import org.eclipse.core.runtime.NullProgressMonitor;
-import org.eclipse.jst.j2ee.project.facet.IJ2EEFacetConstants;
-import org.eclipse.m2e.core.project.ResolverConfiguration;
-import org.eclipse.m2e.tests.common.WorkspaceHelpers;
 import org.eclipse.m2e.wtp.jsf.internal.MavenJSFConstants;
-import org.eclipse.m2e.wtp.jsf.internal.configurators.JSFProjectConfigurator;
-import org.eclipse.wst.common.project.facet.core.IFacetedProject;
-import org.eclipse.wst.common.project.facet.core.IProjectFacetVersion;
-import org.eclipse.wst.common.project.facet.core.ProjectFacetsManager;
 import org.junit.Test;
 
 
@@ -51,6 +34,9 @@ public class JSFConfiguratorTest extends AbstractMavenConfiguratorTest {
 		assertIsJSFProject(project, MavenJSFConstants.JSF_FACET_VERSION_2_0);
 	}
 	
+	/*
+	 Commented until the new m2e-wtp features are available  
+
 	@Test
 	public void testJBIDE9242_supportMultipleJSFDependencies() throws Exception {
 		IProject[] projects = importProjects("projects/jsf/", 
@@ -63,23 +49,23 @@ public class JSFConfiguratorTest extends AbstractMavenConfiguratorTest {
 		waitForJobsToComplete(new NullProgressMonitor());
 		IProject mojarra = projects[0];
 		assertNoErrors(mojarra);
-		assertIsJSFProject(mojarra, MavenJSFConstants.JSF_FACET_VERSION_2_0);
+		assertIsJSFProject(mojarra, JSFProjectConfigurator.JSF_FACET_VERSION_2_0);
 		
 		IProject jboss = projects[1];
 		assertNoErrors(jboss);
-		assertIsJSFProject(jboss, MavenJSFConstants.JSF_FACET_VERSION_2_0);
+		assertIsJSFProject(jboss, JSFProjectConfigurator.JSF_FACET_VERSION_2_0);
 		
 		IProject jsfapi_20 = projects[2];
 		assertNoErrors(jsfapi_20);
-		assertIsJSFProject(jsfapi_20, MavenJSFConstants.JSF_FACET_VERSION_2_0);
+		assertIsJSFProject(jsfapi_20, JSFProjectConfigurator.JSF_FACET_VERSION_2_0);
 		
 		IProject myfaces = projects[3];
 		assertNoErrors(myfaces);
-		assertIsJSFProject(myfaces, MavenJSFConstants.JSF_FACET_VERSION_1_1);
+		assertIsJSFProject(myfaces, JSFProjectConfigurator.JSF_FACET_VERSION_1_1);
 
 		IProject jsfapi_12 = projects[4];
 		assertNoErrors(jsfapi_12);
-		assertIsJSFProject(jsfapi_12, MavenJSFConstants.JSF_FACET_VERSION_1_2);
+		assertIsJSFProject(jsfapi_12, JSFProjectConfigurator.JSF_FACET_VERSION_1_2);
 		
 
 	}
@@ -91,7 +77,7 @@ public class JSFConfiguratorTest extends AbstractMavenConfiguratorTest {
 		
 		IProject jsfProject = importProject(projectLocation+"/pom.xml");
 		waitForJobsToComplete(new NullProgressMonitor());
-		assertIsJSFProject(jsfProject, MavenJSFConstants.JSF_FACET_VERSION_2_0);
+		assertIsJSFProject(jsfProject, JSFProjectConfigurator.JSF_FACET_VERSION_2_0);
 
 		IFile webXml = jsfProject.getFile(webxmlRelPath);
 		assertTrue(webXml.exists());
@@ -105,12 +91,12 @@ public class JSFConfiguratorTest extends AbstractMavenConfiguratorTest {
 		String projectLocation = "projects/jsf/JBIDE-10468/jsf-webxml-20";
 		IProject jsfProject = importProject(projectLocation+"/pom.xml");
 		waitForJobsToComplete(new NullProgressMonitor());
-		assertIsJSFProject(jsfProject, MavenJSFConstants.JSF_FACET_VERSION_2_0);
+		assertIsJSFProject(jsfProject, JSFProjectConfigurator.JSF_FACET_VERSION_2_0);
 
 		projectLocation = "projects/jsf/JBIDE-10468/jsf-webxml-12";
 		jsfProject = importProject(projectLocation+"/pom.xml");
 		waitForJobsToComplete(new NullProgressMonitor());
-		assertIsJSFProject(jsfProject, MavenJSFConstants.JSF_FACET_VERSION_1_2);
+		assertIsJSFProject(jsfProject, JSFProjectConfigurator.JSF_FACET_VERSION_1_2);
 	}	
 	
 	@Test
@@ -118,7 +104,7 @@ public class JSFConfiguratorTest extends AbstractMavenConfiguratorTest {
 		String projectLocation = "projects/jsf/JBIDE-10468/jsf-facesconfig";
 		IProject jsfProject = importProject(projectLocation+"/pom.xml");
 		waitForJobsToComplete(new NullProgressMonitor());
-		assertIsJSFProject(jsfProject, MavenJSFConstants.JSF_FACET_VERSION_2_0);
+		assertIsJSFProject(jsfProject, JSFProjectConfigurator.JSF_FACET_VERSION_2_0);
 	}	
 	
 	
@@ -129,7 +115,7 @@ public class JSFConfiguratorTest extends AbstractMavenConfiguratorTest {
 		waitForJobsToComplete(new NullProgressMonitor());
 		IFacetedProject facetedProject = ProjectFacetsManager.create(jsfProject);
 		assertNotNull(jsfProject.getName() + " is not a faceted project", facetedProject);
-		assertFalse("JSF Facet should be missing", facetedProject.hasProjectFacet(MavenJSFConstants.JSF_FACET));
+		assertFalse("JSF Facet should be missing", facetedProject.hasProjectFacet(JSFProjectConfigurator.JSF_FACET));
 		assertHasJSFConfigurationError(jsfProject, "JavaServer Faces 2.0 can not be installed : One or more constraints have not been satisfied.");
 		assertHasJSFConfigurationError(jsfProject, "JavaServer Faces 2.0 requires Dynamic Web Module 2.5 or newer.");
 		
@@ -137,7 +123,7 @@ public class JSFConfiguratorTest extends AbstractMavenConfiguratorTest {
 		copyContent(jsfProject, "src/main/webapp/WEB-INF/good-web.xml", "src/main/webapp/WEB-INF/web.xml", true);
 		updateProject(jsfProject);
 		assertNoErrors(jsfProject);
-		assertIsJSFProject(jsfProject, MavenJSFConstants.JSF_FACET_VERSION_2_0);
+		assertIsJSFProject(jsfProject, JSFProjectConfigurator.JSF_FACET_VERSION_2_0);
 	}
 
 	@Test
@@ -147,7 +133,7 @@ public class JSFConfiguratorTest extends AbstractMavenConfiguratorTest {
 		
 		IFacetedProject facetedProject = ProjectFacetsManager.create(project);
 		assertNotNull(project.getName() + " is not a faceted project", facetedProject);
-		assertFalse(project.getName() + " should not have the JSF facet", facetedProject.hasProjectFacet(MavenJSFConstants.JSF_FACET));
+		assertFalse(project.getName() + " should not have the JSF facet", facetedProject.hasProjectFacet(JSFProjectConfigurator.JSF_FACET));
 		assertTrue(project.getName() + " doesn't have the expected Web facet", facetedProject.hasProjectFacet(IJ2EEFacetConstants.DYNAMIC_WEB_25));
 		
 		IFile webXml = project.getFile("src/main/webapp/WEB-INF/web.xml");
@@ -162,7 +148,7 @@ public class JSFConfiguratorTest extends AbstractMavenConfiguratorTest {
 		waitForJobsToComplete(new NullProgressMonitor());
 		IFacetedProject facetedProject = ProjectFacetsManager.create(jsfProject);
 		assertNotNull(jsfProject.getName() + " is not a faceted project", facetedProject);
-		assertFalse(jsfProject.getName() + " should not have the JSF facet", facetedProject.hasProjectFacet(MavenJSFConstants.JSF_FACET));
+		assertFalse(jsfProject.getName() + " should not have the JSF facet", facetedProject.hasProjectFacet(JSFProjectConfigurator.JSF_FACET));
 		assertTrue(jsfProject.getName() + " doesn't have the expected Web facet", facetedProject.hasProjectFacet(IJ2EEFacetConstants.DYNAMIC_WEB_25));
 	}	
 	
@@ -171,7 +157,7 @@ public class JSFConfiguratorTest extends AbstractMavenConfiguratorTest {
 		String projectLocation = "projects/jsf/JBIDE-10831/jsf-customfacesconfig";
 		IProject jsfProject = importProject(projectLocation+"/pom.xml");
 		waitForJobsToComplete(new NullProgressMonitor());
-		assertIsJSFProject(jsfProject, MavenJSFConstants.JSF_FACET_VERSION_2_0);
+		assertIsJSFProject(jsfProject, JSFProjectConfigurator.JSF_FACET_VERSION_2_0);
 		
 		IFile facesConfigXml = jsfProject.getFile("src/main/webapp/WEB-INF/faces-config.xml");
 		assertFalse("A new faces-config.xml was added to the project!", facesConfigXml.exists());
@@ -201,17 +187,18 @@ public class JSFConfiguratorTest extends AbstractMavenConfiguratorTest {
 		
 		boolean isJsf21available = false;
 		try {
-			isJsf21available = null != ProjectFacetsManager.getProjectFacet("jst.jsf").getVersion(MavenJSFConstants.JSF_VERSION_2_1); 
+			isJsf21available = null != ProjectFacetsManager.getProjectFacet("jst.jsf").getVersion(JSF_VERSION_2_1); 
 		} catch (Exception e) {
 			//ignore
 		}
 		
-		IProjectFacetVersion expectedJsfVersion = isJsf21available?  MavenJSFConstants.JSF_FACET_VERSION_2_1
-																	:MavenJSFConstants.JSF_FACET_VERSION_2_0;
+		IProjectFacetVersion expectedJsfVersion = isJsf21available?  JSFProjectConfigurator.JSF_FACET_VERSION_2_1
+																	:JSFProjectConfigurator.JSF_FACET_VERSION_2_0;
 		assertIsJSFProject(project,expectedJsfVersion);
 	}	
 	
 	private void assertHasJSFConfigurationError(IProject project, String message) throws Exception {
 		WorkspaceHelpers.assertErrorMarker(MavenJSFConstants.JSF_CONFIGURATION_ERROR_MARKER_ID, message, 1, "", project);
 	}
+	*/
 }
