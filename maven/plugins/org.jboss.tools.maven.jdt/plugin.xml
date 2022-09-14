@@ -15,11 +15,11 @@
    </extension>
       
  	<extension point="org.eclipse.m2e.core.projectConfigurators">
-      <configurator 
-          id="org.jboss.tools.maven.jdt.configurator.endorsedlib"
-          class="org.jboss.tools.maven.jdt.configurators.EndorsedLibProjectConfigurator"
-          name="%Endorsed_Lib_Configurator_label" 
-          secondaryTo="org.eclipse.m2e.jdt.javaConfigurator"/>
+      <configurator
+            class="org.jboss.tools.maven.jdt.configurators.EndorsedLibProjectConfigurator"
+            id="org.jboss.tools.maven.jdt.configurator.endorsedlib"
+            name="%Endorsed_Lib_Configurator_label"
+            runsAfter="org.eclipse.m2e.jdt.javaConfigurator"/>
     </extension>
 
     

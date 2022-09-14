@@ -9,7 +9,7 @@
 	</parent>
 	<groupId>org.jboss.tools.common.launcher</groupId>
 	<artifactId>launcher</artifactId>
-	<version>3.10.100-SNAPSHOT</version>
+	<version>3.11.0-SNAPSHOT</version>
 	<name>launcher.all</name>
 	<packaging>pom</packaging>
 	<modules>

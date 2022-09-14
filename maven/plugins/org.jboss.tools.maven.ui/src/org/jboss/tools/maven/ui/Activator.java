@@ -147,20 +147,4 @@ public class Activator extends AbstractUIPlugin {
 		getDefault().getLog().log(status);
 	}
 
-	/**
-	 * @deprecated use {@link MavenUtil#getDependencyVersion(MavenProject, String, String)} instead
-	 */
-	@Deprecated
-	public String getDependencyVersion(MavenProject mavenProject, String gid, String aid) {
-	    return MavenUtil.getDependencyVersion(mavenProject, gid, aid) ;
-	}
-	
-	/**
-	 * @deprecated use {@link MavenUtil#getDependencyVersion(Artifact, List, String, String)} instead
-	 */
-	@Deprecated
-	public String getDependencyVersion(Artifact artifact, List<ArtifactRepository> remoteRepos, String gid, String aid) {
-    	return MavenUtil.getDependencyVersion(artifact, remoteRepos, gid, aid); 	
-	}
-
 }

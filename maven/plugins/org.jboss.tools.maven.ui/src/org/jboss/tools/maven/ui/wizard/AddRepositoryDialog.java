@@ -422,15 +422,15 @@ public class AddRepositoryDialog extends TitleAreaDialog {
 	private String getCoords() {
 		if (coords == null && artifactKey != null) {
 			StringBuilder builder = new StringBuilder();
-			builder.append(artifactKey.getGroupId());
+			builder.append(artifactKey.groupId());
 			builder.append(":"); //$NON-NLS-1$
-			builder.append(artifactKey.getArtifactId());
+			builder.append(artifactKey.artifactId());
 			builder.append(":"); //$NON-NLS-1$
-			if (artifactKey.getClassifier() != null) {
-				builder.append(artifactKey.getClassifier());
+			if (artifactKey.classifier() != null) {
+				builder.append(artifactKey.classifier());
 				builder.append(":"); //$NON-NLS-1$
 			}
-			builder.append(artifactKey.getVersion());
+			builder.append(artifactKey.version());
 			coords = builder.toString();
 		}
 		return coords;

@@ -42,6 +42,7 @@ import org.jboss.tools.common.model.util.EclipseResourceUtil;
 import org.jboss.tools.maven.cdi.MavenCDIActivator;
 import org.jboss.tools.maven.cdi.internal.BeansXmlQuickPeek;
 import org.jboss.tools.maven.core.IJBossMavenConstants;
+import org.jboss.tools.maven.core.MavenUtil;
 import org.jboss.tools.maven.core.ProjectUtil;
 import org.jboss.tools.maven.core.VersionUtil;
 import org.jboss.tools.maven.core.internal.project.facet.MavenFacetInstallDataModelProvider;
@@ -82,8 +83,8 @@ public class CDIProjectConfigurator extends AbstractProjectConfigurator {
 	@Override
 	public void configure(ProjectConfigurationRequest request,
 			IProgressMonitor monitor) throws CoreException {
-		MavenProject mavenProject = request.getMavenProject();
-		IProject project = request.getProject();
+		MavenProject mavenProject = request.mavenProject();
+		IProject project = request.mavenProjectFacade().getProject();
 		configureInternal(mavenProject,project, monitor);
 	}
 	
@@ -192,7 +193,7 @@ public class CDIProjectConfigurator extends AbstractProjectConfigurator {
 
 	
 	private String getCDIVersion(IProject project, MavenProject mavenProject) throws CoreException {
-		String version = Activator.getDefault().getDependencyVersion(mavenProject, CDI_API_GROUP_ID, CDI_API_ARTIFACT_ID);
+		String version = MavenUtil.getDependencyVersion(mavenProject, CDI_API_GROUP_ID, CDI_API_ARTIFACT_ID);
 		if (version == null) {
 			version = inferCdiVersionFromDependencies(mavenProject);
 		}
@@ -220,7 +221,7 @@ public class CDIProjectConfigurator extends AbstractProjectConfigurator {
 		for (Artifact artifact : mavenProject.getArtifacts()) {
 			if (isKnownCdiExtension(artifact)) {
 				hasCandidates = true;
-				cdiVersion = Activator.getDefault().getDependencyVersion(artifact, repos, CDI_API_GROUP_ID, CDI_API_ARTIFACT_ID);
+				cdiVersion = MavenUtil.getDependencyVersion(artifact, repos, CDI_API_GROUP_ID, CDI_API_ARTIFACT_ID);
 				if (cdiVersion != null) {
 					//TODO should probably not break and take the highest version returned from all dependencies
 					break;

@@ -56,8 +56,8 @@ public class SpringBootProjectConfigurator extends AbstractProjectConfigurator {
 
 	@Override
 	public void configure(ProjectConfigurationRequest request, IProgressMonitor monitor) throws CoreException {
-		MavenProject mavenProject = request.getMavenProject();
-		IProject project = request.getProject();
+		MavenProject mavenProject = request.mavenProject();
+		IProject project = request.mavenProjectFacade().getProject();
 		configureProject(mavenProject, project, monitor);
 		configureDependencies(mavenProject, project, monitor);
 	}

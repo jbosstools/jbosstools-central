@@ -2,7 +2,7 @@
 <feature
       id="org.jboss.tools.maven.jbosspackaging.feature"
       label="%featureName"
-      version="1.9.400.qualifier"
+      version="1.10.0.qualifier"
       provider-name="%providerName"
       plugin="org.jboss.tools.maven.jbosspackaging"
       license-feature="org.jboss.tools.foundation.license.feature"
@@ -21,8 +21,8 @@
    </license>
 
    <requires>
-      <import feature="org.eclipse.m2e.feature" version="1.5.0" match="greaterOrEqual"/>
-      <import feature="org.eclipse.m2e.wtp.feature" version="1.1.0" match="greaterOrEqual"/>
+      <import feature="org.eclipse.m2e.feature" version="2.0.0" match="greaterOrEqual"/>
+      <import feature="org.eclipse.m2e.wtp.feature" version="1.5.0" match="greaterOrEqual"/>
       <import feature="org.jboss.tools.maven.feature" version="1.6.0" match="greaterOrEqual"/>
       <import feature="org.jboss.ide.eclipse.as.feature" version="3.0.0" match="greaterOrEqual"/>
    </requires>

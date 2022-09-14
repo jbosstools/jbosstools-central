@@ -31,12 +31,12 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.m2e.core.MavenPlugin;
+import org.eclipse.m2e.core.embedder.IMaven;
+import org.eclipse.m2e.core.embedder.IMavenExecutionContext;
 import org.eclipse.m2e.core.embedder.MavenModelManager;
 import org.eclipse.m2e.core.internal.IMavenConstants;
-import org.eclipse.m2e.core.internal.embedder.MavenImpl;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 
 /**
@@ -129,11 +129,10 @@ public class MavenUtil {
 		String version = null;
 	    if (pom != null) {
 		    MavenProject mavenProject = null;
-	    	MavenImpl maven = (MavenImpl)MavenPlugin.getMaven();
+	    	IMaven maven = MavenPlugin.getMaven();
 		    try {
 		    	//Create a custom execution request
-		    	IProgressMonitor monitor = new NullProgressMonitor();
-		    	MavenExecutionRequest request = maven.createExecutionRequest(monitor);
+		    	MavenExecutionRequest request = IMavenExecutionContext.getThreadContext().get().getExecutionRequest();
 		    	for (ArtifactRepository repo : remoteRepos) {
 		    		request.addRemoteRepository(repo);
 		    	}
@@ -141,7 +140,7 @@ public class MavenUtil {
 		    	request.getProjectBuildingRequest().setResolveDependencies(true);
 
 		    	//Load the MavenProject
-		    	MavenExecutionResult result = maven.readProject(request, monitor);
+		    	MavenExecutionResult result = maven.readMavenProject(pom, request.getProjectBuildingRequest());
 		    	//log errors
 		    	if (result.hasExceptions()) {
 		    		for (Throwable e : result.getExceptions()) {

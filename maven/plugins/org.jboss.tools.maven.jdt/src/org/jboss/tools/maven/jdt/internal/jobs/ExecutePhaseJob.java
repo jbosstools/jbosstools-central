@@ -23,7 +23,7 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.MultiStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.m2e.core.MavenPlugin;
-import org.eclipse.m2e.core.embedder.IMaven;
+import org.eclipse.m2e.core.embedder.IMavenExecutionContext;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.jdt.MavenJdtPlugin;
 
@@ -42,13 +42,11 @@ public class ExecutePhaseJob extends WorkspaceJob {
 	@Override
     public IStatus runInWorkspace(IProgressMonitor monitor) throws CoreException {
 		
-		IMaven maven =  MavenPlugin.getMaven();
-		
-		MavenExecutionRequest request = maven.createExecutionRequest(monitor);
+		MavenExecutionRequest request = IMavenExecutionContext.getThreadContext().get().getExecutionRequest();
 		request.setPom(mavenProjectFacade.getPomFile());
 		request.setGoals(Arrays.asList(phase));
 		
-		MavenExecutionResult result = maven.execute(request, monitor);
+		MavenExecutionResult result = IMavenExecutionContext.getThreadContext().get().execute(request);
 		
 		if (result.hasExceptions()) {
 			IStatus errorStatus; 

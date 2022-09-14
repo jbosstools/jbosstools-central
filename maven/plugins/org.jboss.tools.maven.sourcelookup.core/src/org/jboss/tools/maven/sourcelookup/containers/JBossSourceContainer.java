@@ -303,9 +303,9 @@ public class JBossSourceContainer extends AbstractSourceContainer {
 
 	public static Job downloadArtifact(File file, ArtifactKey artifact, IJobChangeListener ... listeners) {
 		final ArtifactKey sourcesArtifact = new ArtifactKey(
-				artifact.getGroupId(), artifact.getArtifactId(),
-				artifact.getVersion(),
-				IdentificationUtil.getSourcesClassifier(artifact.getClassifier()));
+				artifact.groupId(), artifact.artifactId(),
+				artifact.version(),
+				IdentificationUtil.getSourcesClassifier(artifact.classifier()));
 		//FIXME static variable, What The ...!!!
 		resolvedFile = null;
 		Job job = new Job("Downloading sources for " + file.getName()) {
@@ -346,11 +346,11 @@ public class JBossSourceContainer extends AbstractSourceContainer {
 	protected static Artifact resolveArtifact(ArtifactKey artifact,
 			IProgressMonitor monitor) throws CoreException {
 		IMaven maven = MavenPlugin.getMaven();
-		Artifact resolved = maven.resolve(artifact.getGroupId(), //
-				artifact.getArtifactId(), //
-				artifact.getVersion(), //
+		Artifact resolved = maven.resolve(artifact.groupId(), //
+				artifact.artifactId(), //
+				artifact.version(), //
 				"jar" /* type */, // //$NON-NLS-1$
-				artifact.getClassifier(), //
+				artifact.classifier(), //
 				maven.getArtifactRepositories(), //
 				monitor);
 		monitor.done();
@@ -359,7 +359,7 @@ public class JBossSourceContainer extends AbstractSourceContainer {
 
 	public static IPath getSourcePath(ArtifactKey a) {
 		File file = getAttachedArtifactFile(a,
-				IdentificationUtil.getSourcesClassifier(a.getClassifier()));
+				IdentificationUtil.getSourcesClassifier(a.classifier()));
 
 		if (file != null) {
 			return Path.fromOSString(file.getAbsolutePath());
@@ -373,7 +373,7 @@ public class JBossSourceContainer extends AbstractSourceContainer {
 			IMaven maven = MavenPlugin.getMaven();
 			ArtifactRepository localRepository = maven.getLocalRepository();
 			String relPath = maven.getArtifactPath(localRepository,
-					a.getGroupId(), a.getArtifactId(), a.getVersion(),
+					a.groupId(), a.artifactId(), a.version(),
 					"jar", classifier); //$NON-NLS-1$
 			File file = new File(localRepository.getBasedir(), relPath)
 					.getCanonicalFile();

@@ -45,7 +45,6 @@ public class FileIdentificationManager implements IFileIdentificationManager {
 	protected void initArtifactIdentifiers() {
 		//TODO read from extension points?
 		addArtifactIdentifier(new MavenPropertiesIdentifier());
-		addArtifactIdentifier(new NexusIndexIdentifier());
 		addArtifactIdentifier(new NexusRepositoryIdentifier());
 		//JBIDE-12702 Add Maven Central identifier last. Even though it's faster, 
 		//we don't want to pound that public service too hard

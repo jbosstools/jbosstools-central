@@ -20,6 +20,7 @@ import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.zip.ZipEntry;
@@ -36,8 +37,8 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.embedder.MavenModelManager;
-import org.eclipse.m2e.core.internal.MavenPluginActivator;
 import org.eclipse.m2e.core.project.IProjectConfigurationManager;
 import org.eclipse.m2e.core.project.LocalProjectScanner;
 import org.eclipse.m2e.core.project.MavenProjectInfo;
@@ -121,12 +122,10 @@ public class NewLauncherProjectWizardController {
 
 	private IStatus createMavenProject(IProgressMonitor monitor) {
 		IStatus status = Status.OK_STATUS;
-		MavenPluginActivator mavenPlugin = MavenPluginActivator.getDefault();
-		IProjectConfigurationManager configurationManager = mavenPlugin.getProjectConfigurationManager();
-		MavenModelManager modelManager = mavenPlugin.getMavenModelManager();
+		IProjectConfigurationManager configurationManager = MavenPlugin.getProjectConfigurationManager();
+		MavenModelManager modelManager = MavenPlugin.getMavenModelManager();
 		LocalProjectScanner scanner = new LocalProjectScanner(
-				ResourcesPlugin.getWorkspace().getRoot().getRawLocation().toFile(), 
-				model.getLocation().toOSString(), 
+				Collections.singletonList(model.getLocation().toOSString()),
 				false,
 				modelManager);
 		try {

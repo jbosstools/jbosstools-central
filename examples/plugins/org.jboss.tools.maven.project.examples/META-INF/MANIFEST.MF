@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: %Bundle-Name
 Bundle-SymbolicName: org.jboss.tools.maven.project.examples;singleton:=true
-Bundle-Version: 3.1.700.qualifier
+Bundle-Version: 3.2.0.qualifier
 Bundle-Activator: org.jboss.tools.maven.project.examples.MavenProjectExamplesActivator
 Bundle-Localization: plugin
 Require-Bundle: org.eclipse.ui,
@@ -10,9 +10,9 @@ Require-Bundle: org.eclipse.ui,
  org.jboss.tools.maven.core,
  org.jboss.tools.project.examples,
  org.eclipse.ui.ide,
- org.eclipse.m2e.archetype.common;bundle-version="1.0.0",
- org.eclipse.m2e.core;bundle-version="1.5.0",
- org.eclipse.m2e.core.ui;bundle-version="1.5.0",
+ org.eclipse.m2e.archetype.common;bundle-version="3.2.0",
+ org.eclipse.m2e.core;bundle-version="2.0.0",
+ org.eclipse.m2e.core.ui;bundle-version="2.0.0",
  org.eclipse.wst.web.ui;bundle-version="1.1.400",
  org.eclipse.ui.forms,
  org.jboss.ide.eclipse.as.core;bundle-version="2.3.0",
@@ -23,12 +23,13 @@ Require-Bundle: org.eclipse.ui,
  org.jboss.tools.runtime.core;bundle-version="2.0.0",
  org.jboss.tools.stacks.core;bundle-version="1.0.0",
  org.jboss.tools.as.runtimes.integration;bundle-version="2.4.100",
- org.eclipse.m2e.wtp;bundle-version="1.1.0",
- org.eclipse.m2e.wtp.jaxrs;bundle-version="1.1.0",
- org.eclipse.m2e.wtp.jpa;bundle-version="1.1.0",
- org.eclipse.m2e.wtp.jsf;bundle-version="1.1.0"
+ org.eclipse.m2e.wtp;bundle-version="1.5.0",
+ org.eclipse.m2e.wtp.jaxrs;bundle-version="1.5.0",
+ org.eclipse.m2e.wtp.jpa;bundle-version="1.5.0",
+ org.eclipse.m2e.wtp.jsf;bundle-version="1.5.0",
+ org.osgi.service.component.annotations;bundle-version="1.5.0"
 Bundle-ActivationPolicy: lazy
-Bundle-RequiredExecutionEnvironment: JavaSE-1.8
+Bundle-RequiredExecutionEnvironment: JavaSE-17
 Bundle-Vendor: %Bundle-Vendor
 Export-Package: org.jboss.tools.maven.project.examples.internal.stacks;x-friends:="org.jboss.tools.maven.examples.test",
  org.jboss.tools.maven.project.examples.utils;x-friends:="org.jboss.tools.maven.examples.test"

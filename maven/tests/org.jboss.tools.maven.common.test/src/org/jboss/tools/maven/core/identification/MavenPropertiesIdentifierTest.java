@@ -29,8 +29,8 @@ public class MavenPropertiesIdentifierTest extends AbstractIdentificationTest {
 		assertNull(identifier.identify(jansi));
 		
 		ArtifactKey key = identifier.identify(arquillian);
-		assertEquals("arquillian-core-spi", key.getArtifactId());
-		assertEquals("1.7.0.Final-SNAPSHOT", key.getVersion());
+		assertEquals("arquillian-core-spi", key.artifactId());
+		assertEquals("1.7.0.Final-SNAPSHOT", key.version());
 	}
 
 }

@@ -17,6 +17,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Properties;
 import java.util.Set;
 import java.util.regex.Pattern;
@@ -27,14 +28,16 @@ import org.apache.maven.archetype.exception.UnknownArchetype;
 import org.apache.maven.archetype.metadata.ArchetypeDescriptor;
 import org.apache.maven.archetype.metadata.RequiredProperty;
 import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.execution.MavenSession;
 import org.apache.maven.model.Model;
-import org.codehaus.plexus.util.StringUtils;
+import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.IWorkspace;
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.viewers.CellEditor;
 import org.eclipse.jface.viewers.ICellModifier;
@@ -44,11 +47,13 @@ import org.eclipse.jface.viewers.TextCellEditor;
 import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.embedder.IMaven;
-import org.eclipse.m2e.core.internal.MavenPluginActivator;
+import org.eclipse.m2e.core.internal.embedder.PlexusContainerManager;
+import org.eclipse.m2e.core.internal.project.ProjectConfigurationManager;
 import org.eclipse.m2e.core.project.ProjectImportConfiguration;
 import org.eclipse.m2e.core.ui.internal.Messages;
 import org.eclipse.m2e.core.ui.internal.components.TextComboBoxCellEditor;
 import org.eclipse.m2e.core.ui.internal.wizards.AbstractMavenWizardPage;
+import org.eclipse.m2e.core.ui.internal.wizards.MavenProjectWizard;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
@@ -65,6 +70,7 @@ import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 import org.jboss.tools.maven.project.examples.MavenProjectExamplesActivator;
+import org.osgi.service.component.annotations.Reference;
 
 
 /**
@@ -79,6 +85,7 @@ import org.jboss.tools.maven.project.examples.MavenProjectExamplesActivator;
  * <li>Changed visibility of validate() to protected</li>
  * </ul>
  */
+@SuppressWarnings("restriction")
 public class MavenProjectWizardArchetypeParametersPage extends AbstractMavenWizardPage {
 
   public static final String DEFAULT_VERSION = "0.0.1-SNAPSHOT"; //$NON-NLS-1$
@@ -125,6 +132,9 @@ public class MavenProjectWizardArchetypeParametersPage extends AbstractMavenWiza
 
   /** shows if the package has been customized by the user */
   protected boolean packageCustomized = false;
+  
+  @Reference
+  private static PlexusContainerManager containerManager;
 
   /** Creates a new page. */
   public MavenProjectWizardArchetypeParametersPage(ProjectImportConfiguration projectImportConfiguration) {
@@ -342,7 +352,8 @@ public class MavenProjectWizardArchetypeParametersPage extends AbstractMavenWiza
     }
 
     // validate project name
-    IStatus nameStatus = getImportConfiguration().validateProjectName(getModel());
+    IStatus nameStatus = validateProjectName(getImportConfiguration(), getModel());
+    
     if(!nameStatus.isOK()) {
       return NLS.bind(Messages.wizardProjectPageMaven2ValidatorProjectNameInvalid, nameStatus.getMessage());
     }
@@ -450,9 +461,9 @@ public class MavenProjectWizardArchetypeParametersPage extends AbstractMavenWiza
 	        
 	      } catch(UnknownArchetype e) {
 	    	  String msg = NLS.bind("Error downloading archetype {0}",archetypeName);
-	    	  MavenProjectExamplesActivator.log(e, msg); //$NON-NLS-1$
+	    	  MavenProjectExamplesActivator.log(e, msg);
 	      } catch(CoreException ex) {
-	    	  MavenProjectExamplesActivator.log(ex, ex.getMessage()); //$NON-NLS-1$
+	    	  MavenProjectExamplesActivator.log(ex, ex.getMessage());
 	      } finally {
 	        monitor.done();
 	      }
@@ -654,8 +665,6 @@ public class MavenProjectWizardArchetypeParametersPage extends AbstractMavenWiza
     
     IMaven maven = MavenPlugin.getMaven();
 
-    ArtifactRepository localRepository = maven.getLocalRepository();
-
     List<ArtifactRepository> repositories;
     
     if (remoteArchetypeRepository == null) {
@@ -663,7 +672,25 @@ public class MavenProjectWizardArchetypeParametersPage extends AbstractMavenWiza
     } else {
       repositories = Collections.singletonList(remoteArchetypeRepository);
     }
-
+    
+    return maven.createExecutionContext().execute((context, monitor1) -> {
+        ArtifactRepository localRepository = context.getLocalRepository();
+        ArchetypeArtifactManager archetypeArtifactManager = containerManager.getComponentLookup().lookup(ArchetypeArtifactManager.class);
+        if(archetypeArtifactManager.isFileSetArchetype(groupId, artifactId, version, null, localRepository, repositories,
+            context.newProjectBuildingRequest())) {
+          ArchetypeDescriptor descriptor;
+          try {
+            descriptor = archetypeArtifactManager.getFileSetArchetypeDescriptor(groupId, artifactId, version, null,
+                localRepository,
+                repositories, context.newProjectBuildingRequest());
+          } catch(UnknownArchetype ex) {
+            throw new CoreException(Status.error("UnknownArchetype", ex));
+          }
+          return descriptor.getRequiredProperties();
+        }
+        return null;
+      }, monitor);
+/*
     MavenSession session = maven.createSession(maven.createExecutionRequest(monitor), null);
     
     MavenSession oldSession = MavenPluginActivator.getDefault().setSession(session);
@@ -692,7 +719,7 @@ public class MavenProjectWizardArchetypeParametersPage extends AbstractMavenWiza
       MavenPluginActivator.getDefault().setSession(oldSession);
     }
 
-    return properties;
+    return properties;*/
   }
 
   
@@ -710,8 +737,27 @@ public class MavenProjectWizardArchetypeParametersPage extends AbstractMavenWiza
       return false;
     }
 
-    return StringUtils.equals(one.getGroupId(), another.getGroupId())
-        && StringUtils.equals(one.getArtifactId(), another.getArtifactId())
-        && StringUtils.equals(one.getVersion(), another.getVersion());
+    return Objects.equals(one.getGroupId(), another.getGroupId())
+        && Objects.equals(one.getArtifactId(), another.getArtifactId())
+        && Objects.equals(one.getVersion(), another.getVersion());
   }
+  
+  /** 
+   * copied from {@link MavenProjectWizard#validateProjectName}
+   */
+  static IStatus validateProjectName(ProjectImportConfiguration configuration, Model model) {
+	    String projectName = ProjectConfigurationManager.getProjectName(configuration, model);
+	    IWorkspace workspace = ResourcesPlugin.getWorkspace();
+
+	    // check if the project name is valid
+	    IStatus nameStatus = workspace.validateName(projectName, IResource.PROJECT);
+	    if(!nameStatus.isOK()) {
+	      return nameStatus;
+	    }
+	    // check if project already exists
+	    if(workspace.getRoot().getProject(projectName).exists()) {
+	      return Status.error(NLS.bind(org.eclipse.m2e.core.internal.Messages.importProjectExists, projectName));
+	    }
+	    return Status.OK_STATUS;
+	  }
 }

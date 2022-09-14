@@ -11,7 +11,7 @@
 package org.jboss.tools.maven.jbosspackaging.configurators;
 
 import org.eclipse.m2e.core.project.configurator.MojoExecutionKey;
-import org.sonatype.m2e.mavenarchiver.internal.JarArchiverConfigurator;
+import org.eclipse.m2e.mavenarchiver.internal.JarArchiverConfigurator;
 
 public abstract class JBossPackagingArchiverConfigurator extends JarArchiverConfigurator {
 

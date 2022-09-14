@@ -26,7 +26,6 @@ import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.model.Model;
 import org.codehaus.plexus.util.StringUtils;
-import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.IWorkspaceRunnable;
 import org.eclipse.core.resources.ResourcesPlugin;
@@ -44,7 +43,11 @@ import org.eclipse.m2e.core.embedder.IMaven;
 import org.eclipse.m2e.core.embedder.IMavenExecutionContext;
 import org.eclipse.m2e.core.internal.IMavenConstants;
 import org.eclipse.m2e.core.internal.MavenPluginActivator;
+import org.eclipse.m2e.core.internal.embedder.PlexusContainerManager;
+import org.eclipse.m2e.core.internal.project.ProjectConfigurationManager;
+import org.eclipse.m2e.core.project.IArchetype;
 import org.eclipse.m2e.core.project.ProjectImportConfiguration;
+import org.eclipse.m2e.core.ui.internal.M2EUIPluginActivator;
 import org.eclipse.m2e.core.ui.internal.Messages;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.events.ModifyEvent;
@@ -64,16 +67,17 @@ import org.jboss.tools.project.examples.model.ProjectExample;
 import org.jboss.tools.project.examples.model.ProjectExampleWorkingCopy;
 import org.jboss.tools.project.examples.wizard.IProjectExamplesWizardPage;
 import org.jboss.tools.project.examples.wizard.WizardContext;
+import org.osgi.service.component.annotations.Reference;
 
 /**
  * 
  * @author snjeza
  *
  */
+@SuppressWarnings("restriction")
 public class ArchetypeExamplesWizardPage extends
 		MavenProjectWizardArchetypeParametersPage implements IProjectExamplesWizardPage, MavenSettingsChangeListener  {
 
-	private ProjectExample projectDescription;
 	private ProjectExample projectExample;
 	private boolean initialized = false;
 	private Map<String, Object> propertiesMap = new HashMap<>();
@@ -82,6 +86,10 @@ public class ArchetypeExamplesWizardPage extends
 	private IStatus enterpriseRepoStatus;
 
 	private ArchetypeModel archetypeModel;
+	
+
+	@Reference
+	private PlexusContainerManager containerManager;
 	
 	public ArchetypeExamplesWizardPage() {
 		super(new ProjectImportConfiguration());
@@ -205,7 +213,7 @@ public class ArchetypeExamplesWizardPage extends
 	            //JBIDE-10018 : remote archetypes need to be downloaded 1st or resolution will fail
 	            Artifact a = downloadArchetype(groupId, artifactId, version, archetypeRepository, repositories);
 	            
-	            ArchetypeArtifactManager aaMgr = MavenPluginActivator.getDefault().getArchetypeArtifactManager();
+	            ArchetypeArtifactManager aaMgr = containerManager.getComponentLookup().lookup(ArchetypeArtifactManager.class);
 	            
 	            ArchetypeDescriptor descriptor = aaMgr.getFileSetArchetypeDescriptor(a.getFile());
 	              
@@ -354,14 +362,12 @@ public class ArchetypeExamplesWizardPage extends
 			return false;
 		}
 		final ProjectImportConfiguration configuration = getImportConfiguration();
-		String projectName = configuration.getProjectName(model);
+		String projectName = ProjectConfigurationManager.getProjectName(configuration, model);
 		propertiesMap.put(ProjectExamplesActivator.PROPERTY_PROJECT_NAME, projectName);
-		final IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject(projectName);
 		final IPath location = simplePage.getLocationPath();
 		propertiesMap.put(ProjectExamplesActivator.PROPERTY_LOCATION_PATH, location);
 		propertiesMap.put(ProjectExamplesActivator.PROPERTY_ARTIFACT_ID, artifactId);
 		
-	    IWorkspace workspace = ResourcesPlugin.getWorkspace();
 	    
 	    boolean pomExists = location.append(projectName).append(IMavenConstants.POM_FILE_NAME).toFile().exists();
 	    if ( pomExists ) {
@@ -373,16 +379,31 @@ public class ArchetypeExamplesWizardPage extends
 			
 			public void run(final IProgressMonitor monitor)
 					throws CoreException {
-				
-				MavenPlugin.getMaven().execute(new ICallable<Void>() {
+				IMavenExecutionContext.getThreadContext().get().execute(new ICallable<Void>() {
 				      public Void call(IMavenExecutionContext context, IProgressMonitor monitor) throws CoreException {
 				    	  
 				    	  ensureArchetyperCacheIsLoaded(archetype);
 				    	  
-				    	  MavenPlugin.getProjectConfigurationManager().createArchetypeProjects(
-				    			  location, archetype,
+				    	  M2EUIPluginActivator.getDefault().getArchetypePlugin().getGenerator().createArchetypeProjects(
+				    			  location, new IArchetype() {
+									
+									@Override
+									public String getVersion() {
+										return archetype.getVersion();
+									}
+									
+									@Override
+									public String getGroupId() {
+										return archetype.getGroupId();
+									}
+									
+									@Override
+									public String getArtifactId() {
+										return archetype.getArtifactId();
+									}
+								},
 				    			  groupId, artifactId, version, javaPackage, properties,
-				    			  configuration, monitor);
+				    			  false, monitor);
 				    	  return null;
 				      }
 				    }, monitor);
@@ -404,10 +425,10 @@ public class ArchetypeExamplesWizardPage extends
                     repos.add(0, archetypeRepository);//If the archetype doesn't exist locally, this will be the first remote repo to be searched.
                 }
 
-                @SuppressWarnings("restriction")
-                ArchetypeArtifactManager aam = MavenPluginActivator.getDefault().getArchetypeArtifactManager();
+                ArchetypeArtifactManager aam = containerManager.getComponentLookup().lookup(ArchetypeArtifactManager.class);
                 aam.exists(archetype.getGroupId(), archetype.getArtifactId(), archetype.getVersion(),
-                		archetypeRepository, maven.getLocalRepository(), repos);
+                		archetypeRepository, maven.getLocalRepository(), repos,
+                		IMavenExecutionContext.getThreadContext().get().newProjectBuildingRequest());
             }
 		};
 		
@@ -472,10 +493,9 @@ public class ArchetypeExamplesWizardPage extends
 			if (configuration != null) {
 				String profiles = projectExample.getDefaultProfiles();
 			    if (profiles != null && profiles.trim().length() > 0) {
-			    	configuration.getResolverConfiguration().setActiveProfiles(profiles);
+			    	configuration.getResolverConfiguration().setSelectedProfiles(profiles);
 			    }
 			}
-			projectDescription = projectExample;
 			archetypeModel = (ArchetypeModel) context.getProperty(MavenProjectConstants.ARCHETYPE_MODEL);
 			if (archetypeModel == null) {
 				archetypeModel = projectExample.getArchetypeModel();

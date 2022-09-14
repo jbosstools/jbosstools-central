@@ -37,10 +37,10 @@ public class IdentifyJarJob extends IdentificationJob {
 		ArtifactKey artifactKey = fileIdentificationManager.identify(file, monitor);
 		if (artifactKey != null) {
 			dependency = new Dependency();
-			dependency.setArtifactId(artifactKey.getArtifactId());
-			dependency.setGroupId(artifactKey.getGroupId());
-			dependency.setVersion(artifactKey.getVersion());
-			dependency.setClassifier(artifactKey.getClassifier());
+			dependency.setArtifactId(artifactKey.artifactId());
+			dependency.setGroupId(artifactKey.groupId());
+			dependency.setVersion(artifactKey.version());
+			dependency.setClassifier(artifactKey.classifier());
 		}
 	}
 }

@@ -26,9 +26,9 @@ public class MavenCentralIdentifierTest extends AbstractIdentificationTest {
 	
 		key = identifier.identify(groovy_jsr223, null);
 		assertNotNull("groovy-jsr223 was not identifed", key);
-		assertEquals("groovy-jsr223", key.getArtifactId());
-		assertEquals("org.codehaus.groovy", key.getGroupId());
-		assertEquals("2.0.4", key.getVersion());
+		assertEquals("groovy-jsr223", key.artifactId());
+		assertEquals("org.codehaus.groovy", key.groupId());
+		assertEquals("2.0.4", key.version());
 	}
 
 	
