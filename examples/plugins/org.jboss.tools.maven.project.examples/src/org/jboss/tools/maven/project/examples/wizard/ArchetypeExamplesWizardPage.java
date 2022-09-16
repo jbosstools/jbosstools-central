@@ -18,7 +18,6 @@ import java.util.Map;
 import java.util.Properties;
 
 import org.apache.maven.archetype.catalog.Archetype;
-import org.apache.maven.archetype.common.ArchetypeArtifactManager;
 import org.apache.maven.archetype.metadata.RequiredProperty;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.repository.ArtifactRepository;
@@ -45,8 +44,6 @@ import org.eclipse.m2e.core.project.IArchetype;
 import org.eclipse.m2e.core.project.ProjectImportConfiguration;
 import org.eclipse.m2e.core.ui.internal.M2EUIPluginActivator;
 import org.eclipse.m2e.core.ui.internal.Messages;
-import org.eclipse.m2e.core.ui.internal.archetype.ArchetypePlugin;
-import org.eclipse.m2e.core.ui.internal.util.M2EUIUtils;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
@@ -432,12 +429,13 @@ public class ArchetypeExamplesWizardPage extends MavenProjectWizardArchetypePara
 					repos.add(0, archetypeRepository);// If the archetype doesn't exist locally, this will be the first
 														// remote repo to be searched.
 				}
-				/*M2EUIPluginActivator.getDefault().getArchetypePlugin().getGenerator();
-				MavenPlugin.getMaven().lookup(ArchetypeArtifactManager.class);
-				ArchetypeArtifactManager aam = maven.lookup(ArchetypeArtifactManager.class);
-				aam.exists(archetype.getGroupId(), archetype.getArtifactId(), archetype.getVersion(),
-						archetypeRepository, maven.getLocalRepository(), repos,
-						IMavenExecutionContext.getThreadContext().get().newProjectBuildingRequest());*/
+				
+				// Code below does not work o nruntime, due to ArchetypeArtifactManager not accessible in runtime
+				
+				//ArchetypeArtifactManager aam = maven.lookup(ArchetypeArtifactManager.class);
+				//aam.exists(archetype.getGroupId(), archetype.getArtifactId(), archetype.getVersion(),
+				//		archetypeRepository, maven.getLocalRepository(), repos,
+				//		IMavenExecutionContext.getThreadContext().get().newProjectBuildingRequest());
 			}
 		};
 
