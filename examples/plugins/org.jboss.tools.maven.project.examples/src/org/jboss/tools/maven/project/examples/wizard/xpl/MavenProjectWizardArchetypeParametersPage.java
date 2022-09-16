@@ -12,7 +12,6 @@ package org.jboss.tools.maven.project.examples.wizard.xpl;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -23,9 +22,7 @@ import java.util.Set;
 import java.util.regex.Pattern;
 
 import org.apache.maven.archetype.catalog.Archetype;
-import org.apache.maven.archetype.common.ArchetypeArtifactManager;
 import org.apache.maven.archetype.exception.UnknownArchetype;
-import org.apache.maven.archetype.metadata.ArchetypeDescriptor;
 import org.apache.maven.archetype.metadata.RequiredProperty;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.model.Model;
@@ -46,10 +43,10 @@ import org.eclipse.jface.viewers.TableViewerColumn;
 import org.eclipse.jface.viewers.TextCellEditor;
 import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.m2e.core.MavenPlugin;
-import org.eclipse.m2e.core.embedder.IMaven;
-import org.eclipse.m2e.core.internal.embedder.PlexusContainerManager;
 import org.eclipse.m2e.core.internal.project.ProjectConfigurationManager;
+import org.eclipse.m2e.core.project.IArchetype;
 import org.eclipse.m2e.core.project.ProjectImportConfiguration;
+import org.eclipse.m2e.core.ui.internal.M2EUIPluginActivator;
 import org.eclipse.m2e.core.ui.internal.Messages;
 import org.eclipse.m2e.core.ui.internal.components.TextComboBoxCellEditor;
 import org.eclipse.m2e.core.ui.internal.wizards.AbstractMavenWizardPage;
@@ -70,7 +67,6 @@ import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 import org.jboss.tools.maven.project.examples.MavenProjectExamplesActivator;
-import org.osgi.service.component.annotations.Reference;
 
 
 /**
@@ -133,9 +129,6 @@ public class MavenProjectWizardArchetypeParametersPage extends AbstractMavenWiza
   /** shows if the package has been customized by the user */
   protected boolean packageCustomized = false;
   
-  @Reference
-  private static PlexusContainerManager containerManager;
-
   /** Creates a new page. */
   public MavenProjectWizardArchetypeParametersPage(ProjectImportConfiguration projectImportConfiguration) {
     super("Maven2ProjectWizardArchifactPage", projectImportConfiguration); //$NON-NLS-1$
@@ -663,6 +656,23 @@ public class MavenProjectWizardArchetypeParametersPage extends AbstractMavenWiza
     final String artifactId = archetype.getArtifactId();
     final String version = archetype.getVersion();
     
+    return M2EUIPluginActivator.getDefault().getArchetypePlugin().getRequiredProperties(new IArchetype() {
+		
+		@Override
+		public String getVersion() {
+			return version;
+		}
+		
+		@Override
+		public String getGroupId() {
+			return groupId;
+		}
+		
+		@Override
+		public String getArtifactId() {
+			return artifactId;
+		}
+	}, monitor);/*
     IMaven maven = MavenPlugin.getMaven();
 
     List<ArtifactRepository> repositories;
@@ -675,7 +685,7 @@ public class MavenProjectWizardArchetypeParametersPage extends AbstractMavenWiza
     
     return maven.createExecutionContext().execute((context, monitor1) -> {
         ArtifactRepository localRepository = context.getLocalRepository();
-        ArchetypeArtifactManager archetypeArtifactManager = containerManager.getComponentLookup().lookup(ArchetypeArtifactManager.class);
+        ArchetypeArtifactManager archetypeArtifactManager = maven.lookup(ArchetypeArtifactManager.class);
         if(archetypeArtifactManager.isFileSetArchetype(groupId, artifactId, version, null, localRepository, repositories,
             context.newProjectBuildingRequest())) {
           ArchetypeDescriptor descriptor;
@@ -689,7 +699,7 @@ public class MavenProjectWizardArchetypeParametersPage extends AbstractMavenWiza
           return descriptor.getRequiredProperties();
         }
         return null;
-      }, monitor);
+      }, monitor);*/
 /*
     MavenSession session = maven.createSession(maven.createExecutionRequest(monitor), null);
     

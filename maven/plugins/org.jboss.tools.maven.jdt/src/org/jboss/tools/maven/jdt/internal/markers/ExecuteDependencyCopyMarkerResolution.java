@@ -18,8 +18,7 @@ import org.eclipse.ui.IMarkerResolution;
 import org.eclipse.ui.IMarkerResolution2;
 import org.jboss.tools.maven.jdt.internal.jobs.ExecutePhaseJob;
 
-public class ExecuteDependencyCopyMarkerResolution implements IMarkerResolution,
-		IMarkerResolution2 {
+public class ExecuteDependencyCopyMarkerResolution implements IMarkerResolution2 {
 
 	private final String phase;
 	private final IMavenProjectFacade mavenProjectFacade;
@@ -35,7 +34,7 @@ public class ExecuteDependencyCopyMarkerResolution implements IMarkerResolution,
 	}
 
 	@Override
-	public Image getImage() {					
+	public Image getImage() {
 		return null;
 	}
 

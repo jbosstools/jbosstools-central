@@ -22,6 +22,7 @@ import java.io.StringReader;
 import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -1290,7 +1291,7 @@ public class ConfigureMavenRepositoriesWizardPage extends WizardPage implements 
 
 					IProject[] projects = ResourcesPlugin.getWorkspace().getRoot().getProjects();
 					if (projects != null && projects.length > 0) {
-						MavenUpdateRequest updateRequest = new MavenUpdateRequest(mavenConfiguration.isOffline(),true);
+						MavenUpdateRequest updateRequest = new MavenUpdateRequest(Arrays.asList(projects), mavenConfiguration.isOffline(),true);
 						MavenPlugin.getMavenProjectRegistry().refresh(updateRequest);
 					}
 					return Status.OK_STATUS;
