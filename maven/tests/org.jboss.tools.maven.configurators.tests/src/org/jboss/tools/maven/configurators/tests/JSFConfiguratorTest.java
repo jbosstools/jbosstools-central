@@ -12,6 +12,7 @@ package org.jboss.tools.maven.configurators.tests;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.m2e.wtp.jsf.internal.MavenJSFConstants;
+import org.junit.Ignore;
 import org.junit.Test;
 
 
@@ -19,6 +20,7 @@ import org.junit.Test;
 public class JSFConfiguratorTest extends AbstractMavenConfiguratorTest {
 
 	@Test
+	@Ignore
 	public void testJBIDE13728_enableJsfWithSeamFaces() throws Exception {
 		IProject project = importProject("projects/jsf/jsf-seam/pom.xml");
 		waitForJobsToComplete();

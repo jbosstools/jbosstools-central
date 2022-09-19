@@ -19,6 +19,7 @@ import java.util.regex.Pattern;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
+import org.apache.maven.execution.DefaultMavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionResult;
 import org.apache.maven.model.Dependency;
@@ -115,7 +116,6 @@ public class MavenUtil {
 	    return null;
 	}
 	
-	@SuppressWarnings("restriction")
 	public static String getDependencyVersion(Artifact artifact, List<ArtifactRepository> remoteRepos, String gid, String aid) {
 	    IMavenProjectFacade facade = MavenPlugin.getMavenProjectRegistry().getMavenProject(
 	    		artifact.getGroupId(), artifact.getArtifactId(), artifact.getVersion());
@@ -132,7 +132,7 @@ public class MavenUtil {
 	    	IMaven maven = MavenPlugin.getMaven();
 		    try {
 		    	//Create a custom execution request
-		    	MavenExecutionRequest request = IMavenExecutionContext.getThreadContext().get().getExecutionRequest();
+		    	MavenExecutionRequest request =  DefaultMavenExecutionRequest.copy(IMavenExecutionContext.getThreadContext().get().getExecutionRequest());
 		    	for (ArtifactRepository repo : remoteRepos) {
 		    		request.addRemoteRepository(repo);
 		    	}

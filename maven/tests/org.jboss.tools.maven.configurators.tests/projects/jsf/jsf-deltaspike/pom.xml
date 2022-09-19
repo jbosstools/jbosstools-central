@@ -8,7 +8,7 @@
 	<packaging>war</packaging>
 
 	<properties>
-		<deltaspike.version>0.4</deltaspike.version>
+		<deltaspike.version>1.0.0</deltaspike.version>
 	</properties>
 
 	<dependencies>
@@ -27,20 +27,12 @@
 		</dependency>
 	</dependencies>
 
-	<repositories>
-		<repository>
-			<id>apache-m2-snapshot</id>
-			<name>Apache Snapshot Repository</name>
-			<url>https://repository.apache.org/snapshots</url>
-		</repository>
-	</repositories>
-	
 	<build>
 		<plugins>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-war-plugin</artifactId>
-				<version>3.3.1</version>
+				<version>3.3.2</version>
 				<configuration>
 					<failOnMissingWebXml>false</failOnMissingWebXml>
 				</configuration>
@@ -48,7 +40,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
-				<version>3.8.1</version>
+				<version>3.10.1</version>
 			</plugin>
 		</plugins>
 	</build>

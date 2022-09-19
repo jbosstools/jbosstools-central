@@ -52,10 +52,13 @@ public class ImportMavenArchetypeProjectExampleDelegate extends AbstractImportMa
 		
 		String projectName = (String) propertiesMap.get(ProjectExamplesActivator.PROPERTY_PROJECT_NAME);
 		includedProjects.add(projectName);
+		String artifactId = (String) propertiesMap.get(ProjectExamplesActivator.PROPERTY_ARTIFACT_ID);
 		IPath location = (IPath) propertiesMap.get(ProjectExamplesActivator.PROPERTY_LOCATION_PATH);
+		String projectFolder = location.append(artifactId).toFile().getAbsolutePath();
+
 		MavenModelManager mavenModelManager = MavenPlugin.getMavenModelManager();
 		
-		LocalProjectScanner scanner = new LocalProjectScanner(Collections.singletonList(location.toFile().getAbsolutePath()), true, mavenModelManager);
+		LocalProjectScanner scanner = new LocalProjectScanner(Collections.singletonList(projectFolder), true, mavenModelManager);
 		try {
 			scanner.run(monitor);
 		} catch (InterruptedException e1) {
@@ -76,6 +79,9 @@ public class ImportMavenArchetypeProjectExampleDelegate extends AbstractImportMa
 				return false;
 			}
 		}
+		MavenPlugin.getProjectConfigurationManager().importProjects(projectSet,
+				importConfiguration, monitor);
+		
 		List<IProject> iprojects = toIProjects(includedProjects);
 		
 		//If maven projects are out of date, we trigger a project update.

@@ -10,11 +10,16 @@
  ************************************************************************************/
 package org.jboss.tools.maven.jdt.internal.jobs;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+import org.apache.maven.artifact.InvalidRepositoryException;
+import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.execution.DefaultMavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionResult;
+import org.apache.maven.repository.RepositorySystem;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.WorkspaceJob;
 import org.eclipse.core.runtime.CoreException;
@@ -23,12 +28,11 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.MultiStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.m2e.core.MavenPlugin;
-import org.eclipse.m2e.core.embedder.IMavenExecutionContext;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.jdt.MavenJdtPlugin;
 
 public class ExecutePhaseJob extends WorkspaceJob {
-	
+
 	private final IMavenProjectFacade mavenProjectFacade;
 	private final String phase;
 
@@ -40,30 +44,41 @@ public class ExecutePhaseJob extends WorkspaceJob {
 	}
 
 	@Override
-    public IStatus runInWorkspace(IProgressMonitor monitor) throws CoreException {
-		
-		MavenExecutionRequest request = IMavenExecutionContext.getThreadContext().get().getExecutionRequest();
+	public IStatus runInWorkspace(IProgressMonitor monitor) throws CoreException {
+
+		MavenExecutionRequest request = new DefaultMavenExecutionRequest();
 		request.setPom(mavenProjectFacade.getPomFile());
 		request.setGoals(Arrays.asList(phase));
-		
-		MavenExecutionResult result = IMavenExecutionContext.getThreadContext().get().execute(request);
-		
+		String localRepositoryPath = RepositorySystem.defaultUserLocalRepository.getAbsolutePath();
+		ArtifactRepository localRepository;
+		try {
+			localRepository = mavenProjectFacade.getComponentLookup().lookup(RepositorySystem.class)
+					.createLocalRepository(new File(localRepositoryPath));
+		} catch (InvalidRepositoryException | CoreException e) {
+			return toStatus(e);
+		}
+		request.setLocalRepository(localRepository);
+		request.setLocalRepositoryPath(localRepositoryPath);
+
+		MavenExecutionResult result = MavenPlugin.getMaven().createExecutionContext().execute(request);
+
 		if (result.hasExceptions()) {
-			IStatus errorStatus; 
+			IStatus errorStatus;
 			if (result.getExceptions().size() > 1) {
 				ArrayList<IStatus> errors = new ArrayList<>();
 				for (Throwable t : result.getExceptions()) {
 					errors.add(toStatus(t));
 				}
-				errorStatus = new MultiStatus(MavenJdtPlugin.PLUGIN_ID, -1, 
-						errors.toArray(new IStatus[errors.size()]), "Unable to execute mvn "+phase, null);
+				errorStatus = new MultiStatus(MavenJdtPlugin.PLUGIN_ID, -1, errors.toArray(new IStatus[errors.size()]),
+						"Unable to execute mvn " + phase, null);
 			} else {
 				errorStatus = toStatus(result.getExceptions().get(0));
 			}
 			return errorStatus;
 		}
-		
-		UpdateMavenProjectJob updateProjectJob = new UpdateMavenProjectJob(new IProject[]{mavenProjectFacade.getProject()});
+
+		UpdateMavenProjectJob updateProjectJob = new UpdateMavenProjectJob(
+				new IProject[] { mavenProjectFacade.getProject() });
 		updateProjectJob.schedule();
 		return Status.OK_STATUS;
 	}
@@ -71,5 +86,5 @@ public class ExecutePhaseJob extends WorkspaceJob {
 	private Status toStatus(Throwable t) {
 		return new Status(IStatus.ERROR, MavenJdtPlugin.PLUGIN_ID, t.getLocalizedMessage());
 	}
-	
+
 }
