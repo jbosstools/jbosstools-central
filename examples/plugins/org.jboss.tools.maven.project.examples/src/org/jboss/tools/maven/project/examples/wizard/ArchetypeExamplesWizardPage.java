@@ -44,6 +44,7 @@ import org.eclipse.m2e.core.project.IArchetype;
 import org.eclipse.m2e.core.project.ProjectImportConfiguration;
 import org.eclipse.m2e.core.ui.internal.M2EUIPluginActivator;
 import org.eclipse.m2e.core.ui.internal.Messages;
+import org.eclipse.m2e.core.ui.internal.util.ArchetypeUtil;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
@@ -128,7 +129,7 @@ public class ArchetypeExamplesWizardPage extends MavenProjectWizardArchetypePara
 		archetype.setVersion(archetypeModel.getArchetypeVersion());
 		archetype.setRepository(archetypeModel.getArchetypeRepository());
 
-		if (areEqual(archetype, this.archetype) && initialized) {
+		if (ArchetypeUtil.areEqual(archetype, this.archetype) && initialized) {
 			return;
 		}
 
@@ -386,7 +387,7 @@ public class ArchetypeExamplesWizardPage extends MavenProjectWizardArchetypePara
 				MavenPlugin.getMaven().createExecutionContext().execute(new ICallable<Void>() {
 					public Void call(IMavenExecutionContext context, IProgressMonitor monitor) throws CoreException {
 
-						ensureArchetyperCacheIsLoaded(archetype);
+						//ensureArchetyperCacheIsLoaded(archetype);
 
 						M2EUIPluginActivator.getDefault().getArchetypePlugin().getGenerator()
 								.createArchetypeProjects(location, new IArchetype() {
@@ -416,27 +417,27 @@ public class ArchetypeExamplesWizardPage extends MavenProjectWizardArchetypePara
 			// archetyper cache for offline use
 			// This is absolutely f*** up but we're using an oooold version of that
 			// archetyper
-			private void ensureArchetyperCacheIsLoaded(Archetype archetype) throws CoreException {
-				IMaven maven = MavenPlugin.getMaven();
-
-				ArrayList<ArtifactRepository> repos = new ArrayList<>();
-				repos.addAll(maven.getArtifactRepositories());
-
-				ArtifactRepository archetypeRepository = null;
-				if (StringUtils.isNotBlank(archetype.getRepository())) {
-					archetypeRepository = maven.createArtifactRepository(archetype.getArtifactId() + "-repo", //$NON-NLS-1$
-							archetype.getRepository().trim());
-					repos.add(0, archetypeRepository);// If the archetype doesn't exist locally, this will be the first
-														// remote repo to be searched.
-				}
-				
-				// Code below does not work o nruntime, due to ArchetypeArtifactManager not accessible in runtime
-				
-				//ArchetypeArtifactManager aam = maven.lookup(ArchetypeArtifactManager.class);
-				//aam.exists(archetype.getGroupId(), archetype.getArtifactId(), archetype.getVersion(),
-				//		archetypeRepository, maven.getLocalRepository(), repos,
-				//		IMavenExecutionContext.getThreadContext().get().newProjectBuildingRequest());
-			}
+//			private void ensureArchetyperCacheIsLoaded(Archetype archetype) throws CoreException {
+//				IMaven maven = MavenPlugin.getMaven();
+//
+//				ArrayList<ArtifactRepository> repos = new ArrayList<>();
+//				repos.addAll(maven.getArtifactRepositories());
+//
+//				ArtifactRepository archetypeRepository = null;
+//				if (StringUtils.isNotBlank(archetype.getRepository())) {
+//					archetypeRepository = maven.createArtifactRepository(archetype.getArtifactId() + "-repo", //$NON-NLS-1$
+//							archetype.getRepository().trim());
+//					repos.add(0, archetypeRepository);// If the archetype doesn't exist locally, this will be the first
+//														// remote repo to be searched.
+//				}
+//				
+//				// Code below does not work, due to ArchetypeArtifactManager not accessible in runtime
+//				
+//				ArchetypeArtifactManager aam = maven.lookup(ArchetypeArtifactManager.class);
+//				aam.exists(archetype.getGroupId(), archetype.getArtifactId(), archetype.getVersion(),
+//						archetypeRepository, maven.getLocalRepository(), repos,
+//						IMavenExecutionContext.getThreadContext().get().newProjectBuildingRequest());
+//			}
 		};
 
 		final IRunnableWithProgress op = new IRunnableWithProgress() {
