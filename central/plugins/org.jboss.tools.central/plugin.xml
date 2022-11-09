@@ -228,14 +228,6 @@
             name="Spring MVC Project"
             project="true">
       </wizard>
-      <wizard
-            category="org.jboss.tools.central.ui.wizard.category"
-            id="org.jboss.tools.central.wizards.NewForgeProjectWizard"
-            class="org.jboss.tools.central.wizards.NewForgeProjectWizard"
-            icon="icons/jbossforge_icon_16px.png"
-            name="AngularJS with Forge Project"
-            project="true">
-      </wizard>
 
    </extension>
 
