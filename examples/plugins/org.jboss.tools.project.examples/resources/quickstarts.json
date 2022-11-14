@@ -7214,47 +7214,6 @@
       {
         "_index": "data_jbossdeveloper_quickstart",
         "_type": "jbossdeveloper_quickstart",
-        "_id": "jbossdeveloper_quickstart-2d8d1fa8",
-        "_score": 1,
-        "fields": {
-          "git_commit": [
-            "0a1ed9e"
-          ],
-          "git_tag": [
-            "7.0.0.GA"
-          ],
-          "quickstart_id": [
-            "forge-from-scratch"
-          ],
-          "sys_description": [
-            "The `forge-from-scratch` quickstart demonstrates how *JBoss Forge* can generate a Java EE (JPA, EJB, JAX-RS, JSF) web-enabled database application."
-          ],
-          "experimental": [
-            false
-          ],
-          "sys_type": [
-            "quickstart"
-          ],
-          "github_repo_url": [
-            "https://github.com/jboss-developer/jboss-eap-quickstarts"
-          ],
-          "git_download": [
-            "https://github.com/jboss-developer/jboss-eap-quickstarts/archive/7.0.0.GA.zip"
-          ],
-          "sys_tags": [
-            "Forge"
-          ],
-          "target_product": [
-            "eap"
-          ],
-          "sys_title": [
-            "forge-from-scratch: Shows How Forge Can Generate an Application"
-          ]
-        }
-      },
-      {
-        "_index": "data_jbossdeveloper_quickstart",
-        "_type": "jbossdeveloper_quickstart",
         "_id": "jbossdeveloper_quickstart-aa123c0b",
         "_score": 1,
         "fields": {

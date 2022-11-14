@@ -61,45 +61,8 @@ public class ProjectExampleParserTest {
 		File file = new File("resources/examples.xml");
 		List<ProjectExample> result = parser.parse(file);
 		assertNotNull(result);
-		assertEquals(6, result.size());
+		assertEquals(5, result.size());
 		assertEquals("errai", result.get(0).getName());	
-		{
-			ProjectExample forge = result.get(5);		
-			List<RequirementModel> reqs = forge.getRequirements();
-			assertEquals(5, reqs.size());
-			RequirementModel wtpReq = reqs.get(0);
-			assertEquals("wtpruntime", wtpReq.getType());
-			
-			assertEquals("jboss-forge-html5-archetype", forge.getName());
-			assertEquals(2, forge.getIncludedProjects().size());
-			assertEquals("jboss-forge-html5-archetype", forge.getIncludedProjects().get(0));
-			assertEquals("dummy", forge.getIncludedProjects().get(1));
-			assertEquals("JBoss Maven Archetypes", forge.getCategory());
-			assertEquals("AngularJS Forge Project", forge.getShortDescription());
-			assertEquals(3, forge.getPriority());
-			assertEquals("Create a modern Java EE 6 + HTML5 web application project with JBoss Forge", forge.getHeadLine());
-			assertTrue(forge.getDescription().startsWith("This project is a sample project"));
-			assertEquals(165567, forge.getSize());
-			assertEquals("161.69KB", forge.getSizeAsText());
-			assertEquals("http://forge.jboss.org/somefile.zip",forge.getUrl());
-			assertEquals(5, forge.getRequirements().size());
-			assertEquals("mavenArchetype", forge.getImportType());
-			assertEquals("The example requires JBoss Forge tools, m2e-wtp, JBoss Maven Integration and AngularJS Eclipse features.", forge.getImportTypeDescription());
-			assertEquals("foo,bar", forge.getDefaultProfiles());
-			ArchetypeModel archetype = forge.getArchetypeModel();
-			assertEquals("org.jboss.tools.archetypes", archetype.getArchetypeGroupId());
-			assertEquals("jboss-forge-html5", archetype.getArchetypeArtifactId());
-			assertEquals("1.0.0-SNAPSHOT", archetype.getArchetypeVersion());
-			assertEquals("https://repository.jboss.org/nexus/content/repositories/snapshots/", archetype.getArchetypeRepository());
-			assertEquals("org.jboss.tools.example", archetype.getGroupId());
-			assertEquals("jboss-forge-html5", archetype.getArtifactId());
-			assertEquals("0.0.1-SNAPSHOT", archetype.getVersion());
-			assertEquals("org.jboss.tools.example.forge", archetype.getJavaPackage());
-			assertEquals("tags : "+forge.getTags(), 2, forge.getTags().size());
-			assertTrue(forge.hasTags("forge","wizard"));
-			assertFalse(forge.hasTags("central"));
-			assertEquals("org.jboss.ide.eclipse.as.runtime.71, org.jboss.ide.eclipse.as.runtime.eap.60, org.jboss.ide.eclipse.as.runtime.eap.61, org.jboss.ide.eclipse.as.runtime.wildfly.80", wtpReq.getProperties().get("allowed-types"));
-		}
 		{
 			ProjectExample numberguess = result.get(3);
 			assertEquals("richfaces-archetype-simpleapp", numberguess.getName());
