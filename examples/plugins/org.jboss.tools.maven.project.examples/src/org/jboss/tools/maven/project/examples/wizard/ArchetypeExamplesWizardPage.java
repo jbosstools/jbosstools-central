@@ -16,6 +16,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.stream.Collectors;
 
 import org.apache.maven.archetype.catalog.Archetype;
 import org.apache.maven.archetype.metadata.RequiredProperty;
@@ -406,7 +407,7 @@ public class ArchetypeExamplesWizardPage extends MavenProjectWizardArchetypePara
 									public String getArtifactId() {
 										return archetype.getArtifactId();
 									}
-								}, groupId, artifactId, version, javaPackage, properties, false, monitor);
+								}, groupId, artifactId, version, javaPackage, convert(properties), false, monitor);
 						return null;
 					}
 				}, monitor);
@@ -595,5 +596,14 @@ public class ArchetypeExamplesWizardPage extends MavenProjectWizardArchetypePara
 				checkEnterpriseProperty();
 			}
 		});
+	}
+	
+	private Map<String, String> convert(Properties prop) {
+		return prop.entrySet().stream().collect(
+				Collectors.toMap(
+					e -> String.valueOf(e.getKey()),
+					e -> String.valueOf(e.getValue()),
+					(prev, next) -> next,
+					HashMap::new));
 	}
 }
