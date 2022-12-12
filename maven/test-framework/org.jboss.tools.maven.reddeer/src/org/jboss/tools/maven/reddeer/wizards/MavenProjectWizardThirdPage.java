@@ -12,6 +12,7 @@ package org.jboss.tools.maven.reddeer.wizards;
 
 import org.eclipse.reddeer.jface.wizard.WizardPage;
 import org.eclipse.reddeer.swt.condition.ControlIsEnabled;
+import org.eclipse.reddeer.swt.impl.button.CheckBox;
 import org.eclipse.reddeer.swt.impl.button.PushButton;
 import org.eclipse.reddeer.swt.impl.combo.LabeledCombo;
 import org.eclipse.reddeer.common.wait.TimePeriod;
@@ -31,6 +32,8 @@ public class MavenProjectWizardThirdPage extends WizardPage{
 		if(version!=null){
 			new LabeledCombo("Version:").setText(version);
 		}
+		// toggle off the "run archetype generation interactively" checkbox
+		new CheckBox("run archetype generation interactively").toggle(false);
 	}
 
 }
