@@ -927,7 +927,7 @@ public class MavenSeamActivator extends AbstractUIPlugin {
 			MavenCoreActivator.createMavenProject(parentProjectName, null, model, false, location);
 			// disable workspace resolution
 		    IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject(parentProjectName);
-		    ResolverConfiguration configuration = ResolverConfigurationIO.readResolverConfiguration(project);
+		    ResolverConfiguration configuration = (ResolverConfiguration) ResolverConfigurationIO.readResolverConfiguration(project);
 		    configuration.setResolveWorkspaceProjects(false);
 		    ResolverConfigurationIO.saveResolverConfiguration(project, configuration);
 		} catch (Exception e) {
