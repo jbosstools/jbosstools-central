@@ -93,11 +93,6 @@
             name="Refresh"
             id="org.jboss.tools.central.refreshJBossBuzz">
       </command>
-      <command
-      		defaultHandler="org.jboss.tools.central.actions.RefreshDiscoveryHandler"
-            name="Refresh"
-            id="org.jboss.tools.central.refreshDiscovery">
-      </command>
 
       <command
       		defaultHandler="org.jboss.tools.central.actions.NewProjectExamplesWizardHandler"
@@ -151,10 +146,6 @@
       </image>
       <image
             commandId="org.jboss.tools.central.refreshJBossTutorials"
-            icon="icons/refresh.gif">
-      </image>
-      <image
-            commandId="org.jboss.tools.central.refreshDiscovery"
             icon="icons/refresh.gif">
       </image>
       <image
