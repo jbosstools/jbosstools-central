@@ -17,8 +17,8 @@
 		<module>org.jboss.tools.project.examples</module>
 		<module>org.jboss.tools.maven.project.examples</module>
 		<module>org.jboss.tools.project.examples.cheatsheet</module>
-		<!--
 		<module>org.jboss.tools.project.examples.seam</module>	
+		<!--
 		<module>org.jboss.tools.project.examples.core</module>
 		<module>org.jboss.tools.project.examples.registry</module>	
 		-->		

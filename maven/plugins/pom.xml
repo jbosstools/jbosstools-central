@@ -14,6 +14,7 @@
 	<packaging>pom</packaging>
 	<modules>
 		<module>org.jboss.tools.maven.core</module>
+		<module>org.jboss.tools.maven.seam</module>
 		<module>org.jboss.tools.maven.ui</module>
 		<module>org.jboss.tools.maven.cdi</module>
 		<module>org.jboss.tools.maven.hibernate</module>
@@ -23,9 +24,6 @@
 		<module>org.jboss.tools.maven.conversion.ui</module>
 		<module>org.jboss.tools.maven.jdt</module>
 		<module>org.jboss.tools.maven.springboot</module>
-		<!--
-		<module>org.jboss.tools.maven.seam</module>
-		-->
      </modules>
 </project>
 	
