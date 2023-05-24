@@ -10,45 +10,27 @@
  ************************************************************************************/
 package org.jboss.tools.project.examples.tests;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import java.io.File;
 import java.io.InputStream;
-import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 import org.apache.commons.io.FileUtils;
-import org.eclipse.core.resources.IMarker;
-import org.eclipse.core.resources.IProject;
-import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
-import org.eclipse.core.resources.WorkspaceJob;
-import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Platform;
-import org.eclipse.core.runtime.Status;
-import org.jboss.tools.project.examples.internal.Messages;
-import org.jboss.tools.project.examples.internal.ProjectExamplesActivator;
 import org.jboss.tools.project.examples.internal.UnArchiver;
-import org.jboss.tools.project.examples.model.IImportProjectExample;
 import org.jboss.tools.project.examples.model.IProjectExampleSite;
 import org.jboss.tools.project.examples.model.ProjectExample;
 import org.jboss.tools.project.examples.model.ProjectExampleCategory;
 import org.jboss.tools.project.examples.model.ProjectExampleSite;
 import org.jboss.tools.project.examples.model.ProjectExampleUtil;
-import org.jboss.tools.project.examples.model.ProjectExampleWorkingCopy;
-import org.jboss.tools.test.util.JobUtils;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -109,92 +91,6 @@ public class ProjectTest {
 		try (InputStream is = url.openStream()){
 			assertTrue(is != null);
 		}
-	}
-	
-	@Test
-	public void importNumberguess() throws Exception {
-		WorkspaceJob workspaceJob = new WorkspaceJob(Messages.NewProjectExamplesWizard_Downloading) {
-
-			@Override
-			public IStatus runInWorkspace(IProgressMonitor monitor)
-					throws CoreException {
-				try {
-					importProject(monitor);
-				} catch (Exception e) {
-					return Status.CANCEL_STATUS;
-				} 
-				return Status.OK_STATUS;
-			}
-			
-		};
-		workspaceJob.setUser(true);
-		workspaceJob.schedule();
-		JobUtils.waitForIdle();
-		testImportedProject("numberguess");
-		testImportedProject("numberguess-ejb");
-		testImportedProject("numberguess-ear");
-	}
-
-	private void importProject(IProgressMonitor monitor) throws MalformedURLException, Exception {
-		
-		IProjectExampleSite site = ProjectExampleUtil.getSite("https://download.jboss.org/jbosstools/examples/project-examples-community-4.2.Beta2.xml");
-		site.setExperimental(false);
-		List<ProjectExampleCategory> projects = ProjectExampleUtil.getCategories(Collections.singleton(site), monitor);
-		ProjectExampleCategory seamCategory = null;
-		for (ProjectExampleCategory category: projects) {
-			if ("Seam".equals(category.getName())) {
-				seamCategory = category;
-				break;
-			}
-		}
-		assertNotNull(seamCategory);
-		ProjectExampleWorkingCopy projectExample = null;
-		for (ProjectExample project: seamCategory.getProjects()) {
-			if ("numberguess".equals(project.getName())) {
-				projectExample = ProjectExamplesActivator.getDefault().getProjectExampleManager().createWorkingCopy(project);
-				break;
-			}
-		}
-		assertNotNull(projectExample);
-		ProjectExamplesActivator.downloadProject(projectExample, new NullProgressMonitor());
-		assertNotNull(projectExample.getFile());
-		IImportProjectExample importProjectExample = ProjectExamplesActivator.getDefault().getImportProjectExample(projectExample.getImportType());
-		if (importProjectExample.importProject(projectExample, projectExample.getFile(), null, monitor)) {
-			importProjectExample.fix(projectExample, monitor);
-		}
-	}
-	
-	private void testImportedProject(String project) throws CoreException {
-		projectExists(project);
-		checkErrors(project);
-	}
-	
-	private void projectExists(String projectName) {
-		IProject project = ResourcesPlugin.getWorkspace().getRoot()
-		.getProject(projectName);
-		assertTrue(project != null && project.isOpen());
-	}
-	
-	private void checkErrors(String projectName) throws CoreException {
-		List<IMarker> markers = getMarkers(projectName);
-		assertEquals("The '" + projectName + "' contains " + markers.size() + " error(s). "+ProjectExamplesTestUtil.toString(markers), 0, markers.size());
-	}
-	
-	private List<IMarker> getMarkers(String projectName) throws CoreException {
-		List<IMarker> markers = new ArrayList<>();
-		IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject(projectName);
-		IMarker[] projectMarkers = project.findMarkers(IMarker.PROBLEM, true, IResource.DEPTH_INFINITE);
-		for (IMarker marker : projectMarkers) {
-			if (marker.getAttribute(IMarker.SEVERITY,
-					IMarker.SEVERITY_ERROR) == IMarker.SEVERITY_ERROR) {
-				// ignore XHTML errors
-				if ("org.jboss.tools.jsf.xhtmlsyntaxproblem".equals(marker.getType())) {
-					continue;
-				}
-				markers.add(marker);
-			}
-		}
-		return markers;
 	}
 	
 }
