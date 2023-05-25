@@ -14,14 +14,14 @@
 	<packaging>pom</packaging>
 	<modules>
 		<module>org.jboss.tools.maven.feature</module>
-		<module>org.jboss.tools.maven.seam.feature</module>
 		<module>org.jboss.tools.maven.cdi.feature</module>
 		<module>org.jboss.tools.maven.hibernate.feature</module>
 		<module>org.jboss.tools.maven.test.feature</module>
-		<module>org.jboss.tools.maven.jbosspackaging.feature</module>	
+		<module>org.jboss.tools.maven.jbosspackaging.feature</module>
 		<module>org.jboss.tools.maven.sourcelookup.feature</module>
 		<module>org.jboss.tools.maven.jdt.feature</module>
 		<module>org.jboss.tools.maven.springboot.feature</module>
+		<!-- <module>org.jboss.tools.maven.seam.feature</module> -->
 	</modules>
 	<build>
 		<plugins>

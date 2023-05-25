@@ -20,8 +20,6 @@ import org.jboss.tools.project.examples.fixes.IProjectExamplesFix;
 import org.jboss.tools.project.examples.fixes.ProjectFixManager;
 import org.jboss.tools.project.examples.fixes.UIHandler;
 import org.jboss.tools.project.examples.model.RequirementModel;
-import org.jboss.tools.project.examples.seam.internal.fixes.SeamRuntimeFix;
-import org.jboss.tools.project.examples.seam.internal.fixes.SeamRuntimeFixUIHandler;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -50,7 +48,6 @@ public class ProjectFixManagerParameterizedTest {
 	public static Collection<Object[]> loadParameters() {
 		List<Object[]> params = new ArrayList<>();
 		params.add(new Object[] {"plugin", PluginFix.class, PluginFixUIHandler.class});
-		params.add(new Object[] {"seam", SeamRuntimeFix.class, SeamRuntimeFixUIHandler.class});
 		params.add(new Object[] {"wtpruntime", WTPRuntimeFix.class, WTPRuntimeFixUIHandler.class});
 		params.add(new Object[] {"unknown-fix", UnsupportedFixProvider.NoopFix.class, UnsupportedFixProvider.NoOpUIHandler.class});
 		return params;

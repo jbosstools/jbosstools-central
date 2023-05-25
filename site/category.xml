@@ -33,12 +33,10 @@
 
 	<feature id="org.jboss.tools.project.examples.feature"><category name="AllFeatures"/></feature>
 	<feature id="org.jboss.tools.community.project.examples.feature"><category name="AllFeatures"/></feature>
-	<feature id="org.jboss.tools.project.examples.seam.feature"><category name="AllFeatures"/></feature>
 	<feature id="org.jboss.tools.project.examples.test.feature"><category name="AllFeatures"/></feature>	
 	<!-- Sources -->
 	<feature id="org.jboss.tools.project.examples.feature.source"><category name="AllSources"/></feature>
 	<feature id="org.jboss.tools.community.project.examples.feature.source"><category name="AllSources"/></feature>
-	<feature id="org.jboss.tools.project.examples.seam.feature.source"><category name="AllSources"/></feature>
 	<feature id="org.jboss.tools.project.examples.test.feature.source"><category name="AllSources"/></feature>
 
 <!-- launcher -->
@@ -52,7 +50,6 @@
 <!-- maven -->
 
 	<feature id="org.jboss.tools.maven.feature"><category name="AllFeatures"/></feature>
-	<feature id="org.jboss.tools.maven.seam.feature"><category name="AllFeatures"/></feature>
 	<feature id="org.jboss.tools.maven.cdi.feature"><category name="AllFeatures"/></feature>
 	<feature id="org.jboss.tools.maven.springboot.feature"><category name="AllFeatures"/></feature>
 	<feature id="org.jboss.tools.maven.hibernate.feature"><category name="AllFeatures"/></feature>
@@ -63,7 +60,6 @@
 	<feature id="org.jboss.tools.maven.jdt.feature"><category name="AllFeatures"/></feature>    
 	<!-- Sources --> 
 	<feature id="org.jboss.tools.maven.feature.source"><category name="AllSources"/></feature>
-	<feature id="org.jboss.tools.maven.seam.feature.source"><category name="AllSources"/></feature>
 	<feature id="org.jboss.tools.maven.cdi.feature.source"><category name="AllSources"/></feature>
 	<feature id="org.jboss.tools.maven.springboot.feature.source"><category name="AllSources"/></feature>
 	<feature id="org.jboss.tools.maven.hibernate.feature.source"><category name="AllSources"/></feature>

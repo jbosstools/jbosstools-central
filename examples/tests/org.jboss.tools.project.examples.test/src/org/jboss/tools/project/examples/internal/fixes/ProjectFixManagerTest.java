@@ -20,7 +20,6 @@ import org.jboss.tools.project.examples.internal.fixes.UnsupportedFixProvider.No
 import org.jboss.tools.project.examples.model.ProjectExample;
 import org.jboss.tools.project.examples.model.ProjectExampleWorkingCopy;
 import org.jboss.tools.project.examples.model.RequirementModel;
-import org.jboss.tools.project.examples.seam.internal.fixes.SeamRuntimeFix;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -66,6 +65,5 @@ public class ProjectFixManagerTest {
 		assertEquals(PluginFix.class, workingCopy.getFixes().get(0).getClass());
 		assertEquals(NoopFix.class, workingCopy.getFixes().get(1).getClass());
 		assertEquals(WTPRuntimeFix.class, workingCopy.getFixes().get(2).getClass());
-		assertEquals(SeamRuntimeFix.class, workingCopy.getFixes().get(3).getClass());
 	}
 }

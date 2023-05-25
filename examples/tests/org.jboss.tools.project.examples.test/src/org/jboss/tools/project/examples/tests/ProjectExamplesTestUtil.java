@@ -52,9 +52,6 @@ import org.eclipse.wst.server.core.ServerCore;
 import org.eclipse.wst.server.core.ServerUtil;
 import org.eclipse.wst.server.core.internal.RuntimeWorkingCopy;
 import org.eclipse.wst.server.core.internal.ServerWorkingCopy;
-import org.jboss.tools.seam.core.project.facet.SeamRuntime;
-import org.jboss.tools.seam.core.project.facet.SeamRuntimeManager;
-import org.jboss.tools.seam.core.project.facet.SeamVersion;
 
 /**
  * @author snjeza
@@ -94,11 +91,6 @@ public class ProjectExamplesTestUtil {
 
 	public static final String JBOSS_AS_SERVER_ID = "org.jboss.ide.eclipse.as.42";
 
-	public static final String SEAM_HOME_PROPERTY = System.getProperty(
-			"jbosstools.test.seam.2.0.1.GA.home",
-			"target/requirements/jboss-seam-2.0.1.GA".replace('/',
-					File.separatorChar));
-
 	public static final String HSQLDB_DRIVER_JAR_NAME = "hsqldb.jar"; //$NON-NLS-1$
 
 	public static final String HSQLDB_DRIVER_LOCATION = "/common/lib/" + HSQLDB_DRIVER_JAR_NAME; //$NON-NLS-1$
@@ -113,9 +105,6 @@ public class ProjectExamplesTestUtil {
 
 		createJBossServer(new File(asLocation), serverType, runtimeType,
 				JBOSS_AS_SERVER_NAME, JBOSS_AS_RUNTIME_NAME);
-
-		String seamPath = SEAM_HOME_PROPERTY;
-		createSeamRuntime(SEAM_RUNTIME_NAME, seamPath, SeamVersion.SEAM_2_0);
 
 		createDriver(asLocation, HSQLDB_DRIVER_LOCATION);
 	}
@@ -324,24 +313,6 @@ public class ProjectExamplesTestUtil {
 
 		server.save(false, progressMonitor);
 		return server;
-	}
-
-	public static void createSeamRuntime(String name, String seamPath,
-			SeamVersion seamVersion) {
-		SeamRuntime seamRuntime = SeamRuntimeManager.getInstance()
-				.findRuntimeByName(name);
-		if (seamRuntime != null) {
-			return;
-		}
-		File seamFolder = new File(seamPath);
-		if (seamFolder.exists() && seamFolder.isDirectory()) {
-			SeamRuntime rt = new SeamRuntime();
-			rt.setHomeDir(seamPath);
-			rt.setName(name);
-			rt.setDefault(true);
-			rt.setVersion(seamVersion);
-			SeamRuntimeManager.getInstance().addRuntime(rt);
-		}
 	}
 
 	public static String toString(Collection<IMarker> markers) {
