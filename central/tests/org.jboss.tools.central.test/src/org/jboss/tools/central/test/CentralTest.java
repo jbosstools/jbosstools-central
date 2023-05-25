@@ -87,7 +87,7 @@ public class CentralTest {
 		Map<ProjectExampleCategory, List<ProjectExample>> categories = RefreshTutorialsJob.INSTANCE
 				.getTutorialCategories();
 		assertNotNull(categories);
-		assertFalse("No tutorial found", categories.isEmpty());
+		assertFalse("No tutorial found, is https://download.jboss.org/jbosstools/configuration/ide-config.properties properly configured ?", categories.isEmpty());
 	}
 
 	@Test

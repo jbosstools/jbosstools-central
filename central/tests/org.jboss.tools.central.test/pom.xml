@@ -11,4 +11,10 @@
 	<artifactId>org.jboss.tools.central.test</artifactId>
 
 	<packaging>eclipse-test-plugin</packaging>
+	
+	<properties>
+		<!-- workaround of https://www.eclipse.org/eclipse/news/4.28/platform.php#force-https to use local jetty on http-->
+		<systemProperties>-Dp2.httpRule=allow</systemProperties>
+	</properties>
+	
 </project>
