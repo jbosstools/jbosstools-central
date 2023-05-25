@@ -99,13 +99,7 @@ public class JBossCentralEditor extends SharedHeaderFormEditor {
 
 	private AbstractJBossCentralPage gettingStartedPage;
 
-	private SoftwarePage softwarePage;
-
 	private Image gettingStartedImage;
-	private Image softwareImage;
-
-	private Composite settingsComposite;
-
 	private Composite toolbarComposite;
 
 	private Composite searchComposite;
@@ -120,14 +114,9 @@ public class JBossCentralEditor extends SharedHeaderFormEditor {
 	@Override
 	public void dispose() {
 		gettingStartedPage = null;
-		softwarePage = null;
 		if (gettingStartedImage != null) {
 			gettingStartedImage.dispose();
 			gettingStartedImage = null;
-		}
-		if (softwareImage != null) {
-			softwareImage.dispose();
-			softwareImage = null;
 		}
 		Job.getJobManager().cancel(JBossCentralActivator.JBOSS_CENTRAL_FAMILY); 
 		try {
@@ -197,13 +186,6 @@ public class JBossCentralEditor extends SharedHeaderFormEditor {
 			}
 			setPageImage(index, gettingStartedImage);
 
-			softwarePage = new SoftwarePage(this);
-			index = addPage(softwarePage);
-			if (softwareImage == null) {
-				softwareImage = JBossCentralActivator.getImageDescriptor(
-						"/icons/software.png").createImage();
-			}
-			setPageImage(index, softwareImage);
 		} catch (PartInitException e) {
 			JBossCentralActivator.log(e, "Error adding page");
 		}
@@ -440,14 +422,6 @@ public class JBossCentralEditor extends SharedHeaderFormEditor {
 	private Image getHeaderImage() {
 		return JBossCentralActivator.getDefault().getConfigurator()
 				.getHeaderImage();
-	}
-
-	public AbstractJBossCentralPage getGettingStartedPage() {
-		return gettingStartedPage;
-	}
-
-	public SoftwarePage getSoftwarePage() {
-		return softwarePage;
 	}
 
 	private class HeaderText {
