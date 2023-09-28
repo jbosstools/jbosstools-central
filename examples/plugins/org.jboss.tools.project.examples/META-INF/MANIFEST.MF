@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: %BundleName
 Bundle-SymbolicName: org.jboss.tools.project.examples;singleton:=true
-Bundle-Version: 3.3.0.qualifier
+Bundle-Version: 3.3.100.qualifier
 Bundle-Activator: org.jboss.tools.project.examples.internal.ProjectExamplesActivator
 Bundle-Vendor: %BundleVendor
 Require-Bundle: org.eclipse.ui,
@@ -65,7 +65,6 @@ Export-Package: org.jboss.tools.project.examples,
  org.jboss.tools.project.examples.wizard
 Bundle-RequiredExecutionEnvironment: JavaSE-11
 Import-Package: com.sun.xml.bind.v2;version="2.3.3",
- javax.activation;version="1.2.2",
  javax.xml.bind;version="2.3.3",
  javax.xml.bind.annotation;version="2.3.3",
  javax.xml.bind.annotation.adapters;version="2.3.3"
