@@ -19,7 +19,6 @@
 		<module>maven</module>
 		<module>examples</module>
 		<module>central</module>
-		<module>launcher</module>
 		<module>site</module>
 	</modules>
 
