@@ -253,15 +253,6 @@
           requiredComponentIds="org.jboss.tools.quarkus.feature">
       </proxyWizard>
       <proxyWizard
-          id="launcher.wizard"
-          description="%launcher.wizard.description"
-          label="Launcher Application"
-          priority="2"
-          iconPath="icons/fabric8_icon_16px.png"
-          wizardId="org.jboss.tools.common.launcher.ui.wizard.newProjectWizard"
-          requiredComponentIds="org.jboss.tools.common.launcher.feature">
-      </proxyWizard>
-      <proxyWizard
           id="maven.wizard"
           description="%maven.wizard.description"
           label="Maven Project"
